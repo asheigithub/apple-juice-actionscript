@@ -1,0 +1,57 @@
+﻿Namespace AS3
+    Public Class AS3Try
+        Implements IAS3Stmt
+
+        Public TryBlock As List(Of IAS3Stmt)
+
+        Public CatchList As New List(Of AS3Catch)
+
+        Public FinallyBlock As List(Of IAS3Stmt)
+
+        Public Sub Write(tabs As Integer, srcout As ISrcOut) Implements IAS3Stmt.Write
+
+           
+
+
+            srcout.WriteLn("try", tabs)
+            srcout.WriteLn("{", tabs)
+
+            For Each b In TryBlock
+                b.Write(tabs + 1, srcout)
+            Next
+
+            srcout.WriteLn("}", tabs)
+
+            For Each c In CatchList
+                srcout.WriteLn("catch (" & c.CatchVariable.Name & ":" & c.CatchVariable.TypeStr & ")", tabs)
+                srcout.WriteLn("{", tabs)
+
+                For Each cb In c.CatchBlock
+                    cb.Write(tabs + 1, srcout)
+                Next
+
+                srcout.WriteLn("}", tabs)
+            Next
+
+            srcout.WriteLn("finally", tabs)
+            srcout.WriteLn("{", tabs)
+
+            For Each b In FinallyBlock
+                b.Write(tabs + 1, srcout)
+            Next
+            srcout.WriteLn("}", tabs)
+
+        End Sub
+    End Class
+
+    Public Class AS3Catch
+        Public CatchVariable As AS3Variable
+
+        Public CatchBlock As List(Of IAS3Stmt)
+
+    End Class
+
+
+
+End Namespace
+

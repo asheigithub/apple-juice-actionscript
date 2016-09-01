@@ -1,0 +1,48 @@
+﻿Namespace AS3
+    Public Class AS3Const
+        Inherits AS3Member
+
+        Public Sub New(token As Token)
+            MyBase.New(token)
+        End Sub
+
+        Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
+
+            If Not Meta Is Nothing Then
+                Meta.Write(tabs, srcout)
+            End If
+
+            Dim defalutvalue As String = ""
+            'If Not ValueExpr Is Nothing Then
+            '    defalutvalue = " =" & ValueExpr.ToString()
+            'End If
+
+            If Not ValueExpr Is Nothing Then
+                ValueExpr.Write(tabs, srcout)
+
+                If Not (Not ValueExpr.Value.IsReg AndAlso ValueExpr.Value.Data.FF1Type = Expr.FF1DataValueType.as3_function) Then
+                    defalutvalue = " =" & ValueExpr.Value.ToString()
+                End If
+
+
+            End If
+
+            If Not ValueExpr Is Nothing AndAlso _
+                (Not ValueExpr.Value.IsReg AndAlso ValueExpr.Value.Data.FF1Type = Expr.FF1DataValueType.as3_function) Then
+
+
+                srcout.WriteLn(Access.ToString() & "const " & Name & ":" & TypeStr & "=", tabs)
+
+                CType(ValueExpr.Value.Data.Value, AS3Function).Write(tabs, srcout)
+
+                srcout.WriteLn(";", tabs)
+
+            Else
+                srcout.WriteLn(Access.ToString() & "const " & Name & ":" & TypeStr & defalutvalue & ";", tabs)
+            End If
+
+        End Sub
+
+    End Class
+End Namespace
+

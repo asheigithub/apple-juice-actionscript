@@ -1,0 +1,808 @@
+﻿Select Case node.GrammerLeftNode.Name
+	Case "PACKAGE"
+		_PACKAGE(node)
+	Case "PACKAGE_NAME"
+		_PACKAGE_NAME(node)
+	Case "PACKAGEBODY"
+		_PACKAGEBODY(node)
+	Case "OUT_PACKAGE"
+		_OUT_PACKAGE(node)
+	Case "PACKAGE_STMTS"
+		_PACKAGE_STMTS(node)
+	Case "ClassPath"
+		_ClassPath(node)
+	Case "PACKAGE_STMT"
+		_PACKAGE_STMT(node)
+	Case "PACKAGE_STMTS1"
+		_PACKAGE_STMTS1(node)
+	Case "PACKAGE_BLOCK"
+		_PACKAGE_BLOCK(node)
+	Case "PACKAGE_BLOCK_2"
+		_PACKAGE_BLOCK_2(node)
+	Case "PACKAGE_EXPR"
+		_PACKAGE_EXPR(node)
+	Case "ACCESS_DEF"
+		_ACCESS_DEF(node)
+	Case "Syntax"
+		_Syntax(node)
+	Case "Import"
+		_Import(node)
+	Case "Import_ClassPath"
+		_Import_ClassPath(node)
+	Case "Import_ClassName"
+		_Import_ClassName(node)
+	Case "Import_ClassPath_1"
+		_Import_ClassPath_1(node)
+	Case "Use"
+		_Use(node)
+	Case "ClassName"
+		_ClassName(node)
+	Case "ClassPath_1"
+		_ClassPath_1(node)
+	Case "ClassMetaProperty"
+		_ClassMetaProperty(node)
+	Case "Access"
+		_Access(node)
+	Case "NameSpace"
+		_NameSpace(node)
+	Case "NameSpaceDefaultValue"
+		_NameSpaceDefaultValue(node)
+	Case "Expression"
+		_Expression(node)
+	Case "DefClass"
+		_DefClass(node)
+	Case "Extends"
+		_Extends(node)
+	Case "Implements"
+		_Implements(node)
+	Case "ClassBody"
+		_ClassBody(node)
+	Case "ImplList"
+		_ImplList(node)
+	Case "ImplList1"
+		_ImplList1(node)
+	Case "DefInterface"
+		_DefInterface(node)
+	Case "InterfaceName"
+		_InterfaceName(node)
+	Case "ACCESS_KEYWORD"
+		_ACCESS_KEYWORD(node)
+	Case "Function"
+		_Function(node)
+	Case "Const"
+		_Const(node)
+	Case "Variable"
+		_Variable(node)
+	Case "Stmts"
+		_Stmts(node)
+	Case "Stmt"
+		_Stmt(node)
+	Case "StmtList"
+		_StmtList(node)
+	Case "BLOCK"
+		_BLOCK(node)
+	Case "BP2"
+		_BP2(node)
+	Case "ACCESS_MEMBER"
+		_ACCESS_MEMBER(node)
+	Case "EatAnSemicolon"
+		_EatAnSemicolon(node)
+	Case "IF"
+		_IF(node)
+	Case "FOR_STMT"
+		_FOR_STMT(node)
+	Case "WHILE"
+		_WHILE(node)
+	Case "DO"
+		_DO(node)
+	Case "TRY"
+		_TRY(node)
+	Case "THROW"
+		_THROW(node)
+	Case "SWITCH"
+		_SWITCH(node)
+	Case "Return"
+		_Return(node)
+	Case "Break"
+		_Break(node)
+	Case "Continue"
+		_Continue(node)
+	Case "ACCESS_MEMBER_KEYWORD"
+		_ACCESS_MEMBER_KEYWORD(node)
+	Case "ExpressionList"
+		_ExpressionList(node)
+	Case "ID_EABLED_KEYWORD"
+		_ID_EABLED_KEYWORD(node)
+	Case "DefineType"
+		_DefineType(node)
+	Case "DefineTypeVector"
+		_DefineTypeVector(node)
+	Case "VariableDefineList"
+		_VariableDefineList(node)
+	Case "VariableDefine"
+		_VariableDefine(node)
+	Case "VariableDefineList1"
+		_VariableDefineList1(node)
+	Case "VariableName"
+		_VariableName(node)
+	Case "VariableDEFType"
+		_VariableDEFType(node)
+	Case "VariableDefaultValue"
+		_VariableDefaultValue(node)
+	Case "VariableType"
+		_VariableType(node)
+	Case "ConstDefineList"
+		_ConstDefineList(node)
+	Case "ConstDefine"
+		_ConstDefine(node)
+	Case "ConstDefineList1"
+		_ConstDefineList1(node)
+	Case "ConstName"
+		_ConstName(node)
+	Case "ConstDEFType"
+		_ConstDEFType(node)
+	Case "ConstDefaultValue"
+		_ConstDefaultValue(node)
+	Case "ConstType"
+		_ConstType(node)
+	Case "FunctionProperty"
+		_FunctionProperty(node)
+	Case "Parameters"
+		_Parameters(node)
+	Case "FunctionReturnType"
+		_FunctionReturnType(node)
+	Case "FunctionCode"
+		_FunctionCode(node)
+	Case "FunctionBody"
+		_FunctionBody(node)
+	Case "FunctionName"
+		_FunctionName(node)
+	Case "FunctionType"
+		_FunctionType(node)
+	Case "Parameter_list"
+		_Parameter_list(node)
+	Case "Parameter_Array"
+		_Parameter_Array(node)
+	Case "Parameter"
+		_Parameter(node)
+	Case "Parameter_list1"
+		_Parameter_list1(node)
+	Case "ParameterDEFType"
+		_ParameterDEFType(node)
+	Case "ParameterDefaultValue"
+		_ParameterDefaultValue(node)
+	Case "ParameterName"
+		_ParameterName(node)
+	Case "ParameterType"
+		_ParameterType(node)
+	Case "ReturnValue"
+		_ReturnValue(node)
+	Case "IFElse"
+		_IFElse(node)
+	Case "FORTYPE"
+		_FORTYPE(node)
+	Case "Each"
+		_Each(node)
+	Case "FOR_FORIN"
+		_FOR_FORIN(node)
+	Case "Each_TEMP1"
+		_Each_TEMP1(node)
+	Case "ForVar"
+		_ForVar(node)
+	Case "Each_TEMP2"
+		_Each_TEMP2(node)
+	Case "FOR_TEMP1"
+		_FOR_TEMP1(node)
+	Case "FOR_TEMP2"
+		_FOR_TEMP2(node)
+	Case "FOR"
+		_FOR(node)
+	Case "FORIN"
+		_FORIN(node)
+	Case "FORPART2"
+		_FORPART2(node)
+	Case "FORPART3"
+		_FORPART3(node)
+	Case "FORPART1"
+		_FORPART1(node)
+	Case "DO_CONDITION"
+		_DO_CONDITION(node)
+	Case "TRYBLOCK"
+		_TRYBLOCK(node)
+	Case "CATCHLIST"
+		_CATCHLIST(node)
+	Case "FINALLY"
+		_FINALLY(node)
+	Case "THROWEXCEPTION"
+		_THROWEXCEPTION(node)
+	Case "CATCH"
+		_CATCH(node)
+	Case "CATCHLIST1"
+		_CATCHLIST1(node)
+	Case "CATCHBLOCK"
+		_CATCHBLOCK(node)
+	Case "FINALLYBLOCK"
+		_FINALLYBLOCK(node)
+	Case "CASEBODY"
+		_CASEBODY(node)
+	Case "SWITCH_CASE"
+		_SWITCH_CASE(node)
+	Case "CASESTMT"
+		_CASESTMT(node)
+	Case "CASELIST"
+		_CASELIST(node)
+	Case "CASELIST1"
+		_CASELIST1(node)
+	Case "Assigning"
+		_Assigning(node)
+	Case "Ternary"
+		_Ternary(node)
+	Case "AssigningOpt"
+		_AssigningOpt(node)
+	Case "LogicOr"
+		_LogicOr(node)
+	Case "TernaryOpt"
+		_TernaryOpt(node)
+	Case "LogicAnd"
+		_LogicAnd(node)
+	Case "LogicOrOpt"
+		_LogicOrOpt(node)
+	Case "BitOr"
+		_BitOr(node)
+	Case "LogicAndOpt"
+		_LogicAndOpt(node)
+	Case "BitXor"
+		_BitXor(node)
+	Case "BitOrOpt"
+		_BitOrOpt(node)
+	Case "BitAnd"
+		_BitAnd(node)
+	Case "BitXorOpt"
+		_BitXorOpt(node)
+	Case "LogicEQ"
+		_LogicEQ(node)
+	Case "BitAndOpt"
+		_BitAndOpt(node)
+	Case "Logic"
+		_Logic(node)
+	Case "LogicEQOpt"
+		_LogicEQOpt(node)
+	Case "BitShift"
+		_BitShift(node)
+	Case "LogicOpt"
+		_LogicOpt(node)
+	Case "Plus"
+		_Plus(node)
+	Case "BitShiftOpt"
+		_BitShiftOpt(node)
+	Case "Multiply"
+		_Multiply(node)
+	Case "PlusOpt"
+		_PlusOpt(node)
+	Case "Unary"
+		_Unary(node)
+	Case "MultiplyOpt"
+		_MultiplyOpt(node)
+	Case "Unit"
+		_Unit(node)
+	Case "AccessOpt"
+		_AccessOpt(node)
+	Case "UnitSuffix"
+		_UnitSuffix(node)
+	Case "Call"
+		_Call(node)
+	Case "Object"
+		_Object(node)
+	Case "E4XAccess"
+		_E4XAccess(node)
+	Case "Array"
+		_Array(node)
+	Case "Vector"
+		_Vector(node)
+	Case "Argements"
+		_Argements(node)
+	Case "ArrayElements"
+		_ArrayElements(node)
+	Case "ArrayExpressionList"
+		_ArrayExpressionList(node)
+	Case "Expression_1"
+		_Expression_1(node)
+	Case "ArrayCommaOpt"
+		_ArrayCommaOpt(node)
+	Case "CommaOpt"
+		_CommaOpt(node)
+	Case "VectorConstructor"
+		_VectorConstructor(node)
+	Case "ObjectBody"
+		_ObjectBody(node)
+	Case "ObjMembers"
+		_ObjMembers(node)
+	Case "ObjMember"
+		_ObjMember(node)
+	Case "ObjMembers1"
+		_ObjMembers1(node)
+End Select
+
+Sub _PACKAGE(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_NAME(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGEBODY(node As GrammerExpr)
+
+End Sub
+Sub _OUT_PACKAGE(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_STMTS(node As GrammerExpr)
+
+End Sub
+Sub _ClassPath(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_STMT(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_STMTS1(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_BLOCK(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_BLOCK_2(node As GrammerExpr)
+
+End Sub
+Sub _PACKAGE_EXPR(node As GrammerExpr)
+
+End Sub
+Sub _ACCESS_DEF(node As GrammerExpr)
+
+End Sub
+Sub _Syntax(node As GrammerExpr)
+
+End Sub
+Sub _Import(node As GrammerExpr)
+
+End Sub
+Sub _Import_ClassPath(node As GrammerExpr)
+
+End Sub
+Sub _Import_ClassName(node As GrammerExpr)
+
+End Sub
+Sub _Import_ClassPath_1(node As GrammerExpr)
+
+End Sub
+Sub _Use(node As GrammerExpr)
+
+End Sub
+Sub _ClassName(node As GrammerExpr)
+
+End Sub
+Sub _ClassPath_1(node As GrammerExpr)
+
+End Sub
+Sub _ClassMetaProperty(node As GrammerExpr)
+
+End Sub
+Sub _Access(node As GrammerExpr)
+
+End Sub
+Sub _NameSpace(node As GrammerExpr)
+
+End Sub
+Sub _NameSpaceDefaultValue(node As GrammerExpr)
+
+End Sub
+Sub _Expression(node As GrammerExpr)
+
+End Sub
+Sub _DefClass(node As GrammerExpr)
+
+End Sub
+Sub _Extends(node As GrammerExpr)
+
+End Sub
+Sub _Implements(node As GrammerExpr)
+
+End Sub
+Sub _ClassBody(node As GrammerExpr)
+
+End Sub
+Sub _ImplList(node As GrammerExpr)
+
+End Sub
+Sub _ImplList1(node As GrammerExpr)
+
+End Sub
+Sub _DefInterface(node As GrammerExpr)
+
+End Sub
+Sub _InterfaceName(node As GrammerExpr)
+
+End Sub
+Sub _ACCESS_KEYWORD(node As GrammerExpr)
+
+End Sub
+Sub _Function(node As GrammerExpr)
+
+End Sub
+Sub _Const(node As GrammerExpr)
+
+End Sub
+Sub _Variable(node As GrammerExpr)
+
+End Sub
+Sub _Stmts(node As GrammerExpr)
+
+End Sub
+Sub _Stmt(node As GrammerExpr)
+
+End Sub
+Sub _StmtList(node As GrammerExpr)
+
+End Sub
+Sub _BLOCK(node As GrammerExpr)
+
+End Sub
+Sub _BP2(node As GrammerExpr)
+
+End Sub
+Sub _ACCESS_MEMBER(node As GrammerExpr)
+
+End Sub
+Sub _EatAnSemicolon(node As GrammerExpr)
+
+End Sub
+Sub _IF(node As GrammerExpr)
+
+End Sub
+Sub _FOR_STMT(node As GrammerExpr)
+
+End Sub
+Sub _WHILE(node As GrammerExpr)
+
+End Sub
+Sub _DO(node As GrammerExpr)
+
+End Sub
+Sub _TRY(node As GrammerExpr)
+
+End Sub
+Sub _THROW(node As GrammerExpr)
+
+End Sub
+Sub _SWITCH(node As GrammerExpr)
+
+End Sub
+Sub _Return(node As GrammerExpr)
+
+End Sub
+Sub _Break(node As GrammerExpr)
+
+End Sub
+Sub _Continue(node As GrammerExpr)
+
+End Sub
+Sub _ACCESS_MEMBER_KEYWORD(node As GrammerExpr)
+
+End Sub
+Sub _ExpressionList(node As GrammerExpr)
+
+End Sub
+Sub _ID_EABLED_KEYWORD(node As GrammerExpr)
+
+End Sub
+Sub _DefineType(node As GrammerExpr)
+
+End Sub
+Sub _DefineTypeVector(node As GrammerExpr)
+
+End Sub
+Sub _VariableDefineList(node As GrammerExpr)
+
+End Sub
+Sub _VariableDefine(node As GrammerExpr)
+
+End Sub
+Sub _VariableDefineList1(node As GrammerExpr)
+
+End Sub
+Sub _VariableName(node As GrammerExpr)
+
+End Sub
+Sub _VariableDEFType(node As GrammerExpr)
+
+End Sub
+Sub _VariableDefaultValue(node As GrammerExpr)
+
+End Sub
+Sub _VariableType(node As GrammerExpr)
+
+End Sub
+Sub _ConstDefineList(node As GrammerExpr)
+
+End Sub
+Sub _ConstDefine(node As GrammerExpr)
+
+End Sub
+Sub _ConstDefineList1(node As GrammerExpr)
+
+End Sub
+Sub _ConstName(node As GrammerExpr)
+
+End Sub
+Sub _ConstDEFType(node As GrammerExpr)
+
+End Sub
+Sub _ConstDefaultValue(node As GrammerExpr)
+
+End Sub
+Sub _ConstType(node As GrammerExpr)
+
+End Sub
+Sub _FunctionProperty(node As GrammerExpr)
+
+End Sub
+Sub _Parameters(node As GrammerExpr)
+
+End Sub
+Sub _FunctionReturnType(node As GrammerExpr)
+
+End Sub
+Sub _FunctionCode(node As GrammerExpr)
+
+End Sub
+Sub _FunctionBody(node As GrammerExpr)
+
+End Sub
+Sub _FunctionName(node As GrammerExpr)
+
+End Sub
+Sub _FunctionType(node As GrammerExpr)
+
+End Sub
+Sub _Parameter_list(node As GrammerExpr)
+
+End Sub
+Sub _Parameter_Array(node As GrammerExpr)
+
+End Sub
+Sub _Parameter(node As GrammerExpr)
+
+End Sub
+Sub _Parameter_list1(node As GrammerExpr)
+
+End Sub
+Sub _ParameterDEFType(node As GrammerExpr)
+
+End Sub
+Sub _ParameterDefaultValue(node As GrammerExpr)
+
+End Sub
+Sub _ParameterName(node As GrammerExpr)
+
+End Sub
+Sub _ParameterType(node As GrammerExpr)
+
+End Sub
+Sub _ReturnValue(node As GrammerExpr)
+
+End Sub
+Sub _IFElse(node As GrammerExpr)
+
+End Sub
+Sub _FORTYPE(node As GrammerExpr)
+
+End Sub
+Sub _Each(node As GrammerExpr)
+
+End Sub
+Sub _FOR_FORIN(node As GrammerExpr)
+
+End Sub
+Sub _Each_TEMP1(node As GrammerExpr)
+
+End Sub
+Sub _ForVar(node As GrammerExpr)
+
+End Sub
+Sub _Each_TEMP2(node As GrammerExpr)
+
+End Sub
+Sub _FOR_TEMP1(node As GrammerExpr)
+
+End Sub
+Sub _FOR_TEMP2(node As GrammerExpr)
+
+End Sub
+Sub _FOR(node As GrammerExpr)
+
+End Sub
+Sub _FORIN(node As GrammerExpr)
+
+End Sub
+Sub _FORPART2(node As GrammerExpr)
+
+End Sub
+Sub _FORPART3(node As GrammerExpr)
+
+End Sub
+Sub _FORPART1(node As GrammerExpr)
+
+End Sub
+Sub _DO_CONDITION(node As GrammerExpr)
+
+End Sub
+Sub _TRYBLOCK(node As GrammerExpr)
+
+End Sub
+Sub _CATCHLIST(node As GrammerExpr)
+
+End Sub
+Sub _FINALLY(node As GrammerExpr)
+
+End Sub
+Sub _THROWEXCEPTION(node As GrammerExpr)
+
+End Sub
+Sub _CATCH(node As GrammerExpr)
+
+End Sub
+Sub _CATCHLIST1(node As GrammerExpr)
+
+End Sub
+Sub _CATCHBLOCK(node As GrammerExpr)
+
+End Sub
+Sub _FINALLYBLOCK(node As GrammerExpr)
+
+End Sub
+Sub _CASEBODY(node As GrammerExpr)
+
+End Sub
+Sub _SWITCH_CASE(node As GrammerExpr)
+
+End Sub
+Sub _CASESTMT(node As GrammerExpr)
+
+End Sub
+Sub _CASELIST(node As GrammerExpr)
+
+End Sub
+Sub _CASELIST1(node As GrammerExpr)
+
+End Sub
+Sub _Assigning(node As GrammerExpr)
+
+End Sub
+Sub _Ternary(node As GrammerExpr)
+
+End Sub
+Sub _AssigningOpt(node As GrammerExpr)
+
+End Sub
+Sub _LogicOr(node As GrammerExpr)
+
+End Sub
+Sub _TernaryOpt(node As GrammerExpr)
+
+End Sub
+Sub _LogicAnd(node As GrammerExpr)
+
+End Sub
+Sub _LogicOrOpt(node As GrammerExpr)
+
+End Sub
+Sub _BitOr(node As GrammerExpr)
+
+End Sub
+Sub _LogicAndOpt(node As GrammerExpr)
+
+End Sub
+Sub _BitXor(node As GrammerExpr)
+
+End Sub
+Sub _BitOrOpt(node As GrammerExpr)
+
+End Sub
+Sub _BitAnd(node As GrammerExpr)
+
+End Sub
+Sub _BitXorOpt(node As GrammerExpr)
+
+End Sub
+Sub _LogicEQ(node As GrammerExpr)
+
+End Sub
+Sub _BitAndOpt(node As GrammerExpr)
+
+End Sub
+Sub _Logic(node As GrammerExpr)
+
+End Sub
+Sub _LogicEQOpt(node As GrammerExpr)
+
+End Sub
+Sub _BitShift(node As GrammerExpr)
+
+End Sub
+Sub _LogicOpt(node As GrammerExpr)
+
+End Sub
+Sub _Plus(node As GrammerExpr)
+
+End Sub
+Sub _BitShiftOpt(node As GrammerExpr)
+
+End Sub
+Sub _Multiply(node As GrammerExpr)
+
+End Sub
+Sub _PlusOpt(node As GrammerExpr)
+
+End Sub
+Sub _Unary(node As GrammerExpr)
+
+End Sub
+Sub _MultiplyOpt(node As GrammerExpr)
+
+End Sub
+Sub _Unit(node As GrammerExpr)
+
+End Sub
+Sub _AccessOpt(node As GrammerExpr)
+
+End Sub
+Sub _UnitSuffix(node As GrammerExpr)
+
+End Sub
+Sub _Call(node As GrammerExpr)
+
+End Sub
+Sub _Object(node As GrammerExpr)
+
+End Sub
+Sub _E4XAccess(node As GrammerExpr)
+
+End Sub
+Sub _Array(node As GrammerExpr)
+
+End Sub
+Sub _Vector(node As GrammerExpr)
+
+End Sub
+Sub _Argements(node As GrammerExpr)
+
+End Sub
+Sub _ArrayElements(node As GrammerExpr)
+
+End Sub
+Sub _ArrayExpressionList(node As GrammerExpr)
+
+End Sub
+Sub _Expression_1(node As GrammerExpr)
+
+End Sub
+Sub _ArrayCommaOpt(node As GrammerExpr)
+
+End Sub
+Sub _CommaOpt(node As GrammerExpr)
+
+End Sub
+Sub _VectorConstructor(node As GrammerExpr)
+
+End Sub
+Sub _ObjectBody(node As GrammerExpr)
+
+End Sub
+Sub _ObjMembers(node As GrammerExpr)
+
+End Sub
+Sub _ObjMember(node As GrammerExpr)
+
+End Sub
+Sub _ObjMembers1(node As GrammerExpr)
+
+End Sub
