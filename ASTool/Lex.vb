@@ -401,7 +401,7 @@ readnumber:
 
             End If
 
-            If csymobl.ToLower() = "e" Then
+            If Not csymobl Is Nothing AndAlso csymobl.ToLower() = "e" Then
                 Dim en1 = seeNextChar(input, currentptr)
 
                 If Not en1 Is Nothing AndAlso (en1 = "+" Or en1 = "-") Then
@@ -425,7 +425,7 @@ readnumber:
 
                 End If
 
-                
+
 
             End If
 

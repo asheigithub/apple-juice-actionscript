@@ -5,6 +5,9 @@
     ''' <remarks></remarks>
     Public Interface IAS3Stmt
         Sub Write(tabs As Integer, srcout As ISrcOut)
+
+        ReadOnly Property Token As Token
+
     End Interface
 End Namespace
 

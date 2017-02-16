@@ -1,7 +1,16 @@
 ﻿Namespace AS3
     Public Class AS3IF
         Implements IAS3Stmt
+        Private matchtoken As Token
+        Public Sub New(token As Token)
+            Me.matchtoken = token
+        End Sub
 
+        Public ReadOnly Property Token As Token Implements IAS3Stmt.Token
+            Get
+                Return matchtoken
+            End Get
+        End Property
         Public Condition As AS3StmtExpressions
 
         Public TruePass As List(Of IAS3Stmt)

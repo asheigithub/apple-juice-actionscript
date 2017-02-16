@@ -84,7 +84,7 @@
         ''' <remarks></remarks>
         Private Sub FindMemberType(member As AS3Member, srcfile As AS3SrcFile, import As List(Of AS3Import))
 
-            
+
             'Console.WriteLine(member.token.sourceFile & " 行" & member.token.line + 1 & " 列" & member.token.ptr & " " & member.TypeStr)
 
             Dim str = member.TypeStr
@@ -241,7 +241,7 @@
 
             Next
 
-            Dim fclass As New HashSet(Of IMemberDataType)
+            Dim fclass As HashSet(Of IMemberDataType)
 
             If typestr.IndexOf(".") >= 0 Then
                 '***完全限定***
@@ -304,5 +304,6 @@
 
 
     End Class
+
 End Namespace
 

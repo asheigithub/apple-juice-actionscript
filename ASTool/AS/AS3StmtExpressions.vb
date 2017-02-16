@@ -6,6 +6,17 @@
     Public Class AS3StmtExpressions
         Implements IAS3Stmt
 
+        Private matchtoken As Token
+        Public Sub New(token As Token)
+            Me.matchtoken = token
+        End Sub
+
+        Public ReadOnly Property Token As Token Implements IAS3Stmt.Token
+            Get
+                Return matchtoken
+            End Get
+        End Property
+
         'Public grammerExpr As GrammerExpr
 
         Public as3exprlist As List(Of AS3Expression)

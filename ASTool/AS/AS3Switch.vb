@@ -2,6 +2,17 @@
     Public Class AS3Switch
         Implements IAS3Stmt
 
+        Private matchtoken As Token
+        Public Sub New(token As Token)
+            Me.matchtoken = token
+        End Sub
+
+        Public ReadOnly Property Token As Token Implements IAS3Stmt.Token
+            Get
+                Return matchtoken
+            End Get
+        End Property
+
         Public Expr As AS3Expression
 
         Public CaseList As New List(Of AS3SwitchCase)

@@ -1,8 +1,9 @@
 ﻿Namespace AS3
     Public Class AS3SrcFile
-       
 
-        Public File As String
+
+
+        Public srcFile As String
 
         Public Package As AS3Package
 

@@ -136,10 +136,7 @@ Public Class Grammar
             Console.WriteLine()
 
         Next
-        'Console.WriteLine("终结符:")
-        'For Each e In termianlnodes.Values
-        '    Console.WriteLine(e.Name & vbTab & "FIRST{ " & String.Join(" , ", e.FIRST.Select(Function(n) """" & n.Name & """").ToArray()) & " }")
-        'Next
+
 
         '***生成预测分析表***
         M = New Dictionary(Of GrammarNode, Dictionary(Of GrammarNode, GrammarLine))()

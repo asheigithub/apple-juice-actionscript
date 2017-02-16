@@ -22,16 +22,19 @@ Module Module1
 
         Dim grammar As New Grammar(words)
 
-        parseAS3(grammar)
-        Return
+        'parseAS3(grammar)
+        'Return
 
-        'Dim teststring As String = "6/2/3+(3- 4) * (5 +6)+7 //;{123{;13+456;;}{}}"
 
-        Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
+        Dim teststring As String = "package{} 6/2/3+(3- 4) * (5 +6)+7//;{123{;13+456;;}{}}"
+
+        'Dim teststring As String = "package{} for(var i:int;i<5;i++){ (function($what){alert($what)})(i)} " '"package{ var i=new int(); }"
+
+        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files\Adobe Gaming SDK 1.3\Frameworks\Box2DFlashAS3 2.1a\Examples\General\Input.as")
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files\Adobe Gaming SDK 1.3\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
+        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files (x86)\Adobe Gaming SDK 1.4\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\SceneConsole.as")
 
 
@@ -55,7 +58,7 @@ Module Module1
         'Console.WriteLine(treestr)
 
         If grammar.hasErrorFF Then
-            Console.WriteLine(grammar.ErrorFFStr)
+            'Console.WriteLine(grammar.ErrorFFStr)
         End If
 
         If Not grammar.hasError Then
@@ -91,11 +94,11 @@ Module Module1
     Private Sub parseAS3(grammar As Grammar)
         'Dim rootpaths As String() = {"D:\fishluv_svn_repository\NewSG\trunk\program\client\SG2Mobile3\src",
         '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\implement",
-        '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\interface",
+        '                                "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\interface",
         '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\implement",
         '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\interface"}
 
-        'Dim rootpaths As String() = {"D:\flash-x\flashxTools\src"}
+        Dim rootpaths As String() = {"E:\新建文件夹\Box2DFlashAS3 2.1a\Source"}
 
         'Dim rootpaths As String() = {"D:\ASCRIPT\ascript-master\ascript-master\src"}
         'Dim rootpaths As String() = {" D:\flash-x\game\src"}
@@ -117,7 +120,7 @@ Module Module1
         'Dim rootpaths As String() = {"D:\flres\rjlwomanrun\view~\GytCoverFlow"}
         'Dim rootpaths As String() = {"D:\flres\rjlwomanrun\Components2(TransitionStyle)"}
 
-        Dim rootpaths As String() = {"D:\ASToolTestScript\src"}
+        'Dim rootpaths As String() = {"D:\ASToolTestScript\src"}
 
         'Dim rootpaths As String() = {"E:\layabox\MornUI\MornUI"}
 
@@ -168,8 +171,6 @@ Module Module1
         Next
 
 
-
-
         proj.Analyse()
 
 
@@ -181,145 +182,145 @@ Module Module1
     End Sub
 
 
-    Private visited As New HashSet(Of GrammerExpr)
-    Private numberstack As New Stack(Of Double)
-    ''' <summary>
-    ''' 前序遍历
-    ''' </summary>
-    ''' <param name="treenode"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Private Sub perorderVisit(treenode As GrammerExpr)
+    'Private visited As New HashSet(Of GrammerExpr)
+    'Private numberstack As New Stack(Of Double)
+    '''' <summary>
+    '''' 前序遍历
+    '''' </summary>
+    '''' <param name="treenode"></param>
+    '''' <returns></returns>
+    '''' <remarks></remarks>
+    'Private Sub perorderVisit(treenode As GrammerExpr)
 
-        If visited.Contains(treenode) Then
-            Return
-        Else
-            visited.Add(treenode)
-        End If
-
-
-        If treenode.GrammerLeftNode.Name = "Expression" Then
-            perorderVisit(treenode.Nodes(0))
-        ElseIf treenode.GrammerLeftNode.Name = "PlusOpt" _
-            Or treenode.GrammerLeftNode.Name = "MultiplyOpt" Then
-
-            If treenode.Nodes.Count > 0 Then
-                perorderVisit(treenode.Nodes(1))
-
-                Dim v2 = numberstack.Pop()
-                Dim v1 = numberstack.Pop()
-
-                Console.Write(treenode.Nodes(0).MatchedToken.StringValue)
+    '    If visited.Contains(treenode) Then
+    '        Return
+    '    Else
+    '        visited.Add(treenode)
+    '    End If
 
 
-                Select Case treenode.Nodes(0).MatchedToken.StringValue
-                    Case "+"
-                        numberstack.Push(v1 + v2)
-                    Case "-"
-                        numberstack.Push(v1 - v2)
-                    Case "*"
-                        numberstack.Push(v1 * v2)
-                    Case "/"
-                        numberstack.Push(v1 / v2)
-                    Case Else
+    '    If treenode.GrammerLeftNode.Name = "Expression" Then
+    '        perorderVisit(treenode.Nodes(0))
+    '    ElseIf treenode.GrammerLeftNode.Name = "PlusOpt" _
+    '        Or treenode.GrammerLeftNode.Name = "MultiplyOpt" Then
 
-                End Select
+    '        If treenode.Nodes.Count > 0 Then
+    '            perorderVisit(treenode.Nodes(1))
 
+    '            Dim v2 = numberstack.Pop()
+    '            Dim v1 = numberstack.Pop()
 
-            End If
-
-        ElseIf treenode.GrammerLeftNode.Name = "Multiply" Then
-            perorderVisit(treenode.Nodes(0))
-        ElseIf treenode.GrammerLeftNode.Name = "Unit" Then
-            If treenode.Nodes.Count > 1 Then
-                perorderVisit(treenode.Nodes(1))
-            Else
-                numberstack.Push(Double.Parse(treenode.Nodes(0).MatchedToken.StringValue))
-
-                Console.Write(treenode.Nodes(0).MatchedToken.StringValue)
-            End If
-
-        End If
-
-        For Each node In treenode.Nodes
-            perorderVisit(node)
-        Next
+    '            Console.Write(treenode.Nodes(0).MatchedToken.StringValue)
 
 
-    End Sub
+    '            Select Case treenode.Nodes(0).MatchedToken.StringValue
+    '                Case "+"
+    '                    numberstack.Push(v1 + v2)
+    '                Case "-"
+    '                    numberstack.Push(v1 - v2)
+    '                Case "*"
+    '                    numberstack.Push(v1 * v2)
+    '                Case "/"
+    '                    numberstack.Push(v1 / v2)
+    '                Case Else
+
+    '            End Select
 
 
+    '        End If
 
-    Private Function getTreevalue(treenode As GrammerExpr) As String
-        If treenode.GrammerLeftNode.Type = GrammarNodeType.non_terminal Then
-            Dim result As String = ""
+    '    ElseIf treenode.GrammerLeftNode.Name = "Multiply" Then
+    '        perorderVisit(treenode.Nodes(0))
+    '    ElseIf treenode.GrammerLeftNode.Name = "Unit" Then
+    '        If treenode.Nodes.Count > 1 Then
+    '            perorderVisit(treenode.Nodes(1))
+    '        Else
+    '            numberstack.Push(Double.Parse(treenode.Nodes(0).MatchedToken.StringValue))
+
+    '            Console.Write(treenode.Nodes(0).MatchedToken.StringValue)
+    '        End If
+
+    '    End If
+
+    '    For Each node In treenode.Nodes
+    '        perorderVisit(node)
+    '    Next
 
 
-            For i = 0 To treenode.Nodes.Count - 1
-                Dim temptv = getTreevalue(treenode.Nodes(i))
-
-
-                result = result & temptv
-            Next
+    'End Sub
 
 
 
+    'Private Function getTreevalue(treenode As GrammerExpr) As String
+    '    If treenode.GrammerLeftNode.Type = GrammarNodeType.non_terminal Then
+    '        Dim result As String = ""
 
-            Return result
 
-        Else
+    '        For i = 0 To treenode.Nodes.Count - 1
+    '            Dim temptv = getTreevalue(treenode.Nodes(i))
 
-            Return treenode.MatchedToken.StringValue
-        End If
-    End Function
+
+    '            result = result & temptv
+    '        Next
 
 
 
 
+    '        Return result
 
-    Private Sub ReadAllUsedImage()
-        Dim rootpaths As String() = {"D:\fishluv_svn_repository\NewSG\trunk\program\client\SG2Mobile3\src"
-                                     }
+    '    Else
 
-        Dim files As New List(Of String)
-        For Each r In rootpaths
-            files.AddRange(My.Computer.FileSystem.GetFiles(r, FileIO.SearchOption.SearchAllSubDirectories, "*.as"))
-        Next
-
-        Dim str As New HashSet(Of String)
-
-        For Each asfile In files
-            Dim lex As New Lex(asfile)
-
-            Dim tokens = lex.GetWords(My.Computer.FileSystem.ReadAllText(asfile))
-            For i = 0 To tokens.Count - 1
-                If tokens(i).Type = Token.TokenType.const_string Then
-                    str.Add(tokens(i).StringValue)
-                End If
-            Next
-        Next
-
-        
-
-        Dim pngs = My.Computer.FileSystem.GetFiles("D:\fishluv_svn_repository\NewSG\trunk\program\client\R___UIImages\commimages1", FileIO.SearchOption.SearchAllSubDirectories, "*.png")
-
-        Dim gameimages As New List(Of String)
-
-        For Each p In pngs
-            Dim np = p.Replace("D:\fishluv_svn_repository\NewSG\trunk\program\client\R___UIImages\commimages1\", "commimage1/").Replace("\", "/")
-
-            If Not str.Contains(np) Then
-                Console.WriteLine(np)
-            End If
-
-        Next
+    '        Return treenode.MatchedToken.StringValue
+    '    End If
+    'End Function
 
 
 
 
-        Console.ReadLine()
+
+    'Private Sub ReadAllUsedImage()
+    '    Dim rootpaths As String() = {"D:\fishluv_svn_repository\NewSG\trunk\program\client\SG2Mobile3\src"
+    '                                 }
+
+    '    Dim files As New List(Of String)
+    '    For Each r In rootpaths
+    '        files.AddRange(My.Computer.FileSystem.GetFiles(r, FileIO.SearchOption.SearchAllSubDirectories, "*.as"))
+    '    Next
+
+    '    Dim str As New HashSet(Of String)
+
+    '    For Each asfile In files
+    '        Dim lex As New Lex(asfile)
+
+    '        Dim tokens = lex.GetWords(My.Computer.FileSystem.ReadAllText(asfile))
+    '        For i = 0 To tokens.Count - 1
+    '            If tokens(i).Type = Token.TokenType.const_string Then
+    '                str.Add(tokens(i).StringValue)
+    '            End If
+    '        Next
+    '    Next
 
 
-    End Sub
+
+    '    Dim pngs = My.Computer.FileSystem.GetFiles("D:\fishluv_svn_repository\NewSG\trunk\program\client\R___UIImages\commimages1", FileIO.SearchOption.SearchAllSubDirectories, "*.png")
+
+    '    Dim gameimages As New List(Of String)
+
+    '    For Each p In pngs
+    '        Dim np = p.Replace("D:\fishluv_svn_repository\NewSG\trunk\program\client\R___UIImages\commimages1\", "commimage1/").Replace("\", "/")
+
+    '        If Not str.Contains(np) Then
+    '            Console.WriteLine(np)
+    '        End If
+
+    '    Next
+
+
+
+
+    '    Console.ReadLine()
+
+
+    'End Sub
 
 End Module

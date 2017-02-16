@@ -161,7 +161,14 @@
 
         Public Arg3 As AS3DataStackElement
 
-        Public Arg4 As AS3DataStackElement
+        'Public Arg4 As AS3DataStackElement
+
+        Public token As Token
+
+        Public Sub New(token As Token)
+            Me.token = token
+        End Sub
+
 
 
         Private Shared flagseed As Integer
@@ -194,9 +201,9 @@
                 result = result & vbTab & Arg3.ToString()
             End If
 
-            If Not Arg4 Is Nothing Then
-                result = result & vbTab & Arg4.ToString()
-            End If
+            'If Not Arg4 Is Nothing Then
+            '    result = result & vbTab & Arg4.ToString()
+            'End If
 
 
             Return result

@@ -1,0 +1,11 @@
+D:\ASTool\ASCR\bin\Debug\ASCompiler.exe.config
+D:\ASTool\ASCR\obj\Debug\ASCompiler.exe
+D:\ASTool\ASCR\obj\Debug\ASCompiler.pdb
+D:\ASTool\ASCR\bin\Debug\ASCompiler.exe
+D:\ASTool\ASCR\bin\Debug\ASCompiler.pdb
+D:\ASTool\ASCR\bin\Debug\ASBinCode.dll
+D:\ASTool\ASCR\bin\Debug\ASTool.exe
+D:\ASTool\ASCR\bin\Debug\ASBinCode.pdb
+D:\ASTool\ASCR\bin\Debug\ASTool.pdb
+D:\ASTool\ASCR\bin\Debug\ASTool.xml
+D:\ASTool\ASCR\obj\Debug\ASCR.csprojResolveAssemblyReference.cache

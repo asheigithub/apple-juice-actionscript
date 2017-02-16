@@ -20,6 +20,12 @@
         ''' <remarks></remarks>
         Public Meta As AS3Meta
 
+        Private ReadOnly Property IAS3Stmt_Token As Token Implements IAS3Stmt.Token
+            Get
+                Return token
+            End Get
+        End Property
+
         Public Overridable Sub Write(tabs As Integer, srcout As ISrcOut) Implements IAS3Stmt.Write
 
         End Sub

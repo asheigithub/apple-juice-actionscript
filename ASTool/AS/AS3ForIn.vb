@@ -5,7 +5,16 @@
     ''' <remarks></remarks>
     Public Class AS3ForIn
         Implements IAS3Stmt
+        Private matchtoken As Token
+        Public Sub New(token As Token)
+            Me.matchtoken = token
+        End Sub
 
+        Public ReadOnly Property Token As Token Implements IAS3Stmt.Token
+            Get
+                Return matchtoken
+            End Get
+        End Property
         ''' <summary>
         ''' forin 变量部分 可能是AS3Variable 或者 AS3StmtExpressions
         ''' </summary>

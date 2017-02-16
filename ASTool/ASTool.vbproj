@@ -18,7 +18,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
@@ -111,7 +111,6 @@
     <Compile Include="AS\Expr\AS3Reg.vb" />
     <Compile Include="AS\IAS3MemberList.vb" />
     <Compile Include="AS\IAS3Stmt.vb" />
-    <Compile Include="AS\Runtime\AS3RuntimeData.vb" />
     <Compile Include="ConSrcOut.vb" />
     <Compile Include="FileSrcOut.vb" />
     <Compile Include="Grammar\AS3LexKeywords.vb" />
@@ -151,6 +150,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
