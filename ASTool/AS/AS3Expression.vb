@@ -8,6 +8,12 @@
 
         Public Value As AS3.Expr.AS3DataStackElement
 
+        Public token As Token
+
+        Public Sub New(token As Token)
+            Me.token = token
+        End Sub
+
 
         Public Overridable Sub Write(tabs As Integer, srcout As ISrcOut)
 

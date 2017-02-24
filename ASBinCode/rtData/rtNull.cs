@@ -18,6 +18,11 @@ namespace ASBinCode.rtData
             }
         }
 
+        public object Clone()
+        {
+            return nullptr;
+        }
+
         public override string ToString()
         {
             return "rtNull";

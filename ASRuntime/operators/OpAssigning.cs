@@ -6,10 +6,10 @@ namespace ASRuntime.operators
 {
     class OpAssigning
     {
-        public static void execAssigning(Player player, ASBinCode.OpStep step ,IList<ASBinCode.IEAX> eaxs,ASBinCode.IRunTimeScope scope)
+        public static void execAssigning(Player player, ASBinCode.OpStep step ,ASBinCode.IRunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v = step.arg1.getValue(eaxs,scope);
-            step.reg.setValue(v, eaxs, scope);
+            ASBinCode.IRunTimeValue v = step.arg1.getValue(scope);
+            step.reg.getISlot(scope).directSet(v);
 
         }
 

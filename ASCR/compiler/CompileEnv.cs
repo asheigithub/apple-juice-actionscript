@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ASCompiler.compiler
@@ -18,6 +17,17 @@ namespace ASCompiler.compiler
 
         private Dictionary<string, ASBinCode.Register> dictCompileRegisters;
 
+
+        private int labelIdx=0;
+        public string makeLabel(string labelHead)
+        {
+            return labelHead + "_" + (++labelIdx);
+        }
+
+        public int getLabelId()
+        {
+            return ++labelIdx;
+        }
 
         public ASBinCode.Register getAdditionalRegister()
         {
@@ -72,27 +82,54 @@ namespace ASCompiler.compiler
         /// <returns></returns>
         public int combieRegisters()
         {
-            //for (int i = 0; i < additionalEaxList.Count; i++)
-            //{
-            //    additionalEaxList[i].Id += tempEaxList.Count;
-            //}
-
-            //for (int i = 0; i < additionalEaxList.Count; i++)
-            //{
-            //    tempEaxList.Add(additionalEaxList[i]);
-            //}
-
-            //tempEaxList.RemoveAt(0);
-            //for (int i = 0; i < tempEaxList.Count; i++)
-            //{
-            //    tempEaxList[i].Id -= 1;
-            //}
-
-            //return tempEaxList.Count;
-
-
             return dictCompileRegisters.Count;
         }
+
+        /// <summary>
+        /// 刷新条件跳转语句等的目标行
+        /// </summary>
+        public void completSteps()
+        {
+            for (int i = 0; i < block.opSteps.Count; i++)
+            {
+                ASBinCode.OpStep step = block.opSteps[i];
+
+                string findflag=null;
+
+                if (step.opCode == ASBinCode.OpCode.if_jmp
+                    )
+                {
+                    findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null)).value;
+                }
+                else if (step.opCode == ASBinCode.OpCode.jmp)
+                {
+                     findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null)).value;
+                }
+
+                if (findflag != null)
+                {
+
+                    bool isfound = false;
+                    for (int j = 0; j < block.opSteps.Count ; j++)
+                    {
+                        if (block.opSteps[j].flag == findflag)
+                        {
+                            step.jumoffset  = j-i;
+                            isfound = true;
+                            break;
+                        }
+                    }
+
+                    if (!isfound)
+                    {
+                        throw new BuildException(step.token.line,step.token.ptr,step.token.sourceFile ,"跳转标记没有找到");
+                    }
+
+                }
+
+            }
+        }
+
 
 
         public CompileEnv(ASBinCode.CodeBlock block)

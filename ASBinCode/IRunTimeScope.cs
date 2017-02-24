@@ -11,6 +11,16 @@ namespace ASBinCode
     {
         IRunTimeScope parent { get; }
 
-        IEAX[] memberData { get; }
+        ISLOT[] memberData { get; }
+
+        /// <summary>
+        /// 程序执行栈
+        /// </summary>
+        IList<ISLOT> stack { get; }
+        /// <summary>
+        /// 程序执行栈偏移量
+        /// </summary>
+        int offset { get; }
+
     }
 }

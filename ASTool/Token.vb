@@ -7,6 +7,11 @@
         identifier
 
         ''' <summary>
+        ''' 检查出是一个label
+        ''' </summary>
+        label
+
+        ''' <summary>
         ''' 字符串常量
         ''' </summary>
         ''' <remarks></remarks>

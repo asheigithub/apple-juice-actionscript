@@ -3,7 +3,6 @@ D:\ASTool\ASCTest\bin\Debug\ASCTest.exe
 D:\ASTool\ASCTest\bin\Debug\ASCTest.pdb
 D:\ASTool\ASCTest\bin\Debug\ASBinCode.dll
 D:\ASTool\ASCTest\bin\Debug\ASCompiler.dll
-D:\ASTool\ASCTest\bin\Debug\ASTool.exe
 D:\ASTool\ASCTest\bin\Debug\ASBinCode.pdb
 D:\ASTool\ASCTest\bin\Debug\ASCompiler.pdb
 D:\ASTool\ASCTest\bin\Debug\ASTool.pdb
@@ -13,3 +12,6 @@ D:\ASTool\ASCTest\obj\Debug\ASCTest.exe
 D:\ASTool\ASCTest\obj\Debug\ASCTest.pdb
 D:\ASTool\ASCTest\bin\Debug\ASRuntime.dll
 D:\ASTool\ASCTest\bin\Debug\ASRuntime.pdb
+D:\ASTool\ASCTest\obj\Debug\ASCTest.Properties.Resources.resources
+D:\ASTool\ASCTest\obj\Debug\ASCTest.csproj.GenerateResource.Cache
+D:\ASTool\ASCTest\bin\Debug\ASTool.dll

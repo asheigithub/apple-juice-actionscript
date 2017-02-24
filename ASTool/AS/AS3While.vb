@@ -2,6 +2,8 @@
     Public Class AS3While
         Implements IAS3Stmt
 
+        Public label As String
+
         Public Condition As AS3StmtExpressions
 
         Public Body As List(Of IAS3Stmt)
@@ -21,7 +23,7 @@
 
             Condition.Write(tabs, srcout)
 
-            srcout.WriteLn("while (" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "while (" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
             srcout.WriteLn("{", tabs)
             For Each s In Body
 

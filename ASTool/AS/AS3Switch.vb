@@ -2,6 +2,8 @@
     Public Class AS3Switch
         Implements IAS3Stmt
 
+        Public label As String
+
         Private matchtoken As Token
         Public Sub New(token As Token)
             Me.matchtoken = token
@@ -27,21 +29,21 @@
 
             Next
 
-            srcout.WriteLn("switch (" & Expr.Value.ToString() & ")", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "switch (" & Expr.Value.ToString() & ")", tabs)
             srcout.WriteLn("{", tabs)
 
             For Each c In CaseList
                 If Not c.IsDefault Then
                     srcout.WriteLn("case " & c.Condition.Value.ToString() & ":", tabs + 1)
+                    For Each b In c.Body
+                        b.Write(tabs + 2, srcout)
+                    Next
                 Else
                     srcout.WriteLn("default:", tabs + 1)
+                    For Each b In c.Body
+                        b.Write(tabs + 2, srcout)
+                    Next
                 End If
-
-                For Each b In c.Body
-                    b.Write(tabs + 2, srcout)
-                Next
-
-
             Next
 
 
@@ -54,6 +56,14 @@
 
     Public Class AS3SwitchCase
         Public Condition As AS3Expression
+
+        Public token As Token
+
+        Public holdreg As Expr.AS3DataStackElement
+
+        Public Sub New(token As Token)
+            Me.token = token
+        End Sub
 
         Public Body As List(Of IAS3Stmt)
 

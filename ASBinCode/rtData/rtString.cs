@@ -56,5 +56,9 @@ namespace ASBinCode.rtData
             }
         }
 
+        public object Clone()
+        {
+            return new rtString(value);
+        }
     }
 }

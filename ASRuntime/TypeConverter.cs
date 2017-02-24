@@ -12,19 +12,19 @@ namespace ASRuntime
             switch (type)
             {
                 case rt.rt_boolean:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtBoolean>(ASBinCode.rtData.rtBoolean.False);
+                    return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtBoolean.False);
                 case rt.rt_int:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtInt>(ASBinCode.rtData.rtInt.zero);
+                    return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(0));
                 case rt.rt_uint:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtUInt>(ASBinCode.rtData.rtUInt.zero);
+                    return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtUInt(0));
                 case rt.rt_number:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtNumber>(ASBinCode.rtData.rtNumber.zero);
+                    return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtNumber(0));
                 case rt.rt_string:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtNull>(ASBinCode.rtData.rtNull.nullptr);
+                    return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
                 case rt.rt_void:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtUndefined>(ASBinCode.rtData.rtUndefined.undefined);
+                    return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
                 case rt.rt_null:
-                    return new ASBinCode.rtData.RightValue<ASBinCode.rtData.rtNull>(ASBinCode.rtData.rtNull.nullptr);
+                    return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
                 case rt.unknown:
                 default:
                     return null;
@@ -98,34 +98,34 @@ namespace ASRuntime
         }
 
 
-        public static ASBinCode.rtData.rtInt ConvertToInt(ASBinCode.IRunTimeValue src,Player player, ASBinCode.SourceToken token , bool isthrow=false)
+        public static int ConvertToInt(ASBinCode.IRunTimeValue src,Player player, ASBinCode.SourceToken token , bool isthrow=false)
         {
             switch (src.rtType)
             {
                 case rt.rt_boolean:
                     if (((ASBinCode.rtData.rtBoolean)src).value == true)
                     {
-                        return new ASBinCode.rtData.rtInt(1);
+                        return 1;// new ASBinCode.rtData.rtInt(1);
                     }
                     else
                     {
-                        return ASBinCode.rtData.rtInt.zero;
+                        return 0;// ASBinCode.rtData.rtInt.zero;
                     }
                 case rt.rt_int:
-                    return (ASBinCode.rtData.rtInt)src;
+                    return ((ASBinCode.rtData.rtInt)src).value; //(ASBinCode.rtData.rtInt)src;
                 case rt.rt_uint:
-                    return new ASBinCode.rtData.rtInt((int)((ASBinCode.rtData.rtUInt)src).value  );
-                    
+                    return (int)((ASBinCode.rtData.rtUInt)src).value; //new ASBinCode.rtData.rtInt((int)((ASBinCode.rtData.rtUInt)src).value  );
                 case rt.rt_number:
                     {
                         double r = ((ASBinCode.rtData.rtNumber)src).value;
                         if (double.IsNaN(r) || double.IsInfinity(r))
                         {
-                            return new ASBinCode.rtData.rtInt(0);
+                            return 0; //new ASBinCode.rtData.rtInt(0);
                         }
                         else
                         {
-                            return new ASBinCode.rtData.rtInt((int)r);
+                            return (int)((long)r);
+                             //new ASBinCode.rtData.rtInt((int)r);
                         }
                     }
                 case rt.rt_string:
@@ -133,69 +133,69 @@ namespace ASRuntime
                         double r = 0;
                         if (((ASBinCode.rtData.rtString)src).value == null)
                         {
-                            return new ASBinCode.rtData.rtInt(0);
+                            return 0;// new ASBinCode.rtData.rtInt(0);
                         }
                         else if (double.TryParse(((ASBinCode.rtData.rtString)src).value, out r))
                         {
                             if (double.IsNaN(r) || double.IsInfinity(r))
                             {
-                                return new ASBinCode.rtData.rtInt(0);
+                                return 0;// new ASBinCode.rtData.rtInt(0);
                             }
                             else
                             {
-                                return new ASBinCode.rtData.rtInt((int)r);
+                                return (int)((long)r);// new ASBinCode.rtData.rtInt((int)r);
                             }
                         }
                         else
                         {
-                            return new ASBinCode.rtData.rtInt(0);
+                            return 0;// new ASBinCode.rtData.rtInt(0);
                         }
                     }
                 case rt.rt_void:
-                    return new ASBinCode.rtData.rtInt(0);
+                    return 0;// new ASBinCode.rtData.rtInt(0);
                     
                 case rt.rt_null:
-                    return new ASBinCode.rtData.rtInt(0);
+                    return 0;// new ASBinCode.rtData.rtInt(0);
                 case rt.unknown: 
                 default:
-                    if (isthrow)
-                    {
-                        player.throwCastException(token, rt.unknown, rt.rt_int);
-                    }
-                    return null;
+                    //if (isthrow)
+                    //{
+                    //    player.throwCastException(token, rt.unknown, rt.rt_int);
+                    //}
+                    return 0;
                     
             }
         }
 
-        public static ASBinCode.rtData.rtUInt ConvertToUInt(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
+        public static uint ConvertToUInt(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
                 case rt.rt_boolean:
                     if (((ASBinCode.rtData.rtBoolean)src).value == true)
                     {
-                        return new ASBinCode.rtData.rtUInt(1);
+                        return 1;// new ASBinCode.rtData.rtUInt(1);
                     }
                     else
                     {
-                        return ASBinCode.rtData.rtUInt.zero;
+                        return 0;// ASBinCode.rtData.rtUInt.zero;
                     }
 
                 case rt.rt_int:
-                    return new ASBinCode.rtData.rtUInt((uint)((ASBinCode.rtData.rtInt)src).value);
+                    return (uint)((ASBinCode.rtData.rtInt)src).value;// new ASBinCode.rtData.rtUInt((uint)((ASBinCode.rtData.rtInt)src).value);
                 case rt.rt_uint:
-                    return (ASBinCode.rtData.rtUInt)src;
+                    return ((ASBinCode.rtData.rtUInt)src).value; //(ASBinCode.rtData.rtUInt)src;
 
                 case rt.rt_number:
                     {
                         double r = ((ASBinCode.rtData.rtNumber)src).value;
                         if (double.IsNaN(r) || double.IsInfinity(r))
                         {
-                            return new ASBinCode.rtData.rtUInt(0);
+                            return 0;// new ASBinCode.rtData.rtUInt(0);
                         }
                         else
                         {
-                            return new ASBinCode.rtData.rtUInt((uint)r);
+                            return (uint)((long)r);// new ASBinCode.rtData.rtUInt((uint)r);
                         }
                     }
 
@@ -204,107 +204,107 @@ namespace ASRuntime
                         double r = 0;
                         if (((ASBinCode.rtData.rtString)src).value == null)
                         {
-                            return new ASBinCode.rtData.rtUInt(0);
+                            return 0;// new ASBinCode.rtData.rtUInt(0);
                         }
                         else if (double.TryParse(((ASBinCode.rtData.rtString)src).value, out r))
                         {
                             if (double.IsNaN(r) || double.IsInfinity(r))
                             {
-                                return new ASBinCode.rtData.rtUInt(0);
+                                return 0;// new ASBinCode.rtData.rtUInt(0);
                             }
                             else
                             {
-                                return new ASBinCode.rtData.rtUInt((uint)r);
+                                return (uint)((long)r);// new ASBinCode.rtData.rtUInt((uint)r);
                             }
                         }
                         else
                         {
-                            return new ASBinCode.rtData.rtUInt(0);
+                            return 0;// new ASBinCode.rtData.rtUInt(0);
                             
                         }
                     }
                 case rt.rt_void:
-                    return new ASBinCode.rtData.rtUInt(0);
+                    return 0;// new ASBinCode.rtData.rtUInt(0);
 
                 case rt.rt_null:
-                    return new ASBinCode.rtData.rtUInt(0);
+                    return 0;// new ASBinCode.rtData.rtUInt(0);
                 case rt.unknown:
                 default:
-                    return null;
+                    return 0;
 
             }
         }
 
 
-        public static ASBinCode.rtData.rtNumber ConvertToNumber(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
+        public static double ConvertToNumber(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
                 case rt.rt_boolean:
                     if (((ASBinCode.rtData.rtBoolean)src).value == true)
                     {
-                        return new ASBinCode.rtData.rtNumber(1);
+                        return 1;// new ASBinCode.rtData.rtNumber(1);
                     }
                     else
                     {
-                        return ASBinCode.rtData.rtNumber.zero;
+                        return 0;// ASBinCode.rtData.rtNumber.zero;
                     }
                 case rt.rt_int:
-                    return new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtInt)src).value);
+                    return ((ASBinCode.rtData.rtInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtInt)src).value);
                 case rt.rt_uint:
-                    return new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtUInt)src).value);
+                    return ((ASBinCode.rtData.rtUInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtUInt)src).value);
 
                 case rt.rt_number:
-                    return (ASBinCode.rtData.rtNumber)src;
+                    return ((ASBinCode.rtData.rtNumber)src).value; //(ASBinCode.rtData.rtNumber)src;
 
                 case rt.rt_string:
                     {
                         double r = 0;
                         if (((ASBinCode.rtData.rtString)src).value == null)
                         {
-                            return new ASBinCode.rtData.rtNumber(0);
+                            return 0;// new ASBinCode.rtData.rtNumber(0);
                         }
                         else if (double.TryParse(((ASBinCode.rtData.rtString)src).value, out r))
                         {
-                            return new ASBinCode.rtData.rtNumber(r);
+                            return r;//new ASBinCode.rtData.rtNumber(r);
                         }
                         else
                         {
-                            return new ASBinCode.rtData.rtNumber(double.NaN);
+                            return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
                         }
                     }
                 case rt.rt_void:
-                    return new ASBinCode.rtData.rtNumber(double.NaN);
+                    return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
 
                 case rt.rt_null:
-                    return new ASBinCode.rtData.rtNumber(0);
+                    return 0;// new ASBinCode.rtData.rtNumber(0);
                 case rt.unknown:
                 default:
-                    return null;
+                    return 0;// null;
 
             }
         }
 
 
-        public static ASBinCode.rtData.rtString ConvertToString(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
+        public static string ConvertToString(ASBinCode.IRunTimeValue src, Player player, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
                 case rt.rt_boolean:
-                    return new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtBoolean)src).ToString());
+                    return ((ASBinCode.rtData.rtBoolean)src).ToString();// new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtBoolean)src).ToString());
                 case rt.rt_int:
-                    return new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtInt)src).value.ToString());
+                    return ((ASBinCode.rtData.rtInt)src).ToString();// new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtInt)src).value.ToString());
                 case rt.rt_uint:
-                    return new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtUInt)src).value.ToString());
+                    return ((ASBinCode.rtData.rtUInt)src).value.ToString();// new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtUInt)src).value.ToString());
                 case rt.rt_number:
-                    return new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtNumber)src).value.ToString());
+                    return ((ASBinCode.rtData.rtNumber)src).ToString();// new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtNumber)src).value.ToString());
 
                 case rt.rt_string:
-                    return (ASBinCode.rtData.rtString)src;
+                    return ((ASBinCode.rtData.rtString)src).value;//(ASBinCode.rtData.rtString)src;
                 case rt.rt_void:
-                    return new ASBinCode.rtData.rtString(null);
+                    return null; //new ASBinCode.rtData.rtString(null);
                 case rt.rt_null:
-                    return new ASBinCode.rtData.rtString(null);
+                    return null;//new ASBinCode.rtData.rtString(null);
                 case rt.unknown:
                 default:
                     return null;
@@ -349,6 +349,10 @@ namespace ASRuntime
             {
                 return implicit_opsub_coverttable[(int)v1, (int)v2];
             }
+            else if (op == ASBinCode.OpCode.multi || op== ASBinCode.OpCode.div || op== ASBinCode.OpCode.mod)
+            {
+                return implicit_opmulti_coverttable[(int)v1, (int)v2];
+            }
             else
             {
                 return rt.unknown;
@@ -370,6 +374,21 @@ namespace ASRuntime
             };
         //- 操作隐式类型转换表
         private static rt[,] implicit_opsub_coverttable =
+            {
+            /*------*/    //bool        int             uint            number          string          var_void       null         unknown
+            /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown  },
+            /*int*/     { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_int      ,rt.unknown  },
+            /*uint*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_uint     ,rt.unknown  },
+            /*number*/  { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_number   ,rt.unknown  },
+            /*string*/  { rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  },
+            /*var_void*/{ rt.unknown    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.unknown     ,rt.rt_void     ,rt.rt_void     ,rt.unknown  },
+            /*null*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown     ,rt.rt_void     ,rt.rt_number     ,rt.unknown  },
+            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  }
+            };
+
+
+        //* / % 操作隐式类型转换表
+        private static rt[,] implicit_opmulti_coverttable =
             {
             /*------*/    //bool        int             uint            number          string          var_void       null         unknown
             /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown  },

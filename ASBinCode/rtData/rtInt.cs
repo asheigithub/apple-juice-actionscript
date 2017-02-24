@@ -6,8 +6,6 @@ namespace ASBinCode.rtData
 {
     public class rtInt : IRunTimeValue
     {
-        public static readonly rtInt zero = new rtInt(0);
-
         public int value;
         public rtInt(int v)
         {
@@ -20,6 +18,11 @@ namespace ASBinCode.rtData
             {
                 return RunTimeDataType.rt_int;
             }
+        }
+
+        public object Clone()
+        {
+            return new rtInt(value);
         }
 
         public override string ToString()

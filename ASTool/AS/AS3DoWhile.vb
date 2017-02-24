@@ -1,6 +1,9 @@
 ﻿Namespace AS3
     Public Class AS3DoWhile
         Implements IAS3Stmt
+
+        Public label As String
+
         Private matchtoken As Token
         Public Sub New(token As Token)
             Me.matchtoken = token
@@ -22,7 +25,7 @@
 
 
 
-            srcout.WriteLn("do", tabs) '(" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "do", tabs) '(" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
             srcout.WriteLn("{", tabs)
             For Each s In Body
                 s.Write(tabs + 1, srcout)

@@ -27,7 +27,9 @@ Public Class GrammarNode
 
     Public Shared GNodeWhiteSpace As New GrammarNode() With {.Type = GrammarNodeType.whitespace, .Name = "S"}
 
-   
+    Public Shared GNodeLabel As New GrammarNode() With {.Type = GrammarNodeType.label, .Name = "label"}
+
+
     Public FIRST As New HashSet(Of GrammarNode)()
     Public FOLLOW As New HashSet(Of GrammarNode)()
 

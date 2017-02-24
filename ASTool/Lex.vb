@@ -8,6 +8,8 @@ Public Class Lex
     Public File As String
     Public defineWords As List(Of String)
 
+    Public defineSkipBlankWords As List(Of String)
+
     Private specBrackets As New Stack(Of Token)
 
     Public parseXML As Boolean
@@ -15,16 +17,35 @@ Public Class Lex
     Public Sub New(file As String)
         Me.File = file
         defineWords = New List(Of String)
+
+        defineSkipBlankWords = New List(Of String)
+
     End Sub
 
-    Public Sub New(file As String, definewords As IEnumerable(Of String), parseXML As Boolean)
+    Public Sub New(file As String, definewords As IEnumerable(Of String), defineSkipBlankWords As IEnumerable(Of String), parseXML As Boolean)
         Me.New(file)
         If Not definewords Is Nothing Then
-            Me.defineWords.AddRange(definewords.OrderByDescending(Of Integer)(Function(i) i.Length).ToArray())
+            'Me.defineWords.AddRange(definewords.OrderByDescending(Of Integer)(Function(i) i.Length).ToArray())
+            Dim temp As New List(Of String)
+            temp.AddRange(definewords)
 
+            temp.Sort(New Comparison(Of String)(Function(s1, s2) s2.Length - s1.Length))
 
+            Me.defineWords.AddRange(temp)
+        End If
+
+        If Not defineSkipBlankWords Is Nothing Then
+            'Me.defineSkipBlankWords.AddRange(defineSkipBlankWords.OrderByDescending(Of Integer)(Function(i) i.Length).ToArray())
+
+            Dim temp As New List(Of String)
+            temp.AddRange(defineSkipBlankWords)
+
+            temp.Sort(New Comparison(Of String)(Function(s1, s2) s2.Length - s1.Length))
+
+            Me.defineSkipBlankWords.AddRange(temp)
 
         End If
+
         Me.parseXML = parseXML
     End Sub
 
@@ -311,6 +332,49 @@ flagdefwords:
 
                     End If
                 Next
+
+                For Each w In defineSkipBlankWords
+                    Dim test As String = ch
+
+                    Dim real As String = ch
+
+                    Dim k As Integer
+
+                    While w.StartsWith(test)
+                        test = test & seeNextChar(input, currentptr + k)
+                        real = real & seeNextChar(input, currentptr + k)
+                        k = k + 1
+
+                        test = test.TrimEnd()
+
+                        If w = test Then
+                            result.line = cline
+                            result.ptr = linepos
+                            result.Type = TokenType.other
+                            result.StringValue = w
+
+                            getNextChar(input, currentptr)
+                            For k = 0 To real.Length - 2
+                                getNextChar(input, currentptr)
+                            Next
+
+
+                            Exit Do
+
+                        End If
+
+                    End While
+
+
+
+
+
+                Next
+
+
+
+
+
             Loop
         ElseIf isIdStChar(ch) Then
             '***读取标识符
@@ -346,7 +410,7 @@ flagdefwords:
                 result.StringValue &= getNextChar(input, currentptr)
             Next
             getNextChar(input, currentptr)
-            
+
         ElseIf ch = "." AndAlso Not seeNextChar(input, currentptr) Is Nothing AndAlso Char.IsDigit(seeNextChar(input, currentptr)) Then
             GoTo readnumber
         ElseIf ch = "0" AndAlso ("x" = seeNextChar(input, currentptr) Or "X" = seeNextChar(input, currentptr)) Then
@@ -468,10 +532,10 @@ readnumber:
     End Function
 
 
-    Dim partern As String = "<(?<HtmlTag>[\w]+)[^>]*>.*?</\k<HtmlTag>>" & _
-         "|" & _
-         "<!\[CDATA\[.*?]]>" & _
-         "|" & _
+    Dim partern As String = "<(?<HtmlTag>[\w]+)[^>]*>.*?</\k<HtmlTag>>" &
+         "|" &
+         "<!\[CDATA\[.*?]]>" &
+         "|" &
          "<[\w]+\s*/>"
     Private expr As New Text.RegularExpressions.Regex(partern, Text.RegularExpressions.RegexOptions.Compiled Or Text.RegularExpressions.RegexOptions.Singleline)
     Private Function findxml(ch As String, input As String, currentptr As Integer, ByRef len As Integer) As Integer
@@ -530,6 +594,40 @@ readnumber:
 
 
         End If
+
+
+        If defineSkipBlankWords.Count > 0 Then
+
+            For Each w In defineSkipBlankWords
+                Dim test As String = ch
+
+                Dim real As String = ch
+
+                Dim k As Integer
+
+                While w.StartsWith(test)
+                    test = test & seeNextChar(input, currentptr + k)
+                    real = real & seeNextChar(input, currentptr + k)
+                    k = k + 1
+
+                    test = test.TrimEnd()
+
+                    If w = test Then
+                        Return True
+
+                    End If
+
+                End While
+
+
+
+
+
+            Next
+
+
+        End If
+
         Return False
     End Function
 
@@ -559,10 +657,10 @@ readnumber:
 
     Private Function getNextChar(input As String, ByRef currentptr As Integer) As String
 
-        
+
 
         currentptr += 1
-        
+
         If currentptr < input.Length Then
 
             If input(currentptr - 1) = vbLf Then
@@ -629,6 +727,6 @@ readnumber:
 
     End Function
 
-   
+
 
 End Class

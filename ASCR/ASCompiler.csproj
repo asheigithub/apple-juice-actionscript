@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCompiler</RootNamespace>
     <AssemblyName>ASCompiler</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,8 +45,16 @@
     <Compile Include="compiler\Builder.cs" />
     <Compile Include="compiler\BuildError.cs" />
     <Compile Include="compiler\BuildException.cs" />
+    <Compile Include="compiler\builds\AS3BreakBuilder.cs" />
+    <Compile Include="compiler\builds\AS3ContinueBuilder.cs" />
+    <Compile Include="compiler\builds\AS3LoopBuilder.cs" />
+    <Compile Include="compiler\builds\AS3IFBuilder.cs" />
+    <Compile Include="compiler\builds\AS3SwitchBuilder.cs" />
+    <Compile Include="compiler\builds\AS3ThrowBuilder.cs" />
     <Compile Include="compiler\builds\ExpressionBuilder.cs" />
+    <Compile Include="compiler\builds\FuncCallBuilder.cs" />
     <Compile Include="compiler\CompileEnv.cs" />
+    <Compile Include="compiler\ExpressionEval.cs" />
     <Compile Include="compiler\TypeReader.cs" />
     <Compile Include="compiler\MemberFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

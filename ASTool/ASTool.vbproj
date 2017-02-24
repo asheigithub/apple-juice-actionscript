@@ -8,14 +8,16 @@
     <SchemaVersion>
     </SchemaVersion>
     <ProjectGuid>{F6119D2E-215B-4FB1-A1C6-E83EDE52DA8C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <StartupObject>ASTool.Module1</StartupObject>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
     <RootNamespace>ASTool</RootNamespace>
     <AssemblyName>ASTool</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>Console</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -28,7 +30,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -48,6 +50,27 @@
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>ASTool.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>ASTool.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -71,6 +94,7 @@
   <ItemGroup>
     <Compile Include="AS3FileGrammarAnalyser.vb" />
     <Compile Include="AS\AS3Access.vb" />
+    <Compile Include="AS\AS3Block.vb" />
     <Compile Include="AS\AS3Break.vb" />
     <Compile Include="AS\AS3Class.vb" />
     <Compile Include="AS\AS3Const.vb" />
@@ -104,6 +128,7 @@
     <Compile Include="AS\AS3Variable.vb" />
     <Compile Include="AS\AS3Vector.vb" />
     <Compile Include="AS\AS3While.vb" />
+    <Compile Include="AS\AS3With.vb" />
     <Compile Include="AS\Expr\AS3DataStackElement.vb" />
     <Compile Include="AS\Expr\AS3DataValue.vb" />
     <Compile Include="AS\Expr\AS3ExprStep.vb" />
@@ -120,6 +145,7 @@
     <Compile Include="Grammar\GrammarNodeType.vb" />
     <Compile Include="Grammar\GrammerExpr.vb" />
     <Compile Include="Grammar\GrammerTree.vb" />
+    <Compile Include="HashSet.vb" />
     <Compile Include="ISrcOut.vb" />
     <Compile Include="Lex.vb" />
     <Compile Include="Module1.vb" />
@@ -163,7 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GrammarNodes.txt" />
-    <Content Include="PG1.txt" />
+    <EmbeddedResource Include="PG1.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

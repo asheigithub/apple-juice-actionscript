@@ -5,11 +5,13 @@ using System.Text;
 namespace ASBinCode
 {
     /// <summary>
-    /// 寄存器接口
+    /// 数据存储槽接口
     /// </summary>
-    public interface IEAX
+    public interface ISLOT:IValueSetter
     {
-        void setValue(IRunTimeValue value);
+        //void setValue(IRunTimeValue value);
+
+        void directSet(IRunTimeValue value);
 
         IRunTimeValue getValue();
     }

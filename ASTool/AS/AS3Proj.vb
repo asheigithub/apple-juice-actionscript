@@ -241,7 +241,7 @@
 
             Next
 
-            Dim fclass As HashSet(Of IMemberDataType)
+            Dim fclass As New HashSet(Of IMemberDataType)
 
             If typestr.IndexOf(".") >= 0 Then
                 '***完全限定***

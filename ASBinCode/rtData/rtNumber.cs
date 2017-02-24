@@ -9,9 +9,7 @@ namespace ASBinCode.rtData
     /// </summary>
     public class rtNumber : IRunTimeValue
     {
-        public static readonly rtNumber zero = new rtNumber(0);
-
-
+        
         public double value;
         public rtNumber(double v)
         {
@@ -26,9 +24,29 @@ namespace ASBinCode.rtData
             }
         }
 
+        public object Clone()
+        {
+            return new rtNumber(value);
+        }
+
         public override string ToString()
         {
-            return value.ToString();
+            if (double.IsPositiveInfinity(value))
+            {
+                return "Infinity";
+            }
+            else if (double.IsNegativeInfinity(value))
+            {
+                return "-Infinity";
+            }
+            else if (double.IsNaN(value))
+            {
+                return "NaN";
+            }
+            else
+            {
+                return value.ToString();
+            }
         }
 
     }

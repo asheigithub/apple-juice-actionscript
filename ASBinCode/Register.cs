@@ -32,22 +32,20 @@ namespace ASBinCode
             }
         }
 
-        public IRunTimeValue getValue(IList<IEAX> temporarys, IRunTimeScope scope)
+        public IRunTimeValue getValue( IRunTimeScope scope)
         {
-            return temporarys[Id].getValue();
+            return getISlot(scope).getValue();
         }
 
-        public void setValue(IRunTimeValue value, IList<IEAX> temporarys, IRunTimeScope scope)
-        {
-            temporarys[Id].setValue(value);
-        }
-
-
-
+        
         public override string ToString()
         {
             return "EAX(" + Id + "\t" +type+ ")";
         }
 
+        public ISLOT getISlot(IRunTimeScope scope)
+        {
+            return scope.stack[scope.offset + Id];
+        }
     }
 }

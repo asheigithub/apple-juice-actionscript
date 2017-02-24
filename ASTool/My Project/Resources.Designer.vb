@@ -59,5 +59,38 @@ Namespace My.Resources
                 resourceCulture = value
             End Set
         End Property
+        
+        '''<summary>
+        '''  查找类似 /*
+        '''&lt;E&gt; ::= &lt;T&gt;&lt;E1&gt; ;
+        '''&lt;E1&gt;::= &quot;+&quot; &lt;T&gt; &lt;E1&gt; | null ;
+        '''&lt;T&gt; ::= &lt;F&gt;&lt;T1&gt; ;
+        '''&lt;T1&gt;::= &quot;*&quot; &lt;F&gt;&lt;T1&gt; |null;
+        '''&lt;F&gt; ::=   identifier | number|&quot;(&quot; &lt;E&gt; &quot;)&quot;;
+        '''*/
+        '''
+        '''/*
+        '''//加上&quot;d&quot;即没有二义性
+        '''&lt;S&gt; ::= &quot;i&quot;&lt;E&gt;&quot;t&quot;&lt;S&gt;&lt;S1&gt;&quot;d&quot;  | &quot;a&quot;;
+        '''&lt;S1&gt; ::=&quot;e&quot;&lt;S&gt;|null;
+        '''&lt;E&gt;  ::=&quot;b&quot;;
+        '''*/
+        '''
+        '''/*
+        '''&lt;Stmts&gt; ::= &lt;Stmt&gt; &lt;StmtList&gt;;
+        '''&lt;StmtList&gt; ::= &lt;Stmts&gt; | null;
+        '''&lt;Stmt&gt; ::= &lt;Expression&gt; &lt;ExpEnd&gt;;
+        '''&lt;ExpEnd&gt; ::= &quot;;&quot;|null;
+        '''
+        '''&lt;Expression&gt; ::= &lt;Multiply&gt; &lt;PlusOpt&gt;;
+        '''&lt;PlusOpt&gt; ::= &quot;+&quot; &lt;Multiply&gt;&lt;PlusOpt&gt; | &quot;-&quot; &lt;Multiply&gt;&lt;PlusOpt&gt; | null;
+        '''&lt;Multiply&gt; ::= &lt;Unit&gt; &lt;MultiplyOpt&gt;;
+        '''&lt;Multip [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        '''</summary>
+        Friend ReadOnly Property PG1() As String
+            Get
+                Return ResourceManager.GetString("PG1", resourceCulture)
+            End Get
+        End Property
     End Module
 End Namespace

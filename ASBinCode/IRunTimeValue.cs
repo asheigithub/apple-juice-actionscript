@@ -7,7 +7,7 @@ namespace ASBinCode
     /// <summary>
     /// 标记是一个运行时的值
     /// </summary>
-    public interface IRunTimeValue
+    public interface IRunTimeValue:ICloneable
     {
         RunTimeDataType rtType { get; }
     }

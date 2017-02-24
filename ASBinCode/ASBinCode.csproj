@@ -37,7 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeBlock.cs" />
-    <Compile Include="IEAX.cs" />
+    <Compile Include="ISLOT.cs" />
     <Compile Include="IMember.cs" />
     <Compile Include="IRunTimeScope.cs" />
     <Compile Include="IScope.cs" />

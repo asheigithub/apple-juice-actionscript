@@ -1,5 +1,5 @@
 D:\ASTool\ASBinCode\bin\Debug\ASBinCode.dll
 D:\ASTool\ASBinCode\bin\Debug\ASBinCode.pdb
-D:\ASTool\ASBinCode\obj\Debug\ASBinCode.csprojResolveAssemblyReference.cache
 D:\ASTool\ASBinCode\obj\Debug\ASBinCode.dll
 D:\ASTool\ASBinCode\obj\Debug\ASBinCode.pdb
+D:\ASTool\ASBinCode\obj\Debug\ASBinCode.csprojResolveAssemblyReference.cache

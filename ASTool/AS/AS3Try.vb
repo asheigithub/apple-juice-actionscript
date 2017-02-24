@@ -2,6 +2,8 @@
     Public Class AS3Try
         Implements IAS3Stmt
 
+        Public label As String
+
         Public TryBlock As List(Of IAS3Stmt)
 
         Public CatchList As New List(Of AS3Catch)
@@ -21,10 +23,7 @@
 
         Public Sub Write(tabs As Integer, srcout As ISrcOut) Implements IAS3Stmt.Write
 
-           
-
-
-            srcout.WriteLn("try", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "try", tabs)
             srcout.WriteLn("{", tabs)
 
             For Each b In TryBlock

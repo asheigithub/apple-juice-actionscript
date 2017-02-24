@@ -67,7 +67,7 @@
 
             Dim cline As String = Access.ToString() & "interface " & Name
             If ExtendsNames.Count > 0 Then
-                cline &= " extends " & String.Join(",", ExtendsNames)
+                cline &= " extends " & String.Join(",", ExtendsNames.ToArray())
             End If
 
             srcout.WriteLn(cline, tabs)

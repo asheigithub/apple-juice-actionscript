@@ -10,7 +10,7 @@ namespace ASBinCode
     /// <typeparam name="T"></typeparam>
     public interface IRightValue
     {
-        IRunTimeValue getValue(IList<IEAX> temporarys,IRunTimeScope scope);
+        IRunTimeValue getValue(IRunTimeScope scope);
 
         RunTimeDataType valueType { get; }
 
@@ -22,6 +22,25 @@ namespace ASBinCode
     /// <typeparam name="T"></typeparam>
     public interface ILeftValue : IRightValue
     {
-        void setValue(IRunTimeValue value ,IList<IEAX> temporary, IRunTimeScope scope);
+        //void setValue(IRunTimeValue value ,IRunTimeScope scope);
+        /// <summary>
+        /// 或
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        ISLOT getISlot(IRunTimeScope scope);
     }
+
+
+    public interface IValueSetter
+    {
+        void setValue(rtData.rtBoolean value);
+        void setValue(double value);
+        void setValue(int value);
+        void setValue(uint value);
+        void setValue(string value);
+        void setValue(rtData.rtNull value);
+        void setValue(rtData.rtUndefined value);
+    }
+
 }

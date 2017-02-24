@@ -23,6 +23,18 @@ namespace ASBinCode.rtData
             }
         }
 
+        public object Clone()
+        {
+            if (value)
+            {
+                return True;
+            }
+            else
+            {
+                return False;
+            }
+        }
+
         public override string ToString()
         {
             if (value)

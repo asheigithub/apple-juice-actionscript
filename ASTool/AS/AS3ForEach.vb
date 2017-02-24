@@ -6,6 +6,8 @@
     Public Class AS3ForEach
         Implements IAS3Stmt
 
+        Public label As String
+
         Private matchtoken As Token
         Public Sub New(token As Token)
             Me.matchtoken = token
@@ -38,7 +40,7 @@
 
             ForExpr.Write(tabs, srcout)
 
-            srcout.WriteLn("for each( ", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "for each( ", tabs)
             If TypeOf ForArg Is AS3Variable Then
                 srcout.WriteLn(CType(ForArg, AS3Variable).Name, tabs + 1)
             Else

@@ -23,11 +23,12 @@
         '''' <remarks></remarks>
         ''LogicOr
 
-        ''' <summary>
-        ''' 逻辑与
-        ''' </summary>
-        ''' <remarks></remarks>
-        LogicAnd
+        ''''逻辑与也被取代了 有短路
+        '''' <summary>
+        '''' 逻辑与
+        '''' </summary>
+        '''' <remarks></remarks>
+        'LogicAnd
         ''' <summary>
         ''' 位或|
         ''' </summary>

@@ -1,3 +1,13 @@
 *.suo
 ASTool/bin/
 ASTool/obj/
+ASBinCode/bin/
+ASBinCode/obj/
+ASCR/bin/
+ASCR/obj/
+ASCTest/bin/
+ASCTest/obj/
+ASRuntime/bin/
+ASRuntime/obj/
+ASBinCode/bin/
+*.pdb

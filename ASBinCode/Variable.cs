@@ -45,16 +45,17 @@ namespace ASBinCode
             }
         }
 
-        public IRunTimeValue getValue(IList<IEAX> temporarys, IRunTimeScope scope)
+        public IRunTimeValue getValue(IRunTimeScope scope)
         {
             //throw new NotImplementedException();
-            return scope.memberData[indexOfMembers].getValue();
+            return getISlot(scope).getValue();
         }
 
-        public void setValue(IRunTimeValue value, IList<IEAX> temporarys, IRunTimeScope scope)
+        public ISLOT getISlot(IRunTimeScope scope)
         {
-            scope.memberData[indexOfMembers].setValue(value);
+            return scope.memberData[indexOfMembers];
         }
+        
 
 
         public override string ToString()
@@ -62,5 +63,6 @@ namespace ASBinCode
             return "VAR("+name+"\t"+type +")" ;
         }
 
+        
     }
 }

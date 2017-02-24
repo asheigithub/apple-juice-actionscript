@@ -100,7 +100,7 @@ Public Class Grammar
 
                 For i = 0 To line.Derivation.Count - 1
                     If line.Derivation(i).Type = GrammarNodeType.non_terminal Then
-                        If (i < line.Derivation.Count - 1 AndAlso line.Derivation(i + 1).FIRST.Contains(GrammarNode.GNodeNull)) Or _
+                        If (i < line.Derivation.Count - 1 AndAlso line.Derivation(i + 1).FIRST.Contains(GrammarNode.GNodeNull)) Or
                             i = line.Derivation.Count - 1 Then
                             Dim oldcount = line.Derivation(i).FOLLOW.Count
 
@@ -129,14 +129,17 @@ Public Class Grammar
 
 
 
-        Console.WriteLine("非终结符:")
-        For Each e In gnodes.Values
-            Console.WriteLine(e.Name & vbTab & "FIRST{ " & String.Join(",", e.FIRST.Select(Function(n) IIf(n.Type = GrammarNodeType.terminal, """" & n.Name & """", n.Name)).ToArray()) & " }")
-            Console.WriteLine(vbTab & "FOLLOW{ " & String.Join(",", e.FOLLOW.Select(Function(n) IIf(n.Type = GrammarNodeType.terminal, """" & n.Name & """", n.Name)).ToArray()) & " }")
-            Console.WriteLine()
+        'Console.WriteLine("非终结符:")
+        'For Each e In gnodes.Values
+        '    Console.WriteLine(e.Name & vbTab & "FIRST{ " & String.Join(",", e.FIRST._Select(Function(n) IIf(n.Type = GrammarNodeType.terminal, """" & n.Name & """", n.Name))) & " }")
+        '    Console.WriteLine(vbTab & "FOLLOW{ " & String.Join(",", e.FOLLOW._Select(Function(n) IIf(n.Type = GrammarNodeType.terminal, """" & n.Name & """", n.Name))) & " }")
+        '    Console.WriteLine()
 
-        Next
-
+        'Next
+        'Console.WriteLine("终结符:")
+        'For Each e In termianlnodes.Values
+        '    Console.WriteLine(e.Name & vbTab & "FIRST{ " & String.Join(" , ", e.FIRST.Select(Function(n) """" & n.Name & """").ToArray()) & " }")
+        'Next
 
         '***生成预测分析表***
         M = New Dictionary(Of GrammarNode, Dictionary(Of GrammarNode, GrammarLine))()
@@ -160,8 +163,8 @@ Public Class Grammar
 
                 If k.Type <> GrammarNodeType.null Then
                     If Not M(line.Main)(k) Is Nothing AndAlso Not M(line.Main)(k).Equals(line) Then
-                        Console.WriteLine("发现二义文法! 行[" & line.Main.Name & "] 输入[" & k.Name & "] 原来是" & M(line.Main)(k).ToString())
-                        Console.WriteLine("            " & line.ToString())
+                        'Console.WriteLine("发现二义文法! 行[" & line.Main.Name & "] 输入[" & k.Name & "] 原来是" & M(line.Main)(k).ToString())
+                        'Console.WriteLine("            " & line.ToString())
 
                         ErrorFFStr &= "发现二义文法! 行[" & line.Main.Name & "] 输入[" & k.Name & "] 原来是" & M(line.Main)(k).ToString() & vbCrLf
                         ErrorFFStr &= "            " & line.ToString() & vbCrLf
@@ -199,8 +202,8 @@ Public Class Grammar
 
                     For Each b In follow
                         If Not M(line.Main)(b) Is Nothing AndAlso Not M(line.Main)(b).Equals(line) Then
-                            Console.WriteLine("发现二义文法! 行[" & line.Main.Name & "] 输入[" & b.Name & "] 原来是" & M(line.Main)(b).ToString())
-                            Console.WriteLine("            " & line.ToString())
+                            'Console.WriteLine("发现二义文法! 行[" & line.Main.Name & "] 输入[" & b.Name & "] 原来是" & M(line.Main)(b).ToString())
+                            'Console.WriteLine("            " & line.ToString())
 
                             ErrorFFStr &= "发现二义文法! 行[" & line.Main.Name & "] 输入[" & b.Name & "] 原来是" & M(line.Main)(b).ToString() & vbCrLf
                             ErrorFFStr &= "            " & line.ToString() & vbCrLf
@@ -242,36 +245,36 @@ Public Class Grammar
         Next
 
 
-        Console.WriteLine("预测分析表:")
-        For Each t In termianlnodes.Values
-            If t.Type = GrammarNodeType.null Then
-                Continue For
-            End If
-            Console.Write(vbTab)
-            Console.Write("|")
-            Console.Write(IIf(t.Type = GrammarNodeType.terminal, """" & t.Name & """", t.Name))
-        Next
-        Console.Write(vbTab)
-        Console.Write("|")
-        Console.Write(GrammarNode.GNodeEOF.Name)
-        Console.WriteLine()
+        'Console.WriteLine("预测分析表:")
+        'For Each t In termianlnodes.Values
+        '    If t.Type = GrammarNodeType.null Then
+        '        Continue For
+        '    End If
+        '    Console.Write(vbTab)
+        '    Console.Write("|")
+        '    Console.Write(IIf(t.Type = GrammarNodeType.terminal, """" & t.Name & """", t.Name))
+        'Next
+        'Console.Write(vbTab)
+        'Console.Write("|")
+        'Console.Write(GrammarNode.GNodeEOF.Name)
+        'Console.WriteLine()
 
-        For Each f In M.Keys
-            Console.Write(f.Name)
-            For Each t In termianlnodes.Values
-                If t.Type = GrammarNodeType.null Then
-                    Continue For
-                End If
-                Console.Write(vbTab)
-                Console.Write("|")
-                Console.Write(M(f)(t))
-            Next
-            Console.Write(vbTab)
-            Console.Write("|")
-            Console.Write(M(f)(GrammarNode.GNodeEOF))
-            Console.WriteLine()
+        'For Each f In M.Keys
+        '    Console.Write(f.Name)
+        '    For Each t In termianlnodes.Values
+        '        If t.Type = GrammarNodeType.null Then
+        '            Continue For
+        '        End If
+        '        Console.Write(vbTab)
+        '        Console.Write("|")
+        '        Console.Write(M(f)(t))
+        '    Next
+        '    Console.Write(vbTab)
+        '    Console.Write("|")
+        '    Console.Write(M(f)(GrammarNode.GNodeEOF))
+        '    Console.WriteLine()
 
-        Next
+        'Next
 
 
 
@@ -338,7 +341,7 @@ Public Class Grammar
 
                     grammarline.Derivation.Add(node)
 
-                    
+
                     Match(words.GetNextToken(), Token.TokenType.other, ">")
 
                     tk = words.GetNextToken()
@@ -358,6 +361,8 @@ Public Class Grammar
                     node = GrammarNode.GNodeIdentifier
                 ElseIf tk.StringValue = "S" Then
                     node = GrammarNode.GNodeWhiteSpace
+                ElseIf tk.StringValue = "label" Then
+                    node = GrammarNode.GNodeLabel
                 Else
                     Throw New Exception("错误的符号" & tk.StringValue)
                 End If
@@ -422,8 +427,8 @@ Public Class Grammar
     End Sub
 
 
-    
-    Public Function ParseTree(input As String, definekeywords As IEnumerable(Of String), Optional srcfile As String = "") As GrammerTree
+
+    Public Function ParseTree(input As String, definekeywords As IEnumerable(Of String), defineSkipBlankWords As IEnumerable(Of String), Optional srcfile As String = "") As GrammerTree
 
         Dim tree As New GrammerTree()
 
@@ -433,7 +438,176 @@ Public Class Grammar
 
 
 
-        Dim words = New Lex(srcfile, definekeywords, True).GetWords(input)
+        Dim words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input)
+
+#Region "检测语句label"
+
+        '***检测label  label:for label:while label:do label:switch***
+        '这些关键字前出现 identifier ":" 说明是一个label标记
+        For index = 2 To words.Count - 1
+            Dim token = words(index)
+            If token.Type = Token.TokenType.identifier Then
+                If token.StringValue = "for" Or
+                    token.StringValue = "while" Or
+                    token.StringValue = "do" Or
+                    token.StringValue = "switch" Or
+                    token.StringValue = "if" Or
+                    token.StringValue = "try" Or
+                    token.StringValue = "with" Then
+                    '**前向查找
+                    Dim found As Boolean = False
+                    Dim fidx = index
+
+                    Dim fstep As Integer = 0
+                    Dim stepidx = 0
+
+                    While Not found AndAlso fidx > 0
+                        fidx = fidx - 1
+                        Dim test = words(fidx)
+
+                        If fstep = 0 Then '查找":"
+                            If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+                                Continue While
+                            ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
+                                fstep = 1
+                                stepidx = fidx
+                                Continue While
+                            Else
+                                Exit While
+                            End If
+                        End If
+
+                        If fstep = 1 Then '查找 identifier为 label名
+                            If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+                                Continue While
+                            ElseIf test.Type = Token.TokenType.identifier Then
+
+                                '前一个必须是空或者;
+                                If fidx > 0 Then
+                                    Dim test2 = words(fidx - 1)
+                                    If Not (test2.Type = Token.TokenType.whitespace Or
+                                            (test2.Type = Token.TokenType.other AndAlso
+                                            test2.StringValue = ";")) Then
+
+                                        Exit While
+
+                                    End If
+
+                                End If
+
+
+                                found = True
+                                test.Type = Token.TokenType.label
+
+
+                                '**将label:移动到关键字后面去
+                                words(fidx) = words(index) '关键字向前移动
+                                words(index) = words(stepidx) '冒号后移
+                                words(stepidx) = test
+
+
+                                index = index + 3
+                                Exit While
+                            Else
+                                Exit While
+                            End If
+                        End If
+
+                    End While
+                End If
+            End If
+        Next
+#End Region
+
+#Region "查找代码块label"
+        ' label:{
+
+        For i = 2 To words.Count - 1
+            Dim token = words(i)
+            If token.Type = Token.TokenType.other Then
+                If token.StringValue = "{" Then
+                    '**前向查找":"
+
+                    Dim fidx As Integer = i
+
+
+
+                    While fidx > 0
+                        fidx = fidx - 1
+                        Dim test = words(fidx)
+
+                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+                            Continue While
+                        ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
+                            Exit While
+                        Else
+                            Exit While
+                        End If
+                    End While
+
+                    If Not (words(fidx).Type = Token.TokenType.other And words(fidx).StringValue = ":") Then
+                        Continue For
+                    End If
+                    Dim stepidx As Integer = fidx
+
+                    '***向前查找identifier;
+                    While fidx > 0
+                        fidx = fidx - 1
+                        Dim test = words(fidx)
+
+                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+                            Continue While
+                        ElseIf test.Type = Token.TokenType.identifier Then
+                            Exit While
+                        Else
+                            Exit While
+                        End If
+                    End While
+                    If Not words(fidx).Type = Token.TokenType.identifier Then
+                        Continue For
+                    End If
+
+                    Dim identifieridx As Integer = fidx
+
+                    If words(identifieridx).StringValue = "default" Then
+                        Continue For
+                    End If
+
+                    '***向前查找其他排除项***
+                    While fidx > 0
+                        fidx = fidx - 1
+                        Dim test = words(fidx)
+
+                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+                            Continue While
+                        ElseIf test.Type = Token.TokenType.other And test.StringValue = "." Then
+                            Continue For
+                        ElseIf test.Type = Token.TokenType.identifier And (
+                            test.StringValue = "case") Then
+                            Continue For
+                        Else
+                            Exit While
+                        End If
+                    End While
+
+                    words(identifieridx).Type = Token.TokenType.label
+
+                    Dim temp = words(identifieridx)
+                    '**将label:移动到关键字后面去
+                    words(identifieridx) = words(i) '关键字向前移动
+                    words(i) = words(stepidx) '冒号后移
+                    words(stepidx) = temp
+
+
+                End If
+            End If
+        Next
+
+
+#End Region
+
+
+
 
         words.Reset()
         words.GetNextToken()
@@ -652,6 +826,9 @@ Public Class Grammar
             Return True
         End If
 
+        If node.Type = GrammarNodeType.label And token.Type = Token.TokenType.label Then
+            Return True
+        End If
 
         If node.Type = GrammarNodeType.number And token.Type = ASTool.Token.TokenType.const_number Then
             Return True

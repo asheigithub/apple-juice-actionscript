@@ -36,14 +36,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="error\InternalError.cs" />
+    <Compile Include="HeapSlot.cs" />
+    <Compile Include="nativefuncs\Throw.cs" />
+    <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="operators\OpAdd.cs" />
     <Compile Include="operators\OpAssigning.cs" />
+    <Compile Include="operators\OpBit.cs" />
     <Compile Include="operators\OpCast.cs" />
+    <Compile Include="operators\OpIncrementDecrement.cs" />
     <Compile Include="operators\OpLogic.cs" />
+    <Compile Include="operators\OpMulti.cs" />
     <Compile Include="operators\OpNeg.cs" />
     <Compile Include="operators\OpSub.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
+    <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

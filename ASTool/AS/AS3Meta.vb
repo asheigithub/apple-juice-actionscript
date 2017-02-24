@@ -6,6 +6,10 @@
     Public Class AS3Meta
         Inherits AS3Expression
 
+        Public Sub New(token As Token)
+            MyBase.New(token)
+        End Sub
+
         Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
             MyBase.Write(tabs, srcout)
 

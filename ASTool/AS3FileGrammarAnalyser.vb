@@ -72,6 +72,9 @@ Public Class AS3FileGrammarAnalyser
     Private currentTryStack As Stack(Of AS3Try)
 
 
+    Private currentLabelStack As Stack(Of String)
+
+
     Private as3file As New AS3SrcFile()
 
 
@@ -107,6 +110,9 @@ Public Class AS3FileGrammarAnalyser
         currentSwitchStack = New Stack(Of AS3Switch)
 
         currentTryStack = New Stack(Of AS3Try)
+
+        currentLabelStack = New Stack(Of String)
+
 
         currentMain = Nothing
         currentImpllist = Nothing
@@ -247,6 +253,8 @@ Public Class AS3FileGrammarAnalyser
                 _FOR_STMT(node)
             Case "WHILE"
                 _WHILE(node)
+            Case "WITH"
+                _WITH(node)
             Case "DO"
                 _DO(node)
             Case "TRY"
@@ -604,6 +612,30 @@ Public Class AS3FileGrammarAnalyser
     End Sub
     Sub _PACKAGE_BLOCK(node As GrammerExpr)
 
+        ':<PACKAGE_BLOCK> ::="{"<Label> <PACKAGE_BLOCK_2> | <PACKAGE_EXPR> ;
+
+        If node.Nodes.Count = 3 Then
+
+            Dim lbl As String = Nothing
+            If node.Nodes(1).Nodes.Count = 2 Then
+                lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+            End If
+
+            Dim blockstmts As New List(Of IAS3Stmt)
+            MemberScopeStack.Peek().StamentsStack.Push(blockstmts)
+
+            VisitNodes(node.Nodes(2))
+
+            blockstmts = MemberScopeStack.Peek().StamentsStack.Pop()
+
+            Dim block As New AS3Block(node.MatchedToken)
+            block.CodeList = blockstmts
+            block.label = lbl
+
+            MemberScopeStack.Peek().StamentsStack.Peek().Add(block)
+
+        End If
+
     End Sub
     Sub _PACKAGE_BLOCK_2(node As GrammerExpr)
 
@@ -683,7 +715,7 @@ Public Class AS3FileGrammarAnalyser
 
         If node.Nodes.Count = 4 Then
             Dim use As New AS3Use(node.MatchedToken)
-            Dim as3expr As New AS3Expression
+            Dim as3expr As New AS3Expression(node.Nodes(3).MatchedToken)
             VisitNodes(node.Nodes(3))
             as3expr.exprStepList = node.Nodes(3).exprsteplist
             as3expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
@@ -692,21 +724,21 @@ Public Class AS3FileGrammarAnalyser
             use.xmlnsexpr = as3expr
             MemberScopeStack.Peek().StamentsStack.Peek().Add(use)
 
-        Else
-            '**case
-            Dim sw = currentSwitchStack.Peek()
+            'Else
+            '    '**case
+            '    Dim sw = currentSwitchStack.Peek()
 
-            Dim as3case As New AS3SwitchCase()
-            as3case.IsDefault = True
+            '    Dim as3case As New AS3SwitchCase()
+            '    as3case.IsDefault = True
 
-            Dim body As New List(Of IAS3Stmt)
-            MemberScopeStack.Peek().StamentsStack.Push(body)
+            '    Dim body As New List(Of IAS3Stmt)
+            '    MemberScopeStack.Peek().StamentsStack.Push(body)
 
-            VisitNodes(node.Nodes(1))
+            '    VisitNodes(node.Nodes(1))
 
-            as3case.Body = MemberScopeStack.Peek().StamentsStack.Pop()
+            '    as3case.Body = MemberScopeStack.Peek().StamentsStack.Pop()
 
-            sw.CaseList.Add(as3case)
+            '    sw.CaseList.Add(as3case)
         End If
 
 
@@ -934,7 +966,7 @@ Public Class AS3FileGrammarAnalyser
 
             'Throw New Exception("<ClassMetaProperty>未实现")
 
-            Dim meta As New AS3Meta()
+            Dim meta As New AS3Meta(node.MatchedToken)
             VisitNodes(node.Nodes(0))
             meta.exprStepList = node.Nodes(0).exprsteplist
 
@@ -969,7 +1001,7 @@ Public Class AS3FileGrammarAnalyser
 
                     VisitNodes(node.Nodes(0))
 
-                    Dim expr As New AS3Meta
+                    Dim expr As New AS3Meta(node.MatchedToken)
                     expr.exprStepList = node.Nodes(0).exprsteplist
                     expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
@@ -1136,6 +1168,27 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _BLOCK(node As GrammerExpr)
+        '<BLOCK> ::="{"<Label> <BP2>     ;
+
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+
+        Dim blockstmts As New List(Of IAS3Stmt)
+        MemberScopeStack.Peek().StamentsStack.Push(blockstmts)
+
+        VisitNodes(node.Nodes(2))
+
+        blockstmts = MemberScopeStack.Peek().StamentsStack.Pop()
+
+        Dim block As New AS3Block(node.MatchedToken)
+        block.CodeList = blockstmts
+        block.label = lbl
+
+        MemberScopeStack.Peek().StamentsStack.Peek().Add(block)
+
 
     End Sub
     Sub _BP2(node As GrammerExpr)
@@ -1151,14 +1204,21 @@ Public Class AS3FileGrammarAnalyser
     End Sub
     Sub _IF(node As GrammerExpr)
 
-        '<IF>   ::="if" "(" <ExpressionList> ")" <Stmt><IFElse>;
+        '<IF>   ::="if" <Label> "(" <ExpressionList> ")" <Stmt><IFElse>;
         '<IFElse> ::="else" <Stmt>|null;
 
         Dim as3if As New AS3IF(node.MatchedToken)
 
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+        as3if.label = lbl
+
         Dim condition As New AS3StmtExpressions(node.MatchedToken)
 
-        VisitNodes(node.Nodes(2))
+        VisitNodes(node.Nodes(3))
 
         condition.as3exprlist = currentparseExprListStack.Pop()
 
@@ -1167,16 +1227,16 @@ Public Class AS3FileGrammarAnalyser
         Dim truepass As New List(Of IAS3Stmt)
         MemberScopeStack.Peek().StamentsStack.Push(truepass)
 
-        VisitNodes(node.Nodes(4))
+        VisitNodes(node.Nodes(5))
 
         as3if.TruePass = MemberScopeStack.Peek().StamentsStack.Pop()
 
-        If node.Nodes(5).Nodes.Count > 0 Then
+        If node.Nodes(6).Nodes.Count > 0 Then
 
             Dim elsepass As New List(Of IAS3Stmt)
             MemberScopeStack.Peek().StamentsStack.Push(elsepass)
 
-            VisitNodes(node.Nodes(5).Nodes(1))
+            VisitNodes(node.Nodes(6).Nodes(1))
 
             as3if.FalsePass = MemberScopeStack.Peek().StamentsStack.Pop()
 
@@ -1187,15 +1247,65 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _FOR_STMT(node As GrammerExpr)
+        '<FOR_STMT>  ::="for"<Label><FORTYPE>;
+
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+
+        End If
+
+        currentLabelStack.Push(lbl)
+
 
     End Sub
+
+    Sub _WITH(node As GrammerExpr)
+        '<WITH>		::="with"  <Label> "(" <ExpressionList> ")" "{" <Stmts> "}";
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+        Dim as3with As New AS3.AS3With(node.MatchedToken)
+        as3with.label = lbl
+
+        Dim withObj As New AS3StmtExpressions(node.MatchedToken)
+
+        VisitNodes(node.Nodes(3))
+
+        withObj.as3exprlist = currentparseExprListStack.Pop()
+
+        as3with.withObject = withObj
+
+
+        Dim body As New List(Of IAS3Stmt)
+
+        MemberScopeStack.Peek().StamentsStack.Push(body)
+        VisitNodes(node.Nodes(6))
+
+        as3with.Body = MemberScopeStack.Peek().StamentsStack.Pop()
+
+
+        MemberScopeStack.Peek().StamentsStack.Peek().Add(as3with)
+
+    End Sub
+
     Sub _WHILE(node As GrammerExpr)
-        '::="while" "(" <ExpressionList> ")" <Stmt>;
+        '::="while"<Label> "(" <ExpressionList> ")" <Stmt>;
+
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
         Dim as3while As New AS3While(node.MatchedToken)
+        as3while.label = lbl
 
         Dim conditon As New AS3StmtExpressions(node.MatchedToken)
 
-        VisitNodes(node.Nodes(2))
+        VisitNodes(node.Nodes(3))
 
         conditon.as3exprlist = currentparseExprListStack.Pop()
 
@@ -1204,7 +1314,7 @@ Public Class AS3FileGrammarAnalyser
         Dim body As New List(Of IAS3Stmt)
 
         MemberScopeStack.Peek().StamentsStack.Push(body)
-        VisitNodes(node.Nodes(4))
+        VisitNodes(node.Nodes(5))
 
         as3while.Body = MemberScopeStack.Peek().StamentsStack.Pop()
 
@@ -1213,22 +1323,31 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _DO(node As GrammerExpr)
-        '<DO>        ::= "do" <Stmt><DO_CONDITION>;
+        '<DO>        ::= "do"<Label> <Stmt><DO_CONDITION>;
         '<DO_CONDITION> ::="while" "(" <ExpressionList> ")";
 
+
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+
         Dim as3do As New AS3DoWhile(node.MatchedToken)
+        as3do.label = lbl
+
 
         Dim body As New List(Of IAS3Stmt)
 
         MemberScopeStack.Peek().StamentsStack.Push(body)
-        VisitNodes(node.Nodes(1))
+        VisitNodes(node.Nodes(2))
 
         as3do.Body = MemberScopeStack.Peek().StamentsStack.Pop()
 
 
         Dim conditon As New AS3StmtExpressions(node.MatchedToken)
 
-        VisitNodes(node.Nodes(2).Nodes(2))
+        VisitNodes(node.Nodes(3).Nodes(2))
 
         conditon.as3exprlist = currentparseExprListStack.Pop()
 
@@ -1240,24 +1359,29 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _TRY(node As GrammerExpr)
-        '"try" "{" <TRYBLOCK> "}" <CATCHLIST> <FINALLY>;
+        '"try" <Label> "{" <TRYBLOCK> "}" <CATCHLIST> <FINALLY>;
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
         Dim as3try As New AS3Try(node.MatchedToken)
+        as3try.label = lbl
 
         currentTryStack.Push(as3try)
 
         Dim tryblock As New List(Of IAS3Stmt)
         MemberScopeStack.Peek().StamentsStack.Push(tryblock)
-        VisitNodes(node.Nodes(2))
+        VisitNodes(node.Nodes(3))
         as3try.TryBlock = MemberScopeStack.Peek().StamentsStack.Pop()
 
 
-        VisitNodes(node.Nodes(4))
+        VisitNodes(node.Nodes(5))
 
 
 
         Dim finallyblock As New List(Of IAS3Stmt)
         MemberScopeStack.Peek().StamentsStack.Push(finallyblock)
-        VisitNodes(node.Nodes(5))
+        VisitNodes(node.Nodes(6))
         as3try.FinallyBlock = MemberScopeStack.Peek().StamentsStack.Pop()
 
 
@@ -1271,7 +1395,7 @@ Public Class AS3FileGrammarAnalyser
         Dim as3throw As New AS3Throw(node.MatchedToken)
 
         If node.Nodes(1).Nodes.Count > 0 Then
-            Dim as3expr As New AS3Expression
+            Dim as3expr As New AS3Expression(node.Nodes(1).MatchedToken)
 
             VisitNodes(node.Nodes(1).Nodes(0))
 
@@ -1289,33 +1413,39 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _SWITCH(node As GrammerExpr)
-        '"switch" "(" <Expression> ")" "{" <CASEBODY> ;
+        '"switch" <Label> "(" <Expression> ")" "{" <CASEBODY> ;
         Dim sw As New AS3Switch(node.MatchedToken)
 
-        VisitNodes(node.Nodes(2))
+        Dim lbl As String = Nothing
+        If node.Nodes(1).Nodes.Count = 2 Then
+            lbl = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+        sw.label = lbl
 
-        Dim expr As New AS3Expression()
-        expr.exprStepList = node.Nodes(2).exprsteplist
+        VisitNodes(node.Nodes(3))
+
+        Dim expr As New AS3Expression(node.Nodes(3).MatchedToken)
+        expr.exprStepList = node.Nodes(3).exprsteplist
         expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
         sw.Expr = expr
 
         currentSwitchStack.Push(sw)
 
-        VisitNodes(node.Nodes(5))
+        VisitNodes(node.Nodes(6))
 
         MemberScopeStack.Peek().StamentsStack.Peek().Add(currentSwitchStack.Pop())
 
     End Sub
 
     Sub _SWITCH_CASE(node As GrammerExpr)
-        '"case" <Expression> ":"<CASESTMT> |<CaseDefultOrXMLUse> ;
+        '<SWITCH_CASE> ::="case" <Expression> ":"<CASESTMT> | "default:" <CASESTMT> ;
 
         Dim sw = currentSwitchStack.Peek()
 
         If node.Nodes.Count = 4 Then
-            Dim as3case As New AS3SwitchCase()
+            Dim as3case As New AS3SwitchCase(node.MatchedToken)
 
-            Dim expr As New AS3Expression()
+            Dim expr As New AS3Expression(node.Nodes(1).MatchedToken)
 
             VisitNodes(node.Nodes(1))
 
@@ -1331,10 +1461,27 @@ Public Class AS3FileGrammarAnalyser
 
             as3case.Body = MemberScopeStack.Peek().StamentsStack.Pop()
 
+            Dim reg = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+            as3case.holdreg = reg
+
             sw.CaseList.Add(as3case)
         Else
-            VisitNodes(node.Nodes(0))
+            'VisitNodes(node.Nodes(0))
 
+            Dim as3case As New AS3SwitchCase(node.MatchedToken)
+            as3case.IsDefault = True
+
+            Dim body As New List(Of IAS3Stmt)
+            MemberScopeStack.Peek().StamentsStack.Push(body)
+
+            VisitNodes(node.Nodes(1))
+
+            as3case.Body = MemberScopeStack.Peek().StamentsStack.Pop()
+
+            Dim reg = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+            as3case.holdreg = reg
+
+            sw.CaseList.Add(as3case)
         End If
 
 
@@ -1360,10 +1507,23 @@ Public Class AS3FileGrammarAnalyser
         MemberScopeStack.Peek().StamentsStack.Peek().Add(as3return)
     End Sub
     Sub _Break(node As GrammerExpr)
-        MemberScopeStack.Peek().StamentsStack.Peek().Add(New AS3Break(node.MatchedToken))
+
+        Dim nodeflag As String = Nothing
+        If node.Nodes(1).Nodes.Count > 0 Then
+            nodeflag = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+        MemberScopeStack.Peek().StamentsStack.Peek().Add(New AS3Break(node.MatchedToken) With {.breakFlag = nodeflag})
     End Sub
     Sub _Continue(node As GrammerExpr)
-        MemberScopeStack.Peek().StamentsStack.Peek().Add(New AS3Continue(node.MatchedToken))
+
+        Dim nodeflag As String = Nothing
+        If node.Nodes(1).Nodes.Count > 0 Then
+            nodeflag = node.Nodes(1).Nodes(0).MatchedToken.StringValue
+        End If
+
+
+        MemberScopeStack.Peek().StamentsStack.Peek().Add(New AS3Continue(node.MatchedToken) With {.continueFlag = nodeflag})
     End Sub
 
     Sub _AExprList(node As GrammerExpr)
@@ -1394,7 +1554,7 @@ Public Class AS3FileGrammarAnalyser
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
         VisitNodes(node.Nodes(0))
 
-        Dim as3expr As New AS3Expression()
+        Dim as3expr As New AS3Expression(node.Nodes(0).MatchedToken)
         as3expr.exprStepList = node.Nodes(0).exprsteplist
         as3expr.Value = MemberScopeStack.Peek().ExprDataStack.Peek()
 
@@ -1448,7 +1608,7 @@ Public Class AS3FileGrammarAnalyser
         variable.TypeStr = getDefTypeStr(node.Nodes(1))
 
         If node.Nodes(2).Nodes.Count > 0 Then
-            Dim expr As New AS3Expression
+            Dim expr As New AS3Expression(node.Nodes(2).Nodes(1).MatchedToken)
 
             VisitNodes(node.Nodes(2).Nodes(1))
             expr.exprStepList = node.Nodes(2).Nodes(1).exprsteplist
@@ -1544,7 +1704,7 @@ Public Class AS3FileGrammarAnalyser
         as3const.TypeStr = getDefTypeStr(node.Nodes(1))
 
         If node.Nodes(2).Nodes.Count > 0 Then
-            Dim expr As New AS3Expression
+            Dim expr As New AS3Expression(node.Nodes(2).Nodes(1).MatchedToken)
 
             VisitNodes(node.Nodes(2).Nodes(1))
             expr.exprStepList = node.Nodes(2).Nodes(1).exprsteplist
@@ -1623,7 +1783,7 @@ Public Class AS3FileGrammarAnalyser
             para.TypeStr = getDefTypeStr(node.Nodes(1))
 
             If node.Nodes(2).Nodes.Count = 2 Then
-                Dim expr As New AS3Expression()
+                Dim expr As New AS3Expression(node.Nodes(2).Nodes(1).MatchedToken)
 
                 VisitNodes(node.Nodes(2).Nodes(1))
                 expr.exprStepList = node.Nodes(2).Nodes(1).exprsteplist
@@ -1712,7 +1872,7 @@ Public Class AS3FileGrammarAnalyser
 
 
         VisitNodes(nodeforeach.Nodes(1))
-        Dim forinexpr = New AS3Expression()
+        Dim forinexpr = New AS3Expression(nodeforeach.Nodes(1).MatchedToken)
         forinexpr.exprStepList = nodeforeach.Nodes(1).exprsteplist
         forinexpr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
@@ -1726,7 +1886,7 @@ Public Class AS3FileGrammarAnalyser
         as3foreach.ForArg = foreachArg
         as3foreach.ForExpr = forinexpr
         as3foreach.Body = foreachinbody
-
+        as3foreach.label = currentLabelStack.Pop()
         MemberScopeStack.Peek().StamentsStack.Peek().Add(as3foreach)
 
     End Sub
@@ -1751,6 +1911,14 @@ Public Class AS3FileGrammarAnalyser
             If node.Nodes(1).Nodes(0).GrammerLeftNode.Name = "FOR" Then
 
                 VisitNodes(node.Nodes(0))
+                If node.Nodes(0).Nodes(0).GrammerLeftNode.Name = "F_ExpressionList" Then
+
+                    Dim exprs As New AS3StmtExpressions(node.Nodes(0).MatchedToken)
+                    exprs.as3exprlist = currentparseExprListStack.Pop()
+
+                    MemberScopeStack.Peek().StamentsStack.Peek().Add(exprs)
+
+                End If
                 VisitNodes(node.Nodes(1))
 
             Else
@@ -1797,7 +1965,7 @@ Public Class AS3FileGrammarAnalyser
 
 
                     VisitNodes(nodeforin.Nodes(1))
-                    Dim forinexpr = New AS3Expression()
+                    Dim forinexpr = New AS3Expression(nodeforin.Nodes(1).MatchedToken)
                     forinexpr.exprStepList = nodeforin.Nodes(1).exprsteplist
                     forinexpr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
@@ -1811,6 +1979,7 @@ Public Class AS3FileGrammarAnalyser
                     as3forin.ForArg = forinArg
                     as3forin.ForExpr = forinexpr
                     as3forin.Body = forinbody
+                    as3forin.label = currentLabelStack.Pop()
 
                     MemberScopeStack.Peek().StamentsStack.Peek().Add(as3forin)
 
@@ -1833,14 +2002,14 @@ Public Class AS3FileGrammarAnalyser
     End Sub
     Sub _FOR(node As GrammerExpr)
 
-        Dim forpart1 As AS3StmtExpressions = Nothing
+        'Dim forpart1 As AS3StmtExpressions = Nothing
         Dim forpart2 As AS3StmtExpressions = Nothing
 
-        If currentparseExprListStack.Count > 0 Then
-            forpart1 = New AS3StmtExpressions(node.MatchedToken)
-            forpart1.as3exprlist = currentparseExprListStack.Pop()
+        'If currentparseExprListStack.Count > 0 Then
+        '    forpart1 = New AS3StmtExpressions(node.MatchedToken)
+        '    forpart1.as3exprlist = currentparseExprListStack.Peek()
 
-        End If
+        'End If
 
 
         If node.Nodes(1).Nodes.Count > 0 Then
@@ -1869,10 +2038,12 @@ Public Class AS3FileGrammarAnalyser
         Dim forbody As List(Of IAS3Stmt) = MemberScopeStack.Peek().StamentsStack.Pop()
 
         Dim as3for As New AS3For(node.MatchedToken)
-        as3for.Part1 = forpart1
+        'as3for.Part1 = forpart1
         as3for.Part2 = forpart2
         as3for.Part3 = forpart3
         as3for.Body = forbody
+
+        as3for.label = currentLabelStack.Pop()
 
         MemberScopeStack.Peek().StamentsStack.Peek().Add(as3for)
 
@@ -2029,21 +2200,99 @@ Public Class AS3FileGrammarAnalyser
             VisitNodes(node.Nodes(1))
 
 
-            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
-
-
             Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
             Dim arg1 = MemberScopeStack.Peek().ExprDataStack.Pop()
 
-            Dim op As New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
-            op.Type = Expr.OpType.Assigning
-            op.OpCode = node.Nodes(0).MatchedToken.StringValue
-            op.Arg1 = arg1
-            op.Arg2 = arg2
 
-            node.exprsteplist.Add(op)
+            Dim code As String = node.Nodes(0).MatchedToken.StringValue
 
-            MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+
+            If code = "||=" Then
+                '***短路拆分***
+                Dim lv_true_flag As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+                lv_true_flag.Type = Expr.OpType.Flag
+                lv_true_flag.OpCode = "logicOr_leftvalue_true_" & AS3.Expr.AS3ExprStep.GetFlagId().ToString()
+
+                Dim opifgoto_lvtrue As New AS3.Expr.AS3ExprStep(node.MatchedToken)    '短路操作
+                opifgoto_lvtrue.Arg1 = arg1
+                opifgoto_lvtrue.OpCode = lv_true_flag.OpCode
+                opifgoto_lvtrue.Type = Expr.OpType.IF_GotoFlag
+
+                node.exprsteplist.Add(opifgoto_lvtrue)
+
+                node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+                Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+                op.Type = Expr.OpType.Assigning
+                op.OpCode = "="
+                op.Arg1 = arg1
+                op.Arg2 = arg2
+
+                node.exprsteplist.Add(op)
+
+                node.exprsteplist.Add(lv_true_flag)
+
+                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+
+            ElseIf code <> "=" Then
+                '操作拆分  v<temp> = arg1+arg2
+                '         arg1 = v<temp>
+                node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+                Dim rcode = code.Substring(0, code.Length - 1)
+
+                Dim optype As Expr.OpType
+
+                If rcode = "+" Or rcode = "-" Then
+                    optype = Expr.OpType.Plus
+                ElseIf rcode = "*" Or rcode = "/" Or rcode = "%" Then
+                    optype = Expr.OpType.Multiply
+                ElseIf rcode = "<<" Or rcode = ">>" Or rcode = ">>>" Then
+                    optype = Expr.OpType.BitShift
+                ElseIf rcode = "&" Then
+                    optype = Expr.OpType.BitAnd
+                ElseIf rcode = "|" Then
+                    optype = Expr.OpType.BitOr
+                ElseIf rcode = "^" Then
+                    optype = Expr.OpType.BitXor
+                End If
+
+                Dim reg = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+                Dim op As New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
+                op.Type = optype
+                op.OpCode = rcode
+                op.Arg1 = reg
+                op.Arg2 = arg1
+                op.Arg3 = arg2
+
+                node.exprsteplist.Add(op)
+
+
+                op = New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
+                op.Type = Expr.OpType.Assigning
+                op.OpCode = "="
+                op.Arg1 = arg1
+                op.Arg2 = reg
+
+                node.exprsteplist.Add(op)
+
+                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+
+            Else
+                node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+                Dim op As New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
+                op.Type = Expr.OpType.Assigning
+                op.OpCode = node.Nodes(0).MatchedToken.StringValue
+                op.Arg1 = arg1
+                op.Arg2 = arg2
+
+                node.exprsteplist.Add(op)
+
+                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+
+            End If
+
 
         End If
 
@@ -2256,17 +2505,64 @@ Public Class AS3FileGrammarAnalyser
             Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
             Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
 
-            Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-            op.Arg1 = arg1
-            op.Arg2 = arg2
-            op.Arg3 = arg3
-            op.OpCode = "&&"
-            op.Type = Expr.OpType.LogicAnd
+            'Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            'op.Arg1 = arg1
+            'op.Arg2 = arg2
+            'op.Arg3 = arg3
+            'op.OpCode = "&&"
+            'op.Type = Expr.OpType.LogicAnd
 
             MemberScopeStack.Peek().ExprDataStack.Push(arg1)
 
+            'node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+            'node.exprsteplist.Add(op)
+
+            '**如果arg2为真，则继续求arg3的值，否则直接返回arg2的值
+            Dim lv_true_flag As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            lv_true_flag.Type = Expr.OpType.Flag
+            lv_true_flag.OpCode = "logicAnd_leftvalue_true_" & AS3.Expr.AS3ExprStep.GetFlagId().ToString()
+
+            Dim lv_false_flag As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            lv_false_flag.Type = Expr.OpType.Flag
+            lv_false_flag.OpCode = "logicAnd_leftvalue_false_" & AS3.Expr.AS3ExprStep.GetFlagId().ToString()
+
+            Dim opifgoto_lvtrue As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            opifgoto_lvtrue.Arg1 = arg2
+            opifgoto_lvtrue.OpCode = lv_true_flag.OpCode
+            opifgoto_lvtrue.Type = Expr.OpType.IF_GotoFlag
+
+
+            node.exprsteplist.Add(opifgoto_lvtrue)
+
+            Dim op1 As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            op1.Type = Expr.OpType.Assigning
+            op1.OpCode = "="
+            op1.Arg1 = arg1
+            op1.Arg2 = arg2
+
+            node.exprsteplist.Add(op1)
+            Dim opgoto As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            opgoto.Type = Expr.OpType.GotoFlag
+            opgoto.OpCode = lv_false_flag.OpCode
+
+            node.exprsteplist.Add(opgoto)
+
+            node.exprsteplist.Add(lv_true_flag)
+
             node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
-            node.exprsteplist.Add(op)
+
+            Dim op2 As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            op2.Type = Expr.OpType.Assigning
+            op2.OpCode = "="
+            op2.Arg1 = arg1
+            op2.Arg2 = arg3
+            node.exprsteplist.Add(op2)
+            node.exprsteplist.Add(lv_false_flag)
+
+
+
+
+
 
             VisitNodes(node.Nodes(2))
             node.exprsteplist.AddRange(node.Nodes(2).exprsteplist)
@@ -2928,8 +3224,8 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _E4XAccess(node As GrammerExpr)
-        '"*"| "@"<E4XAccess_1>;    <E4XAccess_1>  ::=identifier|"*";
-        '<F_E4XAccess>  ::=".."<NSAccess>;
+        '"@"<E4XAccess_1>;    <E4XAccess_1>  ::=identifier|"*";
+        '<F_E4XAccess>  ::=".."<NSAccess>|".*";
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
@@ -2993,6 +3289,27 @@ Public Class AS3FileGrammarAnalyser
             '    MemberScopeStack.Peek().ExprDataStack.Push(arg3)
 
             'End If
+        ElseIf node.Nodes(0).GrammerLeftNode.Name = ".*" Then
+            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
+            Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+
+            Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            op.Arg1 = arg1
+            op.Arg2 = arg2
+            op.OpCode = "*"
+            op.Type = Expr.OpType.E4XAccess
+
+
+
+            'If op.OpCode = ".." Then
+            MemberScopeStack.Peek().ExprDataStack.Pop()
+            'End If
+
+
+
+            MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+            node.exprsteplist.Add(op)
+
 
         ElseIf node.Nodes(0).GrammerLeftNode.Name = "*" Then
             'If node.MatchedToken.StringValue = ".." Then
@@ -3082,7 +3399,7 @@ Public Class AS3FileGrammarAnalyser
             'node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
             node.exprsteplist.Add(op)
 
-            End If
+        End If
 
 
     End Sub
@@ -3134,13 +3451,13 @@ Public Class AS3FileGrammarAnalyser
                 node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
             Else
                 VisitNodes(node.Nodes(0))
-                
+
                 node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
 
             End If
 
 
-            
+
 
 
         End If
@@ -3403,7 +3720,7 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes.Count > 0 Then
             VisitNodes(node.Nodes(0))
 
-            Dim expr As New AS3Expression()
+            Dim expr As New AS3Expression(node.Nodes(0).MatchedToken)
             expr.exprStepList = node.Nodes(0).exprsteplist
             expr.Value = MemberScopeStack.Peek().ExprDataStack.Peek()
 
@@ -3449,7 +3766,7 @@ Public Class AS3FileGrammarAnalyser
 
         Dim vn = node.Nodes(0).MatchedToken
 
-        Dim expr As New AS3Expression()
+        Dim expr As New AS3Expression(node.Nodes(2).MatchedToken)
         VisitNodes(node.Nodes(2))
         expr.exprStepList = node.Nodes(2).exprsteplist
 

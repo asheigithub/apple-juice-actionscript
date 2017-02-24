@@ -12,8 +12,8 @@ Module Module1
 
 
         Dim lex As New Lex("D:\ASTool\ASTool\PG1.txt")
-        Dim words = lex.GetWords(My.Computer.FileSystem.ReadAllText(lex.File))
-        words.Write(New ConSrcOut(), 0)
+        Dim words = lex.GetWords(My.Resources.PG1) 'My.Computer.FileSystem.ReadAllText(lex.File))
+        'words.Write(New ConSrcOut(), 0)
 
 
         'Dim i As Integer = 1
@@ -22,17 +22,17 @@ Module Module1
 
         Dim grammar As New Grammar(words)
 
-        'parseAS3(grammar)
-        'Return
+        parseAS3(grammar)
+        Return
 
 
-        Dim teststring As String = "package{} 6/2/3+(3- 4) * (5 +6)+7//;{123{;13+456;;}{}}"
+        'Dim teststring As String = "package{} 6/2/3+(3- 4) * (5 +6)+7//;{123{;13+456;;}{}}"
 
         'Dim teststring As String = "package{} for(var i:int;i<5;i++){ (function($what){alert($what)})(i)} " '"package{ var i=new int(); }"
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files\Adobe Gaming SDK 1.3\Frameworks\Box2DFlashAS3 2.1a\Examples\General\Input.as")
+        Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\implement\net\fishluv\sanguo2\client\biz\impl\plan\PlanRowData.as")
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files (x86)\Adobe Gaming SDK 1.4\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\SceneConsole.as")
@@ -42,7 +42,7 @@ Module Module1
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\ui\IForm.as")
 
-        Dim tree = grammar.ParseTree(teststring, AS3LexKeywords.LEXKEYWORDS, teststring)
+        Dim tree = grammar.ParseTree(teststring, AS3LexKeywords.LEXKEYWORDS, AS3LexKeywords.LEXSKIPBLANKWORDS, teststring)
 
 
 
@@ -92,13 +92,13 @@ Module Module1
     End Sub
 
     Private Sub parseAS3(grammar As Grammar)
-        'Dim rootpaths As String() = {"D:\fishluv_svn_repository\NewSG\trunk\program\client\SG2Mobile3\src",
-        '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\implement",
-        '                                "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\interface",
-        '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\implement",
-        '                             "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\interface"}
+        Dim rootpaths As String() = {"D:\fishluv_svn_repository\NewSG\trunk\program\client\SG2Mobile3\src",
+                                     "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\implement",
+                                        "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\interface",
+                                     "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\implement",
+                                     "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\interface"}
 
-        Dim rootpaths As String() = {"E:\新建文件夹\Box2DFlashAS3 2.1a\Source"}
+        'Dim rootpaths As String() = {"E:\新建文件夹\Box2DFlashAS3 2.1a\Source"}
 
         'Dim rootpaths As String() = {"D:\ASCRIPT\ascript-master\ascript-master\src"}
         'Dim rootpaths As String() = {" D:\flash-x\game\src"}
@@ -143,12 +143,13 @@ Module Module1
                 Continue For
             End If
 
-            Dim tree = grammar.ParseTree(strProg , AS3LexKeywords.LEXKEYWORDS, fs)
+            Dim tree = grammar.ParseTree(strProg, AS3LexKeywords.LEXKEYWORDS, AS3LexKeywords.LEXSKIPBLANKWORDS, fs)
             'Dim tt = tree.GetTreeString()
             If grammar.hasError Then
                 Console.ForegroundColor = ConsoleColor.Red
                 Console.WriteLine(fs & "有误")
                 Console.ResetColor()
+                GoTo over
             Else
                 Console.ForegroundColor = ConsoleColor.Green
                 Console.WriteLine(fs & "分析语法树成功")
@@ -174,7 +175,7 @@ Module Module1
         proj.Analyse()
 
 
-
+over:
 
 
         Console.WriteLine("OK")

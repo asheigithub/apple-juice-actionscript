@@ -12,6 +12,12 @@
     terminal
 
     ''' <summary>
+    ''' 检测出的label
+    ''' </summary>
+    label
+
+
+    ''' <summary>
     ''' 终结符-数字 number
     ''' </summary>
     ''' <remarks></remarks>

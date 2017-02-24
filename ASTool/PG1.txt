@@ -31,7 +31,9 @@
 <StmtList> ::= <Stmts> | null;
 <Stmt> ::= <BLOCK> |";";
 
-<BLOCK> ::="{" <BP2> | <Expression> ;
+
+
+<BLOCK> ::= "{" <BP2> | <Expression> ;
 <BP2>   ::= <Stmts> "}"|"}";
 
 
@@ -62,13 +64,11 @@
 <PACKAGE_NAME> ::=<ClassPath>|null;
 
 
-
-
 <PACKAGE_STMTS> ::=<PACKAGE_STMT><PACKAGE_STMTS1>;
 <PACKAGE_STMTS1> ::=<PACKAGE_STMT><PACKAGE_STMTS1>|null;
 <PACKAGE_STMT> ::=<PACKAGE_BLOCK>|";";
 
-<PACKAGE_BLOCK> ::="{" <PACKAGE_BLOCK_2> | <PACKAGE_EXPR> ;
+<PACKAGE_BLOCK> ::="{"<Label> <PACKAGE_BLOCK_2> | <PACKAGE_EXPR> ;
 <PACKAGE_BLOCK_2>   ::= <PACKAGE_STMTS> "}"|"}";
 
 <PACKAGE_EXPR> ::= <ACCESS_DEF>|<Syntax>|<ExpressionList>;
@@ -76,14 +76,14 @@
 
 <Import>    ::= "import"  <Import_ClassPath> ;    
 <Import_ClassPath> ::= <Import_ClassName><Import_ClassPath_1>;
-<Import_ClassPath_1> ::="."<Import_ClassName><Import_ClassPath_1>|null;
+<Import_ClassPath_1> ::=".*"|"."<Import_ClassName><Import_ClassPath_1>|null;
 <Import_ClassName> ::= identifier|"*";
 
 <Use>       ::= "use" "namespace"  <ClassPath> ; //"default" "xml" "namespace" "=" <Expression>; 
 
 <CaseDefultOrXMLUse> ::="default" <CaseDefultOrXMLUse_1>;
-<CaseDefultOrXMLUse_1> ::= identifier "namespace" "=" <Expression> |
-						   ":" <CASESTMT> ; 
+<CaseDefultOrXMLUse_1> ::= identifier "namespace" "=" <Expression> ;//|
+						   //":" <CASESTMT> ; 
 
 
 
@@ -118,16 +118,17 @@
 <Stmts> ::= <Stmt> <StmtList>;
 <StmtList> ::= <Stmt><StmtList> | null;
 
-<BLOCK> ::="{" <BP2>     ;
+<BLOCK> ::="{"<Label> <BP2>     ;
 <BP2>   ::= <Stmts> "}"|"}";
 
 <Stmt> ::= <BLOCK>		|    <Syntax>|";"|<ACCESS_MEMBER><EatAnSemicolon>;
 
+
 <Syntax> ::=<Use> |<Import> |<CaseDefultOrXMLUse>|
-			<IF>		|
-			<FOR_STMT>		|
-			<WHILE>			|
-			<DO>			|
+			<IF>		|	
+			<FOR_STMT>		|	
+			<WHILE>			|<WITH>		|
+			<DO>			|	
 			<TRY>			|
 			<THROW>	<EatAnSemicolon>	|
 			<SWITCH>		|
@@ -201,19 +202,21 @@
 <FunctionBody>::=<Stmts>|null;
 
 
-
 <Return>  ::="return"<ReturnValue>;
 <ReturnValue> ::=<ExpressionList>|null;
 
-<Break>   ::="break";
-<Continue> ::="continue";
+<Break>   ::="break" <LabelFlag>;
+<Continue> ::="continue" <LabelFlag>;
 
 
-<IF>   ::="if" "(" <ExpressionList> ")" <Stmt><IFElse>;
+<Label>	::=label ":"|null;
+<LabelFlag> ::=identifier|null;
+
+<IF>   ::="if" <Label> "(" <ExpressionList> ")" <Stmt><IFElse>;
 <IFElse> ::="else" <Stmt>|null;
 
 
-<FOR_STMT>  ::="for"<FORTYPE>  ;
+<FOR_STMT>  ::="for"<Label><FORTYPE>;			//<Label>在语法分析器初始阶段用程序移动到了关键字后面，否则无法写出文法
 
 <FORTYPE> ::=<Each>|<FOR_FORIN>;
 
@@ -237,12 +240,12 @@
 <FORPART3>  ::=<ExpressionList>|null;
 
 
-<WHILE>     ::="while" "(" <ExpressionList> ")" <Stmt>;
-
-<DO>        ::= "do" <Stmt><DO_CONDITION>;
+<WHILE>     ::="while" <Label> "(" <ExpressionList> ")" <Stmt>;
+<WITH>		::="with"  <Label> "(" <ExpressionList> ")" "{" <Stmts> "}";
+<DO>        ::= "do"<Label><Stmt><DO_CONDITION>;
 <DO_CONDITION> ::="while" "(" <ExpressionList> ")";//|null;
 
-<TRY>       ::="try" "{" <TRYBLOCK> "}" <CATCHLIST> <FINALLY>;
+<TRY>       ::="try"<Label> "{" <TRYBLOCK> "}" <CATCHLIST> <FINALLY>;
 <TRYBLOCK>  ::=<Stmts>|null; 
 
 <THROW>     ::="throw" <THROWEXCEPTION>;
@@ -257,8 +260,8 @@
 <FINALLY> ::= "finally" "{" <FINALLYBLOCK> "}" |null;
 <FINALLYBLOCK> ::=<Stmts>|null;
 
-<SWITCH>	::= "switch" "(" <Expression> ")" "{" <CASEBODY> ;
-<SWITCH_CASE> ::="case" <Expression> ":"<CASESTMT> |<CaseDefultOrXMLUse>  ;//| "default" ":" <CASESTMT> ;
+<SWITCH>	::="switch"<Label> "(" <Expression> ")" "{" <CASEBODY>  ;
+<SWITCH_CASE> ::="case" <Expression> ":"<CASESTMT> | "default:" <CASESTMT> ;
 <CASESTMT>    ::=<Stmts>|null;
 <CASELIST>    ::=<SWITCH_CASE><CASELIST1>;
 <CASELIST1>	  ::=<SWITCH_CASE><CASELIST1>|null;
@@ -440,10 +443,11 @@
 
 
 //<E4XAccess> ::="@"<E4XAccess1>  |"*";
-<E4XAccess>    ::="*"| "@"<E4XAccess_1>  ;
+<E4XAccess>    ::="@"<E4XAccess_1>  ;
 <E4XAccess_1>  ::=identifier|"*"|"["<ExpressionList>"]";
 
-<F_E4XAccess>  ::=".."<E4XNSAPPEND>;
+//<F_E4XAccess>  ::=".."<E4XNSAPPEND>;
+<F_E4XAccess>  ::=".."<NSAccess>|".*";
 <E4XFilter>    ::="(" <AExprList> ")";
 
 

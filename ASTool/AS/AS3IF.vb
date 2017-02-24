@@ -1,6 +1,9 @@
 ﻿Namespace AS3
     Public Class AS3IF
         Implements IAS3Stmt
+
+        Public label As String
+
         Private matchtoken As Token
         Public Sub New(token As Token)
             Me.matchtoken = token
@@ -21,7 +24,7 @@
 
             Condition.Write(tabs, srcout)
 
-            srcout.WriteLn("if (" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
+            srcout.WriteLn(IIf(label Is Nothing, "", label & ":") & "if (" & Condition.as3exprlist(Condition.as3exprlist.Count - 1).Value.ToString() & ")", tabs)
             srcout.WriteLn("{", tabs)
             For Each s In TruePass
                 s.Write(tabs + 1, srcout)

@@ -74,10 +74,10 @@
 
             Dim cline As String = Access.ToString() & "class " & Name
             If ExtendsNames.Count > 0 Then
-                cline &= " extends " & String.Join(",", ExtendsNames)
+                cline &= " extends " & String.Join(",", ExtendsNames.ToArray())
             End If
             If ImplementsNames.Count > 0 Then
-                cline &= " implements " & String.Join(",", ImplementsNames)
+                cline &= " implements " & String.Join(",", ImplementsNames.ToArray())
             End If
 
             srcout.WriteLn(cline, tabs)

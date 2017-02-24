@@ -6,27 +6,27 @@ namespace ASRuntime.operators
 {
     class OpSub
     {
-        public static void execSub_Number(Player player, ASBinCode.OpStep step, IList<ASBinCode.IEAX> eaxs, ASBinCode.IRunTimeScope scope)
+        public static void execSub_Number(Player player, ASBinCode.OpStep step,ASBinCode.IRunTimeScope scope)
         {
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(eaxs, scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(eaxs, scope);
+            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
 
-            step.reg.setValue(new ASBinCode.rtData.rtNumber(a1.value - a2.value), eaxs, scope);
+            step.reg.getISlot(scope).setValue(a1.value - a2.value);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
         }
 
-        public static void execSub(Player player, ASBinCode.OpStep step, IList<ASBinCode.IEAX> eaxs, ASBinCode.IRunTimeScope scope)
+        public static void execSub(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(eaxs, scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(eaxs, scope);
+            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
+            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
             //if (v1.rtType == ASBinCode.RunTimeDataType.rt_void)
-            {
-                v1 = TypeConverter.ConvertToNumber(v1, player, step.token);
-            }
+            //{
+            double    n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
+            //}
             //if (v2.rtType == ASBinCode.RunTimeDataType.rt_void)
-            {
-                v2 = TypeConverter.ConvertToNumber(v2, player, step.token);
-            }
+            //{
+            double    n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+            //}
 
 
             //ASBinCode.RunTimeDataType finalType =
@@ -47,7 +47,7 @@ namespace ASRuntime.operators
 
             //if (finalType == ASBinCode.RunTimeDataType.rt_number)
             {
-                step.reg.setValue(new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value), eaxs, scope);
+                step.reg.getISlot(scope).setValue(n1-n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
             //else if (finalType == ASBinCode.RunTimeDataType.rt_void)
             //{

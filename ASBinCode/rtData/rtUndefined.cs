@@ -32,5 +32,9 @@ namespace ASBinCode.rtData
             return "undefined";
         }
 
+        public object Clone()
+        {
+            return undefined;
+        }
     }
 }

@@ -16,7 +16,12 @@ Public Class GrammarLine
     Public Derivation As New List(Of GrammarNode)
 
     Public Overrides Function ToString() As String
-        Return Main.Name & "->" & String.Join(" ", Derivation.Select(Function(o) o.Name))
+        Dim names As New List(Of String)
+        For index = 0 To Derivation.Count - 1
+            names.Add(Derivation(index).Name)
+        Next
+
+        Return Main.Name & "->" & String.Join(" ", names.ToArray()) 'Derivation.Select(Function(o) o.Name))
     End Function
 
 End Class
