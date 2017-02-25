@@ -1,7 +1,0 @@
-D:\ASTool\ASRuntime\bin\Debug\ASRuntime.dll
-D:\ASTool\ASRuntime\bin\Debug\ASRuntime.pdb
-D:\ASTool\ASRuntime\bin\Debug\ASBinCode.dll
-D:\ASTool\ASRuntime\bin\Debug\ASBinCode.pdb
-D:\ASTool\ASRuntime\obj\Debug\ASRuntime.csprojResolveAssemblyReference.cache
-D:\ASTool\ASRuntime\obj\Debug\ASRuntime.dll
-D:\ASTool\ASRuntime\obj\Debug\ASRuntime.pdb
