@@ -11,7 +11,7 @@ namespace ASBinCode
     {
         private RunTimeDataType type;
 
-        private readonly string _name;
+        private  string _name;
 
         public readonly int indexOfMembers;
 
@@ -22,7 +22,14 @@ namespace ASBinCode
 
             type = RunTimeDataType.rt_void;
         }
-
+        /// <summary>
+        /// 仅用于编译Catch块时
+        /// </summary>
+        /// <param name="n"></param>
+        public void resetName(string n)
+        {
+            _name = n;
+        }
 
         public RunTimeDataType valueType
         {

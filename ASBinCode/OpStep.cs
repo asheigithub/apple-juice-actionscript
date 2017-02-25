@@ -76,7 +76,31 @@ namespace ASBinCode
             }
             else if (opCode == OpCode.raise_error)
             {
-                return "throw" + "\t" + (arg1 != null ? arg1.ToString() : "");  
+                return "throw" + "\t" + (arg1 != null ? arg1.ToString() : "");
+            }
+            else if (opCode == OpCode.enter_try)
+            {
+                return "enter_try" + "\t" + arg1.ToString();
+            }
+            else if (opCode == OpCode.quit_try)
+            {
+                return "quit_try" + "\t" + arg1.ToString();
+            }
+            else if (opCode == OpCode.enter_catch)
+            {
+                return "enter_catch" + "\t" + arg1.ToString();
+            }
+            else if (opCode == OpCode.quit_catch)
+            {
+                return "quit_catch" + "\t" + arg1.ToString();
+            }
+            else if (opCode == OpCode.enter_finally)
+            {
+                return "enter_finally" + "\t" + arg1.ToString();
+            }
+            else if (opCode == OpCode.quit_finally)
+            {
+                return "quit_finally" + "\t" + arg1.ToString();
             }
 
             string result = reg.ToString() + "\t" + opCode.ToString();

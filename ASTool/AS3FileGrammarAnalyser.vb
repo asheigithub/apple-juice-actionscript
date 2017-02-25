@@ -125,7 +125,9 @@ Public Class AS3FileGrammarAnalyser
         '        CType(currentMain, AS3Class).outpackageinnermembers.AddRange(outpackageprivatescope)
         '    End If
         'End If
-
+        'If currentparseExprListStack.Count > 0 Then
+        '    Throw New Exception()
+        'End If
 
         as3file.srcFile = srcFile
         as3file.OutPackageImports.AddRange(outpackimports)
@@ -995,7 +997,7 @@ Public Class AS3FileGrammarAnalyser
 
                     MemberScopeStack.Peek().ExprDataStack.Pop()
 
-
+                    currentparseExprListStack.Pop()
                 Else
                     '**元数据定义***
 
@@ -1006,6 +1008,8 @@ Public Class AS3FileGrammarAnalyser
                     expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
                     metapropertystack.Push(expr)
+
+                    currentparseExprListStack.Pop()
                 End If
             End If
 
@@ -1386,7 +1390,7 @@ Public Class AS3FileGrammarAnalyser
 
 
 
-        MemberScopeStack.Peek().StamentsStack.Peek().Add(as3try)
+        MemberScopeStack.Peek().StamentsStack.Peek().Add(currentTryStack.Pop())
     End Sub
     Sub _THROW(node As GrammerExpr)
         '"throw" <THROWEXCEPTION>;
@@ -1566,8 +1570,6 @@ Public Class AS3FileGrammarAnalyser
 
         node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
         node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
-
-
 
     End Sub
     Sub _ID_EABLED_KEYWORD(node As GrammerExpr)
@@ -2056,6 +2058,7 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes.Count > 0 Then
             VisitNodes(node.Nodes(0))
             node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+
         End If
 
     End Sub
@@ -2064,6 +2067,7 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes.Count > 0 Then
             VisitNodes(node.Nodes(0))
             node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+
         End If
     End Sub
     Sub _FORPART1(node As GrammerExpr)
@@ -2098,11 +2102,11 @@ Public Class AS3FileGrammarAnalyser
         MemberScopeStack.Pop()
 
         For index = 0 To tempscope.Count - 1
-            MemberScopeStack.Peek().Add(tempscope(index))
+            'MemberScopeStack.Peek().Add(tempscope(index))
             MemberScopeStack.Peek().StamentsStack.Peek().Remove(tempscope(index))
         Next
 
-        MemberScopeStack.Peek().StamentsStack.Peek().AddRange(tempscope.StamentsStack.Peek())
+        'MemberScopeStack.Peek().StamentsStack.Peek().AddRange(tempscope.StamentsStack.Peek())
 
         While MemberScopeStack.Peek().LastRegId() < tempscope.LastRegId()
             MemberScopeStack.Peek().NextRegId()

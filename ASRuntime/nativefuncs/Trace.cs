@@ -15,7 +15,11 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var totrace = step.arg1.getValue(scope);
-                Console.WriteLine(TypeConverter.ConvertToString(totrace, player, step.token));
+                string toout = TypeConverter.ConvertToString(totrace, player, step.token);
+                Console.WriteLine(
+                    toout==null?"null":toout
+                    
+                    );
             }
         }
     }

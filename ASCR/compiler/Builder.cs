@@ -105,7 +105,7 @@ namespace ASCompiler.compiler
         /// </summary>
         /// <param name="env"></param>
         /// <param name="stmt"></param>
-        private void buildVariables(CompileEnv env, ASTool.AS3.IAS3Stmt stmt)
+        internal void buildVariables(CompileEnv env, ASTool.AS3.IAS3Stmt stmt)
         {
             try
             {
@@ -202,6 +202,40 @@ namespace ASCompiler.compiler
 
                         }
                     }
+                }
+                else if (stmt is ASTool.AS3.AS3Try)
+                {
+                    ASTool.AS3.AS3Try as3try = (ASTool.AS3.AS3Try)stmt;
+                    if (as3try.TryBlock != null)
+                    {
+                        for (int i = 0; i < as3try.TryBlock.Count ; i++)
+                        {
+                            buildVariables(env, as3try.TryBlock[i]);
+                        }
+                    }
+                    for (int i = 0; i < as3try.CatchList.Count; i++)
+                    {
+                        var c = as3try.CatchList[i];
+
+                        //由于catch块的捕获变量有重名可能，所以放在后面建立变量
+
+                        //c.CatchVariable.Name = c.CatchVariable.Name + "_" + i;
+                        //buildVariables(env, c.CatchVariable);
+
+                        for (int j = 0; j < c.CatchBlock.Count; j++)
+                        {
+                            buildVariables(env, c.CatchBlock[j]);
+                        }
+                    }
+
+                    if (as3try.FinallyBlock != null)
+                    {
+                        for (int i = 0; i < as3try.FinallyBlock.Count ; i++)
+                        {
+                            buildVariables(env, as3try.FinallyBlock[i]);
+                        }
+                    }
+
                 }
                 else if (stmt is ASTool.AS3.AS3Variable)
                 {
@@ -424,6 +458,11 @@ namespace ASCompiler.compiler
                 {
                     builds.AS3ThrowBuilder builder = new builds.AS3ThrowBuilder();
                     builder.buildAS3Throw(env, (ASTool.AS3.AS3Throw)stmt, this);
+                }
+                else if (stmt is ASTool.AS3.AS3Try)
+                {
+                    builds.AS3TryBuilder builder = new builds.AS3TryBuilder();
+                    builder.buildAS3Try(env, (ASTool.AS3.AS3Try )stmt ,this);
                 }
                 else if (stmt is ASTool.AS3.AS3StmtExpressions)
                 {

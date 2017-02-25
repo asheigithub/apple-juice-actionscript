@@ -15,13 +15,13 @@ namespace ASRuntime.nativefuncs
             {
                 //表示重新抛出接住的异常
 
-                player.runtimeErrors.Push(new error.InternalError(step.token,
-                                "重抛异常还未实现"
+                player.runtimeError=(new error.InternalError(step.token,
+                                "AS3不支持重抛异常"
                                 ));
             }
             else
             {
-                player.runtimeErrors.Push(new error.InternalError(step.token,
+                player.runtimeError=(new error.InternalError(step.token,
                                 step.arg1.getValue(scope)
                                 ));
             }

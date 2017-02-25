@@ -313,7 +313,16 @@ namespace ASRuntime
         }
         #endregion
 
-
+        /// <summary>
+        /// 比较值src是否和值dst类型匹配
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <returns></returns>
+        public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype)
+        {
+            return dsttype== rt.rt_void || src.rtType == dsttype;
+        }
 
             /// <summary>
             /// 隐式类型转换表

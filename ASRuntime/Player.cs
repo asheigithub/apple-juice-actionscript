@@ -16,12 +16,12 @@ namespace ASRuntime
             this.block = block;
         }
 
-        public Stack<error.InternalError> runtimeErrors = new Stack<error.InternalError>();
+        public error.InternalError runtimeError;
 
 
         public IRunTimeScope run()
         {
-            runtimeErrors.Clear();
+            runtimeError = null;
 
             StackSlot[] eaxs = new StackSlot[block.totalRegisters];
             runtimeScope scope = new runtimeScope( block.scope.members,eaxs,0 );// block.scope.members.Count);
@@ -213,9 +213,45 @@ namespace ASRuntime
                         case OpCode.raise_error:
                             nativefuncs.Throw.exec(this, step, scope);
                             break;
+                        case OpCode.enter_try:
+                            {
+                                int tryid = ((rtInt)step.arg1.getValue(scope)).value;
+                                enter_try(scope, tryid);
+                            }
+                            break;
+                        case OpCode.quit_try:
+                            {
+                                int tryid = ((rtInt)step.arg1.getValue(scope)).value;
+                                quit_try(scope, tryid,step.token);
+                            }
+                            break;
+                        case OpCode.enter_catch:
+                            {
+                                int catchid = ((rtInt)step.arg1.getValue(scope)).value;
+                                enter_catch(scope, catchid);
+                            }
+                            break;
+                        case OpCode.quit_catch:
+                            {
+                                int catchid = ((rtInt)step.arg1.getValue(scope)).value;
+                                quit_catch(scope, catchid, step.token);
+                            }
+                            break;
+                        case OpCode.enter_finally:
+                            {
+                                int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
+                                enter_finally(scope, finallyid);
+                            }
+                            break;
+                        case OpCode.quit_finally:
+                            {
+                                int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
+                                quit_finally(scope, finallyid, step.token);
+                            }
+                            break;
                         default:
 
-                           runtimeErrors.Push(new error.InternalError  (step.token,
+                           runtimeError=(new error.InternalError  (step.token,
                                 step.opCode + "操作未实现"
                                 ));
                            break;
@@ -223,12 +259,98 @@ namespace ASRuntime
 
                     //检查该步骤是否发生错误
                     {
-                        if (runtimeErrors.Count > 0)
+                        if (runtimeError!=null)
                         {
-                            var err = runtimeErrors.Peek();
-                            outPutErrorMessage(err);
 
-                            return scope;
+                            if (runtimeError.catchable
+                                    &&
+                                scope.tryCatchState.Count > 0
+                                    &&
+                                scope.tryCatchState.Peek().state == runtimeScope.Try_catch_finally.Try
+                                )
+                            {
+                                //先脱掉try;
+                                int tryid = quit_try(scope, scope.tryCatchState.Peek().tryid, step.token);
+                                var err = runtimeError;
+                                //***清除运行时错误***
+                                runtimeError = null;
+
+                                bool foundcatch = false;
+
+                                IRunTimeValue errorValue = err.errorValue;
+                                //***查找匹配catch找到后给捕获异常变量赋值.**
+                                for (int j = i + 1; j < block.opSteps.Count; j++)
+                                {
+                                    var op = block.opSteps[j];
+                                    if (op.opCode == OpCode.catch_error
+                                        )
+                                    {
+                                        if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope))
+                                        {
+                                            ((Variable)op.reg).getISlot(scope).directSet(errorValue);
+                                            //引导到catch块
+                                            i = j;
+                                            foundcatch = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                //catch块不存在,前往finally块
+                                if (!foundcatch)
+                                {
+                                    scope.holdedError = err;
+                                    for (int j = i + 1; j < block.opSteps.Count; j++)
+                                    {
+                                        var op = block.opSteps[j];
+                                        if (op.opCode == OpCode.enter_finally)
+                                        {
+                                            int id = ((ASBinCode.rtData.rtInt)
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                            if (id == tryid)
+                                            {
+                                                i = j - 1;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else if (runtimeError.catchable
+                                &&
+                                scope.tryCatchState.Count > 0
+                                    &&
+                                scope.tryCatchState.Peek().state == runtimeScope.Try_catch_finally.Catch
+                                )
+                            {
+                                //catch块中抛错,****移动到finally块***
+                                int tryid = quit_catch(scope, scope.tryCatchState.Peek().tryid, step.token);
+                                var err = runtimeError;
+                                //***清除运行时错误***
+                                runtimeError = null;
+
+                                scope.holdedError = err;
+                                for (int j = i + 1; j < block.opSteps.Count; j++)
+                                {
+                                    var op = block.opSteps[j];
+                                    if (op.opCode == OpCode.enter_finally)
+                                    {
+                                        int id = ((ASBinCode.rtData.rtInt)
+                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        if (id == tryid)
+                                        {
+                                            i = j - 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var err = runtimeError;
+                                outPutErrorMessage(err);
+
+                                return scope;
+                            }
                         }
                     }
                 }
@@ -258,15 +380,82 @@ namespace ASRuntime
             return scope;
         }
 
+        private void enter_try(runtimeScope scope,int tryid)
+        {
+            scope.tryCatchState.Push(new runtimeScope.TryState(runtimeScope.Try_catch_finally.Try, tryid));
+        }
+
+        private int quit_try(runtimeScope scope, int tryid,SourceToken token)
+        {
+            var s = scope.tryCatchState.Pop();
+
+            if ( s.state != runtimeScope.Try_catch_finally.Try || s.tryid != tryid)
+            {
+                runtimeError=(new error.InternalError(token,
+                                                                    "运行时异常 try块不匹配"
+                                                                    ));
+                //引擎异常，抛出
+                throw new InvalidOperationException();
+            }
+            return s.tryid;
+        }
+
+        private void enter_catch(runtimeScope scope, int catchid)
+        {
+            scope.tryCatchState.Push(new runtimeScope.TryState(runtimeScope.Try_catch_finally.Catch, catchid));
+        }
+        private int quit_catch(runtimeScope scope, int catchid, SourceToken token)
+        {
+            var s = scope.tryCatchState.Pop();
+
+            if (s.state != runtimeScope.Try_catch_finally.Catch || s.tryid != catchid)
+            {
+                runtimeError = (new error.InternalError(token,
+                                                                    "运行时异常 catch块不匹配"
+                                                                    ));
+                //引擎异常，抛出
+                throw new InvalidOperationException();
+            }
+            return s.tryid;
+        }
+
+        private void enter_finally(runtimeScope scope, int finallyid)
+        {
+            scope.tryCatchState.Push(new runtimeScope.TryState(runtimeScope.Try_catch_finally.Finally, finallyid));
+        }
+        private int quit_finally(runtimeScope scope, int finallyid, SourceToken token)
+        {
+            var s = scope.tryCatchState.Pop();
+
+            if (s.state != runtimeScope.Try_catch_finally.Finally || s.tryid != finallyid)
+            {
+                runtimeError = (new error.InternalError(token,
+                                                                    "运行时异常 finally块不匹配"
+                                                                    ));
+                //引擎异常，抛出
+                throw new InvalidOperationException();
+            }
+
+
+            // finally块执行完成后，再次抛出异常
+            if (scope.holdedError != null)
+            {
+                runtimeError = scope.holdedError;
+                scope.holdedError = null;
+            }
+
+            return s.tryid;
+        }
+
 
         internal void throwCastException(ASBinCode.SourceToken token,RunTimeDataType srctype,RunTimeDataType dsttype)
         {
-            runtimeErrors.Push( new error.InternalError (token, "类型转换失败:"+srctype+"->"+dsttype));
+            runtimeError=( new error.InternalError (token, "类型转换失败:"+srctype+"->"+dsttype));
         }
 
         internal void throwOpException(ASBinCode.SourceToken token, OpCode opcode)
         {
-            runtimeErrors.Push(new error.InternalError(token, "无法执行操作" + opcode ));
+            runtimeError=(new error.InternalError(token, "无法执行操作" + opcode ));
         }
         
         private void outPutErrorMessage(error.InternalError err)
@@ -298,6 +487,31 @@ namespace ASRuntime
         
         class runtimeScope : IRunTimeScope
         {
+            internal enum Try_catch_finally
+            {
+                Try,
+                Catch,
+                Finally
+            }
+
+            internal struct TryState
+            {
+                public TryState(Try_catch_finally state,int id)
+                {
+                    this.state = state;
+                    tryid = id;
+                }
+
+                public Try_catch_finally state;
+                public int tryid;
+            }
+
+            public Stack<TryState> tryCatchState;
+            /// <summary>
+            /// 暂存已发生的错误
+            /// </summary>
+            internal error.InternalError holdedError;
+
             HeapSlot[] memberDataList;
 
             private IList<ISLOT> runtimestack;
@@ -315,7 +529,12 @@ namespace ASRuntime
                         ((Variable)members[i]).valueType
                         );
                 }
+
+                tryCatchState = new Stack<TryState>();
+
             }
+
+            
 
             public ISLOT[] memberData
             {

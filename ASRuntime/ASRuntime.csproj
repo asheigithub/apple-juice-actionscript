@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="error\InternalError.cs" />
     <Compile Include="HeapSlot.cs" />
+    <Compile Include="nativefuncs\Catch.cs" />
     <Compile Include="nativefuncs\Throw.cs" />
     <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="operators\OpAdd.cs" />

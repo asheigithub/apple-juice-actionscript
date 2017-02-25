@@ -24,6 +24,13 @@ namespace ASRuntime.error
             this.message = message;
             this.errorValue = null;
         }
+        /// <summary>
+        /// 是否可被捕获的异常
+        /// </summary>
+        public bool catchable
+        {
+            get { return  errorValue != null; }
+        }
 
 
         public InternalError(ASBinCode.SourceToken token, string message ,ASBinCode.IRunTimeValue errorValue )

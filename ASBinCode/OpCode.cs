@@ -202,6 +202,34 @@ namespace ASBinCode
         /// 抛出异常
         /// </summary>
         raise_error=55,
+        /// <summary>
+        /// 捕获异常
+        /// </summary>
+        catch_error=56,
+        /// <summary>
+        /// 进入try
+        /// </summary>
+        enter_try=57,
+        /// <summary>
+        /// 退出try
+        /// </summary>
+        quit_try=58,
+        /// <summary>
+        /// 进入catch
+        /// </summary>
+        enter_catch=59,
+        /// <summary>
+        /// 退出catch
+        /// </summary>
+        quit_catch=60,
+        /// <summary>
+        /// 进入finally
+        /// </summary>
+        enter_finally=61,
+        /// <summary>
+        /// 退出finally
+        /// </summary>
+        quit_finally=62,
 
     }
 }

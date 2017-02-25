@@ -35,7 +35,7 @@ namespace ASCompiler.compiler
 
                     IRunTimeScope scope = player.run();
 
-                    if (player.runtimeErrors.Count == 0)
+                    if (player.runtimeError !=null)
                     {
                         return value.getValue(scope);
                     }

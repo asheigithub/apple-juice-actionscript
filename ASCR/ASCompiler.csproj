@@ -51,6 +51,7 @@
     <Compile Include="compiler\builds\AS3IFBuilder.cs" />
     <Compile Include="compiler\builds\AS3SwitchBuilder.cs" />
     <Compile Include="compiler\builds\AS3ThrowBuilder.cs" />
+    <Compile Include="compiler\builds\AS3TryBuilder.cs" />
     <Compile Include="compiler\builds\ExpressionBuilder.cs" />
     <Compile Include="compiler\builds\FuncCallBuilder.cs" />
     <Compile Include="compiler\CompileEnv.cs" />

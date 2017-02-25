@@ -46,16 +46,41 @@ namespace ASCompiler.compiler.builds
             }
             else
             {
-                OpStep op = new OpStep(OpCode.raise_error, new SourceToken(as3throw.Token.line, as3throw.Token.ptr, as3throw.Token.sourceFile));
+                //***只有在catch块中才能throw***;
+                int l = 0;
+                for (int i = 0; i < env.block.opSteps.Count ; i++)
+                {
+                    if (env.block.opSteps[i].opCode == OpCode.enter_catch)
+                    {
+                        l++;
+                    }
+                    else if (env.block.opSteps[i].opCode == OpCode.quit_catch)
+                    {
+                        l--;
+                    }
+                }
 
-                op.arg1 = null;
-                op.arg1Type =  RunTimeDataType.unknown;
-                op.arg2 = null;
-                op.arg2Type = RunTimeDataType.unknown;
-                op.reg = null;
-                op.regType = RunTimeDataType.unknown;
+                if (l < 1)
+                {
+                    throw new BuildException(as3throw.Token.line, as3throw.Token.ptr, as3throw.Token.sourceFile,
+                        "此处不能有throw;"
+                        );
+                }
 
-                env.block.opSteps.Add(op);
+                throw new BuildException(as3throw.Token.line, as3throw.Token.ptr, as3throw.Token.sourceFile,
+                        "throw必须有抛出的对象;"
+                        );
+
+                //OpStep op = new OpStep(OpCode.raise_error, new SourceToken(as3throw.Token.line, as3throw.Token.ptr, as3throw.Token.sourceFile));
+
+                //op.arg1 = null;
+                //op.arg1Type =  RunTimeDataType.unknown;
+                //op.arg2 = null;
+                //op.arg2Type = RunTimeDataType.unknown;
+                //op.reg = null;
+                //op.regType = RunTimeDataType.unknown;
+
+                //env.block.opSteps.Add(op);
             }
         }
     }
