@@ -23,11 +23,12 @@ package
 try 
 {
 	var l:int;
-	throw "ggg";
-	l = 1;
+	throw 3.3;
+	l = 1+2+3+4;
 }
-catch(e:int)
+catch(e:String)
 {
+	
 	trace(e);
 	
 	try 
@@ -36,18 +37,30 @@ catch(e:int)
 		trace(e);
 		throw "catch 中抛出";
 	}
-	catch (e)
+	catch (e:int)
 	{
+		var ll:int;
 		trace(e);
 	}
-	trace("incatch");
+	finally
+	{
+		trace("incatch");
+	}
 }
-catch(e:String)
+catch(e:Number)
 {
+	trace(e);
 	
+	var e:String = "ff";
+	
+	ll = 0;
+	trace(e);
+	
+	trace("haha" + e)
 }
 finally 
 {
 	//***222***
+	l = 1+2+3+4;
 	trace(l);
 }

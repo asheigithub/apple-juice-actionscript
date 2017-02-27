@@ -1,6 +1,10 @@
 ﻿Namespace AS3
     Public Class AS3Try
         Implements IAS3Stmt
+        ''' <summary>
+        ''' 编译时用，保持的tryid
+        ''' </summary>
+        Public holdTryId As Integer
 
         Public label As String
 

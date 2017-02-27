@@ -15,10 +15,21 @@ namespace ASBinCode
 
         public readonly int indexOfMembers;
 
-        public Variable(string name,int index)
+        /// <summary>
+        /// 赋值是否忽略编译期类型检查
+        /// </summary>
+        public readonly bool ignoreImplicitCast;
+
+        public Variable(string name, int index):this(name,index,false)
+        {
+
+        }
+
+        public Variable(string name,int index,bool ignoreImplicitCast)
         {
             this._name = name;
             this.indexOfMembers = index;
+            this.ignoreImplicitCast = ignoreImplicitCast;
 
             type = RunTimeDataType.rt_void;
         }
@@ -51,6 +62,7 @@ namespace ASBinCode
                 return _name;
             }
         }
+
 
         public IRunTimeValue getValue(IRunTimeScope scope)
         {

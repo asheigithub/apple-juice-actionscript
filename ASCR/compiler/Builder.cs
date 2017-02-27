@@ -206,6 +206,8 @@ namespace ASCompiler.compiler
                 else if (stmt is ASTool.AS3.AS3Try)
                 {
                     ASTool.AS3.AS3Try as3try = (ASTool.AS3.AS3Try)stmt;
+                    as3try.holdTryId = env.getLabelId();
+
                     if (as3try.TryBlock != null)
                     {
                         for (int i = 0; i < as3try.TryBlock.Count ; i++)
@@ -217,15 +219,14 @@ namespace ASCompiler.compiler
                     {
                         var c = as3try.CatchList[i];
 
-                        //由于catch块的捕获变量有重名可能，所以放在后面建立变量
-
-                        //c.CatchVariable.Name = c.CatchVariable.Name + "_" + i;
-                        //buildVariables(env, c.CatchVariable);
+                        builds.AS3TryBuilder b = new builds.AS3TryBuilder();
+                        b.buildCatchVariable(env, c, i, as3try.holdTryId, this);
 
                         for (int j = 0; j < c.CatchBlock.Count; j++)
                         {
                             buildVariables(env, c.CatchBlock[j]);
                         }
+                        
                     }
 
                     if (as3try.FinallyBlock != null)
@@ -467,8 +468,7 @@ namespace ASCompiler.compiler
                 else if (stmt is ASTool.AS3.AS3StmtExpressions)
                 {
                     ASTool.AS3.AS3StmtExpressions expressions = (ASTool.AS3.AS3StmtExpressions)stmt;
-
-
+                    
                     for (int i = 0; i < expressions.as3exprlist.Count; i++)
                     {
                         buildExpression(env, expressions.as3exprlist[i]);
@@ -515,7 +515,11 @@ namespace ASCompiler.compiler
 
                                 //**加入赋值操作***
                                 //**隐式类型转换检查
-                                if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType))
+                                if (rtVariable.ignoreImplicitCast) // catch异常的变量 原行为中似乎忽略编译时类型检查
+                                {
+                                    //而且只在此处场合忽略检查
+                                }
+                                else if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType))
                                 {
                                     throw new BuildException(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
                                         "不能将[" + defaultv.valueType + "]类型赋值给[" + rtVariable.valueType + "]类型的变量");
@@ -591,7 +595,62 @@ namespace ASCompiler.compiler
 
         internal void buildExpression(CompileEnv env,ASTool.AS3.AS3Expression expression)
         {
+            ASTool.AS3.AS3Expression testexpr = new ASTool.AS3.AS3Expression(expression.token);
+            testexpr.exprStepList = new ASTool.AS3.Expr.AS3ExprStepList();
+            for (int i = 0; i < expression.exprStepList.Count ; i++)
+            {
+                if (expression.exprStepList[i].Type != ASTool.AS3.Expr.OpType.Assigning)
+                {
+                    testexpr.exprStepList.Add(expression.exprStepList[i]);
+                }
+                else
+                {
+                    testexpr.Value = expression.exprStepList[i].Arg2;
+                    break;
+                }
+            }
 
+            if (testexpr.Value == null)
+            {
+                testexpr.Value = expression.Value;
+            }
+
+            IRunTimeValue value = ExpressionEval.Eval(testexpr);
+
+            if (value != null && testexpr.Value.IsReg)
+            {
+                IRightValue rv = new ASBinCode.rtData.RightValue(value);
+
+                ASBinCode.Register eax = env.createASTRegister(testexpr.Value.Reg.ID);
+                eax.setEAXTypeWhenCompile(rv.valueType);
+
+                OpStep op = new OpStep(OpCode.assigning, new SourceToken(testexpr.token.line, testexpr.token.ptr, testexpr.token.sourceFile));
+                op.reg = eax;
+                op.regType = eax.valueType;
+                op.arg1 = rv;
+                op.arg1Type = rv.valueType;
+                op.arg2 = null;
+                op.arg2Type = RunTimeDataType.unknown;
+
+                env.block.opSteps.Add(op);
+
+                int i = testexpr.exprStepList.Count;
+                testexpr.exprStepList.Clear();
+                for (int j = i; j < expression.exprStepList.Count ; j++)
+                {
+                    testexpr.exprStepList.Add(expression.exprStepList[j]);
+                }
+                testexpr.Value = expression.Value;
+                buildExpressNotEval(env, testexpr);
+            }
+            else
+            {
+                buildExpressNotEval(env, expression);
+            }
+        }
+
+        internal void buildExpressNotEval(CompileEnv env, ASTool.AS3.AS3Expression expression)
+        {
             try
             {
                 builds.ExpressionBuilder expressionbuilder =
@@ -603,7 +662,6 @@ namespace ASCompiler.compiler
             {
                 pushBuildError(ex.error);
             }
-            
         }
 
     }

@@ -21,7 +21,7 @@ namespace ASCompiler.compiler
 
                 CompileEnv tempEnv = new CompileEnv(new CodeBlock());
                 tempEnv.block.scope = new ASBinCode.scopes.OutPackageMemberScope();
-                builder.buildExpression(tempEnv, expression);
+                builder.buildExpressNotEval(tempEnv, expression);
                 tempEnv.completSteps();
                 tempEnv.block.totalRegisters = tempEnv.combieRegisters();
 
@@ -35,7 +35,7 @@ namespace ASCompiler.compiler
 
                     IRunTimeScope scope = player.run();
 
-                    if (player.runtimeError !=null)
+                    if (player.runtimeError ==null)
                     {
                         return value.getValue(scope);
                     }

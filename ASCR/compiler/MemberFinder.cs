@@ -11,9 +11,11 @@ namespace ASCompiler.compiler
     {
         public static ASBinCode.IMember find(string name, CompileEnv env)
         {
-            for (int i = 0; i < env.block.scope.members.Count; i++)
+            //从后往前找。可解决catch块同名变量e问题
+            for (int i = env.block.scope.members.Count-1; i >=0; i--)
             {
-                if (env.block.scope.members[i].name == name)
+                if (env.block.scope.members[i].name == name
+                    )
                 {
                     return env.block.scope.members[i];
                 }

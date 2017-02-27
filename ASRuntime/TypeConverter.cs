@@ -321,7 +321,32 @@ namespace ASRuntime
         /// <returns></returns>
         public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype)
         {
-            return dsttype== rt.rt_void || src.rtType == dsttype;
+            if (dsttype == rt.rt_void || src.rtType == dsttype)
+                return true;
+
+            if (src.rtType == rt.rt_number && dsttype == rt.rt_int)
+            {
+                double v = ((ASBinCode.rtData.rtNumber)src).value;
+                if (v == (int)(long)v)
+                {
+                    return true;
+                }
+            }
+            if (src.rtType == rt.rt_number && dsttype == rt.rt_uint)
+            {
+                double v = ((ASBinCode.rtData.rtNumber)src).value;
+                if (v == (uint)(long)v)
+                {
+                    return true;
+                }
+            }
+            if (src.rtType == rt.rt_int || src.rtType == rt.rt_uint)
+            {
+                return dsttype == rt.rt_number;
+            }
+
+
+            return false;
         }
 
             /// <summary>

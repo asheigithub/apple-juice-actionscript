@@ -24,12 +24,24 @@ namespace ASCompiler.compiler.builds
             builder.buildStmt(env, jumptofinally);
         }
 
+        public void buildCatchVariable(CompileEnv env, ASTool.AS3.AS3Catch c,int i,int tryid, Builder builder)
+        {
+            //Variable rtVariable = 
+            //    new Variable( "0"+ c.CatchVariable.Name + "_" + i + "_" + tryid
 
+            //    , env.block.scope.members.Count);
+
+            //rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, env, c.CatchVariable.token);
+            //env.block.scope.members.Add(rtVariable);
+        }
+
+
+        //private int trydepth;
         public void buildAS3Try(CompileEnv env, ASTool.AS3.AS3Try as3try,Builder builder)
         {
             //***先编译Try块
-
-            int tryid= env.getLabelId();
+            //trydepth++;
+            int tryid = as3try.holdTryId;
 
             //string LBL_BEGIN_TRY = "BEGIN_TRY_" + tryid;
             //string LBL_END_TRY = "END_TRY_" + tryid;
@@ -81,10 +93,19 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < as3try.CatchList.Count; i++)
             {
                 var c = as3try.CatchList[i];
-                //c.CatchVariable.Name = c.CatchVariable.Name + "_" + i;
-                builder.buildVariables(env, c.CatchVariable);
-                Variable rtVariable = (Variable)MemberFinder.find(c.CatchVariable.Name, env);
-                rtVariable.valueType = RunTimeDataType.rt_void;
+                //c.CatchVariable.Name = "0"+c.CatchVariable.Name + "_" + i;
+
+
+                Variable rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true);
+                rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, env, c.CatchVariable.token);
+                env.block.scope.members.Add(rtVariable);
+
+                //builder.buildVariables(env, c.CatchVariable);
+                //string catchvariablename = "0" + c.CatchVariable.Name + "_" + i + "_" + tryid;
+                //Variable rtVariable = (Variable)MemberFinder.find(catchvariablename, env);
+                //rtVariable.resetName(c.CatchVariable.Name);
+
+                //rtVariable.valueType = RunTimeDataType.rt_void;
 
                 OpStep op = new OpStep(OpCode.catch_error, 
                     new SourceToken(c.CatchVariable.token.line,
@@ -111,7 +132,8 @@ namespace ASCompiler.compiler.builds
                     builder.buildStmt(env,c.CatchBlock[j]);
                 }
 
-                //rtVariable.resetName( rtVariable.name + "_" +i );
+                
+                rtVariable.resetName( "0"+ rtVariable.name  + "_" +i+"_" + tryid );
 
                 {
                     OpStep quit_catch = new OpStep(OpCode.quit_catch, new SourceToken(c.CatchVariable.token.line, c.CatchVariable.token.ptr, c.CatchVariable.token.sourceFile));
@@ -158,7 +180,7 @@ namespace ASCompiler.compiler.builds
                 env.block.opSteps.Add(endfinally);
             }
 
-
+            //trydepth--;
 
 
 

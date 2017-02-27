@@ -21,6 +21,34 @@ namespace ASBinCode
 
     public struct RunTimeDataType
     {
+        public override string ToString()
+        {
+            switch (RTTI)
+            {
+                case rt_boolean:
+                    return "rt_boolean";
+                case rt_int:
+                    return "rt_int";
+                case rt_uint:
+                    return "rt_uint";
+                case rt_number:
+                    return "rt_number";
+                case rt_string:
+                    return "rt_string";
+                case rt_void:
+                    return "rt_void";
+                case rt_null:
+                    return "rt_null";
+                case unknown:
+                    return "unknown";
+                default:
+                    return RTTI.ToString();
+            }
+
+
+            
+        }
+
         public const int rt_boolean = 0;
         public const int rt_int = 1;
         public const int rt_uint = 2;

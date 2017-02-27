@@ -7,5 +7,6 @@ namespace ASBinCode
     public interface IMember
     {
         string name { get; }
+
     }
 }
