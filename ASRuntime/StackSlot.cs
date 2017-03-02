@@ -9,22 +9,15 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    class StackSlot : ASBinCode.ISLOT
+    class StackSlot : ISLOT
     {
         public StackSlot()
         {
-            store = new IRunTimeValue[(int)RunTimeDataType.unknown];
-            index = (int)RunTimeDataType.unknown-1;
+            store = new IRunTimeValue[(int)RunTimeDataType.unknown+1];
+            index = (int)RunTimeDataType.unknown;
 
             //存储器设置初始值
-            for (int i = 0; i < index; i++)
-            {
-                RunTimeDataType t = (RunTimeDataType)i;
-                
-                {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null);
-                }
-            }
+            clear();
 
         }
 
@@ -63,6 +56,21 @@ namespace ASRuntime
                     store[index] = value;
                     break;
                 case RunTimeDataType.rt_null:
+                    store[index] = value;
+                    break;
+                case RunTimeDataType.rt_function:
+                    {
+                        if (store[index].rtType == RunTimeDataType.rt_null)
+                        {
+                            store[index] = (rtFunction)value.Clone();
+                        }
+                        else
+                        {
+                            ((rtFunction)store[index]).CopyFrom((rtFunction)value);
+                        }
+                    }
+                    break;
+                case RunTimeDataType.fun_void:
                     store[index] = value;
                     break;
                 case RunTimeDataType.unknown:
@@ -140,6 +148,16 @@ namespace ASRuntime
             store[(int)RunTimeDataType.rt_boolean] = value;
         }
 
-        
+        public void clear()
+        {
+            for (int i = 0; i < RunTimeDataType.unknown ; i++)
+            {
+                RunTimeDataType t = (RunTimeDataType)i;
+
+                {
+                    store[i] = TypeConverter.getDefaultValue(t).getValue(null);
+                }
+            }
+        }
     }
 }

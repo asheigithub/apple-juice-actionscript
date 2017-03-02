@@ -61,6 +61,12 @@ namespace ASRuntime
                     case RunTimeDataType.rt_null:
                         this.value = value;
                         break;
+                    case RunTimeDataType.rt_function:
+                        ((rtFunction)this.value).CopyFrom((rtFunction)value);
+                        break;
+                    case RunTimeDataType.fun_void:
+                        this.value = value;
+                        break;
                     case RunTimeDataType.unknown:
                         this.value = null;
                         break;
@@ -106,6 +112,11 @@ namespace ASRuntime
         }
 
         public void setValue(rtBoolean value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void clear()
         {
             throw new NotImplementedException();
         }

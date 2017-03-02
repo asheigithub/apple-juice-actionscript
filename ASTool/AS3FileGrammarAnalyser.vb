@@ -1382,11 +1382,16 @@ Public Class AS3FileGrammarAnalyser
         VisitNodes(node.Nodes(5))
 
 
-
         Dim finallyblock As New List(Of IAS3Stmt)
         MemberScopeStack.Peek().StamentsStack.Push(finallyblock)
         VisitNodes(node.Nodes(6))
-        as3try.FinallyBlock = MemberScopeStack.Peek().StamentsStack.Pop()
+
+        If node.Nodes(6).MatchedToken.StringValue = "finally" Then
+
+            as3try.FinallyBlock = MemberScopeStack.Peek().StamentsStack.Pop()
+
+
+        End If
 
 
 
@@ -1651,12 +1656,13 @@ Public Class AS3FileGrammarAnalyser
     ''' <returns></returns>
     ''' <remarks></remarks>
     Private Function getFuncTypeStr(node As GrammerExpr) As String
+        '":"<FunctionType>|":*"|":void"|null;
         If node.Nodes.Count = 0 Then
-            Return "void"
+            Return "*"
         ElseIf node.Nodes.Count = 2 Then
             Return GrammerExpr.getNodeValue(node.Nodes(1))
         Else
-            Return "*"
+            Return node.MatchedToken.StringValue.Substring(1)
         End If
     End Function
 

@@ -43,6 +43,7 @@
     <Compile Include="operators\OpAdd.cs" />
     <Compile Include="operators\OpAssigning.cs" />
     <Compile Include="operators\OpBit.cs" />
+    <Compile Include="operators\OpCallFunction.cs" />
     <Compile Include="operators\OpCast.cs" />
     <Compile Include="operators\OpIncrementDecrement.cs" />
     <Compile Include="operators\OpLogic.cs" />
@@ -51,6 +52,8 @@
     <Compile Include="operators\OpSub.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
+    <Compile Include="RunTimeScope.cs" />
+    <Compile Include="StackFrame.cs" />
     <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

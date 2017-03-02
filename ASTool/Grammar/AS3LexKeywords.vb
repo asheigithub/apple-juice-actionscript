@@ -9,6 +9,6 @@
                                                             , "+=", "-=", "*=", "/=", "%=", ">>=", "<<=", ">>>=", "&=", "^=", "|="}
 
 
-    Public Shared LEXSKIPBLANKWORDS As String() = {".*", "default:"}
+    Public Shared LEXSKIPBLANKWORDS As String() = {".*", "default:", ":void"}
 
 End Class

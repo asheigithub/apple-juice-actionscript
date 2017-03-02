@@ -47,13 +47,16 @@
                 srcout.WriteLn("}", tabs)
             Next
 
-            srcout.WriteLn("finally", tabs)
-            srcout.WriteLn("{", tabs)
+            If Not FinallyBlock Is Nothing Then
 
-            For Each b In FinallyBlock
-                b.Write(tabs + 1, srcout)
-            Next
-            srcout.WriteLn("}", tabs)
+                srcout.WriteLn("finally", tabs)
+                srcout.WriteLn("{", tabs)
+
+                For Each b In FinallyBlock
+                    b.Write(tabs + 1, srcout)
+                Next
+                srcout.WriteLn("}", tabs)
+            End If
 
         End Sub
     End Class

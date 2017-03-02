@@ -39,6 +39,7 @@ namespace ASCompiler.compiler.builds
         //private int trydepth;
         public void buildAS3Try(CompileEnv env, ASTool.AS3.AS3Try as3try,Builder builder)
         {
+            
             //***先编译Try块
             //trydepth++;
             int tryid = as3try.holdTryId;
@@ -89,6 +90,8 @@ namespace ASCompiler.compiler.builds
             startCatch.flag = LBL_CATCH;
             env.block.opSteps.Add(startCatch);
 
+            
+
             //***编译Catch块***
             for (int i = 0; i < as3try.CatchList.Count; i++)
             {
@@ -96,8 +99,8 @@ namespace ASCompiler.compiler.builds
                 //c.CatchVariable.Name = "0"+c.CatchVariable.Name + "_" + i;
 
 
-                Variable rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true);
-                rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, env, c.CatchVariable.token);
+                Variable rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true , env.block.id );
+                rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, c.CatchVariable.token);
                 env.block.scope.members.Add(rtVariable);
 
                 //builder.buildVariables(env, c.CatchVariable);
@@ -111,7 +114,7 @@ namespace ASCompiler.compiler.builds
                     new SourceToken(c.CatchVariable.token.line,
                     c.CatchVariable.token.ptr, c.CatchVariable.token.sourceFile));
                 op.reg = rtVariable;
-                op.regType = TypeReader.fromSourceCodeStr( c.CatchVariable.TypeStr,env,c.CatchVariable.token  ) ;
+                op.regType = TypeReader.fromSourceCodeStr( c.CatchVariable.TypeStr,c.CatchVariable.token  ) ;
                 op.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(tryid));
                 op.arg1Type = RunTimeDataType.rt_int;
                 op.arg2 = null;
@@ -146,7 +149,7 @@ namespace ASCompiler.compiler.builds
                     jumpTo(env, as3try, builder, LBL_BEGIN_FINALLY);
                 }
             }
-
+            
             //FINALLY
             {
                 OpStep finallylbl = new OpStep(OpCode.flag, new SourceToken(as3try.Token.line, as3try.Token.ptr, as3try.Token.sourceFile));
@@ -162,9 +165,18 @@ namespace ASCompiler.compiler.builds
 
                 if (as3try.FinallyBlock != null)
                 {
-                    for (int i = 0; i < as3try.FinallyBlock.Count ; i++)
+                    for (int i = 0; i < as3try.FinallyBlock.Count; i++)
                     {
-                        builder.buildStmt(env,as3try.FinallyBlock[i]);
+                        builder.buildStmt(env, as3try.FinallyBlock[i]);
+                    }
+                }
+                else
+                {
+                    if (as3try.CatchList.Count == 0)
+                    {
+                        throw new BuildException(as3try.Token.line,
+                            as3try.Token.ptr,
+                            as3try.Token.sourceFile, "try块至少要有1个catch块或1个finally块.");
                     }
                 }
 
@@ -179,7 +191,7 @@ namespace ASCompiler.compiler.builds
                 endfinally.flag = LBL_END_FINALLY;
                 env.block.opSteps.Add(endfinally);
             }
-
+            
             //trydepth--;
 
 

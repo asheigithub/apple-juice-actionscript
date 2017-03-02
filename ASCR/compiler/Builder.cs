@@ -9,8 +9,32 @@ namespace ASCompiler.compiler
     {
         public bool isConsoleOut = true;
 
+        private int blockseed = 0;
+        internal int getBlockId() { return blockseed++; }
+        private int functionseed = 0;
+        internal int getFunctionId()
+        {
+            int rid= functionseed++;
+
+            while (bin.functions.Count <= rid)
+            {
+                bin.functions.Add(null);
+            }
+
+            return rid;
+        }
 
         public List<BuildError> buildErrors=new List<BuildError>();
+
+        internal Dictionary<int, List<builds.AS3FunctionBuilder.NamedFunction>>
+            dictNamedFunctions=new Dictionary<int, List<builds.AS3FunctionBuilder.NamedFunction>>();
+
+        /// <summary>
+        /// 记录当前正在编译的function
+        /// </summary>
+        internal Stack<ASTool.AS3.AS3Function> buildingfunctons = new Stack<ASTool.AS3.AS3Function>();
+
+        internal Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtData.rtFunction> buildoutfunctions=new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtData.rtFunction>();
 
         private void pushBuildError(BuildError err)
         {
@@ -35,10 +59,13 @@ namespace ASCompiler.compiler
         }
 
 
-        public List<CodeBlock> blocks = new List<CodeBlock>();
+        public ASBinCode.CSWC bin;
+
         public void Build(ASTool.AS3.AS3Proj proj)
         {
             buildErrors.Clear();
+
+            bin = new CSWC();
 
             try
             {
@@ -74,29 +101,108 @@ namespace ASCompiler.compiler
         {
             //***分析包外代码***
             List<ASTool.AS3.IAS3Stmt> outstmts = srcfile.OutPackagePrivateScope.StamentsStack.Peek();
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock();
+            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(getBlockId());
             block.scope = new ASBinCode.scopes.OutPackageMemberScope();
             
-            CompileEnv env = new CompileEnv(block);
+            buildCodeBlock(outstmts, block);
+        }
+
+
+        internal void buildCodeBlock(List<ASTool.AS3.IAS3Stmt> statements, CodeBlock block)
+        {
+            CompileEnv env = new CompileEnv(block,false);
             //先提取变量定义
-            for (int i = 0; i < outstmts.Count; i++)
+            for (int i = 0; i < statements.Count; i++)
             {
-                buildVariables(env, outstmts[i]);
+                buildVariables(env, statements[i]);
             }
 
-            
-            for (int i = 0; i < outstmts.Count; i++)
+            for (int i = 0; i < env.tobuildNamedfunction.Count; i++)
             {
-                buildStmt(env, outstmts[i]);
+                buildNamedFunctions(env, env.tobuildNamedfunction[i]);
+            }
+            
+            
+
+            for (int i = 0; i < statements.Count; i++)
+            {
+                buildStmt(env, statements[i]);
             }
             env.completSteps();
             block.totalRegisters = env.combieRegisters();
 
-
-
             if (buildErrors.Count == 0)
             {
-                blocks.Add(block);
+                bin.blocks.Add(block);
+
+                bin.blocks.Sort((CodeBlock b1, CodeBlock b2) => { return b1.id - b2.id; });
+            }
+        }
+
+        /// <summary>
+        /// 编译命名后的闭包函数
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="stmt"></param>
+        internal void buildNamedFunctions(CompileEnv env, ASTool.AS3.IAS3Stmt stmt)
+        {
+            try
+            {
+                if (stmt is ASTool.AS3.AS3Function)
+                {
+                    ASTool.AS3.AS3Function as3function = (ASTool.AS3.AS3Function)stmt;
+
+                    if ( 
+                        !as3function.IsMethod) //闭包
+                    {
+                        if (!as3function.IsAnonymous)
+                        {
+
+                            ASBinCode.IMember member = MemberFinder.find(as3function.Name, env);
+
+                            if (!(member is Variable))
+                            {
+                                pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "此处应该是个Variable"));
+                                return;
+                            }
+
+                            var rtVariable = (Variable)member;
+
+                            builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                            var func = builder.buildAS3Function(env,
+                                as3function, this,rtVariable);
+
+                            OpStep step = new OpStep(OpCode.assigning, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                            step.reg = rtVariable;
+                            step.regType = rtVariable.valueType;
+                            step.arg1 = new ASBinCode.rtData.RightValue(func);
+                            step.arg1Type = RunTimeDataType.rt_function;
+                            step.arg2 = null;
+                            step.arg2Type = RunTimeDataType.unknown;
+
+                            env.block.opSteps.Add(step);
+
+                            OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                            stepbind.reg = null;
+                            stepbind.regType = RunTimeDataType.unknown;
+                            stepbind.arg1 = rtVariable;
+                            stepbind.arg1Type = rtVariable.valueType;
+                            stepbind.arg2 = null;
+                            stepbind.arg2Type = RunTimeDataType.unknown;
+
+                            env.block.opSteps.Add(stepbind);
+
+                        }
+                    }
+
+
+                }
+
+            }
+            catch (BuildException ex)
+            {
+                pushBuildError(ex.error);
             }
         }
 
@@ -115,6 +221,48 @@ namespace ASCompiler.compiler
                     for (int i = 0; i < b.CodeList.Count; i++)
                     {
                         buildVariables(env, b.CodeList[i]);
+                    }
+                }
+                else if (stmt is ASTool.AS3.AS3Function)
+                {
+                    if (env.isEval)
+                    {
+                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "当前环境处于表达式求值环境不编译function"));
+                        return;
+                    }
+
+                    ASTool.AS3.AS3Function as3function = (ASTool.AS3.AS3Function)stmt;
+                    if (as3function.IsMethod)
+                    {
+                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "类的方法不应该出现在这里"));
+                        return;
+                    }
+                    else
+                    {
+                        if (!as3function.IsAnonymous)
+                        {
+                            //***构造一个变量名等于函数名的function数据类型
+                            for (int i = 0; i < env.block.scope.members.Count; i++) //scope内查找是否有重复
+                            {
+                                IMember member = env.block.scope.members[i];
+                                if (member.name == as3function.Name)
+                                {
+                                    {
+                                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                            "重复声明 " + as3function.Name));
+                                        return;
+                                    }
+                                }
+                            }
+
+                            Variable rtVariable = new Variable(as3function.Name, env.block.scope.members.Count, env.block.id);
+                            env.block.scope.members.Add(rtVariable);
+                            rtVariable.valueType = RunTimeDataType.rt_function;
+
+                            env.tobuildNamedfunction.Add(as3function);
+                        }
                     }
                 }
                 else if (stmt is ASTool.AS3.AS3IF)
@@ -210,7 +358,7 @@ namespace ASCompiler.compiler
 
                     if (as3try.TryBlock != null)
                     {
-                        for (int i = 0; i < as3try.TryBlock.Count ; i++)
+                        for (int i = 0; i < as3try.TryBlock.Count; i++)
                         {
                             buildVariables(env, as3try.TryBlock[i]);
                         }
@@ -226,12 +374,12 @@ namespace ASCompiler.compiler
                         {
                             buildVariables(env, c.CatchBlock[j]);
                         }
-                        
+
                     }
 
                     if (as3try.FinallyBlock != null)
                     {
-                        for (int i = 0; i < as3try.FinallyBlock.Count ; i++)
+                        for (int i = 0; i < as3try.FinallyBlock.Count; i++)
                         {
                             buildVariables(env, as3try.FinallyBlock[i]);
                         }
@@ -256,7 +404,7 @@ namespace ASCompiler.compiler
 
                             Variable var = (Variable)member;
 
-                            var newtype = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
+                            var newtype = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
 
                             if (newtype == var.valueType)
                             {
@@ -285,10 +433,10 @@ namespace ASCompiler.compiler
                                     {
                                         //读取测试
 
-                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock());
+                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock(0),false);
                                         buildExpression(tempEnv, variable.ValueExpr);
                                         IRightValue tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
-                                            stmt.Token
+                                            stmt.Token,new Builder()
                                             );
                                         newtype = tempRv.valueType;
                                     }
@@ -313,7 +461,7 @@ namespace ASCompiler.compiler
                     }
 
                     {
-                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count);
+                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count,env.block.id);
                         env.block.scope.members.Add(rtVariable);
 
                         //ASBinCode.IRightValue defaultv = null;
@@ -322,7 +470,7 @@ namespace ASCompiler.compiler
                         try
                         {
 
-                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
+                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
 
                             if (variable.ValueExpr != null) //变量值表达式
                             {
@@ -417,12 +565,42 @@ namespace ASCompiler.compiler
                     }
 
                 }
+                else if (stmt is ASTool.AS3.AS3Function)
+                {
+                    ASTool.AS3.AS3Function as3function = (ASTool.AS3.AS3Function)stmt;
+
+                    {
+                        if (as3function.IsMethod)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                        "类的方法不应该出现在这里"));
+                            return;
+                        }
+                        else
+                        {
+                            if (as3function.IsAnonymous)
+                            {
+
+                                builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                                builder.buildAS3Function(env,
+                                as3function, this,null);
+                            }
+                        }
+                    }
+
+                }
                 else if (stmt is ASTool.AS3.AS3Break)
                 {
                     ASTool.AS3.AS3Break as3Break = (ASTool.AS3.AS3Break)stmt;
                     builds.AS3BreakBuilder builder = new builds.AS3BreakBuilder();
                     builder.buildAS3Break(env, as3Break);
 
+                }
+                else if (stmt is ASTool.AS3.AS3Return)
+                {
+                    ASTool.AS3.AS3Return as3return = (ASTool.AS3.AS3Return)stmt;
+                    builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                    builder.buildAS3Return(env, as3return, this);
                 }
                 else if (stmt is ASTool.AS3.AS3Continue)
                 {
@@ -463,12 +641,12 @@ namespace ASCompiler.compiler
                 else if (stmt is ASTool.AS3.AS3Try)
                 {
                     builds.AS3TryBuilder builder = new builds.AS3TryBuilder();
-                    builder.buildAS3Try(env, (ASTool.AS3.AS3Try )stmt ,this);
+                    builder.buildAS3Try(env, (ASTool.AS3.AS3Try)stmt, this);
                 }
                 else if (stmt is ASTool.AS3.AS3StmtExpressions)
                 {
                     ASTool.AS3.AS3StmtExpressions expressions = (ASTool.AS3.AS3StmtExpressions)stmt;
-                    
+
                     for (int i = 0; i < expressions.as3exprlist.Count; i++)
                     {
                         buildExpression(env, expressions.as3exprlist[i]);
@@ -509,7 +687,7 @@ namespace ASCompiler.compiler
                                 {
                                     buildExpression(env, variable.ValueExpr);
                                     defaultv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
-                                        stmt.Token
+                                        stmt.Token, this
                                         );
                                 }
 
@@ -525,7 +703,11 @@ namespace ASCompiler.compiler
                                         "不能将[" + defaultv.valueType + "]类型赋值给[" + rtVariable.valueType + "]类型的变量");
                                 }
 
-
+                                bool isbindscope = false;
+                                if (defaultv.valueType == RunTimeDataType.rt_function)
+                                {
+                                    isbindscope = true;
+                                }
 
                                 if (defaultv.valueType != rtVariable.valueType)
                                 {
@@ -550,7 +732,19 @@ namespace ASCompiler.compiler
 
                                     env.block.opSteps.Add(step);
                                 }
+                                if (isbindscope)
+                                {
+                                    //***需追加绑定scope***
+                                    OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile));
+                                    stepbind.reg = null;
+                                    stepbind.regType = RunTimeDataType.unknown;
+                                    stepbind.arg1 = rtVariable;
+                                    stepbind.arg1Type = rtVariable.valueType;
+                                    stepbind.arg2 = null;
+                                    stepbind.arg2Type = RunTimeDataType.unknown;
 
+                                    env.block.opSteps.Add(stepbind);
+                                }
                             }
                             //else
                             //{
@@ -654,7 +848,7 @@ namespace ASCompiler.compiler
             try
             {
                 builds.ExpressionBuilder expressionbuilder =
-                            new builds.ExpressionBuilder();
+                            new builds.ExpressionBuilder(this);
 
                 expressionbuilder.buildAS3Expression(env, expression);
             }

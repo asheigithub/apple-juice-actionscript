@@ -6,9 +6,9 @@ namespace ASRuntime.operators
 {
     class OpLogic
     {
-        public static void execNOT(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNOT(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var v = TypeConverter.ConvertToBoolean(step.arg1.getValue(scope),player,step.token);
+            var v = TypeConverter.ConvertToBoolean(step.arg1.getValue(scope),frame,step.token);
 
             if (object.ReferenceEquals(v, ASBinCode.rtData.rtBoolean.True))
             {
@@ -61,7 +61,7 @@ namespace ASRuntime.operators
             //step.reg.setValue(new ASBinCode.rtData.rtNumber(a1.value + a2.value), eaxs, scope);
         }
 
-        public static void execGT_Void(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGT_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
@@ -78,8 +78,8 @@ namespace ASRuntime.operators
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
                 if (s1 == null || s2 == null)
                 {
@@ -97,8 +97,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1,player,step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1,frame,step.token);
+                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 > n2)
                 {
@@ -111,7 +111,7 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execGE_Void(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGE_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
@@ -128,8 +128,8 @@ namespace ASRuntime.operators
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
                 if (s1 == null || s2 == null)
                 {
@@ -147,8 +147,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 >= n2)
                 {
@@ -199,7 +199,7 @@ namespace ASRuntime.operators
             
         }
 
-        public static void execLT_VOID(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLT_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
@@ -216,8 +216,8 @@ namespace ASRuntime.operators
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
                 if (s1 == null || s2 == null)
                 {
@@ -234,8 +234,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 < n2)
                 {
@@ -248,7 +248,7 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execLE_VOID(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLE_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
@@ -265,8 +265,8 @@ namespace ASRuntime.operators
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
                 if (s1 == null || s2 == null)
                 {
@@ -283,8 +283,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 <= n2)
                 {
@@ -297,9 +297,9 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execEQ(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), player, step, scope))
+            if (testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -309,9 +309,9 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execNotEQ(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (!testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), player, step, scope))
+            if (!testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -321,10 +321,10 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execEQ_NumNum(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), player, step.token);
-            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), player, step.token);
+            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
+            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
 
             if (n1==n2)
             {
@@ -336,10 +336,10 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execNotEQ_NumNum(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), player, step.token);
-            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), player, step.token);
+            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
+            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
 
             if (n1 != n2)
             {
@@ -351,10 +351,10 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execEQ_StrStr(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
             if (string.CompareOrdinal(n1,n2)==0)
             {
@@ -366,10 +366,10 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void execNotEQ_StrStr(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
             if (string.CompareOrdinal(n1, n2) != 0)
             {
@@ -381,7 +381,7 @@ namespace ASRuntime.operators
             }
         }
 
-        private static bool  _execStrictEQ(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             //strict equality 运算符仅针对数字类型（Number、int 和 uint）执行自动数据转换
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
@@ -401,8 +401,8 @@ namespace ASRuntime.operators
                 )
                 )
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 == n2)
                 {
@@ -415,8 +415,8 @@ namespace ASRuntime.operators
             }
             else if (v1.rtType == ASBinCode.RunTimeDataType.rt_string && v2.rtType == ASBinCode.RunTimeDataType.rt_string)
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), player, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), player, step.token);
+                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
                 if (string.CompareOrdinal(s1, s2) == 0)
                 {
                     return true;
@@ -440,9 +440,9 @@ namespace ASRuntime.operators
 
         }
 
-        public static void execStrictEQ(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (_execStrictEQ(player, step, scope))
+            if (_execStrictEQ(frame, step, scope))
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -451,9 +451,9 @@ namespace ASRuntime.operators
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
         }
-        public static void execStrictNotEQ(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execStrictNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (!_execStrictEQ(player, step, scope))
+            if (!_execStrictEQ(frame, step, scope))
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -488,7 +488,7 @@ namespace ASRuntime.operators
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <returns></returns>
-        public static bool testEquals(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2, Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static bool testEquals(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.RunTimeDataType t1 = v1.rtType;
             ASBinCode.RunTimeDataType t2 = v2.rtType;
@@ -506,7 +506,7 @@ namespace ASRuntime.operators
                 )
                 )
             {
-                return TypeConverter.ConvertToNumber(v1, player, step.token) == TypeConverter.ConvertToNumber(v2, player, step.token);
+                return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
             }
             else if (
                 (t1 == ASBinCode.RunTimeDataType.rt_null || t1 == ASBinCode.RunTimeDataType.rt_void)
@@ -518,9 +518,9 @@ namespace ASRuntime.operators
             }
             else if (t1 == ASBinCode.RunTimeDataType.rt_string && t2 == ASBinCode.RunTimeDataType.rt_string)
             {
-                return string.CompareOrdinal(TypeConverter.ConvertToString(v1, player, step.token)
+                return string.CompareOrdinal(TypeConverter.ConvertToString(v1, frame, step.token)
                     ,
-                    TypeConverter.ConvertToString(v2, player, step.token)
+                    TypeConverter.ConvertToString(v2, frame, step.token)
                     ) == 0;
             }
             else if (t1 == ASBinCode.RunTimeDataType.rt_string)
@@ -530,23 +530,23 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_boolean:
                         if (v2.Equals(ASBinCode.rtData.rtBoolean.True))
                         {
-                            return TypeConverter.ConvertToInt(v1, player, step.token) == 1;
+                            return TypeConverter.ConvertToInt(v1, frame, step.token) == 1;
                         }
                         else
                         {
-                            return TypeConverter.ConvertToInt(v1, player, step.token) != 1;
+                            return TypeConverter.ConvertToInt(v1, frame, step.token) != 1;
                         }
                     case ASBinCode.RunTimeDataType.rt_int:
-                        return TypeConverter.ConvertToInt(v1, player, step.token) == TypeConverter.ConvertToInt(v2, player, step.token);
+                        return TypeConverter.ConvertToInt(v1, frame, step.token) == TypeConverter.ConvertToInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_uint:
-                        return TypeConverter.ConvertToUInt(v1, player, step.token) == TypeConverter.ConvertToUInt(v2, player, step.token);
+                        return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
-                        return TypeConverter.ConvertToNumber(v1, player, step.token) == TypeConverter.ConvertToNumber(v2, player, step.token);
+                        return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
-                            TypeConverter.ConvertToString(v1, player, step.token)
+                            TypeConverter.ConvertToString(v1, frame, step.token)
                             ,
-                            TypeConverter.ConvertToString(v2, player, step.token)
+                            TypeConverter.ConvertToString(v2, frame, step.token)
                             ) == 0;
                     case ASBinCode.RunTimeDataType.rt_void:
                         return false;
@@ -565,23 +565,23 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_boolean:
                         if (v1.Equals(ASBinCode.rtData.rtBoolean.True))
                         {
-                            return TypeConverter.ConvertToInt(v2, player, step.token) == 1;
+                            return TypeConverter.ConvertToInt(v2, frame, step.token) == 1;
                         }
                         else
                         {
-                            return TypeConverter.ConvertToInt(v2, player, step.token) != 1;
+                            return TypeConverter.ConvertToInt(v2, frame, step.token) != 1;
                         }
                     case ASBinCode.RunTimeDataType.rt_int:
-                        return TypeConverter.ConvertToInt(v1, player, step.token) == TypeConverter.ConvertToInt(v2, player, step.token);
+                        return TypeConverter.ConvertToInt(v1, frame, step.token) == TypeConverter.ConvertToInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_uint:
-                        return TypeConverter.ConvertToUInt(v1, player, step.token) == TypeConverter.ConvertToUInt(v2, player, step.token);
+                        return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
-                        return TypeConverter.ConvertToNumber(v1, player, step.token) == TypeConverter.ConvertToNumber(v2, player, step.token);
+                        return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
-                            TypeConverter.ConvertToString(v1, player, step.token)
+                            TypeConverter.ConvertToString(v1, frame, step.token)
                             ,
-                            TypeConverter.ConvertToString(v2, player, step.token)
+                            TypeConverter.ConvertToString(v2, frame, step.token)
                             ) == 0;
                     case ASBinCode.RunTimeDataType.rt_void:
                         return false;

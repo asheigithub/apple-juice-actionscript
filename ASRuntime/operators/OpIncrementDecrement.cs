@@ -6,7 +6,7 @@ namespace ASRuntime.operators
 {
     class OpIncrementDecrement
     {
-        public static void execIncrement(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
 
@@ -35,7 +35,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         if (string.IsNullOrEmpty( ((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -52,7 +52,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.unknown:
                 default:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
@@ -97,7 +97,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execDecrement(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
 
@@ -126,7 +126,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -143,7 +143,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.unknown:
                 default:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
@@ -186,7 +186,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execSuffixInc(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixInc(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -225,7 +225,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -244,7 +244,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.unknown:
                 default:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
 
                         step.reg.getISlot(scope).setValue(n);
 
@@ -299,7 +299,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execSuffixDec(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -338,7 +338,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -357,7 +357,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.unknown:
                 default:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, player, step.token);
+                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
 
                         step.reg.getISlot(scope).setValue(n);
 

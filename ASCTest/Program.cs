@@ -64,33 +64,37 @@ namespace ASCTest
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
             builder.Build(proj);
 
-            
 
-
-            for (int i = 0; i < builder.blocks.Count; i++)
+            if (builder.buildErrors.Count == 0)
             {
-                var block = builder.blocks[i];
+                ASBinCode.CSWC swc = builder.bin;
+
+                for (int i = 0; i < swc.blocks.Count ; i++)
+                {
+                    var block = swc.blocks[i];
 
 
-                Console.WriteLine();
-                Console.WriteLine("====操作指令====");
-                Console.WriteLine();
-                Console.WriteLine("total registers:" + block.totalRegisters );
-                Console.WriteLine(block.ToString());
+                    Console.WriteLine();
+                    Console.WriteLine("====操作指令 block "+block.id+"====");
+                    Console.WriteLine();
+                    Console.WriteLine("total registers:" + block.totalRegisters);
+                    Console.WriteLine(block.ToString());
+                }
 
 
                 ASRuntime.Player player = new ASRuntime.Player();
-                player.loadCode(block);
+                player.loadCode(swc);
+                
 
                 Console.WriteLine();
                 Console.WriteLine("====程序输出====");
 
-                var scope= player.run();
+                player.run2(null);
 
                 Console.WriteLine();
+                
 
             }
-
 
 #if DEBUG
             Console.WriteLine("按任意键结束");

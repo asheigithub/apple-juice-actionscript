@@ -18,6 +18,8 @@ namespace ASRuntime.error
 
         public ASBinCode.IRunTimeValue errorValue;
 
+        internal Stack<StackFrame> callStack;
+
         public InternalError(ASBinCode.SourceToken token,string message)
         {
             this.token = token;

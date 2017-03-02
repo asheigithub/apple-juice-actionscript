@@ -102,6 +102,15 @@ namespace ASBinCode
             {
                 return "quit_finally" + "\t" + arg1.ToString();
             }
+            else if (opCode == OpCode.bind_scope)
+            {
+                return "bind scope" + "\t" + arg1.ToString();
+            }
+
+            if (reg == null)
+            {
+                return opCode.ToString() + "\t" + (arg1==null?"":arg1.ToString());
+            }
 
             string result = reg.ToString() + "\t" + opCode.ToString();
 

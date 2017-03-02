@@ -10,5 +10,8 @@ namespace ASBinCode
     public interface IRunTimeValue:ICloneable
     {
         RunTimeDataType rtType { get; }
+
+        
+
     }
 }

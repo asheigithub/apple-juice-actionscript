@@ -6,7 +6,7 @@ namespace ASRuntime.operators
 {
     class OpCast
     {
-        public static void execCast( Player player, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
+        public static void execCast( StackFrame frame, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
         {
 
             //ASBinCode.IRunTimeValue output = CastValue(
@@ -22,9 +22,9 @@ namespace ASRuntime.operators
             //}
 
             if (!CastValue(
-                step.arg1.getValue(scope), step.regType, step.reg.getISlot(scope), player, step.token, scope))
+                step.arg1.getValue(scope), step.regType, step.reg.getISlot(scope), frame, step.token, scope))
             {
-                player.throwCastException(step.token, step.arg1.valueType, step.regType);
+                frame.throwCastException(step.token, step.arg1.getValue(scope).rtType, step.regType);
             }
             
 
@@ -34,7 +34,7 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue srcValue,ASBinCode.RunTimeDataType targetType,
             ASBinCode.ISLOT storeto
             ,
-            Player player, ASBinCode.SourceToken token,  ASBinCode.IRunTimeScope scope
+            StackFrame frame, ASBinCode.SourceToken token,  ASBinCode.IRunTimeScope scope
 
             )
         {
@@ -46,7 +46,7 @@ namespace ASRuntime.operators
                     //);
                     storeto.setValue(
                         TypeConverter.ConvertToBoolean(
-                        srcValue, player, token, true
+                        srcValue, frame, token, true
                     )
                         );
                     return true;
@@ -58,7 +58,7 @@ namespace ASRuntime.operators
                        
                         storeto.setValue(
                              TypeConverter.ConvertToInt(
-                                srcValue, player, token, true
+                                srcValue, frame, token, true
                             )
                             );
 
@@ -70,7 +70,7 @@ namespace ASRuntime.operators
                     //);
                     storeto.setValue(
                         TypeConverter.ConvertToUInt(
-                        srcValue, player, token, true
+                        srcValue, frame, token, true
                     )
                         );
                     return true;
@@ -81,7 +81,7 @@ namespace ASRuntime.operators
                     //);
                     storeto.setValue(
                         TypeConverter.ConvertToNumber(
-                        srcValue, player, token, true
+                        srcValue, frame, token, true
                     )
                         );
                     return true;
@@ -92,17 +92,35 @@ namespace ASRuntime.operators
                     //);
                     storeto.setValue(
                         TypeConverter.ConvertToString(
-                        srcValue, player, token, true
+                        srcValue, frame, token, true
                     )
                         );
                     return true;
 
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
-
+                case ASBinCode.RunTimeDataType.fun_void:
                     //return srcValue;
                     storeto.directSet(srcValue);
                     return true;
+
+                case ASBinCode.RunTimeDataType.rt_function:
+                    {
+                        if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
+                            ||
+                            srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
+                            ||
+                            srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
+                            )
+                        {
+                            storeto.directSet(srcValue);
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                 case ASBinCode.RunTimeDataType.unknown:
                 default:
                     return false;

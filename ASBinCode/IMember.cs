@@ -8,5 +8,9 @@ namespace ASBinCode
     {
         string name { get; }
 
+        int indexOfMembers { get; }
+
+        IMember clone();
+
     }
 }

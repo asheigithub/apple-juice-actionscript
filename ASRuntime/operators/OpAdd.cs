@@ -43,7 +43,7 @@ namespace ASRuntime.operators
             step.reg.getISlot(scope).setValue(a1.valueString() + a2.valueString());// new ASBinCode.rtData.rtString(a1.valueString() + a2.valueString()));
         }
 
-        public static void execAdd(Player player, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
+        public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue( scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue( scope);
@@ -88,18 +88,18 @@ namespace ASRuntime.operators
             if (finalType == ASBinCode.RunTimeDataType.rt_number)
             {
                 step.reg.getISlot(scope).setValue(
-                    TypeConverter.ConvertToNumber(v1,player,step.token)
+                    TypeConverter.ConvertToNumber(v1,frame,step.token)
                     //((ASBinCode.rtData.rtNumber)v1).value 
                     +
-                    TypeConverter.ConvertToNumber(v2, player, step.token)
+                    TypeConverter.ConvertToNumber(v2, frame, step.token)
                     //((ASBinCode.rtData.rtNumber)v2).value
 
                     );// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value + ((ASBinCode.rtData.rtNumber)v2).value));
             }
             else if (finalType == ASBinCode.RunTimeDataType.rt_string)
             {
-                string s1 = TypeConverter.ConvertToString(v1, player, step.token);
-                string s2 = TypeConverter.ConvertToString(v2, player, step.token);
+                string s1 = TypeConverter.ConvertToString(v1, frame, step.token);
+                string s2 = TypeConverter.ConvertToString(v2, frame, step.token);
 
                 if (s1 == null) { s1 = "null"; }
                 if (s2 == null) { s2 = "null"; }
@@ -112,7 +112,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                player.throwOpException(step.token, ASBinCode.OpCode.add);
+                frame.throwOpException(step.token, ASBinCode.OpCode.add);
             }
         }
 

@@ -14,9 +14,9 @@ namespace ASCompiler.compiler
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static ASBinCode.RunTimeDataType fromSourceCodeStr(string t,CompileEnv env,ASTool.Token token)
+        public static ASBinCode.RunTimeDataType fromSourceCodeStr(string t,ASTool.Token token)
         {
-            if (t == "*")
+            if (t == "*" || t=="void")
             {
                 return rt.rt_void;
             }
@@ -39,6 +39,10 @@ namespace ASCompiler.compiler
             else if (t == "String")
             {
                 return ASBinCode.RunTimeDataType.rt_string;
+            }
+            else if (t == "Function")
+            {
+                return ASBinCode.RunTimeDataType.rt_function;
             }
             else
             {

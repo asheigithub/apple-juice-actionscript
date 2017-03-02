@@ -4,7 +4,9 @@ using System.Text;
 
 namespace ASBinCode
 {
-    
+    /// <summary>
+    /// 定义编译期内存数据
+    /// </summary>
     public interface IScope
     {
         

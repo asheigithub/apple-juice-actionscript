@@ -14,18 +14,18 @@ namespace ASRuntime.operators
             step.reg.getISlot(scope).setValue(a1.value - a2.value);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
         }
 
-        public static void execSub(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSub(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
             //if (v1.rtType == ASBinCode.RunTimeDataType.rt_void)
             //{
-            double    n1 = TypeConverter.ConvertToNumber(v1, player, step.token);
+            double    n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
             //}
             //if (v2.rtType == ASBinCode.RunTimeDataType.rt_void)
             //{
-            double    n2 = TypeConverter.ConvertToNumber(v2, player, step.token);
+            double    n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
             //}
 
 

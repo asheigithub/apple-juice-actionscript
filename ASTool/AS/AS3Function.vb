@@ -51,6 +51,7 @@
         Public ParentScope As IAS3MemberList
 
 
+
         Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
 
             If Not Meta Is Nothing Then

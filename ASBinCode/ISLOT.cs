@@ -14,5 +14,8 @@ namespace ASBinCode
         void directSet(IRunTimeValue value);
 
         IRunTimeValue getValue();
+
+        void clear();
+
     }
 }

@@ -31,7 +31,7 @@ namespace ASCompiler.compiler.builds
 
                     OpStep op = new OpStep(OpCode.raise_error, new SourceToken(as3throw.Token.line, as3throw.Token.ptr, as3throw.Token.sourceFile));
 
-                    IRightValue lv = builds.ExpressionBuilder.getRightValue(env, as3throw.Exception.Value, as3throw.Token);
+                    IRightValue lv = builds.ExpressionBuilder.getRightValue(env, as3throw.Exception.Value, as3throw.Token,builder);
                     op.arg1 = lv;
                     op.arg1Type = lv.valueType;
                     op.arg2 = null;

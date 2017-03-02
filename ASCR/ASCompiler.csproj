@@ -47,6 +47,7 @@
     <Compile Include="compiler\BuildException.cs" />
     <Compile Include="compiler\builds\AS3BreakBuilder.cs" />
     <Compile Include="compiler\builds\AS3ContinueBuilder.cs" />
+    <Compile Include="compiler\builds\AS3FunctionBuilder.cs" />
     <Compile Include="compiler\builds\AS3LoopBuilder.cs" />
     <Compile Include="compiler\builds\AS3IFBuilder.cs" />
     <Compile Include="compiler\builds\AS3SwitchBuilder.cs" />

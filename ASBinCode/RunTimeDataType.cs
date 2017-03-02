@@ -6,19 +6,6 @@ namespace ASBinCode
 {
 
 
-    //public enum RunTimeDataType
-    //{
-    //    rt_boolean=0,
-    //    rt_int=1,
-    //    rt_uint=2,
-    //    rt_number=3,
-    //    rt_string=4,
-    //    rt_void=5,
-    //    rt_null=6,
-    //    unknown=7
-    //}
-
-
     public struct RunTimeDataType
     {
         public override string ToString()
@@ -39,6 +26,10 @@ namespace ASBinCode
                     return "rt_void";
                 case rt_null:
                     return "rt_null";
+                case rt_function:
+                    return "rt_function";
+                case fun_void:
+                    return "return_void";
                 case unknown:
                     return "unknown";
                 default:
@@ -56,14 +47,15 @@ namespace ASBinCode
         public const int rt_string = 4;
         public const int rt_void = 5;
         public const int rt_null = 6;
-        public const int unknown = 7;
+        public const int rt_function = 7;
+        public const int fun_void = 8;
+        public const int unknown = 9;
 
         public readonly int RTTI;
         public RunTimeDataType(int rtti)
         {
             RTTI = rtti;
         }
-        
 
         public static bool operator ==(RunTimeDataType v1, RunTimeDataType v2)
         {

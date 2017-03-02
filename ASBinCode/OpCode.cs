@@ -193,43 +193,69 @@ namespace ASBinCode
         /// </summary>
         flag=53,
 
-        /// <summary>
-        /// 内置trace语句
-        /// </summary>
-        native_trace=54,
+        
 
         /// <summary>
         /// 抛出异常
         /// </summary>
-        raise_error=55,
+        raise_error=54,
         /// <summary>
         /// 捕获异常
         /// </summary>
-        catch_error=56,
+        catch_error=55,
         /// <summary>
         /// 进入try
         /// </summary>
-        enter_try=57,
+        enter_try=56,
         /// <summary>
         /// 退出try
         /// </summary>
-        quit_try=58,
+        quit_try=57,
         /// <summary>
         /// 进入catch
         /// </summary>
-        enter_catch=59,
+        enter_catch=58,
         /// <summary>
         /// 退出catch
         /// </summary>
-        quit_catch=60,
+        quit_catch=59,
         /// <summary>
         /// 进入finally
         /// </summary>
-        enter_finally=61,
+        enter_finally=60,
         /// <summary>
         /// 退出finally
         /// </summary>
-        quit_finally=62,
+        quit_finally=61,
 
+
+        /// <summary>
+        /// 内置trace语句
+        /// </summary>
+        native_trace = 62,
+
+        /// <summary>
+        /// function绑定上下文
+        /// </summary>
+        bind_scope =63,
+        
+
+        /// <summary>
+        /// 创建函数参数上下文
+        /// </summary>
+        make_para_scope =64,
+        /// <summary>
+        /// 复制参数
+        /// </summary>
+        push_parameter =65,
+
+        /// <summary>
+        /// 调 function
+        /// </summary>
+        call_function = 66,
+        /// <summary>
+        /// return
+        /// </summary>
+        function_return=67,
     }
 }

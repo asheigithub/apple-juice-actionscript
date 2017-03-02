@@ -11,15 +11,27 @@ namespace ASCompiler.compiler
     {
         public static ASBinCode.IMember find(string name, CompileEnv env)
         {
-            //从后往前找。可解决catch块同名变量e问题
-            for (int i = env.block.scope.members.Count-1; i >=0; i--)
+
+            ASBinCode.IScope scope = env.block.scope;
+            int depth = 0;
+            while (scope !=null)
             {
-                if (env.block.scope.members[i].name == name
-                    )
+
+                //从后往前找。可解决catch块同名变量e问题
+                for (int i = scope.members.Count - 1; i >= 0; i--)
                 {
-                    return env.block.scope.members[i];
+                    if (scope.members[i].name == name
+                        )
+                    {
+                        return scope.members[i].clone();
+                    }
                 }
+
+                scope = scope.parentScope;
+                ++depth;
             }
+
+
             return null;
         } 
 

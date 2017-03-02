@@ -6,7 +6,7 @@ namespace ASRuntime.nativefuncs
 {
     class Trace
     {
-        public static void exec(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             if (step.arg1.valueType == ASBinCode.RunTimeDataType.unknown)
             {
@@ -15,7 +15,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var totrace = step.arg1.getValue(scope);
-                string toout = TypeConverter.ConvertToString(totrace, player, step.token);
+                string toout = TypeConverter.ConvertToString(totrace, frame, step.token);
                 Console.WriteLine(
                     toout==null?"null":toout
                     

@@ -22,5 +22,9 @@ namespace ASBinCode
         /// </summary>
         int offset { get; }
 
+        /// <summary>
+        /// 所属代码块的id
+        /// </summary>
+        int blockId { get; }
     }
 }

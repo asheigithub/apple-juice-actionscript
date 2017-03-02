@@ -8,6 +8,9 @@ namespace ASCompiler.compiler
     {
         public ASBinCode.CodeBlock block;
 
+        internal List<ASTool.AS3.AS3Function> tobuildNamedfunction = new List<ASTool.AS3.AS3Function>();
+
+        
         //public List<ASBinCode.Register> tempEaxList;
         ///// <summary>
         ///// 编译期间额外增加的寄存器
@@ -130,13 +133,15 @@ namespace ASCompiler.compiler
             }
         }
 
+        public readonly bool isEval;
 
-
-        public CompileEnv(ASBinCode.CodeBlock block)
+        public CompileEnv(ASBinCode.CodeBlock block,bool isEval)
         {
             this.block = block;
 
             dictCompileRegisters = new Dictionary<string, ASBinCode.Register>();
+
+            this.isEval = isEval;
 
             //tempEaxList = new List<ASBinCode.Register>();
 

@@ -103,7 +103,7 @@ Public Class Lex
         Dim result As Token = New Token()
         result.sourceFile = File
 
-        Dim ch As String
+        Dim ch As String = Nothing
 
         Dim tempwhitespace As String = ""
         Dim templf As Boolean = False

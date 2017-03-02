@@ -9,6 +9,7 @@ namespace ASBinCode
     /// </summary>
     public class CodeBlock
     {
+        public readonly int id;
         /// <summary>
         /// 运行环境定义
         /// </summary>
@@ -21,8 +22,9 @@ namespace ASBinCode
         /// </summary>
         public int totalRegisters;
 
-        public CodeBlock()
+        public CodeBlock(int id)
         {
+            this.id = id;
             opSteps = new List<OpStep>();
         }
 

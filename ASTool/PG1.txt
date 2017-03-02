@@ -183,7 +183,7 @@
 <FunctionProperty>  ::= "get" <FunctionName> |"set" <FunctionName>|<FunctionName>; 
 <FunctionName> ::= identifier |null|<ID_EABLED_KEYWORD> ;
 
-<FunctionReturnType> ::=":"<FunctionType>|":*"|null;
+<FunctionReturnType> ::=":"<FunctionType>|":*"|":void"|null;
 <FunctionType>    ::=<DefineType>;
 
 
@@ -410,7 +410,7 @@
 <MultiplyOpt> ::= "*" <Unary><MultiplyOpt> | "/" <Unary><MultiplyOpt> | "%" <Unary><MultiplyOpt> | null;    
 
 <Unary>    ::=  "+" <Access> | "-" <Access> | "~" <Unary>| "!" <Unary>| "delete"<Access> | "typeof"<Unary> /*| "void" <Access> void会和返回值冲突.. */ //单目运算
-                | "++" <Access> | "--" <Access>|<Access>  ;                        
+                | "++" <Access> | "--" <Access>| "void" <Access>  |<Access>  ;                        
 //<Unary>    ::=<Access>;
 <New>      ::=  "new" <NewClassOrVector> ;
 <NewClassOrVector> ::=<ClassPath> <NewOpt>| <Vector>;
