@@ -10,6 +10,16 @@ package
 	}
 }
 
+function abc():int
+{
+	while (true) 
+	{
+		return 1;
+	}
+	
+}
+
+
 //
 //var getFunc=function(i:int,j):Function{
 	//
@@ -56,29 +66,29 @@ package
 	//trace(line);
 //}
 
-
-
-var count:int;
-function fab (i:int):int
-{
-	count++;
-	if (i < 1)
-	{
-		return 0;
-	}
-	else if (i == 1)
-	{
-		return 1;
-	}
-	else
-	{
-		return fab(i - 1) + fab(i - 2);
-	}
-}
-
-var fabnum = fab(15) ;
-
-trace( "total invok count" + count + " value: " +fabnum  );
+//
+//
+//var count:int;
+//function fab (i:int):int
+//{
+	//count++;
+	//if (i < 1)
+	//{
+		//return 0;
+	//}
+	//else if (i == 1)
+	//{
+		//return 1;
+	//}
+	//else
+	//{
+		//return fab(i - 1) + fab(i - 2);
+	//}
+//}
+//
+//var fabnum = fab(15) ;
+//
+//trace( "total invok count" + count + " value: " +fabnum  );
 
 //function foo(num:Number):void // bound method defined 
     //{ 

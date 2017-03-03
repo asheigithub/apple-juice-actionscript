@@ -110,15 +110,26 @@ namespace ASCompiler.compiler.builds
 
         private bool detectingReturn(CodeBlock block)
         {
-            return findReturn(block.opSteps,0);
+            return findReturn(block.opSteps,0,new int[] { });
         }
-        private bool findReturn(List<OpStep> commands,int st)
+        private bool findReturn(List<OpStep> commands,int st,int[] hasvisited)
         {
             Dictionary<int, object> visited = new Dictionary<int, object>();
+            for (int i = 0; i < hasvisited.Length; i++)
+            {
+                visited.Add(hasvisited[i],null);
+            }
 
-            for (int i = st; i < commands.Count && !visited.ContainsKey(i) ; i++)
+            for (int i = st; i < commands.Count  ; i++)
             {
                 OpStep op = commands[i];
+
+                if (visited.ContainsKey(i))
+                {
+                    return true;
+                }
+
+                visited.Add(i, null);
 
                 if (op.opCode == OpCode.function_return)
                 {
@@ -132,9 +143,12 @@ namespace ASCompiler.compiler.builds
                 {
                     int line = i + op.jumoffset ;
 
-                    return findReturn(commands, i + 1) && findReturn(commands, line);
+                    int[] add = new int[visited.Keys.Count ];
+                    visited.Keys.CopyTo(add, 0);
+
+                    return findReturn(commands, i + 1,add) && findReturn(commands, line,add);
                 }
-                visited.Add(i, null);
+                
             }
 
             return false;
