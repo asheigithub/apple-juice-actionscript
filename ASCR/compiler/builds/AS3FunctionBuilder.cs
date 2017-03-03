@@ -194,7 +194,7 @@ namespace ASCompiler.compiler.builds
 
             builder.buildingfunctons.Push(as3function);
 
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(builder.getBlockId());
+            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(builder.getBlockId(),env.block.name +"::"+as3function.Name);
             ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope();
             funcscope.parentScope = env.block.scope;
             block.scope = funcscope;

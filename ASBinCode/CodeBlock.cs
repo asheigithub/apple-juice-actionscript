@@ -10,6 +10,7 @@ namespace ASBinCode
     public class CodeBlock
     {
         public readonly int id;
+        public readonly string name;
         /// <summary>
         /// 运行环境定义
         /// </summary>
@@ -22,9 +23,10 @@ namespace ASBinCode
         /// </summary>
         public int totalRegisters;
 
-        public CodeBlock(int id)
+        public CodeBlock(int id,string name)
         {
             this.id = id;
+            this.name = name;
             opSteps = new List<OpStep>();
         }
 

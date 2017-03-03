@@ -101,7 +101,7 @@ namespace ASCompiler.compiler
         {
             //***分析包外代码***
             List<ASTool.AS3.IAS3Stmt> outstmts = srcfile.OutPackagePrivateScope.StamentsStack.Peek();
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(getBlockId());
+            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(getBlockId(),srcfile.Package.MainClass.Name+"privateScope");
             block.scope = new ASBinCode.scopes.OutPackageMemberScope();
             
             buildCodeBlock(outstmts, block);
@@ -433,7 +433,7 @@ namespace ASCompiler.compiler
                                     {
                                         //读取测试
 
-                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock(0),false);
+                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock(0,"temp"),false);
                                         buildExpression(tempEnv, variable.ValueExpr);
                                         IRightValue tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
                                             stmt.Token,new Builder()

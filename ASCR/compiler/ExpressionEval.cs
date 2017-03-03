@@ -19,7 +19,7 @@ namespace ASCompiler.compiler
                 Builder builder = new Builder();
                 builder.isConsoleOut = false;
 
-                CompileEnv tempEnv = new CompileEnv(new CodeBlock(builder.getBlockId()),true);
+                CompileEnv tempEnv = new CompileEnv(new CodeBlock(builder.getBlockId(),"temp"),true);
                 tempEnv.block.scope = new ASBinCode.scopes.OutPackageMemberScope();
                 builder.buildExpressNotEval(tempEnv, expression);
                 tempEnv.completSteps();

@@ -10,14 +10,7 @@ package
 	}
 }
 
-function abc():int
-{
-	while (true) 
-	{
-		return 1;
-	}
-	
-}
+
 
 
 //
