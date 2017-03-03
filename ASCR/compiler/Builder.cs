@@ -26,15 +26,17 @@ namespace ASCompiler.compiler
 
         public List<BuildError> buildErrors=new List<BuildError>();
 
-        internal Dictionary<int, List<builds.AS3FunctionBuilder.NamedFunction>>
-            dictNamedFunctions=new Dictionary<int, List<builds.AS3FunctionBuilder.NamedFunction>>();
+        internal Dictionary<int, Dictionary<IMember,ASBinCode.rtti.FunctionSignature>>
+            dictSignatures=new Dictionary<int, Dictionary<IMember, ASBinCode.rtti.FunctionSignature>>();
 
         /// <summary>
         /// 记录当前正在编译的function
         /// </summary>
         internal Stack<ASTool.AS3.AS3Function> buildingfunctons = new Stack<ASTool.AS3.AS3Function>();
 
-        internal Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtData.rtFunction> buildoutfunctions=new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtData.rtFunction>();
+        internal Dictionary<ASTool.AS3.AS3Function,ASBinCode.rtti.FunctionDefine> 
+            buildoutfunctions=new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>();
+        
 
         private void pushBuildError(BuildError err)
         {
@@ -101,7 +103,7 @@ namespace ASCompiler.compiler
         {
             //***分析包外代码***
             List<ASTool.AS3.IAS3Stmt> outstmts = srcfile.OutPackagePrivateScope.StamentsStack.Peek();
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(getBlockId(),srcfile.Package.MainClass.Name+"privateScope");
+            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(getBlockId(),srcfile.Package.MainClass.Name+"::privateScope");
             block.scope = new ASBinCode.scopes.OutPackageMemberScope();
             
             buildCodeBlock(outstmts, block);
@@ -117,12 +119,18 @@ namespace ASCompiler.compiler
                 buildVariables(env, statements[i]);
             }
 
+            //***生成所有命名函数的函数签名****
+            for (int i = 0; i < env.tobuildNamedfunction.Count; i++)
+            {
+                buildNamedFunctionSignature(env, env.tobuildNamedfunction[i]);
+            }
+            //***编译所有命名函数***
             for (int i = 0; i < env.tobuildNamedfunction.Count; i++)
             {
                 buildNamedFunctions(env, env.tobuildNamedfunction[i]);
             }
-            
-            
+            env.tobuildNamedfunction = null;
+
 
             for (int i = 0; i < statements.Count; i++)
             {
@@ -134,24 +142,66 @@ namespace ASCompiler.compiler
             if (buildErrors.Count == 0)
             {
                 bin.blocks.Add(block);
-
                 bin.blocks.Sort((CodeBlock b1, CodeBlock b2) => { return b1.id - b2.id; });
+
+                foreach (var item in buildoutfunctions.Values)
+                {
+                    bin.functions[item.functionid] = item;
+                }
+
             }
         }
+
+        internal void buildNamedFunctionSignature(CompileEnv env,ASTool.AS3.AS3Function as3function)
+        {
+            try
+            {
+                if (
+                        !as3function.IsMethod) //闭包
+                {
+                    if (!as3function.IsAnonymous)
+                    {
+
+                        ASBinCode.IMember member = MemberFinder.find(as3function.Name, env);
+
+                        if (!(member is Variable))
+                        {
+                            pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                "此处应该是个Variable"));
+                            return;
+                        }
+
+                        var rtVariable = (Variable)member;
+
+                        builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                        ASBinCode.rtti.FunctionSignature signature = builder.buildSignature(
+                            env, as3function, this
+                            );
+                        if (!dictSignatures.ContainsKey(env.block.id))
+                        {
+                            dictSignatures.Add(env.block.id, new Dictionary<IMember, ASBinCode.rtti.FunctionSignature>());
+                        }
+                        dictSignatures[env.block.id].Add(member, signature);
+                    }
+                }
+            }
+            catch (BuildException ex)
+            {
+                pushBuildError(ex.error);
+            }
+        }
+
 
         /// <summary>
         /// 编译命名后的闭包函数
         /// </summary>
         /// <param name="env"></param>
         /// <param name="stmt"></param>
-        internal void buildNamedFunctions(CompileEnv env, ASTool.AS3.IAS3Stmt stmt)
+        internal void buildNamedFunctions(CompileEnv env, ASTool.AS3.AS3Function as3function)
         {
             try
             {
-                if (stmt is ASTool.AS3.AS3Function)
                 {
-                    ASTool.AS3.AS3Function as3function = (ASTool.AS3.AS3Function)stmt;
-
                     if ( 
                         !as3function.IsMethod) //闭包
                     {
@@ -162,7 +212,7 @@ namespace ASCompiler.compiler
 
                             if (!(member is Variable))
                             {
-                                pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                     "此处应该是个Variable"));
                                 return;
                             }
@@ -171,7 +221,7 @@ namespace ASCompiler.compiler
 
                             builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
                             var func = builder.buildAS3Function(env,
-                                as3function, this,rtVariable);
+                                as3function,this, dictSignatures[env.block.id][member]);
 
                             OpStep step = new OpStep(OpCode.assigning, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
                             step.reg = rtVariable;

@@ -1,8 +1,14 @@
 package 
 {
+	
+	
 	public class FuncTest
 	{
-		public function ttt()
+		public var  k:int = j;
+		public var  j:Number = k+l;
+		public var  l:Number = 999+Math.atan(4);
+		
+		public function ttt():void
 		{
 			
 		}
@@ -12,17 +18,15 @@ package
 
 
 
-
-//
 //var getFunc=function(i:int,j):Function{
 	//
 	//switch (i) 
 	//{
 		//case 0:
 			//
-			//return function()
+			//return function(l:*)
 			//{
-				//trace("select 0 args:" + j  );
+				//trace("select 0 args:" + l  );
 				//
 			//}
 			//
@@ -59,29 +63,29 @@ package
 	//trace(line);
 //}
 
-//
-//
-//var count:int;
-//function fab (i:int):int
-//{
-	//count++;
-	//if (i < 1)
-	//{
-		//return 0;
-	//}
-	//else if (i == 1)
-	//{
-		//return 1;
-	//}
-	//else
-	//{
-		//return fab(i - 1) + fab(i - 2);
-	//}
-//}
-//
-//var fabnum = fab(15) ;
-//
-//trace( "total invok count" + count + " value: " +fabnum  );
+
+
+var count:int;
+function fab (i:int):int
+{
+	count++;
+	if (i < 1)
+	{
+		return 0;
+	}
+	else if (i == 1)
+	{
+		return 1;
+	}
+	else
+	{
+		return fab(i - 1) + fab(i - 2);
+	}
+}
+
+var fabnum = fab(20) ;
+
+trace( "total invok count" + count + " value: " +fabnum  );
 
 //function foo(num:Number):void // bound method defined 
     //{ 

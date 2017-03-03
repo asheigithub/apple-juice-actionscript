@@ -9,13 +9,15 @@ namespace ASBinCode.rtti
     /// </summary>
     public class FunctionDefine
     {
-        public List<FunctionParameter> parameters;
+        //public List<FunctionParameter> parameters;
 
         public bool IsAnonymous;
 
         public string name;
 
-        public RunTimeDataType returnType;
+        //public RunTimeDataType returnType;
+
+        public FunctionSignature signature;
 
         public int blockid;
 

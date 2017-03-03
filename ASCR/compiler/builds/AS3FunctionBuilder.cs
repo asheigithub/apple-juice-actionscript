@@ -7,19 +7,19 @@ namespace ASCompiler.compiler.builds
 {
     class AS3FunctionBuilder
     {
-        public class NamedFunction
-        {
-            public NamedFunction(ASBinCode.rtti.FunctionDefine function,
-                Variable member
-                )
-            {
-                this.function = function;
-                this.member = member;
-            }
+        //public class NamedFunctionSignature
+        //{
+        //    public NamedFunctionSignature(ASBinCode.rtti.FunctionSignature signature,
+        //        Variable member
+        //        )
+        //    {
+        //        this.signature = signature;
+        //        this.member = member;
+        //    }
 
-            public readonly ASBinCode.rtti.FunctionDefine function;
-            public readonly Variable member;
-        }
+        //    public readonly ASBinCode.rtti.FunctionSignature signature;
+        //    public readonly Variable member;
+        //}
 
 
         public void buildAS3Return(CompileEnv env, ASTool.AS3.AS3Return as3return, Builder builder)
@@ -169,38 +169,38 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        public ASBinCode.rtData.rtFunction buildAS3Function(CompileEnv env, ASTool.AS3.AS3Function as3function, Builder builder,Variable addIntoNamedFunction)
+
+        private ASBinCode.rtti.FunctionParameter buildSignatureParameter(ASTool.AS3.AS3Parameter parameter)
         {
-            if (builder.buildoutfunctions.ContainsKey(as3function))
             {
-                if (addIntoNamedFunction != null)
+                ASBinCode.rtti.FunctionParameter para = new ASBinCode.rtti.FunctionParameter();
+                para.name = parameter.Name;
+                para.type = TypeReader.fromSourceCodeStr(parameter.TypeStr, parameter.token);
+
+                if (parameter.ValueExpr != null)
                 {
-                    if (!builder.dictNamedFunctions.ContainsKey(env.block.id))
+                    IRightValue defaultv;
+
+                    var testEval = ExpressionEval.Eval(parameter.ValueExpr);
+                    if (testEval != null && !parameter.ValueExpr.Value.IsReg)
                     {
-                        builder.dictNamedFunctions.Add(env.block.id, new List<builds.AS3FunctionBuilder.NamedFunction>());
+                        defaultv = new ASBinCode.rtData.RightValue(testEval);
+
+                        para.defaultValue = defaultv;
                     }
-                    builder.dictNamedFunctions[env.block.id].Add(new builds.AS3FunctionBuilder.NamedFunction(
-                        builder.bin.functions[
-                            builder.buildoutfunctions[as3function].functionId
-                        ]
-                        ,
-                        
-                        addIntoNamedFunction));
+                    else
+                    {
+                        throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+                            "Parameter initializer unknown or is not a compile-time constant. An initial value of undefined will be used instead.");
+                    }
                 }
-
-
-                return builder.buildoutfunctions[as3function];
+                return para;
             }
+        }
 
-            builder.buildingfunctons.Push(as3function);
-
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(builder.getBlockId(),env.block.name +"::"+as3function.Name);
-            ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope();
-            funcscope.parentScope = env.block.scope;
-            block.scope = funcscope;
-
+        public ASBinCode.rtti.FunctionSignature buildSignature(CompileEnv env, ASTool.AS3.AS3Function as3function, Builder builder)
+        {
             bool isdefault = false;
-
             List<ASBinCode.rtti.FunctionParameter> parameterList = new List<ASBinCode.rtti.FunctionParameter>();
             //***参数***
             for (int i = 0; i < as3function.Parameters.Count; i++)
@@ -216,7 +216,7 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        ASBinCode.rtti.FunctionParameter para= buildParameter(block, parameter, builder, env);
+                        ASBinCode.rtti.FunctionParameter para = buildSignatureParameter(parameter);
                         para.isPara = true;
                         parameterList.Add(para);
                     }
@@ -233,35 +233,71 @@ namespace ASCompiler.compiler.builds
                         isdefault = true;
                     }
 
-                    ASBinCode.rtti.FunctionParameter para = buildParameter(block, parameter, builder, env);
+                    ASBinCode.rtti.FunctionParameter para = buildSignatureParameter(parameter);
+
+                    for (int j = 0; j < parameterList.Count; j++)
+                    {
+                        if (parameterList[j].name == para.name)
+                        {
+                            throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+                                "形参名重复");
+                        }
+                    }
+
                     parameterList.Add(para);
                 }
             }
-            
+
+            ASBinCode.rtti.FunctionSignature signature = new ASBinCode.rtti.FunctionSignature();
+            signature.parameters = parameterList;
+            signature.returnType = getFunReturnType(as3function);
+            return signature;
+
+        }
+
+        public ASBinCode.rtData.rtFunction buildAS3Function(CompileEnv env, ASTool.AS3.AS3Function as3function, Builder builder,ASBinCode.rtti.FunctionSignature signature)
+        {
+            if (builder.buildoutfunctions.ContainsKey(as3function))
+            {
+                //return builder.buildoutfunctions[as3function];
+                return new ASBinCode.rtData.rtFunction(builder.buildoutfunctions[as3function].functionid);
+            }
+
+            builder.buildingfunctons.Push(as3function);
+
+            int function_codeblock_id = builder.getBlockId();
+            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(function_codeblock_id,
+                env.block.name + "::" +
+                (as3function.IsAnonymous ? "$" + function_codeblock_id + "anonymous" : as3function.Name)
+                );
+
+            ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope();
+            funcscope.parentScope = env.block.scope;
+            block.scope = funcscope;
+
+            if (signature == null)
+            {
+                signature = buildSignature(env, as3function, builder);
+            }
+
+            for (int i = 0; i < as3function.Parameters.Count; i++)
+            {
+                buildParameter(block, as3function.Parameters[i],builder, env);
+            }
+
 
             ASBinCode.rtti.FunctionDefine function = new ASBinCode.rtti.FunctionDefine(builder.getFunctionId());
-            
+
             function.blockid = block.id;
-            function.parameters = parameterList;
             function.IsAnonymous = as3function.IsAnonymous;
             function.name = as3function.Name;
-            function.returnType = getFunReturnType(as3function);
-
-
-            if (addIntoNamedFunction !=null)
-            {
-                if (!builder.dictNamedFunctions.ContainsKey(env.block.id))
-                {
-                    builder.dictNamedFunctions.Add(env.block.id, new List<builds.AS3FunctionBuilder.NamedFunction>());
-                }
-                builder.dictNamedFunctions[env.block.id].Add(new builds.AS3FunctionBuilder.NamedFunction(function, addIntoNamedFunction));
-            }
+            function.signature = signature;
 
             builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
 
-            
-            if (function.returnType != RunTimeDataType.fun_void &&
-                function.returnType != RunTimeDataType.rt_void &&
+
+            if (function.signature.returnType != RunTimeDataType.fun_void &&
+                function.signature.returnType != RunTimeDataType.rt_void &&
                 !function.IsAnonymous
                 )
             {
@@ -273,19 +309,16 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
-            builder.bin.functions[function.functionid]=function;
-
-            ASBinCode.rtData.rtFunction func = new ASBinCode.rtData.rtFunction(function.functionid);
-            //func.returnType = TypeReader.fromSourceCodeStr(as3function.TypeStr, as3function.token); 
-
-            builder.buildingfunctons.Pop();
-
-            builder.buildoutfunctions.Add(as3function, func);
             
+            ASBinCode.rtData.rtFunction func = new ASBinCode.rtData.rtFunction(function.functionid);
+            
+            builder.buildingfunctons.Pop();
+            builder.buildoutfunctions.Add(as3function, function);
+
             return func;
         }
 
-        private ASBinCode.rtti.FunctionParameter buildParameter(CodeBlock block, ASTool.AS3.AS3Parameter parameter, Builder builder,CompileEnv env)
+        private void buildParameter(CodeBlock block, ASTool.AS3.AS3Parameter parameter, Builder builder, CompileEnv env)
         {
             for (int i = 0; i < block.scope.members.Count; i++) //scope内查找是否有重复
             {
@@ -302,28 +335,172 @@ namespace ASCompiler.compiler.builds
             block.scope.members.Add(argement);
             argement.valueType = TypeReader.fromSourceCodeStr(parameter.TypeStr, parameter.token);
 
-            ASBinCode.rtti.FunctionParameter para = new ASBinCode.rtti.FunctionParameter();
-            para.name = parameter.Name;
-            para.type = TypeReader.fromSourceCodeStr(parameter.TypeStr , parameter.token ); 
-
-            if (parameter.ValueExpr != null)
-            {
-                IRightValue defaultv;
-
-                var testEval = ExpressionEval.Eval(parameter.ValueExpr);
-                if (testEval != null && !parameter.ValueExpr.Value.IsReg)
-                {
-                    defaultv = new ASBinCode.rtData.RightValue(testEval);
-
-                    para.defaultValue = defaultv;
-                }
-                else
-                {
-                    throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
-                        "Parameter initializer unknown or is not a compile-time constant. An initial value of undefined will be used instead.");
-                }
-            }
-            return para;
         }
+
+
+
+
+
+        //public ASBinCode.rtData.rtFunction buildAS3Function(CompileEnv env, ASTool.AS3.AS3Function as3function, Builder builder,object kkk,object mmm)
+        //{
+        //    if (builder.buildoutfunctions.ContainsKey(as3function))
+        //    {
+        //        if (addIntoNamedFunction != null)
+        //        {
+        //            if (!builder.dictNamedFunctions.ContainsKey(env.block.id))
+        //            {
+        //                builder.dictNamedFunctions.Add(env.block.id, new List<builds.AS3FunctionBuilder.NamedFunction>());
+        //            }
+        //            builder.dictNamedFunctions[env.block.id].Add(new builds.AS3FunctionBuilder.NamedFunction(
+        //                builder.bin.functions[
+        //                    builder.buildoutfunctions[as3function].functionId
+        //                ]
+        //                ,
+                        
+        //                addIntoNamedFunction));
+        //        }
+
+
+        //        return builder.buildoutfunctions[as3function];
+        //    }
+
+        //    builder.buildingfunctons.Push(as3function);
+
+        //    int function_codeblock_id = builder.getBlockId();
+        //    ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(function_codeblock_id,
+        //        env.block.name +"::"+
+        //        (as3function.IsAnonymous?"$"+ function_codeblock_id + "anonymous" : as3function.Name)
+        //        );
+
+        //    ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope();
+        //    funcscope.parentScope = env.block.scope;
+        //    block.scope = funcscope;
+
+        //    bool isdefault = false;
+
+        //    List<ASBinCode.rtti.FunctionParameter> parameterList = new List<ASBinCode.rtti.FunctionParameter>();
+        //    //***参数***
+        //    for (int i = 0; i < as3function.Parameters.Count; i++)
+        //    {
+        //        ASTool.AS3.AS3Parameter parameter = as3function.Parameters[i];
+
+        //        if (parameter.IsArrPara)
+        //        {
+        //            if (i != as3function.Parameters.Count - 1)
+        //            {
+        //                throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+        //                    "Rest parameter must be last");
+        //            }
+        //            else
+        //            {
+        //                ASBinCode.rtti.FunctionParameter para= buildParameter(block, parameter, builder, env);
+        //                para.isPara = true;
+        //                parameterList.Add(para);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (parameter.ValueExpr == null && isdefault)
+        //            {
+        //                throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+        //                        "Required parameters are not permitted after optional parameters.");
+        //            }
+        //            if (parameter.ValueExpr != null)
+        //            {
+        //                isdefault = true;
+        //            }
+
+        //            ASBinCode.rtti.FunctionParameter para = buildParameter(block, parameter, builder, env);
+        //            parameterList.Add(para);
+        //        }
+        //    }
+            
+
+        //    ASBinCode.rtti.FunctionDefine function = new ASBinCode.rtti.FunctionDefine(builder.getFunctionId());
+            
+        //    function.blockid = block.id;
+        //    function.parameters = parameterList;
+        //    function.IsAnonymous = as3function.IsAnonymous;
+        //    function.name = as3function.Name;
+        //    function.returnType = getFunReturnType(as3function);
+
+
+        //    if (addIntoNamedFunction !=null)
+        //    {
+        //        if (!builder.dictNamedFunctions.ContainsKey(env.block.id))
+        //        {
+        //            builder.dictNamedFunctions.Add(env.block.id, new List<builds.AS3FunctionBuilder.NamedFunction>());
+        //        }
+        //        builder.dictNamedFunctions[env.block.id].Add(new builds.AS3FunctionBuilder.NamedFunction(function, addIntoNamedFunction));
+        //    }
+
+        //    builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
+
+            
+        //    if (function.returnType != RunTimeDataType.fun_void &&
+        //        function.returnType != RunTimeDataType.rt_void &&
+        //        !function.IsAnonymous
+        //        )
+        //    {
+        //        //查找是否所有分支均有return.
+        //        if (!detectingReturn(block))
+        //        {
+        //            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+        //                       "Function does not return a value.");
+        //        }
+        //    }
+
+        //    builder.bin.functions[function.functionid]=function;
+
+        //    ASBinCode.rtData.rtFunction func = new ASBinCode.rtData.rtFunction(function.functionid);
+        //    //func.returnType = TypeReader.fromSourceCodeStr(as3function.TypeStr, as3function.token); 
+
+        //    builder.buildingfunctons.Pop();
+
+        //    builder.buildoutfunctions.Add(as3function, func);
+            
+        //    return func;
+        //}
+
+        //private ASBinCode.rtti.FunctionParameter buildParameter(CodeBlock block, ASTool.AS3.AS3Parameter parameter, Builder builder,CompileEnv env)
+        //{
+        //    for (int i = 0; i < block.scope.members.Count; i++) //scope内查找是否有重复
+        //    {
+        //        IMember member = block.scope.members[i];
+        //        if (member.name == parameter.Name)
+        //        {
+
+        //            throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+        //                "形参名重复");
+        //        }
+        //    }
+
+        //    Variable argement = new Variable(parameter.Name, block.scope.members.Count, block.id);
+        //    block.scope.members.Add(argement);
+        //    argement.valueType = TypeReader.fromSourceCodeStr(parameter.TypeStr, parameter.token);
+
+        //    ASBinCode.rtti.FunctionParameter para = new ASBinCode.rtti.FunctionParameter();
+        //    para.name = parameter.Name;
+        //    para.type = TypeReader.fromSourceCodeStr(parameter.TypeStr , parameter.token ); 
+
+        //    if (parameter.ValueExpr != null)
+        //    {
+        //        IRightValue defaultv;
+
+        //        var testEval = ExpressionEval.Eval(parameter.ValueExpr);
+        //        if (testEval != null && !parameter.ValueExpr.Value.IsReg)
+        //        {
+        //            defaultv = new ASBinCode.rtData.RightValue(testEval);
+
+        //            para.defaultValue = defaultv;
+        //        }
+        //        else
+        //        {
+        //            throw new BuildException(parameter.token.line, parameter.token.ptr, parameter.token.sourceFile,
+        //                "Parameter initializer unknown or is not a compile-time constant. An initial value of undefined will be used instead.");
+        //        }
+        //    }
+        //    return para;
+        //}
     }
 }

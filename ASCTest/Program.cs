@@ -75,7 +75,7 @@ namespace ASCTest
 
 
                     Console.WriteLine();
-                    Console.WriteLine("====操作指令 block "+block.id+"====");
+                    Console.WriteLine("====操作指令 block "+block.name+"====");
                     Console.WriteLine();
                     Console.WriteLine("total registers:" + block.totalRegisters);
                     Console.WriteLine(block.ToString());

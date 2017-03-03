@@ -59,6 +59,7 @@
     <Compile Include="rtData\rtUndefined.cs" />
     <Compile Include="rtti\FunctionDefine.cs" />
     <Compile Include="rtti\FunctionParameter.cs" />
+    <Compile Include="rtti\FunctionSignature.cs" />
     <Compile Include="RunTimeDataType.cs" />
     <Compile Include="scopes\FunctionScope.cs" />
     <Compile Include="scopes\OutPackageMemberScope.cs" />

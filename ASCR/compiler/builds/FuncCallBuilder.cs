@@ -123,7 +123,7 @@ namespace ASCompiler.compiler.builds
                         op.regType = RunTimeDataType.rt_void;
 
 
-                        ASBinCode.rtti.FunctionDefine funcDefine = null;
+                        ASBinCode.rtti.FunctionSignature signature = null;
 
                         int blockid = env.block.id;
                         if (rValue is Variable)
@@ -131,24 +131,36 @@ namespace ASCompiler.compiler.builds
                             blockid = ((Variable)rValue).refdefinedinblockid;
                         }
 
-                        if (builder.dictNamedFunctions.ContainsKey(blockid))
+                        if (builder.dictSignatures.ContainsKey(blockid))
                         {
-                            List<AS3FunctionBuilder.NamedFunction> lstNF = builder.dictNamedFunctions[blockid];
-                            for (int i = lstNF.Count - 1; i >= 0; i--)
+                            if (builder.dictSignatures[blockid].ContainsKey((Variable)rValue))
                             {
-                                AS3FunctionBuilder.NamedFunction nf = lstNF[i];
-                                if (nf.member.Equals(rValue))
-                                {
-                                    var returnvalueType = nf.function.returnType;
+                                
+                                signature =
+                                     builder.dictSignatures[blockid][(Variable)rValue];
+                                var returnvalueType = signature.returnType;
 
-
-                                    op.regType = RunTimeDataType.rt_void;
-                                    eax.setEAXTypeWhenCompile(returnvalueType);
-
-                                    funcDefine = nf.function;
-                                    break;
-                                }
+                                op.regType = RunTimeDataType.rt_void;
+                                eax.setEAXTypeWhenCompile(returnvalueType);
                             }
+
+                            //List<AS3FunctionBuilder.NamedFunctionSignature> lstNF = 
+                            //    builder.dictSignatures[blockid];
+                            //for (int i = lstNF.Count - 1; i >= 0; i--)
+                            //{
+                            //    AS3FunctionBuilder.NamedFunctionSignature nf = lstNF[i];
+                            //    if (nf.member.Equals(rValue))
+                            //    {
+                            //        var returnvalueType = nf.signature.returnType;
+
+
+                            //        op.regType = RunTimeDataType.rt_void;
+                            //        eax.setEAXTypeWhenCompile(returnvalueType);
+
+                            //        signature = nf.signature;
+                            //        break;
+                            //    }
+                            //}
                         }
 
 
@@ -158,20 +170,20 @@ namespace ASCompiler.compiler.builds
                         List<ASTool.AS3.Expr.AS3DataStackElement> args
                             = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
 
-                        if (funcDefine != null)
+                        if (signature != null)
                         {
-                            if (args.Count < funcDefine.parameters.Count)
+                            if (args.Count < signature.parameters.Count)
                             {
-                                if (funcDefine.parameters[args.Count].defaultValue == null)
+                                if (signature.parameters[args.Count].defaultValue == null)
                                 {
                                     throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                                         "参数数量不足"
                                         );
                                 }
                             }
-                            else if (args.Count > funcDefine.parameters.Count)
+                            else if (args.Count > signature.parameters.Count)
                             {
-                                if (!funcDefine.parameters[funcDefine.parameters.Count - 1].isPara)
+                                if (!signature.parameters[signature.parameters.Count - 1].isPara)
                                 {
                                     throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                                         "参数数量过多"
@@ -193,9 +205,9 @@ namespace ASCompiler.compiler.builds
                             ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
                             IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
 
-                            if (funcDefine != null) //参数类型检查
+                            if (signature != null) //参数类型检查
                             {
-                                ASBinCode.rtti.FunctionParameter para = funcDefine.parameters[i];
+                                ASBinCode.rtti.FunctionParameter para = signature.parameters[i];
                                 if (para.isPara)
                                 {
                                     throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,

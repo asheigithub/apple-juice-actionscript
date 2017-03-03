@@ -44,15 +44,16 @@ namespace ASRuntime.operators
 
             ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
+            ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
 
             frame.tempCallFuncHeap = //new HeapSlot[ player.swc.blocks[funcDefine.blockid].scope.members.Count];
                 player.genHeapFromCodeBlock(player.swc.blocks[funcDefine.blockid]);
 
-            for (int i = 0; i < funcDefine.parameters.Count; i++)
+            for (int i = 0; i < signature.parameters.Count; i++)
             {
-                if (funcDefine.parameters[i].defaultValue != null)
+                if (signature.parameters[i].defaultValue != null)
                 {
-                    frame.tempCallFuncHeap[i].directSet(funcDefine.parameters[i].defaultValue.getValue(null));
+                    frame.tempCallFuncHeap[i].directSet(signature.parameters[i].defaultValue.getValue(null));
                 }
             }
 
@@ -65,13 +66,13 @@ namespace ASRuntime.operators
             int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
             IRunTimeValue arg = step.arg1.getValue(frame.scope);
 
-            if (arg.rtType != frame._toCallFunc.parameters[id].type)
+            if (arg.rtType != frame._toCallFunc.signature.parameters[id].type)
             {
-                if (!OpCast.CastValue(arg, frame._toCallFunc.parameters[id].type,
+                if (!OpCast.CastValue(arg, frame._toCallFunc.signature.parameters[id].type,
                     frame._tempSlot, frame, step.token, frame.scope
                     ))
                 {
-                    frame.throwCastException(step.token, arg.rtType, frame._toCallFunc.parameters[id].type);
+                    frame.throwCastException(step.token, arg.rtType, frame._toCallFunc.signature.parameters[id].type);
                     return;
                 }
                 frame.tempCallFuncHeap[id].directSet(frame._tempSlot.getValue());
@@ -106,27 +107,34 @@ namespace ASRuntime.operators
                 return;
             }
 
-            if (frame._pushedArgs < funcDefine.parameters.Count)
+            if (frame._pushedArgs < funcDefine.signature.parameters.Count)
             {
-                if (funcDefine.parameters[frame._pushedArgs].defaultValue == null
-                    &&
-                    !funcDefine.parameters[frame._pushedArgs].isPara
-                    )
+                for (int i = frame._pushedArgs; i < funcDefine.signature.parameters.Count; i++)
                 {
-                    frame.throwError(
-                        new error.InternalError(step.token,
-                        string.Format(
-                        "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
-                        funcDefine.IsAnonymous?"anonymous": funcDefine.name ,funcDefine.parameters.Count,frame._pushedArgs
-                        )
-                        )
-                        );
-                    return;
+                    if (funcDefine.signature.parameters[frame._pushedArgs].defaultValue == null
+                    &&
+                    !funcDefine.signature.parameters[frame._pushedArgs].isPara
+                    &&
+                    funcDefine.signature.parameters[frame._pushedArgs].type != RunTimeDataType.rt_void
+                    )
+                    {
+                        frame.throwError(
+                            new error.InternalError(step.token,
+                            string.Format(
+                            "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
+                            player.swc.blocks[funcDefine.blockid].name, funcDefine.signature.parameters.Count, frame._pushedArgs
+                            )
+                            )
+                            );
+                        return;
+                    }
                 }
+
+                
             }
 
             step.reg.getISlot(frame.scope).directSet(
-                TypeConverter.getDefaultValue(funcDefine.returnType).getValue(null));
+                TypeConverter.getDefaultValue(funcDefine.signature.returnType).getValue(null));
 
             player.CallBlock( 
                 player.swc.blocks[ funcDefine.blockid ] ,
