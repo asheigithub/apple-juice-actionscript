@@ -13,15 +13,28 @@ namespace ASRuntime
     {
         public StackSlot()
         {
-            store = new IRunTimeValue[(int)RunTimeDataType.unknown+1];
+            store = new IRunTimeValue[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
 
             //存储器设置初始值
-            clear();
+            for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
+            {
+                RunTimeDataType t = (RunTimeDataType)i;
+                if(t != RunTimeDataType.unknown)
+                {
+                    store[i] = TypeConverter.getDefaultValue(t).getValue(null);
+                }
+            }
 
         }
 
-        
+
+        internal ISLOT linktarget;
+        public void linkTo(ISLOT linktarget)
+        {
+            this.linktarget = linktarget;
+        }
+
 
         private int index;
         private IRunTimeValue[] store;
@@ -30,134 +43,201 @@ namespace ASRuntime
 
         public void directSet(IRunTimeValue value)
         {
-            index = (int)value.rtType;
-            //store[index] = value;
-
-            //必须拷贝!!否则值可能被其他引用而导致错误
-            //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
-            switch (value.rtType)
+            if (linktarget != null)
             {
-                case RunTimeDataType.rt_boolean:
-                    store[index] = value;       
-                    break;
-                case RunTimeDataType.rt_int:
-                    setValue( ((rtInt)value).value);
-                    break;
-                case RunTimeDataType.rt_uint:
-                    setValue(((rtUInt)value).value);
-                    break;
-                case RunTimeDataType.rt_number:
-                    setValue(((rtNumber)value).value);
-                    break;
-                case RunTimeDataType.rt_string:
-                    setValue(((rtString)value).value);
-                    break;
-                case RunTimeDataType.rt_void:
-                    store[index] = value;
-                    break;
-                case RunTimeDataType.rt_null:
-                    store[index] = value;
-                    break;
-                case RunTimeDataType.rt_function:
-                    {
-                        if (store[index].rtType == RunTimeDataType.rt_null)
-                        {
-                            store[index] = (rtFunction)value.Clone();
-                        }
-                        else
-                        {
-                            ((rtFunction)store[index]).CopyFrom((rtFunction)value);
-                        }
-                    }
-                    break;
-                case RunTimeDataType.fun_void:
-                    store[index] = value;
-                    break;
-                case RunTimeDataType.unknown:
-                    store[index] = null;
-                    break;
-                default:
-                    break;
+                linktarget.directSet(value);
             }
+            else
+            {
 
+                index = (int)value.rtType;
+                if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
+                {
+                    index = RunTimeDataType._OBJECT;
+                }
+                //store[index] = value;
+
+                //必须拷贝!!否则值可能被其他引用而导致错误
+                //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
+                switch (value.rtType)
+                {
+                    case RunTimeDataType.rt_boolean:
+                        store[index] = value;
+                        break;
+                    case RunTimeDataType.rt_int:
+                        setValue(((rtInt)value).value);
+                        break;
+                    case RunTimeDataType.rt_uint:
+                        setValue(((rtUInt)value).value);
+                        break;
+                    case RunTimeDataType.rt_number:
+                        setValue(((rtNumber)value).value);
+                        break;
+                    case RunTimeDataType.rt_string:
+                        setValue(((rtString)value).value);
+                        break;
+                    case RunTimeDataType.rt_void:
+                        store[index] = value;
+                        break;
+                    case RunTimeDataType.rt_null:
+                        store[index] = value;
+                        break;
+                    case RunTimeDataType.rt_function:
+                        {
+                            if (store[index].rtType == RunTimeDataType.rt_null)
+                            {
+                                store[index] = (rtFunction)value.Clone();
+                            }
+                            else
+                            {
+                                ((rtFunction)store[index]).CopyFrom((rtFunction)value);
+                            }
+                        }
+                        break;
+                    case RunTimeDataType.fun_void:
+                        store[index] = value;
+                        break;
+                    case RunTimeDataType.unknown:
+                        store[index] = null;
+                        break;
+                    default:
+                        {
+                            if (store[RunTimeDataType._OBJECT].rtType == RunTimeDataType.rt_null)
+                            {
+                                store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
+                            }
+                            else
+                            {
+                                ((rtObject)store[RunTimeDataType._OBJECT]).CopyFrom((rtObject)value);
+                            }
+                        }
+                        break;
+                }
+            }
         }
 
         public IRunTimeValue getValue()
         {
-            return store[index];
+            if (linktarget != null)
+            {
+                return linktarget.getValue();
+            }
+            else
+            {
+                return store[index];
+            }
             //throw new NotImplementedException();
         }
 
         public void setValue(string value)
         {
-            //throw new NotImplementedException();
-            index = (int)RunTimeDataType.rt_string;
-
-
-            if (value == null)
+            if (linktarget != null)
             {
-                store[(int)RunTimeDataType.rt_string] = rtNull.nullptr;
+                linktarget.setValue(value);
             }
             else
             {
-                if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
+                index = (int)RunTimeDataType.rt_string;
+                if (value == null)
                 {
-                    store[(int)RunTimeDataType.rt_string] = new rtString(value);
+                    store[(int)RunTimeDataType.rt_string] = rtNull.nullptr;
                 }
                 else
                 {
-                    ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
+                    if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
+                    {
+                        store[(int)RunTimeDataType.rt_string] = new rtString(value);
+                    }
+                    else
+                    {
+                        ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
+                    }
                 }
             }
         }
 
         public void setValue(rtUndefined value)
         {
-            //throw new NotImplementedException();
-            index = (int)RunTimeDataType.rt_void;
-            store[(int)RunTimeDataType.rt_void] = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_void;
+                store[(int)RunTimeDataType.rt_void] = value;
+            }
         }
 
         public void setValue(rtNull value)
         {
-            index = (int)RunTimeDataType.rt_null;
-            store[(int)RunTimeDataType.rt_null] = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_null;
+                store[(int)RunTimeDataType.rt_null] = value;
+            }
         }
 
         public void setValue(uint value)
         {
-            index = (int)RunTimeDataType.rt_uint;
-            ((rtUInt)store[(int)RunTimeDataType.rt_uint]).value = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_uint;
+                ((rtUInt)store[(int)RunTimeDataType.rt_uint]).value = value;
+            }
         }
 
         public void setValue(int value)
         {
-            index = (int)RunTimeDataType.rt_int;
-            ((rtInt)store[(int)RunTimeDataType.rt_int]).value = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_int;
+                ((rtInt)store[(int)RunTimeDataType.rt_int]).value = value;
+            }
         }
 
         public void setValue(double value)
         {
-            index = (int)RunTimeDataType.rt_number;
-            ((rtNumber)store[(int)RunTimeDataType.rt_number]).value = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_number;
+                ((rtNumber)store[(int)RunTimeDataType.rt_number]).value = value;
+            }
         }
 
         public void setValue(rtBoolean value)
         {
-            index = (int)RunTimeDataType.rt_boolean;
-            store[(int)RunTimeDataType.rt_boolean] = value;
+            if (linktarget != null)
+            {
+                linktarget.setValue(value);
+            }
+            else
+            {
+                index = (int)RunTimeDataType.rt_boolean;
+                store[(int)RunTimeDataType.rt_boolean] = value;
+            }
         }
 
         public void clear()
         {
-            for (int i = 0; i < RunTimeDataType.unknown ; i++)
-            {
-                RunTimeDataType t = (RunTimeDataType)i;
-
-                {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null);
-                }
-            }
+            linktarget = null;
+            index = (int)RunTimeDataType.unknown;
         }
     }
 }

@@ -11,6 +11,10 @@ namespace ASBinCode
     {
         IRunTimeScope parent { get; }
 
+        Dictionary<int, rtData.rtObject> static_objects { get; }
+
+        rtData.rtObject this_pointer { get; }
+
         ISLOT[] memberData { get; }
 
         /// <summary>

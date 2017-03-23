@@ -97,7 +97,7 @@ namespace ASCompiler.compiler
             {
                 ASBinCode.OpStep step = block.opSteps[i];
 
-                string findflag=null;
+                string findflag = null;
 
                 if (step.opCode == ASBinCode.OpCode.if_jmp
                     )
@@ -106,18 +106,18 @@ namespace ASCompiler.compiler
                 }
                 else if (step.opCode == ASBinCode.OpCode.jmp)
                 {
-                     findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null)).value;
+                    findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null)).value;
                 }
-
+               
                 if (findflag != null)
                 {
 
                     bool isfound = false;
-                    for (int j = 0; j < block.opSteps.Count ; j++)
+                    for (int j = 0; j < block.opSteps.Count; j++)
                     {
                         if (block.opSteps[j].flag == findflag)
                         {
-                            step.jumoffset  = j-i;
+                            step.jumoffset = j - i;
                             isfound = true;
                             break;
                         }
@@ -125,7 +125,37 @@ namespace ASCompiler.compiler
 
                     if (!isfound)
                     {
-                        throw new BuildException(step.token.line,step.token.ptr,step.token.sourceFile ,"跳转标记没有找到");
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
+                    }
+
+                }
+            }
+
+
+            Stack<int> trys = new Stack<int>();
+            for (int i = 0; i < block.opSteps.Count; i++)
+            {
+                ASBinCode.OpStep step = block.opSteps[i];
+                if (step.opCode == ASBinCode.OpCode.enter_try)
+                {
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    trys.Push(tryid);
+                }
+                else if (step.opCode == ASBinCode.OpCode.quit_try)
+                {
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    if (trys.Pop() != tryid)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "try块不匹配");
+                    }
+                }
+                else if(trys.Count >0)
+                {
+                    step.trys = new Stack<int>();
+                    int[] toadd = trys.ToArray();
+                    for (int j = 0; j < toadd.Length; j++)
+                    {
+                        step.trys.Push(toadd[j]);
                     }
 
                 }

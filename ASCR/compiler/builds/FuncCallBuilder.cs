@@ -11,9 +11,6 @@ namespace ASCompiler.compiler.builds
         {
             if (step.Arg2.IsReg)
             {
-                //throw new BuildException(
-                //            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                //            "不要从寄存器返回函数"));
                 IRightValue rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
 
                 OpStep op = new OpStep(OpCode.call_function,
@@ -111,8 +108,8 @@ namespace ASCompiler.compiler.builds
                             );
                     }
 
-                    IRightValue rValue = (IRightValue)member;
-                    if (ASRuntime.TypeConverter.testImplicitConvert(RunTimeDataType.rt_function, rValue.valueType))
+                    IRightValue rFunc = (IRightValue)member;
+                    if (ASRuntime.TypeConverter.testImplicitConvert( rFunc.valueType, RunTimeDataType.rt_function, builder))
                     {
                         OpStep op = new OpStep(OpCode.call_function,
                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -126,123 +123,33 @@ namespace ASCompiler.compiler.builds
                         ASBinCode.rtti.FunctionSignature signature = null;
 
                         int blockid = env.block.id;
-                        if (rValue is Variable)
+                        if (rFunc is Variable)
                         {
-                            blockid = ((Variable)rValue).refdefinedinblockid;
+                            blockid = ((Variable)rFunc).refdefinedinblockid;
                         }
 
                         if (builder.dictSignatures.ContainsKey(blockid))
                         {
-                            if (builder.dictSignatures[blockid].ContainsKey((Variable)rValue))
+                            if (builder.dictSignatures[blockid].ContainsKey((Variable)rFunc))
                             {
                                 
                                 signature =
-                                     builder.dictSignatures[blockid][(Variable)rValue];
+                                     builder.dictSignatures[blockid][(Variable)rFunc];
                                 var returnvalueType = signature.returnType;
 
                                 op.regType = RunTimeDataType.rt_void;
                                 eax.setEAXTypeWhenCompile(returnvalueType);
                             }
-
-                            //List<AS3FunctionBuilder.NamedFunctionSignature> lstNF = 
-                            //    builder.dictSignatures[blockid];
-                            //for (int i = lstNF.Count - 1; i >= 0; i--)
-                            //{
-                            //    AS3FunctionBuilder.NamedFunctionSignature nf = lstNF[i];
-                            //    if (nf.member.Equals(rValue))
-                            //    {
-                            //        var returnvalueType = nf.signature.returnType;
-
-
-                            //        op.regType = RunTimeDataType.rt_void;
-                            //        eax.setEAXTypeWhenCompile(returnvalueType);
-
-                            //        signature = nf.signature;
-                            //        break;
-                            //    }
-                            //}
                         }
 
 
-                        op.arg1 = rValue;
+                        op.arg1 = rFunc;
                         op.arg1Type = RunTimeDataType.rt_function;
 
                         List<ASTool.AS3.Expr.AS3DataStackElement> args
                             = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
 
-                        if (signature != null)
-                        {
-                            if (args.Count < signature.parameters.Count)
-                            {
-                                if (signature.parameters[args.Count].defaultValue == null)
-                                {
-                                    throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                        "参数数量不足"
-                                        );
-                                }
-                            }
-                            else if (args.Count > signature.parameters.Count)
-                            {
-                                if (!signature.parameters[signature.parameters.Count - 1].isPara)
-                                {
-                                    throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                        "参数数量过多"
-                                        );
-                                }
-                            }
-                        }
-
-                        {
-                            OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-                            opMakeArgs.arg1 = rValue;
-                            opMakeArgs.arg1Type = RunTimeDataType.rt_function;
-                            env.block.opSteps.Add(opMakeArgs);
-                        }
-
-
-                        for (int i = 0; i < args.Count; i++)
-                        {
-                            ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                            IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
-
-                            if (signature != null) //参数类型检查
-                            {
-                                ASBinCode.rtti.FunctionParameter para = signature.parameters[i];
-                                if (para.isPara)
-                                {
-                                    throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                        "... (rest) parameter 未实现"
-                                        );
-                                }
-
-                                if (!ASRuntime.TypeConverter.testImplicitConvert(arg.valueType, para.type))
-                                {
-                                    throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                        "参数类型不匹配，不能将" + arg.valueType + "转换成" + para.type
-                                        );
-                                }
-
-                                if (arg.valueType != para.type)
-                                {
-                                    arg = builds.ExpressionBuilder.addCastOpStep(env, arg, para.type,
-                                        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-                                }
-                            }
-                            
-                            //***参数准备***
-                            OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-                            opPushArgs.arg1 = arg;
-                            opPushArgs.arg1Type = arg.valueType;
-                            opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));
-                            opPushArgs.arg2Type = RunTimeDataType.rt_int;
-                            env.block.opSteps.Add(opPushArgs);
-
-                        }
-
-
-
-
-
+                        createParaOp(args, signature, step, env, rFunc, builder,false,null);
 
                         env.block.opSteps.Add(op);
 
@@ -266,5 +173,95 @@ namespace ASCompiler.compiler.builds
                             "目前只实现了trace函数"));
             }
         }
+
+        public void createParaOp(List<ASTool.AS3.Expr.AS3DataStackElement> args,
+            ASBinCode.rtti.FunctionSignature signature, 
+            ASTool.AS3.Expr.AS3ExprStep step, CompileEnv env,
+            IRightValue rFunc,Builder builder,bool isConstructor,ASBinCode.rtti.Class cls
+            )
+        {
+            
+            if (signature != null)
+            {
+                if (args.Count < signature.parameters.Count)
+                {
+                    if (signature.parameters[args.Count].defaultValue == null)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "参数数量不足"
+                            );
+                    }
+                }
+                else if (args.Count > signature.parameters.Count)
+                {
+                    if (! (signature.parameters.Count >0 
+                        && signature.parameters[signature.parameters.Count - 1].isPara))
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "参数数量过多"
+                            );
+                    }
+                }
+            }
+
+            if (!isConstructor)
+            {
+                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opMakeArgs.arg1 = rFunc;
+                opMakeArgs.arg1Type = RunTimeDataType.rt_function;
+                env.block.opSteps.Add(opMakeArgs);
+            }
+            else
+            {
+                
+                OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opMakeArgs.arg1 = new ASBinCode.rtData.RightValue( new ASBinCode.rtData.rtInt( cls.classid));
+                opMakeArgs.arg1Type = RunTimeDataType.rt_int;
+                env.block.opSteps.Add(opMakeArgs);
+                
+            }
+
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
+                IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
+
+                if (signature != null) //参数类型检查
+                {
+                    ASBinCode.rtti.FunctionParameter para = signature.parameters[i];
+                    if (para.isPara)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "... (rest) parameter 未实现"
+                            );
+                    }
+
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(arg.valueType, para.type, builder))
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "参数类型不匹配，不能将" + arg.valueType + "转换成" + para.type
+                            );
+                    }
+
+                    if (arg.valueType != para.type)
+                    {
+                        arg = builds.ExpressionBuilder.addCastOpStep(env, arg, para.type,
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    }
+                }
+
+                //***参数准备***
+                OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opPushArgs.arg1 = arg;
+                opPushArgs.arg1Type = arg.valueType;
+                opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));
+                opPushArgs.arg2Type = RunTimeDataType.rt_int;
+                env.block.opSteps.Add(opPushArgs);
+                
+            }
+        }
+
+
     }
 }

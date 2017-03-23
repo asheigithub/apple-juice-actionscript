@@ -31,9 +31,36 @@ namespace ASCompiler.compiler
                 ++depth;
             }
 
-
+            
             return null;
-        } 
+        }
+
+
+        public static ASBinCode.rtti.ClassMember findClassMember(ASBinCode.rtti.Class cls,
+            string name, 
+            CompileEnv env,
+            Builder builder
+            )
+        {
+            if (env.block.scope is ASBinCode.scopes.FunctionScope)
+            {
+                ASBinCode.scopes.FunctionScope funcscope = env.block.scope as ASBinCode.scopes.FunctionScope;
+
+                if (!funcscope.function.IsAnonymous && funcscope.parentScope is ASBinCode.scopes.ObjectInstanceScope)
+                {
+                    return ASBinCode.ClassMemberFinder.find(
+                        cls, name,
+                        ((ASBinCode.scopes.ObjectInstanceScope)funcscope.parentScope)._class);
+                }
+                
+            }
+            
+            return ASBinCode.ClassMemberFinder.find(cls, name,
+                builder.getClassByRunTimeDataType(ASBinCode.RunTimeDataType._OBJECT)
+                    );
+            
+        }
+
 
     }
 }

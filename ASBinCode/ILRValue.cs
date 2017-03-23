@@ -29,6 +29,7 @@ namespace ASBinCode
         /// <param name="scope"></param>
         /// <returns></returns>
         ISLOT getISlot(IRunTimeScope scope);
+
     }
 
 

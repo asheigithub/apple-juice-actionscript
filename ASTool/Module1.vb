@@ -32,7 +32,7 @@ Module Module1
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
 
-        Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.common\implement\net\fishluv\sanguo2\client\biz\impl\plan\PlanRowData.as")
+        Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScriptOutput\GYLite(v1.10)\GYLite\component\text\GYText.as")
 
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files (x86)\Adobe Gaming SDK 1.4\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
         'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\SceneConsole.as")
@@ -99,6 +99,8 @@ Module Module1
                                      "D:\fishluv_svn_repository\NewSG\trunk\program\client\biz_csharp\sgx.client.biz.world\interface"}
 
         'Dim rootpaths As String() = {"E:\新建文件夹\Box2DFlashAS3 2.1a\Source"}
+        'Dim rootpaths As String() = {"D:\ASToolTestScriptOutput\GYLite(v1.10)\GYLite"}
+
 
         'Dim rootpaths As String() = {"D:\ASCRIPT\ascript-master\ascript-master\src"}
         'Dim rootpaths As String() = {" D:\flash-x\game\src"}

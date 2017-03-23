@@ -412,8 +412,10 @@
 <Unary>    ::=  "+" <Access> | "-" <Access> | "~" <Unary>| "!" <Unary>| "delete"<Access> | "typeof"<Unary> /*| "void" <Access> void会和返回值冲突.. */ //单目运算
                 | "++" <Access> | "--" <Access>| "void" <Access>  |<Access>  ;                        
 //<Unary>    ::=<Access>;
+
+<ThisSuper> ::=this <AccessOpt> |super <AccessOpt> ;
 <New>      ::=  "new" <NewClassOrVector> ;
-<NewClassOrVector> ::=<ClassPath> <NewOpt>| <Vector>;
+<NewClassOrVector> ::=<ClassPath> <NewOpt>| <Vector> |<ThisSuper> ;
 <NewOpt>   ::=  "("<Argements>")"|null; 
 
 
@@ -426,7 +428,7 @@
 
 
 				
-<NSAccess> ::=  <Unit><NSAccessOpt>;
+<NSAccess> ::=  <Unit><NSAccessOpt>|<ThisSuper>;
 <NSAccessOpt> ::= "::" <Unit><NSAccessOpt>					
 					|null;
 
@@ -434,6 +436,7 @@
 
 
 <UnitSuffix> ::="++" | "--"| null ;    //后缀
+
 
 <Unit> ::= <New>|<Object>|<E4XAccess>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <AExprList> ")" | <Array> |<Vector>|"CONFIG::" identifier ;
 <F_Unit> ::= <Object>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <AExprList> ")" | <Array> |<Vector>|"CONFIG::" identifier ;

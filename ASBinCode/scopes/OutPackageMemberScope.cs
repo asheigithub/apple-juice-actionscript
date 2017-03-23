@@ -9,5 +9,10 @@ namespace ASBinCode.scopes
     /// </summary>
     public class OutPackageMemberScope :ScopeBase
     {
+        public readonly rtti.Class mainclass;
+        public OutPackageMemberScope(rtti.Class mainclass)
+        {
+            this.mainclass = mainclass;
+        }
     }
 }

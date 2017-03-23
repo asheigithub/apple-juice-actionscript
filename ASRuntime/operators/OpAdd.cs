@@ -8,15 +8,16 @@ namespace ASRuntime.operators
     {
         internal static readonly ASBinCode.rtData.rtString nullStr = new ASBinCode.rtData.rtString(null);
 
-        public static void execAdd_Number(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execAdd_Number(Player player, ASBinCode.OpStep step,StackFrame frame ,ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
 
             step.reg.getISlot(scope).setValue(a1.value + a2.value);//new ASBinCode.rtData.rtNumber(a1.value +a2.value ));
+            frame.endStep(step);
         }
 
-        public static void execAdd_String(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execAdd_String(Player player, ASBinCode.OpStep step,StackFrame frame, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.rtData.rtString a1;
             if (step.arg1.getValue(scope).rtType == ASBinCode.RunTimeDataType.rt_null)
@@ -41,6 +42,7 @@ namespace ASRuntime.operators
 
 
             step.reg.getISlot(scope).setValue(a1.valueString() + a2.valueString());// new ASBinCode.rtData.rtString(a1.valueString() + a2.valueString()));
+            frame.endStep(step);
         }
 
         public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
@@ -114,6 +116,8 @@ namespace ASRuntime.operators
             {
                 frame.throwOpException(step.token, ASBinCode.OpCode.add);
             }
+
+            frame.endStep(step);
         }
 
 

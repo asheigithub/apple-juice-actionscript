@@ -30,15 +30,11 @@ namespace ASRuntime
             public int tryid;
         }
 
-        /// <summary>
-        /// 临时保存准备调用函数的参数
-        /// </summary>
-        internal HeapSlot[] tempCallFuncHeap;
-        internal ASBinCode.rtti.FunctionDefine _toCallFunc;
-        internal int _pushedArgs;
+
+        internal operators.FunctionCaller funCaller;
         internal StackSlot _tempSlot;
 
-        private Stack<TryState> tryCatchState = new Stack<TryState>() ;
+        private Stack<TryState> tryCatchState = new Stack<TryState>();
         /// <summary>
         /// 暂存已发生的错误
         /// </summary>
@@ -52,6 +48,12 @@ namespace ASRuntime
         /// 暂存是否调用了return
         /// </summary>
         private bool holdHasCallReturn;
+
+        /// <summary>
+        /// 暂存是否调用了跳转
+        /// </summary>
+        private bool holdhasjumpto;
+        private int holdjumptoline;
 
         /// <summary>
         /// 当前指向的指令行
@@ -72,7 +74,8 @@ namespace ASRuntime
         /// </summary>
         public ASBinCode.ISLOT returnSlot;
 
-        
+        internal IBlockCallBack callbacker;
+
         public bool IsEnd()
         {
             return codeLinePtr >= block.opSteps.Count;
@@ -84,34 +87,44 @@ namespace ASRuntime
         public void step()
         {
             ASBinCode.OpStep step = block.opSteps[codeLinePtr];
-
             exec(step);
-
-            codeLinePtr++;
+            
         }
 
+        internal void endStep(OpStep step)
+        {
+            execing = false;
+            doTryCatchReturn(step);
+            codeLinePtr++;
+        }
+        private bool execing = false;
 
         private void exec(ASBinCode.OpStep step)
         {
+            if (execing)
+            {
+                throw new InvalidOperationException();
+            }
+            execing = true;
             switch (step.opCode)
             {
                 case OpCode.cast:
                     operators.OpCast.execCast(this, step, scope);
                     break;
                 case OpCode.assigning:
-                    operators.OpAssigning.execAssigning(player, step, scope);
+                    operators.OpAssigning.execAssigning(player, step,this, scope);
                     break;
                 case OpCode.add_number:
-                    operators.OpAdd.execAdd_Number(player, step, scope);
+                    operators.OpAdd.execAdd_Number(player, step,this, scope);
                     break;
                 case OpCode.add_string:
-                    operators.OpAdd.execAdd_String(player, step, scope);
+                    operators.OpAdd.execAdd_String(player, step,this, scope);
                     break;
                 case OpCode.add:
                     operators.OpAdd.execAdd(this, step, scope);
                     break;
                 case OpCode.sub_number:
-                    operators.OpSub.execSub_Number(player, step, scope);
+                    operators.OpSub.execSub_Number(player, step,this, scope);
                     break;
                 case OpCode.sub:
                     operators.OpSub.execSub(this, step, scope);
@@ -126,28 +139,28 @@ namespace ASRuntime
                     operators.OpMulti.execMod(this, step, scope);
                     break;
                 case OpCode.neg:
-                    operators.OpNeg.execNeg(player, step, scope);
+                    operators.OpNeg.execNeg(this, step, scope);
                     break;
                 case OpCode.gt_num:
-                    operators.OpLogic.execGT_NUM(player, step, scope);
+                    operators.OpLogic.execGT_NUM(this, step, scope);
                     break;
                 case OpCode.gt_void:
                     operators.OpLogic.execGT_Void(this, step, scope);
                     break;
                 case OpCode.lt_num:
-                    operators.OpLogic.execLT_NUM(player, step, scope);
+                    operators.OpLogic.execLT_NUM(this, step, scope);
                     break;
                 case OpCode.lt_void:
                     operators.OpLogic.execLT_VOID(this, step, scope);
                     break;
                 case OpCode.ge_num:
-                    operators.OpLogic.execGE_NUM(player, step, scope);
+                    operators.OpLogic.execGE_NUM(this, step, scope);
                     break;
                 case OpCode.ge_void:
                     operators.OpLogic.execGE_Void(this, step, scope);
                     break;
                 case OpCode.le_num:
-                    operators.OpLogic.execLE_NUM(player, step, scope);
+                    operators.OpLogic.execLE_NUM(this, step, scope);
                     break;
                 case OpCode.le_void:
                     operators.OpLogic.execLE_VOID(this, step, scope);
@@ -204,66 +217,73 @@ namespace ASRuntime
                     operators.OpIncrementDecrement.execIncrement(this, step, scope);
                     break;
                 case OpCode.increment_int:
-                    operators.OpIncrementDecrement.execIncInt(player, step, scope);
+                    operators.OpIncrementDecrement.execIncInt(this, step, scope);
                     break;
                 case OpCode.increment_uint:
-                    operators.OpIncrementDecrement.execIncUInt(player, step, scope);
+                    operators.OpIncrementDecrement.execIncUInt(this, step, scope);
                     break;
                 case OpCode.increment_number:
-                    operators.OpIncrementDecrement.execIncNumber(player, step, scope);
+                    operators.OpIncrementDecrement.execIncNumber(this, step, scope);
                     break;
                 case OpCode.decrement:
                     operators.OpIncrementDecrement.execDecrement(this, step, scope);
                     break;
 
                 case OpCode.decrement_int:
-                    operators.OpIncrementDecrement.execDecInt(player, step, scope);
+                    operators.OpIncrementDecrement.execDecInt(this, step, scope);
                     break;
                 case OpCode.decrement_uint:
-                    operators.OpIncrementDecrement.execDecUInt(player, step, scope);
+                    operators.OpIncrementDecrement.execDecUInt(this, step, scope);
                     break;
                 case OpCode.decrement_number:
-                    operators.OpIncrementDecrement.execDecNumber(player, step, scope);
+                    operators.OpIncrementDecrement.execDecNumber(this, step, scope);
                     break;
 
                 case OpCode.suffix_inc:
                     operators.OpIncrementDecrement.execSuffixInc(this, step, scope);
                     break;
                 case OpCode.suffix_inc_int:
-                    operators.OpIncrementDecrement.execSuffixIncInt(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixIncInt(this, step, scope);
                     break;
                 case OpCode.suffix_inc_uint:
-                    operators.OpIncrementDecrement.execSuffixIncUint(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixIncUint(this, step, scope);
                     break;
                 case OpCode.suffix_inc_number:
-                    operators.OpIncrementDecrement.execSuffixIncNumber(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixIncNumber(this, step, scope);
                     break;
                 case OpCode.suffix_dec:
                     operators.OpIncrementDecrement.execSuffixDec(this, step, scope);
                     break;
                 case OpCode.suffix_dec_int:
-                    operators.OpIncrementDecrement.execSuffixDecInt(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixDecInt(this, step, scope);
                     break;
                 case OpCode.suffix_dec_uint:
-                    operators.OpIncrementDecrement.execSuffixDecUInt(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixDecUInt(this, step, scope);
                     break;
                 case OpCode.suffix_dec_number:
-                    operators.OpIncrementDecrement.execSuffixDecNumber(player, step, scope);
+                    operators.OpIncrementDecrement.execSuffixDecNumber(this, step, scope);
                     break;
                 case OpCode.flag:
                     //标签行，不做任何操作
+                    endStep(step);
                     break;
                 case OpCode.if_jmp:
                     {
                         if (ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
                         {
-                            codeLinePtr += step.jumoffset - 1;
+                            hasCallJump = true;
+                            jumptoline = codeLinePtr + step.jumoffset - 1;
+                            //codeLinePtr += step.jumoffset - 1;
+                            endStep(step);
                             break;
                         }
                     }
                     break;
                 case OpCode.jmp:
-                    codeLinePtr += step.jumoffset - 1;
+                    //codeLinePtr += step.jumoffset - 1;
+                    hasCallJump = true;
+                    jumptoline = codeLinePtr + step.jumoffset - 1;
+                    endStep(step);
                     break;
                 case OpCode.raise_error:
                     nativefuncs.Throw.exec(this, step, scope);
@@ -272,36 +292,48 @@ namespace ASRuntime
                     {
                         int tryid = ((rtInt)step.arg1.getValue(scope)).value;
                         enter_try( tryid);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.quit_try:
                     {
                         int tryid = ((rtInt)step.arg1.getValue(scope)).value;
                         quit_try( tryid, step.token);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.enter_catch:
                     {
                         int catchid = ((rtInt)step.arg1.getValue(scope)).value;
                         enter_catch( catchid);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.quit_catch:
                     {
                         int catchid = ((rtInt)step.arg1.getValue(scope)).value;
                         quit_catch( catchid, step.token);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.enter_finally:
                     {
                         int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
                         enter_finally( finallyid);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.quit_finally:
                     {
                         int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
                         quit_finally( finallyid, step.token);
+
+                        endStep(step);
                     }
                     break;
                 case OpCode.native_trace:
@@ -309,6 +341,9 @@ namespace ASRuntime
                     break;
                 case OpCode.bind_scope:
                     operators.OpCallFunction.bind(player,this,step);
+                    break;
+                case OpCode.bind_this:
+                    operators.OpCallFunction.bind_this(player, this, step);
                     break;
                 case OpCode.make_para_scope:
                     operators.OpCallFunction.create_paraScope(player, this, step);
@@ -320,8 +355,37 @@ namespace ASRuntime
                     operators.OpCallFunction.exec(player, this, step);
                     break;
                 case OpCode.function_return:
-                    operators.OpCallFunction.exec_return(player, this, step);
                     hasCallReturn = true;
+                    operators.OpCallFunction.exec_return(player, this, step);
+                    
+                    break;
+
+                case OpCode.new_instance:
+                    operators.OpCreateInstance.exec(player,this, step ,scope);
+                    break;
+                case OpCode.init_staticclass:
+                    operators.OpCreateInstance.init_static(player, this, step, scope);
+                    break;
+                case OpCode.new_instance_class:
+                    operators.OpCreateInstance.exec_instanceClass(player, this, step, scope);
+                    break;
+                case OpCode.prepare_constructor_argement:
+                    operators.OpCreateInstance.prepareConstructorArgements(player, this, step, scope);
+                    break;
+                case OpCode.prepare_constructor_class_argement:
+                    operators.OpCreateInstance.prepareConstructorClassArgements(player, this, step, scope);
+                    break;
+                case OpCode.push_parameter_class:
+                    operators.OpCreateInstance.push_parameter_class(player, this, step, scope);
+                    break;
+                case OpCode.access_dot:
+                    operators.OpAccess_Dot.exec_dot(player, this, step, scope);
+                    break;
+                case OpCode.access_dot_byname:
+                    operators.OpAccess_Dot.exec_dot_byname(player, this, step, scope);
+                    break;
+                case OpCode.delete_prop:
+                    operators.OpDynamicProperty.exec_delete(player, this, step, scope);
                     break;
                 default:
 
@@ -331,10 +395,13 @@ namespace ASRuntime
                     break;
             }
 
-            doTryCatchReturn(step);
+            
         }
 
         private bool hasCallReturn;
+
+        private bool hasCallJump;
+        private int jumptoline;
 
         private void doTryCatchReturn(OpStep step)
         {
@@ -518,40 +585,133 @@ namespace ASRuntime
                     }
                     else
                     {
-                        //bool existsTry = false;
-                        ////查找是还有try块未脱掉
-                        //foreach (var item in tryCatchState)
-                        //{
-                        //    if (item.state == Try_catch_finally.Try)
-                        //    {
-                        //        existsTry = true;
-                        //        break;
-                        //    }
-                        //}
-                        //if (!existsTry)
-                        {
-                            codeLinePtr = block.opSteps.Count;
-                        }
-                        //else
-                        //{
-
-                        //}
+                        codeLinePtr = block.opSteps.Count;
                     }
-                    
+
+                }
+                else if (hasCallJump)
+                {
+                    Stack<int> jumptolinetrys = block.opSteps[jumptoline + 1].trys;
+
+                    if ((jumptolinetrys != null && jumptolinetrys.Peek() != tryCatchState.Peek().tryid)
+                        ||
+                        jumptolinetrys == null
+                        )
+                    {
+                        if (
+                            tryCatchState.Count > 0
+                                &&
+                            tryCatchState.Peek().state == Try_catch_finally.Try
+                            )
+                        {
+                            //先脱掉try;
+                            int tryid = quit_try(tryCatchState.Peek().tryid, step.token);
+                            //前往finally块
+                            hasCallJump = false;
+                            holdhasjumpto = true;
+                            holdjumptoline = jumptoline;
+                            jumptoline = 0;
+                            {
+                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                {
+                                    var op = block.opSteps[j];
+                                    if (op.opCode == OpCode.enter_finally)
+                                    {
+                                        int id = ((ASBinCode.rtData.rtInt)
+                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        if (id == tryid)
+                                        {
+                                            codeLinePtr = j - 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (tryCatchState.Count > 0
+                                &&
+                            tryCatchState.Peek().state == Try_catch_finally.Catch)
+                        {
+                            //脱掉catch
+                            int tryid = quit_catch(tryCatchState.Peek().tryid, step.token);
+                            //前往finally块
+                            hasCallJump = false;
+                            holdhasjumpto = true;
+                            holdjumptoline = jumptoline;
+                            jumptoline = 0;
+
+                            {
+                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                {
+                                    var op = block.opSteps[j];
+                                    if (op.opCode == OpCode.enter_finally)
+                                    {
+                                        int id = ((ASBinCode.rtData.rtInt)
+                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        if (id == tryid)
+                                        {
+                                            codeLinePtr = j - 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (tryCatchState.Count > 0
+                                &&
+                            tryCatchState.Peek().state == Try_catch_finally.Finally)
+                        {
+                            //***在finally中break**
+                            //前往退出finally;
+                            int tryid = tryCatchState.Peek().tryid;
+                            hasCallJump = false;
+                            holdhasjumpto = true;
+                            holdjumptoline = jumptoline;
+                            jumptoline = 0;
+                            {
+                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                {
+                                    var op = block.opSteps[j];
+                                    if (op.opCode == OpCode.quit_finally)
+                                    {
+                                        int id = ((ASBinCode.rtData.rtInt)
+                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        if (id == tryid)
+                                        {
+                                            codeLinePtr = j - 1;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            hasCallJump = false;
+                            codeLinePtr = jumptoline;
+                            jumptoline = 0;
+                        }
+                    }
+                    else
+                    {
+                        hasCallJump = false;
+                        codeLinePtr = jumptoline;
+                        jumptoline = 0;
+                    }
+
                 }
                 
             }
         }
 
         /// <summary>
-        /// 接收从调用栈底
+        /// 接收从调用栈底发来的异常
         /// </summary>
         /// <param name="error"></param>
         internal void receiveErrorFromStackFrame(error.InternalError error)
         {
             runtimeError = error;
-            doTryCatchReturn(block.opSteps[codeLinePtr - 1]);
-            codeLinePtr++;
+            endStep(block.opSteps[codeLinePtr]);
         }
 
         private void enter_try( int tryid)
@@ -619,7 +779,19 @@ namespace ASRuntime
             }
 
             hasCallReturn = holdHasCallReturn;
+
+            if (holdhasjumpto)
+            {
+                hasCallJump = holdhasjumpto;
+                jumptoline = holdjumptoline;
+                holdhasjumpto = false;
+                holdjumptoline = 0;
+            }
             if (hasCallReturn)
+            {
+                doTryCatchReturn(block.opSteps[codeLinePtr]);
+            }
+            else if (hasCallJump)
             {
                 doTryCatchReturn(block.opSteps[codeLinePtr]);
             }
@@ -630,7 +802,20 @@ namespace ASRuntime
 
         internal void throwCastException(ASBinCode.SourceToken token, RunTimeDataType srctype, RunTimeDataType dsttype)
         {
-            runtimeError = (new error.InternalError(token, "类型转换失败:" + srctype + "->" + dsttype));
+            string src = srctype.ToString();
+            string dst = dsttype.ToString();
+
+            if (srctype > RunTimeDataType.unknown)
+            {
+                src = player.swc.classes[srctype - RunTimeDataType._OBJECT].name;
+            }
+
+            if (dsttype > RunTimeDataType.unknown)
+            {
+                dst = player.swc.classes[dsttype - RunTimeDataType._OBJECT].name;
+            }
+
+            runtimeError = (new error.InternalError(token, "类型转换失败:" + src + "->" + dst));
         }
 
         internal void throwOpException(ASBinCode.SourceToken token, OpCode opcode)
@@ -648,12 +833,13 @@ namespace ASRuntime
         /// </summary>
         public void close()
         {
+            int offset = scope.offset;
             //清除执行栈
-            for (int i = scope.offset; i < scope.offset + block.totalRegisters; i++)
+            for (int i = offset; i < offset + block.totalRegisters; i++)
             {
                 scope.stack[i].clear();
             }
-
+            _tempSlot.clear();
         }
 
     }

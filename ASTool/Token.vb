@@ -10,6 +10,14 @@
         ''' 检查出是一个label
         ''' </summary>
         label
+        ''' <summary>
+        ''' 检查出是一个this
+        ''' </summary>
+        this_pointer
+        ''' <summary>
+        ''' 检查出是一个super
+        ''' </summary>
+        super_pointer
 
         ''' <summary>
         ''' 字符串常量

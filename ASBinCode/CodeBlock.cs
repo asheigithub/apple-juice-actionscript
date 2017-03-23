@@ -11,6 +11,10 @@ namespace ASBinCode
     {
         public readonly int id;
         public readonly string name;
+
+        public readonly int define_class_id;
+        public readonly bool isoutclass;
+
         /// <summary>
         /// 运行环境定义
         /// </summary>
@@ -23,10 +27,13 @@ namespace ASBinCode
         /// </summary>
         public int totalRegisters;
 
-        public CodeBlock(int id,string name)
+        public CodeBlock(int id,string name,int define_class_id,bool isoutclass)
         {
             this.id = id;
             this.name = name;
+            this.define_class_id = define_class_id;
+            this.isoutclass = isoutclass;
+
             opSteps = new List<OpStep>();
         }
 

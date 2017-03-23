@@ -21,4 +21,6 @@ D:\ASTool\ASCR\bin\Debug\ASTool.xml
 D:\ASTool\ASCR\obj\Debug\ASCompiler.csprojResolveAssemblyReference.cache
 D:\ASTool\ASCR\obj\Debug\ASCompiler.dll
 D:\ASTool\ASCR\obj\Debug\ASCompiler.pdb
-D:\ASTool\ASCR\bin\Debug\ASTool.dll
+D:\ASTool\ASCR\bin\Debug\ASTool.exe
+D:\ASTool\ASCR\obj\Debug\ASCompiler.csproj.GenerateResource.Cache
+D:\ASTool\ASCR\obj\Debug\ASCompiler.Properties.Resources.resources

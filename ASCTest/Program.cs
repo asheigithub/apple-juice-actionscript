@@ -10,45 +10,58 @@ namespace ASCTest
     {
         static void Main(string[] args)
         {
-            ASTool.Lex lex = new ASTool.Lex(null);// @"D:\ASTool\ASTool\PG1.txt");
-            var words = lex.GetWords(Properties.Resources.PG1);//System.IO.File.ReadAllText(lex.File));
-            //words.Write(new ASTool.ConSrcOut(), 0);
 
-            ASTool.Grammar grammar = new ASTool.Grammar(words);
+            ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";
             string teststring = "package{}";//System.IO.File.ReadAllText("../../testScript/AS3Testproj/src/Main.as");
 
+            string[] files = null;
+
             if (args.Length > 0)
             {
-                if (System.IO.File.Exists(args[0]))
+                if (System.IO.Directory.Exists(args[0]))
                 {
-                    teststring = System.IO.File.ReadAllText(args[0]);
+                    //teststring = System.IO.File.ReadAllText(args[0]);
+                    files = System.IO.Directory.GetFiles(args[0], "*.as", System.IO.SearchOption.AllDirectories );
                 }
             }
             else
             {
-                Console.Write("输入要处理的 *.as文件");
+                Console.Write("输入as文件所在路径");
                 return;
             }
 
-            var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
-                ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  , args[0]);
-
-            if (grammar.hasError)
-            {
-                Console.WriteLine("解析语法树失败!");
-                Console.ReadLine();
-                return;
-            }
-
-            Console.Clear();
+           
 
             var proj = new ASTool.AS3.AS3Proj();
             var srcout = new ASTool.ConSrcOut();
 
-            var analyser = new ASTool.AS3FileGrammarAnalyser(proj, teststring);
-            analyser.Analyse(grammar, tree); //生成项目的语法树
+            for (int i = 0; i < files.Length; i++)
+            {
+                grammar.hasError = false;
+                teststring = System.IO.File.ReadAllText(files[i]);
+                if (string.IsNullOrEmpty(teststring))
+                {
+                    continue;
+                }
+
+                var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  ,files[i]);
+
+                if (grammar.hasError)
+                {
+                    Console.WriteLine("解析语法树失败!");
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.Clear();
+
+                var analyser = new ASTool.AS3FileGrammarAnalyser(proj, files[i]);
+                analyser.Analyse(grammar, tree); //生成项目的语法树
+
+            }
 
             Console.WriteLine();
             Console.WriteLine("====语法树翻译====");
@@ -58,10 +71,10 @@ namespace ASCTest
             {
                 p.Write(0, srcout);
             }
+            
+            ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 
             
-
-            ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
             builder.Build(proj);
 
 
@@ -72,25 +85,28 @@ namespace ASCTest
                 for (int i = 0; i < swc.blocks.Count ; i++)
                 {
                     var block = swc.blocks[i];
-
-
-                    Console.WriteLine();
-                    Console.WriteLine("====操作指令 block "+block.name+"====");
-                    Console.WriteLine();
-                    Console.WriteLine("total registers:" + block.totalRegisters);
-                    Console.WriteLine(block.ToString());
+                    if (block != null)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
+                        Console.WriteLine();
+                        Console.WriteLine("total registers:" + block.totalRegisters);
+                        Console.WriteLine(block.ToString());
+                    }
                 }
 
+                if (swc.blocks.Count > 0)
+                {
+                    ASRuntime.Player player = new ASRuntime.Player();
+                    player.loadCode(swc);
 
-                ASRuntime.Player player = new ASRuntime.Player();
-                player.loadCode(swc);
-                
 
-                Console.WriteLine();
-                Console.WriteLine("====程序输出====");
+                    Console.WriteLine();
+                    Console.WriteLine("====程序输出====");
 
-                player.run2(null);
+                    player.run2(null);
 
+                }
                 Console.WriteLine();
                 
 

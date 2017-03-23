@@ -26,8 +26,8 @@ namespace ASRuntime.operators
             {
                 frame.throwCastException(step.token, step.arg1.getValue(scope).rtType, step.regType);
             }
-            
 
+            frame.endStep(step);
         }
 
         public static bool CastValue(
@@ -122,7 +122,25 @@ namespace ASRuntime.operators
                         }
                     }
                 case ASBinCode.RunTimeDataType.unknown:
+                    return false;
                 default:
+                    {
+                        if (srcValue.rtType == targetType
+                            ||
+                            targetType == ASBinCode.RunTimeDataType.rt_void
+                            )
+                        {
+                            storeto.directSet(srcValue);
+                            return true;
+                        }
+                        else if (targetType > ASBinCode.RunTimeDataType.unknown)
+                        {
+                            //**检查基类
+                            return false;
+                        }
+                        //**检查类型转换
+
+                    }
                     return false;
             }
         }

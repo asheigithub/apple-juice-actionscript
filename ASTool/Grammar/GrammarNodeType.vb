@@ -16,6 +16,15 @@
     ''' </summary>
     label
 
+    ''' <summary>
+    ''' 关键字this
+    ''' </summary>
+    this
+
+    ''' <summary>
+    ''' 关键字super
+    ''' </summary>
+    super
 
     ''' <summary>
     ''' 终结符-数字 number

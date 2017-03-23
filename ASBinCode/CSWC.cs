@@ -12,5 +12,7 @@ namespace ASBinCode
         public List<CodeBlock> blocks = new List<CodeBlock>();
         public List<ASBinCode.rtti.FunctionDefine> functions = new List<ASBinCode.rtti.FunctionDefine>();
 
+        public List<rtti.Class> classes = new List<rtti.Class>();
+
     }
 }

@@ -11,6 +11,7 @@ namespace ASRuntime
     /// </summary>
     class HeapSlot : ASBinCode.ISLOT
     {
+        
         public HeapSlot()
         {
             rtType = RunTimeDataType.unknown;
@@ -26,7 +27,7 @@ namespace ASRuntime
         }
 
 
-        public void directSet(IRunTimeValue value)
+        public virtual void directSet(IRunTimeValue value)
         {
             //value只会在内部new出来，因此，如果value不为null,也肯定是自己new出来的
             rtType = value.rtType;
@@ -71,9 +72,12 @@ namespace ASRuntime
                         this.value = null;
                         break;
                     default:
+
+                        ((rtObject)this.value).CopyFrom((rtObject)value);
                         break;
                 }
             }
+            
         }
 
         public IRunTimeValue getValue()
@@ -104,6 +108,7 @@ namespace ASRuntime
         public void setValue(int value)
         {
             throw new NotImplementedException();
+            
         }
 
         public void setValue(double value)

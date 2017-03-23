@@ -1,0 +1,7 @@
+﻿package
+{
+	public dynamic class Object
+	{
+		public function Object ();
+	}
+}

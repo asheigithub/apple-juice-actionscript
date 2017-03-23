@@ -21,6 +21,8 @@ namespace ASRuntime.nativefuncs
                     
                     );
             }
+
+            frame.endStep(step);
         }
     }
 }

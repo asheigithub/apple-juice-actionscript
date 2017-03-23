@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime
 {
@@ -17,7 +18,9 @@ namespace ASRuntime
             HeapSlot[] memberDataList,
             IList<ISLOT> rtStack,
             int offset, int blockid,
-            IRunTimeScope parent
+            IRunTimeScope parent,
+            Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
+            ASBinCode.rtData.rtObject this_pointer
             )
         {
             runtimestack = rtStack;
@@ -26,8 +29,8 @@ namespace ASRuntime
             _parent = parent;
 
             this.memberDataList = memberDataList;
-            
-
+            this._static_scope = _static_scope;
+            _this_pointer = this_pointer;
         }
 
 
@@ -70,6 +73,23 @@ namespace ASRuntime
             get
             {
                 return _blockid;
+            }
+        }
+
+        private Dictionary<int, ASBinCode.rtData.rtObject> _static_scope;
+        public Dictionary<int, ASBinCode.rtData.rtObject> static_objects
+        {
+            get
+            {
+                return _static_scope;
+            }
+        }
+        private ASBinCode.rtData.rtObject _this_pointer;
+        public ASBinCode.rtData.rtObject this_pointer
+        {
+            get
+            {
+                return _this_pointer;
             }
         }
     }

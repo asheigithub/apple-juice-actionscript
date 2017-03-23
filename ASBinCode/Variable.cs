@@ -35,24 +35,38 @@ namespace ASBinCode
         /// </summary>
         public readonly bool ignoreImplicitCast;
 
-        public Variable(string name, int index,int refblockid):this(name,index,false,refblockid)
+        /// <summary>
+        /// 是否不可赋值
+        /// </summary>
+        public readonly bool isConst;
+
+        public Variable(string name, int index, int refblockid) : this(name, index, false, refblockid, false)
         {
 
         }
+        public Variable(string name, int index,int refblockid,bool isConst):this(name,index,false,refblockid,isConst)
+        {
 
-        public Variable(string name, int index, bool ignoreImplicitCast,int refblockid)
-            :this(name,index,ignoreImplicitCast,refblockid, RunTimeDataType.rt_void)
+        }
+        public Variable(string name, int index, bool ignoreImplicitCast, int refblockid)
+            : this(name, index, ignoreImplicitCast, refblockid, RunTimeDataType.rt_void, false)
+
+        {
+        }
+        public Variable(string name, int index, bool ignoreImplicitCast,int refblockid,bool isConst)
+            :this(name,index,ignoreImplicitCast,refblockid, RunTimeDataType.rt_void,isConst)
 
         {
         }
 
-        private Variable(string name, int index, bool ignoreImplicitCast, int refblockid,RunTimeDataType type)
+        private Variable(string name, int index, bool ignoreImplicitCast, int refblockid,RunTimeDataType type,bool isConst)
         {
             this._name = name;
             this._indexOfMembers = index;
             this.ignoreImplicitCast = ignoreImplicitCast;
             this.refblockid = refblockid;
             this.type = type;
+            this.isConst = isConst;
         }
 
         /// <summary>
@@ -105,28 +119,41 @@ namespace ASBinCode
 
         public override string ToString()
         {
-            return "VAR("+name+"\t"+type +")" ;
+            return  (isConst?"CST":"VAR")+ "("+name+"\t"+type +")" ;
         }
 
         IMember IMember.clone()
         {
-            return new  Variable(name, _indexOfMembers, ignoreImplicitCast,refblockid,valueType);
-            
+            return _clone();
         }
+
+        protected virtual IMember _clone()
+        {
+            return new Variable(name, _indexOfMembers, ignoreImplicitCast, refblockid, valueType, isConst);
+        }
+
 
         public override int GetHashCode()
         {
-            return name.GetHashCode() ^ _indexOfMembers.GetHashCode() ^ ignoreImplicitCast.GetHashCode() ^ refblockid.GetHashCode() ^ valueType.GetHashCode();   
+            return name.GetHashCode() ^ _indexOfMembers.GetHashCode() 
+                ^ ignoreImplicitCast.GetHashCode() 
+                ^ refblockid.GetHashCode() 
+                ^ valueType.GetHashCode()
+                ^ isConst.GetHashCode()
+                ;   
         }
 
         public override bool Equals(object obj)
         {
-            Variable other = obj as Variable;
-            if (other == null)
+            if (obj == null) { return false; }
+
+            if (!(obj.GetType().Equals(this.GetType())))
             {
                 return false;
             }
 
+            Variable other = obj as Variable;
+            
             return name == other.name
                 &&
                 _indexOfMembers == other._indexOfMembers
@@ -135,7 +162,10 @@ namespace ASBinCode
                 &&
                 refblockid == other.refblockid
                 &&
-                valueType == other.valueType;
+                valueType == other.valueType
+                &&
+                isConst == other.isConst
+                ;
 
         }
     }

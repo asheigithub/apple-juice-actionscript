@@ -100,7 +100,7 @@ namespace ASCompiler.compiler.builds
 
 
                 Variable rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true , env.block.id );
-                rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, c.CatchVariable.token);
+                rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, c.CatchVariable.token,builder);
                 env.block.scope.members.Add(rtVariable);
 
                 //builder.buildVariables(env, c.CatchVariable);
@@ -114,7 +114,7 @@ namespace ASCompiler.compiler.builds
                     new SourceToken(c.CatchVariable.token.line,
                     c.CatchVariable.token.ptr, c.CatchVariable.token.sourceFile));
                 op.reg = rtVariable;
-                op.regType = TypeReader.fromSourceCodeStr( c.CatchVariable.TypeStr,c.CatchVariable.token  ) ;
+                op.regType = TypeReader.fromSourceCodeStr( c.CatchVariable.TypeStr,c.CatchVariable.token,builder  ) ;
                 op.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(tryid));
                 op.arg1Type = RunTimeDataType.rt_int;
                 op.arg2 = null;

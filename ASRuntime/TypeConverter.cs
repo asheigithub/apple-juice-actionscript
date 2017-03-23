@@ -28,8 +28,9 @@ namespace ASRuntime
                 case rt.rt_function:
                     return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
                 case rt.unknown:
-                default:
                     return null;
+                default:
+                    return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
             }
         }
 
@@ -92,12 +93,14 @@ namespace ASRuntime
                 case rt.rt_function:
                     return ASBinCode.rtData.rtBoolean.True;
                 case rt.unknown:
-                default:
                     if (isthrow)
                     {
                         frame.throwCastException(token, rt.unknown, rt.rt_int);
                     }
                     return null;
+                default:
+                    //凡是大于unknown的都是对象
+                    return ASBinCode.rtData.rtBoolean.True;
 
             }
         }
@@ -291,8 +294,9 @@ namespace ASRuntime
                 case rt.rt_function:
                     return double.NaN;
                 case rt.unknown:
+                    return double.NaN;
                 default:
-                    return 0;// null;
+                    return double.NaN;// null;
 
             }
         }
@@ -322,8 +326,39 @@ namespace ASRuntime
                     return "function Function() {}";
                 
                 case rt.unknown:
-                default:
                     return null;
+                default:
+                    {
+                        //ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)src;
+                        //var toStr = (ASBinCode.ClassMemberFinder.find(obj.value._class, "toString", obj.value._class));
+                        //if (toStr.type == rt.rt_function && !toStr.isStatic && toStr.isPublic 
+                        //    && !toStr.isConstructor
+                        //    )
+                        //{
+                        //    operators.FunctionCaller fc = new operators.FunctionCaller(frame.player, frame, token);
+                        //    fc.function = (ASBinCode.rtData.rtFunction)obj.value.memberData[toStr.index].getValue();
+                        //    fc.loadDefineFromFunction();
+                        //    fc.createParaScope();
+                        //    fc.returnSlot = frame._tempSlot;
+                        //    fc.call();
+
+                        //    if (frame.player.step_toblockend())
+                        //    {
+                        //        return ConvertToString(fc.returnSlot.getValue(), frame, token, isthrow);
+                        //    }
+                        //    else
+                        //    {
+                        //        return null;
+                        //    }
+                        //}
+                        //else
+                        {
+                            return ((ASBinCode.rtData.rtObject)src).value.ToString();
+                        }
+                    }
+
+                    
+                    //return "object " + ((ASBinCode.rtData.rtObject)src).value._class.name;
 
             }
         }
@@ -337,6 +372,11 @@ namespace ASRuntime
         /// <returns></returns>
         public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype)
         {
+            if (src.rtType >rt.unknown || dsttype >rt.unknown)
+            {
+                throw new NotImplementedException();
+            }
+
             if (dsttype == rt.rt_void || src.rtType == dsttype)
                 return true;
 
@@ -371,8 +411,40 @@ namespace ASRuntime
             /// <param name="f"></param>
             /// <param name="t"></param>
             /// <returns></returns>
-        public static bool testImplicitConvert(ASBinCode.RunTimeDataType f, ASBinCode.RunTimeDataType t)
+        public static bool testImplicitConvert(ASBinCode.RunTimeDataType f, ASBinCode.RunTimeDataType t,ASBinCode.IClassFinder classfinder)
         {
+            if (f == t)
+            {
+                return true;
+            }
+
+            if (f > rt.unknown && t == ASBinCode.RunTimeDataType.rt_void)
+            {
+                return true;
+            }
+
+            if (f == rt.rt_void && t > rt.unknown)
+            {
+                return true;
+            }
+
+            
+
+            if (f > rt.unknown && t > rt.unknown)
+            {
+                ASBinCode.rtti.Class cls1 = classfinder.getClassByRunTimeDataType(f);
+                ASBinCode.rtti.Class cls2 = classfinder.getClassByRunTimeDataType(t);
+                
+
+                //检查继承关系
+                throw new NotImplementedException();
+            }
+
+            if (f > rt.unknown || t > rt.unknown)
+            {
+                throw new NotImplementedException();
+            }
+
             return implicitcoverttable[(int)f, (int)t];
         }
 
@@ -393,6 +465,12 @@ namespace ASRuntime
         
         public static rt getImplicitOpType(ASBinCode.RunTimeDataType v1, ASBinCode.RunTimeDataType v2, ASBinCode.OpCode op)
         {
+            if (v1 > rt.unknown || v2 > rt.unknown)
+            {
+                throw new NotImplementedException();
+            }
+
+
             if (op == ASBinCode.OpCode.add)
             {
                 return implicit_opadd_coverttable[(int)v1, (int)v2];

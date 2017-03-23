@@ -36,12 +36,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassMemberFinder.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CSWC.cs" />
+    <Compile Include="Field.cs" />
+    <Compile Include="IClassFinder.cs" />
     <Compile Include="ISLOT.cs" />
     <Compile Include="IMember.cs" />
     <Compile Include="IRunTimeScope.cs" />
     <Compile Include="IScope.cs" />
+    <Compile Include="PackagePathGetter.cs" />
     <Compile Include="Register.cs" />
     <Compile Include="ILRValue.cs" />
     <Compile Include="IRunTimeValue.cs" />
@@ -54,17 +58,28 @@
     <Compile Include="rtData\rtInt.cs" />
     <Compile Include="rtData\rtNull.cs" />
     <Compile Include="rtData\rtNumber.cs" />
+    <Compile Include="rtData\rtObject.cs" />
     <Compile Include="rtData\rtString.cs" />
     <Compile Include="rtData\rtUInt.cs" />
     <Compile Include="rtData\rtUndefined.cs" />
+    <Compile Include="rtti\Class.cs" />
+    <Compile Include="rtti\ClassMember.cs" />
+    <Compile Include="rtti\DynamicObject.cs" />
     <Compile Include="rtti\FunctionDefine.cs" />
     <Compile Include="rtti\FunctionParameter.cs" />
     <Compile Include="rtti\FunctionSignature.cs" />
+    <Compile Include="rtti\Global_Object.cs" />
+    <Compile Include="rtti\IImportable.cs" />
+    <Compile Include="rtti\Object.cs" />
     <Compile Include="RunTimeDataType.cs" />
     <Compile Include="scopes\FunctionScope.cs" />
+    <Compile Include="scopes\ObjectInstanceScope.cs" />
     <Compile Include="scopes\OutPackageMemberScope.cs" />
     <Compile Include="scopes\ScopeBase.cs" />
+    <Compile Include="scopes\StartUpBlockScope.cs" />
     <Compile Include="SourceToken.cs" />
+    <Compile Include="StaticClassDataGetter.cs" />
+    <Compile Include="ThisPointer.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup />

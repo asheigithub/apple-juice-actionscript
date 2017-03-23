@@ -19,7 +19,7 @@ namespace ASRuntime.operators
 
             int r =(int)( n1 & n2);
             step.reg.getISlot(scope).setValue(r);
-
+            frame.endStep(step);
         }
 
         public static void execBitOR(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -32,7 +32,7 @@ namespace ASRuntime.operators
 
             int r = (int)(n1 | n2);
             step.reg.getISlot(scope).setValue(r);
-
+            frame.endStep(step);
         }
         public static void execBitXOR(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -44,7 +44,7 @@ namespace ASRuntime.operators
 
             int r = (int)(n1 ^ n2);
             step.reg.getISlot(scope).setValue(r);
-
+            frame.endStep(step);
         }
         public static void execBitNot(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -54,7 +54,7 @@ namespace ASRuntime.operators
 
             int r = ~n1;
             step.reg.getISlot(scope).setValue(r);
-
+            frame.endStep(step);
         }
 
         public static void execBitLeftShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -69,6 +69,9 @@ namespace ASRuntime.operators
 
             int r = n1 << n2;
             step.reg.getISlot(scope).setValue(r);
+
+            frame.endStep(step);
+
         }
         public static void execBitRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -82,6 +85,8 @@ namespace ASRuntime.operators
 
             int r = n1 >> n2;
             step.reg.getISlot(scope).setValue(r);
+
+            frame.endStep(step);
         }
 
         public static void execBitUnSignRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -96,6 +101,8 @@ namespace ASRuntime.operators
 
             uint r = n1 >> n2;
             step.reg.getISlot(scope).setValue(r);
+
+            frame.endStep(step);
         }
 
     }

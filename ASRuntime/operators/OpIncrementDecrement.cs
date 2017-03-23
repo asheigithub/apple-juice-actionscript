@@ -59,38 +59,40 @@ namespace ASRuntime.operators
                     break;
             }
 
-
+            frame.endStep(step);
 
         }
 
 
-        public static void execIncInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value++;
             }
+            frame.endStep(step);
         }
 
-        public static void execIncUInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value++;
             }
+            frame.endStep(step);
         }
 
-        public static void execIncNumber(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value++;
             }
-                   
 
+            frame.endStep(step);
         }
 
 
@@ -151,36 +153,38 @@ namespace ASRuntime.operators
             }
 
 
-
+            frame.endStep(step);
         }
 
 
-        public static void execDecInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value--;
             }
+            frame.endStep(step);
         }
 
-        public static void execDecUInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value--;
             }
+            frame.endStep(step);
         }
 
-        public static void execDecNumber(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value--;
             }
-
+            frame.endStep(step);
 
         }
 
@@ -254,10 +258,10 @@ namespace ASRuntime.operators
                     break;
             }
 
-
+            frame.endStep(step);
         }
 
-        public static void execSuffixIncInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -268,9 +272,11 @@ namespace ASRuntime.operators
 
                         iv.value++;
                     }
+
+            frame.endStep(step);
         }
 
-        public static void execSuffixIncUint(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncUint(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -281,9 +287,11 @@ namespace ASRuntime.operators
 
                         iv.value++;
                     }
+
+            frame.endStep(step);
         }
 
-        public static void execSuffixIncNumber(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -294,6 +302,7 @@ namespace ASRuntime.operators
 
                 iv.value++;
             }
+            frame.endStep(step);
         }
 
 
@@ -367,10 +376,10 @@ namespace ASRuntime.operators
                     break;
             }
 
-
+            frame.endStep(step);
         }
 
-        public static void execSuffixDecInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -381,9 +390,10 @@ namespace ASRuntime.operators
 
                 iv.value--;
             }
+            frame.endStep(step);
         }
 
-        public static void execSuffixDecUInt(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -394,10 +404,10 @@ namespace ASRuntime.operators
 
                 iv.value--;
             }
-                    
+            frame.endStep(step);
         }
 
-        public static void execSuffixDecNumber(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -408,7 +418,7 @@ namespace ASRuntime.operators
 
                 iv.value--;
             }
-                    
+            frame.endStep(step);
         }
 
 

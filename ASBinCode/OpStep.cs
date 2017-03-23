@@ -26,7 +26,10 @@ namespace ASBinCode
         /// 所属标签
         /// </summary>
         public Stack<string> labels;
-
+        /// <summary>
+        /// 当前行在哪些try块里
+        /// </summary>
+        public Stack<int> trys;
 
         public OpCode opCode;
 

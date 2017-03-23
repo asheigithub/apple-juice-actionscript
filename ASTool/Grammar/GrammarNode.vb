@@ -30,6 +30,11 @@ Public Class GrammarNode
     Public Shared GNodeLabel As New GrammarNode() With {.Type = GrammarNodeType.label, .Name = "label"}
 
 
+    Public Shared GNodeThis As New GrammarNode() With {.Type = GrammarNodeType.this, .Name = "this"}
+
+    Public Shared GNodeSuper As New GrammarNode() With {.Type = GrammarNodeType.super, .Name = "super"}
+
+
     Public FIRST As New HashSet(Of GrammarNode)()
     Public FOLLOW As New HashSet(Of GrammarNode)()
 

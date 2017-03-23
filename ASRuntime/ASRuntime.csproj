@@ -35,16 +35,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DynamicPropertySlot.cs" />
     <Compile Include="error\InternalError.cs" />
     <Compile Include="HeapSlot.cs" />
+    <Compile Include="IBlockCallBack.cs" />
     <Compile Include="nativefuncs\Catch.cs" />
     <Compile Include="nativefuncs\Throw.cs" />
     <Compile Include="nativefuncs\Trace.cs" />
+    <Compile Include="ObjectMemberSlot.cs" />
+    <Compile Include="operators\FunctionCaller.cs" />
+    <Compile Include="operators\OpAccess_Dot.cs" />
     <Compile Include="operators\OpAdd.cs" />
     <Compile Include="operators\OpAssigning.cs" />
     <Compile Include="operators\OpBit.cs" />
     <Compile Include="operators\OpCallFunction.cs" />
     <Compile Include="operators\OpCast.cs" />
+    <Compile Include="operators\OpCreateInstance.cs" />
+    <Compile Include="operators\OpDynamicProperty.cs" />
     <Compile Include="operators\OpIncrementDecrement.cs" />
     <Compile Include="operators\OpLogic.cs" />
     <Compile Include="operators\OpMulti.cs" />

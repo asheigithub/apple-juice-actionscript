@@ -11,6 +11,13 @@ namespace ASBinCode
     {
         private  RunTimeDataType type;
 
+        /// <summary>
+        /// 指示访问成员的中间状态
+        /// </summary>
+        public rtti.ClassMember _regMember;
+
+        public PackagePathGetter _pathGetter;
+
         public void setEAXTypeWhenCompile(RunTimeDataType t)
         {
             type = t;
@@ -22,6 +29,7 @@ namespace ASBinCode
         {
             this.Id = id;
             type = RunTimeDataType.unknown;
+            
         }
 
         public RunTimeDataType valueType
@@ -34,7 +42,8 @@ namespace ASBinCode
 
         public IRunTimeValue getValue( IRunTimeScope scope)
         {
-            return getISlot(scope).getValue();
+            var v= getISlot(scope).getValue();
+            return v;
         }
 
         

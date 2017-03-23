@@ -10,13 +10,69 @@ namespace ASRuntime
     {
         public bool isConsoleOut = true;
 
+
+        internal Dictionary<int, rtObject> static_instance;
+        internal Dictionary<int, IRunTimeScope> outpackage_runtimescope;
+
+
         internal CSWC swc;
         private CodeBlock defaultblock;
-        public void loadCode(CSWC swc)
+        public void loadCode(CSWC swc,CodeBlock block=null)
         {
             this.swc = swc;
-            defaultblock = swc.blocks[0];
 
+            static_instance = new Dictionary<int, rtObject>();
+            outpackage_runtimescope = new Dictionary<int, IRunTimeScope>();
+
+            if (block != null)
+            {
+                defaultblock = block;
+            }
+            else if (swc.blocks.Count == 1)
+            {
+                defaultblock = swc.blocks[0];
+            }
+            else
+            {
+                //for (int i = 0; i < swc.blocks.Count; i++)
+                //{
+                //    if (swc.blocks[i] != null)
+                //    {
+                //        defaultblock = swc.blocks[i];
+                //        break;
+                //    }
+                //}
+                //查找文档类
+                for (int i = 0; i < swc.classes.Count; i++)
+                {
+                    if (swc.classes[i].isdocumentclass)
+                    {
+                        defaultblock = new CodeBlock(int.MaxValue, "_player_run",-65535,true);
+                        defaultblock.scope = new ASBinCode.scopes.StartUpBlockScope();
+                        defaultblock.totalRegisters = 1;
+
+                        {
+                            OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(0, 0, ""));
+                            opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(swc.classes[i].classid));
+                            opMakeArgs.arg1Type = RunTimeDataType.rt_int;
+                            defaultblock.opSteps.Add(opMakeArgs);
+
+                        }
+                        {
+                            OpStep step = new OpStep(OpCode.new_instance, new SourceToken(0, 0, ""));
+                            step.arg1 = new RightValue(new rtInt(swc.classes[i].classid));
+                            step.arg1Type = swc.classes[i].getRtType();
+                            step.reg = new Register(0);
+                            step.regType = swc.classes[i].getRtType();
+
+                            defaultblock.opSteps.Add(step);
+                        }
+                        break;
+                    }
+                }
+
+                
+            }
             runtimeStack = new Stack<StackFrame>();
             stackSlots = new StackSlot[1024];
             
@@ -39,7 +95,14 @@ namespace ASRuntime
                 stackSlots[i] = new StackSlot();
             }
 
-            var topscope = CallBlock(defaultblock, genHeapFromCodeBlock(defaultblock) ,new StackSlot(), null, new SourceToken(0, 0, ""));
+            HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
+
+            
+            var topscope = CallBlock(defaultblock,data ,new StackSlot(), null, 
+                new SourceToken(0, 0, ""),null,
+                null
+                );
+            
             while (step())
             {
 
@@ -93,44 +156,75 @@ namespace ASRuntime
             return memberDataList;
         }
 
-        internal IRunTimeScope CallBlock(ASBinCode.CodeBlock calledblock, 
-            HeapSlot[] membersHeap ,
-            ISLOT returnSlot, 
-            IRunTimeScope callerScope, 
-            SourceToken token)
+        internal IRunTimeScope CallBlock(ASBinCode.CodeBlock calledblock,
+            HeapSlot[] membersHeap,
+            ISLOT returnSlot,
+            IRunTimeScope callerScope,
+            SourceToken token,
+            IBlockCallBack callbacker,
+            ASBinCode.rtData.rtObject this_pointer
+            )
         {
             StackFrame frame = new StackFrame();
             frame.block = calledblock;
             frame.codeLinePtr = 0;
             frame.player = this;
             frame.returnSlot = returnSlot;
-            
-            
+            frame.callbacker = callbacker;
 
             int startOffset = 0;
             if (runtimeStack.Count > 0)
             {
-                startOffset = runtimeStack.Peek().scope.offset + runtimeStack.Peek().block.totalRegisters;
+                startOffset = runtimeStack.Peek().scope.offset + runtimeStack.Peek().block.totalRegisters+1;
             }
 
-            if (startOffset + calledblock.totalRegisters >= stackSlots.Length)
+            if (startOffset + calledblock.totalRegisters+1 >= stackSlots.Length)
             {
                 runtimeError = new error.InternalError(token, "stack overflow");
                 
             }
             else
             {
+                frame._tempSlot = stackSlots[startOffset + frame.block.totalRegisters];
+
                 runtimeStack.Push(frame);
                 currentRunFrame = frame;
             }
 
             
 
-            RunTimeScope scope = new RunTimeScope(membersHeap, stackSlots, startOffset, calledblock.id,callerScope);
+            RunTimeScope scope = new RunTimeScope(
+                membersHeap, stackSlots, startOffset, calledblock.id,callerScope
+                ,
+                static_instance
+                ,
+                this_pointer
+                );
             frame.scope = scope;
 
             return frame.scope;
         }
+
+        /// <summary>
+        /// 执行到当前代码块结束
+        /// </summary>
+        /// <returns></returns>
+        internal bool step_toblockend()
+        {
+            int f = runtimeStack.Count - 1;
+            while (step())
+            {
+                if (runtimeStack.Count == f)
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+
+
 
         private StackFrame currentRunFrame;
         public bool step()
@@ -146,8 +240,16 @@ namespace ASRuntime
 
             if (currentRunFrame.IsEnd()) //执行完成
             {
-                
                 runtimeStack.Pop(); //出栈
+
+                if (currentRunFrame.callbacker != null)
+                {
+                    IBlockCallBack temp = currentRunFrame.callbacker;
+                    currentRunFrame.callbacker = null;
+                    temp.call(temp.args);
+
+                }
+
                 if (runtimeStack.Count > 0)
                 {
                     currentRunFrame.close();//Eval需保留第一个栈的数值不清空
@@ -166,6 +268,7 @@ namespace ASRuntime
             return true;
         }
 
+        
         internal void exitStackFrameWithError(error.InternalError error)
         {
             if (error.callStack == null) //收集调用栈
@@ -174,13 +277,16 @@ namespace ASRuntime
             }
             error.callStack.Push(currentRunFrame); 
 
-            
             runtimeStack.Pop();
+
+            
             if (runtimeStack.Count > 0)
             {
                 currentRunFrame.close();//Eval需保留第一个栈的数值不清空
                 currentRunFrame = runtimeStack.Peek();
+
                 currentRunFrame.receiveErrorFromStackFrame(error);
+
             }
             else
             {
@@ -195,8 +301,8 @@ namespace ASRuntime
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("运行时错误");
-                Console.WriteLine("file :" + err.token.sourceFile);
-                Console.WriteLine("line :" + err.token.line + " ptr :" + err.token.ptr);
+                //Console.WriteLine("file :" + err.token.sourceFile);
+                //Console.WriteLine("line :" + err.token.line + " ptr :" + err.token.ptr);
 
                 if (err.errorValue != null)
                 {
@@ -206,6 +312,29 @@ namespace ASRuntime
                 {
                     Console.WriteLine(err.message);
                 }
+
+                Stack<StackFrame> _temp = new Stack<StackFrame>();
+
+                while (err.callStack.Count>0)
+                {
+                    _temp.Push(err.callStack.Pop());
+                }
+
+                foreach (var item in _temp)
+                {
+                    if (item.codeLinePtr < item.block.opSteps.Count)
+                    {
+                        Console.WriteLine(item.block.name + " at file:" + item.block.opSteps[item.codeLinePtr].token.sourceFile);
+                        Console.WriteLine("\t\t line:" + item.block.opSteps[item.codeLinePtr].token.line + " ptr:" + item.block.opSteps[item.codeLinePtr].token.ptr);
+                    }
+                    else
+                    {
+                        Console.WriteLine(item.block.name);
+                    }
+
+                    Console.WriteLine("----");
+                }
+
 
                 Console.ResetColor();
             }

@@ -25,6 +25,8 @@ namespace ASRuntime.nativefuncs
                                 step.arg1.getValue(scope)
                                 ));
             }
+
+            frame.endStep(step);
         }
     }
 }

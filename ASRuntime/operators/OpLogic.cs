@@ -18,10 +18,11 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
+            frame.endStep(step);
         }
 
 
-        public static void execGT_NUM(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             
             
@@ -37,11 +38,11 @@ namespace ASRuntime.operators
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
+            frame.endStep(step);
             
-            //step.reg.setValue(new ASBinCode.rtData.rtNumber(a1.value + a2.value), eaxs, scope);
         }
 
-        public static void execGE_NUM(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
 
@@ -58,7 +59,7 @@ namespace ASRuntime.operators
             }
 
 
-            //step.reg.setValue(new ASBinCode.rtData.rtNumber(a1.value + a2.value), eaxs, scope);
+            frame.endStep(step);
         }
 
         public static void execGT_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -109,6 +110,7 @@ namespace ASRuntime.operators
                     step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
+            frame.endStep(step);
         }
 
         public static void execGE_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -159,9 +161,10 @@ namespace ASRuntime.operators
                     step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
+            frame.endStep(step);
         }
 
-        public static void execLT_NUM(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
 
@@ -178,10 +181,10 @@ namespace ASRuntime.operators
             }
 
 
-            //step.reg.setValue(new ASBinCode.rtData.rtNumber(a1.value + a2.value), eaxs, scope);
+            frame.endStep(step);
         }
 
-        public static void execLE_NUM(Player player, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
 
@@ -196,7 +199,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            
+            frame.endStep(step);
         }
 
         public static void execLT_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -246,6 +249,7 @@ namespace ASRuntime.operators
                     step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
+            frame.endStep(step);
         }
 
         public static void execLE_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -295,6 +299,7 @@ namespace ASRuntime.operators
                     step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
+            frame.endStep(step);
         }
 
         public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -307,6 +312,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False );
             }
+            frame.endStep(step);
         }
 
         public static void execNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -319,6 +325,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -334,6 +341,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -349,6 +357,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -364,6 +373,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -379,6 +389,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -426,6 +437,28 @@ namespace ASRuntime.operators
                     return false;
                 }
             }
+            else if (v1.rtType == ASBinCode.RunTimeDataType.rt_function
+                &&
+                v2.rtType == ASBinCode.RunTimeDataType.rt_function
+                )
+            {
+                ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
+                ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
+
+                return ASBinCode.rtData.rtFunction.isEqual(obj1, obj2);
+
+            }
+            else if (v1.rtType > ASBinCode.RunTimeDataType.unknown
+                &&
+                v2.rtType > ASBinCode.RunTimeDataType.unknown
+                )
+            {
+                ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
+                ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
+
+                return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
+
+            }
             else
             {
                 if (object.ReferenceEquals(v1, v2))
@@ -437,7 +470,6 @@ namespace ASRuntime.operators
                     return false;
                 }
             }
-
         }
 
         public static void execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -450,6 +482,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
         public static void execStrictNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -461,6 +494,7 @@ namespace ASRuntime.operators
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
+            frame.endStep(step);
         }
 
         /// <summary>
@@ -593,7 +627,28 @@ namespace ASRuntime.operators
                         break;
                 }
             }
+            else if (v1.rtType == ASBinCode.RunTimeDataType.rt_function
+                &&
+                v2.rtType == ASBinCode.RunTimeDataType.rt_function
+                )
+            {
+                ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
+                ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
 
+                return ASBinCode.rtData.rtFunction.isEqual(obj1, obj2);
+
+            }
+            else if (v1.rtType > ASBinCode.RunTimeDataType.unknown
+                &&
+                v2.rtType > ASBinCode.RunTimeDataType.unknown
+                )
+            {
+                ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
+                ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
+
+                return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
+
+            }
             return false;
         }
 

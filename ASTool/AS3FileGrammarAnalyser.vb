@@ -509,7 +509,8 @@ Public Class AS3FileGrammarAnalyser
                 _NewClassOrVector(node)
             Case "NewOpt"
                 _NewOpt(node)
-
+            Case "ThisSuper"
+                _ThisSuper(node)
         End Select
 
         visitednodes.Add(node)
@@ -816,8 +817,31 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
 
+    Sub _ThisSuper(node As GrammerExpr)
+        '<ThisSuper> ::=this <AccessOpt> |super <AccessOpt> ;
+        node.exprsteplist = New Expr.AS3ExprStepList()
+        If node.Nodes(0).MatchedToken.Type = Token.TokenType.this_pointer Then
+            Dim v As New AS3.Expr.AS3DataStackElement()
+            v.Data = New AS3.Expr.AS3DataValue()
+            v.Data.FF1Type = Expr.FF1DataValueType.this_pointer
+            v.Data.Value = node.Nodes(0).MatchedToken.StringValue
+            MemberScopeStack.Peek().ExprDataStack.Push(v)
+        ElseIf node.Nodes(0).MatchedToken.Type = Token.TokenType.super_pointer Then
+            Dim v As New AS3.Expr.AS3DataStackElement()
+            v.Data = New AS3.Expr.AS3DataValue()
+            v.Data.FF1Type = Expr.FF1DataValueType.super_pointer
+            v.Data.Value = node.Nodes(0).MatchedToken.StringValue
+            MemberScopeStack.Peek().ExprDataStack.Push(v)
+
+        End If
+
+        VisitNodes(node.Nodes(1))
+        node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+    End Sub
+
     Sub _NSAccess(node As GrammerExpr)
-        '<Unit><NSAccessOpt>;
+        '<ThisSuper> ::=this <AccessOpt> |super <AccessOpt> ;
+        '<Unit><NSAccessOpt>|<ThisSuper>;
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
@@ -1072,7 +1096,8 @@ Public Class AS3FileGrammarAnalyser
         Else
             If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
                 func.Access.IsInternal = True
-            ElseIf TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
+            End If
+            If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
                 func.IsMethod = True
             End If
         End If
@@ -2939,7 +2964,9 @@ Public Class AS3FileGrammarAnalyser
         '<New>|<Object>|<E4XAccess>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <Expression> ")" | <Function>| <Array> |<Vector>|"CONFIG::" identifier ;
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
-        If node.Nodes(0).GrammerLeftNode.Type = GrammarNodeType.identifier OrElse node.Nodes(0).GrammerLeftNode.Name = "ID_EABLED_KEYWORD" Then
+        If node.Nodes(0).GrammerLeftNode.Type = GrammarNodeType.identifier _
+            OrElse node.Nodes(0).GrammerLeftNode.Name = "ID_EABLED_KEYWORD" Then
+
 
             Dim v As New AS3.Expr.AS3DataStackElement()
             v.Data = New AS3.Expr.AS3DataValue()
@@ -3813,6 +3840,9 @@ Public Class AS3FileGrammarAnalyser
         '<NewOpt>   ::=  "("<Argements>")"|null; 
     End Sub
     Sub _NewClassOrVector(node As GrammerExpr)
+
+        '<NewClassOrVector> ::=<ClassPath> <NewOpt>| <Vector> |<ThisSuper> ;
+
         node.exprsteplist = New Expr.AS3ExprStepList()
         If (node.Nodes.Count = 2) Then
 
@@ -3846,8 +3876,23 @@ Public Class AS3FileGrammarAnalyser
             node.exprsteplist.Add(op)
 
         Else
+
+            Dim op As New Expr.AS3ExprStep(node.MatchedToken)
+            op.Type = Expr.OpType.Constructor
+            op.OpCode = node.Parent.Nodes(0).MatchedToken.StringValue
+
             VisitNodes(node.Nodes(0))
             node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+
+            op.Arg1 = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+            op.Arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
+
+
+
+            MemberScopeStack.Peek().ExprDataStack.Push(op.Arg1)
+            node.exprsteplist.Add(op)
+
+
         End If
 
 

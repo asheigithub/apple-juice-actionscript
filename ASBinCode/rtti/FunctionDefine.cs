@@ -15,9 +15,17 @@ namespace ASBinCode.rtti
 
         public string name;
 
-        //public RunTimeDataType returnType;
+        public bool isMethod;
+        ///// <summary>
+        ///// 如果是method,绑定于哪个类。
+        ///// </summary>
+        //public Class bindClass;
+
+        public bool isConstructor;
 
         public FunctionSignature signature;
+
+        
 
         public int blockid;
 

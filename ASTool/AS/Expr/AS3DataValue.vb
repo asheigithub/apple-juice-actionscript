@@ -3,6 +3,9 @@
         dynamicobj
         e4xxml
         identifier
+        this_pointer
+        super_pointer
+
         const_number
         const_string
         as3_function

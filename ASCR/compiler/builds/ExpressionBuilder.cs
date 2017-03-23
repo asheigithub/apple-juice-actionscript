@@ -69,10 +69,15 @@ namespace ASCompiler.compiler.builds
                         FuncCallBuilder fcb = new FuncCallBuilder();
                         fcb.buildFuncCall(env, step,builder);
                         break;
-                    case ASTool.AS3.Expr.OpType.Constructor:
-
+                    
                     case ASTool.AS3.Expr.OpType.Access:
-
+                        AccessBuilder acb = new AccessBuilder();
+                        acb.buildAccess(env, step, builder);
+                        break;
+                    case ASTool.AS3.Expr.OpType.Constructor:
+                        ConstructorBuilder cb = new ConstructorBuilder();
+                        cb.buildConstructor(env, step, builder);
+                        break;
                     case ASTool.AS3.Expr.OpType.E4XAccess:
 
                     case ASTool.AS3.Expr.OpType.E4XFilter:
@@ -176,8 +181,27 @@ namespace ASCompiler.compiler.builds
                     IRightValue rv = getRightValue(env, step.Arg2, step.token,builder);
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-                    eax.setEAXTypeWhenCompile(rv.valueType);
-                    
+                    //当是暂存成员访问中间结果时
+                    if (eax._regMember == null) 
+                    {
+                        eax.setEAXTypeWhenCompile(rv.valueType);
+                    }
+                    else if(eax._regMember.isConst)
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "const成员" + eax._regMember.name + "不能在此赋值"));
+                    }
+
+
+                    //***如果是成员访问的中间缓存，则需要转型
+                    if (rv.valueType != eax.valueType)
+                    {
+                        //插入转型代码
+                        rv = addCastOpStep(env, rv, eax.valueType,
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+
+                    }
 
                     OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     op.reg = eax;
@@ -206,11 +230,19 @@ namespace ASCompiler.compiler.builds
                 else
                 {
                     IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env);
+
                     if (member == null)
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "成员" + step.Arg1.Data.Value + "未找到"));
+                    }
+
+                    if (member is Variable && ((Variable)member).isConst)
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "const成员" + step.Arg1.Data.Value + "不能在此赋值"));
                     }
 
                     if (member is ASBinCode.ILeftValue)
@@ -221,7 +253,7 @@ namespace ASCompiler.compiler.builds
 
                         //**加入赋值操作***
                         //**隐式类型转换检查
-                        if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType))
+                        if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType,builder))
                         {
                             throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                                 "不能将[" + rv.valueType + "]类型赋值给[" + lv.valueType + "]类型的变量");
@@ -492,14 +524,22 @@ namespace ASCompiler.compiler.builds
                 //if (env.tempEaxList.Count <= data.Reg.ID)
 
                 Register reg = env.loadRegisterByAST(data.Reg.ID);
-
+                
                 if (reg == null)
                 {
                     throw new BuildException(
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
                             "编译异常 无法获得临时变量类型"));
                 }
-                return reg;
+
+                if (reg._pathGetter != null)
+                {
+                    return reg._pathGetter;
+                }
+                else
+                {
+                    return reg;
+                }
             }
             else
             {
@@ -508,7 +548,7 @@ namespace ASCompiler.compiler.builds
                     List<ASTool.AS3.Expr.AS3DataStackElement> datalist
                         = (List<ASTool.AS3.Expr.AS3DataStackElement>)data.Data.Value;
 
-                    return getRightValue(env, datalist[datalist.Count - 1], matchtoken,builder);
+                    return getRightValue(env, datalist[datalist.Count - 1], matchtoken, builder);
                 }
                 else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.const_number)
                 {
@@ -556,7 +596,54 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        ASBinCode.IMember member = MemberFinder.find(data.Data.Value.ToString(), env);
+                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env);
+
+                        if (member == null && builder._currentImports.Count > 0)
+                        {
+                            string t = data.Data.Value.ToString();
+                            //查找导入的类
+                            var found = TypeReader.findClassFromImports(t, builder);
+                            if (found.Count == 1)
+                            {
+                                var item = found[0];
+
+                                OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                                stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                                    new ASBinCode.rtData.rtInt(item.classid));
+                                stepInitClass.arg1Type = item.staticClass.getRtType();
+                                env.block.opSteps.Add(stepInitClass);
+
+
+                                return new StaticClassDataGetter(item.staticClass);
+                            }
+                            else if (found.Count > 1)
+                            {
+                                throw new BuildException(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                                        "类型" + t + "不明确."
+                                    );
+                            }
+                        }
+
+                        if (member == null && builder._currentImports.Count>0)
+                        {
+                            string packagepath = data.Data.Value.ToString();
+
+                            List<ASBinCode.rtti.Class> classlist = builder._currentImports.Peek();
+
+                            //***查找包路径***
+                            for (int i = 0; i < classlist.Count; i++)
+                            {
+                                if (classlist[i].package == packagepath
+                                    ||
+                                    classlist[i].package.StartsWith(packagepath + ".")
+                                    )
+                                {
+                                    return new PackagePathGetter(packagepath);
+                                }
+                            }
+                            
+                        }
+
                         if (member == null)
                         {
                             throw new BuildException(
@@ -576,6 +663,30 @@ namespace ASCompiler.compiler.builds
                         }
                     }
                 }
+                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.this_pointer)
+                {
+                    if (env.isEval)
+                    {
+                        throw new BuildException(
+                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                            "表达式求值时不考虑this "));
+                    }
+
+                    if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                        ||
+                        env.block.scope is ASBinCode.scopes.FunctionScope
+                        )
+                    {
+                        return new ThisPointer(env.block.scope);
+                    }
+                    else
+                    {
+                        throw new BuildException(
+                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                            "this不能出现在这里"));
+                    }
+                    
+                }
                 else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function)
                 {
                     if (env.isEval)
@@ -585,10 +696,10 @@ namespace ASCompiler.compiler.builds
                             "表达式求值时不考虑function " + data.Data.FF1Type));
                     }
                     ASTool.AS3.AS3Function as3func = (ASTool.AS3.AS3Function)data.Data.Value;
-                    
-                    
+
+
                     builds.AS3FunctionBuilder fb = new AS3FunctionBuilder();
-                    var fc= fb.buildAS3Function(env, as3func, builder,null);
+                    var fc = fb.buildAS3Function(env, as3func, builder, null);
 
                     return new ASBinCode.rtData.RightValue(fc);
                 }
@@ -610,6 +721,17 @@ namespace ASCompiler.compiler.builds
                     throw new BuildException(
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                         step.OpCode + "后缀操作应该是个变量."));
+                }
+
+                if ((v1 is Register && ((Register)v1)._regMember != null))
+                {
+                    var m = ((Register)v1)._regMember;
+                    if (m.isConst)
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "const成员" + m.name + "不能在此赋值"));
+                    }
                 }
 
                 if (
@@ -712,7 +834,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number))
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number, builder))
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "类型[" + v1.valueType + "]不能进行一元操作[+]");
@@ -761,7 +883,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number))
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number, builder))
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "类型[" + v1.valueType + "]不能进行一元操作[-]");
@@ -808,7 +930,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_number, builder)
                         ||
                         v1.valueType == RunTimeDataType.rt_boolean
                         )
@@ -854,7 +976,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_boolean)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_boolean, builder)
                         )
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -888,18 +1010,66 @@ namespace ASCompiler.compiler.builds
 
                 #endregion
             }
+            else if (step.OpCode == "delete")
+            {
+                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+
+                if (step.Arg1.IsReg)
+                {
+                    //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
+                    if (!
+                        (
+                            v1.valueType == RunTimeDataType.rt_void ||
+                            v1.valueType > RunTimeDataType.unknown   
+                        )
+                        )
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "类型[" + v1.valueType + "]不能进行一元操作[delete]");
+                    }
+
+                    if (v1 is Variable)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "成员[" + ((Variable)v1).name + "]不能进行一元操作[delete]");
+                    }
+
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+
+                    ASBinCode.OpStep op
+                        = new ASBinCode.OpStep(ASBinCode.OpCode.delete_prop, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+                    op.arg1 = v1;
+                    op.arg1Type = v1.valueType;
+                    op.arg2 = null;
+                    op.arg2Type = RunTimeDataType.unknown;
+
+                    op.reg = eax;
+                    op.regType = eax.valueType;
+
+                    env.block.opSteps.Add(op);
+
+                }
+                else
+                {
+                    throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "编译异常 此处应该是个寄存器"));
+                }
+            }
             else if (step.OpCode == "void" && !env.isEval)
             {
                 if (step.Arg1.IsReg)
                 {
-                    
+
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.OpStep op
                         = new ASBinCode.OpStep(ASBinCode.OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                    op.arg1 = new ASBinCode.rtData.RightValue( ASBinCode.rtData.rtUndefined.undefined );
+                    op.arg1 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
                     op.arg1Type = RunTimeDataType.rt_void;
                     op.arg2 = null;
                     op.arg2Type = RunTimeDataType.unknown;
@@ -920,7 +1090,7 @@ namespace ASCompiler.compiler.builds
             else if (step.OpCode == "++" || step.OpCode == "--")
             {
                 ASBinCode.IRightValue v1 = getRightValue(env, step.Arg1, step.token, builder);
-                if (!step.Arg1.IsReg)
+                if (!step.Arg1.IsReg || (v1 is Register && ((Register)v1)._regMember != null))
                 {
                     if (!(v1 is ILeftValue))
                     {
@@ -928,6 +1098,18 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             step.OpCode + "操作应该是个变量."));
                     }
+
+                    if ((v1 is Register && ((Register)v1)._regMember != null))
+                    {
+                        var m = ((Register)v1)._regMember;
+                        if (m.isConst)
+                        {
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "const成员" + m.name + "不能在此赋值"));
+                        }
+                    }
+
 
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
                     if (
@@ -1237,7 +1419,7 @@ namespace ASCompiler.compiler.builds
             ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
             if (step.Arg1.IsReg)
             {
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v1.valueType== RunTimeDataType.rt_boolean
                     )
@@ -1246,7 +1428,7 @@ namespace ASCompiler.compiler.builds
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                         v1.valueType + "不能执行位与操作"));
                 }
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v2.valueType== RunTimeDataType.rt_boolean 
                     )
@@ -1289,7 +1471,7 @@ namespace ASCompiler.compiler.builds
             ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
             if (step.Arg1.IsReg)
             {
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v1.valueType == RunTimeDataType.rt_boolean
                     )
@@ -1298,7 +1480,7 @@ namespace ASCompiler.compiler.builds
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                         v1.valueType + "不能执行位或操作"));
                 }
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v2.valueType == RunTimeDataType.rt_boolean
                     )
@@ -1340,7 +1522,7 @@ namespace ASCompiler.compiler.builds
             ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
             if (step.Arg1.IsReg)
             {
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v1.valueType == RunTimeDataType.rt_boolean
                     )
@@ -1349,7 +1531,7 @@ namespace ASCompiler.compiler.builds
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                         v1.valueType + "不能执行位异或操作"));
                 }
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v2.valueType == RunTimeDataType.rt_boolean
                     )
@@ -1394,7 +1576,7 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                         ||
                         v1.valueType== RunTimeDataType.rt_boolean
                         )
@@ -1403,7 +1585,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             v1.valueType + "不能执行移位操作"));
                     }
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                         ||
                         v2.valueType== RunTimeDataType.rt_boolean 
                         )
@@ -1444,7 +1626,7 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                         ||
                         v1.valueType== RunTimeDataType.rt_boolean
                         )
@@ -1453,7 +1635,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             v1.valueType +"不能执行移位操作"));
                     }
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                         ||
                         v2.valueType== RunTimeDataType.rt_boolean 
                         )
@@ -1494,7 +1676,7 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_uint)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_uint,builder)
                         ||
                         v1.valueType == RunTimeDataType.rt_boolean
                         )
@@ -1503,7 +1685,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             v1.valueType + "不能执行移位操作"));
                     }
-                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int)
+                    if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                         ||
                         v2.valueType == RunTimeDataType.rt_boolean
                         )

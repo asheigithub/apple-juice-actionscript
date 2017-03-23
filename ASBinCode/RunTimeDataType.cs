@@ -5,7 +5,9 @@ using System.Text;
 namespace ASBinCode
 {
 
-
+    /// <summary>
+    /// 凡大与unknow的都是对象类型
+    /// </summary>
     public struct RunTimeDataType
     {
         public override string ToString()
@@ -33,7 +35,7 @@ namespace ASBinCode
                 case unknown:
                     return "unknown";
                 default:
-                    return RTTI.ToString();
+                    return "rt_object";   //RTTI.ToString();
             }
 
 
@@ -50,6 +52,9 @@ namespace ASBinCode
         public const int rt_function = 7;
         public const int fun_void = 8;
         public const int unknown = 9;
+
+
+        public const int _OBJECT = unknown + 1;
 
         public readonly int RTTI;
         public RunTimeDataType(int rtti)

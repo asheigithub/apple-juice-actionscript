@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.operators
 {
@@ -14,22 +15,51 @@ namespace ASRuntime.operators
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
                     new ASBinCode.rtData.rtString("value is not a function")));
-                //return new error.InternalError(step.token, "value is not a function",
-                //    new ASBinCode.rtData.rtString("value is not a function"));
-                return;
             }
-            
-            ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-            
-            if (function.bindScope == null
-                ||
-                function.bindScope.blockId == frame.scope.blockId
-                )
+            else
             {
-                function.bind(frame.scope);
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+
+                if (function.bindScope == null
+                    ||
+                    function.bindScope.blockId == frame.scope.blockId
+                    )
+                {
+                    function.bind(frame.scope);
+                }
+
+                if (!function.ismethod)
+                {
+                    if (function.this_pointer == null)
+                    {
+                        var s = frame.scope;
+                        while (!(s.this_pointer.value is ASBinCode.rtti.Global_Object))
+                        {
+                            s = s.parent;
+                        }
+                        function.setThis(s.this_pointer);
+                    }
+                }
             }
-            
+            frame.endStep(step);
         }
+
+        public static void bind_this(Player player, StackFrame frame, ASBinCode.OpStep step)
+        {
+            var rv = step.arg1.getValue(frame.scope);
+            if (rv.rtType != RunTimeDataType.rt_function)
+            {
+                frame.throwError(new error.InternalError(step.token, "value is not a function",
+                    new ASBinCode.rtData.rtString("value is not a function")));
+            }
+            else
+            {
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+                function.setThis(frame.scope.this_pointer);
+            }
+            frame.endStep(step);
+        }
+
 
         public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
@@ -38,27 +68,18 @@ namespace ASRuntime.operators
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
                     new ASBinCode.rtData.rtString("value is not a function")));
-                
-                return;
             }
-
-            ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-            ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
-            ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
-
-            frame.tempCallFuncHeap = //new HeapSlot[ player.swc.blocks[funcDefine.blockid].scope.members.Count];
-                player.genHeapFromCodeBlock(player.swc.blocks[funcDefine.blockid]);
-
-            for (int i = 0; i < signature.parameters.Count; i++)
+            else
             {
-                if (signature.parameters[i].defaultValue != null)
-                {
-                    frame.tempCallFuncHeap[i].directSet(signature.parameters[i].defaultValue.getValue(null));
-                }
-            }
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
 
-            frame._tempSlot = new StackSlot();
-            frame._toCallFunc = funcDefine;
+                frame.funCaller = new FunctionCaller(player, frame, step.token);
+                frame.funCaller.function = function;
+                frame.funCaller._tempSlot = frame._tempSlot;
+                frame.funCaller.loadDefineFromFunction();
+                frame.funCaller.createParaScope();
+            }
+            frame.endStep(step);
         }
 
         public static void push_parameter(Player player, StackFrame frame, ASBinCode.OpStep step)
@@ -66,23 +87,9 @@ namespace ASRuntime.operators
             int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
             IRunTimeValue arg = step.arg1.getValue(frame.scope);
 
-            if (arg.rtType != frame._toCallFunc.signature.parameters[id].type)
-            {
-                if (!OpCast.CastValue(arg, frame._toCallFunc.signature.parameters[id].type,
-                    frame._tempSlot, frame, step.token, frame.scope
-                    ))
-                {
-                    frame.throwCastException(step.token, arg.rtType, frame._toCallFunc.signature.parameters[id].type);
-                    return;
-                }
-                frame.tempCallFuncHeap[id].directSet(frame._tempSlot.getValue());
-            }
-            else
-            {
-                frame.tempCallFuncHeap[id].directSet(arg);
-            }
-            frame._pushedArgs++;
-            //frame.tempCallFuncHeap[id] = OpCast.CastValue()
+            frame.funCaller.pushParameter(arg, id);
+
+            frame.endStep(step);
         }
 
 
@@ -95,68 +102,84 @@ namespace ASRuntime.operators
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
                     new ASBinCode.rtData.rtString("value is not a function")));
 
+                frame.endStep(step);
                 return;
             }
 
             ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
 
-            if (!frame._toCallFunc.Equals(funcDefine))
+            if (!frame.funCaller.function.Equals(function))
             {
                 frame.throwError(new error.InternalError( step.token,"运行时异常，调用函数不对" ));
+                frame.endStep(step);
                 return;
             }
 
-            if (frame._pushedArgs < funcDefine.signature.parameters.Count)
-            {
-                for (int i = frame._pushedArgs; i < funcDefine.signature.parameters.Count; i++)
-                {
-                    if (funcDefine.signature.parameters[frame._pushedArgs].defaultValue == null
-                    &&
-                    !funcDefine.signature.parameters[frame._pushedArgs].isPara
-                    &&
-                    funcDefine.signature.parameters[frame._pushedArgs].type != RunTimeDataType.rt_void
-                    )
-                    {
-                        frame.throwError(
-                            new error.InternalError(step.token,
-                            string.Format(
-                            "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
-                            player.swc.blocks[funcDefine.blockid].name, funcDefine.signature.parameters.Count, frame._pushedArgs
-                            )
-                            )
-                            );
-                        return;
-                    }
-                }
+            funbacker cb = new funbacker();
+            object[] args = new object[2];
+            args[0] = frame;
+            args[1] = step;
+            cb.args = args;
 
+            frame.funCaller.callbacker = cb;
+            frame.funCaller.returnSlot = step.reg.getISlot(frame.scope);
+            frame.funCaller.call();
+            
+            frame.funCaller = null;
+
+            
+        }
+
+        class funbacker : IBlockCallBack
+        {
+            public object args
+            {
+                get
+                ;
+
+                set
+                ;
+            }
+
+            public ASBinCode.rtti.Object obj
+            {
+                get;
+
+                set;
                 
             }
 
-            step.reg.getISlot(frame.scope).directSet(
-                TypeConverter.getDefaultValue(funcDefine.signature.returnType).getValue(null));
+            public IRunTimeScope objScope
+            {
+                get;
 
-            player.CallBlock( 
-                player.swc.blocks[ funcDefine.blockid ] ,
-                frame.tempCallFuncHeap, 
-                step.reg.getISlot(frame.scope),
-                function.bindScope, 
-                step.token);
+                set;
+                
+            }
 
-            frame.tempCallFuncHeap = null;
-            frame._toCallFunc = null;
-            frame._pushedArgs = 0;
-            frame._tempSlot = null;
+            public void call(object args)
+            {
+                object[] a = (object[])args;
+                ((StackFrame)a[0]).endStep((OpStep)a[1]);
+            }
         }
 
 
         public static void exec_return(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
+            IRunTimeValue result = step.arg1.getValue(frame.scope);
+            if (result.rtType == RunTimeDataType.rt_function) 
+            {
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
+                if (!function.ismethod)//闭包
+                {
+                    function.setThis(null);
+                }
+            }
 
-
-            frame.returnSlot.directSet(step.arg1.getValue(frame.scope));
-            
-            
+            frame.returnSlot.directSet(result);
+            frame.endStep(step);
         }
 
     }

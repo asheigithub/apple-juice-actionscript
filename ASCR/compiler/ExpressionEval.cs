@@ -10,7 +10,9 @@ namespace ASCompiler.compiler
     /// </summary>
     public class ExpressionEval
     {
-        public static ASBinCode.IRunTimeValue Eval(ASTool.AS3.AS3Expression expression)
+        public static ASBinCode.IRunTimeValue Eval(ASTool.AS3.AS3Expression expression,
+            Builder importBuilder=null
+            )
         {
 
             try
@@ -19,8 +21,21 @@ namespace ASCompiler.compiler
                 Builder builder = new Builder();
                 builder.isConsoleOut = false;
 
-                CompileEnv tempEnv = new CompileEnv(new CodeBlock(builder.getBlockId(),"temp"),true);
-                tempEnv.block.scope = new ASBinCode.scopes.OutPackageMemberScope();
+                int bid = builder.getBlockId();
+
+                if (importBuilder != null && importBuilder._currentImports.Count > 0)
+                {
+                    List<ASBinCode.rtti.Class> imps = new List<ASBinCode.rtti.Class>();
+                    imps.AddRange(importBuilder._currentImports.Peek());
+
+                    builder._currentImports.Push(imps);
+
+                    bid = importBuilder.bin.blocks.Count;
+
+                }
+
+                CompileEnv tempEnv = new CompileEnv(new CodeBlock(bid,"temp",-65535,true),true);
+                tempEnv.block.scope = new ASBinCode.scopes.StartUpBlockScope();
                 builder.buildExpressNotEval(tempEnv, expression);
                 tempEnv.completSteps();
                 tempEnv.block.totalRegisters = tempEnv.combieRegisters();
@@ -33,8 +48,16 @@ namespace ASCompiler.compiler
                     ASRuntime.Player player = new ASRuntime.Player();
                     player.isConsoleOut = false;
 
-                    CSWC tempswc = new CSWC();tempswc.blocks.Add(tempEnv.block);
-                    player.loadCode(tempswc);
+                    CSWC tempswc = new CSWC();
+                    if (importBuilder != null)
+                    {
+                        tempswc.blocks.AddRange(importBuilder.bin.blocks);
+                        tempswc.classes.AddRange(importBuilder.bin.classes);
+                        tempswc.functions.AddRange(importBuilder.bin.functions);
+                    }
+                    tempswc.blocks.Add(tempEnv.block);
+
+                    player.loadCode(tempswc,tempEnv.block);
 
                     IRunTimeValue result=  player.run2(value);
 

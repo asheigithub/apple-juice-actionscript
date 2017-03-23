@@ -1,8 +1,10 @@
 package
 {
-	import flash.display.
-	*;
+	import flash.display.*;
+	import ppp.PPC;
+	import ppp.pp2.*;
 	
+	[Doc]
 	/**
 	 * ...
 	 * @author 
@@ -12,55 +14,56 @@ package
 		
 		public function Main() 
 		{	
-			var f:FuncTest = new FuncTest();
+			test();
+		}
+		
+		public override function toString():String
+		{
+			return "tostring";
+		}
+		
+		private function test()
+		{
+			try 
+			{
+				var ff:Function = function() {
+					trace(this.Book);
+					return this.Book;
+				};
+				trace( ff());
+				
+			}
+			catch (e)
+			{
+				//trace(e);
+			}
+			finally
+			{
+				trace(this);
+			}
+			
+			//trace( new o()  );
+			
+			var simpleObj:Simple = new Simple();
+			simpleObj.func = ff;
+			simpleObj.func();
+			
+			
+			var obj:Object = new Object();
+			obj.fg = ff;
+			obj.fg();
+			
+			
+			trace( simpleObj.func === obj.func );
+			
+			
+			var p:PPC = new PPC(5);
+			trace(p.pf);
+			
+			trace(p.getFunc(7)(5).test);
+			
 		}
 		
 	}
 	
 }
-//
-//
-//try 
-//{
-	//var l:int;
-	//throw 3.3;
-	//l = 1+2+3+4;
-//}
-//catch(e:String)
-//{
-	//
-	//trace(e);
-	//
-	//try 
-	//{
-		//e = null;
-		//trace(e);
-		//throw "catch 中抛出";
-	//}
-	//catch (e:int)
-	//{
-		//var ll:int;
-		//trace(e);
-	//}
-	//finally
-	//{
-		//trace("incatch");
-	//}
-//}
-//catch(e:Number)
-//{
-	//trace(e,1,2,3,4);
-	//
-	//var e:String = "ff";
-	//
-	//ll = 0;
-	//trace(e);
-	//
-	//trace("haha" + e)
-//}
-//finally 
-//{
-	////***222***
-	//l = 1+2+3+4;
-	//trace(l);
-//}

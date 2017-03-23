@@ -257,5 +257,46 @@ namespace ASBinCode
         /// return
         /// </summary>
         function_return=67,
+
+        /// <summary>
+        /// 创建类的实例
+        /// </summary>
+        new_instance=68,
+        /// <summary>
+        /// 从class创建类的实例
+        /// </summary>
+        new_instance_class =69,
+        /// <summary>
+        /// 初始化静态类对象
+        /// </summary>
+        init_staticclass=70,
+        /// <summary>
+        /// 准备构造函数参数
+        /// </summary>
+        prepare_constructor_argement=71,
+        /// <summary>
+        /// 准备从class中创建类的构造函数
+        /// </summary>
+        prepare_constructor_class_argement = 72,
+        /// <summary>
+        /// 加class构造函数参数
+        /// </summary>
+        push_parameter_class=73,
+        /// <summary>
+        /// 访问对象成员
+        /// </summary>
+        access_dot =74,
+
+        access_dot_byname=75,
+
+        /// <summary>
+        /// method绑定this
+        /// </summary>
+        bind_this=76,
+
+        /// <summary>
+        /// 删除属性
+        /// </summary>
+        delete_prop=77,
     }
 }

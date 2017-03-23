@@ -363,6 +363,10 @@ Public Class Grammar
                     node = GrammarNode.GNodeWhiteSpace
                 ElseIf tk.StringValue = "label" Then
                     node = GrammarNode.GNodeLabel
+                ElseIf tk.StringValue = "this" Then
+                    node = GrammarNode.GNodeThis
+                ElseIf tk.StringValue = "super" Then
+                    node = GrammarNode.GNodeSuper
                 Else
                     Throw New Exception("错误的符号" & tk.StringValue)
                 End If
@@ -438,7 +442,22 @@ Public Class Grammar
 
 
 
-        Dim words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input)
+        Dim words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input.Trim())
+
+#Region "检查 this 和 super关键字"
+        For index = 0 To words.Count - 1
+            Dim token = words(index)
+            If token.Type = Token.TokenType.identifier Then
+                If token.StringValue = "this" Then
+                    token.Type = Token.TokenType.this_pointer
+                ElseIf token.StringValue = "super" Then
+                    token.Type = Token.TokenType.super_pointer
+                End If
+            End If
+        Next
+
+#End Region
+
 
 #Region "检测语句label"
 
@@ -827,6 +846,14 @@ Public Class Grammar
         End If
 
         If node.Type = GrammarNodeType.label And token.Type = Token.TokenType.label Then
+            Return True
+        End If
+
+        If node.Type = GrammarNodeType.this And token.Type = Token.TokenType.this_pointer Then
+            Return True
+        End If
+
+        If node.Type = GrammarNodeType.super And token.Type = Token.TokenType.super_pointer Then
             Return True
         End If
 
