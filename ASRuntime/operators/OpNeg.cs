@@ -9,7 +9,43 @@ namespace ASRuntime.operators
         public static void execNeg(StackFrame frame, ASBinCode.OpStep step,ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v = step.arg1.getValue(scope);
-            step.reg.getISlot(scope).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
+
+            if (v.rtType != ASBinCode.RunTimeDataType.rt_number)
+            {
+                OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execNeg_ValueOf_Callbacker);
+            }
+            else
+            {
+                step.reg.getISlot(scope).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
+                frame.endStep(step);
+            }
+        }
+
+        private static void _execNeg_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                OpCast.InvokeTwoToString(v1, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execNeg_ToString_Callbacker);
+            }
+            else
+            {
+
+                step.reg.getISlot(scope).setValue(
+                    -TypeConverter.ConvertToNumber(v1,frame,step.token)  
+                    );
+                frame.endStep(step);
+            }
+        }
+        private static void _execNeg_ToString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            step.reg.getISlot(scope).setValue(
+                    -TypeConverter.ConvertToNumber(v1, frame, step.token)
+                    //-((ASBinCode.rtData.rtNumber)v1).value
+                    );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
             frame.endStep(step);
         }
     }

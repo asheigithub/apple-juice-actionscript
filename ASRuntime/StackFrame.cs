@@ -11,6 +11,8 @@ namespace ASRuntime
     /// </summary>
     class StackFrame
     {
+        public delegate void DelegeExec(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope);
+
         internal enum Try_catch_finally
         {
             Try,
@@ -32,7 +34,8 @@ namespace ASRuntime
 
 
         internal operators.FunctionCaller funCaller;
-        internal StackSlot _tempSlot;
+        internal StackSlot _tempSlot1;
+        internal StackSlot _tempSlot2;
 
         private Stack<TryState> tryCatchState = new Stack<TryState>();
         /// <summary>
@@ -73,8 +76,12 @@ namespace ASRuntime
         /// 返回值存储槽
         /// </summary>
         public ASBinCode.ISLOT returnSlot;
-
+        /// <summary>
+        /// 如果非null,则退出时会回调。
+        /// </summary>
         internal IBlockCallBack callbacker;
+
+
 
         public bool IsEnd()
         {
@@ -91,12 +98,18 @@ namespace ASRuntime
             
         }
 
+        internal void endStep()
+        {
+            endStep(block.opSteps[codeLinePtr]);
+        }
+
         internal void endStep(OpStep step)
         {
             execing = false;
             doTryCatchReturn(step);
             codeLinePtr++;
         }
+
         private bool execing = false;
 
         private void exec(ASBinCode.OpStep step)
@@ -105,7 +118,9 @@ namespace ASRuntime
             {
                 throw new InvalidOperationException();
             }
+
             execing = true;
+
             switch (step.opCode)
             {
                 case OpCode.cast:
@@ -276,6 +291,10 @@ namespace ASRuntime
                             //codeLinePtr += step.jumoffset - 1;
                             endStep(step);
                             break;
+                        }
+                        else
+                        {
+                            endStep(step);
                         }
                     }
                     break;
@@ -839,7 +858,8 @@ namespace ASRuntime
             {
                 scope.stack[i].clear();
             }
-            _tempSlot.clear();
+            _tempSlot1.clear();
+            _tempSlot2.clear();
         }
 
     }

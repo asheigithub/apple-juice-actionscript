@@ -175,18 +175,18 @@ namespace ASRuntime
             int startOffset = 0;
             if (runtimeStack.Count > 0)
             {
-                startOffset = runtimeStack.Peek().scope.offset + runtimeStack.Peek().block.totalRegisters+1;
+                startOffset = runtimeStack.Peek().scope.offset + runtimeStack.Peek().block.totalRegisters+1+1;
             }
 
-            if (startOffset + calledblock.totalRegisters+1 >= stackSlots.Length)
+            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length)
             {
                 runtimeError = new error.InternalError(token, "stack overflow");
                 
             }
             else
             {
-                frame._tempSlot = stackSlots[startOffset + frame.block.totalRegisters];
-
+                frame._tempSlot1 = stackSlots[startOffset + frame.block.totalRegisters];
+                frame._tempSlot2 = stackSlots[startOffset + frame.block.totalRegisters+1];
                 runtimeStack.Push(frame);
                 currentRunFrame = frame;
             }
@@ -212,7 +212,7 @@ namespace ASRuntime
         internal bool step_toblockend()
         {
             int f = runtimeStack.Count - 1;
-            while (step())
+            while (step() && receive_error==null)
             {
                 if (runtimeStack.Count == f)
                 {
@@ -238,6 +238,14 @@ namespace ASRuntime
                 return false;
             }
 
+            if (receive_error != null)
+            {
+                var temp = receive_error;
+                receive_error = null;
+                currentRunFrame.receiveErrorFromStackFrame(temp);
+                return true;
+            }
+
             if (currentRunFrame.IsEnd()) //执行完成
             {
                 runtimeStack.Pop(); //出栈
@@ -250,9 +258,10 @@ namespace ASRuntime
 
                 }
 
+                currentRunFrame.close();
                 if (runtimeStack.Count > 0)
                 {
-                    currentRunFrame.close();//Eval需保留第一个栈的数值不清空
+                    
                     currentRunFrame = runtimeStack.Peek();
                 }
                 else
@@ -268,7 +277,7 @@ namespace ASRuntime
             return true;
         }
 
-        
+        private error.InternalError receive_error;
         internal void exitStackFrameWithError(error.InternalError error)
         {
             if (error.callStack == null) //收集调用栈
@@ -279,14 +288,12 @@ namespace ASRuntime
 
             runtimeStack.Pop();
 
-            
+            currentRunFrame.close();
             if (runtimeStack.Count > 0)
             {
-                currentRunFrame.close();//Eval需保留第一个栈的数值不清空
                 currentRunFrame = runtimeStack.Peek();
-
-                currentRunFrame.receiveErrorFromStackFrame(error);
-
+                receive_error = error;
+                //currentRunFrame.receiveErrorFromStackFrame(error);
             }
             else
             {
@@ -315,7 +322,7 @@ namespace ASRuntime
 
                 Stack<StackFrame> _temp = new Stack<StackFrame>();
 
-                while (err.callStack.Count>0)
+                while (err.callStack !=null && err.callStack.Count>0)
                 {
                     _temp.Push(err.callStack.Pop());
                 }

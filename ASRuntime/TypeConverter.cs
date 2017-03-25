@@ -95,9 +95,9 @@ namespace ASRuntime
                 case rt.unknown:
                     if (isthrow)
                     {
-                        frame.throwCastException(token, rt.unknown, rt.rt_int);
+                        frame.throwCastException(token, rt.unknown, rt.rt_boolean);
                     }
-                    return null;
+                    return ASBinCode.rtData.rtBoolean.False;
                 default:
                     //凡是大于unknown的都是对象
                     return ASBinCode.rtData.rtBoolean.True;
@@ -170,7 +170,7 @@ namespace ASRuntime
                 default:
                     //if (isthrow)
                     //{
-                    //    player.throwCastException(token, rt.unknown, rt.rt_int);
+                    //    frame.throwCastException(token, rt.unknown, rt.rt_int);
                     //}
                     return 0;
                     
@@ -331,7 +331,7 @@ namespace ASRuntime
                     {
                         //ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)src;
                         //var toStr = (ASBinCode.ClassMemberFinder.find(obj.value._class, "toString", obj.value._class));
-                        //if (toStr.type == rt.rt_function && !toStr.isStatic && toStr.isPublic 
+                        //if (toStr.type == rt.rt_function && !toStr.isStatic && toStr.isPublic
                         //    && !toStr.isConstructor
                         //    )
                         //{
@@ -374,7 +374,11 @@ namespace ASRuntime
         {
             if (src.rtType >rt.unknown || dsttype >rt.unknown)
             {
+#if DEBUG
                 throw new NotImplementedException();
+#else
+                return false;
+#endif
             }
 
             if (dsttype == rt.rt_void || src.rtType == dsttype)
@@ -423,6 +427,11 @@ namespace ASRuntime
                 return true;
             }
 
+            if (f > rt.unknown && t == ASBinCode.RunTimeDataType.rt_string)
+            {
+                return false;
+            }
+
             if (f == rt.rt_void && t > rt.unknown)
             {
                 return true;
@@ -434,15 +443,20 @@ namespace ASRuntime
             {
                 ASBinCode.rtti.Class cls1 = classfinder.getClassByRunTimeDataType(f);
                 ASBinCode.rtti.Class cls2 = classfinder.getClassByRunTimeDataType(t);
-                
-
                 //检查继承关系
-                throw new NotImplementedException();
+                
             }
 
             if (f > rt.unknown || t > rt.unknown)
             {
+               
+                
+#if DEBUG
                 throw new NotImplementedException();
+#else
+                return false;
+#endif
+
             }
 
             return implicitcoverttable[(int)f, (int)t];
@@ -463,24 +477,50 @@ namespace ASRuntime
             /*unknown*/ { false ,false ,false  ,false  ,false  ,false ,false  ,false    ,false,false  }
             };
         
-        public static rt getImplicitOpType(ASBinCode.RunTimeDataType v1, ASBinCode.RunTimeDataType v2, ASBinCode.OpCode op)
+        public static rt getImplicitOpType(ASBinCode.RunTimeDataType v1, ASBinCode.RunTimeDataType v2, 
+            ASBinCode.OpCode op , ASBinCode.IClassFinder lib)
         {
-            if (v1 > rt.unknown || v2 > rt.unknown)
+            if (v1 > rt.unknown)
             {
-                throw new NotImplementedException();
+                if (ObjectImplicit_ToNumber(v1, lib))
+                {
+                    v1 = rt.rt_number;
+                }
             }
-
+            if (v2 > rt.unknown)
+            {
+                if (ObjectImplicit_ToNumber(v2, lib))
+                {
+                    v2 = rt.rt_number;
+                }
+            }
 
             if (op == ASBinCode.OpCode.add)
             {
+                if (v1 > rt.unknown || v2 > rt.unknown)
+                {
+                    //**执行动态计算
+                    return rt.rt_void;
+                }
+
                 return implicit_opadd_coverttable[(int)v1, (int)v2];
             }
             else if (op == ASBinCode.OpCode.sub)
             {
+                if (v1 > rt.unknown || v2 > rt.unknown)
+                {
+                    return rt.unknown;
+                }
+
                 return implicit_opsub_coverttable[(int)v1, (int)v2];
             }
             else if (op == ASBinCode.OpCode.multi || op== ASBinCode.OpCode.div || op== ASBinCode.OpCode.mod)
             {
+                if (v1 > rt.unknown || v2 > rt.unknown)
+                {
+                    return rt.unknown;
+                }
+
                 return implicit_opmulti_coverttable[(int)v1, (int)v2];
             }
             else
@@ -537,5 +577,42 @@ namespace ASRuntime
             /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown  }
             };
 
+
+       
+        public static bool ObjectImplicit_ToNumber(rt classtype ,ASBinCode.IClassFinder bin)
+        {
+            if (classtype < rt.unknown)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+
+        public static bool Object_CanImplicit_ToPrimitive(rt classtype, ASBinCode.IClassFinder bin,out rt primitiveType)
+        {
+            if (classtype < rt.unknown)
+            {
+                primitiveType = rt.unknown;
+                return false;
+            }
+
+            primitiveType = rt.unknown;
+            return false;
+        }
+
+        /// <summary>
+        /// 对于可以隐式转换到基本类型的对象，执行隐式转换
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static ASBinCode.IRunTimeValue ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
+        {
+            return ASBinCode.rtData.rtUndefined.undefined;
+        }
+
     }
+
+    
 }

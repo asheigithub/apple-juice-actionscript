@@ -101,7 +101,7 @@ namespace ASCompiler.compiler.builds
             //***查找构造函数**
             if (_class.constructor != null)
             {
-                Field field = (Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
+                Field field = _class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
                 int blockid = field.refdefinedinblockid;
 
                 var signature =

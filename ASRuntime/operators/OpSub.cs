@@ -20,16 +20,23 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
-           
-            double    n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);          
-            double    n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
-            
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
+                frame._tempSlot1, frame._tempSlot2, step, _execSub_CallBacker);
+
+        }
+
+        private static void _execSub_CallBacker(
+            ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+
             {
-                step.reg.getISlot(scope).setValue(n1-n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
+                step.reg.getISlot(scope).setValue(n1 - n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
             frame.endStep(step);
         }
-
-
     }
 }

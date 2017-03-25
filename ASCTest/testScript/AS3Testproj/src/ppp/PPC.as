@@ -1,5 +1,6 @@
 package ppp
 {
+	import ppp.pp2.TC;
 	
 	/**
 	 * ...
@@ -33,8 +34,44 @@ package ppp
 			
 		}
 		
+		public function toString():*
+		{
+			var tc:TC = new TC(pf);
+			
+			
+			return "5" + ppi + tc.f() ;
+			//trace("invoke toString");
+			//return null;// "J ";
+		}
+		
+		public function valueOf()
+		{
+			trace("invoke valueof");
+			//return pf;
+			//trace("invoke valueof");
+			//return pf;
+			return new ippc();
+		}
+		
 	}
 
+}
+
+class ippc
+{
+	public function valueOf()
+	{
+		return new lll();
+	}
+}
+
+class lll
+{
+	public function valueOf()
+	{
+		return 4;
+	}
+	
 }
 
 trace("PPC outscope");

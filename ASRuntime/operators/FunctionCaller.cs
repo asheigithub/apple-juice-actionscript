@@ -22,13 +22,13 @@ namespace ASRuntime.operators
 
 
         public Player player;
-        private StackFrame frame;
+        private StackFrame invokerFrame;
         private SourceToken token;
 
-        public FunctionCaller(Player player,StackFrame frame,SourceToken token)
+        public FunctionCaller(Player player,StackFrame invokerFrame, SourceToken token)
         {
             this.player = player;
-            this.frame = frame;
+            this.invokerFrame = invokerFrame;
             this.token = token;
         }
 
@@ -57,25 +57,75 @@ namespace ASRuntime.operators
 
         public void pushParameter(IRunTimeValue argement,int id)
         {
-            if (argement.rtType != toCallFunc.signature.parameters[id].type)
-            {
-                if (!OpCast.CastValue(argement, toCallFunc.signature.parameters[id].type,
-                    _tempSlot, frame, token, frame.scope
-                    ))
-                {
-                    frame.throwCastException(token, argement.rtType, toCallFunc.signature.parameters[id].type);
-                    return;
-                }
-                CallFuncHeap[id].directSet(_tempSlot.getValue());
-            }
-            else
-            {
-                CallFuncHeap[id].directSet(argement);
-            }
+            //if (argement.rtType != toCallFunc.signature.parameters[id].type)
+            //{
+            //    if (!OpCast.CastValue(argement, toCallFunc.signature.parameters[id].type,
+            //        _tempSlot, invokerFrame, token, invokerFrame.scope
+            //        ))
+            //    {
+            //        invokerFrame.throwCastException(token, argement.rtType, toCallFunc.signature.parameters[id].type);
+            //        return;
+            //    }
+            //    CallFuncHeap[id].directSet(_tempSlot.getValue());
+            //}
+            //else
+            //{
+            //    CallFuncHeap[id].directSet(argement);
+            //}
+
+            CallFuncHeap[id].directSet(argement);
             pushedArgs++;
         }
 
-        public void call()
+        private int check_para_id = 0;
+
+        BlockCallBackBase cb;
+        private void check_para()
+        {
+            while (check_para_id < pushedArgs)
+            {
+                IRunTimeValue argement = CallFuncHeap[check_para_id].getValue();
+                if (argement.rtType != toCallFunc.signature.parameters[check_para_id].type)
+                {
+                    
+                    cb.args = argement;
+                    cb._intArg = check_para_id;
+                    cb.setCallBacker(check_para_callbacker);
+
+                    check_para_id++;
+
+                    OpCast.CastValue(argement, toCallFunc.signature.parameters[
+                        cb._intArg].type,
+
+                        invokerFrame, token, invokerFrame.scope, _tempSlot,cb);
+
+                    
+                    return;
+                }
+                else
+                {
+                    check_para_id++;
+                }
+            }
+            //***全部参数检查通过***
+            _doCall();
+        }
+
+        private void check_para_callbacker(BlockCallBackBase sender,object args)
+        {
+            if (sender.isSuccess)
+            {
+                CallFuncHeap[sender._intArg].directSet(_tempSlot.getValue());
+                check_para();
+            }
+            else
+            {
+                invokerFrame.throwCastException(token, ((IRunTimeValue)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
+                return;
+            }
+        }
+
+        private void _doCall()
         {
             if (pushedArgs < toCallFunc.signature.parameters.Count)
             {
@@ -85,10 +135,14 @@ namespace ASRuntime.operators
                     &&
                     !toCallFunc.signature.parameters[pushedArgs].isPara
                     &&
+                    (
                     toCallFunc.signature.parameters[pushedArgs].type != RunTimeDataType.rt_void
+                        ||
+                    toCallFunc.isMethod
+                    )
                     )
                     {
-                        frame.throwError(
+                        invokerFrame.throwError(
                             new error.InternalError(token,
                             string.Format(
                             "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
@@ -104,6 +158,9 @@ namespace ASRuntime.operators
 
                             )
                             );
+
+                        //***中断本帧本次代码执行进入try catch阶段
+                        invokerFrame.endStep();
                         return;
                     }
                 }
@@ -119,9 +176,17 @@ namespace ASRuntime.operators
                 CallFuncHeap,
                 returnSlot,
                 function.bindScope,
-                token,callbacker, function.this_pointer != null ? function.this_pointer : frame.scope.this_pointer);
+                token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer);
 
         }
+
+
+        public void call()
+        {
+            check_para();
+        }
+
+        
 
     }
 }

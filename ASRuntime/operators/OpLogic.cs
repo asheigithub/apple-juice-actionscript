@@ -21,6 +21,8 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
+        
+
 
         public static void execGT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -66,7 +68,10 @@ namespace ASRuntime.operators
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
-
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GTVoid_ValueOf_CallBacker);
+        }
+        private static void _GTVoid_ValueOf_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             if (
                 (
                 v1.rtType == ASBinCode.RunTimeDataType.rt_string
@@ -77,28 +82,35 @@ namespace ASRuntime.operators
                 v2.rtType == ASBinCode.RunTimeDataType.rt_string
                 &&
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
+                ||
+                (
+                v1.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                    )
+                ||
+                (v2.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                )
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
-                if (s1 == null || s2 == null)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
-                else if (string.CompareOrdinal(s1, s2) > 0)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_GTVoid_TwoString_Callbacker);
+                cb.args = frame;
+                cb.scope = scope;
+                cb.step = step;
 
+                OpCast.CastTwoValue(v1, v2, ASBinCode.RunTimeDataType.rt_string,
+                    frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, cb
+                    );
+
+                return;
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1,frame,step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
                 double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
                 if (n1 > n2)
@@ -113,10 +125,66 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
+        private static void _readTwoStringFromCallBacker(BlockCallBackBase sender,out string s1,out string s2)
+        {
+            
+            {
+                var rv = ((StackFrame)sender.args)._tempSlot1.getValue();
+                if (rv.rtType == ASBinCode.RunTimeDataType.rt_null)
+                {
+                    s1 = null;
+                }
+                else
+                {
+                    s1 = (((ASBinCode.rtData.rtString)rv).valueString());
+                }
+            }
+            
+            {
+                var rv = ((StackFrame)sender.args)._tempSlot2.getValue();
+                if (rv.rtType == ASBinCode.RunTimeDataType.rt_null)
+                {
+                    s2 = null;
+                }
+                else
+                {
+                    s2 = (((ASBinCode.rtData.rtString)rv).valueString());
+                }
+            }
+        }
+        private static void _GTVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        {
+            string s1;
+            string s2;
+            _readTwoStringFromCallBacker(sender,out s1,out s2);
+
+            if (s1 == null || s2 == null)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            else if (string.CompareOrdinal(s1, s2) > 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
+
+
+
+
         public static void execGE_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GEVoid_ValueOf_Callbacker);
+        }
+        private static void _GEVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
 
             if (
                 (
@@ -128,24 +196,30 @@ namespace ASRuntime.operators
                 v2.rtType == ASBinCode.RunTimeDataType.rt_string
                 &&
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
+                ||
+                (
+                v1.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                    )
+                ||
+                (v2.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                )
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+                
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_GEVoid_TwoString_Callbacker);
+                cb.args = frame;
+                cb.scope = scope;
+                cb.step = step;
 
-                if (s1 == null || s2 == null)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else if (string.CompareOrdinal(s1, s2) >= 0)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
+                OpCast.CastTwoValue(v1, v2, ASBinCode.RunTimeDataType.rt_string,
+                    frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, cb);
 
+                return;
             }
             else
             {
@@ -162,6 +236,26 @@ namespace ASRuntime.operators
                 }
             }
             frame.endStep(step);
+        }
+
+        private static void _GEVoid_TwoString_Callbacker(BlockCallBackBase sender,object args)
+        {
+            string s1, s2;
+            _readTwoStringFromCallBacker(sender, out s1, out s2);
+            if (s1 == null || s2 == null)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else if (string.CompareOrdinal(s1, s2) >= 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+
+            ((StackFrame)sender.args).endStep(sender.step);
         }
 
         public static void execLT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -206,34 +300,46 @@ namespace ASRuntime.operators
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LTVoid_ValueOf_Callbacker);
+        }
 
+        private static void _LTVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             if (
-                (
-                v1.rtType == ASBinCode.RunTimeDataType.rt_string
-                &&
-                (v2.rtType == ASBinCode.RunTimeDataType.rt_string || v2.rtType == ASBinCode.RunTimeDataType.rt_null)
-                )
-                ||
-                v2.rtType == ASBinCode.RunTimeDataType.rt_string
-                &&
-                (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
-                )
-            {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+               (
+               v1.rtType == ASBinCode.RunTimeDataType.rt_string
+               &&
+               (v2.rtType == ASBinCode.RunTimeDataType.rt_string || v2.rtType == ASBinCode.RunTimeDataType.rt_null)
+               )
+               ||
+               v2.rtType == ASBinCode.RunTimeDataType.rt_string
+               &&
+               (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
 
-                if (s1 == null || s2 == null)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
-                else if (string.CompareOrdinal(s1, s2) < 0)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
+               ||
+               (
+               v1.rtType > ASBinCode.RunTimeDataType.unknown
+                   &&
+                   !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                   )
+               ||
+               (v2.rtType > ASBinCode.RunTimeDataType.unknown
+                   &&
+                   !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+               )
+
+               )
+            {
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_LTVoid_TwoString_Callbacker);
+                cb.scope = scope;
+                cb.args = frame;
+                cb.step = step;
+
+                OpCast.CastTwoValue(v1, v2, ASBinCode.RunTimeDataType.rt_string, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, cb);
+
+                return;
             }
             else
             {
@@ -252,11 +358,36 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
+        private static void _LTVoid_TwoString_Callbacker(BlockCallBackBase sender,object args)
+        {
+            string s1;
+            string s2;
+            _readTwoStringFromCallBacker(sender, out s1, out s2);
+            if (s1 == null || s2 == null)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            else if (string.CompareOrdinal(s1, s2) < 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
+
+
         public static void execLE_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LEVoid_ValueOf_Callbacker);
+        }
+        private static void _LEVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             if (
                 (
                 v1.rtType == ASBinCode.RunTimeDataType.rt_string
@@ -267,23 +398,29 @@ namespace ASRuntime.operators
                 v2.rtType == ASBinCode.RunTimeDataType.rt_string
                 &&
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
+                ||
+                (
+                v1.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                    )
+                ||
+                (v2.rtType > ASBinCode.RunTimeDataType.unknown
+                    &&
+                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                )
                 )
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_LEVoid_TwoString_Callbacker);
+                cb.args = frame;
+                cb.step = step;
+                cb.scope = scope;
 
-                if (s1 == null || s2 == null)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else if (string.CompareOrdinal(s1, s2) <= 0)
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else
-                {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
-                }
+                OpCast.CastTwoValue(v1, v2, ASBinCode.RunTimeDataType.rt_string, frame, step.token,
+                    scope, frame._tempSlot1, frame._tempSlot2, cb);
+
+                return;
             }
             else
             {
@@ -301,31 +438,153 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
-
-        public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _LEVoid_TwoString_Callbacker(BlockCallBackBase sender,object args)
         {
-            if (testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
+            string s1, s2;
+            _readTwoStringFromCallBacker(sender, out s1, out s2);
+
+            if (s1 == null || s2 == null)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else if (string.CompareOrdinal(s1, s2) <= 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False );
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+
+
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
+
+        public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            var v1 = step.arg1.getValue(scope);
+            var v2 = step.arg2.getValue(scope);
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _EQ_ValueOf_Callbacker);
+        }
+        private static void _EQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            if (TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc))
+            {
+                v1 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v1, frame, step.token));
+            }
+            if (TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc))
+            {
+                v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
+            }
+
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                //***转成字符串比较***
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_EQ_TwoString_Callbacker);
+                cb.args = frame;
+                cb.scope = scope;
+                cb.step = step;
+
+                OpCast.CastTwoValue(v1, v2,
+                    ASBinCode.RunTimeDataType.rt_string,
+                    frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, cb);
+
+
+                return;
+            }
+            else
+            {
+                if (testEquals(v1, v2, frame, step, scope))
+                {
+                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                }
+                else
+                {
+                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                }
+                frame.endStep(step);
+            }
+        }
+
+        private static void _EQ_TwoString_Callbacker(BlockCallBackBase sender,object args)
+        {
+            string s1, s2;_readTwoStringFromCallBacker(sender, out s1, out s2);
+
+            if (string.CompareOrdinal(s1, s2) == 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            ((StackFrame)sender.args).endStep(sender.step);
         }
 
         public static void execNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (!testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
+            var v1 = step.arg1.getValue(scope);
+            var v2 = step.arg2.getValue(scope);
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _NotEQ_ValueOf_Callbacker);
+        }
+
+        private static void _NotEQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            if (TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc))
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                v1 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v1, frame, step.token));
+            }
+            if (TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc))
+            {
+                v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
+            }
+
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                //***转成字符串比较***
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_NOTEQ_TwoString_Callbacker);
+                cb.args = frame;
+                cb.scope = scope;
+                cb.step = step;
+
+                OpCast.CastTwoValue(v1, v2,
+                    ASBinCode.RunTimeDataType.rt_string,
+                    frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, cb);
+
+
+                return;
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                if (!testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
+                {
+                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                }
+                else
+                {
+                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                }
+                frame.endStep(step);
             }
-            frame.endStep(step);
+        }
+
+        private static void _NOTEQ_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        {
+            string s1, s2; _readTwoStringFromCallBacker(sender, out s1, out s2);
+
+            if (string.CompareOrdinal(s1, s2) != 0)
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            ((StackFrame)sender.args).endStep(sender.step);
         }
 
         public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -362,8 +621,8 @@ namespace ASRuntime.operators
 
         public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+            var n1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+            var n2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
             if (string.CompareOrdinal(n1,n2)==0)
             {
@@ -378,8 +637,8 @@ namespace ASRuntime.operators
 
         public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-            var n2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+            var n1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+            var n2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
 
             if (string.CompareOrdinal(n1, n2) != 0)
             {
@@ -402,6 +661,8 @@ namespace ASRuntime.operators
                 v1.rtType == ASBinCode.RunTimeDataType.rt_number || v1.rtType == ASBinCode.RunTimeDataType.rt_int
                 ||
                 v1.rtType == ASBinCode.RunTimeDataType.rt_uint
+                ||
+                TypeConverter.ObjectImplicit_ToNumber(v1.rtType,frame.player.swc)
                 )
 
                 &&
@@ -409,6 +670,8 @@ namespace ASRuntime.operators
                 v2.rtType == ASBinCode.RunTimeDataType.rt_number || v2.rtType == ASBinCode.RunTimeDataType.rt_int
                 ||
                 v2.rtType == ASBinCode.RunTimeDataType.rt_uint
+                ||
+                TypeConverter.ObjectImplicit_ToNumber(v2.rtType,frame.player.swc)
                 )
                 )
             {
@@ -426,8 +689,11 @@ namespace ASRuntime.operators
             }
             else if (v1.rtType == ASBinCode.RunTimeDataType.rt_string && v2.rtType == ASBinCode.RunTimeDataType.rt_string)
             {
-                string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+                //string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
+                //string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
+                string s1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value;
+                string s2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value;
+
                 if (string.CompareOrdinal(s1, s2) == 0)
                 {
                     return true;
@@ -532,11 +798,13 @@ namespace ASRuntime.operators
                 t1 == ASBinCode.RunTimeDataType.rt_int
                 || t1 == ASBinCode.RunTimeDataType.rt_uint || t1 == ASBinCode.RunTimeDataType.rt_boolean
                 || t1 == ASBinCode.RunTimeDataType.rt_number
+                || TypeConverter.ObjectImplicit_ToNumber(t1, frame.player.swc)
                 )
                 &&
                 (t2 == ASBinCode.RunTimeDataType.rt_int
                 || t2 == ASBinCode.RunTimeDataType.rt_uint || t2 == ASBinCode.RunTimeDataType.rt_boolean
                 || t2 == ASBinCode.RunTimeDataType.rt_number
+                || TypeConverter.ObjectImplicit_ToNumber(t2,frame.player.swc)
                 )
                 )
             {
@@ -552,9 +820,10 @@ namespace ASRuntime.operators
             }
             else if (t1 == ASBinCode.RunTimeDataType.rt_string && t2 == ASBinCode.RunTimeDataType.rt_string)
             {
-                return string.CompareOrdinal(TypeConverter.ConvertToString(v1, frame, step.token)
+                return string.CompareOrdinal(
+                    ((ASBinCode.rtData.rtString)v1).value
                     ,
-                    TypeConverter.ConvertToString(v2, frame, step.token)
+                    ((ASBinCode.rtData.rtString)v2).value
                     ) == 0;
             }
             else if (t1 == ASBinCode.RunTimeDataType.rt_string)
@@ -578,9 +847,9 @@ namespace ASRuntime.operators
                         return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
-                            TypeConverter.ConvertToString(v1, frame, step.token)
+                            ((ASBinCode.rtData.rtString)v1).value
                             ,
-                            TypeConverter.ConvertToString(v2, frame, step.token)
+                            ((ASBinCode.rtData.rtString)v2).value
                             ) == 0;
                     case ASBinCode.RunTimeDataType.rt_void:
                         return false;
@@ -613,9 +882,9 @@ namespace ASRuntime.operators
                         return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
-                            TypeConverter.ConvertToString(v1, frame, step.token)
+                           ((ASBinCode.rtData.rtString)v1).value
                             ,
-                            TypeConverter.ConvertToString(v2, frame, step.token)
+                            ((ASBinCode.rtData.rtString)v2).value
                             ) == 0;
                     case ASBinCode.RunTimeDataType.rt_void:
                         return false;

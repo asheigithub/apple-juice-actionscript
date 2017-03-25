@@ -54,10 +54,20 @@ namespace ASBinCode.rtti
 
         public readonly int index;
 
-        public ClassMember(string name,int index)
+        /// <summary>
+        /// 所属Class
+        /// </summary>
+        public readonly Class refClass;
+
+        public readonly Field bindField;
+
+        public ClassMember(string name,int index,Class refClass,Field bindField)
         {
+            
             this.index = index;
             this.name = name;
+            this.refClass = refClass;
+            this.bindField = bindField;
             _type = RunTimeDataType.rt_void;
         }
         public void setTypeWhenCompile(RunTimeDataType t)
@@ -65,17 +75,36 @@ namespace ASBinCode.rtti
             _type = t;
         }
 
+        //public ISLOT getISlot(IRunTimeScope scope)
+        //{
+        //    //throw new NotImplementedException();
+        //    if (scope.blockId == refClass.blockid)
+        //    {
+        //        return scope.memberData[index];
+        //    }
+        //    else
+        //    {
+        //        throw new InvalidOperationException();
+        //    }
+
+        //}
+
+        //public IRunTimeValue getValue(IRunTimeScope scope)
+        //{
+        //    return getISlot(scope).getValue();
+        //}
+
         private RunTimeDataType _type;
+        
         /// <summary>
         /// 成员类型
         /// </summary>
-        public RunTimeDataType type
+        public RunTimeDataType valueType
         {
             get
             {
                 return _type;
             }
         }
-
     }
 }

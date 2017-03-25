@@ -50,6 +50,14 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue( scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue( scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, 
+                frame._tempSlot1, frame._tempSlot2,step, _execAdd_CallBacker);
+        }
+
+        private static void _execAdd_CallBacker( 
+            ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2 ,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             ASBinCode.RunTimeDataType v1type = v1.rtType;
             ASBinCode.RunTimeDataType v2type = v2.rtType;
 
@@ -62,51 +70,73 @@ namespace ASRuntime.operators
                 v2type = ASBinCode.RunTimeDataType.rt_number;
             }
 
-            //if (v1.rtType == ASBinCode.RunTimeDataType.rt_void)
+            if (v1type > ASBinCode.RunTimeDataType.unknown || v2type > ASBinCode.RunTimeDataType.unknown)
+            {
+                //***调用toString()***
+                OpCast.InvokeTwoToString(v1, v2, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, step, _execAdd_InvokeToString_CallBacker);
+            }
+            //else if (v1type > ASBinCode.RunTimeDataType.unknown)
             //{
-            //    v1 = TypeConverter.ConvertToNumber(v1, player, step.token);
+            //    OpCast.InvokeTwoToString(v1, v2, frame, step.token, scope,
+            //        frame._tempSlot1, frame._tempSlot2, step, _execAdd_InvokeToString_CallBacker);
             //}
-            //if (v2.rtType == ASBinCode.RunTimeDataType.rt_void)
+            //else if (v2type > ASBinCode.RunTimeDataType.unknown)
             //{
-            //    v2 = TypeConverter.ConvertToNumber(v2, player, step.token);
-            //}
 
-            ASBinCode.RunTimeDataType finalType = 
+            //}
+            else
+            {
+                _execAdd_InvokeToString_CallBacker(v1, v2, frame, step, scope);
+            }
+        }
+        private static void _execAdd_InvokeToString_CallBacker(
+            ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            ASBinCode.RunTimeDataType v1type = v1.rtType;
+            ASBinCode.RunTimeDataType v2type = v2.rtType;
+
+            if (v1type == ASBinCode.RunTimeDataType.rt_void)
+            {
+                v1type = ASBinCode.RunTimeDataType.rt_number;
+            }
+            if (v2type == ASBinCode.RunTimeDataType.rt_void)
+            {
+                v2type = ASBinCode.RunTimeDataType.rt_number;
+            }
+
+            ASBinCode.RunTimeDataType finalType =
                 TypeConverter.getImplicitOpType(
                     v1type,
                     v2type,
-                    ASBinCode.OpCode.add
+                    ASBinCode.OpCode.add, frame.player.swc
                 );
-
-            //if (v1.rtType != finalType)
-            //{
-            //    v1 = OpCast.CastValue(v1, finalType, player, step.token,  scope);
-            //}
-            //if (v2.rtType != finalType)
-            //{
-            //    v2 = OpCast.CastValue(v2, finalType, player, step.token,  scope);
-            //}
 
             if (finalType == ASBinCode.RunTimeDataType.rt_number)
             {
                 step.reg.getISlot(scope).setValue(
-                    TypeConverter.ConvertToNumber(v1,frame,step.token)
-                    //((ASBinCode.rtData.rtNumber)v1).value 
+                    TypeConverter.ConvertToNumber(v1, frame, step.token)
                     +
                     TypeConverter.ConvertToNumber(v2, frame, step.token)
-                    //((ASBinCode.rtData.rtNumber)v2).value
 
-                    );// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value + ((ASBinCode.rtData.rtNumber)v2).value));
+                    );
             }
             else if (finalType == ASBinCode.RunTimeDataType.rt_string)
             {
-                string s1 = TypeConverter.ConvertToString(v1, frame, step.token);
-                string s2 = TypeConverter.ConvertToString(v2, frame, step.token);
 
-                if (s1 == null) { s1 = "null"; }
-                if (s2 == null) { s2 = "null"; }
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_Cast_TwoString_Callbacker);
+                cb.args = frame;
+                cb.scope = scope;
+                cb.step = step;
 
-                step.reg.getISlot(scope).setValue(s1+s2);//new ASBinCode.rtData.rtString(((ASBinCode.rtData.rtString)v1).valueString() + ((ASBinCode.rtData.rtString)v2).valueString()));
+                OpCast.CastTwoValue(v1, v2, finalType, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, cb
+                    );
+
+
+                return;
             }
             else if (finalType == ASBinCode.RunTimeDataType.rt_void)
             {
@@ -120,6 +150,39 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
+
+
+        private static void _Cast_TwoString_Callbacker(BlockCallBackBase sender,object args)
+        {
+            string v1;
+            {
+                var rv = ((StackFrame)sender.args)._tempSlot1.getValue();
+                if (rv.rtType == ASBinCode.RunTimeDataType.rt_null)
+                {
+                    v1 = "null";
+                }
+                else
+                {
+                    v1 = (((ASBinCode.rtData.rtString)rv).valueString());
+                }
+            }
+            string v2;
+            {
+                var rv = ((StackFrame)sender.args)._tempSlot2.getValue();
+                if (rv.rtType == ASBinCode.RunTimeDataType.rt_null)
+                {
+                    v2 = "null";
+                }
+                else
+                {
+                    v2 = (((ASBinCode.rtData.rtString)rv).valueString());
+                }
+            }
+
+            sender.step.reg.getISlot(sender.scope).setValue(v1 + v2);
+            ((StackFrame)sender.args).endStep(sender.step);
+
+        }
 
     }
 }

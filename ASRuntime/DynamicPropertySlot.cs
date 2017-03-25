@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode;
 
 namespace ASRuntime
 {
@@ -10,11 +11,23 @@ namespace ASRuntime
     /// </summary>
     class DynamicPropertySlot : ObjectMemberSlot
     {
-        public DynamicPropertySlot(ASBinCode.rtData.rtObject obj):base(obj)
+        internal bool _canDelete;
+        internal ASBinCode.IRunTimeValue backup;
+        public DynamicPropertySlot(ASBinCode.rtData.rtObject obj,bool _canDelete):base(obj)
         {
-
+            this._canDelete = _canDelete;
         }
 
         internal string _propname;
+
+        public override void directSet(IRunTimeValue value)
+        {
+            base.directSet(value);
+            if (!_canDelete && backup ==null)
+            {
+                backup = value;
+            }
+        }
+
     }
 }

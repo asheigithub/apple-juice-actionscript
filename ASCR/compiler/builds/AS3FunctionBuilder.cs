@@ -63,7 +63,7 @@ namespace ASCompiler.compiler.builds
 
                         returnValue= ExpressionBuilder.addCastOpStep(
                             env, returnValue, retType, 
-                            new SourceToken(expression.token.line, expression.token.ptr, expression.token.sourceFile));
+                            new SourceToken(expression.token.line, expression.token.ptr, expression.token.sourceFile),builder);
                     }
 
 

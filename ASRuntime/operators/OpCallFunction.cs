@@ -75,7 +75,7 @@ namespace ASRuntime.operators
 
                 frame.funCaller = new FunctionCaller(player, frame, step.token);
                 frame.funCaller.function = function;
-                frame.funCaller._tempSlot = frame._tempSlot;
+                frame.funCaller._tempSlot = frame._tempSlot1;
                 frame.funCaller.loadDefineFromFunction();
                 frame.funCaller.createParaScope();
             }
@@ -141,23 +141,7 @@ namespace ASRuntime.operators
                 set
                 ;
             }
-
-            public ASBinCode.rtti.Object obj
-            {
-                get;
-
-                set;
-                
-            }
-
-            public IRunTimeScope objScope
-            {
-                get;
-
-                set;
-                
-            }
-
+            
             public void call(object args)
             {
                 object[] a = (object[])args;

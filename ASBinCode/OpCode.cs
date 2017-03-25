@@ -298,5 +298,10 @@ namespace ASBinCode
         /// 删除属性
         /// </summary>
         delete_prop=77,
+
+        /// <summary>
+        /// 从对象转换到基本类型
+        /// </summary>
+        cast_primitive=78,
     }
 }

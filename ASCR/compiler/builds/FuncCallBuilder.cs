@@ -247,7 +247,7 @@ namespace ASCompiler.compiler.builds
                     if (arg.valueType != para.type)
                     {
                         arg = builds.ExpressionBuilder.addCastOpStep(env, arg, para.type,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                     }
                 }
 

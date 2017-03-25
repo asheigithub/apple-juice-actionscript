@@ -26,13 +26,19 @@ namespace ASRuntime.operators
             {
                 rtObject rtObj =
                     (rtObject)obj;
-                int memberidx = ((rtInt)step.arg2.getValue(scope)).value;
-
-                //step.reg.getISlot(scope).directSet(rtObj.objScope.memberData[memberidx].getValue());
+                
                 StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                 if (slot != null)
                 {
-                    slot.linkTo(rtObj.objScope.memberData[memberidx]);
+                    ISLOT lintoslot = ((Field)step.arg2).getISlot(rtObj.objScope);
+                    if (lintoslot == null)
+                    {
+                        frame.throwError((new error.InternalError(step.token,
+                         "没有获取到类成员数据"
+                         )));
+                    }
+
+                    slot.linkTo(lintoslot);
                 }
                 else
                 {
@@ -71,8 +77,8 @@ namespace ASRuntime.operators
                     if (rtObj.value is Global_Object)
                     {
                         Global_Object gobj = (Global_Object)rtObj.value;
-                        ISLOT propSlot = gobj.findpropertybyname(name);
-                        if (propSlot == null)
+                        
+                        if (!gobj.hasproperty(name))//propSlot == null)
                         {
                             frame.throwError(
                             new error.InternalError(
@@ -84,6 +90,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
+                            ISLOT propSlot = gobj[name];
                             StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                             if (slot != null)
                             {
@@ -121,7 +128,7 @@ namespace ASRuntime.operators
 
                                 if (!dobj.hasproperty(name))
                                 {
-                                    DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj);
+                                    DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj,true);
                                     heapslot._propname = name;
                                     heapslot.directSet(rtUndefined.undefined);
                                     dobj.createproperty(name, heapslot);
@@ -170,7 +177,7 @@ namespace ASRuntime.operators
                             StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                             if (slot != null)
                             {
-                                slot.linkTo(rtObj.objScope.memberData[member.index]);
+                                slot.linkTo( member.bindField.getISlot(rtObj.objScope) );
                             }
                             else
                             {

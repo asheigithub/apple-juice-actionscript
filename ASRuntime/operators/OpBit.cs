@@ -14,19 +14,30 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitAnd_ValueOf_CallBacker);
+        }
+        private static void _BitAnd_ValueOf_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             uint n1 = TypeConverter.ConvertToUInt(v1, frame, step.token);
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
-            int r =(int)( n1 & n2);
+            int r = (int)(n1 & n2);
             step.reg.getISlot(scope).setValue(r);
             frame.endStep(step);
         }
+
 
         public static void execBitOR(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitOR_ValueOf_CallBacker);
+        }
+        private static void _BitOR_ValueOf_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             uint n1 = TypeConverter.ConvertToUInt(v1, frame, step.token);
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
@@ -34,11 +45,19 @@ namespace ASRuntime.operators
             step.reg.getISlot(scope).setValue(r);
             frame.endStep(step);
         }
+
+
         public static void execBitXOR(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitXOR_ValueOf_Callbacker);
+        }
+
+        private static void _BitXOR_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             uint n1 = TypeConverter.ConvertToUInt(v1, frame, step.token);
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
@@ -46,10 +65,17 @@ namespace ASRuntime.operators
             step.reg.getISlot(scope).setValue(r);
             frame.endStep(step);
         }
+
         public static void execBitNot(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            
+
+            OpCast.InvokeTwoValueOf(v1, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitNot_ValueOf_Callbacker);
+        }
+
+        private static void _BitNot_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
 
             int r = ~n1;
@@ -62,6 +88,11 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitLeftShift_ValueOf_Callbacker);
+
+        }
+        private static void _BitLeftShift_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
             int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
             int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
 
@@ -71,12 +102,17 @@ namespace ASRuntime.operators
             step.reg.getISlot(scope).setValue(r);
 
             frame.endStep(step);
-
         }
+
         public static void execBitRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitRightShift_ValueOf_CallBacker);
+        }
+        private static void _BitRightShift_ValueOf_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
 
             int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
             int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
@@ -88,11 +124,16 @@ namespace ASRuntime.operators
 
             frame.endStep(step);
         }
-
         public static void execBitUnSignRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitUnSignRightShift_ValueOf_Callbacker);
+        }
+        private static void _BitUnSignRightShift_ValueOf_Callbacker(
+            ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
 
             uint n1 = TypeConverter.ConvertToUInt(v1, frame, step.token);
             int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
@@ -104,6 +145,5 @@ namespace ASRuntime.operators
 
             frame.endStep(step);
         }
-
     }
 }

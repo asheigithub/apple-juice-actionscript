@@ -206,7 +206,7 @@ namespace ASCompiler.compiler.builds
         {
             ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
             eax._regMember = member;
-            eax.setEAXTypeWhenCompile(member.type);
+            eax.setEAXTypeWhenCompile(member.valueType);
 
 
             OpStep op = new OpStep(OpCode.access_dot, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -214,8 +214,8 @@ namespace ASCompiler.compiler.builds
             op.regType = eax.valueType;
             op.arg1 = v1;
             op.arg1Type = v1.valueType;
-            op.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
-            op.arg2Type = RunTimeDataType.rt_int;
+            op.arg2 = member.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+            op.arg2Type = member.valueType; //RunTimeDataType.rt_int;
 
             env.block.opSteps.Add(op);
         }

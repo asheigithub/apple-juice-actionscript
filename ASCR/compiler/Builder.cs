@@ -409,8 +409,10 @@ namespace ASCompiler.compiler
                         if (item.Value.constructor != null)
                         {
                             //***查找构造函数id***
-                            Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
-                                item.Value.constructor.index];
+                            //Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
+                            //    item.Value.constructor.index];
+
+                            Field field = item.Value.constructor.bindField;
                             int blockid = field.refdefinedinblockid;
 
                             var signature =
@@ -1150,9 +1152,9 @@ namespace ASCompiler.compiler
                                     defaultv =
                                         builds.ExpressionBuilder.addCastOpStep(
                                             env, defaultv, rtVariable.valueType,
-                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile)
+                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile),this
                                             );
-
+                                    
                                 }
 
                                 //赋初始值
@@ -1241,9 +1243,9 @@ namespace ASCompiler.compiler
                                     defaultv =
                                         builds.ExpressionBuilder.addCastOpStep(
                                             env, defaultv, rtVariable.valueType,
-                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile)
+                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile),this
                                             );
-
+                                    
                                 }
 
                                 //赋初始值

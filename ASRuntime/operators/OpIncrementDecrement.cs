@@ -49,19 +49,52 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_boolean:
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
-                case ASBinCode.RunTimeDataType.unknown:
-                default:
                     {
                         double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
                     break;
+                case ASBinCode.RunTimeDataType.unknown:
+                default:
+                    {
+                        OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr, frame, step.token, 
+                            scope, frame._tempSlot1, 
+                            frame._tempSlot2, step, _execIncrement_ValueOf_Callbacker);
+                        return;
+                    }
             }
 
             frame.endStep(step);
 
         }
+        private static void _execIncrement_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                OpCast.InvokeTwoToString(v1, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execIncrement_ToString_Callbacker);
+            }
+            else
+            {
+                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
+                ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+                frame.endStep(step);
+            }
+            
+        }
+        private static void _execIncrement_ToString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+           StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+           )
+        {
+            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
+            ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+            frame.endStep(step);
+        }
+
 
 
         public static void execIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -142,19 +175,52 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_boolean:
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
-                case ASBinCode.RunTimeDataType.unknown:
-                default:
                     {
                         double n = TypeConverter.ConvertToNumber(v, frame, step.token);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
                     break;
+                case ASBinCode.RunTimeDataType.unknown:
+                default:
+                    {
+                        OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr, frame, step.token,
+                            scope, frame._tempSlot1,
+                            frame._tempSlot2, step, _execDecrement_ValueOf_Callbacker);
+                        return;
+                    }
             }
 
 
             frame.endStep(step);
         }
+
+        private static void _execDecrement_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                OpCast.InvokeTwoToString(v1, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execDecrement_toString_Callbacker);
+            }
+            else
+            {
+                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
+                ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+                frame.endStep(step);
+            }
+        }
+        private static void _execDecrement_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            )
+        {
+            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
+            ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+            frame.endStep(step);
+        }
+
 
 
         public static void execDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -245,8 +311,6 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_boolean:
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
-                case ASBinCode.RunTimeDataType.unknown:
-                default:
                     {
                         double n = TypeConverter.ConvertToNumber(v, frame, step.token);
 
@@ -256,8 +320,49 @@ namespace ASRuntime.operators
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
                     break;
+                case ASBinCode.RunTimeDataType.unknown:
+                default:
+                    {
+                        OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr,
+                            frame, step.token, scope, frame._tempSlot1, frame._tempSlot2,
+                            step, _execSuffixInc_ValueOf_Callbacker);
+                        return;
+                    }
             }
 
+            frame.endStep(step);
+        }
+
+        private static void _execSuffixInc_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                OpCast.InvokeTwoToString(v1, ASBinCode.rtData.rtNull.nullptr,
+                            frame, step.token, scope, frame._tempSlot1, frame._tempSlot2,
+                            step, _execSuffixInc_toString_Callbacker);
+            }
+            else
+            {
+                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+
+                step.reg.getISlot(scope).setValue(n);
+
+                ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
+                ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+                frame.endStep(step);
+            }
+        }
+
+        private static void _execSuffixInc_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+
+            step.reg.getISlot(scope).setValue(n);
+
+            ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
+            ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
             frame.endStep(step);
         }
 
@@ -363,8 +468,6 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_boolean:
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
-                case ASBinCode.RunTimeDataType.unknown:
-                default:
                     {
                         double n = TypeConverter.ConvertToNumber(v, frame, step.token);
 
@@ -374,8 +477,49 @@ namespace ASRuntime.operators
                         ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
                     }
                     break;
+                case ASBinCode.RunTimeDataType.unknown:
+                default:
+                    {
+                        OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr,
+                            frame, step.token, scope, frame._tempSlot1, frame._tempSlot2,
+                            step, _execSuffixDec_ValueOf_Callbacker);
+                        return;
+                    }
             }
 
+            frame.endStep(step);
+        }
+
+        private static void _execSuffixDec_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                OpCast.InvokeTwoToString(v1, ASBinCode.rtData.rtNull.nullptr,
+                            frame, step.token, scope, frame._tempSlot1, frame._tempSlot2,
+                            step, _execSuffixDec_toString_Callbacker);
+            }
+            else
+            {
+                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+
+                step.reg.getISlot(scope).setValue(n);
+
+                ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
+                ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
+                frame.endStep(step);
+            }
+        }
+
+        private static void _execSuffixDec_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+
+            step.reg.getISlot(scope).setValue(n);
+
+            ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
+            ((ASBinCode.ILeftValue)step.arg1).getISlot(scope).directSet(num);
             frame.endStep(step);
         }
 

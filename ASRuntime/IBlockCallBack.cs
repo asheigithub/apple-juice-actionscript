@@ -8,11 +8,38 @@ namespace ASRuntime
     {
         object args { get; set; }
 
-        ASBinCode.rtti.Object obj { get; set; }
-
-        ASBinCode.IRunTimeScope objScope { get; set; }
-
         void call(object args);
-
     }
+
+    struct BlockCallBackBase : IBlockCallBack
+    {
+        public delegate void dgeCallbacker(BlockCallBackBase sender, object args);
+        public bool isSuccess;
+
+        public int _intArg;
+        public ASBinCode.IRunTimeScope scope;
+        public ASBinCode.OpStep step;
+        private dgeCallbacker callbacker;
+
+        public void setCallBacker(dgeCallbacker callbacker)
+        {
+            this.callbacker = callbacker;
+        }
+
+        public object args
+        {
+            get
+            ;
+            set
+            ;
+        }
+
+        public void call(object args)
+        {
+            callbacker(this, args);
+            callbacker = null;
+        }
+    }
+
+
 }

@@ -94,17 +94,10 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-
-        class afterCreateStaticInstance : IBlockCallBack
+        abstract class  baseinstancecallbacker : IBlockCallBack
         {
             public object args
             {
-                get;
-                set;
-            }
-
-            public ASBinCode.rtti.Object obj
-            {
                 get
                 ;
 
@@ -112,16 +105,20 @@ namespace ASRuntime.operators
                 ;
             }
 
-            public IRunTimeScope objScope
-            {
-                get
-                ;
+            public ASBinCode.rtti.Object obj { get; set; }
 
-                set
-                ;
-            }
+            public ASBinCode.IRunTimeScope objScope { get; set; }
 
-            public void call(object args)
+            public ASBinCode.rtData.rtObject rtObject { get; set; }
+
+            public abstract void call(object args);
+            
+        }
+
+        class afterCreateStaticInstance : baseinstancecallbacker
+        {
+           
+            public override void call(object args)
             {
                 object[] a = (object[])args;
 
@@ -135,34 +132,11 @@ namespace ASRuntime.operators
             }
         }
 
-        class afterCreateOutScope : IBlockCallBack
+        class afterCreateOutScope : baseinstancecallbacker
         {
-            public object args
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-
-            public ASBinCode.rtti.Object obj
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-            public IRunTimeScope objScope
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-            public void call(object args)
+            
+            
+            public override void call(object args)
             {
                 object[] a = (object[])args;
 
@@ -176,29 +150,10 @@ namespace ASRuntime.operators
             }
         }
 
-        class afterCreateInstanceData : IBlockCallBack
+        class afterCreateInstanceData : baseinstancecallbacker
         {
-            public object args
-            {
-                get; set;
-            }
-
-            public ASBinCode.rtti.Object obj
-            {
-                get
-                ;
-                set
-                ;
-            }
-            public IRunTimeScope objScope
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-            public void call(object args)
+            
+            public override void call(object args)
             {
                 object[] a = (object[])args;
 
@@ -207,41 +162,15 @@ namespace ASRuntime.operators
                      (StackFrame)a[1],
                       (ASBinCode.OpStep)a[2],
                        obj,objScope,
-                        (ASBinCode.IRunTimeScope)a[4]
+                        (ASBinCode.IRunTimeScope)a[4],
+                        rtObject
                     );
             }
         }
 
-        class afterCallConstructor : IBlockCallBack
+        class afterCallConstructor : baseinstancecallbacker
         {
-            public object args
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-
-            public ASBinCode.rtti.Object obj
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-
-            public IRunTimeScope objScope
-            {
-                get
-                ;
-
-                set
-                ;
-            }
-
-            public void call(object args)
+            public override void call(object args)
             {
                 object[] a = (object[])args;
                 exec_step3(
@@ -430,12 +359,28 @@ namespace ASRuntime.operators
         }
 
         private static void exec_step2(Player player, StackFrame frame, ASBinCode.OpStep step,
-            ASBinCode.rtti.Object obj,IRunTimeScope objScope, ASBinCode.IRunTimeScope scope)
+            ASBinCode.rtti.Object obj,IRunTimeScope objScope, ASBinCode.IRunTimeScope scope ,ASBinCode.rtData.rtObject _object )
         {
+            //***添加Object的动态对象****
+            if (obj._class.classid == 0 && obj._class.staticClass !=null)
+            {
+                DynamicObject dobj = (DynamicObject)obj;
+                Global_Object global = (Global_Object)objScope.parent.this_pointer.value;
+
+                dobj.createproperty("toString", new DynamicPropertySlot(_object,false));
+                dobj["toString"].directSet(global["toString"].getValue());
+
+                dobj.createproperty("valueOf", new DynamicPropertySlot(_object, false));
+                dobj["valueOf"].directSet(global["valueOf"].getValue());
+            }
+
+
             //调用构造函数
             if (obj._class.constructor != null)
             {
-                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
+                ASBinCode.rtData.rtFunction function =
+                    (ASBinCode.rtData.rtFunction)obj._class.constructor.bindField.getValue(objScope);
+                    //(ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
                 
 
                 HeapSlot _temp = new HeapSlot();
@@ -474,7 +419,7 @@ namespace ASRuntime.operators
 
         private static ASBinCode.rtData.rtObject makeObj(Player player, StackFrame frame,
             ASBinCode.rtti.Class cls,SourceToken token,
-            IBlockCallBack callbacker,out ASBinCode.IRunTimeScope objScope)
+            baseinstancecallbacker callbacker,out ASBinCode.IRunTimeScope objScope)
         {
             ASBinCode.rtti.Object obj=null;// = new ASBinCode.rtti.Object(cls);
             if (cls.dynamic)
@@ -495,7 +440,7 @@ namespace ASRuntime.operators
                 obj.memberData[i] = new ObjectMemberSlot(result);
                 if(cls.classMembers[i].defaultValue==null)
                 {
-                    obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.classMembers[i].type).getValue(null));
+                    obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.classMembers[i].valueType).getValue(null));
                 }
             }
 
@@ -526,11 +471,15 @@ namespace ASRuntime.operators
                 ,
                 result
                 );
+
+            result.objScope = objScope;
             if (callbacker != null)
             {
+                callbacker.rtObject = result;
                 callbacker.objScope = objScope;
+                
             }
-            result.objScope = objScope;
+            
             return result;
         }
 

@@ -25,20 +25,10 @@ namespace ASBinCode.rtti
             
         }
 
-        public ISLOT findpropertybyname(string name)
-        {
-            if (propertys.ContainsKey(name))
-            {
-                return propertys[name];
-            }
-            return null;
-        }
-
-        
 
         public override string ToString()
         {
-            return "[global @" +objectid.ToString("x")+ "]";
+            return "[object global]";
         }
 
     }

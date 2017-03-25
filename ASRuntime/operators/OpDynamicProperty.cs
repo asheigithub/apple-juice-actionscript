@@ -17,8 +17,17 @@ namespace ASRuntime.operators
                 if (slot.linktarget is DynamicPropertySlot)
                 {
                     DynamicPropertySlot link = (DynamicPropertySlot)slot.linktarget;
-
-                    ((ASBinCode.rtti.DynamicObject)link.obj.value).deleteProperty(link._propname); 
+                    if (link._canDelete)
+                    {
+                        ((ASBinCode.rtti.DynamicObject)link.obj.value).deleteProperty(link._propname);
+                    }
+                    else
+                    {
+                        if (link.backup != null)
+                        {
+                            link.directSet(link.backup);
+                        }
+                    }
                 }
                 else
                 {

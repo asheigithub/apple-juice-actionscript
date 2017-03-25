@@ -95,21 +95,144 @@ namespace ASCompiler.compiler.builds
 
         }
 
-        public static IRightValue addCastOpStep(CompileEnv env, IRightValue src, RunTimeDataType dstType, SourceToken token)
+        public static IRightValue addCastOpStep(CompileEnv env, IRightValue src, RunTimeDataType dstType, 
+            SourceToken token,Builder builder)
         {
-            OpStep op =
-                new OpStep(OpCode.cast, token);
+            if (dstType < RunTimeDataType.unknown && dstType != RunTimeDataType.rt_void)
+            {
+                src = addCastToPrimitive(env, src,
+                            token,builder
+                            );
+            }
 
-            Register tempreg = env.getAdditionalRegister();
-            tempreg.setEAXTypeWhenCompile(dstType);
-            op.reg = tempreg;
-            op.regType = dstType;
+            if (src.valueType != dstType)
+            {
+                OpStep op =
+                    new OpStep(OpCode.cast, token);
 
-            op.arg1 = src;
-            op.arg1Type = src.valueType;
-            env.block.opSteps.Add(op);
+                Register tempreg = env.getAdditionalRegister();
+                tempreg.setEAXTypeWhenCompile(dstType);
+                op.reg = tempreg;
+                op.regType = dstType;
 
-            return tempreg;
+                op.arg1 = src;
+                op.arg1Type = src.valueType;
+                env.block.opSteps.Add(op);
+
+                return tempreg;
+            }
+            else
+            {
+                return src;
+            }
+        }
+
+        public static IRightValue addCastToPrimitive(CompileEnv env, IRightValue src, SourceToken token,Builder builder)
+        {
+            RunTimeDataType dstType;
+            if (ASRuntime.TypeConverter.Object_CanImplicit_ToPrimitive(src.valueType, builder,out dstType))
+            {
+                OpStep op =
+                    new OpStep(OpCode.cast_primitive, token);
+
+                Register tempreg = env.getAdditionalRegister();
+                tempreg.setEAXTypeWhenCompile(dstType);
+                op.reg = tempreg;
+                op.regType = dstType;
+
+                op.arg1 = src;
+                op.arg1Type = src.valueType;
+                env.block.opSteps.Add(op);
+
+                return tempreg;
+            }
+            else
+            {
+                return src;
+            }
+        }
+
+        public static IRightValue addValueOfOpStep(CompileEnv env, 
+            IRightValue src,  
+            SourceToken token,Builder builder)
+        {
+            if (src.valueType > RunTimeDataType.unknown )
+            {
+                ASBinCode.rtti.Class _class = (builder.getClassByRunTimeDataType(src.valueType));
+                var valueOf= ClassMemberFinder.find(_class, "valueOf", _class);
+                ASBinCode.rtti.FunctionSignature signature = null;
+                if (valueOf != null)
+                {
+                    signature  = builder.dictSignatures[valueOf.bindField.refdefinedinblockid][valueOf.bindField];
+                }
+
+                if (valueOf != null
+                    && valueOf.valueType == RunTimeDataType.rt_function
+                        && !valueOf.isStatic
+                        && valueOf.isPublic
+                        && !valueOf.isConstructor
+                        && !valueOf.isGetter
+                        && !valueOf.isSetter
+                        && signature.returnType<RunTimeDataType.unknown
+                        && signature.returnType != RunTimeDataType.rt_void
+                        && signature.returnType != RunTimeDataType.fun_void
+                    )
+                {
+                    Register dot_eax = null;
+                    {
+                        OpStep op = new OpStep(OpCode.access_dot, token);
+                        var eax = env.getAdditionalRegister();
+                        eax.setEAXTypeWhenCompile(valueOf.valueType);
+
+                        dot_eax = eax;
+
+                        op.reg = eax;
+                        op.regType = eax.valueType;
+                        op.arg1 = src;
+                        op.arg1Type = src.valueType;
+                        op.arg2 = valueOf.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+                        op.arg2Type = valueOf.valueType; //RunTimeDataType.rt_int;
+
+                        env.block.opSteps.Add(op);
+                    }
+                    {
+                        OpStep op = new OpStep(OpCode.call_function,
+                        new SourceToken(token.line, token.ptr, token.sourceFile));
+
+                        OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
+                        opMakeArgs.arg1 = dot_eax;
+                        opMakeArgs.arg1Type = RunTimeDataType.rt_function;
+                        env.block.opSteps.Add(opMakeArgs);
+
+
+                        var eax = env.getAdditionalRegister();
+                        eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                        op.reg = eax;
+                        op.regType = RunTimeDataType.rt_void;
+
+                        //***调用valueof***
+                        
+                        var returnvalueType = signature.returnType;
+                        op.regType = RunTimeDataType.rt_void;
+                        eax.setEAXTypeWhenCompile(returnvalueType);
+
+                        op.arg1 = dot_eax;
+                        op.arg1Type = RunTimeDataType.rt_function;
+                        env.block.opSteps.Add(op);
+
+                        return eax;
+                    }
+                }
+                else
+                {
+                    return src;
+                }
+            }
+            else
+            {
+                return src;
+            }
+            
         }
 
         public void buildIFGoto(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
@@ -120,7 +243,7 @@ namespace ASCompiler.compiler.builds
             {
                 //插入转型代码
                 rv = addCastOpStep(env, rv, RunTimeDataType.rt_boolean,
-                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
             }
 
             OpStep op = new OpStep(OpCode.if_jmp, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -199,7 +322,7 @@ namespace ASCompiler.compiler.builds
                     {
                         //插入转型代码
                         rv = addCastOpStep(env, rv, eax.valueType,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
 
                     }
 
@@ -263,7 +386,7 @@ namespace ASCompiler.compiler.builds
                         {
                             //插入转型代码
                             rv = addCastOpStep(env, rv, lv.valueType,
-                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
 
                         }
 
@@ -310,13 +433,14 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
                 ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
 
+                v1 = addValueOfOpStep(env, v1, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
+                v2 = addValueOfOpStep(env, v2, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
+
+
                 if (step.Arg1.IsReg)
                 {
-
-
-
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, ASBinCode.OpCode.add);
+                    var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, ASBinCode.OpCode.add,builder);
                     if (rt == ASBinCode.RunTimeDataType.unknown)
                     {
                         throw new BuildException(
@@ -328,11 +452,11 @@ namespace ASCompiler.compiler.builds
                     //操作类型转换
                     if (v1.valueType != rt)
                     {
-                        v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                     }
                     if (v2.valueType != rt)
                     {
-                        v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                     }
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
@@ -376,12 +500,10 @@ namespace ASCompiler.compiler.builds
             {
                 ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
                 ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
-
-
-
+                
                 if (step.Arg1.IsReg)
                 {
-                    var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, ASBinCode.OpCode.sub);
+                    var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, ASBinCode.OpCode.sub,builder);
                     if (rt == ASBinCode.RunTimeDataType.unknown)
                     {
                         throw new BuildException(
@@ -392,11 +514,11 @@ namespace ASCompiler.compiler.builds
                     //操作类型转换
                     if (v1.valueType != rt)
                     {
-                        v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                     }
                     if (v2.valueType != rt)
                     {
-                        v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                     }
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
@@ -470,7 +592,7 @@ namespace ASCompiler.compiler.builds
                             "不支持的操作类型 " + step.Type + " " + step.OpCode));
                 }
 
-                var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, code);
+                var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, code,builder);
                 if (rt == ASBinCode.RunTimeDataType.unknown)
                 {
                     throw new BuildException(
@@ -481,11 +603,11 @@ namespace ASCompiler.compiler.builds
                 //操作类型转换
                 if (v1.valueType != rt)
                 {
-                    v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                 }
                 if (v2.valueType != rt)
                 {
-                    v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
                 }
 
                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
@@ -738,7 +860,8 @@ namespace ASCompiler.compiler.builds
                         v1.valueType != RunTimeDataType.rt_number &&
                         v1.valueType != RunTimeDataType.rt_int &&
                         v1.valueType != RunTimeDataType.rt_uint &&
-                        v1.valueType != RunTimeDataType.rt_void
+                        v1.valueType != RunTimeDataType.rt_void &&
+                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
                         )
                 {
                     throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -847,7 +970,7 @@ namespace ASCompiler.compiler.builds
                     {
                         //相当于转型成Number后赋值
                         v1 = addCastOpStep(env, v1, RunTimeDataType.rt_number,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
 
                         ASBinCode.OpStep op
                         = new ASBinCode.OpStep(ASBinCode.OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -892,12 +1015,13 @@ namespace ASCompiler.compiler.builds
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_number);
 
-                    if (v1.valueType != RunTimeDataType.rt_number)
-                    {
-                        //插入转型代码
-                        v1 = addCastOpStep(env, v1, RunTimeDataType.rt_number,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
-                    }
+                    
+                    //if (v1.valueType != RunTimeDataType.rt_number)
+                    //{
+                    //    //插入转型代码
+                    //    v1 = addCastOpStep(env, v1, RunTimeDataType.rt_number,
+                    //        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
+                    //}
 
                     ASBinCode.OpStep op
                         = new ASBinCode.OpStep(ASBinCode.OpCode.neg, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -1116,7 +1240,8 @@ namespace ASCompiler.compiler.builds
                         v1.valueType != RunTimeDataType.rt_number &&
                         v1.valueType != RunTimeDataType.rt_int &&
                         v1.valueType != RunTimeDataType.rt_uint &&
-                        v1.valueType != RunTimeDataType.rt_void
+                        v1.valueType != RunTimeDataType.rt_void &&
+                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
                         )
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -1239,6 +1364,8 @@ namespace ASCompiler.compiler.builds
                     //比较两个表达式，确定 expression1 是否大于 expression2；如果是，则结果为 true。如果 expression1 小于等于 expression2，则结果为 false。 
                     //如果两个操作数的类型都为 String，则使用字母顺序比较操作数；所有大写字母都排在小写字母的前面。否则，首先将操作数转换为数字，然后进行比较。
 
+                    RunTimeDataType t1;ASRuntime.TypeConverter.Object_CanImplicit_ToPrimitive(v1.valueType, builder, out t1);
+                    RunTimeDataType t2;ASRuntime.TypeConverter.Object_CanImplicit_ToPrimitive(v1.valueType, builder, out t2);
 
                     //如果v1和v2,有任何一个是数值或布尔类型，则转成数字，否则动态计算。
                     if (
@@ -1249,7 +1376,14 @@ namespace ASCompiler.compiler.builds
                         v2.valueType == RunTimeDataType.rt_boolean ||
                         v2.valueType == RunTimeDataType.rt_int ||
                         v2.valueType == RunTimeDataType.rt_uint ||
-                        v2.valueType == RunTimeDataType.rt_number
+                        v2.valueType == RunTimeDataType.rt_number ||
+                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType,builder.bin)
+                        ||
+                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder.bin)
+                        ||
+                        t1== RunTimeDataType.rt_boolean
+                        ||
+                        t2 == RunTimeDataType.rt_boolean
                         )
                     {
 
@@ -1257,14 +1391,14 @@ namespace ASCompiler.compiler.builds
                         {
                             //插入转型代码
                             v1 = addCastOpStep(env, v1, RunTimeDataType.rt_number,
-                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
                         }
 
                         if (v2.valueType != RunTimeDataType.rt_number)
                         {
                             //插入转型代码
                             v2 = addCastOpStep(env, v2, RunTimeDataType.rt_number,
-                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)); //op.reg;
+                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
                         }
                         //opcode = step.OpCode ==">"? OpCode.gt : OpCode.lt;
 
@@ -1335,12 +1469,14 @@ namespace ASCompiler.compiler.builds
                         v1.valueType == RunTimeDataType.rt_int
                         || v1.valueType == RunTimeDataType.rt_uint
                         || v1.valueType == RunTimeDataType.rt_number
+                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
                         )
                         &&
                         (
                         v2.valueType == RunTimeDataType.rt_int
                         || v2.valueType == RunTimeDataType.rt_uint
                         || v2.valueType == RunTimeDataType.rt_number
+                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder.bin)
                         )
                         )
                     {
@@ -1438,7 +1574,7 @@ namespace ASCompiler.compiler.builds
                         v2.valueType + "不能执行位与操作"));
                 }
 
-
+                
                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 

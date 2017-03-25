@@ -43,7 +43,8 @@ namespace ASCompiler.compiler.builds
                     throw new Exception("异常的成员类型");
                 }
 
-                ((Variable)env.block.scope.members[member.index]).valueType = member.type;
+                //((Variable)env.block.scope.members[member.index]).valueType = member.valueType;
+                member.bindField.valueType = member.valueType;
             }
         }
 
@@ -231,7 +232,7 @@ namespace ASCompiler.compiler.builds
                         method.isStatic = as3function.Access.IsStatic;
                         
                         //field.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
-                        ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(method.name,method.indexOfMembers);
+                        ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(method.name,method.indexOfMembers,cls,method);
 
                         member.setTypeWhenCompile(RunTimeDataType.rt_function);
                         member.isInternal = method.isInternal;
@@ -307,7 +308,7 @@ namespace ASCompiler.compiler.builds
                     field.isStatic = variable.Access.IsStatic;
                     
                     //field.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
-                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(field.name,field.indexOfMembers);
+                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(field.name,field.indexOfMembers,cls,field);
 
                     member.isInternal = field.isInternal;
                     member.isPrivate = field.isPrivate;
@@ -347,7 +348,7 @@ namespace ASCompiler.compiler.builds
                     constfield.isPublic = constant.Access.IsPublic;
                     constfield.isStatic = constant.Access.IsStatic;
 
-                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(constfield.name,constfield.indexOfMembers);
+                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(constfield.name,constfield.indexOfMembers,cls,constfield);
 
                     member.isInternal = constfield.isInternal;
                     member.isPrivate = constfield.isPrivate;
