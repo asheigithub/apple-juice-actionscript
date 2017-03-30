@@ -205,7 +205,7 @@ namespace ASRuntime.operators
 
                         )
                     {
-                        function = (rtFunction)toStr.bindField.getValue(obj.objScope);
+                        function = (rtFunction)((ILeftValue)toStr.bindField).getValue(obj.objScope);
                     }
                     else
                     {
@@ -563,7 +563,7 @@ namespace ASRuntime.operators
                 && !valueOf.isSetter
                 )
             {
-                function = (rtFunction)valueOf.bindField.getValue(obj.objScope);
+                function = (rtFunction)((ILeftValue)valueOf.bindField).getValue(obj.objScope);
             }
             else
             {
@@ -777,7 +777,7 @@ namespace ASRuntime.operators
                 && !toString.isSetter
                 )
             {
-                function = (rtFunction)toString.bindField.getValue(obj.objScope);
+                function = (rtFunction)((ILeftValue)toString.bindField).getValue(obj.objScope);
             }
             else
             {

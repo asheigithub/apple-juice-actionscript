@@ -41,8 +41,9 @@ namespace ASCompiler.compiler
 
 
         internal Dictionary<ASTool.AS3.AS3Parameter,utils.Tuple< ASBinCode.rtti.FunctionParameter,List<ASBinCode.rtti.Class>>>
-            _toEvalDefaultParameters = new Dictionary<ASTool.AS3.AS3Parameter, utils.Tuple<ASBinCode.rtti.FunctionParameter, List<ASBinCode.rtti.Class>>>();  
+            _toEvalDefaultParameters = new Dictionary<ASTool.AS3.AS3Parameter, utils.Tuple<ASBinCode.rtti.FunctionParameter, List<ASBinCode.rtti.Class>>>();
 
+        internal Dictionary<IRightValue, List<OpStep>> _propLines = new Dictionary<IRightValue, List<OpStep>>();
 
 
         /// <summary>
@@ -203,6 +204,10 @@ namespace ASCompiler.compiler
                     for (int i = 0; i < scls.classMembers.Count; i++)
                     {
                         var m = scls.classMembers[i];
+                        if (m.bindField is ClassPropertyGetter)
+                        {
+                            continue;
+                        }
                         var expr = _buildingmembers[m];
                         IRunTimeValue defaultvalue=null;
                         if (expr is ASTool.AS3.AS3Const)
@@ -235,6 +240,10 @@ namespace ASCompiler.compiler
                     for (int i = 0; i < scls.classMembers.Count; i++)
                     {
                         var m = scls.classMembers[i];
+                        if (m.bindField is ClassPropertyGetter)
+                        {
+                            continue;
+                        }
                         var expr = _buildingmembers[m];
                         
                         if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
@@ -308,6 +317,12 @@ namespace ASCompiler.compiler
                     for (int i = 0; i < cls.classMembers.Count; i++)
                     {
                         var m = cls.classMembers[i];
+
+                        if (m.bindField is ClassPropertyGetter)
+                        {
+                            continue;
+                        }
+
                         var expr = _buildingmembers[m];
                         IRunTimeValue defaultvalue = null;
                         if (expr is ASTool.AS3.AS3Const)
@@ -338,6 +353,11 @@ namespace ASCompiler.compiler
                     for (int i = 0; i < cls.classMembers.Count; i++)
                     {
                         var m = cls.classMembers[i];
+                        if (m.bindField is ClassPropertyGetter)
+                        {
+                            continue;
+                        }
+
                         var expr = _buildingmembers[m];
 
                         if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
@@ -412,7 +432,7 @@ namespace ASCompiler.compiler
                             //Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
                             //    item.Value.constructor.index];
 
-                            Field field = item.Value.constructor.bindField;
+                            ClassMethodGetter field = (ClassMethodGetter)item.Value.constructor.bindField;
                             int blockid = field.refdefinedinblockid;
 
                             var signature =
@@ -506,21 +526,78 @@ namespace ASCompiler.compiler
             {
                 //之前检查过是命名函数所以不需再检查
 
-                ASBinCode.IMember member = MemberFinder.find(as3function.Name, env);
+                ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
 
-                if (!(member is Variable))
+                if (member is ClassMethodGetter)
+                {
+
+                }
+                else if (member is ClassPropertyGetter)
+                {
+                    ClassPropertyGetter prop = (ClassPropertyGetter)member;
+                    if (as3function.IsGet)
+                    {
+                        member = prop.getter;
+                    }
+                    else if (as3function.IsSet)
+                    {
+                        member = prop.setter;
+                    }
+                    else
+                    {
+                        pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                        "此处应该是个属性访问器"));
+                        return;
+                    }
+                }
+                else if (!(member is Variable))
                 {
                     pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                         "此处应该是个Variable"));
                     return;
                 }
 
-                var rtVariable = (Variable)member;
-
+               
                 builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
                 ASBinCode.rtti.FunctionSignature signature = builder.buildSignature(
                     env, as3function, this
                     );
+
+                if (as3function.IsGet)
+                {
+                    if (signature.parameters.Count > 0)
+                    {
+                        pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                            "getter访问器不能带参数"));
+                        return;
+                    }
+                    if (signature.returnType == RunTimeDataType.fun_void)
+                    {
+                        pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                            "getter访问器必须有返回值"));
+                        return;
+                    }
+                }
+                else if (as3function.IsSet)
+                {
+                    if (signature.parameters.Count !=1 )
+                    {
+                        pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                            "setter访问器参数必须是1个"));
+                        return;
+                    }
+                    if (signature.returnType != RunTimeDataType.fun_void
+                        &&
+                        signature.returnType != RunTimeDataType.rt_void
+                        )
+                    {
+                        pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                            "setter访问器不能有返回值"));
+                        return;
+                    }
+
+                }
+
                 if (!dictSignatures.ContainsKey(env.block.id))
                 {
                     dictSignatures.Add(env.block.id, new Dictionary<IMember, ASBinCode.rtti.FunctionSignature>());
@@ -551,7 +628,7 @@ namespace ASCompiler.compiler
                         if (!as3function.IsAnonymous)
                         {
 
-                            ASBinCode.IMember member = MemberFinder.find(as3function.Name, env);
+                            ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
 
                             if (!(member is Variable))
                             {
@@ -643,6 +720,26 @@ namespace ASCompiler.compiler
                             {
                                 pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
                                     "类的方法不应该出现在这里"));
+                                return;
+                            }
+
+                            if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                                &&
+                                (as3function.IsGet || as3function.IsSet)
+                                )
+                            {
+                                pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "访问器方法只能是类的方法"));
+                                return;
+                            }
+
+                            if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                                &&
+                                as3function.Access.IsStatic
+                                )
+                            {
+                                pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The static attribute may be used only on definitions inside a class."));
                                 return;
                             }
 
@@ -803,12 +900,12 @@ namespace ASCompiler.compiler
                         }
                     }
                     {
-                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id,true);
-                        
+                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id, true);
+
                         env.block.scope.members.Add(rtVariable);
                         try
                         {
-                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token,this);
+                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token, this);
                         }
                         catch (BuildException ex)
                         {
@@ -820,6 +917,16 @@ namespace ASCompiler.compiler
                 else if (stmt is ASTool.AS3.AS3Variable)
                 {
                     ASTool.AS3.AS3Variable variable = (ASTool.AS3.AS3Variable)stmt;
+
+                    //if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                    //    &&
+                    //    variable.Access.IsStatic 
+                    //    )
+                    //{                        
+                    //    pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                    //                "The static attribute may be used only on definitions inside a class." + variable.Name));
+                    //            return;
+                    //}
 
                     for (int i = 0; i < env.block.scope.members.Count; i++) //scope内查找是否有重复
                     {
@@ -994,8 +1101,42 @@ namespace ASCompiler.compiler
                                 ASBinCode.rtti.FunctionSignature signature = null;
                                 if (as3function.IsMethod)
                                 {
-                                    IMember member= MemberFinder.find(as3function.Name, env);
-                                    signature = dictSignatures[env.block.id][member];
+                                    if (as3function.IsGet)
+                                    {
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+
+                                        if(
+                                            !dictSignatures[env.block.id].ContainsKey(((ClassPropertyGetter)member).getter))
+                                            {
+                                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                "访问器未找到"));
+                                            return;
+                                            }
+
+                                        signature = dictSignatures[env.block.id][ 
+                                            ((ClassPropertyGetter)member).getter];
+                                    }
+                                    else if (as3function.IsSet)
+                                    {
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+
+                                        if (
+                                            !dictSignatures[env.block.id].ContainsKey(
+                                                ((ClassPropertyGetter)member).setter))
+                                        {
+                                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                "访问器未找到"));
+                                            return;
+                                        }
+
+                                        signature = dictSignatures[env.block.id][
+                                            ((ClassPropertyGetter)member).setter];
+                                    }
+                                    else
+                                    {
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                                        signature = dictSignatures[env.block.id][member];
+                                    }
                                 }
 
                                 builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
@@ -1004,39 +1145,53 @@ namespace ASCompiler.compiler
 
                                 if (as3function.IsMethod)
                                 {
-                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env);
                                     
-                                    var rtVariable = (Variable)member;
 
-                                    OpStep step = new OpStep(OpCode.assigning, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    step.reg = rtVariable;
-                                    step.regType = rtVariable.valueType;
-                                    step.arg1 = new ASBinCode.rtData.RightValue(func);
-                                    step.arg1Type = RunTimeDataType.rt_function;
-                                    step.arg2 = null;
-                                    step.arg2Type = RunTimeDataType.unknown;
+                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
 
-                                    env.block.opSteps.Add(step);
+                                    if (as3function.IsGet)
+                                    {
+                                        ((ClassPropertyGetter)member).getter.setFunctionId(func.functionId);
+                                    }
+                                    else if (as3function.IsSet)
+                                    {
+                                        ((ClassPropertyGetter)member).setter.setFunctionId(func.functionId);
+                                    }
+                                    else
+                                    {
+                                        ((ClassMethodGetter)member).setFunctionId(func.functionId);
+                                    }
+                                    //var rtVariable = (ILeftValue)member;
 
-                                    OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    stepbind.reg = null;
-                                    stepbind.regType = RunTimeDataType.unknown;
-                                    stepbind.arg1 = rtVariable;
-                                    stepbind.arg1Type = rtVariable.valueType;
-                                    stepbind.arg2 = null;
-                                    stepbind.arg2Type = RunTimeDataType.unknown;
+                                    //OpStep step = new OpStep(OpCode.assigning, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                                    //step.reg = rtVariable;
+                                    //step.regType = RunTimeDataType.rt_function;
+                                    //step.arg1 = new ASBinCode.rtData.RightValue(func);
+                                    //step.arg1Type = RunTimeDataType.rt_function;
+                                    //step.arg2 = null;
+                                    //step.arg2Type = RunTimeDataType.unknown;
 
-                                    env.block.opSteps.Add(stepbind);
+                                    //env.block.opSteps.Add(step);
 
-                                    OpStep stepbindthis = new OpStep(OpCode.bind_this, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    stepbindthis.reg = null;
-                                    stepbindthis.regType = RunTimeDataType.unknown;
-                                    stepbindthis.arg1 = rtVariable;
-                                    stepbindthis.arg1Type = rtVariable.valueType;
-                                    stepbindthis.arg2 = null;
-                                    stepbindthis.arg2Type = RunTimeDataType.unknown;
+                                    //OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                                    //stepbind.reg = null;
+                                    //stepbind.regType = RunTimeDataType.unknown;
+                                    //stepbind.arg1 = rtVariable;
+                                    //stepbind.arg1Type = rtVariable.valueType;
+                                    //stepbind.arg2 = null;
+                                    //stepbind.arg2Type = RunTimeDataType.unknown;
 
-                                    env.block.opSteps.Add(stepbindthis);
+                                    //env.block.opSteps.Add(stepbind);
+
+                                    //OpStep stepbindthis = new OpStep(OpCode.bind_this, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                                    //stepbindthis.reg = null;
+                                    //stepbindthis.regType = RunTimeDataType.unknown;
+                                    //stepbindthis.arg1 = rtVariable;
+                                    //stepbindthis.arg1Type = rtVariable.valueType;
+                                    //stepbindthis.arg2 = null;
+                                    //stepbindthis.arg2Type = RunTimeDataType.unknown;
+
+                                    //env.block.opSteps.Add(stepbindthis);
 
                                 }
 
@@ -1117,7 +1272,7 @@ namespace ASCompiler.compiler
                         ASBinCode.IRightValue defaultv = null;
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env);
+                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic);
                             if (variable.ValueExpr != null) //变量值表达式
                             {
                                 var testEval = ExpressionEval.Eval(variable.ValueExpr);
@@ -1169,7 +1324,7 @@ namespace ASCompiler.compiler
 
                                     env.block.opSteps.Add(step);
                                 }
-                                if (isbindscope)
+                                if (isbindscope && (rtVariable.valueType == RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void))
                                 {
                                     //***需追加绑定scope***
                                     OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile));
@@ -1201,7 +1356,7 @@ namespace ASCompiler.compiler
 
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env);
+                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic);
                             //rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
 
                             if (variable.ValueExpr != null) //变量值表达式
@@ -1260,7 +1415,7 @@ namespace ASCompiler.compiler
 
                                     env.block.opSteps.Add(step);
                                 }
-                                if (isbindscope)
+                                if (isbindscope && (rtVariable.valueType== RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void   ))
                                 {
                                     //***需追加绑定scope***
                                     OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile));

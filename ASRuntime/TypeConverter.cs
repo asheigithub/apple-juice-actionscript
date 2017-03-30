@@ -472,7 +472,7 @@ namespace ASRuntime
             /*string*/  { true  ,false ,false  ,false  ,true   ,true  ,true   ,false    ,false,false  },
             /*var_void*/{ true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,false  },
             /*null*/    { true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,false  },
-            /*function*/{ false ,false ,false  ,false  ,false  ,true ,true  ,true     ,false,false  },
+            /*function*/{ true ,false ,false  ,false  ,false  ,true ,true  ,true     ,false,false  },
             /*fun_void*/{ false ,false ,false  ,false  ,false  ,true ,false  ,false     ,false,false  },
             /*unknown*/ { false ,false ,false  ,false  ,false  ,false ,false  ,false    ,false,false  }
             };

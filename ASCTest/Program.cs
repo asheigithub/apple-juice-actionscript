@@ -49,17 +49,28 @@ namespace ASCTest
                 var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  ,files[i]);
 
+                //System.IO.File.WriteAllText("d:\\" + System.IO.Path.GetFileName(files[i]), tree.GetTreeString());
+
                 if (grammar.hasError)
                 {
+                    Console.WriteLine(files[i]);
                     Console.WriteLine("解析语法树失败!");
                     Console.ReadLine();
                     return;
                 }
 
-                Console.Clear();
+                
 
                 var analyser = new ASTool.AS3FileGrammarAnalyser(proj, files[i]);
-                analyser.Analyse(grammar, tree); //生成项目的语法树
+                if (!analyser.Analyse(grammar, tree)) //生成项目的语法树
+                {
+                    Console.WriteLine(analyser.err.ToString());
+                    Console.WriteLine("语义分析失败!");
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.Clear();
 
             }
 
@@ -71,7 +82,8 @@ namespace ASCTest
             {
                 p.Write(0, srcout);
             }
-            
+            //Console.Read();
+            //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 
             

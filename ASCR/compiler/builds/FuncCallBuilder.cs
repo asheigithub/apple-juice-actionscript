@@ -9,7 +9,7 @@ namespace ASCompiler.compiler.builds
     {
         public void buildFuncCall(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
         {
-            if (step.Arg2.IsReg)
+            if (step.Arg2.IsReg || step.Arg2.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.as3_function)
             {
                 IRightValue rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
 
@@ -100,7 +100,7 @@ namespace ASCompiler.compiler.builds
                 {
                     string name = step.Arg2.Data.Value.ToString();
 
-                    IMember member = MemberFinder.find(name, env);
+                    IMember member = MemberFinder.find(name, env,false);
                     if (member == null)
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -188,7 +188,7 @@ namespace ASCompiler.compiler.builds
                     if (signature.parameters[args.Count].defaultValue == null)
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "参数数量不足"
+                            "参数数量不足,需要" + signature.parameters.Count 
                             );
                     }
                 }
@@ -198,7 +198,7 @@ namespace ASCompiler.compiler.builds
                         && signature.parameters[signature.parameters.Count - 1].isPara))
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "参数数量过多"
+                            "参数数量过多,期望" + signature.parameters.Count
                             );
                     }
                 }
@@ -252,7 +252,13 @@ namespace ASCompiler.compiler.builds
                 }
 
                 //***参数准备***
-                OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                OpStep opPushArgs = new OpStep(
+                    isConstructor?
+                    OpCode.push_parameter_class 
+                    :
+                    OpCode.push_parameter
+                    
+                    , new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                 opPushArgs.arg1 = arg;
                 opPushArgs.arg1Type = arg.valueType;
                 opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));

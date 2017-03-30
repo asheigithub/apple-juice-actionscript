@@ -30,8 +30,10 @@ namespace ASCompiler
             }
 
             var analyser = new ASTool.AS3FileGrammarAnalyser(lib, "Object.as3");
-            analyser.Analyse(grammar, tree); //生成项目的语法树
-
+            if (!analyser.Analyse(grammar, tree)) //生成项目的语法树
+            {
+                return null;
+            }
             return lib;
         }
 

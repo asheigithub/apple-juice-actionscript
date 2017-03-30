@@ -290,18 +290,35 @@ namespace ASBinCode
         access_dot_byname=75,
 
         /// <summary>
+        /// 访问方法
+        /// </summary>
+        access_method=76,
+
+        /// <summary>
         /// method绑定this
         /// </summary>
-        bind_this=76,
+        bind_this=77,
+
+        /// <summary>
+        /// 如果是一个属性，则尝试从属性中读取值。
+        /// </summary>
+        try_read_getter=78,
+
+        /// <summary>
+        /// 试图往属性中写回值
+        /// </summary>
+        try_write_setter=79,
 
         /// <summary>
         /// 删除属性
         /// </summary>
-        delete_prop=77,
+        delete_prop=80,
 
         /// <summary>
         /// 从对象转换到基本类型
         /// </summary>
-        cast_primitive=78,
+        cast_primitive=81,
+
+        
     }
 }

@@ -44,21 +44,21 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void bind_this(Player player, StackFrame frame, ASBinCode.OpStep step)
-        {
-            var rv = step.arg1.getValue(frame.scope);
-            if (rv.rtType != RunTimeDataType.rt_function)
-            {
-                frame.throwError(new error.InternalError(step.token, "value is not a function",
-                    new ASBinCode.rtData.rtString("value is not a function")));
-            }
-            else
-            {
-                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                function.setThis(frame.scope.this_pointer);
-            }
-            frame.endStep(step);
-        }
+        //public static void bind_this(Player player, StackFrame frame, ASBinCode.OpStep step)
+        //{
+        //    var rv = step.arg1.getValue(frame.scope);
+        //    if (rv.rtType != RunTimeDataType.rt_function)
+        //    {
+        //        frame.throwError(new error.InternalError(step.token, "value is not a function",
+        //            new ASBinCode.rtData.rtString("value is not a function")));
+        //    }
+        //    else
+        //    {
+        //        ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+        //        function.setThis(frame.scope.this_pointer);
+        //    }
+        //    frame.endStep(step);
+        //}
 
 
         public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)

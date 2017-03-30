@@ -20,6 +20,15 @@ namespace ASRuntime
 
         private IRunTimeValue value;
         private RunTimeDataType rtType;
+
+        public bool isPropGetterSetter
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public void setDefaultType(RunTimeDataType type)
         {
             rtType = type;
@@ -27,7 +36,7 @@ namespace ASRuntime
         }
 
 
-        public virtual void directSet(IRunTimeValue value)
+        public virtual bool directSet(IRunTimeValue value)
         {
             //value只会在内部new出来，因此，如果value不为null,也肯定是自己new出来的
             rtType = value.rtType;
@@ -77,7 +86,7 @@ namespace ASRuntime
                         break;
                 }
             }
-            
+            return true;
         }
 
         public IRunTimeValue getValue()

@@ -74,11 +74,16 @@ Public Class AS3FileGrammarAnalyser
 
     Private currentLabelStack As Stack(Of String)
 
+    Private current_expression_canfunctioninvoke As Stack(Of Boolean)
+
+    Private current_new_operator As Stack(Of GrammerExpr)
+    Private current_visiting_expression As Stack(Of GrammerExpr)
 
     Private as3file As New AS3SrcFile()
 
+    Public err As GrammarExpression
 
-    Public Sub Analyse(grammer As Grammar, tree As GrammerTree)
+    Public Function Analyse(grammer As Grammar, tree As GrammerTree) As Boolean
 
         If Not currentPackage Is Nothing Then
             Throw New Exception("不能重复使用")
@@ -113,21 +118,29 @@ Public Class AS3FileGrammarAnalyser
 
         currentLabelStack = New Stack(Of String)
 
+        current_expression_canfunctioninvoke = New Stack(Of Boolean)
+
+        current_new_operator = New Stack(Of GrammerExpr)()
+        current_visiting_expression = New Stack(Of GrammerExpr)()
 
         currentMain = Nothing
         currentImpllist = Nothing
-        VisitNodes(tree.Root)
 
-
+        Try
+            VisitNodes(tree.Root)
+        Catch ex As GrammarExpression
+            err = ex
+            Return False
+        End Try
 
         'If outpackageprivatescope.Count > 0 Then
         '    If TypeOf currentMain Is AS3Class Then
         '        CType(currentMain, AS3Class).outpackageinnermembers.AddRange(outpackageprivatescope)
         '    End If
         'End If
-        'If currentparseExprListStack.Count > 0 Then
-        '    Throw New Exception()
-        'End If
+        If currentparseExprListStack.Count > 0 Then
+            Throw New Exception()
+        End If
 
         as3file.srcFile = srcFile
         as3file.OutPackageImports.AddRange(outpackimports)
@@ -136,7 +149,8 @@ Public Class AS3FileGrammarAnalyser
 
         as3file.OutPackagePrivateScope = outpackageprivatescope
 
-    End Sub
+        Return True
+    End Function
 
 
 
@@ -154,7 +168,7 @@ Public Class AS3FileGrammarAnalyser
         End If
 
         Dim name = node.GrammerLeftNode.Name
-        If name.StartsWith("F_") Then
+        If name.StartsWith("F_") Or name.StartsWith("K_") Then
             name = name.Substring(2)
         End If
 
@@ -511,6 +525,8 @@ Public Class AS3FileGrammarAnalyser
                 _NewOpt(node)
             Case "ThisSuper"
                 _ThisSuper(node)
+            Case "A_FC"
+                _A_FC(node)
         End Select
 
         visitednodes.Add(node)
@@ -796,24 +812,38 @@ Public Class AS3FileGrammarAnalyser
 
     Sub _Expression(node As GrammerExpr)
 
+        current_visiting_expression.Push(node)
+
         VisitNodes(node.Nodes(0))
 
         node.exprsteplist = node.Nodes(0).exprsteplist
 
+        current_visiting_expression.Pop()
+
     End Sub
 
     Sub _Access(node As GrammerExpr)
-        '<NSAccess><AccessOpt>;     
+        '<NSAccess><AccessOpt> | <Function><A_FC>;     
+
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
-        VisitNodes(node.Nodes(0))
-        VisitNodes(node.Nodes(1))
-        VisitNodes(node.Nodes(2))
+        If node.Nodes.Count = 3 Then
 
-        node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
-        node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
-        node.exprsteplist.AddRange(node.Nodes(2).exprsteplist)
+            VisitNodes(node.Nodes(0))
+            VisitNodes(node.Nodes(1))
+            VisitNodes(node.Nodes(2))
 
+            node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+            node.exprsteplist.AddRange(node.Nodes(2).exprsteplist)
+        Else
+            VisitNodes(node.Nodes(0))
+            VisitNodes(node.Nodes(1))
+
+            node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+        End If
 
     End Sub
 
@@ -1022,6 +1052,7 @@ Public Class AS3FileGrammarAnalyser
                     MemberScopeStack.Peek().ExprDataStack.Pop()
 
                     currentparseExprListStack.Pop()
+
                 Else
                     '**元数据定义***
 
@@ -1046,6 +1077,13 @@ Public Class AS3FileGrammarAnalyser
                     VisitNodes(node.Nodes(0))
 
                     MemberScopeStack.Peek().ExprDataStack.Pop()
+
+                    Dim func As AS3Function = MemberScopeStack.Peek()
+                    Dim stmt As New AS3StmtExpressions(node.MatchedToken)
+                    stmt.as3exprlist = currentparseExprListStack.Pop()
+                    func.StamentsStack.Peek().Add(stmt)
+
+
                 Else
 
                     '*****表达式语句****
@@ -1176,8 +1214,6 @@ Public Class AS3FileGrammarAnalyser
 
 
         '****
-
-
 
     End Sub
     Sub _Const(node As GrammerExpr)
@@ -1779,6 +1815,20 @@ Public Class AS3FileGrammarAnalyser
     Sub _FunctionCode(node As GrammerExpr)
         '**当functionCode运行结束时出栈
         'nodevisited.Add(node, AddressOf _FunctionCodeVisited)
+
+        If node.Nodes.Count <> 3 Then
+
+            If node.MatchedToken.Type <> Token.TokenType.identifier And node.MatchedToken.StringValue <> ";" _
+                And node.MatchedToken.StringValue <> "}" Then
+
+                Throw New GrammarExpression(node.MatchedToken, "Syntax error: '" & node.MatchedToken.StringValue & "' is not allowed here")
+
+
+            End If
+
+
+        End If
+
     End Sub
     Private Sub _FunctionCodeVisited(node As GrammerExpr)
         'MemberScopeStack.Pop()
@@ -1874,7 +1924,7 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes(0).Nodes(0).GrammerLeftNode.Name = "F_Variable" Then
             Dim tempscope As New AS3MemberListBase(Nothing)
             Dim currentno = MemberScopeStack.Peek().LastRegId()
-            While tempscope.LastRegId() < currentno
+            While tempscope.LastRegId() <currentno
                 tempscope.NextRegId()
             End While
 
@@ -2180,27 +2230,100 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _Assigning(node As GrammerExpr)
-        '::=<Ternary><AssigningOpt> | <Function>;         
+        '///'::=<Ternary><AssigningOpt> | <Function>;         
+        'If node.Nodes.Count = 2 Then
+        '    VisitNodes(node.Nodes(0))
 
-        If node.Nodes.Count = 2 Then
-            VisitNodes(node.Nodes(0))
+        '    VisitNodes(node.Nodes(1))
 
-            VisitNodes(node.Nodes(1))
+        '    node.exprsteplist = New AS3.Expr.AS3ExprStepList()
+        '    node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+        '    node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
 
-            node.exprsteplist = New AS3.Expr.AS3ExprStepList()
-            node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
-            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+        'Else
+        '    VisitNodes(node.Nodes(0))
+        '    node.exprsteplist = New AS3.Expr.AS3ExprStepList()
+        '    node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+        'End If
+
+        '::=<Ternary><AssigningOpt> ;
+
+
+        If node.MatchedToken.StringValue = "function" Then
+            If current_expression_canfunctioninvoke.Count > 0 Then
+                current_expression_canfunctioninvoke.Push(current_expression_canfunctioninvoke.Peek())
+            Else
+                current_expression_canfunctioninvoke.Push(False)
+            End If
 
         Else
-            VisitNodes(node.Nodes(0))
-            node.exprsteplist = New AS3.Expr.AS3ExprStepList()
-            node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+            current_expression_canfunctioninvoke.Push(True)
         End If
 
 
+        VisitNodes(node.Nodes(0))
+        VisitNodes(node.Nodes(1))
+
+        node.exprsteplist = New AS3.Expr.AS3ExprStepList()
+        node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+        node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+        current_expression_canfunctioninvoke.Pop()
+
+    End Sub
+    Sub _A_FC(node As GrammerExpr)
+        '::=<Call>|null;
+        node.exprsteplist = New AS3.Expr.AS3ExprStepList()
+        If node.Nodes.Count = 2 Then
+
+            'VisitNodes(node.Nodes(0))
+
+            'If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
+            '    Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+            'End If
+
+            'Dim argnode = node.Nodes(0).Nodes(1)
+            'If argnode.Nodes.Count = 0 Then
+            '    If Not current_expression_canfunctioninvoke.Peek() Then
+            '        Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+            '    End If
+
+
+            'End If
+
+
+
+            'node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+
+
+            'VisitNodes(node.Nodes(1).Nodes(0))
+            'node.exprsteplist.AddRange(node.Nodes(1).Nodes(0).exprsteplist)
+
+
+        ElseIf node.Nodes.Count = 1 Then
+            '<Call>|null
+
+            If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
+                Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+            End If
+
+            Dim argnode = node.Nodes(0).Nodes(1)
+            If argnode.Nodes.Count = 0 Then
+                If Not current_expression_canfunctioninvoke.Peek() Then
+                    Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+                End If
+
+            End If
+
+            VisitNodes(node.Nodes(0))
+            node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
+
+        End If
 
 
     End Sub
+
+
     Sub _Ternary(node As GrammerExpr)
         '::=<LogicOr><TernaryOpt>
         VisitNodes(node.Nodes(0))
@@ -2267,7 +2390,7 @@ Public Class AS3FileGrammarAnalyser
 
                 node.exprsteplist.Add(lv_true_flag)
 
-                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+                MemberScopeStack.Peek().ExprDataStack.Push(arg2)
 
             ElseIf code <> "=" Then
                 '操作拆分  v<temp> = arg1+arg2
@@ -2311,7 +2434,7 @@ Public Class AS3FileGrammarAnalyser
 
                 node.exprsteplist.Add(op)
 
-                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+                MemberScopeStack.Peek().ExprDataStack.Push(reg)
 
             Else
                 node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
@@ -2324,7 +2447,7 @@ Public Class AS3FileGrammarAnalyser
 
                 node.exprsteplist.Add(op)
 
-                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+                MemberScopeStack.Peek().ExprDataStack.Push(arg2)
 
             End If
 
@@ -2906,14 +3029,14 @@ Public Class AS3FileGrammarAnalyser
             op.OpCode = node.Nodes(0).MatchedToken.StringValue
 
 
-            If op.OpCode <> "++" And op.OpCode <> "--" Then
-                Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+            'If op.OpCode <> "++" And op.OpCode <> "--" Then
+            Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
                 op.Arg1 = arg1
                 op.Arg2 = arg2
 
-            Else
-                op.Arg1 = arg2
-            End If
+            'Else
+            '    op.Arg1 = arg2
+            'End If
 
 
 
@@ -3053,7 +3176,8 @@ Public Class AS3FileGrammarAnalyser
             VisitNodes(node.Nodes(0))
             node.exprsteplist.AddRange(node.Nodes(0).exprsteplist)
 
-
+            VisitNodes(node.Nodes(1))
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
 
         ElseIf node.Nodes(0).GrammerLeftNode.Name = "Array" Then
 
@@ -3074,6 +3198,33 @@ Public Class AS3FileGrammarAnalyser
             v.Data.FF1Type = Expr.FF1DataValueType.compiler_const
             v.Data.Value = node.Nodes(1).MatchedToken.StringValue
             MemberScopeStack.Peek().ExprDataStack.Push(v)
+        ElseIf node.Nodes(0).GrammerLeftNode.Name = "new" Then
+            '"new" <Expression>
+            current_new_operator.Push(node.Nodes(1))
+            Dim count = current_new_operator.Count
+
+
+            VisitNodes(node.Nodes(1))
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+            If current_new_operator.Count = count Then
+                current_new_operator.Pop()
+                '***new 不带构造参数***
+
+                Dim op As New Expr.AS3ExprStep(node.MatchedToken)
+                op.Type = Expr.OpType.Constructor
+                op.OpCode = "new"
+
+                op.Arg1 = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+                op.Arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
+
+                MemberScopeStack.Peek().ExprDataStack.Push(op.Arg1)
+                node.exprsteplist.Add(op)
+
+            ElseIf current_new_operator.Count > count Then
+                Throw New Exception
+            End If
+
 
         End If
 
@@ -3219,21 +3370,58 @@ Public Class AS3FileGrammarAnalyser
 
         VisitNodes(node.Nodes(1))
 
-        Dim arg3 = MemberScopeStack.Peek().ExprDataStack.Pop()    '参数数组
-        Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()    '方法名
-        Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+        If current_new_operator.Count > 0 AndAlso current_new_operator.Peek().Equals(current_visiting_expression.Peek()) Then
+            'Dim op As New Expr.AS3ExprStep(node.MatchedToken)
+            'op.Type = Expr.OpType.Constructor
+            'op.OpCode = "new"
 
-        Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-        op.Arg1 = arg1
-        op.Arg2 = arg2
-        op.Arg3 = arg3
-        op.OpCode = node.Nodes(0).MatchedToken.StringValue
-        op.Type = Expr.OpType.CallFunc
+            'op.Arg1 = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+            'op.Arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
 
-        MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+            'MemberScopeStack.Peek().ExprDataStack.Push(op.Arg1)
+            'node.exprsteplist.Add(op)
 
-        node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
-        node.exprsteplist.Add(op)
+            current_new_operator.Pop()
+
+            '***提取new的主体
+            Dim arg3 = MemberScopeStack.Peek().ExprDataStack.Pop()    '参数数组
+            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()    '方法名
+
+
+            Dim op As New Expr.AS3ExprStep(node.MatchedToken)
+            op.Type = Expr.OpType.Constructor
+            op.OpCode = "new"
+
+            op.Arg2 = arg2
+            op.Arg3 = arg3
+
+
+            op.Arg1 = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+
+            MemberScopeStack.Peek().ExprDataStack.Push(op.Arg1)
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+            node.exprsteplist.Add(op)
+
+        Else
+
+            Dim arg3 = MemberScopeStack.Peek().ExprDataStack.Pop()    '参数数组
+            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()    '方法名
+            Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
+
+            Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+            op.Arg1 = arg1
+            op.Arg2 = arg2
+            op.Arg3 = arg3
+            op.OpCode = node.Nodes(0).MatchedToken.StringValue
+            op.Type = Expr.OpType.CallFunc
+
+            MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+
+            node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+            node.exprsteplist.Add(op)
+
+        End If
+
 
     End Sub
 

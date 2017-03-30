@@ -32,7 +32,7 @@ namespace ASRuntime
             public int tryid;
         }
 
-
+        internal operators.InstanceCreator instanceCreator;
         internal operators.FunctionCaller funCaller;
         internal StackSlot _tempSlot1;
         internal StackSlot _tempSlot2;
@@ -129,6 +129,7 @@ namespace ASRuntime
                 case OpCode.assigning:
                     operators.OpAssigning.execAssigning(player, step,this, scope);
                     break;
+                
                 case OpCode.add_number:
                     operators.OpAdd.execAdd_Number(player, step,this, scope);
                     break;
@@ -361,9 +362,9 @@ namespace ASRuntime
                 case OpCode.bind_scope:
                     operators.OpCallFunction.bind(player,this,step);
                     break;
-                case OpCode.bind_this:
-                    operators.OpCallFunction.bind_this(player, this, step);
-                    break;
+                //case OpCode.bind_this:
+                //    operators.OpCallFunction.bind_this(player, this, step);
+                //    break;
                 case OpCode.make_para_scope:
                     operators.OpCallFunction.create_paraScope(player, this, step);
                     break;
@@ -403,14 +404,24 @@ namespace ASRuntime
                 case OpCode.access_dot_byname:
                     operators.OpAccess_Dot.exec_dot_byname(player, this, step, scope);
                     break;
+                case OpCode.access_method:
+                    operators.OpAccess_Dot.exec_method(player, this, step, scope);
+                    break;
                 case OpCode.delete_prop:
                     operators.OpDynamicProperty.exec_delete(player, this, step, scope);
+                    break;
+                case OpCode.try_read_getter:
+                    operators.OpPropGetSet.exec_try_read_prop(player, this, step, scope);
+                    break;
+                case OpCode.try_write_setter:
+                    operators.OpPropGetSet.exec_try_write_prop(player, this, step, scope);
                     break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
                          step.opCode + "操作未实现"
                          ));
+                    endStep();
                     break;
             }
 

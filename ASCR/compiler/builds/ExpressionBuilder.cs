@@ -161,9 +161,14 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.rtti.Class _class = (builder.getClassByRunTimeDataType(src.valueType));
                 var valueOf= ClassMemberFinder.find(_class, "valueOf", _class);
                 ASBinCode.rtti.FunctionSignature signature = null;
-                if (valueOf != null)
+                if (valueOf != null && valueOf.bindField is ClassMethodGetter)
                 {
-                    signature  = builder.dictSignatures[valueOf.bindField.refdefinedinblockid][valueOf.bindField];
+                    signature = builder.dictSignatures[
+                        ((ClassMethodGetter)valueOf.bindField).refdefinedinblockid][(ClassMethodGetter)valueOf.bindField];
+                }
+                else
+                {
+                    valueOf = null;
                 }
 
                 if (valueOf != null
@@ -180,7 +185,7 @@ namespace ASCompiler.compiler.builds
                 {
                     Register dot_eax = null;
                     {
-                        OpStep op = new OpStep(OpCode.access_dot, token);
+                        OpStep op = new OpStep(OpCode.access_method, token);
                         var eax = env.getAdditionalRegister();
                         eax.setEAXTypeWhenCompile(valueOf.valueType);
 
@@ -190,7 +195,7 @@ namespace ASCompiler.compiler.builds
                         op.regType = eax.valueType;
                         op.arg1 = src;
                         op.arg1Type = src.valueType;
-                        op.arg2 = valueOf.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+                        op.arg2 = (ClassMethodGetter)valueOf.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
                         op.arg2Type = valueOf.valueType; //RunTimeDataType.rt_int;
 
                         env.block.opSteps.Add(op);
@@ -291,6 +296,111 @@ namespace ASCompiler.compiler.builds
         }
 
 
+        private void buildPropSet(ClassPropertyGetter prop,
+            ASTool.AS3.Expr.AS3ExprStep step,string name,CompileEnv env,
+            ASBinCode.rtti.Class refClass,IRightValue rv, IRightValue setterbindobj
+            ,Register eax
+            )
+        {
+            var member = refClass.classMembers[prop.indexOfMembers];
+
+            if (prop.setter == null)
+            {
+                throw new BuildException(
+                    new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                    "Property " + name + " is read - only."));
+
+            }
+            //***检查可见性***
+            var f = MemberFinder.findClassMember(refClass, prop.setter.name, env, builder);
+            if (f == null)
+            {
+                throw new BuildException(
+                    new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                    "Property " + name + " is read - only."));
+            }
+
+            if (prop.getter != null)
+            {
+                var g = MemberFinder.findClassMember(refClass, prop.getter.name, env, builder);
+                if (g != null)
+                {
+                    //如果2个访问器访问级别不同,却又都可以访问到
+                    if (f.isInternal != g.isInternal || f.isPublic != g.isPublic || f.isPrivate != g.isPrivate)
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "Ambiguous reference to " + name));
+                    }
+                }
+            }
+
+            //**提取function**
+
+            var signature =
+                         builder.dictSignatures[prop.setter.refdefinedinblockid][prop.setter];
+
+            //**隐式类型转换检查
+            if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, member.valueType, builder))
+            {
+                throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                    "不能将[" + rv.valueType + "]类型赋值给[" + member.valueType + "]类型的访问器");
+            }
+            if (rv.valueType != signature.parameters[0].type)
+            {
+                //插入转型代码
+                rv = addCastOpStep(env, rv, signature.parameters[0].type,
+                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder); //op.reg;
+            }
+            
+            //***调用setter访问器**
+
+            IRightValue func;
+            if (setterbindobj != null)
+            {
+                //先从对象中取出setter
+                var eaxDotSetter = env.getAdditionalRegister();
+                eaxDotSetter.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                AccessBuilder.make_dotStep(env,
+                    refClass.classMembers[prop.setter.indexOfMembers],
+                    step.token, eaxDotSetter, setterbindobj);
+                func = eaxDotSetter;
+            }
+            else
+            {
+                func = prop.setter;
+            }
+
+            //***再访问***
+            OpStep opInvokeSetter = new OpStep(OpCode.call_function,
+            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+            opInvokeSetter.reg = eax;
+            opInvokeSetter.regType = eax.valueType;
+            opInvokeSetter.arg1 = func;
+            opInvokeSetter.arg1Type = func.valueType;
+
+            {
+                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opMakeArgs.arg1 = func;
+                opMakeArgs.arg1Type = func.valueType;
+                env.block.opSteps.Add(opMakeArgs);
+            }
+
+            {
+                //***参数准备***
+                OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opPushArgs.arg1 = rv;
+                opPushArgs.arg1Type = rv.valueType;
+                opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(0));
+                opPushArgs.arg2Type = RunTimeDataType.rt_int;
+                env.block.opSteps.Add(opPushArgs);
+            }
+
+            env.block.opSteps.Add(opInvokeSetter);
+
+        }
+
+
         public void buildAssigning(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
             if (step.OpCode == "=")
@@ -305,11 +415,18 @@ namespace ASCompiler.compiler.builds
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     //当是暂存成员访问中间结果时
-                    if (eax._regMember == null) 
+                    if (eax._regMember == null)
                     {
                         eax.setEAXTypeWhenCompile(rv.valueType);
                     }
-                    else if(eax._regMember.isConst)
+                    else if (eax._regMember.bindField is ClassPropertyGetter)
+                    {
+                        //****检查属性存取器***
+                        ClassPropertyGetter prop = (ClassPropertyGetter)eax._regMember.bindField;
+                        buildPropSet(prop, step, prop.name, env, eax._regMember.refClass, rv, eax._regMemberSrcObj, eax);
+                        return;
+                    }
+                    else if (eax._regMember.isConst)
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -352,7 +469,7 @@ namespace ASCompiler.compiler.builds
                 }
                 else
                 {
-                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env);
+                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env,false);
 
                     if (member == null)
                     {
@@ -639,6 +756,100 @@ namespace ASCompiler.compiler.builds
         }
 
 
+        private static IRightValue addOpPropGet(ClassPropertyGetter prop, ASTool.Token matchtoken ,string propname ,
+            ASBinCode.rtti.Class refClass , IRightValue rvObj ,CompileEnv env, Builder builder
+            )
+        {
+            
+            if (prop.getter == null)
+            {
+                throw new BuildException(
+                    new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                    "Property " + propname + " is write-only."));
+
+            }
+            //***检查可见性***
+            var f = MemberFinder.findClassMember(refClass, prop.getter.name, env, builder);
+            if (f == null)
+            {
+                throw new BuildException(
+                    new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                    "Property " + propname + " is write-only."));
+            }
+
+            if (prop.setter != null)
+            {
+                var g = MemberFinder.findClassMember(refClass, prop.setter.name, env, builder);
+                if (g != null)
+                {
+                    //如果2个访问器访问级别不同,却又都可以访问到
+                    if (f.isInternal != g.isInternal || f.isPublic != g.isPublic || f.isPrivate != g.isPrivate)
+                    {
+                        throw new BuildException(
+                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                            "Ambiguous reference to " + propname));
+                    }
+                }
+            }
+
+            //**提取function**
+
+            var signature =
+                         builder.dictSignatures[prop.getter.refdefinedinblockid][prop.getter];
+
+            int idx = env.block.opSteps.Count;
+
+            IRightValue func;
+
+            if (rvObj != null)
+            {
+                var eaxDotGetter = env.getAdditionalRegister();
+                eaxDotGetter.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                //***调用getter访问器**
+                //先从对象中取出setter
+                func = eaxDotGetter;
+                AccessBuilder.make_dotStep(env,
+                    refClass.classMembers[prop.getter.indexOfMembers],
+                    matchtoken, eaxDotGetter, rvObj);
+            }
+            else
+            {
+                func = prop.getter;
+            }
+
+            //***再访问***
+            Register gv = env.getAdditionalRegister();
+            gv.setEAXTypeWhenCompile(signature.returnType);
+
+            OpStep opInvokeGetter = new OpStep(OpCode.call_function,
+            new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+            opInvokeGetter.reg = gv;
+            opInvokeGetter.regType = gv.valueType;
+            opInvokeGetter.arg1 = func;
+            opInvokeGetter.arg1Type = func.valueType;
+
+            {
+                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                opMakeArgs.arg1 = func;
+                opMakeArgs.arg1Type = func.valueType;
+                env.block.opSteps.Add(opMakeArgs);
+            }
+
+            env.block.opSteps.Add(opInvokeGetter);
+
+
+            List<OpStep> addlines = new List<OpStep>();
+            for (int i = idx; i < env.block.opSteps.Count ; i++)
+            {
+                addlines.Add(env.block.opSteps[i]);
+            }
+            builder._propLines.Add(gv, addlines);
+
+            gv._regMember = refClass.classMembers[prop.indexOfMembers];
+            gv._regMemberSrcObj = rvObj;
+            return gv;
+        }
+        
         public static ASBinCode.IRightValue getRightValue(CompileEnv env, ASTool.AS3.Expr.AS3DataStackElement data, ASTool.Token matchtoken,Builder builder)
         {
             if (data.IsReg)
@@ -654,12 +865,40 @@ namespace ASCompiler.compiler.builds
                             "编译异常 无法获得临时变量类型"));
                 }
 
-                if (reg._pathGetter != null)
+                if (reg._regMember != null && 
+                    reg._regMember.bindField is ClassPropertyGetter) //属性访问器
+                {
+                    ClassPropertyGetter prop = (ClassPropertyGetter)reg._regMember.bindField;
+
+                    return addOpPropGet(prop, matchtoken, prop.name, reg._regMember.refClass, reg._regMemberSrcObj, env, builder);
+                }
+                else if (reg._pathGetter != null)
                 {
                     return reg._pathGetter;
-                }
+                }              
                 else
                 {
+                    if (reg.valueType == RunTimeDataType.rt_void)
+                    {
+                        //***有可能是个访问器，
+                        OpStep opgettest = new OpStep(OpCode.try_read_getter, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+
+                        opgettest.arg1 = reg;
+                        opgettest.arg1Type = reg.valueType;
+
+                        reg = env.getAdditionalRegister();
+                        reg.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+
+                        opgettest.reg = reg;
+                        opgettest.regType = reg.valueType;
+
+                        env.block.opSteps.Add(opgettest);
+
+                        List<OpStep> opline = new List<OpStep>();
+                        opline.Add(opgettest);
+                        builder._propLines.Add(reg, opline);
+                    }
+
                     return reg;
                 }
             }
@@ -718,7 +957,7 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env);
+                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env,false);
 
                         if (member == null && builder._currentImports.Count > 0)
                         {
@@ -775,7 +1014,18 @@ namespace ASCompiler.compiler.builds
 
                         if (member is ASBinCode.IRightValue)
                         {
-                            return (ASBinCode.IRightValue)member;
+                            if (member is ClassPropertyGetter) //需要加上测试读取
+                            {
+                                return
+                                    addOpPropGet((ClassPropertyGetter)member, matchtoken, member.name, ((ClassPropertyGetter)member)._class,
+                                        null, env, builder
+                                    );
+                                
+                            }
+                            else
+                            {
+                                return (ASBinCode.IRightValue)member;
+                            }
                         }
                         else
                         {
@@ -835,6 +1085,7 @@ namespace ASCompiler.compiler.builds
         }
         private void buildSuffix(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
+            
             ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
             if (step.Arg1.IsReg)
             {
@@ -929,6 +1180,42 @@ namespace ASCompiler.compiler.builds
                 op.regType = eax.valueType;
 
                 env.block.opSteps.Add(op);
+
+
+
+                //***检查是否是动态属性
+                if (builder._propLines.ContainsKey(v1))
+                {
+                    var addlines = builder._propLines[v1];
+                    if (addlines.Count == 1 && addlines[0].opCode == OpCode.try_read_getter)
+                    {
+                        //***将值赋值回v1***
+                        OpStep opwriteback = new OpStep(OpCode.try_write_setter, 
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        opwriteback.reg = null;
+                        opwriteback.regType = RunTimeDataType.unknown;
+                        opwriteback.arg1 = v1;
+                        opwriteback.arg1Type = v1.valueType;
+                        opwriteback.arg2 = v1;
+                        opwriteback.arg2Type = v1.valueType;
+
+                        env.block.opSteps.Add(opwriteback);
+                    }
+                    else
+                    {
+                        Register addeax = env.getAdditionalRegister();
+
+                        Register t=(Register)v1;
+                        ClassPropertyGetter prop = (ClassPropertyGetter)t._regMember.bindField;
+                        //****将值赋值回去****
+                        buildPropSet(prop,
+                            step, prop.name, env, prop._class, v1 ,t._regMemberSrcObj, addeax
+                            );
+                        
+                    }
+                }
+
+
 
             }
             else
@@ -1213,8 +1500,11 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == "++" || step.OpCode == "--")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg1, step.token, builder);
-                if (!step.Arg1.IsReg || (v1 is Register && ((Register)v1)._regMember != null))
+                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                if (!step.Arg1.IsReg || (v1 is Register && ((Register)v1)._regMember != null)
+                    ||
+                    builder._propLines.ContainsKey(v1)
+                    )
                 {
                     if (!(v1 is ILeftValue))
                     {
@@ -1291,7 +1581,6 @@ namespace ASCompiler.compiler.builds
                         }
                     }
 
-
                     ASBinCode.OpStep op
                     = new ASBinCode.OpStep(
                         code
@@ -1303,10 +1592,46 @@ namespace ASCompiler.compiler.builds
                     op.arg2 = null;
                     op.arg2Type = RunTimeDataType.unknown;
 
-                    op.reg = null;
-                    op.regType = RunTimeDataType.unknown;
+                    Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    eax.setEAXTypeWhenCompile(v1.valueType);
+
+                    op.reg = eax;
+                    op.regType = eax.valueType;
 
                     env.block.opSteps.Add(op);
+
+                    //***检查是否是动态属性
+                    if (builder._propLines.ContainsKey(v1))
+                    {
+                        var addlines = builder._propLines[v1];
+                        if (addlines.Count == 1 && addlines[0].opCode == OpCode.try_read_getter)
+                        {
+                            //***将值赋值回v1***
+                            OpStep opwriteback = new OpStep(OpCode.try_write_setter,
+                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                            opwriteback.reg = null;
+                            opwriteback.regType = RunTimeDataType.unknown;
+                            opwriteback.arg1 = v1;
+                            opwriteback.arg1Type = v1.valueType;
+                            opwriteback.arg2 = eax;
+                            opwriteback.arg2Type = eax.valueType;
+
+                            env.block.opSteps.Add(opwriteback);
+                        }
+                        else
+                        {
+                            Register addeax = env.getAdditionalRegister();
+
+                            Register t = (Register)v1;
+                            ClassPropertyGetter prop = (ClassPropertyGetter)t._regMember.bindField;
+                            //****将值赋值回去****
+                            buildPropSet(prop,
+                                step, prop.name, env, prop._class, eax, t._regMemberSrcObj, addeax
+                                );
+
+                        }
+                    }
+
 
                 }
                 else

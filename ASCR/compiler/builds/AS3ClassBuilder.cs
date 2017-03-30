@@ -35,7 +35,7 @@ namespace ASCompiler.compiler.builds
                 {
                     member.setTypeWhenCompile(RunTimeDataType.rt_function);
                     //**编译函数签名
-                    builder.buildNamedFunctionSignature(builder._classbuildingEnv[cls], (ASTool.AS3.AS3Function)stmt);
+                    builder.buildNamedFunctionSignature(env, (ASTool.AS3.AS3Function)stmt);
 
                 }
                 else
@@ -44,7 +44,10 @@ namespace ASCompiler.compiler.builds
                 }
 
                 //((Variable)env.block.scope.members[member.index]).valueType = member.valueType;
-                member.bindField.valueType = member.valueType;
+                if (member.bindField is Field)
+                {
+                    ((Field)member.bindField).valueType = member.valueType;
+                }
             }
         }
 
@@ -62,17 +65,141 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < cls.staticClass.classMembers.Count; i++)
             {
                 ASBinCode.rtti.ClassMember member = cls.staticClass.classMembers[i];
+                if (member.bindField is ClassPropertyGetter)
+                {
+                    ClassPropertyGetter pg = (ClassPropertyGetter)member.bindField;
+                    if (pg.getter != null)
+                    {
+                        var g = cls.staticClass.classMembers[pg.getter.indexOfMembers];
+
+                        member.isPublic =member.isPublic || g.isPublic;
+                        member.isProtectd = member.isProtectd || g.isProtectd;
+                        member.isInternal = member.isInternal || g.isInternal;
+                        member.isPrivate = member.isPrivate || g.isPrivate;
+
+
+                        
+                    }
+                    if (pg.setter != null)
+                    {
+                        var g = cls.staticClass.classMembers[pg.setter.indexOfMembers];
+
+                        member.isPublic = member.isPublic || g.isPublic;
+                        member.isProtectd = member.isProtectd || g.isProtectd;
+                        member.isInternal = member.isInternal || g.isInternal;
+                        member.isPrivate = member.isPrivate || g.isPrivate;
+                    }
+                    continue;
+                }
                 _doBuildMemberType(member, builder, cls);
             }
+            if (builder.buildErrors.Count == 0)
+            {
+                for (int i = 0; i < cls.staticClass.classMembers.Count; i++) //检查访问器类型
+                {
+                    ASBinCode.rtti.ClassMember member = cls.staticClass.classMembers[i];
+                    CheckProp(member, builder);
+                }
+            }
+
             builder._buildingClass.Pop();
 
             builder._buildingClass.Push( cls);
             for (int i = 0; i < cls.classMembers.Count; i++)
             {
                 ASBinCode.rtti.ClassMember member = cls.classMembers[i];
+                if (member.bindField is ClassPropertyGetter)
+                {
+                    ClassPropertyGetter pg = (ClassPropertyGetter)member.bindField;
+                    if (pg.getter != null)
+                    {
+                        var g = cls.classMembers[pg.getter.indexOfMembers];
+
+                        member.isPublic = member.isPublic || g.isPublic;
+                        member.isProtectd = member.isProtectd || g.isProtectd;
+                        member.isInternal = member.isInternal || g.isInternal;
+                        member.isPrivate = member.isPrivate || g.isPrivate;
+                    }
+                    if (pg.setter != null)
+                    {
+                        var g = cls.classMembers[pg.setter.indexOfMembers];
+
+                        member.isPublic = member.isPublic || g.isPublic;
+                        member.isProtectd = member.isProtectd || g.isProtectd;
+                        member.isInternal = member.isInternal || g.isInternal;
+                        member.isPrivate = member.isPrivate || g.isPrivate;
+                    }
+                    continue;
+                }
                 _doBuildMemberType(member, builder, cls);
             }
+
+            if (builder.buildErrors.Count == 0)
+            {
+                for (int i = 0; i < cls.classMembers.Count; i++) //检查访问器类型
+                {
+                    CheckProp( cls.classMembers[i],  builder);
+                }
+            }
+
             builder._buildingClass.Pop();
+        }
+
+        private void CheckProp(ASBinCode.rtti.ClassMember member, Builder builder)
+        {
+            if (member.bindField is ClassPropertyGetter)
+            {
+                ClassPropertyGetter pg = (ClassPropertyGetter)member.bindField;
+
+                if (pg.setter != null)
+                {
+                    var g = member.refClass.classMembers[pg.setter.indexOfMembers];
+                    var sig =
+                        builder.dictSignatures[builder._classbuildingEnv[member.refClass].block.id][g.bindField];
+
+                    if (pg.getter != null)
+                    {
+                        var gig =
+                            builder.dictSignatures[builder._classbuildingEnv[member.refClass].block.id]
+                            [pg.getter];
+
+
+                        if (!ASRuntime.TypeConverter.testImplicitConvert(
+                            gig.returnType, sig.parameters[0].type, builder
+                            ))
+                        {
+                            var stmt = builder._buildingmembers[g];
+
+                            throw new BuildException(stmt.Token.line,
+                                    stmt.Token.ptr, stmt.Token.sourceFile,
+                                                        "访问器类型不匹配");
+                        }
+                        if (!ASRuntime.TypeConverter.testImplicitConvert(
+                             sig.parameters[0].type, gig.returnType, builder
+                            ))
+                        {
+                            var stmt = builder._buildingmembers[g];
+
+                            throw new BuildException(stmt.Token.line,
+                                    stmt.Token.ptr, stmt.Token.sourceFile,
+                                                        "访问器类型不匹配");
+                        }
+
+                        member.setTypeWhenCompile(gig.returnType);
+                    }
+                    else
+                    {
+                        member.setTypeWhenCompile(sig.parameters[0].type);
+                    }
+                }
+                else
+                {
+                    var gig =
+                            builder.dictSignatures[builder._classbuildingEnv[member.refClass].block.id]
+                            [pg.getter];
+                    member.setTypeWhenCompile(gig.returnType);
+                }
+            }
         }
 
         /// <summary>
@@ -200,12 +327,20 @@ namespace ASCompiler.compiler.builds
                         {
                             if (cls.classMembers[j].name == as3function.Name)
                             {
-                                if (builder._buildingmembers[cls.classMembers[j]] is ASTool.AS3.AS3Function)
+                                if (
+                                    cls.classMembers[j].bindField is ClassPropertyGetter 
+                                    //||
+                                    //builder._buildingmembers[cls.classMembers[j]] is ASTool.AS3.AS3Function
+                                    
+                                    )
                                 {
-                                    ASTool.AS3.AS3Function pf = (ASTool.AS3.AS3Function)builder._buildingmembers[cls.classMembers[j]];
-                                    if (pf.IsGet != as3function.IsGet
-                                        &&
-                                        pf.IsSet != as3function.IsSet
+                                    ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
+
+                                    //ASTool.AS3.AS3Function pf = 
+                                    //    (ASTool.AS3.AS3Function)builder._buildingmembers[cls.classMembers[j]];
+                                    if ((pg.getter ==null && as3function.IsGet)
+                                        ||
+                                        (pg.setter ==null && as3function.IsSet)
                                         )
                                     {
                                         continue;
@@ -220,58 +355,154 @@ namespace ASCompiler.compiler.builds
                             }
                         }
 
-                        Field method = new Field(as3function.Name, env.block.scope.members.Count, env.block.id,true);
-                        env.block.scope.members.Add(method);
-                        method.valueType = RunTimeDataType.rt_function;
-
-
-                        method.isInternal = as3function.Access.IsInternal;
-                        method.isPrivate = as3function.Access.IsPrivate;
-                        method.isProtected = as3function.Access.IsProtected;
-                        method.isPublic = as3function.Access.IsPublic;
-                        method.isStatic = as3function.Access.IsStatic;
-                        
-                        //field.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
-                        ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(method.name,method.indexOfMembers,cls,method);
-
-                        member.setTypeWhenCompile(RunTimeDataType.rt_function);
-                        member.isInternal = method.isInternal;
-                        member.isPrivate = method.isPrivate;
-                        member.isProtectd = method.isProtected;
-                        member.isPublic = method.isPublic;
-                        member.isStatic = method.isStatic;
-                        member.isConst = method.isConst;
-
-                        member.isOverride = as3function.Access.IsOverride;
-
-                        member.isGetter = as3function.IsGet;
-                        member.isSetter = as3function.IsSet;
-
-                        member.isConstructor = as3function.IsConstructor;
-                        if (member.isConstructor )
+                        //***非访问器***
+                        if (!as3function.IsGet && !as3function.IsSet)
                         {
-                            if (member.isStatic)
+                            ASBinCode.rtti.ClassMember member =
+                                new ASBinCode.rtti.ClassMember(as3function.Name, cls,
+                                new ClassMethodGetter(as3function.Name,
+                                cls, cls.classMembers.Count,
+                                env.block.id)
+                                );
+
+                            member.setTypeWhenCompile(RunTimeDataType.rt_function);
+                            member.isInternal = as3function.Access.IsInternal;
+                            member.isPrivate = as3function.Access.IsPrivate;
+                            member.isProtectd = as3function.Access.IsProtected;
+                            member.isPublic = as3function.Access.IsPublic;
+                            member.isStatic = as3function.Access.IsStatic;
+                            member.isConst = true;
+
+                            member.isOverride = as3function.Access.IsOverride;
+
+                            member.isGetter = as3function.IsGet;
+                            member.isSetter = as3function.IsSet;
+
+                            member.isConstructor = as3function.IsConstructor;
+                            if (member.isConstructor)
                             {
-                                throw new BuildException(
-                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                                "Constructor functions must be instance methods")
-                                        );
+                                if (member.isStatic)
+                                {
+                                    throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "Constructor functions must be instance methods")
+                                            );
+                                }
+
+                                if (as3function.Parameters.Count > 0 && cls.isdocumentclass)
+                                {
+                                    throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "文档类的构造函数不能带参数")
+                                            );
+                                }
+
+                                cls.constructor = member;
                             }
 
-                            if (as3function.Parameters.Count > 0 && cls.isdocumentclass)
-                            {
-                                throw new BuildException(
-                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                                "文档类的构造函数不能带参数")
-                                        );
-                            }
+                            cls.classMembers.Add(member);
 
-                            cls.constructor = member;
+                            builder._buildingmembers.Add(member, as3function);
                         }
+                        else
+                        {
+                            ASBinCode.rtti.ClassMember member =
+                                new ASBinCode.rtti.ClassMember("@" + as3function.Name + (as3function.IsGet?"_get":"_set"), cls,
+                                new ClassMethodGetter("@" + as3function.Name + (as3function.IsGet ? "_get" : "_set"),
+                                cls, cls.classMembers.Count,
+                                env.block.id)
+                                );
 
-                        cls.classMembers.Add(member);
+                            member.setTypeWhenCompile(RunTimeDataType.rt_function);
+                            member.isInternal = as3function.Access.IsInternal;
+                            member.isPrivate = as3function.Access.IsPrivate;
+                            member.isProtectd = as3function.Access.IsProtected;
+                            member.isPublic = as3function.Access.IsPublic;
+                            member.isStatic = as3function.Access.IsStatic;
+                            member.isConst = true;
 
-                        builder._buildingmembers.Add(member,as3function);
+                            member.isOverride = as3function.Access.IsOverride;
+
+                            member.isGetter = as3function.IsGet;
+                            member.isSetter = as3function.IsSet;
+
+                            member.isConstructor = as3function.IsConstructor;
+                            if (member.isConstructor)
+                            {
+                                throw new BuildException(
+                                             new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                     "访问器不可能是构造函数")
+                                             );
+                            }
+
+                            if (member.isGetter && member.isSetter)
+                            {
+                                throw new BuildException(
+                                             new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                     "不能同时是getter和setter")
+                                             );
+                            }
+                            
+                            cls.classMembers.Add(member);
+                            builder._buildingmembers.Add(member, as3function);
+
+                            //***查找ClassPropertyGetter****
+                            ClassPropertyGetter pg = null;
+
+                            for (int i = 0; i < cls.classMembers.Count; i++)
+                            {
+                                if (cls.classMembers[i].name== as3function.Name)
+                                {
+                                    if (cls.classMembers[i].bindField is ClassPropertyGetter)
+                                    {
+                                        pg = (ClassPropertyGetter)cls.classMembers[i].bindField;
+
+                                        if (member.isGetter && pg.getter != null)
+                                        {
+                                            throw new BuildException(
+                                                new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                        "属性访问器重复")
+                                                );
+                                        }
+                                        else if (member.isSetter && pg.setter != null)
+                                        {
+                                            throw new BuildException(
+                                                new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                        "属性设置器重复")
+                                                );
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "期望一个属性")
+                                            );
+                                    }
+                                }
+                            }
+
+                            if (pg == null)
+                            {
+                                pg = new ClassPropertyGetter(as3function.Name, cls, cls.classMembers.Count);
+                                ASBinCode.rtti.ClassMember m = new ASBinCode.rtti.ClassMember(as3function.Name, cls, pg);
+
+                                cls.classMembers.Add(m);
+                                
+                            }
+                            if (member.isGetter)
+                            {
+                                pg.getter = (ClassMethodGetter)member.bindField;
+                            }
+                            else
+                            {
+                                pg.setter = (ClassMethodGetter)member.bindField;
+                            }
+
+                            
+
+                        }
                     }
                     else
                     {
@@ -308,7 +539,7 @@ namespace ASCompiler.compiler.builds
                     field.isStatic = variable.Access.IsStatic;
                     
                     //field.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token);
-                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(field.name,field.indexOfMembers,cls,field);
+                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(field.name,cls,field);
 
                     member.isInternal = field.isInternal;
                     member.isPrivate = field.isPrivate;
@@ -318,6 +549,8 @@ namespace ASCompiler.compiler.builds
                     member.isConst = field.isConst;
 
                     cls.classMembers.Add(member);
+
+                    cls.fields.Add(member);
 
                     builder._buildingmembers.Add(member,variable);
                 }
@@ -348,7 +581,7 @@ namespace ASCompiler.compiler.builds
                     constfield.isPublic = constant.Access.IsPublic;
                     constfield.isStatic = constant.Access.IsStatic;
 
-                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(constfield.name,constfield.indexOfMembers,cls,constfield);
+                    ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(constfield.name,cls,constfield);
 
                     member.isInternal = constfield.isInternal;
                     member.isPrivate = constfield.isPrivate;
@@ -358,6 +591,8 @@ namespace ASCompiler.compiler.builds
                     member.isConst = constfield.isConst;
 
                     cls.classMembers.Add(member);
+
+                    cls.fields.Add(member);
 
                     builder._buildingmembers.Add(member,constant);
                 }

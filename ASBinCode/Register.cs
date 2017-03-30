@@ -15,6 +15,10 @@ namespace ASBinCode
         /// 指示访问成员的中间状态
         /// </summary>
         public rtti.ClassMember _regMember;
+        /// <summary>
+        /// 访问成员的所属Object
+        /// </summary>
+        public IRightValue _regMemberSrcObj;
 
         public PackagePathGetter _pathGetter;
 

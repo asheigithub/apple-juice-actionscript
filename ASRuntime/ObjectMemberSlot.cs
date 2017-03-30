@@ -8,14 +8,28 @@ namespace ASRuntime
     class ObjectMemberSlot : HeapSlot
     {
         internal readonly ASBinCode.rtData.rtObject obj;
+
+        internal bool isConstMember;
         public ObjectMemberSlot(ASBinCode.rtData.rtObject obj)
         {
             this.obj = obj;
+            this.isConstMember = false;
         }
 
-        public override void directSet(IRunTimeValue value)
+        private bool flaghasset = false;
+        public override bool directSet(IRunTimeValue value)
         {
-            
+            if (isConstMember)
+            {
+                if (!flaghasset)
+                {
+                    flaghasset = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
 
             base.directSet(value);
             if (value.rtType == RunTimeDataType.rt_function)
@@ -26,6 +40,8 @@ namespace ASRuntime
                     function.setThis(obj);
                 }
             }
+
+            return true;
         }
     }
 }

@@ -44,6 +44,7 @@
     <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="ObjectMemberSlot.cs" />
     <Compile Include="operators\FunctionCaller.cs" />
+    <Compile Include="operators\InstanceCreator.cs" />
     <Compile Include="operators\OpAccess_Dot.cs" />
     <Compile Include="operators\OpAdd.cs" />
     <Compile Include="operators\OpAssigning.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="operators\OpLogic.cs" />
     <Compile Include="operators\OpMulti.cs" />
     <Compile Include="operators\OpNeg.cs" />
+    <Compile Include="operators\OpPropGetSet.cs" />
     <Compile Include="operators\OpSub.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />

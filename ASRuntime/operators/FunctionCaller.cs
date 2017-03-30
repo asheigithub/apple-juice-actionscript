@@ -72,9 +72,15 @@ namespace ASRuntime.operators
             //{
             //    CallFuncHeap[id].directSet(argement);
             //}
-
-            CallFuncHeap[id].directSet(argement);
-            pushedArgs++;
+            if (id < CallFuncHeap.Length)
+            {
+                CallFuncHeap[id].directSet(argement);
+                pushedArgs++;
+            }
+            else
+            {
+                //参数数量不匹配
+            }
         }
 
         private int check_para_id = 0;

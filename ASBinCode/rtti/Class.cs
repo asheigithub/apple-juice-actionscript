@@ -21,6 +21,7 @@ namespace ASBinCode.rtti
             classid = id;
             this.blockid = blockid;
             classMembers = new List<ClassMember>();
+            fields = new List<ClassMember>();
         }
         /// <summary>
         /// 类定义代码所在blockid
@@ -78,6 +79,12 @@ namespace ASBinCode.rtti
         /// 类成员定义
         /// </summary>
         public List<ClassMember> classMembers;
+
+        /// <summary>
+        /// 数据字段表
+        /// </summary>
+        public List<ClassMember> fields;
+
 
         /// <summary>
         /// 父类的定义（如果有）

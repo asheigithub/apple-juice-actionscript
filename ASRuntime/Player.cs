@@ -191,15 +191,19 @@ namespace ASRuntime
                 currentRunFrame = frame;
             }
 
-            
 
-            RunTimeScope scope = new RunTimeScope(
-                membersHeap, stackSlots, startOffset, calledblock.id,callerScope
+
+
+            RunTimeScope scope;
+            
+            scope = new RunTimeScope(
+                membersHeap, stackSlots, startOffset, calledblock.id, callerScope
                 ,
                 static_instance
                 ,
                 this_pointer
-                );
+            );
+            
             frame.scope = scope;
 
             return frame.scope;

@@ -52,19 +52,16 @@ namespace ASBinCode.rtti
         /// </summary>
         public IRunTimeValue defaultValue;
 
-        public readonly int index;
-
         /// <summary>
         /// 所属Class
         /// </summary>
         public readonly Class refClass;
 
-        public readonly Field bindField;
+        public readonly IMember bindField;
 
-        public ClassMember(string name,int index,Class refClass,Field bindField)
+        public ClassMember(string name,Class refClass, IMember bindField)
         {
-            
-            this.index = index;
+
             this.name = name;
             this.refClass = refClass;
             this.bindField = bindField;

@@ -9,13 +9,31 @@ namespace ASCompiler.compiler
     /// </summary>
     class MemberFinder
     {
-        public static ASBinCode.IMember find(string name, CompileEnv env)
+        public static ASBinCode.IMember find(string name, CompileEnv env,bool isStaticMember)
         {
 
             ASBinCode.IScope scope = env.block.scope;
             int depth = 0;
             while (scope !=null)
             {
+                if (scope is ASBinCode.scopes.ObjectInstanceScope)
+                {
+                    //查找类方法
+                    ASBinCode.rtti.Class cls = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                    if (isStaticMember && cls.staticClass !=null)
+                    {
+                        cls = cls.staticClass;
+                    }
+                    for (int i = 0; i < cls.classMembers.Count; i++)
+                    {
+                        if (cls.classMembers[i].name == name)
+                        {
+                            return ((ASBinCode.IMember)cls.classMembers[i].bindField);
+                        }
+                    }
+                    
+                }
+
 
                 //从后往前找。可解决catch块同名变量e问题
                 for (int i = scope.members.Count - 1; i >= 0; i--)

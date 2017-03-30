@@ -21,17 +21,17 @@ namespace ASBinCode
                     if (!member.isPublic)
                     {
                         if (finder != null)
-                        {
-                            if (member.isPrivate)
+                        { 
+                            if (member.isInternal)
                             {
-                                if (finder == cls)
+                                if (finder.package == cls.package)
                                 {
                                     return cls.classMembers[i];
                                 }
                             }
-                            else if (member.isInternal)
+                            else if (member.isPrivate)
                             {
-                                if (finder.package == cls.package)
+                                if (finder == cls)
                                 {
                                     return cls.classMembers[i];
                                 }

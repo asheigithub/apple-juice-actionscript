@@ -20,13 +20,14 @@ namespace ASRuntime
 
         internal string _propname;
 
-        public override void directSet(IRunTimeValue value)
+        public override bool directSet(IRunTimeValue value)
         {
             base.directSet(value);
             if (!_canDelete && backup ==null)
             {
                 backup = value;
             }
+            return true;
         }
 
     }

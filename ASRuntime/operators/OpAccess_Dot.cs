@@ -30,7 +30,52 @@ namespace ASRuntime.operators
                 StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                 if (slot != null)
                 {
-                    ISLOT lintoslot = ((Field)step.arg2).getISlot(rtObj.objScope);
+                    
+                    ISLOT lintoslot = ((ILeftValue)step.arg2).getISlot(rtObj.objScope);
+                    if (lintoslot == null)
+                    {
+                        frame.throwError((new error.InternalError(step.token,
+                            "没有获取到类成员数据"
+                            )));
+                    }
+
+                    slot.linkTo(lintoslot);
+                    
+                }
+                else
+                {
+                    frame.throwError((new error.InternalError(step.token,
+                         "dot操作结果必然是一个StackSlot"
+                         )));
+                }
+
+            }
+
+            frame.endStep(step);
+        }
+
+        public static void exec_method(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        {
+            IRunTimeValue obj = step.arg1.getValue(scope);
+
+            if (rtNull.nullptr.Equals(obj))
+            {
+                frame.throwError(
+                    new error.InternalError(
+                        step.token, "Cannot access a property or method of a null object reference.",
+                            new ASBinCode.rtData.rtString("Cannot access a property or method of a null object reference.")
+                        ));
+
+            }
+            else
+            {
+                rtObject rtObj =
+                    (rtObject)obj;
+
+                StackSlot slot = step.reg.getISlot(scope) as StackSlot;
+                if (slot != null)
+                {
+                    ISLOT lintoslot = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
                     if (lintoslot == null)
                     {
                         frame.throwError((new error.InternalError(step.token,
@@ -52,7 +97,6 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-
         public static void exec_dot_byname(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
             IRunTimeValue obj = step.arg1.getValue(scope);
@@ -71,6 +115,13 @@ namespace ASRuntime.operators
             {
                 do
                 {
+                    if (!(obj is rtObject))
+                    {
+                        frame.throwOpException(step.token, step.opCode);
+                        frame.endStep();
+                        return;
+                    }
+
                     rtObject rtObj = (rtObject)obj;
                     string name = ((rtString)step.arg2.getValue(scope)).value;
 
@@ -177,7 +228,7 @@ namespace ASRuntime.operators
                             StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                             if (slot != null)
                             {
-                                slot.linkTo( member.bindField.getISlot(rtObj.objScope) );
+                                slot.linkTo( ((ILeftValue)member.bindField).getISlot(rtObj.objScope) );
                             }
                             else
                             {

@@ -168,7 +168,10 @@ namespace ASCompiler.compiler.builds
 
                 if (member == null)
                 {
-                    if (cls.dynamic)
+                    if (cls.dynamic 
+                        &&
+                        cls.staticClass !=null //***编译时检查不能向Class动态加属性。
+                        )
                     {
                         //***此处编译为动态属性***
                         build_dot_name(env, step, v1);
@@ -201,23 +204,52 @@ namespace ASCompiler.compiler.builds
             }
         }
 
+        public static void make_dotStep(CompileEnv env, ASBinCode.rtti.ClassMember member, ASTool.Token token,
+            Register eax,IRightValue rvObj
+            )
+        {
+            OpStep op = new OpStep(
+                member.bindField is ClassMethodGetter ?
+                OpCode.access_method
+                :
+                OpCode.access_dot
+
+                , new SourceToken(token.line, token.ptr, token.sourceFile));
+            op.reg = eax;
+            op.regType = eax.valueType;
+            op.arg1 = rvObj;
+            op.arg1Type = rvObj.valueType;
+            op.arg2 = (IRightValue)member.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+            op.arg2Type = member.valueType; //RunTimeDataType.rt_int;
+
+            env.block.opSteps.Add(op);
+        }
 
         private static void build_dot(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, IRightValue v1,ASBinCode.rtti.ClassMember member)
         {
             ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
             eax._regMember = member;
+            eax._regMemberSrcObj = v1;
+
             eax.setEAXTypeWhenCompile(member.valueType);
 
+            make_dotStep(env, member, step.token, eax, v1);
 
-            OpStep op = new OpStep(OpCode.access_dot, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-            op.reg = eax;
-            op.regType = eax.valueType;
-            op.arg1 = v1;
-            op.arg1Type = v1.valueType;
-            op.arg2 = member.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
-            op.arg2Type = member.valueType; //RunTimeDataType.rt_int;
+            //OpStep op = new OpStep(
+            //    member.bindField is ClassMethodGetter?
+            //    OpCode.access_method
+            //    :
+            //    OpCode.access_dot
+                
+            //    , new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+            //op.reg = eax;
+            //op.regType = eax.valueType;
+            //op.arg1 = v1;
+            //op.arg1Type = v1.valueType;
+            //op.arg2 = (IRightValue)member.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+            //op.arg2Type = member.valueType; //RunTimeDataType.rt_int;
 
-            env.block.opSteps.Add(op);
+            //env.block.opSteps.Add(op);
         }
 
 

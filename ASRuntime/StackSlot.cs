@@ -27,7 +27,8 @@ namespace ASRuntime
             }
 
         }
-
+        internal ASBinCode.ClassPropertyGetter propGetSet;
+        internal ASBinCode.rtData.rtObject propBindObj;
 
         internal ISLOT linktarget;
         public void linkTo(ISLOT linktarget)
@@ -39,13 +40,26 @@ namespace ASRuntime
         private int index;
         private IRunTimeValue[] store;
 
-        
+        public bool isPropGetterSetter
+        {
+            get
+            {
+                if (linktarget != null)
+                {
+                    return linktarget.isPropGetterSetter;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
 
-        public void directSet(IRunTimeValue value)
+        public bool directSet(IRunTimeValue value)
         {
             if (linktarget != null)
             {
-                linktarget.directSet(value);
+                return  linktarget.directSet(value);
             }
             else
             {
@@ -113,7 +127,9 @@ namespace ASRuntime
                         }
                         break;
                 }
+                return true;
             }
+            
         }
 
         public IRunTimeValue getValue()
@@ -237,6 +253,8 @@ namespace ASRuntime
         public void clear()
         {
             linktarget = null;
+            propGetSet = null;
+            propBindObj = null;
             index = (int)RunTimeDataType.unknown;
         }
     }

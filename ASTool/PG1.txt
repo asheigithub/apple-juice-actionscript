@@ -149,6 +149,11 @@
 <ACCESS_MEMBER_KEYWORD> ::="public" |"private"| "internal"|"protected" |"final" |"static" |"override" |"dynamic" ;
 
 
+<K_ExpressionList>   ::=<K_Expression><K_CommaOpt> ;
+<K_CommaOpt> ::=  ","<K_CommaOpt_1> |null;
+<K_CommaOpt_1> ::=<K_Expression><K_CommaOpt>|null;
+
+
 //可用作标识符的句法关键字。。
 <ID_EABLED_KEYWORD> ::="each"|"get"|"set"|"namespace"|"include"|"dynamic"|"final"|"native"|"override"|"static";
 
@@ -179,7 +184,7 @@
 
 
 <Function>  ::= "function" <FunctionProperty>"("<Parameters>")"<FunctionReturnType> <FunctionCode> ;
-<FunctionCode> ::="{" <FunctionBody> "}" |null;
+<FunctionCode> ::="{" <FunctionBody> "}" | null ;
 <FunctionProperty>  ::= "get" <FunctionName> |"set" <FunctionName>|<FunctionName>; 
 <FunctionName> ::= identifier |null|<ID_EABLED_KEYWORD> ;
 
@@ -344,12 +349,11 @@
 
 /*******For in结束**********************************/
 
-
+<A_FC> ::=<Call>|null;
 
 
 <Expression> ::= <Assigning>;
-
-<Assigning>  ::=<Ternary><AssigningOpt> | <Function>;           //赋值
+<Assigning>  ::=<Ternary><AssigningOpt>;           //赋值
 				                            
 <AssigningOpt> ::= "="<Assigning> |                        //改为右结合
 				   "*="<Assigning> |
@@ -410,8 +414,10 @@
 <MultiplyOpt> ::= "*" <Unary><MultiplyOpt> | "/" <Unary><MultiplyOpt> | "%" <Unary><MultiplyOpt> | null;    
 
 <Unary>    ::=  "+" <Access> | "-" <Access> | "~" <Unary>| "!" <Unary>| "delete"<Access> | "typeof"<Unary> /*| "void" <Access> void会和返回值冲突.. */ //单目运算
-                | "++" <Access> | "--" <Access>| "void" <Access>  |<Access>  ;                        
-//<Unary>    ::=<Access>;
+                | "++" <Access> | "--" <Access>| "void" <Access> |<Access>  ;                        
+
+
+
 
 <ThisSuper> ::=this <AccessOpt> |super <AccessOpt> ;
 <New>      ::=  "new" <NewClassOrVector> ;
@@ -420,7 +426,7 @@
 
 
 
-<Access>   ::=  <NSAccess><AccessOpt><UnitSuffix>;                                                                               //成员访问
+<Access>   ::=  <NSAccess><AccessOpt><UnitSuffix>|<Function><A_FC>;                                                                               //成员访问
 <AccessOpt> ::= "." <F_NSAccess><AccessOpt> | "[" <Expression> "]" <AccessOpt>|<Call><AccessOpt> 
 				//| ".."<NSAccess><AccessOpt> 
 				| <F_E4XAccess><E4XAccessOpt>
@@ -438,7 +444,7 @@
 <UnitSuffix> ::="++" | "--"| null ;    //后缀
 
 
-<Unit> ::= <New>|<Object>|<E4XAccess>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <AExprList> ")" | <Array> |<Vector>|"CONFIG::" identifier ;
+<Unit> ::= /*<New>|*/ "new" <Expression>|<Object>|<E4XAccess>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <AExprList> ")" | <Array> |<Vector>|"CONFIG::" identifier ;
 <F_Unit> ::= <Object>|<ID_EABLED_KEYWORD>|identifier |number | string  |"(" <AExprList> ")" | <Array> |<Vector>|"CONFIG::" identifier ;
 
 

@@ -136,6 +136,7 @@
     <Compile Include="FileSrcOut.vb" />
     <Compile Include="Grammar\AS3LexKeywords.vb" />
     <Compile Include="Grammar\Grammar.vb" />
+    <Compile Include="Grammar\GrammarExpression.vb" />
     <Compile Include="Grammar\GrammarLine.vb" />
     <Compile Include="Grammar\GrammarNode.vb" />
     <Compile Include="Grammar\GrammarNodeType.vb" />

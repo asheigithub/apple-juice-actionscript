@@ -26,10 +26,32 @@ namespace ASCompiler.compiler.builds
                             build_class(env, _class, step, builder);
                             return;
                         }
-                        else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void)
+                        else if (cls is ClassMethodGetter)
+                        { 
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "Method cannot be used as a constructor."));
+                        }
+                        else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function)
                         {
                             //从Class对象中new
                             build_void(env, cls, step, builder);
+                            return;
+                        }
+                        else if (cls.valueType > ASBinCode.RunTimeDataType.unknown)
+                        {
+                            _class = builder.getClassByRunTimeDataType(cls.valueType);
+
+                            if (_class.staticClass != null)
+                            {
+                                build_class(env, _class, step, builder);
+                            }
+                            else
+                            {
+                                throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "类型" + cls.valueType + "不能new"));
+                            }
                             return;
                         }
                         else
@@ -63,10 +85,17 @@ namespace ASCompiler.compiler.builds
                                 build_class(env, _class, step, builder);
                                 return;
                             }
-                            else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void)
+                            else if (cls is ClassMethodGetter)
+                            {
+                                throw new BuildException(
+                                    new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                    "Method cannot be used as a constructor."));
+                            }
+                            else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function )
                             {
                                 //从Class对象中new
                                 build_void(env, cls, step, builder);
+                                
                                 return;
                             }
                             else
@@ -101,7 +130,7 @@ namespace ASCompiler.compiler.builds
             //***查找构造函数**
             if (_class.constructor != null)
             {
-                Field field = _class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
+                ClassMethodGetter field = (ClassMethodGetter)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
                 int blockid = field.refdefinedinblockid;
 
                 var signature =
@@ -119,7 +148,14 @@ namespace ASCompiler.compiler.builds
                 FuncCallBuilder funcbuilder = new FuncCallBuilder();
                 funcbuilder.createParaOp(args, signature, step, env, field, builder, true, _class);
             }
-
+            else
+            {
+                OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement,
+                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(_class.classid));
+                opMakeArgs.arg1Type = RunTimeDataType.rt_int;
+                env.block.opSteps.Add(opMakeArgs);
+            }
 
             OpStep op = new OpStep(OpCode.new_instance, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
             op.arg1 = new RightValue(new rtInt(_class.classid));
@@ -140,16 +176,16 @@ namespace ASCompiler.compiler.builds
             OpStep opnewclass = new OpStep(OpCode.new_instance_class,
                                 new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
             opnewclass.arg1 = cls;
-            opnewclass.arg1Type = cls.valueType;
+            opnewclass.arg1Type = RunTimeDataType.rt_void;
             Register _eax = env.createASTRegister(step.Arg1.Reg.ID);
-            _eax.setEAXTypeWhenCompile(cls.valueType);
+            _eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
             opnewclass.reg = _eax;
-            opnewclass.regType = cls.valueType;
+            opnewclass.regType = RunTimeDataType.rt_void;
 
 
             OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_class_argement, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
             opMakeArgs.arg1 = cls;
-            opMakeArgs.arg1Type = cls.valueType;
+            opMakeArgs.arg1Type = RunTimeDataType.rt_void;
             env.block.opSteps.Add(opMakeArgs);
 
             if (step.Arg3 != null)

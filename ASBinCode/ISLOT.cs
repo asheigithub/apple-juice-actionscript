@@ -10,8 +10,9 @@ namespace ASBinCode
     public interface ISLOT:IValueSetter
     {
         //void setValue(IRunTimeValue value);
-
-        void directSet(IRunTimeValue value);
+        bool isPropGetterSetter { get; }
+        
+        bool directSet(IRunTimeValue value);
 
         IRunTimeValue getValue();
 
