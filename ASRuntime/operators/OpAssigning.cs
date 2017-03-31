@@ -22,7 +22,7 @@ namespace ASRuntime.operators
                         slot = ((StackSlot)slot).linktarget;
                     }
                     string ext = String.Empty;
-                    if (slot is ASBinCode.ClassMethodGetter.MethodSlot)
+                    if (slot is ClassMethodGetter.MethodSlot)
                     {
                         ext = "Cannot assign to a method ";// + ((ASBinCode.ClassMethodGetter.MethodSlot)slot).method;
                     }
@@ -32,7 +32,7 @@ namespace ASRuntime.operators
                         //+ ((ObjectMemberSlot)slot).obj.value._class.name
                         //+" on ppp.PPC."
                     }
-                    else if (slot is ASBinCode.ClassPropertyGetter.PropertySlot)
+                    else if (slot is ClassPropertyGetter.PropertySlot)
                     {
                         ext = "Illegal write to read-only property ";
                     }
@@ -49,9 +49,12 @@ namespace ASRuntime.operators
                 ClassPropertyGetter.PropertySlot propslot= 
                         (ASBinCode.ClassPropertyGetter.PropertySlot)((StackSlot)slot).linktarget;
                 //***调用访问器。***
-                ASBinCode.ClassPropertyGetter prop = propslot.property;
+                ASBinCode.ClassPropertyGetter prop = ((StackSlot)slot).propGetSet; //propslot.property;
 
-                _doPropAssigning(prop, frame, step, player, scope, propslot.bindObj, v);
+                _doPropAssigning(prop, frame, step, player, scope,
+                    //propslot.bindObj
+                    ((StackSlot)slot).propBindObj
+                    , v);
 
             }
 

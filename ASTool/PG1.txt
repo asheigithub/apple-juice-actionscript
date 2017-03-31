@@ -52,6 +52,8 @@
 <T>  ::="("<E>")"|number|identifier;
 */
 
+
+
 <AS3File>   ::=<PACKAGE>|<HOUT_PACKAGE><PACKAGE>;
 
 <PACKAGE>   ::= "package" <PACKAGE_NAME> "{" <PACKAGEBODY><OUT_PACKAGE>;
@@ -497,7 +499,8 @@
 
 <Object>   ::= "{" <ObjectBody>;
 <ObjectBody> ::=<ObjMembers> "}" | "}";
-<ObjMember> ::=<VariableName>":"<Expression>|number":"<Expression>|string":"<Expression>;
+<ObjMember> ::=identifier":"<Expression>|number":"<Expression>|string":"<Expression>|"{"label":"<ObjectBody>;
+
 <ObjMembers> ::=<ObjMember><ObjMembers1>;
 <ObjMembers1> ::= ","<ObjMember><ObjMembers1>|null;
 

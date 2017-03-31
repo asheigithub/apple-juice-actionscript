@@ -130,11 +130,11 @@ namespace ASCompiler.compiler.builds
 
                         if (builder.dictSignatures.ContainsKey(blockid))
                         {
-                            if (builder.dictSignatures[blockid].ContainsKey((Variable)rFunc))
+                            if (builder.dictSignatures[blockid].ContainsKey((IMember)rFunc))
                             {
                                 
                                 signature =
-                                     builder.dictSignatures[blockid][(Variable)rFunc];
+                                     builder.dictSignatures[blockid][(IMember)rFunc];
                                 var returnvalueType = signature.returnType;
 
                                 op.regType = RunTimeDataType.rt_void;
@@ -149,7 +149,7 @@ namespace ASCompiler.compiler.builds
                         List<ASTool.AS3.Expr.AS3DataStackElement> args
                             = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
 
-                        createParaOp(args, signature, step, env, rFunc, builder,false,null);
+                        createParaOp(args, signature, step.token, env, rFunc, builder,false,null);
 
                         env.block.opSteps.Add(op);
 
@@ -176,7 +176,7 @@ namespace ASCompiler.compiler.builds
 
         public void createParaOp(List<ASTool.AS3.Expr.AS3DataStackElement> args,
             ASBinCode.rtti.FunctionSignature signature, 
-            ASTool.AS3.Expr.AS3ExprStep step, CompileEnv env,
+            ASTool.Token token, CompileEnv env,
             IRightValue rFunc,Builder builder,bool isConstructor,ASBinCode.rtti.Class cls
             )
         {
@@ -187,7 +187,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (signature.parameters[args.Count].defaultValue == null)
                     {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                        throw new BuildException(token.line, token.ptr, token.sourceFile,
                             "参数数量不足,需要" + signature.parameters.Count 
                             );
                     }
@@ -197,7 +197,7 @@ namespace ASCompiler.compiler.builds
                     if (! (signature.parameters.Count >0 
                         && signature.parameters[signature.parameters.Count - 1].isPara))
                     {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                        throw new BuildException(token.line, token.ptr, token.sourceFile,
                             "参数数量过多,期望" + signature.parameters.Count
                             );
                     }
@@ -206,7 +206,7 @@ namespace ASCompiler.compiler.builds
 
             if (!isConstructor)
             {
-                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = rFunc;
                 opMakeArgs.arg1Type = RunTimeDataType.rt_function;
                 env.block.opSteps.Add(opMakeArgs);
@@ -214,7 +214,7 @@ namespace ASCompiler.compiler.builds
             else
             {
                 
-                OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = new ASBinCode.rtData.RightValue( new ASBinCode.rtData.rtInt( cls.classid));
                 opMakeArgs.arg1Type = RunTimeDataType.rt_int;
                 env.block.opSteps.Add(opMakeArgs);
@@ -225,21 +225,21 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < args.Count; i++)
             {
                 ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
+                IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, token, builder);
 
                 if (signature != null) //参数类型检查
                 {
                     ASBinCode.rtti.FunctionParameter para = signature.parameters[i];
                     if (para.isPara)
                     {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                        throw new BuildException(token.line, token.ptr, token.sourceFile,
                             "... (rest) parameter 未实现"
                             );
                     }
 
                     if (!ASRuntime.TypeConverter.testImplicitConvert(arg.valueType, para.type, builder))
                     {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                        throw new BuildException(token.line, token.ptr, token.sourceFile,
                             "参数类型不匹配，不能将" + arg.valueType + "转换成" + para.type
                             );
                     }
@@ -247,7 +247,7 @@ namespace ASCompiler.compiler.builds
                     if (arg.valueType != para.type)
                     {
                         arg = builds.ExpressionBuilder.addCastOpStep(env, arg, para.type,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder);
+                            new SourceToken(token.line, token.ptr, token.sourceFile),builder);
                     }
                 }
 
@@ -258,7 +258,7 @@ namespace ASCompiler.compiler.builds
                     :
                     OpCode.push_parameter
                     
-                    , new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    , new SourceToken(token.line, token.ptr, token.sourceFile));
                 opPushArgs.arg1 = arg;
                 opPushArgs.arg1Type = arg.valueType;
                 opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));

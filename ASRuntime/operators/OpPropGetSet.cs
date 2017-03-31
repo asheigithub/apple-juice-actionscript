@@ -26,7 +26,7 @@ namespace ASRuntime.operators
                     ClassPropertyGetter.PropertySlot propslot =
                         (ASBinCode.ClassPropertyGetter.PropertySlot)((StackSlot)slot).linktarget;
                     //***调用访问器。***
-                    ASBinCode.ClassPropertyGetter prop = propslot.property;
+                    ASBinCode.ClassPropertyGetter prop = ((StackSlot)slot).propGetSet; //propslot.property;
                     if (prop.getter == null)
                     {
                         frame.throwError(
@@ -59,7 +59,8 @@ namespace ASRuntime.operators
 
                     //***读取getter***
                     var func = ((ClassMethodGetter)getter.bindField).getValue(
-                        propslot.bindObj.objScope
+                        //propslot.bindObj.objScope
+                        ((StackSlot)slot).propBindObj.objScope
                         );
                     //***调用设置器***
 
@@ -72,7 +73,7 @@ namespace ASRuntime.operators
                     funCaller.returnSlot = step.reg.getISlot(scope);
 
                     ((StackSlot)funCaller.returnSlot).propGetSet = prop;
-                    ((StackSlot)funCaller.returnSlot).propBindObj = propslot.bindObj;
+                    ((StackSlot)funCaller.returnSlot).propBindObj = ((StackSlot)slot).propBindObj;   //propslot.bindObj;
 
 
                     BlockCallBackBase cb = new BlockCallBackBase();

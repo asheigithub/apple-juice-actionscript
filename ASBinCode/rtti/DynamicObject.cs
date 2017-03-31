@@ -26,6 +26,7 @@ namespace ASBinCode.rtti
             return propertys.ContainsKey(name);
         }
 
+
         public void createproperty(string name,ISLOT slot)
         {
             if (!propertys.ContainsKey(name))
@@ -33,6 +34,20 @@ namespace ASBinCode.rtti
                 propertys.Add(name, slot);
             }
         }
+
+        public void createOrReplaceproperty(string name, ISLOT slot)
+        {
+            if (!propertys.ContainsKey(name))
+            {
+                propertys.Add(name, slot);
+            }
+            else
+            {
+                propertys[name] = slot;
+            }
+        }
+
+
 
         public void deleteProperty(string name)
         {

@@ -70,7 +70,23 @@ namespace ASRuntime
                         break;
                     }
                 }
+                if (defaultblock == null)
+                {
+                    //***查找第一个类的包外代码
+                    for (int i = swc.classes.Count-1; i >0;i--)
+                    {
+                        if (swc.classes[i].staticClass != null)
+                        {
+                            defaultblock = swc.blocks[swc.classes[i].outscopeblockid];
+                            break;
+                        }
+                    }
+                }
 
+                if (defaultblock == null && swc.blocks.Count >0)
+                {
+                    defaultblock = swc.blocks[0];
+                }
                 
             }
             runtimeStack = new Stack<StackFrame>();
@@ -89,7 +105,19 @@ namespace ASRuntime
 
         public IRunTimeValue run2(IRightValue result)
         {
-            
+
+            if (defaultblock == null || swc == null || swc.blocks.Count == 0)
+            {
+                if (isConsoleOut)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("====没有找到可执行的代码====");
+                    Console.WriteLine("用[Doc]标记文档类");
+                    Console.WriteLine("或者第一个类文件的包外代码作为入口");
+                }
+                return null;
+            }
+
             for (int i = 0; i < stackSlots.Length; i++)
             {
                 stackSlots[i] = new StackSlot();
@@ -103,6 +131,8 @@ namespace ASRuntime
                 null
                 );
             
+            
+
             while (step())
             {
 
@@ -202,6 +232,8 @@ namespace ASRuntime
                 static_instance
                 ,
                 this_pointer
+                //,
+                //frame._dictMethods
             );
             
             frame.scope = scope;
@@ -254,24 +286,28 @@ namespace ASRuntime
             {
                 runtimeStack.Pop(); //出栈
 
+
+                var toclose = currentRunFrame;
                 if (currentRunFrame.callbacker != null)
                 {
                     IBlockCallBack temp = currentRunFrame.callbacker;
                     currentRunFrame.callbacker = null;
                     temp.call(temp.args);
-
+                   
                 }
+                
+                toclose.close();
 
-                currentRunFrame.close();
                 if (runtimeStack.Count > 0)
                 {
-                    
+
                     currentRunFrame = runtimeStack.Peek();
                 }
                 else
                 {
                     currentRunFrame = null;
                 }
+                
             }
             else
             {

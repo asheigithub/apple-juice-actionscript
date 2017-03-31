@@ -50,8 +50,31 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue( scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue( scope);
 
-            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, 
-                frame._tempSlot1, frame._tempSlot2,step, _execAdd_CallBacker);
+            if (
+                (v1.rtType > ASBinCode.RunTimeDataType.unknown && v2.rtType > ASBinCode.RunTimeDataType.unknown)
+                ||
+                v1.rtType == ASBinCode.RunTimeDataType.rt_int
+                ||
+                v1.rtType == ASBinCode.RunTimeDataType.rt_uint
+                ||
+                v1.rtType == ASBinCode.RunTimeDataType.rt_number
+                ||
+                v2.rtType == ASBinCode.RunTimeDataType.rt_int
+                ||
+                v2.rtType == ASBinCode.RunTimeDataType.rt_uint
+                ||
+                v2.rtType == ASBinCode.RunTimeDataType.rt_number
+                )
+            {
+                OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, step, _execAdd_CallBacker);
+            }
+            else //toString
+            {
+                OpCast.InvokeTwoToString(v1, v2, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, step, _execAdd_InvokeToString_CallBacker);
+            }
+            
         }
 
         private static void _execAdd_CallBacker( 

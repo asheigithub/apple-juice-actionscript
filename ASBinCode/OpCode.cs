@@ -290,34 +290,44 @@ namespace ASBinCode
         access_dot_byname=75,
 
         /// <summary>
+        /// []访问 需动态检查类型
+        /// </summary>
+        bracket_access =76,
+
+        /// <summary>
         /// 访问方法
         /// </summary>
-        access_method=76,
+        access_method =77,
 
         /// <summary>
         /// method绑定this
         /// </summary>
-        bind_this=77,
+        bind_this=78,
 
         /// <summary>
         /// 如果是一个属性，则尝试从属性中读取值。
         /// </summary>
-        try_read_getter=78,
+        try_read_getter=79,
 
         /// <summary>
         /// 试图往属性中写回值
         /// </summary>
-        try_write_setter=79,
+        try_write_setter=80,
 
         /// <summary>
         /// 删除属性
         /// </summary>
-        delete_prop=80,
+        delete_prop=81,
+
+        /// <summary>
+        /// 设置动态属性
+        /// </summary>
+        set_dynamic_prop=82,
 
         /// <summary>
         /// 从对象转换到基本类型
         /// </summary>
-        cast_primitive=81,
+        cast_primitive=83,
 
         
     }

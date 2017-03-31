@@ -21,6 +21,8 @@ namespace ASRuntime
             IRunTimeScope parent,
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
             ASBinCode.rtData.rtObject this_pointer
+            //,
+            //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
             )
         {
             runtimestack = rtStack;
@@ -31,6 +33,7 @@ namespace ASRuntime
             this.memberDataList = memberDataList;
             this._static_scope = _static_scope;
             _this_pointer = this_pointer;
+            //this._dictMethods = dictMethods;
         }
 
 
@@ -92,6 +95,15 @@ namespace ASRuntime
                 return _this_pointer;
             }
         }
+
+        //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> _dictMethods;
+        //public Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
+        //{
+        //    get
+        //    {
+        //        return _dictMethods;
+        //    }
+        //}
     }
 
     

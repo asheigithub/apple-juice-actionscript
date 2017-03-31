@@ -57,37 +57,61 @@ namespace ASBinCode
 
         public ISLOT getISlot(IRunTimeScope scope)
         {
-            if (_tempSlot == null)
-            {
-                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-                method.bind(scope);
-                method.setThis(scope.this_pointer);
-                _tempSlot = new MethodSlot(method);
+            //if (_tempSlot == null)
+            //{
+            rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return new MethodSlot(method);
+            //    _tempSlot = new MethodSlot(method);
 
-            }
-            else if( !
-                (_tempSlot.method.bindScope.Equals( scope )
-                &&
-                _tempSlot.method.this_pointer.Equals( scope.this_pointer )
-                ) )
-            {
-                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-                method.bind(scope);
-                method.setThis(scope.this_pointer);
-                _tempSlot.method = method;
-            }
+            //}
+            //else if( !
+            //    (_tempSlot.method.bindScope.Equals( scope )
+            //    &&
+            //    _tempSlot.method.this_pointer.Equals( scope.this_pointer )
+            //    ) )
+            //{
+            //    rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            //    method.bind(scope);
+            //    method.setThis(scope.this_pointer);
+            //    _tempSlot.method = method;
+            //}
 
-            return _tempSlot;
+            //return _tempSlot;
+
+            //Dictionary<rtObject, ISLOT> slots;
+
+            //if (!scope.dictMethods.TryGetValue(this, out slots))
+            //{
+            //    slots = new Dictionary<rtObject, ISLOT>();
+            //    scope.dictMethods.Add(this, slots);
+            //}
+
+            //ISLOT slot;
+            //if (!slots.TryGetValue(scope.this_pointer, out slot))
+            //{
+            //    rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            //    method.bind(scope);
+            //    method.setThis(scope.this_pointer);
+            //    slot = new MethodSlot(method);
+            //    slots.Add( scope.this_pointer,slot );
+
+            //}
+            //return slot;
+
+            //throw new NotImplementedException();    
         }
 
-        private MethodSlot _tempSlot;
+
+        //private MethodSlot _tempSlot;
 
         public IRunTimeValue getValue(IRunTimeScope scope)
         {
             //throw new NotImplementedException();
             //return getISlot(scope).getValue();
             return getISlot(scope).getValue();
-           
+            
         }
 
         public IMember clone()
@@ -125,7 +149,7 @@ namespace ASBinCode
 
         public class MethodSlot : ISLOT
         {
-            public rtFunction method;
+            private rtFunction method;
 
             public MethodSlot(rtFunction method)
             {

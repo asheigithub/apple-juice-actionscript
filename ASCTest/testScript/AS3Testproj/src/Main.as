@@ -1,6 +1,7 @@
 package
 {
 	import flash.display.Sprite;
+	import flash.sampler.NewObjectSample;
 	
 	[Doc]
 	/**
@@ -12,25 +13,26 @@ package
 		
 		public function Main() 
 		{
-			var t:* = new Test();
-			//var j;
-			//var k=j=t.i = 5;
-			trace(t.i);
-			//trace(k);
+			//var t:Test = new Test(null);
 			//
-			t.i += "gg";
-			
-			//trace( t.b == true);
 			//
-			////
-			////
-			////
-			////var f = t.testOut;
-			////
-			////trace( f() );
-			trace(t.i++);
-
-			trace(++t.i);
+			//trace(t.i++);
+			//trace(++t.i);
+			//
+			//var t2:Test = new Test(null);
+			//t2._i = 3;
+			//trace( t2.testOut());
+			//
+			//
+			//var f1 = t.testOut;			
+			//var f2 = t2.testOut;
+			//
+			//trace(f1());
+			//trace(f2());
+			//
+			test();
+			//
+			//test2();
 			
 			
 			
@@ -38,10 +40,10 @@ package
 		
 		
 		[to]
-		public override function toString():String
-		{
-			return "Main tostring";
-		}
+		//public override function toString():String
+		//{
+			//return "Main tostring";
+		//}
 		
 		public function valueOf()
 		{
@@ -50,10 +52,34 @@ package
 		
 		private function test()
 		{
+			trace("动态对象加载");
 			
+			var myAssocArray:Object = { fname:"John", lname:"Public", ff:valueOf , 
+			innerObj : { p1:this-"3", p2:"p2" } };
+			
+			
+			 trace(myAssocArray.fname);     // John
+			 trace(myAssocArray["lname"]);  // Public
+			 myAssocArray.initial = "Q";
+			 
+			 trace( myAssocArray.innerObj.p1 );
+			 
+			 trace(myAssocArray.initial);   // Q
+		}
+		
+		private function test2()
+		{
+			//trace("动态[]运算符");
+			//
+			//var obj:Object = new Object();
+			//obj.prop1 = "foo";
+			//obj.prop2 = "bar";
+//
+			//for (var i:int = 1;i < 3;i++) {
+				//trace(obj["prop"+i]);
+			//}
 		}
 		
 	}
 	
 }
-

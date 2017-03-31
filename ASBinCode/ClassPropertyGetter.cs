@@ -17,6 +17,7 @@ namespace ASBinCode
             this._class = _class;
             this.indexofMember = indexofMember;
             this._name = name;
+            this._tempSlot = new PropertySlot();
         }
 
         
@@ -77,21 +78,21 @@ namespace ASBinCode
 
         public ISLOT getISlot(IRunTimeScope scope)
         {
-            if (_tempSlot == null)
-            {
-                _tempSlot = new PropertySlot(scope.this_pointer, scope,this);
-                
-            }
-            else if (!
-                (_tempSlot.scope.Equals(scope)
-                &&
-                _tempSlot.bindObj.Equals(scope.this_pointer)
-                ))
-            {
-                _tempSlot.bindObj = scope.this_pointer;
-                _tempSlot.scope = scope;
+            //if (_tempSlot == null)
+            //{
+            //    _tempSlot = new PropertySlot(scope.this_pointer, scope, this);
 
-            }
+            //}
+            //else if (!
+            //    (_tempSlot.scope.Equals(scope)
+            //    &&
+            //    _tempSlot.bindObj.Equals(scope.this_pointer)
+            //    ))
+            //{
+            //    _tempSlot.bindObj = scope.this_pointer;
+            //    _tempSlot.scope = scope;
+
+            //}
 
             return _tempSlot;
         }
@@ -103,14 +104,14 @@ namespace ASBinCode
 
         public class PropertySlot : ISLOT
         {
-            public rtObject bindObj;
-            public IRunTimeScope scope;
-            public ClassPropertyGetter property;
-            public PropertySlot(rtObject bindObj, IRunTimeScope scope,ClassPropertyGetter property)
+            //public rtObject bindObj;
+            //public IRunTimeScope scope;
+            //public ClassPropertyGetter property;
+            public PropertySlot()// rtObject bindObj, IRunTimeScope scope,ClassPropertyGetter property)
             {
-                this.bindObj = bindObj;
-                this.scope = scope;
-                this.property = property;
+                //this.bindObj = bindObj;
+                //this.scope = scope;
+                //this.property = property;
             }
 
             public bool isPropGetterSetter

@@ -122,10 +122,12 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-
-
-
-        private void build_class(CompileEnv env, ASBinCode.rtti.Class _class, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
+        public void build_class(CompileEnv env,
+            ASBinCode.rtti.Class _class,
+            ASTool.Token token, Builder builder,
+            Register outeax,
+            List<ASTool.AS3.Expr.AS3DataStackElement> args
+            )
         {
             //***查找构造函数**
             if (_class.constructor != null)
@@ -135,37 +137,91 @@ namespace ASCompiler.compiler.builds
 
                 var signature =
                         builder.dictSignatures[blockid][field];
-                //***参数检查***
-                List<ASTool.AS3.Expr.AS3DataStackElement> args;
-                if (step.Arg3 != null)
-                {
-                    args = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
-                }
-                else
-                {
-                    args = new List<ASTool.AS3.Expr.AS3DataStackElement>();
-                }
+                
                 FuncCallBuilder funcbuilder = new FuncCallBuilder();
-                funcbuilder.createParaOp(args, signature, step, env, field, builder, true, _class);
+                funcbuilder.createParaOp(args, signature, token, env, field, builder, true, _class);
             }
             else
             {
                 OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement,
-                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(_class.classid));
                 opMakeArgs.arg1Type = RunTimeDataType.rt_int;
                 env.block.opSteps.Add(opMakeArgs);
             }
 
-            OpStep op = new OpStep(OpCode.new_instance, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+            OpStep op = new OpStep(OpCode.new_instance, new SourceToken(token.line, token.ptr, token.sourceFile));
             op.arg1 = new RightValue(new rtInt(_class.classid));
             op.arg1Type = _class.getRtType();
-            Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-            eax.setEAXTypeWhenCompile(_class.getRtType());
-            op.reg = eax;
+            
+            outeax.setEAXTypeWhenCompile(_class.getRtType());
+            op.reg = outeax;
             op.regType = _class.getRtType();
 
             env.block.opSteps.Add(op);
+        }
+
+
+        private void build_class(CompileEnv env, 
+            ASBinCode.rtti.Class _class, 
+            ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
+        {
+            //***参数检查***
+            List<ASTool.AS3.Expr.AS3DataStackElement> args;
+            if (step.Arg3 != null)
+            {
+                args = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
+            }
+            else
+            {
+                args = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+            }
+
+            build_class(env, _class, step.token, builder,
+                env.createASTRegister(step.Arg1.Reg.ID),
+                args
+                );
+
+
+            ////***查找构造函数**
+            //if (_class.constructor != null)
+            //{
+            //    ClassMethodGetter field = (ClassMethodGetter)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
+            //    int blockid = field.refdefinedinblockid;
+
+            //    var signature =
+            //            builder.dictSignatures[blockid][field];
+            //    //***参数检查***
+            //    List<ASTool.AS3.Expr.AS3DataStackElement> args;
+            //    if (step.Arg3 != null)
+            //    {
+            //        args = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
+            //    }
+            //    else
+            //    {
+            //        args = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+            //    }
+            //    FuncCallBuilder funcbuilder = new FuncCallBuilder();
+            //    funcbuilder.createParaOp(args, signature, step, env, field, builder, true, _class);
+            //}
+            //else
+            //{
+            //    OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement,
+            //        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+            //    opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(_class.classid));
+            //    opMakeArgs.arg1Type = RunTimeDataType.rt_int;
+            //    env.block.opSteps.Add(opMakeArgs);
+            //}
+
+            //OpStep op = new OpStep(OpCode.new_instance, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+            //op.arg1 = new RightValue(new rtInt(_class.classid));
+            //op.arg1Type = _class.getRtType();
+            //Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+            //eax.setEAXTypeWhenCompile(_class.getRtType());
+            //op.reg = eax;
+            //op.regType = _class.getRtType();
+
+            //env.block.opSteps.Add(op);
 
         }
 

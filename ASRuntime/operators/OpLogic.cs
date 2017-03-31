@@ -711,7 +711,7 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
                 ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
 
-                return ASBinCode.rtData.rtFunction.isEqual(obj1, obj2);
+                return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
 
             }
             else if (v1.rtType > ASBinCode.RunTimeDataType.unknown
@@ -904,7 +904,7 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
                 ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
 
-                return ASBinCode.rtData.rtFunction.isEqual(obj1, obj2);
+                return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
 
             }
             else if (v1.rtType > ASBinCode.RunTimeDataType.unknown

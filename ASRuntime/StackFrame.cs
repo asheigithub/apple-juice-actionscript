@@ -37,6 +37,9 @@ namespace ASRuntime
         internal StackSlot _tempSlot1;
         internal StackSlot _tempSlot2;
 
+        //internal Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtObject, ISLOT>> _dictMethods
+        //    =new Dictionary<ClassMethodGetter, Dictionary<rtObject, ISLOT>>();
+
         private Stack<TryState> tryCatchState = new Stack<TryState>();
         /// <summary>
         /// 暂存已发生的错误
@@ -85,7 +88,7 @@ namespace ASRuntime
 
         public bool IsEnd()
         {
-            return codeLinePtr >= block.opSteps.Count;
+            return  codeLinePtr >= block.opSteps.Count ;
         }
 
         /// <summary>
@@ -107,7 +110,10 @@ namespace ASRuntime
         {
             execing = false;
             doTryCatchReturn(step);
-            codeLinePtr++;
+            if (!isclosed)
+            {
+                codeLinePtr++;
+            }
         }
 
         private bool execing = false;
@@ -404,11 +410,17 @@ namespace ASRuntime
                 case OpCode.access_dot_byname:
                     operators.OpAccess_Dot.exec_dot_byname(player, this, step, scope);
                     break;
+                case OpCode.bracket_access:
+                    operators.OpAccess_Dot.exec_bracket_access(player, this, step, scope);
+                    break;
                 case OpCode.access_method:
                     operators.OpAccess_Dot.exec_method(player, this, step, scope);
                     break;
                 case OpCode.delete_prop:
                     operators.OpDynamicProperty.exec_delete(player, this, step, scope);
+                    break;
+                case OpCode.set_dynamic_prop:
+                    operators.OpDynamicProperty.exec_set_dynamic_prop(player, this, step, scope);
                     break;
                 case OpCode.try_read_getter:
                     operators.OpPropGetSet.exec_try_read_prop(player, this, step, scope);
@@ -858,11 +870,13 @@ namespace ASRuntime
             runtimeError = err;
         }
 
+        private bool isclosed;
         /// <summary>
         /// 退出程序栈时
         /// </summary>
         public void close()
         {
+            isclosed = true;
             int offset = scope.offset;
             //清除执行栈
             for (int i = offset; i < offset + block.totalRegisters; i++)
@@ -871,6 +885,7 @@ namespace ASRuntime
             }
             _tempSlot1.clear();
             _tempSlot2.clear();
+            //_dictMethods.Clear();
         }
 
     }

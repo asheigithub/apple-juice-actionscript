@@ -338,7 +338,7 @@ flagdefwords:
 
                     Dim real As String = ch
 
-                    Dim k As Integer
+                    Dim k As Integer = 0
 
                     While w.StartsWith(test)
                         test = test & seeNextChar(input, currentptr + k)
@@ -603,7 +603,7 @@ readnumber:
 
                 Dim real As String = ch
 
-                Dim k As Integer
+                Dim k As Integer = 0
 
                 While w.StartsWith(test)
                     test = test & seeNextChar(input, currentptr + k)

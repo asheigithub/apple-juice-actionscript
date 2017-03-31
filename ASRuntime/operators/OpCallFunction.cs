@@ -33,11 +33,23 @@ namespace ASRuntime.operators
                     if (function.this_pointer == null)
                     {
                         var s = frame.scope;
-                        while (!(s.this_pointer.value is ASBinCode.rtti.Global_Object))
+                        if (s.this_pointer != null)
                         {
-                            s = s.parent;
+                            while (!(s.this_pointer.value is ASBinCode.rtti.Global_Object))
+                            {
+                                s = s.parent;
+                            }
+                            function.setThis(s.this_pointer);
                         }
-                        function.setThis(s.this_pointer);
+                        else
+                        {
+                            if (player.isConsoleOut)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("当前函数没有this指针。也许不是从文档类启动，而是从包外代码启动的");
+                                Console.ResetColor();
+                            }
+                        }
                     }
                 }
             }
@@ -96,7 +108,8 @@ namespace ASRuntime.operators
 
         public static void exec(Player player,StackFrame frame,ASBinCode.OpStep step)
         {
-            var rv= step.arg1.getValue(frame.scope);
+#if DEBUG
+            var rv = step.arg1.getValue(frame.scope);
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
@@ -109,13 +122,14 @@ namespace ASRuntime.operators
             ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
 
+
             if (!frame.funCaller.function.Equals(function))
             {
-                frame.throwError(new error.InternalError( step.token,"运行时异常，调用函数不对" ));
+                frame.throwError(new error.InternalError(step.token, "运行时异常，调用函数不对"));
                 frame.endStep(step);
                 return;
             }
-
+#endif
             funbacker cb = new funbacker();
             object[] args = new object[2];
             args[0] = frame;

@@ -4,11 +4,15 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class Test 
+	public class Test
 	{
 		
-		public function Test()
+		internal var t:Test;
+		
+		public function Test(t:Test)
 		{
+			this.t = t;
+			
 			trace(--i);
 		}
 		

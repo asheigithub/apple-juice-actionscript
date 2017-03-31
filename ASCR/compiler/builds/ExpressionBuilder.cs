@@ -1,5 +1,6 @@
 ﻿using ASBinCode;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -957,7 +958,7 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env,false);
+                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false);
 
                         if (member == null && builder._currentImports.Count > 0)
                         {
@@ -985,7 +986,7 @@ namespace ASCompiler.compiler.builds
                             }
                         }
 
-                        if (member == null && builder._currentImports.Count>0)
+                        if (member == null && builder._currentImports.Count > 0)
                         {
                             string packagepath = data.Data.Value.ToString();
 
@@ -1002,7 +1003,7 @@ namespace ASCompiler.compiler.builds
                                     return new PackagePathGetter(packagepath);
                                 }
                             }
-                            
+
                         }
 
                         if (member == null)
@@ -1020,7 +1021,7 @@ namespace ASCompiler.compiler.builds
                                     addOpPropGet((ClassPropertyGetter)member, matchtoken, member.name, ((ClassPropertyGetter)member)._class,
                                         null, env, builder
                                     );
-                                
+
                             }
                             else
                             {
@@ -1057,7 +1058,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
                             "this不能出现在这里"));
                     }
-                    
+
                 }
                 else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function)
                 {
@@ -1075,6 +1076,53 @@ namespace ASCompiler.compiler.builds
 
                     return new ASBinCode.rtData.RightValue(fc);
                 }
+                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.dynamicobj && !env.isEval)
+                {
+                    //***创建一个Object***//
+
+                    Register eax = env.getAdditionalRegister();
+                    //***创建对象实例
+                    {
+                        var found = TypeReader.findClassFromImports("Object", builder);
+                        var item = found[0];
+                        OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                        stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                            new ASBinCode.rtData.rtInt(item.classid));
+                        stepInitClass.arg1Type = item.staticClass.getRtType();
+                        env.block.opSteps.Add(stepInitClass);
+
+                        eax.setEAXTypeWhenCompile(item.getRtType());
+
+                        ConstructorBuilder cb= new ConstructorBuilder();
+                        cb.build_class(env, item, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
+
+                    }
+                    //***对象赋初始值
+
+                    Hashtable objData = (Hashtable)data.Data.Value;
+                    foreach (var item in objData.Keys)
+                    {
+                        ASTool.Token key = (ASTool.Token)item;
+                        ASTool.AS3.Expr.AS3DataStackElement value = (ASTool.AS3.Expr.AS3DataStackElement)objData[key];
+
+                        IRightValue rv = getRightValue(env, value, matchtoken, builder);
+
+                        OpStep setprop = new OpStep(OpCode.set_dynamic_prop,new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile));
+                        setprop.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtString(key.StringValue));
+                        setprop.arg1Type = RunTimeDataType.rt_string;
+                        setprop.arg2 = rv;
+                        setprop.arg2Type = rv.valueType;
+
+                        setprop.reg = eax;
+                        setprop.regType = eax.valueType;
+
+                        env.block.opSteps.Add(setprop);
+
+                    }
+
+
+                    return eax;
+                }
                 else
                 {
                     throw new BuildException(
@@ -1083,6 +1131,9 @@ namespace ASCompiler.compiler.builds
                 }
             }
         }
+
+
+
         private void buildSuffix(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
             

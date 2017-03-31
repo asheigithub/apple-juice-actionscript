@@ -436,8 +436,11 @@ namespace ASRuntime
             {
                 return true;
             }
+            if (f == rt.rt_null && t > rt.unknown)
+            {
+                return true;
+            }
 
-            
 
             if (f > rt.unknown && t > rt.unknown)
             {
@@ -449,8 +452,8 @@ namespace ASRuntime
 
             if (f > rt.unknown || t > rt.unknown)
             {
-               
-                
+
+
 #if DEBUG
                 throw new NotImplementedException();
 #else

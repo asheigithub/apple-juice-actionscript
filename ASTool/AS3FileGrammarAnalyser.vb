@@ -3983,25 +3983,53 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _ObjMember(node As GrammerExpr)
-        '<VariableName>":"<Expression>|number":"<Expression>|string":"<Expression>;
+        '<ObjMember> ::=identifier":"<Expression>|number":"<Expression>|string":"<Expression>|"{"label":"<ObjectBody>;
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
-        Dim obj = dynamticObjStack.Peek()
+        If node.Nodes.Count = 3 Then
 
-        Dim vn = node.Nodes(0).MatchedToken
+            Dim obj = dynamticObjStack.Peek()
+            Dim vn = node.Nodes(0).MatchedToken
 
-        Dim expr As New AS3Expression(node.Nodes(2).MatchedToken)
-        VisitNodes(node.Nodes(2))
-        expr.exprStepList = node.Nodes(2).exprsteplist
+            Dim expr As New AS3Expression(node.Nodes(2).MatchedToken)
+            VisitNodes(node.Nodes(2))
+            expr.exprStepList = node.Nodes(2).exprsteplist
+
+            node.exprsteplist.AddRange(node.Nodes(2).exprsteplist)
+            expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
+
+            obj.Add(vn, expr.Value)
+
+        Else
+
+            '***新建Object路线***
+            Dim dobj As New Hashtable()
+
+            dynamticObjStack.Push(dobj)
+
+            VisitNodes(node.Nodes(3))
+
+            node.exprsteplist.AddRange(node.Nodes(3).exprsteplist)
+
+            dynamticObjStack.Pop()
+
+            Dim obj As New AS3.Expr.AS3DataStackElement
+            obj.Data = New AS3.Expr.AS3DataValue
+            obj.Data.FF1Type = AS3.Expr.FF1DataValueType.dynamicobj
+            obj.Data.Value = dobj
+            MemberScopeStack.Peek().ExprDataStack.Push(obj)
 
 
-        node.exprsteplist.AddRange(node.Nodes(2).exprsteplist)
+            Dim tobj = dynamticObjStack.Peek()
+            Dim vn = node.Nodes(1).MatchedToken
 
-        expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
-        obj.Add(vn, expr.Value)
 
+            tobj.Add(vn, MemberScopeStack.Peek().ExprDataStack.Pop())
+
+
+        End If
 
     End Sub
     Sub _ObjMembers1(node As GrammerExpr)

@@ -1,4 +1,5 @@
 ﻿using ASBinCode;
+using ASBinCode.rtData;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -42,6 +43,24 @@ namespace ASRuntime.operators
 
                 frame.endStep(step);
             }
+        }
+
+
+        public static void exec_set_dynamic_prop(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        {
+            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)step.reg.getValue(scope);
+            ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
+
+            DynamicPropertySlot heapslot = new DynamicPropertySlot(obj, true);
+            heapslot._propname = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value;
+            heapslot.directSet( step.arg2.getValue(scope) );
+
+
+            dobj.createOrReplaceproperty(heapslot._propname,heapslot);
+
+
+
+            frame.endStep(step);
         }
     }
 }

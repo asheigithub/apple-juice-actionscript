@@ -67,6 +67,7 @@
     <Compile Include="rtti\Class.cs" />
     <Compile Include="rtti\ClassMember.cs" />
     <Compile Include="rtti\DynamicObject.cs" />
+    <Compile Include="rtti\DynamicPropertySlot.cs" />
     <Compile Include="rtti\FunctionDefine.cs" />
     <Compile Include="rtti\FunctionParameter.cs" />
     <Compile Include="rtti\FunctionSignature.cs" />

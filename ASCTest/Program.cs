@@ -16,14 +16,38 @@ namespace ASCTest
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";
             string teststring = "package{}";//System.IO.File.ReadAllText("../../testScript/AS3Testproj/src/Main.as");
 
-            string[] files = null;
+            string[] files =null;
+
 
             if (args.Length > 0)
             {
-                if (System.IO.Directory.Exists(args[0]))
+                string path = args[0];
+
+                
+                if (path.EndsWith(".as"))
                 {
+                    path = System.IO.Path.GetDirectoryName(path);
+                }
+
+                if (string.IsNullOrEmpty(path))
+                {
+                    path=".\\";
+                }
+
+                //path = "D:\\tas3";
+
+
+                string[] ps = path.Split(System.IO.Path.DirectorySeparatorChar);
+                if (ps.Length == 2 && string.IsNullOrEmpty(ps[1])  && ps[0].IndexOf( System.IO.Path.VolumeSeparatorChar)>0)
+                {
+                    Console.WriteLine("无法在根目录下搜索.请将as源代码放到一个文件夹内");
+                    return;
+                }
+                else if (System.IO.Directory.Exists(path))
+                {
+                    Console.WriteLine(path);
                     //teststring = System.IO.File.ReadAllText(args[0]);
-                    files = System.IO.Directory.GetFiles(args[0], "*.as", System.IO.SearchOption.AllDirectories );
+                    files = System.IO.Directory.GetFiles(path, "*.as", System.IO.SearchOption.AllDirectories );
                 }
             }
             else
@@ -32,6 +56,11 @@ namespace ASCTest
                 return;
             }
 
+            if (files == null)
+            {
+                Console.Write("输入as文件所在路径");
+                return;
+            }
            
 
             var proj = new ASTool.AS3.AS3Proj();

@@ -11,6 +11,9 @@ namespace ASBinCode
     {
         IRunTimeScope parent { get; }
 
+       
+        //Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtData.rtObject, ISLOT>> dictMethods { get; }
+
         Dictionary<int, rtData.rtObject> static_objects { get; }
 
         rtData.rtObject this_pointer { get; }

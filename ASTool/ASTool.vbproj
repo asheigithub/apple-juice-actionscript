@@ -8,12 +8,13 @@
     <SchemaVersion>
     </SchemaVersion>
     <ProjectGuid>{F6119D2E-215B-4FB1-A1C6-E83EDE52DA8C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <StartupObject>ASTool.Module1</StartupObject>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
     <RootNamespace>ASTool</RootNamespace>
     <AssemblyName>ASTool</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MyType>Console</MyType>
+    <MyType>Windows</MyType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

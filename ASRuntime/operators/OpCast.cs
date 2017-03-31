@@ -185,6 +185,15 @@ namespace ASRuntime.operators
                     callbacker.isSuccess = true;
                     callbacker.call(null);
                 }
+                else if (srcValue.rtType == RunTimeDataType.rt_null
+                    &&
+                    targetType > RunTimeDataType.unknown //将null赋值给对象
+                    )
+                {
+                    storeto.directSet(srcValue);
+                    callbacker.isSuccess = true;
+                    callbacker.call(null);
+                }
                 else if (targetType == RunTimeDataType.rt_string)
                 {
                     #region toString
@@ -275,8 +284,8 @@ namespace ASRuntime.operators
                     {
                         CastValue(
                             TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue),
-                            targetType,frame,token,scope,storeto,callbacker
-                            
+                            targetType, frame, token, scope, storeto, callbacker
+
                             );
                         return;
                     }
@@ -285,7 +294,7 @@ namespace ASRuntime.operators
                         BlockCallBackBase valueofCB = new BlockCallBackBase();
                         valueofCB.setCallBacker(_Cast_ValueOf_CB);
                         valueofCB._intArg = targetType;
-                        
+
                         object[] sendargs = new object[6];
                         sendargs[0] = frame;
                         sendargs[1] = token;
@@ -822,7 +831,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                storeto.directSet(obj);
+                //storeto.directSet(obj);
+                storeto.directSet( new rtString( TypeConverter.ConvertToString( obj,frame,token)));
                 callbacker.call(null);
             }
         }
