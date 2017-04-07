@@ -31,9 +31,19 @@ namespace ASBinCode.rtti
 
         public readonly int functionid;
 
+        /// <summary>
+        /// 是否本地函数
+        /// </summary>
+        public bool isNative;
+        public string native_name;
+        public int native_index;
+
+
         public FunctionDefine(int id)
         {
             functionid = id;
+            native_index = -1;
+
         }
     }
 }

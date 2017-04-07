@@ -7,7 +7,7 @@ namespace ASRuntime.operators
 {
     class FunctionCaller
     {
-        public HeapSlot[] CallFuncHeap;
+        private HeapSlot[] CallFuncHeap;
 
         public ASBinCode.rtData.rtFunction function;
         public ASBinCode.rtti.FunctionDefine toCallFunc;
@@ -43,6 +43,7 @@ namespace ASRuntime.operators
             
             ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature;
 
+            
             CallFuncHeap =
                 player.genHeapFromCodeBlock(player.swc.blocks[toCallFunc.blockid]);
 
@@ -50,36 +51,81 @@ namespace ASRuntime.operators
             {
                 if (signature.parameters[i].defaultValue != null)
                 {
-                    CallFuncHeap[i].directSet(signature.parameters[i].defaultValue.getValue(null));
+                    var dt = signature.parameters[i].type;
+                    var dv = signature.parameters[i].defaultValue.getValue(null);
+
+
+                    if (dv.rtType != dt && dt !=RunTimeDataType.rt_void)
+                    {
+                        if (dt == RunTimeDataType.rt_int)
+                        {
+                            dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, invokerFrame, token));
+                        }
+                        else if (dt == RunTimeDataType.rt_uint)
+                        {
+                            dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, invokerFrame, token));
+                        }
+                        else if (dt == RunTimeDataType.rt_number)
+                        {
+                            dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv, invokerFrame, token));
+                        }
+                        else if (dt == RunTimeDataType.rt_string)
+                        {
+                            dv = new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(dv, invokerFrame, token));
+                        }
+                        else if (dt == RunTimeDataType.rt_boolean)
+                        {
+                            dv = TypeConverter.ConvertToBoolean(dv, invokerFrame, token);
+                        }
+                    }
+
+
+                    CallFuncHeap[i].directSet(
+                        dv
+                        
+                        );
                 }
             }
+            
         }
 
         public void pushParameter(IRunTimeValue argement,int id)
         {
-            //if (argement.rtType != toCallFunc.signature.parameters[id].type)
-            //{
-            //    if (!OpCast.CastValue(argement, toCallFunc.signature.parameters[id].type,
-            //        _tempSlot, invokerFrame, token, invokerFrame.scope
-            //        ))
-            //    {
-            //        invokerFrame.throwCastException(token, argement.rtType, toCallFunc.signature.parameters[id].type);
-            //        return;
-            //    }
-            //    CallFuncHeap[id].directSet(_tempSlot.getValue());
-            //}
-            //else
-            //{
-            //    CallFuncHeap[id].directSet(argement);
-            //}
-            if (id < CallFuncHeap.Length)
+            if (toCallFunc.signature.parameters.Count > 0)
             {
-                CallFuncHeap[id].directSet(argement);
-                pushedArgs++;
-            }
-            else
-            {
-                //参数数量不匹配
+                bool lastIsPara = false;
+
+                if (toCallFunc.signature.parameters[toCallFunc.signature.parameters.Count - 1].isPara)
+                {
+                    lastIsPara = true;
+                }
+
+                if (!lastIsPara || id < toCallFunc.signature.parameters.Count - 1)
+                {
+                    if (id < toCallFunc.signature.parameters.Count)
+                    {
+                        CallFuncHeap[id].directSet(argement);
+                        pushedArgs++;
+                    }
+                    //else
+                    //{
+                    //    //参数数量不匹配
+                    //}
+
+                }
+                else
+                {
+                    //***最后一个是参数数组，并且id大于等于最后一个
+                    HeapSlot slot = CallFuncHeap[toCallFunc.signature.parameters.Count - 1];
+                    if (slot.getValue().rtType == RunTimeDataType.rt_null)
+                    {
+                        slot.directSet(new ASBinCode.rtData.rtArray());
+                    }
+
+                    ASBinCode.rtData.rtArray arr = (ASBinCode.rtData.rtArray)slot.getValue();
+                    arr.innerArray.Add(argement);
+
+                }
             }
         }
 
@@ -103,7 +149,7 @@ namespace ASRuntime.operators
                     OpCast.CastValue(argement, toCallFunc.signature.parameters[
                         cb._intArg].type,
 
-                        invokerFrame, token, invokerFrame.scope, _tempSlot,cb);
+                        invokerFrame, token, invokerFrame.scope, _tempSlot,cb,false);
 
                     
                     return;
@@ -174,16 +220,71 @@ namespace ASRuntime.operators
 
             }
 
-            returnSlot.directSet(
-                TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null));
+            
+            if (!toCallFunc.isNative)
+            {
+                returnSlot.directSet(
+                    TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null));
+                player.CallBlock(
+                    player.swc.blocks[toCallFunc.blockid],
+                    CallFuncHeap,
+                    returnSlot,
+                    function.bindScope,
+                    token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer);
+            }
+            else
+            {
+                if (toCallFunc.native_index <0)
+                {
+                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+                }
 
-            player.CallBlock(
-                player.swc.blocks[toCallFunc.blockid],
-                CallFuncHeap,
-                returnSlot,
-                function.bindScope,
-                token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer);
+                string errormsg;
+                int errorno;
 
+                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+                nf.bin = player.swc;
+
+                if (!nf.isAsync)
+                {
+                    var result = nf.execute(
+                        function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+                        CallFuncHeap,
+                        out errormsg,
+                        out errorno
+                        );
+
+                    if (errormsg == null)
+                    {
+                        returnSlot.directSet(result);
+
+                        if (callbacker != null)
+                        {
+                            callbacker.call(callbacker.args);
+                        }
+                    }
+                    else
+                    {
+                        invokerFrame.throwError(
+                            new error.InternalError(token, errormsg, new ASBinCode.rtData.rtString(errormsg))
+                            );
+
+                        invokerFrame.endStep();
+                    }
+
+                }
+                else
+                {
+                    nf.executeAsync(function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+                        CallFuncHeap,
+                        returnSlot,
+                        callbacker,
+                        invokerFrame,
+                        token,
+                        function.bindScope
+                        );
+                }
+            }
         }
 
 

@@ -35,6 +35,8 @@ namespace ASRuntime.operators
             this.invokerFrame = invokerFrame;
             this.token = token;
             this._class = _class;
+
+            
         }
 
         public void prepareConstructorArgements()

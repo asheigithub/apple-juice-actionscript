@@ -48,6 +48,10 @@ namespace ASCompiler.compiler
             {
                 return ASBinCode.RunTimeDataType.rt_function;
             }
+            else if (t == "Array")
+            {
+                return rt.rt_array;
+            }
             else
             {
                 //***查找类定义***

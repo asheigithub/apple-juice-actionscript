@@ -81,7 +81,7 @@ Public Class AS3FileGrammarAnalyser
 
     Private as3file As New AS3SrcFile()
 
-    Public err As GrammarExpression
+    Public err As GrammarException
 
     Public Function Analyse(grammer As Grammar, tree As GrammerTree) As Boolean
 
@@ -128,7 +128,7 @@ Public Class AS3FileGrammarAnalyser
 
         Try
             VisitNodes(tree.Root)
-        Catch ex As GrammarExpression
+        Catch ex As GrammarException
             err = ex
             Return False
         End Try
@@ -913,7 +913,12 @@ Public Class AS3FileGrammarAnalyser
         End If
 
         If metapropertystack.Count > 0 Then
-            as3class.Meta = metapropertystack.Pop()
+            'as3class.Meta = metapropertystack.Pop()
+            as3class.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                as3class.Meta.Add(metapropertystack.Pop())
+            End While
+
         End If
 
         If Not currentPackage Is Nothing Then
@@ -990,7 +995,11 @@ Public Class AS3FileGrammarAnalyser
         End If
 
         If metapropertystack.Count > 0 Then
-            as3inteface.Meta = metapropertystack.Pop()
+            'as3inteface.Meta = metapropertystack.Pop()
+            as3inteface.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                as3inteface.Meta.Add(metapropertystack.Pop())
+            End While
         End If
 
         If Not currentPackage Is Nothing Then
@@ -1062,6 +1071,10 @@ Public Class AS3FileGrammarAnalyser
                     expr.exprStepList = node.Nodes(0).exprsteplist
                     expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
 
+                    If expr.Value.IsReg Then
+                        Throw New GrammarException(node.MatchedToken, "多个meta数据用;分开。")
+                    End If
+
                     metapropertystack.Push(expr)
 
                     currentparseExprListStack.Pop()
@@ -1114,7 +1127,11 @@ Public Class AS3FileGrammarAnalyser
         Dim func As New AS3Function(node.MatchedToken)
 
         If metapropertystack.Count > 0 Then
-            func.Meta = metapropertystack.Pop()
+            'func.Meta = metapropertystack.Pop()
+            func.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                func.Meta.Add(metapropertystack.Pop())
+            End While
         End If
 
         If memberaccessStack.Count > 0 Then
@@ -1655,7 +1672,7 @@ Public Class AS3FileGrammarAnalyser
         Dim variable As New AS3Variable(node.MatchedToken)
 
         If metapropertystack.Count > 0 Then
-            variable.Meta = metapropertystack.Pop()
+            'variable.Meta = metapropertystack.Pop()
         End If
 
         If memberaccessStack.Count > 0 Then
@@ -1752,7 +1769,11 @@ Public Class AS3FileGrammarAnalyser
 
         Dim as3const As New AS3Const(node.MatchedToken)
         If metapropertystack.Count > 0 Then
-            as3const.Meta = metapropertystack.Pop()
+            'as3const.Meta = metapropertystack.Pop()
+            as3const.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                as3const.Meta.Add(metapropertystack.Pop())
+            End While
         End If
         If memberaccessStack.Count > 0 Then
             Dim temp = memberaccessStack.ToArray()
@@ -1821,7 +1842,7 @@ Public Class AS3FileGrammarAnalyser
             If node.MatchedToken.Type <> Token.TokenType.identifier And node.MatchedToken.StringValue <> ";" _
                 And node.MatchedToken.StringValue <> "}" Then
 
-                Throw New GrammarExpression(node.MatchedToken, "Syntax error: '" & node.MatchedToken.StringValue & "' is not allowed here")
+                Throw New GrammarException(node.MatchedToken, "Syntax error: '" & node.MatchedToken.StringValue & "' is not allowed here")
 
 
             End If
@@ -2304,13 +2325,13 @@ Public Class AS3FileGrammarAnalyser
             '<Call>|null
 
             If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
-                Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+                Throw New GrammarException(node.MatchedToken, "不能出现在这里")
             End If
 
             Dim argnode = node.Nodes(0).Nodes(1)
             If argnode.Nodes.Count = 0 Then
                 If Not current_expression_canfunctioninvoke.Peek() Then
-                    Throw New GrammarExpression(node.MatchedToken, "不能出现在这里")
+                    Throw New GrammarException(node.MatchedToken, "不能出现在这里")
                 End If
 
             End If

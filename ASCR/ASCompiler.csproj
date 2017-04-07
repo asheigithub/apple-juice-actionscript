@@ -98,7 +98,13 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="aslib\Array.txt" />
+    <Content Include="aslib\Function.txt" />
+    <Content Include="aslib\int.txt" />
+    <Content Include="aslib\Math.txt" />
+    <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
+    <Content Include="aslib\uint.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

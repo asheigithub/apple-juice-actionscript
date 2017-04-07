@@ -77,6 +77,10 @@ namespace ASRuntime
                     case RunTimeDataType.fun_void:
                         this.value = value;
                         break;
+                    case RunTimeDataType.rt_array:
+                        ((rtArray)this.value).CopyFrom((rtArray)value);
+                        //this.value = value;
+                        break;
                     case RunTimeDataType.unknown:
                         this.value = null;
                         break;

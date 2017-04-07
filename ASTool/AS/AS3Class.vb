@@ -66,10 +66,13 @@
                 Next
             End If
 
-            
+
 
             If Not Meta Is Nothing Then
-                Meta.Write(tabs, srcout)
+                For Each m In Meta
+                    m.Write(tabs, srcout)
+                Next
+                'Meta.Write(tabs, srcout)
             End If
 
             Dim cline As String = Access.ToString() & "class " & Name

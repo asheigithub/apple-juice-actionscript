@@ -18,7 +18,8 @@
         ''' 用[SWF()]这样的东西表示的元属性
         ''' </summary>
         ''' <remarks></remarks>
-        Public Meta As AS3Meta
+        Public Meta As List(Of AS3Meta)
+        'Public Meta As AS3Meta
 
         Private ReadOnly Property IAS3Stmt_Token As Token Implements IAS3Stmt.Token
             Get

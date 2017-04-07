@@ -189,8 +189,11 @@ namespace ASCompiler.compiler.builds
                 }
 
 
-                defaultv = new ASBinCode.rtData.RightValue(testEval);
+                
+                defaultv = new ASBinCode.rtData.RightValue( testEval);
+                
 
+                
                 para.defaultValue = defaultv;
             }
             else
@@ -350,17 +353,291 @@ namespace ASCompiler.compiler.builds
             function.signature = signature;
             function.isConstructor = as3function.IsConstructor;
             function.isMethod = as3function.IsMethod;
-            //if (function.isMethod)
-            //{
-            //    function.bindClass = ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope)._class; 
-            //}
-
 
             if (function.isConstructor && function.signature.returnType != RunTimeDataType.rt_void)
             {
                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                "A Constructor cannot specify a return type.");
             }
+
+
+            //****查找meta***
+            if (as3function.Meta != null)
+            {
+                for (int i = 0; i < as3function.Meta.Count; i++)
+                {
+                    var m = as3function.Meta[i];
+                    if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_array)
+                    {
+                        List<ASTool.AS3.Expr.AS3DataStackElement> data =
+                            (List<ASTool.AS3.Expr.AS3DataStackElement>)m.Value.Data.Value;
+
+                        if (data.Count == 0)
+                        {
+                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                           "Meta 格式错误,至少有1个设置");
+                        }
+                        else
+                        {
+                            string meta = data[0].Data.Value.ToString();
+                            if (meta == "implicit_to")
+                            {
+                                #region "implicit_to"
+
+                                if (isoutclass)
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_to特性不能在包外定义");
+                                }
+                                else
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.instanceClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_to特性只能定义在静态方法上");
+                                    }
+                                    if (!as3function.Access.IsPrivate)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_to特性必须为private");
+                                    }
+                                    if (function.signature.parameters.Count != 1 ||
+                                        function.signature.parameters[0].type != RunTimeDataType.rt_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit特性函数必须有1个参数,类型为*");
+                                    }
+
+                                    if (function.signature.returnType == RunTimeDataType.fun_void ||
+                                        function.signature.returnType == RunTimeDataType.rt_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_to特性函数必须有确定的返回值");
+                                    }
+                                    if (function.signature.returnType > RunTimeDataType.unknown)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_to特性函数必须返回原始值");
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            iclass.implicit_to = member;
+                                            iclass.implicit_to_functionid = function.functionid;
+                                            iclass.implicit_to_type = function.signature.returnType;
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+                                #endregion
+
+                            }
+                            else if (meta == "implicit_from")
+                            {
+                                #region "implicit_from"
+
+                                if (isoutclass)
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_from特性不能在包外定义");
+                                }
+                                else
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.instanceClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_from特性只能定义在静态方法上");
+                                    }
+                                    if (!as3function.Access.IsPrivate)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_from特性必须为private");
+                                    }
+                                    if (function.signature.parameters.Count != 1 ||
+                                        function.signature.parameters[0].type == RunTimeDataType.rt_void
+                                        //||
+                                        //function.signature.parameters[0].type == RunTimeDataType.rt_function
+                                        ||
+                                        function.signature.parameters[0].type > RunTimeDataType.unknown
+                                        )
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_from特性函数必须有1个参数,且确定为原始数据类型");
+                                    }
+
+                                    if (function.signature.returnType != RunTimeDataType.rt_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "implicit_from特性函数返回类型必须是void"); //将来做了继承后可能会改为Object
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            iclass.implicit_from = member;
+                                            iclass.implicit_from_functionid = function.functionid;
+                                            iclass.implicit_from_type = function.signature.parameters[0].type;
+                                            function.signature.returnType = iclass.instanceClass.getRtType();
+
+                                            if (builder.bin.primitive_to_class_table[function.signature.parameters[0].type] == null)
+                                            {
+                                                builder.bin.primitive_to_class_table[function.signature.parameters[0].type] = iclass.instanceClass;
+                                            }
+                                            else
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                    function.signature.parameters[0].type.ToString() + "的类型转换不明确"); //将来做了继承后可能会改为Object
+                                            }
+                                            //as3function.TypeStr = iclass.instanceClass.name;
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+                                #endregion
+
+                            }
+                            else if (meta == "explicit_from")
+                            {
+                                #region "explicit_from"
+                                if (isoutclass)
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "explicit_from特性不能在包外定义");
+                                }
+                                else
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.instanceClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "explicit_from特性只能定义在静态方法上");
+                                    }
+                                    if (!as3function.Access.IsPrivate)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "explicit_from特性必须为private");
+                                    }
+                                    //if (function.signature.parameters.Count != 1 ||
+                                    //    function.signature.parameters[0].type == RunTimeDataType.rt_void
+                                    //    ||
+                                    //    function.signature.parameters[0].type == RunTimeDataType.rt_function
+                                    //    ||
+                                    //    function.signature.parameters[0].type > RunTimeDataType.unknown
+                                    //    )
+                                    //{
+                                    //    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                    //    "explicit_from特性函数必须有1个参数,且确定为原始数据类型");
+                                    //}
+
+                                    if (function.signature.returnType != RunTimeDataType.rt_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "explicit_from特性函数返回类型必须是void"); //将来做了继承后可能会改为Object
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            iclass.explicit_from = member;
+                                            iclass.explicit_from_functionid = function.functionid;
+                                            iclass.explicit_from_type = function.signature.parameters[0].type;
+                                            function.signature.returnType = iclass.instanceClass.getRtType();
+
+                                            break;
+                                        }
+                                    }
+
+                                }
+                                #endregion
+                            }
+                            else if (meta == "native")
+                            {
+                                if (data.Count == 2)
+                                {
+                                    string native_to = data[1].Data.Value.ToString();
+
+                                    if (builder.bin.nativefunctionNameIndex.ContainsKey(native_to))
+                                    {
+                                        var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_to]];
+                                        if (as3function.IsMethod == nf.isMethod)
+                                        {
+                                            if (signature.returnType != nf.returnType)
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                    "本地函数 " + native_to + " 返回类型不符");
+                                            }
+
+                                            if (signature.parameters.Count != nf.parameters.Count)
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                    "本地函数 " + native_to + " 参数数量不符");
+                                            }
+
+                                            for (int j = 0; j < signature.parameters.Count; j++)
+                                            {
+                                                if (signature.parameters[j].type != nf.parameters[j]
+                                                    &&
+                                                    !(signature.parameters[j].isPara && nf.parameters[j] == RunTimeDataType.rt_array)
+                                                    )
+                                                {
+                                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                        "本地函数 " + native_to + " 参数类型不符");
+                                                }
+                                            }
+
+                                            function.isNative = true;
+                                            function.native_name = native_to;
+                                        }
+                                        else
+                                        {
+                                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                "本地函数 " + native_to + " isMethod属性不符");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                            "本地函数 " + native_to + " 未注册");
+                                    }
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "native特性需要说明对应的本地函数。用[native,XXXX]格式指定");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                               "Meta 格式错误");
+                    }
+                }
+            }
+
 
             ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope(function);
             funcscope.parentScope = env.block.scope;
@@ -373,25 +650,22 @@ namespace ASCompiler.compiler.builds
                 buildParameter(block, as3function.Parameters[i],builder, env);
             }
 
-
-            
-
-            builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
-
-
-            if (function.signature.returnType != RunTimeDataType.fun_void &&
-                function.signature.returnType != RunTimeDataType.rt_void &&
-                !function.IsAnonymous
-                )
+            if (!function.isNative)
             {
-                //查找是否所有分支均有return.
-                if (!detectingReturn(block))
+                builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
+                if (function.signature.returnType != RunTimeDataType.fun_void &&
+                    function.signature.returnType != RunTimeDataType.rt_void &&
+                    !function.IsAnonymous
+                    )
                 {
-                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                               "Function does not return a value.");
+                    //查找是否所有分支均有return.
+                    if (!detectingReturn(block))
+                    {
+                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                   "Function does not return a value.");
+                    }
                 }
             }
-
             builder.dictfunctionblock.Add(function, block);
             
             ASBinCode.rtData.rtFunction func = 
@@ -420,7 +694,15 @@ namespace ASCompiler.compiler.builds
 
             Variable argement = new Variable(parameter.Name, block.scope.members.Count, block.id);
             block.scope.members.Add(argement);
-            argement.valueType = TypeReader.fromSourceCodeStr(parameter.TypeStr, parameter.token,builder);
+
+            if (parameter.IsArrPara)
+            {
+                argement.valueType = RunTimeDataType.rt_array;
+            }
+            else
+            {
+                argement.valueType = TypeReader.fromSourceCodeStr(parameter.TypeStr, parameter.token, builder);
+            }
 
         }
 

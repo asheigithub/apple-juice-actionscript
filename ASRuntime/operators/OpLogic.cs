@@ -657,6 +657,16 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            ASBinCode.RunTimeDataType ot;
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(v1.rtType, frame.player.swc, out ot))
+            {
+                v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+            }
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(v2.rtType, frame.player.swc, out ot))
+            {
+                v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+            }
+
             if ((
                 v1.rtType == ASBinCode.RunTimeDataType.rt_number || v1.rtType == ASBinCode.RunTimeDataType.rt_int
                 ||
@@ -713,6 +723,11 @@ namespace ASRuntime.operators
 
                 return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
 
+            }
+            else if (v1.rtType == ASBinCode.RunTimeDataType.rt_array
+                && v2.rtType == ASBinCode.RunTimeDataType.rt_array)
+            {
+                return v1.Equals(v2);
             }
             else if (v1.rtType > ASBinCode.RunTimeDataType.unknown
                 &&
@@ -804,7 +819,7 @@ namespace ASRuntime.operators
                 (t2 == ASBinCode.RunTimeDataType.rt_int
                 || t2 == ASBinCode.RunTimeDataType.rt_uint || t2 == ASBinCode.RunTimeDataType.rt_boolean
                 || t2 == ASBinCode.RunTimeDataType.rt_number
-                || TypeConverter.ObjectImplicit_ToNumber(t2,frame.player.swc)
+                || TypeConverter.ObjectImplicit_ToNumber(t2, frame.player.swc)
                 )
                 )
             {
@@ -906,6 +921,11 @@ namespace ASRuntime.operators
 
                 return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
 
+            }
+            else if (v1.rtType == ASBinCode.RunTimeDataType.rt_array 
+                && v2.rtType == ASBinCode.RunTimeDataType.rt_array)
+            {
+                return v1.Equals(v2);
             }
             else if (v1.rtType > ASBinCode.RunTimeDataType.unknown
                 &&

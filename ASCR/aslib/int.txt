@@ -1,0 +1,96 @@
+﻿package
+{
+	
+	public final class int extends Object
+	{
+		/**
+		 * 可表示的最大 32 位带符号整数为 2,147,483,647。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const MAX_VALUE : int = 2147483647;
+
+		/**
+		 * 可表示的最小 32 位带符号整数为 -2,147,483,648。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const MIN_VALUE : int = -2147483648;
+
+
+		[implicit_to]
+		private static function _to_int(thisObj:*):int{ return thisObj._v;}
+
+		[implicit_from]
+		private static function _from_value(value:int):*{ return new int(value); }
+
+
+		private var _v:int;
+		/**
+		 * 构造函数；创建新的 int 对象。使用 int.toString() 和 int.valueOf() 时，必须使用 int 构造函数。使用 int 对象的属性时，不要使用构造函数。new int 构造函数主要用作占位符。int 对象与 int() 函数不同，后者将参数转换为原始值。
+		 * @param	num	要创建的 int 对象的数值，或者要转换为数字的值。如果未提供 value，则默认值为 0。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public function int (value:*=0){ _v=value; }
+
+		[native,_int_toExponential]
+		/**
+		 * 返回数字的字符串表示形式（采用指数表示法）。字符串在小数点前面包含一位，在小数点后面最多包含 20 位（在 fractionDigits 参数中指定）。
+		 * @param	fractionDigits	介于 0 和 20（含）之间的整数，表示所需的小数位数。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	AIR 1.0
+		 * @playerversion	Lite 4
+		 * @throws	RangeError 如果 fractionDigits 参数不在 0 到 20 的范围内，则会引发异常。
+		 */
+		public function toExponential (p:int=0):String;
+
+		[native,_int_toFixed]
+		/**
+		 * 返回数字的字符串表示形式（采用定点表示法）。定点表示法是指字符串的小数点后面包含特定的位数（在 fractionDigits 参数中指定）。fractionDigits 参数的有效范围为 0 到 20。如果指定的值在此范围外，则会引发异常。
+		 * @param	fractionDigits	介于 0 和 20（含）之间的整数，表示所需的小数位数。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	AIR 1.0
+		 * @playerversion	Lite 4
+		 * @throws	RangeError 如果 fractionDigits 参数不在 0 到 20 的范围内，则会引发异常。
+		 */
+		public function toFixed (p:int=0) : String;
+
+		[native,_int_toPrecision]
+		/**
+		 * 返回数字的字符串表示形式（采用指数表示法或定点表示法）。字符串将包含 precision 参数中指定的位数。
+		 * @param	precision	介于 1 和 21（含）之间的整数，表示结果字符串中所需的位数。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	AIR 1.0
+		 * @playerversion	Lite 4
+		 * @throws	RangeError 如果 precision 参数不在 1 到 21 的范围内，则会引发异常。
+		 */
+		public function toPrecision (p:int=0):String ;
+
+		[native,_int_toString]
+		/**
+		 * 返回 int 对象的字符串表示形式。
+		 * @param	radix	指定要用于数字到字符串的转换的基数（从 2 到 36）。如果未指定 radix 参数，则默认值为 10。
+		 * @return	字符串。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public function toString (radix:int=10) : String;
+
+		/**
+		 * 返回指定 int 对象的原始值。
+		 * @return	int 值。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public function valueOf () : int{ return _v;}
+	}
+}

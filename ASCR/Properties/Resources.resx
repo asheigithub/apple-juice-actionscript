@@ -118,10 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Array" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\array.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Function" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\function.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Math" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\math.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Number" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\number.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="Object" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\aslib\object.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="PG1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\ASTool\PG1.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_int" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\int.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_uint" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\uint.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

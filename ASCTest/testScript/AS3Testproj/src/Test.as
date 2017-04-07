@@ -16,6 +16,12 @@ package
 			trace(--i);
 		}
 		
+		public function gt()
+		{
+			var l = this;
+			return l;
+		}
+		
 		
 		public function testOut():int
 		{

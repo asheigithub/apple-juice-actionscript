@@ -30,6 +30,9 @@ namespace ASRuntime
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
 
+        internal rtArray fromArray;
+        internal int fromArrayIndex;
+
         internal ISLOT linktarget;
         public void linkTo(ISLOT linktarget)
         {
@@ -71,7 +74,7 @@ namespace ASRuntime
                 }
                 //store[index] = value;
 
-                //必须拷贝!!否则值可能被其他引用而导致错误
+                //值类型必须拷贝!!否则值可能被其他引用而导致错误
                 //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
                 switch (value.rtType)
                 {
@@ -110,6 +113,19 @@ namespace ASRuntime
                         break;
                     case RunTimeDataType.fun_void:
                         store[index] = value;
+                        break;
+                    case RunTimeDataType.rt_array:
+                        {
+                            //store[index] = value;
+                            if (store[index].rtType == RunTimeDataType.rt_null)
+                            {
+                                store[index] = (rtArray)value.Clone();
+                            }
+                            else
+                            {
+                                ((rtArray)store[index]).CopyFrom((rtArray)value);
+                            }
+                        }
                         break;
                     case RunTimeDataType.unknown:
                         store[index] = null;
@@ -255,6 +271,13 @@ namespace ASRuntime
             linktarget = null;
             propGetSet = null;
             propBindObj = null;
+            fromArray = null;
+            fromArrayIndex = -1;
+
+            store[RunTimeDataType.rt_string] = rtNull.nullptr;
+            store[RunTimeDataType.rt_function] = rtNull.nullptr;
+            store[RunTimeDataType._OBJECT] = rtNull.nullptr;
+
             index = (int)RunTimeDataType.unknown;
         }
     }

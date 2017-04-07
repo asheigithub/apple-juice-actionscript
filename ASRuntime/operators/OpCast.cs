@@ -8,7 +8,7 @@ namespace ASRuntime.operators
 {
     class OpCast
     {
-        
+
 
         public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -26,6 +26,8 @@ namespace ASRuntime.operators
                 step.reg.getISlot(scope)
                 ,
                 cb
+                ,
+                false
                 );
 
             //if (!CastValue(
@@ -61,10 +63,11 @@ namespace ASRuntime.operators
             ASBinCode.SourceToken token,
             ASBinCode.IRunTimeScope scope,
             ASBinCode.ISLOT storeto,
-            BlockCallBackBase callbacker
+            BlockCallBackBase callbacker,
+            bool igrionValueOf
             )
         {
-            if (srcValue.rtType < ASBinCode.RunTimeDataType._OBJECT && targetType < ASBinCode.RunTimeDataType._OBJECT)
+            if ((srcValue.rtType < ASBinCode.RunTimeDataType._OBJECT || igrionValueOf) && targetType < ASBinCode.RunTimeDataType._OBJECT)
             {
                 switch (targetType)
                 {
@@ -158,6 +161,23 @@ namespace ASRuntime.operators
 
                                     return;
                                 }
+                            }
+                        }
+                    case RunTimeDataType.rt_array:
+                        {
+                            if (srcValue.rtType == RunTimeDataType.rt_null)
+                            {
+                                storeto.directSet(srcValue);
+                                callbacker.isSuccess = true;
+                                callbacker.call(null);
+                                return;
+                            }
+                            else
+                            {
+                                frame.throwCastException(token, srcValue.rtType, targetType);
+                                frame.endStep();
+
+                                return;
                             }
                         }
                     case ASBinCode.RunTimeDataType.unknown:
@@ -284,7 +304,7 @@ namespace ASRuntime.operators
                     {
                         CastValue(
                             TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue),
-                            targetType, frame, token, scope, storeto, callbacker
+                            targetType, frame, token, scope, storeto, callbacker,false
 
                             );
                         return;
@@ -295,13 +315,14 @@ namespace ASRuntime.operators
                         valueofCB.setCallBacker(_Cast_ValueOf_CB);
                         valueofCB._intArg = targetType;
 
-                        object[] sendargs = new object[6];
+                        object[] sendargs = new object[7];
                         sendargs[0] = frame;
                         sendargs[1] = token;
                         sendargs[2] = scope;
                         sendargs[3] = storeto;
                         sendargs[4] = callbacker;
                         sendargs[5] = srcValue;
+                        sendargs[6] = true;
 
                         valueofCB.args = sendargs;
 
@@ -318,15 +339,15 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _toString_CB(BlockCallBackBase sender,object args)
+        private static void _toString_CB(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
             FunctionCaller fc = (FunctionCaller)a[5];
 
             var rv = fc.returnSlot.getValue();
-            if (rv.rtType > RunTimeDataType.unknown || 
-                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[ fc.function.functionId].signature.returnType == RunTimeDataType.rt_void )
+            if (rv.rtType > RunTimeDataType.unknown ||
+                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[fc.function.functionId].signature.returnType == RunTimeDataType.rt_void)
             {
                 BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
 
@@ -342,7 +363,7 @@ namespace ASRuntime.operators
                     (SourceToken)a[1],
                     (IRunTimeScope)a[2],
                     (ISLOT)a[3],
-                    (BlockCallBackBase)a[4]
+                    (BlockCallBackBase)a[4],false
                     );
             }
         }
@@ -356,10 +377,25 @@ namespace ASRuntime.operators
             RunTimeDataType targetType = sender._intArg;
             if (rv.rtType > RunTimeDataType.unknown)
             {
-                frame.throwCastException((SourceToken)a[1], ((IRunTimeValue)a[5]).rtType,
-                   targetType);
-                //转换异常后立刻结束执行
-                frame.endStep();
+                if ((bool)a[6])
+                {
+                    frame.throwCastException((SourceToken)a[1], ((IRunTimeValue)a[5]).rtType,
+                       targetType);
+                    //转换异常后立刻结束执行
+                    frame.endStep();
+                }
+                else
+                {
+                    CastValue(rv,
+                        sender._intArg,
+                        frame,
+                        (SourceToken)a[1],
+                        (IRunTimeScope)a[2],
+                        (ISLOT)a[3],
+                        fc,
+                        true
+                    );
+                }
             }
             else
             {
@@ -369,7 +405,8 @@ namespace ASRuntime.operators
                     (SourceToken)a[1],
                     (IRunTimeScope)a[2],
                     (ISLOT)a[3],
-                    fc
+                    fc,
+                    false
                     );
             }
         }
@@ -401,25 +438,26 @@ namespace ASRuntime.operators
             tosend[5] = callbacker;
             cb1.args = tosend;
 
-            CastValue(srcValue1, targetType, frame, token, scope, _tempstoreto1, cb1);
+            CastValue(srcValue1, targetType, frame, token, scope, _tempstoreto1, cb1,false);
 
         }
-        private static void _CastTwoValue_Backer(BlockCallBackBase sender,object args)
+        private static void _CastTwoValue_Backer(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
-            
+
             StackFrame frame = (StackFrame)a[1];
             BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
             if (sender.isSuccess)
             {
                 CastValue(
-                    (IRunTimeValue) a[0],
+                    (IRunTimeValue)a[0],
                     sender._intArg,
                     frame,
                     (SourceToken)a[2],
                     (IRunTimeScope)a[3],
                     (ISLOT)a[4],
-                    callbacker
+                    callbacker,
+                    false
                     );
 
             }
@@ -432,19 +470,84 @@ namespace ASRuntime.operators
 
 
 
+        public static void Primitive_to_Object(
+            ASBinCode.IRunTimeValue srcValue,
+            StackFrame frame,
+            SourceToken token,
+            IRunTimeScope scope,
+            ISLOT _tempstoreto,
+            ASBinCode.OpStep step,
+            StackFrame.DelegeExec exec
+            )
+        {
+            if (srcValue.rtType < RunTimeDataType.unknown && srcValue.rtType != RunTimeDataType.rt_void)
+            {
+                var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
+                if (cls != null)
+                {
+                    var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getValue(scope);
+
+                    FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
+                    fc.function = funConv;
+                    fc.loadDefineFromFunction();
+                    fc.createParaScope();
+                    fc.pushParameter(srcValue, 0);
+                    fc._tempSlot = _tempstoreto;
+                    fc.returnSlot = _tempstoreto;
+
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_primitive_to_obj_callbacker);
+                    cb.step = step;
+                    cb.scope = scope;
+
+                    object[] args = new object[3];
+                    args[0] = _tempstoreto;
+                    args[1] = frame;
+                    args[2] = exec;
+                    cb.args = args;
+                    
+                    fc.callbacker = cb;
+                    fc.call();
+
+                    return;
+                }
+                else
+                {
+                    exec(srcValue, rtNull.nullptr, frame, step, scope);
+                }
+            }
+            else
+            {
+                exec(srcValue, rtNull.nullptr, frame, step, scope);
+            }
+        }
+
+        private static void _primitive_to_obj_callbacker(BlockCallBackBase cb,object args)
+        {
+            object[] a = (object[])cb.args;
+
+            StackFrame frame = (StackFrame)a[1];
+            ISLOT result = (ISLOT)a[0];
+            StackFrame.DelegeExec exec = (StackFrame.DelegeExec)a[2];
+
+            exec(result.getValue(), null, frame, cb.step, cb.scope);
+
+
+        }
+
 
         #region valueOf
 
-        private static void _exec_valueof_callback(BlockCallBackBase sender,object args)
+        private static void _exec_valueof_callback(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
 
             ((StackFrame.DelegeExec)a[5])(
-                ((ISLOT)a[0]).getValue() ,
-                ((ISLOT)a[1]).getValue() ,
-                (StackFrame)a[2] ,
-                (OpStep)a[3] ,
-                (IRunTimeScope)a[4] 
+                ((ISLOT)a[0]).getValue(),
+                ((ISLOT)a[1]).getValue(),
+                (StackFrame)a[2],
+                (OpStep)a[3],
+                (IRunTimeScope)a[4]
                 );
         }
 
@@ -461,7 +564,16 @@ namespace ASRuntime.operators
             //BlockCallBackBase callbacker
             )
         {
-            
+            RunTimeDataType ot;
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(srcValue1.rtType, frame.player.swc, out ot))
+            {
+                srcValue1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue1);
+            }
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(srcValue2.rtType, frame.player.swc, out ot))
+            {
+                srcValue2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue2);
+            }
+
             if (srcValue1 is rtObject)
             {
                 BlockCallBackBase callbacker = new BlockCallBackBase();
@@ -527,7 +639,7 @@ namespace ASRuntime.operators
         private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
-            IRunTimeValue srcValue2= (IRunTimeValue)a[0];
+            IRunTimeValue srcValue2 = (IRunTimeValue)a[0];
             StackFrame frame = (StackFrame)a[1]; //tosend[1] = frame;
             SourceToken token = (SourceToken)a[2]; //tosend[2] = token;
             IRunTimeScope scope = (IRunTimeScope)a[3];  //tosend[3] = scope;
@@ -555,7 +667,7 @@ namespace ASRuntime.operators
         }
 
         private static void InvokeValueOf(
-            rtObject obj,StackFrame frame,SourceToken token,IRunTimeScope scope,ISLOT storeto,
+            rtObject obj, StackFrame frame, SourceToken token, IRunTimeScope scope, ISLOT storeto,
             BlockCallBackBase callbacker
             )
         {
@@ -598,7 +710,7 @@ namespace ASRuntime.operators
             {
                 BlockCallBackBase valueofCB = new BlockCallBackBase();
                 valueofCB.setCallBacker(_InvokeValueOf_Backer);
-                
+
                 operators.FunctionCaller fc = new operators.FunctionCaller(frame.player, frame, token);
                 object[] sendargs = new object[5];
                 sendargs[0] = obj;
@@ -607,7 +719,7 @@ namespace ASRuntime.operators
                 //sendargs[3] = frame;
                 //sendargs[4] = token;
                 valueofCB.args = sendargs;
-                
+
                 fc.function = function;
                 fc.loadDefineFromFunction();
                 fc.createParaScope();
@@ -617,7 +729,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                storeto.directSet(obj);     
+                ((object[])callbacker.args)[6] = false;
+                storeto.directSet(obj);
                 callbacker.call(null);
             }
         }
@@ -832,7 +945,7 @@ namespace ASRuntime.operators
             else
             {
                 //storeto.directSet(obj);
-                storeto.directSet( new rtString( TypeConverter.ConvertToString( obj,frame,token)));
+                storeto.directSet(new rtString(TypeConverter.ConvertToString(obj, frame, token)));
                 callbacker.call(null);
             }
         }
@@ -849,112 +962,14 @@ namespace ASRuntime.operators
         #endregion
 
 
+        public static void exec_CastPrimitive(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            step.reg.getISlot(scope).directSet
+                ( 
+                TypeConverter.ObjectImplicit_ToPrimitive( (rtObject)step.arg1.getValue(scope) )
+                );
 
-        //    public static bool CastValue(
-        //        ASBinCode.IRunTimeValue srcValue,
-        //        ASBinCode.RunTimeDataType targetType,
-        //        ASBinCode.ISLOT storeto
-        //        ,
-        //        StackFrame frame, ASBinCode.SourceToken token,  ASBinCode.IRunTimeScope scope
-
-        //        )
-        //    {
-        //        switch (targetType)
-        //        {
-        //            case ASBinCode.RunTimeDataType.rt_boolean:
-
-        //                storeto.setValue(
-        //                    TypeConverter.ConvertToBoolean(
-        //                    srcValue, frame, token, true
-        //                )
-        //                    );
-        //                return true;
-        //            case ASBinCode.RunTimeDataType.rt_int:
-
-        //                {
-
-        //                    storeto.setValue(
-        //                         TypeConverter.ConvertToInt(
-        //                            srcValue, frame, token, true
-        //                        )
-        //                        );
-
-        //                }
-        //                return true;
-        //            case ASBinCode.RunTimeDataType.rt_uint:
-
-        //                storeto.setValue(
-        //                    TypeConverter.ConvertToUInt(
-        //                    srcValue, frame, token, true
-        //                )
-        //                    );
-        //                return true;
-        //            case ASBinCode.RunTimeDataType.rt_number:
-
-        //                storeto.setValue(
-        //                    TypeConverter.ConvertToNumber(
-        //                    srcValue, frame, token, true
-        //                )
-        //                    );
-        //                return true;
-        //            case ASBinCode.RunTimeDataType.rt_string:
-
-        //                storeto.setValue(
-        //                    TypeConverter.ConvertToString(
-        //                    srcValue, frame, token, true
-        //                )
-        //                    );
-        //                return true;
-
-        //            case ASBinCode.RunTimeDataType.rt_void:
-        //            case ASBinCode.RunTimeDataType.rt_null:
-        //            case ASBinCode.RunTimeDataType.fun_void:
-
-        //                storeto.directSet(srcValue);
-        //                return true;
-
-        //            case ASBinCode.RunTimeDataType.rt_function:
-        //                {
-        //                    if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
-        //                        ||
-        //                        srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
-        //                        ||
-        //                        srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
-        //                        )
-        //                    {
-        //                        storeto.directSet(srcValue);
-        //                        return true;
-        //                    }
-        //                    else
-        //                    {
-        //                        return false;
-        //                    }
-        //                }
-        //            case ASBinCode.RunTimeDataType.unknown:
-        //                return false;
-        //            default:
-        //                {
-        //                    if (srcValue.rtType == targetType
-        //                        ||
-        //                        targetType == ASBinCode.RunTimeDataType.rt_void
-        //                        )
-        //                    {
-        //                        storeto.directSet(srcValue);
-        //                        return true;
-        //                    }
-        //                    else if (targetType > ASBinCode.RunTimeDataType.unknown)
-        //                    {
-        //                        //**检查基类
-        //                        return false;
-        //                    }
-        //                    //**检查类型转换
-
-        //                }
-        //                return false;
-        //        }
-        //    }
-
-
-        //}
+            frame.endStep(step);
+        }
     }
 }

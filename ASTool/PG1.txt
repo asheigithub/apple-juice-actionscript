@@ -95,7 +95,7 @@
 
 
 
-<ClassMetaProperty> ::="[" <Access> "]";
+<ClassMetaProperty> ::="[" <Access> "]"<EatAnSemicolon>;
 <NameSpace>         ::="namespace" <ClassPath><NameSpaceDefaultValue>;
 <NameSpaceDefaultValue> ::="="<Expression>|null;
 

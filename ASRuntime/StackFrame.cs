@@ -132,6 +132,9 @@ namespace ASRuntime
                 case OpCode.cast:
                     operators.OpCast.execCast(this, step, scope);
                     break;
+                case OpCode.cast_primitive:
+                    operators.OpCast.exec_CastPrimitive(this, step, scope);
+                    break;
                 case OpCode.assigning:
                     operators.OpAssigning.execAssigning(player, step,this, scope);
                     break;
@@ -427,6 +430,9 @@ namespace ASRuntime
                     break;
                 case OpCode.try_write_setter:
                     operators.OpPropGetSet.exec_try_write_prop(player, this, step, scope);
+                    break;
+                case OpCode.array_push:
+                    operators.OpArray.exec_Push(player, this, step, scope);
                     break;
                 default:
 

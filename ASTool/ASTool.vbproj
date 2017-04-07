@@ -137,12 +137,13 @@
     <Compile Include="FileSrcOut.vb" />
     <Compile Include="Grammar\AS3LexKeywords.vb" />
     <Compile Include="Grammar\Grammar.vb" />
-    <Compile Include="Grammar\GrammarExpression.vb" />
+    <Compile Include="Grammar\GrammarException.vb" />
     <Compile Include="Grammar\GrammarLine.vb" />
     <Compile Include="Grammar\GrammarNode.vb" />
     <Compile Include="Grammar\GrammarNodeType.vb" />
     <Compile Include="Grammar\GrammerExpr.vb" />
     <Compile Include="Grammar\GrammerTree.vb" />
+    <Compile Include="Grammar\LexException.vb" />
     <Compile Include="HashSet.vb" />
     <Compile Include="ISrcOut.vb" />
     <Compile Include="Lex.vb" />

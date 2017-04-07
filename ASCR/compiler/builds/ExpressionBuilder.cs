@@ -106,6 +106,72 @@ namespace ASCompiler.compiler.builds
                             );
             }
 
+            if (dstType > RunTimeDataType.unknown && src.valueType < RunTimeDataType.unknown)
+            {
+                if (builder.bin.primitive_to_class_table[src.valueType] != null)
+                {
+                    var cls = builder.bin.primitive_to_class_table[src.valueType];
+                    if (cls.getRtType() == dstType)
+                    {
+                        OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+                                    token);
+                        stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                            new ASBinCode.rtData.rtInt(cls.classid));
+                        stepInitClass.arg1Type = cls.staticClass.getRtType();
+                        env.block.opSteps.Add(stepInitClass);
+
+                        //***调用执行隐式类型转换方法,先获取方法***
+                        var eax_dot = env.getAdditionalRegister();
+                        {
+                            OpStep op_dot = new OpStep(OpCode.access_method, token);
+                            eax_dot.setEAXTypeWhenCompile(ASBinCode.RunTimeDataType.rt_function);
+                            op_dot.reg = eax_dot;
+                            op_dot.regType = eax_dot.valueType;
+                            op_dot.arg1 = new StaticClassDataGetter(cls.staticClass);
+                            op_dot.arg1Type = cls.staticClass.getRtType();
+                            op_dot.arg2 = (ClassMethodGetter)cls.staticClass.implicit_from.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+                            op_dot.arg2Type = ASBinCode.RunTimeDataType.rt_function; //RunTimeDataType.rt_int;
+                            env.block.opSteps.Add(op_dot);
+                        }
+                        {
+                            OpStep op = new OpStep(OpCode.call_function,
+                            new SourceToken(token.line, token.ptr, token.sourceFile));
+
+                            OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
+                            opMakeArgs.arg1 = eax_dot;
+                            opMakeArgs.arg1Type = RunTimeDataType.rt_function;
+                            env.block.opSteps.Add(opMakeArgs);
+
+
+                            OpStep opPushArgs = new OpStep(
+                                OpCode.push_parameter
+                            , new SourceToken(token.line, token.ptr, token.sourceFile));
+                                    opPushArgs.arg1 = src;
+                                    opPushArgs.arg1Type = src.valueType;
+                                    opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(0));
+                                    opPushArgs.arg2Type = RunTimeDataType.rt_int;
+                                    env.block.opSteps.Add(opPushArgs);
+
+
+                            var eax = env.getAdditionalRegister();
+                            op.reg = eax;
+                            op.regType = dstType;
+                            eax.setEAXTypeWhenCompile(dstType);
+
+                            op.arg1 = eax_dot;
+                            op.arg1Type = RunTimeDataType.rt_function;
+                            env.block.opSteps.Add(op);
+
+                            return eax;
+                        }
+
+
+                    }
+                }
+
+            }
+
+
             if (src.valueType != dstType)
             {
                 OpStep op =
@@ -956,6 +1022,14 @@ namespace ASCompiler.compiler.builds
                     {
                         return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtBoolean.False);
                     }
+                    else if (data.Data.Value.ToString() == "Infinity")
+                    {
+                        return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtNumber(double.PositiveInfinity));
+                    }
+                    else if (data.Data.Value.ToString() == "NaN")
+                    {
+                        return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtNumber(double.NaN));
+                    }
                     else
                     {
                         IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false);
@@ -1093,7 +1167,7 @@ namespace ASCompiler.compiler.builds
 
                         eax.setEAXTypeWhenCompile(item.getRtType());
 
-                        ConstructorBuilder cb= new ConstructorBuilder();
+                        ConstructorBuilder cb = new ConstructorBuilder();
                         cb.build_class(env, item, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
 
                     }
@@ -1107,7 +1181,7 @@ namespace ASCompiler.compiler.builds
 
                         IRightValue rv = getRightValue(env, value, matchtoken, builder);
 
-                        OpStep setprop = new OpStep(OpCode.set_dynamic_prop,new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile));
+                        OpStep setprop = new OpStep(OpCode.set_dynamic_prop, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                         setprop.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtString(key.StringValue));
                         setprop.arg1Type = RunTimeDataType.rt_string;
                         setprop.arg2 = rv;
@@ -1119,6 +1193,42 @@ namespace ASCompiler.compiler.builds
                         env.block.opSteps.Add(setprop);
 
                     }
+
+
+                    return eax;
+                }
+                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_array && !env.isEval)
+                {
+                    Register eax = env.getAdditionalRegister();
+                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_array);
+
+                    //***创建原始数组对象***
+                    OpStep opCreateArray = new OpStep(OpCode.assigning, new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile));
+                    opCreateArray.reg = eax;
+                    opCreateArray.regType = eax.valueType;
+                    opCreateArray.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtArray());
+                    opCreateArray.arg1Type = RunTimeDataType.rt_array;
+
+                    env.block.opSteps.Add(opCreateArray);
+
+                    List<ASTool.AS3.Expr.AS3DataStackElement> list = (List<ASTool.AS3.Expr.AS3DataStackElement>)data.Data.Value;
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        ASTool.AS3.Expr.AS3DataStackElement value = list[i];
+                        IRightValue rv = getRightValue(env, value, matchtoken, builder);
+
+                        OpStep setprop = new OpStep(OpCode.array_push, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                        setprop.arg1 = rv;
+                        setprop.arg1Type = rv.valueType;
+                        setprop.arg2 = null;
+                        setprop.arg2Type = RunTimeDataType.unknown;
+
+                        setprop.reg = eax;
+                        setprop.regType = eax.valueType;
+
+                        env.block.opSteps.Add(setprop);
+                    }
+
 
 
                     return eax;

@@ -1,0 +1,148 @@
+﻿package
+{
+	public dynamic class Array extends Object
+	{
+		/**
+		 * 指定 Array 类排序方法为不区分大小写的排序。您可以对 sort() 方法或 sortOn() 方法中的 options 参数使用此常数。 
+		 * 此常数的值为 1。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const CASEINSENSITIVE : uint = 1;
+
+		/**
+		 * 指定 Array 类排序方法为降序排序。您可以对 sort() 方法或 sortOn() 方法中的 options 参数使用此常数。 
+		 * 此常数的值为 2。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const DESCENDING : uint = 2;
+
+		/**
+		 * 指定 Array 类排序方法为数值（而不是字符串）排序。在 options 参数中包括此常数会导致 sort() 方法和 sortOn() 方法将数字作为数值排序，而不是作为数字字符的字符串排序。如果不使用 NUMERIC 常数，则排序将每个数组元素视为一个字符串，并且按照 Unicode 顺序生成结果。
+		 * 
+		 *   例如，以值为 [2005, 7, 35] 的数组为例，如果 NUMERIC 常数未包括在 options 参数中，则排序后的数组为 [2005, 35, 7]，但如果包括了 NUMERIC 常数，则排序后的数组为 [7, 35, 2005]。 此常数仅应用于数组中的数字；不应用于包含数值数据（如 ["23", "5"]）的字符串。此常数的值为 16。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const NUMERIC : uint = 16;
+
+		/**
+		 * 指定排序返回的数组包含数组索引。可以将此常数用于 sort() 或 sortOn() 方法中的 options 参数，以便您能够访问数组元素的多个视图，同时又不修改原始数组。 
+		 * 此常数的值为 8。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const RETURNINDEXEDARRAY : uint = 8;
+
+
+		/**
+		 * 指定 Array 类排序方法的唯一排序要求。您可以对 sort() 方法或 sortOn() 方法中的 options 参数使用此常数。如果任何两个要排序的元素或字段的值相同，唯一排序选项就会终止排序。 
+		 * 此常数的值为 4。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		public static const UNIQUESORT : uint = 4;
+
+
+		private var _array:Array;
+
+		[native,_array_constructor]
+		public function Array (...rest);
+
+		[implicit_to]
+		private static function _to_array(thisObj:*):Array{ return thisObj._v;}
+
+		
+		[explicit_from];
+		private static function _explicit_from_value(...rest):*
+		{
+			var result:*
+				=new Array();
+				_fill(result,rest);
+			
+			return result;
+		}
+
+		[implicit_from];
+		private static function _from_value(value:Array):*
+		{
+			
+			if(value==null)
+			{
+				return null;
+			}
+			
+
+			var result:*=_loadArrayObject(value);
+			if(result==null)
+			{
+				result=new Array();
+				_fill(result,value);
+			}
+			return result;
+		}
+
+		[native,_array_fill]
+		private static function _fill(tofill:*,value:Array):void;
+		[native,_array_load]
+		private static function _loadArrayObject(value:Array):*;
+
+
+
+		/**
+		 * 指定数组中元素数量的非负整数。在向数组中添加新元素时，此属性会自动更新。当您给数组元素赋值（例如，my_array[index] = value）时，如果 index 是数字，而且 index+1 大于 length 属性，则 length 属性会更新为 index+1。
+		 * 注意：如果您为 length 属性所赋的值小于现有长度，会将数组截断。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		[native,_array_getlength];
+		public function get length () : uint;
+
+		[native,_array_setlength];
+		public function set length (newLength:uint) : void;
+
+
+		public function indexOf (searchElement:*, fromIndex:uint=0) : int
+		{
+			var l:uint=length;
+			for(var i:uint=fromIndex;i<l;i++)
+			{
+				if( this[i]===searchElement )
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		[native,_array_insertAt];
+		public function insertAt (index:int, element:*) : void;
+
+		[native,_array_join];
+		public function join (sep:*=null) : String;
+
+		[native,_array_pop];
+		public function pop () : *;
+
+		/**
+		 * 将一个或多个元素添加到数组的结尾，并返回该数组的新长度。
+		 * @param	args	要追加到数组中的一个或多个值。
+		 * @return	一个表示新数组长度的整数。
+		 * @langversion	3.0
+		 * @playerversion	Flash 9
+		 * @playerversion	Lite 4
+		 */
+		[native,_array_push];
+		public function push (...rest) : uint;
+		[native,_array_removeat];
+		public function removeAt (index:int) : *;
+
+	}
+}

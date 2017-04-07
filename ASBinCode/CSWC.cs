@@ -15,9 +15,55 @@ namespace ASBinCode
 
         public List<rtti.Class> classes = new List<rtti.Class>();
 
+        /// <summary>
+        /// 基本类型转对象的类型转换表
+        /// </summary>
+        public List<rtti.Class> primitive_to_class_table = new List<Class>();
+
+
+        public readonly List<NativeFunctionBase> nativefunctions=new List<NativeFunctionBase>();
+        public readonly Dictionary<string, int> nativefunctionNameIndex = new Dictionary<string, int>();
+
+
+        public CSWC()
+        {
+            for (int i = 0; i < RunTimeDataType.unknown; i++)
+            {
+                primitive_to_class_table.Add(null);
+            }
+
+            loadBuildinNativeFunctions();
+
+        }
+
+        public void regNativeFunction(NativeFunctionBase nativefunction)
+        {
+            if (!nativefunctionNameIndex.ContainsKey(nativefunction.name))
+            {
+                nativefunctionNameIndex.Add(nativefunction.name, nativefunctions.Count);
+                nativefunctions.Add(nativefunction);
+            }
+            else
+            {
+                throw new InvalidOperationException("同名函数已存在");
+            }
+        }
+
+        private void loadBuildinNativeFunctions()
+        {
+            //regNativeFunction(new nativefunctions.Int_toPrecision());
+        }
+
+
+
+
         public Class getClassByRunTimeDataType(RunTimeDataType rttype)
         {
-            throw new NotImplementedException();
+            return classes[rttype - RunTimeDataType._OBJECT];
+
+            //throw new NotImplementedException();
         }
+
+        
     }
 }

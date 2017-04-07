@@ -15,8 +15,17 @@ namespace ASRuntime.operators
 
             if (!slot.isPropGetterSetter)
             {
-                
-                step.reg.getISlot(scope).directSet( slot.getValue() );
+                ISLOT regslot = step.reg.getISlot(scope);
+
+                StackSlot d = regslot as StackSlot;
+                StackSlot s = slot as StackSlot;
+                if (d != null && s != null)
+                {
+                    d.fromArray = s.fromArray;
+                    d.fromArrayIndex = s.fromArrayIndex;
+                }
+
+                regslot.directSet( slot.getValue() );
                 frame.endStep(step);
             }
             else

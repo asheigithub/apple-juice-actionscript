@@ -1,4 +1,4 @@
-﻿Public Class GrammarExpression
+﻿Public Class GrammarException
     Inherits Exception
 
     Public token As Token

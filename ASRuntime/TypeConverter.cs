@@ -18,7 +18,7 @@ namespace ASRuntime
                 case rt.rt_uint:
                     return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtUInt(0));
                 case rt.rt_number:
-                    return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtNumber(0));
+                    return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtNumber(double.NaN));
                 case rt.rt_string:
                     return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
                 case rt.rt_void:
@@ -26,6 +26,7 @@ namespace ASRuntime
                     return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
                 case rt.rt_null:
                 case rt.rt_function:
+                case rt.rt_array:
                     return new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtNull.nullptr);
                 case rt.unknown:
                     return null;
@@ -91,6 +92,7 @@ namespace ASRuntime
                 case rt.rt_null:
                     return ASBinCode.rtData.rtBoolean.False;
                 case rt.rt_function:
+                case rt.rt_array:
                     return ASBinCode.rtData.rtBoolean.True;
                 case rt.unknown:
                     if (isthrow)
@@ -165,6 +167,7 @@ namespace ASRuntime
                     
                 case rt.rt_null:
                 case rt.rt_function:
+                case rt.rt_array:
                     return 0;// new ASBinCode.rtData.rtInt(0);
                 case rt.unknown: 
                 default:
@@ -241,6 +244,7 @@ namespace ASRuntime
                     return 0;// new ASBinCode.rtData.rtUInt(0);
                 case rt.unknown:
                 case rt.rt_function:
+                case rt.rt_array:
                 default:
                     return 0;
 
@@ -292,6 +296,7 @@ namespace ASRuntime
                 case rt.rt_null:
                     return 0;// new ASBinCode.rtData.rtNumber(0);
                 case rt.rt_function:
+                case rt.rt_array:
                     return double.NaN;
                 case rt.unknown:
                     return double.NaN;
@@ -324,7 +329,8 @@ namespace ASRuntime
                     return null;//new ASBinCode.rtData.rtString(null);
                 case rt.rt_function:
                     return "function Function() {}";
-                
+                case rt.rt_array:
+                    return ((ASBinCode.rtData.rtArray)src).ToString();
                 case rt.unknown:
                     return null;
                 default:
@@ -441,6 +447,33 @@ namespace ASRuntime
                 return true;
             }
 
+            if (f > rt.unknown && t < rt.unknown)
+            {
+                rt outtype;
+
+                if (Object_CanImplicit_ToPrimitive(f, classfinder, out outtype))
+                {
+                    f = outtype;
+                }
+                else
+                {
+                    return false;
+                } 
+            }
+
+            if (f < rt.unknown && t > rt.unknown)
+            {
+                var tc = classfinder.getClassByRunTimeDataType(t);
+                if (tc.implicit_from != null)
+                {
+                    return testImplicitConvert(f, tc.implicit_from_type,classfinder);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
 
             if (f > rt.unknown && t > rt.unknown)
             {
@@ -449,6 +482,7 @@ namespace ASRuntime
                 //检查继承关系
                 
             }
+
 
             if (f > rt.unknown || t > rt.unknown)
             {
@@ -467,17 +501,18 @@ namespace ASRuntime
 
         private static bool[,] implicitcoverttable =
             {
-            /*------*/  //bool  int   uint    number  string  var_void  null   function  fun_void  unknown
-            /*bool   */ { true  ,true  ,true   ,true   ,false   ,true  ,false  ,false    ,false,false  }, 
-            /*int   */  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false    ,false,false  },  
-            /*uint  */  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false   ,false,false  },  
-            /*number*/  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false   ,false,false  },
-            /*string*/  { true  ,false ,false  ,false  ,true   ,true  ,true   ,false    ,false,false  },
-            /*var_void*/{ true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,false  },
-            /*null*/    { true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,false  },
-            /*function*/{ true ,false ,false  ,false  ,false  ,true ,true  ,true     ,false,false  },
-            /*fun_void*/{ false ,false ,false  ,false  ,false  ,true ,false  ,false     ,false,false  },
-            /*unknown*/ { false ,false ,false  ,false  ,false  ,false ,false  ,false    ,false,false  }
+            /*------*/  //bool  int   uint    number  string  var_void  null   function  fun_void   array   unknown
+            /*bool   */ { true  ,true  ,true   ,true   ,false   ,true  ,false  ,false    ,false,    false   ,false  }, 
+            /*int   */  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false    ,false,    false   ,false  },  
+            /*uint  */  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false   ,false,     false   ,false  },  
+            /*number*/  { true  ,true  ,true   ,true   ,false   ,true  ,true   ,false   ,false,     false   ,false  },
+            /*string*/  { true  ,false ,false  ,false  ,true   ,true  ,true   ,false    ,false,     false   ,false  },
+            /*var_void*/{ true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,     true   ,false  },
+            /*null*/    { true  ,true  ,true   ,true   ,true   ,true  ,true   ,true     ,false,     true   ,false  },
+            /*function*/{ true ,false ,false  ,false  ,false  ,true ,true  ,true     ,false,        false   ,false  },
+            /*fun_void*/{ false ,false ,false  ,false  ,false  ,true ,false  ,false     ,false,     false   , false  },
+            /*array*/   { true ,false ,false  ,false  ,false  ,true ,true  ,false     ,false,     true   , false  },
+            /*unknown*/ { false ,false ,false  ,false  ,false  ,false ,false  ,false    ,false,     false   ,false  }
             };
         
         public static rt getImplicitOpType(ASBinCode.RunTimeDataType v1, ASBinCode.RunTimeDataType v2, 
@@ -535,49 +570,52 @@ namespace ASRuntime
         //+ 操作隐式类型转换表
         private static rt[,] implicit_opadd_coverttable =
             {
-            /*------*/    //bool        int             uint            number          string          var_void        null        function    fun_void     unknown
-            /*boolean*/ { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_int   ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*int*/     { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_int   ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*uint*/    { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_uint  ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*number*/  { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number,rt.unknown ,rt.unknown,rt.unknown  },
-            /*string*/  { rt.rt_string  ,rt.rt_string  ,rt.rt_string   ,rt.rt_string   ,rt.rt_string   ,rt.rt_void     ,rt.rt_string,rt.unknown ,rt.unknown,rt.unknown  },
-            /*var_void*/{ rt.rt_void    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void  ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*null*/    { rt.rt_boolean ,rt.rt_int     ,rt.rt_uint     ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*function*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown  }
+            /*------*/    //bool        int             uint            number          string          var_void        null        function    fun_void    array    unknown
+            /*boolean*/ { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_int   ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*int*/     { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_int   ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*uint*/    { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_uint  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*number*/  { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*string*/  { rt.rt_string  ,rt.rt_string  ,rt.rt_string   ,rt.rt_string   ,rt.rt_string   ,rt.rt_void     ,rt.rt_string,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*var_void*/{ rt.rt_void    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*null*/    { rt.rt_boolean ,rt.rt_int     ,rt.rt_uint     ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*function*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*array*/   { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  }
             };
         //- 操作隐式类型转换表
         private static rt[,] implicit_opsub_coverttable =
             {
-            /*------*/    //bool        int             uint            number          string          var_void       null          function    fun_void   unknown
-            /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown,rt.unknown,rt.unknown  },
-            /*int*/     { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_int      ,rt.unknown,rt.unknown,rt.unknown  },
-            /*uint*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_uint     ,rt.unknown,rt.unknown,rt.unknown  },
-            /*number*/  { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_number   ,rt.unknown,rt.unknown,rt.unknown  },
-            /*string*/  { rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*var_void*/{ rt.unknown    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.unknown     ,rt.rt_void     ,rt.rt_void  ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*null*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown     ,rt.rt_void     ,rt.rt_number,rt.unknown ,rt.unknown,rt.unknown  },
-            /*function*/{ rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  },
-            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  }
+            /*------*/    //bool        int             uint            number          string          var_void       null          function    fun_void   array   unknown
+            /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*int*/     { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_int      ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*uint*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_uint     ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*number*/  { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_number   ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*string*/  { rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*var_void*/{ rt.unknown    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.unknown     ,rt.rt_void     ,rt.rt_void  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*null*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown     ,rt.rt_void     ,rt.rt_number,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*function*/{ rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*array*/   { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  },
+            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown,rt.unknown  }
             };
 
 
         //* / % 操作隐式类型转换表
         private static rt[,] implicit_opmulti_coverttable =
             {
-            /*------*/    //bool        int             uint            number          string          var_void       null          function    fun_void      unknown
-            /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown    ,rt.unknown,rt.unknown  },
-            /*int*/     { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_int      ,rt.unknown    ,rt.unknown,rt.unknown  },
-            /*uint*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_uint     ,rt.unknown    ,rt.unknown,rt.unknown  },
-            /*number*/  { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_number   ,rt.unknown    ,rt.unknown,rt.unknown  },
-            /*string*/  { rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown     ,rt.unknown,rt.unknown  },
-            /*var_void*/{ rt.unknown    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.unknown     ,rt.rt_void     ,rt.rt_void      ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*null*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown     ,rt.rt_void     ,rt.rt_number    ,rt.unknown ,rt.unknown,rt.unknown  },
-            /*function*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown  },
-            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown  },
-            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown  }
+            /*------*/    //bool        int             uint            number          string          var_void       null          function    fun_void       array   unknown
+            /*boolean*/ { rt.unknown    ,rt.unknown     ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown      ,rt.unknown    ,rt.unknown,rt.unknown,rt.unknown  },
+            /*int*/     { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_int      ,rt.unknown    ,rt.unknown,rt.unknown,rt.unknown  },
+            /*uint*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_uint     ,rt.unknown    ,rt.unknown,rt.unknown,rt.unknown  },
+            /*number*/  { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown   ,rt.rt_void     ,rt.rt_number   ,rt.unknown    ,rt.unknown,rt.unknown,rt.unknown  },
+            /*string*/  { rt.unknown    ,rt.unknown  ,rt.unknown   ,rt.unknown   ,rt.unknown     ,rt.unknown     ,rt.unknown        ,rt.unknown     ,rt.unknown,rt.unknown,rt.unknown  },
+            /*var_void*/{ rt.unknown    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.unknown     ,rt.rt_void     ,rt.rt_void      ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*null*/    { rt.unknown    ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.unknown     ,rt.rt_void     ,rt.rt_number    ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*function*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  },
+            /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  },
+            /*array*/   { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  },
+            /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown,rt.unknown,rt.unknown  }
             };
 
 
@@ -588,6 +626,20 @@ namespace ASRuntime
             {
                 return false;
             }
+
+            var _class = bin.getClassByRunTimeDataType(classtype);
+
+            if (_class.staticClass == null)
+            {
+                return false;
+            }
+
+            if (_class.staticClass.implicit_to != null)
+            {
+                var to = _class.staticClass.implicit_to_type;
+                return (to == rt.rt_int || to == rt.rt_uint || to == rt.rt_number);
+            }
+
 
             return false;
         }
@@ -601,6 +653,21 @@ namespace ASRuntime
                 return false;
             }
 
+
+            var _class = bin.getClassByRunTimeDataType(classtype);
+
+            if (_class.staticClass == null)
+            {
+                primitiveType = rt.unknown;
+                return false;
+            }
+
+            if (_class.staticClass.implicit_to != null)
+            {
+                primitiveType = _class.staticClass.implicit_to_type;
+                return true;
+            }
+
             primitiveType = rt.unknown;
             return false;
         }
@@ -610,9 +677,12 @@ namespace ASRuntime
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static ASBinCode.IRunTimeValue ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
+        internal static ASBinCode.IRunTimeValue ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
         {
-            return ASBinCode.rtData.rtUndefined.undefined;
+            //return ASBinCode.rtData.rtUndefined.undefined;
+
+            return obj.value.memberData[0].getValue();
+
         }
 
     }

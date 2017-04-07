@@ -329,6 +329,10 @@ namespace ASBinCode
         /// </summary>
         cast_primitive=83,
 
-        
+        /// <summary>
+        /// 往原始数组对象中追加元素
+        /// </summary>
+        array_push=84,
+
     }
 }

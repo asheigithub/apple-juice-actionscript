@@ -50,8 +50,9 @@ namespace ASRuntime.operators
             if (rv.rtType > RunTimeDataType.unknown)
             {
                 var _class = getClass(player, frame, step, scope);
-                if (_class != null)
+                if (_class != null && !_class.no_constructor)
                 {
+
                     frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
                     if (_class.constructor != null)
                     {
@@ -67,6 +68,13 @@ namespace ASRuntime.operators
                     //    frame.funCaller.createParaScope();
 
                     //}
+
+                }
+                else
+                {
+                    
+                    frame.throwError(new error.InternalError(step.token, _class.name + " is not a constructor", new ASBinCode.rtData.rtString(_class.name + " is not a constructor")));
+                   
                 }
             }
             else
@@ -125,8 +133,17 @@ namespace ASRuntime.operators
             var rv = step.arg1.getValue(frame.scope);
             int classid = ((ASBinCode.rtData.rtInt)rv).value;
 
-            frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, player.swc.classes[classid]);
-            frame.instanceCreator.prepareConstructorArgements();
+            var _class = player.swc.classes[classid];
+            if (_class.no_constructor)
+            {
+                frame.throwError(new error.InternalError(step.token, _class.name + " is not a constructor", new ASBinCode.rtData.rtString(_class.name + " is not a constructor")));
+            }
+            else
+            {
+
+                frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
+                frame.instanceCreator.prepareConstructorArgements();
+            }
             //ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             //ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
 

@@ -32,6 +32,8 @@ namespace ASBinCode
                     return "rt_function";
                 case fun_void:
                     return "return_void";
+                case rt_array:
+                    return "rt_array";
                 case unknown:
                     return "unknown";
                 default:
@@ -51,7 +53,8 @@ namespace ASBinCode
         public const int rt_null = 6;
         public const int rt_function = 7;
         public const int fun_void = 8;
-        public const int unknown = 9;
+        public const int rt_array = 9;
+        public const int unknown = 10;
 
 
         public const int _OBJECT = unknown + 1;

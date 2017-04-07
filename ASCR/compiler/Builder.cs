@@ -117,6 +117,8 @@ namespace ASCompiler.compiler
             }
 
             bin = new CSWC();
+            ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
+
             
             try
             {
@@ -434,7 +436,7 @@ namespace ASCompiler.compiler
 
                             ClassMethodGetter field = (ClassMethodGetter)item.Value.constructor.bindField;
                             int blockid = field.refdefinedinblockid;
-
+                            
                             var signature =
                                     dictSignatures[blockid][field];
                             foreach (var func in buildoutfunctions.Values)
@@ -446,8 +448,7 @@ namespace ASCompiler.compiler
                                 }
                             }
                         }
-
-
+                        
                         while (bin.classes.Count <= item.Value.staticClass.classid)
                         {
                             bin.classes.Add(null);
@@ -1135,6 +1136,16 @@ namespace ASCompiler.compiler
                                     else
                                     {
                                         IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+
+                                        if (
+                                            !dictSignatures[env.block.id].ContainsKey(
+                                                (member)))
+                                        {
+                                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                "成员未找到"));
+                                            return;
+                                        }
+
                                         signature = dictSignatures[env.block.id][member];
                                     }
                                 }

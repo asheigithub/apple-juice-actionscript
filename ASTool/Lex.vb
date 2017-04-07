@@ -427,7 +427,7 @@ flagdefwords:
                 If Char.IsDigit(nn(0)) Or nn.ToLower() = "a" Or nn.ToLower() = "b" Or nn.ToLower() = "c" Or nn.ToLower() = "d" Or nn.ToLower() = "e" Or nn.ToLower() = "f" Then
                     result.StringValue += nn
                 ElseIf isIdStChar(nn) Then
-                    Throw New Exception("解析数值错误")
+                    Throw New LexException("解析数值错误", cline, linepos)
 
                 Else
 
@@ -453,7 +453,7 @@ readnumber:
             If csymobl = "." Then
 
                 If result.StringValue(0) = "." Then
-                    Throw New Exception("解析数值错误")
+                    Throw New LexException("解析数值错误", cline, linepos)
                 End If
 
                 result.StringValue += csymobl
@@ -643,7 +643,7 @@ readnumber:
             If Char.IsDigit(nc(0)) Then
                 r = r + getNextChar(input, currentptr)
             ElseIf isIdStChar(nc) And nc.ToLower() <> "e" Then
-                Throw New Exception("解析数值错误")
+                Throw New LexException("解析数值错误", cline, currentptr)
             Else
 
                 Return r

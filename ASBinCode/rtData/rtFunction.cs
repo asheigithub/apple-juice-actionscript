@@ -6,6 +6,33 @@ namespace ASBinCode.rtData
 {
     public sealed class rtFunction : IRunTimeValue
     {
+        public class functionObjHandle
+        {
+            public rtObject bindFunctionObj;
+
+            public override int GetHashCode()
+            {
+                if (bindFunctionObj == null)
+                {
+                    return 0.GetHashCode();
+                }
+                else
+                {
+                    return bindFunctionObj.GetHashCode();
+                }
+            }
+            public override bool Equals(object obj)
+            {
+                functionObjHandle right = obj as functionObjHandle;
+                if (right == null)
+                {
+                    return false;
+                }
+                return ReferenceEquals(bindFunctionObj, right.bindFunctionObj);
+            }
+        }
+
+
         private readonly int _objid;
         private static int _seed;
 
@@ -24,6 +51,9 @@ namespace ASBinCode.rtData
         }
 
 
+        public functionObjHandle objHandle;
+
+
         private int _functionid;
 
         public int functionId
@@ -38,6 +68,8 @@ namespace ASBinCode.rtData
             _functionid = id;_bindScope = null;
             this._ismethod = ismethod;
             _objid = _seed++;
+
+            objHandle = new functionObjHandle();
         }
 
 
@@ -87,13 +119,15 @@ namespace ASBinCode.rtData
             _bindScope = right._bindScope;
             _ismethod = right._ismethod;
             _this_pointer = right._this_pointer;
+
+            objHandle = right.objHandle;
         }
 
         public override int GetHashCode()
         {
             //return base.GetHashCode();
             return _functionid.GetHashCode() ^ _bindScope.GetHashCode() ^
-                _ismethod.GetHashCode() ^ _this_pointer.GetHashCode();
+                _ismethod.GetHashCode() ^ _this_pointer.GetHashCode() ^ objHandle.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -104,10 +138,13 @@ namespace ASBinCode.rtData
                 return false;
             }
 
-            return  _functionid == right._functionid
+            return _functionid == right._functionid
                 && _bindScope.Equals(right._bindScope) && _ismethod == right._ismethod
-                && _this_pointer.Equals(right._this_pointer);
-
+                && //_this_pointer.Equals(right._this_pointer);
+                ReferenceEquals(_this_pointer, right._this_pointer)
+                && objHandle.Equals(right.objHandle);
+                
+                ;
         }
 
 

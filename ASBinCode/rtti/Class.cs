@@ -14,6 +14,11 @@ namespace ASBinCode.rtti
         /// </summary>
         public bool isdocumentclass;
 
+        /// <summary>
+        /// 是否不可实例化
+        /// </summary>
+        public bool no_constructor;
+
         public readonly int classid;
         public Class(int id,int blockid,CSWC swc)
         {
@@ -22,6 +27,9 @@ namespace ASBinCode.rtti
             this.blockid = blockid;
             classMembers = new List<ClassMember>();
             fields = new List<ClassMember>();
+
+            implicit_to_type = RunTimeDataType.unknown;
+            implicit_to_functionid = -1;
         }
         /// <summary>
         /// 类定义代码所在blockid
@@ -74,6 +82,28 @@ namespace ASBinCode.rtti
         /// 构造函数id
         /// </summary>
         public int constructor_functionid;
+
+        /// <summary>
+        /// 隐式类型转换到原始类型函数
+        /// </summary>
+        public ClassMember implicit_to;
+        public RunTimeDataType implicit_to_type;
+        public int implicit_to_functionid;
+
+        /// <summary>
+        /// 隐式从原始类型转换过来
+        /// </summary>
+        public ClassMember implicit_from;
+        public int implicit_from_functionid;
+        public RunTimeDataType implicit_from_type;
+
+        /// <summary>
+        /// 显式类型转换
+        /// </summary>
+        public ClassMember explicit_from;
+        public int explicit_from_functionid;
+        public RunTimeDataType explicit_from_type;
+
 
         /// <summary>
         /// 类成员定义

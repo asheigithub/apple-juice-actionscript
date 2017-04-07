@@ -1,0 +1,53 @@
+﻿package
+{
+	public final dynamic class Function extends Object
+	{
+		
+		
+		private var _func:Function;
+
+		public function Function ()
+		{
+			_func=function():*{};
+		}
+
+		[implicit_to]
+		private static function _to_function(thisObj:*):Function{ return thisObj._func;}
+
+		[implicit_from]
+		private static function _from_value(value:Function):*
+		{ 
+			if(value==null)
+			{
+				return null;
+			}
+
+			var result:*=_loadFunctionObject(value);
+			if(result==null)
+			{
+				result=new Function();
+				_fill(result,value);
+			}
+			return result;
+		}
+
+		[explicit_from];
+		private static function _explicit_from_value(v:Function):*
+		{
+			throw "The form function('function body') is not supported."
+		}
+
+		[native,_function_fill]
+		private static function _fill(tofill:*,value:Function):void;
+		[native,_function_load]
+		private static function _loadFunctionObject(value:Function):*;
+
+		public function get prototype () : *{ throw "Function 的 prototype功能未实现"};
+		public function set prototype (p:*) : void{ throw "Function 的 prototype功能未实现"};
+
+		[native,_function_apply]
+		public function apply (thisArg:*=null, argArray:Array=null) : *;
+		//public function call (thisArg:*=null, ...rest) : *;
+		
+	}
+}

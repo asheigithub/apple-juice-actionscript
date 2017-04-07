@@ -63,12 +63,151 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	
+        ///	public final class int extends Object
+        ///	{
+        ///		/**
+        ///		 * 可表示的最大 32 位带符号整数为 2,147,483,647。
+        ///		 * @langversion	3.0
+        ///		 * @playerversion	Flash 9
+        ///		 * @playerversion	Lite 4
+        ///		 */
+        ///		public static const MAX_VALUE : int = 2147483647;
+        ///
+        ///		/**
+        ///		 * 可表示的最小 32 位带符号整数为 -2,147,483,648。
+        ///		 * @langversion	3.0
+        ///		 * @playerversion	Flash 9
+        ///		 * @playerversion	Lite 4
+        ///		 */
+        ///		public static const MIN_VALUE : int = -2147483648;
+        ///
+        ///
+        ///		[implicit_to]
+        ///		private static function _to_int(thisObj:*):int{ return [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string _int {
+            get {
+                return ResourceManager.GetString("_int", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	/**
+        ///	 * uint 类提供使用表示 32 位无符号整数的数据类型的方法。因为无符号整数只能为正，所以其最大值是 int 类最大值的两倍。
+        ///	 * &lt;p class=&quot;- topic/p &quot;&gt;由 uint 类表示的值的范围介于 0 到 4,294,967,295 (2^32-1) 之间。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;可以通过声明 uint 类型的变量并为变量赋予文本值来创建 uint 对象。uint 类型变量的默认值为 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;0&lt;/codeph&gt;。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;uint 类主要用于像素颜色值（ARGB 和 RGBA）和 int 数据类型无法正常运行的其它情况。例如，数字 0xFFFFFFFF 表示 Alpha 值为 255 的白色颜色值，它无法用 int 数据类型表示，因为它不在有效的 int 值范围内。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;下例将创建一个 uint 对象并调用 &lt;codeph class=&quot;+ topic/ph  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string _uint {
+            get {
+                return ResourceManager.GetString("_uint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	public dynamic class Array extends Object
+        ///	{
+        ///		/**
+        ///		 * 指定 Array 类排序方法为不区分大小写的排序。您可以对 sort() 方法或 sortOn() 方法中的 options 参数使用此常数。 
+        ///		 * 此常数的值为 1。
+        ///		 * @langversion	3.0
+        ///		 * @playerversion	Flash 9
+        ///		 * @playerversion	Lite 4
+        ///		 */
+        ///		public static const CASEINSENSITIVE : uint = 1;
+        ///
+        ///		/**
+        ///		 * 指定 Array 类排序方法为降序排序。您可以对 sort() 方法或 sortOn() 方法中的 options 参数使用此常数。 
+        ///		 * 此常数的值为 2。
+        ///		 * @langversion	3.0
+        ///		 * @playerversion	Flash 9
+        ///		 * @playerversion	Lite 4
+        ///		 */
+        ///		public static const DESC [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Array {
+            get {
+                return ResourceManager.GetString("Array", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	public final dynamic class Function extends Object
+        ///	{
+        ///		
+        ///		//public function get prototype () : *;
+        ///		//public function set prototype (p:*) : void;
+        ///
+        ///		//public function apply (thisArg:any=null, argArray:any=null) : *;
+        ///
+        ///		//public function call (thisArg:any=null, ...rest) : *;
+        ///
+        ///		public static function createEmptyFunction () : Function
+        ///		{
+        ///			return function():*{};
+        ///		}
+        ///
+        ///		
+        ///		public function Function ();
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string Function {
+            get {
+                return ResourceManager.GetString("Function", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	/**
+        ///	 * Math 类包含表示常用数学函数和值的方法和常数。 
+        ///	 * &lt;p class=&quot;- topic/p &quot;&gt;使用此类的方法和属性可以访问和处理数学常数和函数。Math 类的所有属性和方法都是静态的，而且必须使用 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;Math.method(&lt;/codeph&gt;&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;&lt;i class=&quot;+ topic/ph hi-d/i &quot;&gt;parameter&lt;/i&gt;&lt;/codeph&gt;&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;)&lt;/codeph&gt; 或 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;Math.constant&lt;/codeph&gt; 语法才能调用。在 ActionScript 中，使用双精度 IEEE-754 浮点数的最高精度定义常数。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;若干 Math 类方法使用以弧度为单位的角度测量值作为参数。在调用此方法之 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Math {
+            get {
+                return ResourceManager.GetString("Math", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	/**
+        ///	 * 表示 IEEE-754 双精度浮点数的数据类型。使用与 Number 类关联的方法和属性可以操作基元数值。此类与 JavaScript 的 Number 类完全相同。
+        ///	 * &lt;p class=&quot;- topic/p &quot;&gt;但 Number 类的属性是静态属性，这意味着无需对象就可以使用这些属性，因此您不需要使用构造函数。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;Number 数据类型符合双精度 IEEE-754 标准。 &lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;需要使用浮点值时，Number 数据类型很有用。Flash 运行时处理 int 和 uint 数据类型的效率高于处理 Number 数据类型的效率，但当所需值的范围超过 int 和 uint 数据类型的有效范围时，Number 数据类型很有用。Number 类可用于表示超出 int 和 uint 数据类型有效范围的整数值。Number 数据类型可使用多达 53 位来表示整数值，而 int 和 uint 则只能使用 32 位。Number 类型的变量的默认值为 &lt;codeph class=&quot; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Number {
+            get {
+                return ResourceManager.GetString("Number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	public dynamic class Object
         ///	{
         ///		public function Object ();
         ///	}
         ///}
-        /// 的本地化字符串。
+        ///
+        ///function toString():String
+        ///{
+        ///	return &quot;[object Object]&quot;;
+        ///}
+        ///
+        ///function valueOf():Object
+        ///{
+        ///	return this;
+        ///} 的本地化字符串。
         /// </summary>
         internal static string Object {
             get {

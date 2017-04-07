@@ -231,29 +231,41 @@ namespace ASCompiler.compiler.builds
 
             if (as3class.Meta != null)
             {
-                if (!as3class.Meta.Value.IsReg)
+                foreach (var m in as3class.Meta)
                 {
-                    if (as3class.Meta.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
+                    if (!m.Value.IsReg)
                     {
-                        if (as3class.Meta.Value.Data.Value.ToString() == "Doc")
+                        if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
                         {
-                            for (int i = 0; i < builder.buildingclasses.Count; i++)
+                            if (m.Value.Data.Value.ToString() == "Doc")
                             {
-                                if (builder.buildingclasses[as3class].isdocumentclass)
+                                for (int i = 0; i < builder.buildingclasses.Count; i++)
                                 {
-                                    throw new BuildException(as3class.token.line,
-                                        as3class.token.ptr, as3class.token.sourceFile,
-                                                            "只能有1个文档类");
+                                    if (builder.buildingclasses[as3class].isdocumentclass)
+                                    {
+                                        throw new BuildException(as3class.token.line,
+                                            as3class.token.ptr, as3class.token.sourceFile,
+                                                                "只能有1个文档类");
+                                    }
+                                }
+
+                                if (!cls.ispackageout && cls.isPublic)
+                                {
+                                    cls.isdocumentclass = true;
+                                }
+                            }
+                            else if (m.Value.Data.Value.ToString() == "no_constructor")
+                            {
+                                if (!cls.ispackageout && cls.isPublic)
+                                {
+                                    cls.no_constructor = true;
                                 }
                             }
 
-                            if (!cls.ispackageout && cls.isPublic)
-                            {
-                                cls.isdocumentclass = true;
-                            }
                         }
                     }
                 }
+                
             }
 
 

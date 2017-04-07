@@ -133,9 +133,21 @@ namespace ASCompiler.compiler.builds
                     {
                         if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown)
                         {
-                            throw new BuildException(
-                                       new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                       "基础类型转引用类型还没实现"));
+                            if (builder.bin.primitive_to_class_table[v1.valueType] != null)
+                            {
+                                var cls = builder.bin.primitive_to_class_table[v1.valueType];
+                                v1 = ExpressionBuilder.addCastOpStep(env, v1, builder.bin.primitive_to_class_table[v1.valueType].getRtType(),
+                                    new SourceToken(step.token.line,step.token.ptr,step.token.sourceFile)
+                                    , builder
+                                    );
+                                build_class(env, step, v1, cls, builder);
+                            }
+                            else
+                            {
+                                throw new BuildException(
+                                           new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                           "基础类型" + v1.valueType + "无法转换为引用类型"));
+                            }
                         }
                         else
                         {
@@ -258,11 +270,23 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown)
+                        if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown
+                            )
                         {
-                            throw new BuildException(
-                                       new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                       "基础类型转引用类型还没实现"));
+                            if (builder.bin.primitive_to_class_table[v1.valueType] != null)
+                            {
+                                v1 = ExpressionBuilder.addCastOpStep(env, v1, builder.bin.primitive_to_class_table[v1.valueType].getRtType(),
+                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+                                    , builder
+                                    );
+                                build_bracket_access(env, step, v1, builder);
+                            }
+                            else
+                            {
+                                throw new BuildException(
+                                           new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                           "基础类型" + v1.valueType + "无法转换为引用类型"));
+                            }
                         }
                         else
                         {
@@ -432,5 +456,6 @@ namespace ASCompiler.compiler.builds
 
         }
 
+        
     }
 }

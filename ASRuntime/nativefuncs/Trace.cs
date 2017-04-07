@@ -8,7 +8,7 @@ namespace ASRuntime.nativefuncs
     {
         public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (step.arg1.valueType == ASBinCode.RunTimeDataType.unknown)
+            if (step.arg1==null || step.arg1.valueType == ASBinCode.RunTimeDataType.unknown)
             {
                 Console.WriteLine();
                 frame.endStep(step);
@@ -22,7 +22,7 @@ namespace ASRuntime.nativefuncs
                 cb.setCallBacker(cast_back);
 
                 operators.OpCast.CastValue(totrace, ASBinCode.RunTimeDataType.rt_string,
-                    frame, step.token, scope, frame._tempSlot1, cb
+                    frame, step.token, scope, frame._tempSlot1, cb,false
                     );    
             }
 

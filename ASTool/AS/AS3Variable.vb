@@ -13,7 +13,10 @@
         Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
 
             If Not Meta Is Nothing Then
-                Meta.Write(tabs, srcout)
+                'Meta.Write(tabs, srcout)
+                For Each m In Meta
+                    m.Write(tabs, srcout)
+                Next
             End If
 
             Dim defalutvalue As String = ""

@@ -37,10 +37,10 @@ namespace ASCompiler.compiler
                 CompileEnv tempEnv = new CompileEnv(new CodeBlock(bid,"temp",-65535,true),true);
                 tempEnv.block.scope = new ASBinCode.scopes.StartUpBlockScope();
                 builder.buildExpressNotEval(tempEnv, expression);
+
                 tempEnv.completSteps();
                 tempEnv.block.totalRegisters = tempEnv.combieRegisters();
 
-                
                 if (builder.buildErrors.Count == 0)
                 {
                     IRightValue value = builds.ExpressionBuilder.getRightValue(tempEnv, expression.Value, expression.token, builder);

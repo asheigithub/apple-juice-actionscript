@@ -440,9 +440,20 @@ Public Class Grammar
         Dim treenodestack As New Stack(Of GrammerExpr)
         treenodestack.Push(tree.Root)
 
+        Dim words As TokenList
+        Try
+            words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input.Trim())
+        Catch ex As LexException
+
+            hasError = True
+
+            Console.WriteLine(ex.Message & " line:" & ex.line & " ptr:" & ex.ptr)
 
 
-        Dim words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input.Trim())
+            Return tree
+        End Try
+
+
 
 #Region "检查 this 和 super关键字"
         For index = 0 To words.Count - 1

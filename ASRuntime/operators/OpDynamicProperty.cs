@@ -30,6 +30,10 @@ namespace ASRuntime.operators
                         }
                     }
                 }
+                else if (slot.fromArray != null)
+                {
+                    slot.fromArray.innerArray[slot.fromArrayIndex] = rtUndefined.undefined;
+                }
                 else
                 {
                     frame.throwError(
@@ -38,7 +42,7 @@ namespace ASRuntime.operators
                                     new ASBinCode.rtData.rtString("动态属性才能被delete")
                                     )
                         );
-                    
+
                 }
 
                 frame.endStep(step);
