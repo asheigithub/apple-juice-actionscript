@@ -30,6 +30,13 @@ namespace ASBinCode
             this.refdefinedinblockid = refdefinedinblockid;
         }
 
+        public ASBinCode.rtti.ClassMember classmember
+        {
+            get
+            {
+                return _class.classMembers[indexofMember];
+            }
+        }
 
         public RunTimeDataType valueType
         {

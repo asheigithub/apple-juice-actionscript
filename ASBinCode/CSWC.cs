@@ -24,6 +24,8 @@ namespace ASBinCode
         public readonly List<NativeFunctionBase> nativefunctions=new List<NativeFunctionBase>();
         public readonly Dictionary<string, int> nativefunctionNameIndex = new Dictionary<string, int>();
 
+        public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
+            dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
 
         public CSWC()
         {
@@ -51,7 +53,7 @@ namespace ASBinCode
 
         private void loadBuildinNativeFunctions()
         {
-            //regNativeFunction(new nativefunctions.Int_toPrecision());
+               //regNativeFunction(new nativefunctions.Int_toPrecision());
         }
 
 

@@ -40,7 +40,7 @@ namespace ASCompiler.compiler.builds
                     }
 
                 }
-
+                
 
                 List<ASTool.AS3.Expr.AS3DataStackElement> args
                     = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
@@ -72,58 +72,90 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
             {
-
-                if (step.Arg2.Data.Value.ToString() == "trace")
+                #region "查找@__buildin__"
                 {
-                    if (env.isEval)
-                    {
-                        return;
-                    }
+                    string name = step.Arg2.Data.Value.ToString();
+                    
+                        //***从__buildin__中查找
+                        var buildin = TypeReader.findClassFromImports("@__buildin__", builder,step.token);
+                        if (buildin.Count == 1)
+                        {
+                            if (env.isEval)
+                            {
+                                return;
+                            }
 
-                    OpStep op = new OpStep(OpCode.native_trace,
-                        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                            var bi = buildin[0].staticClass;
 
-                    var eax = env.createASTRegister(step.Arg1.Reg.ID);
-                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
-                    op.reg = eax;
-                    op.regType = RunTimeDataType.rt_void;
+                            var member = ClassMemberFinder.find(bi, name, bi);
+                            if (member != null)
+                            {
+                                build_member(member.bindField, step, builder, env, bi, name);
+                                return;
+                            }
 
-
-                    List<ASTool.AS3.Expr.AS3DataStackElement> args
-                        = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
-
-                    if (args.Count > 1)
-                    {
-                        throw new BuildException(
-                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "trace函数目前只接受1个函数"));
-                    }
-                    else if (args.Count > 0)
-                    {
-                        op.arg1 = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
-                        op.arg1Type = op.arg1.valueType;
-                    }
-                    else
-                    {
-                        op.arg1 = null;
-                        op.arg1Type = RunTimeDataType.unknown;
-                    }
-                    op.arg2 = null;
-                    op.arg2Type = RunTimeDataType.unknown;
-
-                    env.block.opSteps.Add(op);
+                        }
+                    
                 }
-                else
+                #endregion
+                //if (step.Arg2.Data.Value.ToString() == "trace")
+                //{
+                //    if (env.isEval)
+                //    {
+                //        return;
+                //    }
+
+                //    OpStep op = new OpStep(OpCode.native_trace,
+                //        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+                //    var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                //    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                //    op.reg = eax;
+                //    op.regType = RunTimeDataType.rt_void;
+
+
+                //    List<ASTool.AS3.Expr.AS3DataStackElement> args
+                //        = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
+
+                //    if (args.Count > 1)
+                //    {
+                //        throw new BuildException(
+                //            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                //            "trace函数目前只接受1个函数"));
+                //    }
+                //    else if (args.Count > 0)
+                //    {
+                //        op.arg1 = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
+                //        op.arg1Type = op.arg1.valueType;
+                //    }
+                //    else
+                //    {
+                //        op.arg1 = null;
+                //        op.arg1Type = RunTimeDataType.unknown;
+                //    }
+                //    op.arg2 = null;
+                //    op.arg2Type = RunTimeDataType.unknown;
+
+                //    env.block.opSteps.Add(op);
+                //}
+                //else
                 {
                     string name = step.Arg2.Data.Value.ToString();
 
                     ASBinCode.rtti.Class _cls = null;
 
-                    IMember member = MemberFinder.find(name, env,false);
+                    IMember member = MemberFinder.find(name, env,false,builder,step.token);
 
-                    if (member == null)     //检查是否强制类型转换
+                    if (member == null
+                        ||
+                        (member is ClassMethodGetter
+                        &&
+                        ((ClassMethodGetter)member).classmember.isConstructor
+                        )
+                        
+                        )     //检查是否强制类型转换
                     {
-                        var found= TypeReader.findClassFromImports(name, builder);
+                        var found= TypeReader.findClassFromImports(name, builder,step.token);
                         if (found.Count == 1)   //说明为强制类型转换
                         {
                             ASBinCode.rtti.Class cls = found[0];
@@ -205,6 +237,11 @@ namespace ASCompiler.compiler.builds
                             "目前只实现了trace函数"));
             }
         }
+
+
+
+
+
 
         private void build_member(IMember member, ASTool.AS3.Expr.AS3ExprStep step, Builder builder,CompileEnv env,
             ASBinCode.rtti.Class _cls , string name
@@ -320,12 +357,14 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
+            List<OpStep> toadd = new List<OpStep>(); //由于这里可能出现嵌套函数调用，所以用临时列表
+
             if (!isConstructor)
             {
                 OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = makeParaArg1==null? rFunc : makeParaArg1 ;
                 opMakeArgs.arg1Type = RunTimeDataType.rt_function;
-                env.block.opSteps.Add(opMakeArgs);
+                toadd.Add(opMakeArgs);
             }
             else
             {
@@ -333,10 +372,10 @@ namespace ASCompiler.compiler.builds
                 OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = new ASBinCode.rtData.RightValue( new ASBinCode.rtData.rtInt( cls.classid));
                 opMakeArgs.arg1Type = RunTimeDataType.rt_int;
-                env.block.opSteps.Add(opMakeArgs);
+                toadd.Add(opMakeArgs);
                 
             }
-
+            
             bool hasIntoPara = false;
             for (int i = 0; i < args.Count; i++)
             {
@@ -394,8 +433,10 @@ namespace ASCompiler.compiler.builds
                         {
                             if (!ASRuntime.TypeConverter.testImplicitConvert(arg.valueType, para.type, builder))
                             {
-                                throw new BuildException(token.line, token.ptr, token.sourceFile,
-                                    "参数类型不匹配，不能将" + arg.valueType + "转换成" + para.type
+                                throw new BuildException(
+                                    new BuildTypeError(
+                                    token.line, token.ptr, token.sourceFile,
+                                    arg.valueType,para.type,builder)
                                     );
                             }
                         }
@@ -421,9 +462,12 @@ namespace ASCompiler.compiler.builds
                 opPushArgs.arg1Type = arg.valueType;
                 opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));
                 opPushArgs.arg2Type = RunTimeDataType.rt_int;
-                env.block.opSteps.Add(opPushArgs);
+                toadd.Add(opPushArgs);
                 
             }
+
+            env.block.opSteps.AddRange(toadd);
+
         }
 
 

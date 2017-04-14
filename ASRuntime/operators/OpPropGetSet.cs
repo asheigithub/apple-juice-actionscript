@@ -19,13 +19,20 @@ namespace ASRuntime.operators
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
-                if (d != null && s != null)
-                {
-                    d.fromArray = s.fromArray;
-                    d.fromArrayIndex = s.fromArrayIndex;
-                }
+                //if (d != null && s != null)
+                //{
+                    //d.fromArray = s.fromArray;
+                    //d.fromArrayIndex = s.fromArrayIndex;
+                //}
 
-                regslot.directSet( slot.getValue() );
+                if ( d !=null && s!=null && s.linktarget != null)
+                {
+                    d.linkTo(s.linktarget);
+                }
+                else
+                {
+                    regslot.directSet(slot.getValue());
+                }
                 frame.endStep(step);
             }
             else

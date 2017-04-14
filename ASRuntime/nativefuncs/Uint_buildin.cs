@@ -48,7 +48,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -76,7 +76,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtUInt)thisObj.value.memberData[0].getValue()).value.ToString("g" + (r))
+                        ((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("g" + (r))
 
                         );
                 }
@@ -132,7 +132,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -160,7 +160,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtUInt)thisObj.value.memberData[0].getValue()).value.ToString("e" + (r + 1))
+                        ((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("e" + (r + 1))
 
                         );
                 }
@@ -215,7 +215,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -243,7 +243,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtUInt)thisObj.value.memberData[0].getValue()).value.ToString("f" + (r))
+                        ((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("f" + (r))
 
                         );
                 }
@@ -299,7 +299,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -324,7 +324,7 @@ namespace ASRuntime.nativefuncs
                     errormessage = null;
                     errorno = 0;
 
-                    var toCast = ((rtUInt)thisObj.value.memberData[0].getValue()).value;
+                    var toCast = ((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value;
 
                     if (r == 10)
                     {

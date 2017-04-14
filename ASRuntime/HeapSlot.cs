@@ -73,20 +73,30 @@ namespace ASRuntime
                         break;
                     case RunTimeDataType.rt_function:
                         ((rtFunction)this.value).CopyFrom((rtFunction)value);
+                        
                         break;
                     case RunTimeDataType.fun_void:
                         this.value = value;
                         break;
                     case RunTimeDataType.rt_array:
-                        ((rtArray)this.value).CopyFrom((rtArray)value);
-                        //this.value = value;
+                        //((rtArray)this.value).CopyFrom((rtArray)value);
+                        this.value = value;
                         break;
                     case RunTimeDataType.unknown:
                         this.value = null;
                         break;
                     default:
 
-                        ((rtObject)this.value).CopyFrom((rtObject)value);
+                        this.value = value;
+
+                        //this.value = (rtObject)value.Clone();
+                        //if (((rtObject)this.value).value.objectid != ((rtObject)value).value.objectid)
+                        //{
+
+                        //}
+
+
+                        //((rtObject)this.value).CopyFrom((rtObject)value);
                         break;
                 }
             }

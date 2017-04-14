@@ -15,6 +15,11 @@ namespace ASBinCode.rtti
         public bool isdocumentclass;
 
         /// <summary>
+        /// 是否是需要非托管类
+        /// </summary>
+        public bool isUnmanaged;
+
+        /// <summary>
         /// 是否不可实例化
         /// </summary>
         public bool no_constructor;

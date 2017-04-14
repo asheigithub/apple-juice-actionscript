@@ -44,6 +44,39 @@ namespace ASBinCode
             
         }
 
+        public string toAS3Name()
+        {
+            switch (RTTI)
+            {
+                case rt_boolean:
+                    return "Boolean";
+                case rt_int:
+                    return "int";
+                case rt_uint:
+                    return "uint";
+                case rt_number:
+                    return "Number";
+                case rt_string:
+                    return "String";
+                case rt_void:
+                    return "*";
+                case rt_null:
+                    return "null";
+                case rt_function:
+                    return "Function";
+                case fun_void:
+                    return "void";
+                case rt_array:
+                    return "Array";
+                case unknown:
+                    return "unknown";
+                default:
+                    return "rt_object";   //RTTI.ToString();
+            }
+        }
+
+
+
         public const int rt_boolean = 0;
         public const int rt_int = 1;
         public const int rt_uint = 2;

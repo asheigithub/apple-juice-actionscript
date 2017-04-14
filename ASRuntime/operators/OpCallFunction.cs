@@ -13,7 +13,8 @@ namespace ASRuntime.operators
             var rv = step.arg1.getValue(frame.scope);
             if (rv.rtType != RunTimeDataType.rt_function)
             {
-                frame.throwError(new error.InternalError(step.token, "value is not a function",
+                frame.throwError(
+                    new error.InternalError(step.token, "value is not a function",
                     new ASBinCode.rtData.rtString("value is not a function")));
             }
             else
@@ -33,9 +34,9 @@ namespace ASRuntime.operators
                     if (function.this_pointer == null)
                     {
                         var s = frame.scope;
-                        if (s.this_pointer != null)
+                        if (s.this_pointer != null && s.this_pointer is ASBinCode.rtData.rtObject)
                         {
-                            while (!(s.this_pointer.value is ASBinCode.rtti.Global_Object))
+                            while (!(((ASBinCode.rtData.rtObject)s.this_pointer).value is ASBinCode.rtti.Global_Object))
                             {
                                 s = s.parent;
                             }

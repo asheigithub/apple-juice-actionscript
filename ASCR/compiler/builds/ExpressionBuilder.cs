@@ -410,8 +410,8 @@ namespace ASCompiler.compiler.builds
             //**隐式类型转换检查
             if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, member.valueType, builder))
             {
-                throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                    "不能将[" + rv.valueType + "]类型赋值给[" + member.valueType + "]类型的访问器");
+                throw new BuildException( new BuildTypeError( step.token.line, step.token.ptr, step.token.sourceFile,
+                    rv.valueType ,member.valueType ,builder,1));
             }
             if (rv.valueType != signature.parameters[0].type)
             {
@@ -475,16 +475,18 @@ namespace ASCompiler.compiler.builds
 
                 if (step.Arg1.IsReg) //在类似短路操作等编译过程中可能成为赋值目标
                 {
-                    //throw new BuildException(
-                    //                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                    //                            "不能成为赋值目标"));
+                    
                     IRightValue rv = getRightValue(env, step.Arg2, step.token,builder);
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    
                     //当是暂存成员访问中间结果时
                     if (eax._regMember == null)
                     {
-                        eax.setEAXTypeWhenCompile(rv.valueType);
+                        if (eax.valueType == RunTimeDataType.unknown)   //只在创建时设置类型
+                        {
+                            eax.setEAXTypeWhenCompile(rv.valueType);
+                        }
                     }
                     else if (eax._regMember.bindField is ClassPropertyGetter)
                     {
@@ -500,13 +502,12 @@ namespace ASCompiler.compiler.builds
                             "const成员" + eax._regMember.name + "不能在此赋值"));
                     }
 
-
-                    //***如果是成员访问的中间缓存，则需要转型
+                    ////***如果是成员访问的中间缓存，则需要转型
                     if (rv.valueType != eax.valueType)
                     {
                         //插入转型代码
                         rv = addCastOpStep(env, rv, eax.valueType,
-                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile),builder); //op.reg;
+                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder); //op.reg;
 
                     }
 
@@ -536,7 +537,7 @@ namespace ASCompiler.compiler.builds
                 }
                 else
                 {
-                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env,false);
+                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env,false,builder,step.token);
 
                     if (member == null)
                     {
@@ -562,8 +563,8 @@ namespace ASCompiler.compiler.builds
                         //**隐式类型转换检查
                         if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType,builder))
                         {
-                            throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "不能将[" + rv.valueType + "]类型赋值给[" + lv.valueType + "]类型的变量");
+                            throw new BuildException( new BuildTypeError( step.token.line, step.token.ptr, step.token.sourceFile,
+                                rv.valueType ,lv.valueType ,builder));
                         }
 
                         if (rv.valueType != lv.valueType)
@@ -1032,13 +1033,13 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false);
+                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false, builder,matchtoken);
 
                         if (member == null && builder._currentImports.Count > 0)
                         {
                             string t = data.Data.Value.ToString();
                             //查找导入的类
-                            var found = TypeReader.findClassFromImports(t, builder);
+                            var found = TypeReader.findClassFromImports(t, builder, matchtoken);
                             if (found.Count == 1)
                             {
                                 var item = found[0];
@@ -1157,7 +1158,7 @@ namespace ASCompiler.compiler.builds
                     Register eax = env.getAdditionalRegister();
                     //***创建对象实例
                     {
-                        var found = TypeReader.findClassFromImports("Object", builder);
+                        var found = TypeReader.findClassFromImports("Object", builder,matchtoken);
                         var item = found[0];
                         OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                         stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
@@ -1203,11 +1204,11 @@ namespace ASCompiler.compiler.builds
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_array);
 
                     //***创建原始数组对象***
-                    OpStep opCreateArray = new OpStep(OpCode.assigning, new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile));
+                    OpStep opCreateArray = new OpStep(OpCode.array_create, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                     opCreateArray.reg = eax;
                     opCreateArray.regType = eax.valueType;
-                    opCreateArray.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtArray());
-                    opCreateArray.arg1Type = RunTimeDataType.rt_array;
+                    opCreateArray.arg1 = null;
+                    opCreateArray.arg1Type = RunTimeDataType.unknown;
 
                     env.block.opSteps.Add(opCreateArray);
 
@@ -1232,6 +1233,129 @@ namespace ASCompiler.compiler.builds
 
 
                     return eax;
+                }
+                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_vector && !env.isEval)
+                {
+                    ASTool.AS3.AS3Vector vector = (ASTool.AS3.AS3Vector)data.Data.Value;
+                    string typeStr = vector.VectorTypeStr;
+
+                    var _vector_= TypeReader.fromSourceCodeStr( "Vector.<" + typeStr + ">", matchtoken, builder);
+
+                    var _class = builder.getClassByRunTimeDataType(_vector_);
+
+                    
+
+                    if (vector.Constructor == null)
+                    {
+                        OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                        stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                            new ASBinCode.rtData.rtInt(_class.classid));
+                        stepInitClass.arg1Type = _class.staticClass.getRtType();
+                        env.block.opSteps.Add(stepInitClass);
+
+                        return new StaticClassDataGetter(_class.staticClass);
+                    }
+                    else
+                    {
+
+                        //OpStep stepinit_vector = new OpStep(OpCode.init_vector, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                        //stepinit_vector.arg1 = new ASBinCode.rtData.RightValue(
+                        //    new ASBinCode.rtData.rtInt(_class.classid));
+                        //stepinit_vector.arg1Type = _class.getRtType();
+                        //env.block.opSteps.Add(stepinit_vector);
+
+                        List<ASTool.AS3.Expr.AS3DataStackElement> args =
+                            (List<ASTool.AS3.Expr.AS3DataStackElement>)vector.Constructor.Data.Value;
+
+                        if (args.Count != 1)
+                        {
+                            throw new BuildException(new BuildError(
+                                matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                                "Argument count mismatch on class coercion.  Expected 1, got " + args.Count + "."
+                                ));
+                        }
+
+                        var init_data = getRightValue(env, args[0], matchtoken, builder);
+
+                        if (init_data.valueType != RunTimeDataType.rt_array)
+                        {
+                            //***强制类型转换
+                            if (ASRuntime.TypeConverter.testImplicitConvert(init_data.valueType, _class.getRtType(), builder))
+                            {
+                                return addCastOpStep(env, init_data, _class.getRtType(), 
+                                    new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile)
+                                    , builder);
+                            }
+                            else
+                            {
+                                throw new BuildException(
+                                    new BuildTypeError(
+                                        matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                                        init_data.valueType, _class.getRtType(),
+                                        builder
+                                        )
+                                    );
+                            }
+
+                        }
+                        else
+                        {
+                            Register eax = env.getAdditionalRegister();
+                            eax.setEAXTypeWhenCompile(_class.getRtType());
+                            //stepinit_vector.reg = eax;
+                            //stepinit_vector.regType = eax.valueType;
+
+                            ConstructorBuilder cb = new ConstructorBuilder();
+                            cb.build_class(env, _class, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
+
+                            //****追加初始值****
+                            var vt = builder.bin.dict_Vector_type[_class];
+
+                            List<ASTool.AS3.Expr.AS3DataStackElement> initdata = (List<ASTool.AS3.Expr.AS3DataStackElement>)args[0].Data.Value;
+
+                            for (int i = 0; i < initdata.Count; i++)
+                            {
+                                var d = ExpressionBuilder.getRightValue(env, initdata[i], matchtoken, builder);
+
+                                if (!ASRuntime.TypeConverter.testImplicitConvert(d.valueType, vt, builder))
+                                {
+                                    string vtstr = vt.toAS3Name();
+                                    if (vt > RunTimeDataType.unknown)
+                                    {
+                                        vtstr = builder.getClassByRunTimeDataType(vt).name;
+                                    }
+
+                                    throw (new BuildException(new BuildError(matchtoken.line, 
+                                        matchtoken.ptr, matchtoken.sourceFile,
+                                                "不能将[" + d.valueType + "]类型存入Vector.<" + vtstr + ">")));
+
+                                }
+
+                                if (d.valueType != vt)
+                                {
+                                    d = addCastOpStep(env, d, vt,
+                                        new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
+                                        , builder);
+                                }
+
+                                OpStep oppush = new OpStep(OpCode.vector_push, 
+                                    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                                oppush.reg = null;
+                                oppush.regType = RunTimeDataType.unknown;
+                                oppush.arg1 = eax;
+                                oppush.arg1Type = eax.valueType;
+                                oppush.arg2 = d;
+                                oppush.arg2Type = d.valueType;
+
+                                env.block.opSteps.Add(oppush);
+                            }
+
+
+
+                            return eax;
+                        }
+                    }
+
                 }
                 else
                 {
@@ -1273,7 +1397,7 @@ namespace ASCompiler.compiler.builds
                         v1.valueType != RunTimeDataType.rt_int &&
                         v1.valueType != RunTimeDataType.rt_uint &&
                         v1.valueType != RunTimeDataType.rt_void &&
-                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
+                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder)
                         )
                 {
                     throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -1692,7 +1816,7 @@ namespace ASCompiler.compiler.builds
                         v1.valueType != RunTimeDataType.rt_int &&
                         v1.valueType != RunTimeDataType.rt_uint &&
                         v1.valueType != RunTimeDataType.rt_void &&
-                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
+                        !ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder)
                         )
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -1863,9 +1987,9 @@ namespace ASCompiler.compiler.builds
                         v2.valueType == RunTimeDataType.rt_int ||
                         v2.valueType == RunTimeDataType.rt_uint ||
                         v2.valueType == RunTimeDataType.rt_number ||
-                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType,builder.bin)
+                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType,builder)
                         ||
-                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder.bin)
+                        ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder)
                         ||
                         t1== RunTimeDataType.rt_boolean
                         ||
@@ -1955,14 +2079,14 @@ namespace ASCompiler.compiler.builds
                         v1.valueType == RunTimeDataType.rt_int
                         || v1.valueType == RunTimeDataType.rt_uint
                         || v1.valueType == RunTimeDataType.rt_number
-                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder.bin)
+                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v1.valueType, builder)
                         )
                         &&
                         (
                         v2.valueType == RunTimeDataType.rt_int
                         || v2.valueType == RunTimeDataType.rt_uint
                         || v2.valueType == RunTimeDataType.rt_number
-                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder.bin)
+                        || ASRuntime.TypeConverter.ObjectImplicit_ToNumber(v2.valueType, builder)
                         )
                         )
                     {

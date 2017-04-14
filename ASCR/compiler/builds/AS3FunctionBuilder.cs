@@ -158,7 +158,22 @@ namespace ASCompiler.compiler.builds
 
         private RunTimeDataType getFunReturnType(ASTool.AS3.AS3Function as3function,Builder builder)
         {
-            var ret= TypeReader.fromSourceCodeStr(as3function.TypeStr, as3function.token,builder);
+            string tofindtypename = as3function.TypeStr;
+            if (as3function.TypeDefine != null)
+            {
+                if (as3function.TypeDefine is ASTool.AS3.AS3Class)
+                {
+                    tofindtypename = ((ASTool.AS3.AS3Class)as3function.TypeDefine).Name;
+                }
+                else if (as3function.TypeDefine is ASTool.AS3.AS3Interface)
+                {
+                    tofindtypename = ((ASTool.AS3.AS3Interface)as3function.TypeDefine).Name;
+                }
+            }
+
+
+
+            var ret= TypeReader.fromSourceCodeStr(tofindtypename,as3function.token,builder);
             if (as3function.TypeStr == "void")
             {
                 return RunTimeDataType.fun_void;
@@ -580,10 +595,37 @@ namespace ASCompiler.compiler.builds
 
                                     if (builder.bin.nativefunctionNameIndex.ContainsKey(native_to))
                                     {
+                                        bool isvectorScope = false;
+                                        RunTimeDataType vt = RunTimeDataType.unknown;
+                                        RunTimeDataType vc = RunTimeDataType.unknown;
+                                        if (as3function.IsMethod &&
+                                            as3function.ParentScope is ASTool.AS3.AS3Class)
+                                        {
+                                            var ascls = builder.buildingclasses[(ASTool.AS3.AS3Class)as3function.ParentScope];
+                                            if (builder.bin.dict_Vector_type.ContainsKey(ascls))
+                                            {
+                                                vt = builder.bin.dict_Vector_type[ascls];
+                                                vc = ascls.getRtType();
+                                                isvectorScope = true;
+                                            }
+                                        }
+
                                         var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_to]];
                                         if (as3function.IsMethod == nf.isMethod)
                                         {
-                                            if (signature.returnType != nf.returnType)
+                                            if (signature.returnType != nf.returnType
+                                                &&
+                                                !(isvectorScope && nf.returnType==RunTimeDataType.rt_void
+                                                    &&
+                                                    signature.returnType==vt
+                                                )
+                                                &&
+                                                !(
+                                                isvectorScope && nf.returnType == RunTimeDataType.rt_void
+                                                    &&
+                                                    signature.returnType == vc
+                                                )
+                                                )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                                     "本地函数 " + native_to + " 返回类型不符");
@@ -597,7 +639,11 @@ namespace ASCompiler.compiler.builds
 
                                             for (int j = 0; j < signature.parameters.Count; j++)
                                             {
+                                               
+
                                                 if (signature.parameters[j].type != nf.parameters[j]
+                                                    &&
+                                                    !(!signature.parameters[j].isPara && isvectorScope && nf.parameters[j]==RunTimeDataType.rt_void )
                                                     &&
                                                     !(signature.parameters[j].isPara && nf.parameters[j] == RunTimeDataType.rt_array)
                                                     )

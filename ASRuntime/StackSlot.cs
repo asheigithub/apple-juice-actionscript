@@ -11,10 +11,12 @@ namespace ASRuntime
     /// </summary>
     class StackSlot : ISLOT
     {
-        public StackSlot()
+        public StackSlot(IClassFinder classfinder)
         {
             store = new IRunTimeValue[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
+
+            _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
 
             //存储器设置初始值
             for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
@@ -30,8 +32,8 @@ namespace ASRuntime
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
 
-        internal rtArray fromArray;
-        internal int fromArrayIndex;
+        internal operators.OpVector.vectorSLot _cache_vectorSlot;
+        
 
         internal ISLOT linktarget;
         public void linkTo(ISLOT linktarget)
@@ -100,7 +102,8 @@ namespace ASRuntime
                         store[index] = value;
                         break;
                     case RunTimeDataType.rt_function:
-                        {
+                        {//Function需要保存上下文环境。因此需要像值类型那样进行拷贝
+                            
                             if (store[index].rtType == RunTimeDataType.rt_null)
                             {
                                 store[index] = (rtFunction)value.Clone();
@@ -116,15 +119,15 @@ namespace ASRuntime
                         break;
                     case RunTimeDataType.rt_array:
                         {
-                            //store[index] = value;
-                            if (store[index].rtType == RunTimeDataType.rt_null)
-                            {
-                                store[index] = (rtArray)value.Clone();
-                            }
-                            else
-                            {
-                                ((rtArray)store[index]).CopyFrom((rtArray)value);
-                            }
+                            store[index] = value;
+                            //if (store[index].rtType == RunTimeDataType.rt_null)
+                            //{
+                            //    store[index] = (rtArray)value.Clone();
+                            //}
+                            //else
+                            //{
+                            //    ((rtArray)store[index]).CopyFrom((rtArray)value);
+                            //}
                         }
                         break;
                     case RunTimeDataType.unknown:
@@ -132,14 +135,22 @@ namespace ASRuntime
                         break;
                     default:
                         {
-                            if (store[RunTimeDataType._OBJECT].rtType == RunTimeDataType.rt_null)
-                            {
-                                store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
-                            }
-                            else
-                            {
-                                ((rtObject)store[RunTimeDataType._OBJECT]).CopyFrom((rtObject)value);
-                            }
+                            store[RunTimeDataType._OBJECT] = value;
+                            //store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
+                            //if (store[RunTimeDataType._OBJECT].rtType == RunTimeDataType.rt_null)
+                            //{
+                            //    store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
+                            //}
+                            //else if (((rtObject)store[RunTimeDataType._OBJECT]).value.objectid
+                            //    != ((rtObject)value).value.objectid
+                            //    )
+                            //{
+                            //    store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
+                            //}
+                            //else
+                            //{
+                            //    ((rtObject)store[RunTimeDataType._OBJECT]).CopyFrom((rtObject)value);
+                            //}
                         }
                         break;
                 }
@@ -271,11 +282,14 @@ namespace ASRuntime
             linktarget = null;
             propGetSet = null;
             propBindObj = null;
-            fromArray = null;
-            fromArrayIndex = -1;
+
+            //fromArray = null;
+            //fromArrayIndex = -1;
+            _cache_vectorSlot.clear();
 
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;
+            store[RunTimeDataType.rt_array] = rtNull.nullptr;
             store[RunTimeDataType._OBJECT] = rtNull.nullptr;
 
             index = (int)RunTimeDataType.unknown;

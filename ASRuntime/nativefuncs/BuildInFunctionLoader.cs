@@ -8,6 +8,10 @@ namespace ASRuntime.nativefuncs
     {
         public static void loadBuildInFunctions(ASBinCode.CSWC bin)
         {
+            bin.regNativeFunction(new __buildin__ismethod());
+            bin.regNativeFunction(new __buildin__trace());
+
+
             bin.regNativeFunction(new Int_toPrecision());
             bin.regNativeFunction(new Int_toExponential());
             bin.regNativeFunction(new Int_toFixed());
@@ -43,6 +47,8 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Function_fill());
             bin.regNativeFunction(new Function_load());
             bin.regNativeFunction(new Function_apply());
+            bin.regNativeFunction(new Function_call());
+            bin.regNativeFunction(new Function_setPrototype());
 
             bin.regNativeFunction(new Array_constructor());
             bin.regNativeFunction(new Array_fill());
@@ -54,6 +60,30 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Array_pop());
             bin.regNativeFunction(new Array_push());
             bin.regNativeFunction(new Array_removeAt());
+            bin.regNativeFunction(new Array_reverse());
+            bin.regNativeFunction(new Array_shift());
+            bin.regNativeFunction(new Array_slice());
+            bin.regNativeFunction(new Array_splice());
+            bin.regNativeFunction(new Array_unshift());
+            bin.regNativeFunction(new Array_concat());
+            bin.regNativeFunction(new Array_toString());
+
+            bin.regNativeFunction(new Vector_constructor());
+            bin.regNativeFunction(new Vector_getIsFixed());
+            bin.regNativeFunction(new Vector_setIsFixed());
+            bin.regNativeFunction(new Vector_getLength());
+            bin.regNativeFunction(new Vector_setLength());
+            bin.regNativeFunction(new Vector_toString());
+            bin.regNativeFunction(new Vector__concat());
+            bin.regNativeFunction(new Vector_insertAt());
+            bin.regNativeFunction(new Vector_join());
+            bin.regNativeFunction(new Vector_pop());
+            bin.regNativeFunction(new Vector_removeAt());
+            bin.regNativeFunction(new Vector_reverse());
+            bin.regNativeFunction(new Vector_shift());
+            bin.regNativeFunction(new Vector_slice());
+            bin.regNativeFunction(new Vector_splice());
+            bin.regNativeFunction(new Vector_push());
         }
 
     }

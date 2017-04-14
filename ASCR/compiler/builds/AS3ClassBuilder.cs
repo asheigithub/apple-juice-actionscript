@@ -205,7 +205,8 @@ namespace ASCompiler.compiler.builds
         /// <summary>
         /// 编译类的类型说明
         /// </summary>
-        public ASBinCode.rtti.Class buildClassDefine(ASTool.AS3.AS3Class as3class, Builder builder, ASBinCode.rtti.Class mainClass ,ASTool.AS3.AS3SrcFile as3srcfile )
+        public ASBinCode.rtti.Class buildClassDefine(ASTool.AS3.AS3Class as3class, 
+            Builder builder, ASBinCode.rtti.Class mainClass ,ASTool.AS3.AS3SrcFile as3srcfile,bool isbuildvector,RunTimeDataType vectortype )
         {
             
 
@@ -214,6 +215,11 @@ namespace ASCompiler.compiler.builds
 
             ASBinCode.rtti.Class cls = new ASBinCode.rtti.Class(classid, blockid,builder.bin);
             builder.buildingclasses.Add(as3class, cls);
+
+            if (isbuildvector)
+            {
+                builder.bin.dict_Vector_type.Add(cls, vectortype);
+            }
 
             cls.package = as3class.Package.Name;
             cls.ispackageout = false;
@@ -253,6 +259,10 @@ namespace ASCompiler.compiler.builds
                                 {
                                     cls.isdocumentclass = true;
                                 }
+                            }
+                            else if (m.Value.Data.Value.ToString() == "unmanaged")
+                            {
+                                cls.isUnmanaged = true;
                             }
                             else if (m.Value.Data.Value.ToString() == "no_constructor")
                             {

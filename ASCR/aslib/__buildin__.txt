@@ -1,0 +1,12 @@
+﻿package
+{
+	public class __buildin__
+	{
+		[native,__buildin__ismethod]
+		public static function _ismethod_(f:Function):Boolean;
+
+		[native,__buildin__trace]
+		public static function trace(...rest):void;
+
+	}
+}

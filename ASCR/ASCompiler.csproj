@@ -58,6 +58,7 @@
     <Compile Include="compiler\builds\ConstructorBuilder.cs" />
     <Compile Include="compiler\builds\ExpressionBuilder.cs" />
     <Compile Include="compiler\builds\FuncCallBuilder.cs" />
+    <Compile Include="compiler\BuildTypeError.cs" />
     <Compile Include="compiler\CompileEnv.cs" />
     <Compile Include="compiler\ExpressionEval.cs" />
     <Compile Include="compiler\TypeReader.cs" />
@@ -105,6 +106,8 @@
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
     <Content Include="aslib\uint.txt" />
+    <Content Include="aslib\Vector.txt" />
+    <Content Include="aslib\__buildin__.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -96,6 +96,18 @@ namespace ASCompiler
             }
 
             {
+                string _buildin_ = Properties.Resources.__buildin__;
+                var tree = grammar.ParseTree(_buildin_, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "__buildin__.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "__buildin__.as3"));
+            }
+
+            {
                 string _math = Properties.Resources.Math;
                 var tree = grammar.ParseTree(_math, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Math.as3");
@@ -114,6 +126,15 @@ namespace ASCompiler
                 if (!analyser.Analyse(grammar, tree.item1)) //生成项目的语法树
                 {
                     return null;
+                }
+            }
+
+
+            for (int i = 0; i < lib.SrcFiles.Count; i++)
+            {
+                if (lib.SrcFiles[i].Package.MainClass.Name == "__buildin__")
+                {
+                    lib.SrcFiles[i].Package.MainClass.Name = "@__buildin__";
                 }
             }
 

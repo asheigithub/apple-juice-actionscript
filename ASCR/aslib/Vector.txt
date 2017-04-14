@@ -1,0 +1,241 @@
+﻿package
+{
+	[imports]
+	[unmanaged]
+	public class Vector.<T>
+	{
+		private const t = T;
+
+		[native,_vector_constructor]
+		public function Vector.<T>(length:uint = 0, fixed:Boolean = false);
+
+		[native,_vector_getfixed]
+		public function get fixed() : Boolean;
+		[native,_vector_setfixed]
+		public function set fixed(value:Boolean):void;
+
+		[native,_vector_getlength]
+		public function get length():uint;
+		[native,_vector_setlength]
+    		public function set length(value:uint):void;
+
+		public function toString():String
+		{
+			return join();
+		}
+		
+		public function concat(... args):Vector.<T>
+		{
+			var count=args.length;
+			var result=new Vector.<T>();
+			_concat(result,this);
+
+			for(var i:int=0;i<count;i++)
+			{
+				var toconcat:Vector.<T> = args[i];
+				
+				
+				_concat(result,toconcat);
+				
+			}
+
+
+			return result;
+		}
+
+		[native,_vector__concat]
+		private function _concat(d:*,s:*):void;
+		
+
+
+		public function every (callback:Function, thisObject:*=null) : Boolean
+		{
+			if(callback==null) return;
+
+			if(thisObject !=null && _ismethod_(callback) )
+			{
+				throw "When the callback argument is a method of a class, the optional this argument must be null.";
+			}
+
+			var len:uint = length;
+			for(var i:int=0;i<len;i++)
+			{
+				var e:* = this[i];
+				if (!callback.call(thisObject,e,i,this))
+					return false;
+			}
+
+			return true;
+		}
+
+		public function filter(callback:Function, thisObject:*=null) : Vector.<T>
+		{
+			if(callback==null) return;
+
+			if(thisObject !=null && _ismethod_(callback) )
+			{
+				throw "When the callback argument is a method of a class, the optional this argument must be null.";
+			}
+
+			var result:Vector.<T>=new Vector.<T>();
+
+			var len:uint = length;
+			for(var i:int=0;i<len;i++)
+			{
+				var e:* = this[i];
+				if( callback.call(thisObject,e,i,this))
+				{
+					result[result.length++]=e;
+					
+				}
+			}
+
+			return result;
+		}
+
+		public function forEach (callback:Function, thisObject:*=null) : void
+		{
+			if(callback==null) return;
+
+			if(thisObject !=null && _ismethod_(callback) )
+			{
+				throw "When the callback argument is a method of a class, the optional this argument must be null.";
+			}
+
+			var len:uint = length;
+			for(var i:int=0;i<len;i++)
+			{
+				var e:* = this[i];
+				callback.call(thisObject,e,i,this);
+
+			}
+		}
+
+		public function indexOf (searchElement:T, fromIndex:uint=0) : int
+		{
+			var l:uint=length;
+			for(var i:uint=fromIndex;i<l;i++)
+			{
+				if( this[i]===searchElement )
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		public function lastIndexOf(searchElement:T, fromIndex:int = 0x7fffffff):int
+		{
+			var l:uint=length;
+			fromIndex=fromIndex<l-1?fromIndex:l-1;
+			
+
+			for(var i:int=fromIndex;i>=0;i--)
+			{
+				if( this[i]===searchElement )
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		[native,_vector_insertat]
+		public function insertAt(index:int, element:T):void;
+		
+		[native,_vector_join]
+		public function join(sep:String=","):String;
+
+		[native,_vector_pop]
+		public function pop():T;
+
+
+		public function push(...args):uint
+		{
+			var count:int=args.length;
+			
+			
+			for(var i:int=0;i<count;i++)
+			{
+				_push(args[i]);
+			}
+			
+			return length;
+		}
+
+		[native,_vector_push]
+		private function _push(element:T):uint
+		
+
+
+		public function unshift(...args):uint
+		{
+			var count:int=args.length;
+			var len=0;
+			for(var i:int=0;i<count;i++,len++)
+			{
+				insertAt(len,args[i]);
+			}
+			return length;
+		}
+
+
+		[native,_vector_removeAt]
+		public function removeAt(index:int):T;
+
+		[native,_vector_reverse]
+		public function reverse():Vector.<T>;
+
+		[native,_vector_shift]
+		public function shift():T;
+
+		public function slice(startIndex:int = 0, endIndex:int = 16777215):Vector.<T>
+		{
+			var result:Vector.<T>=new Vector.<T>();
+			return result._slice(startIndex,endIndex,this);
+		}
+
+		[native,_vector_slice]
+		private function _slice(startIndex:int, endIndex:int,objSource:*):Vector.<T>;
+
+		public function some (callback:Function, thisObject:*=null) : Boolean
+		{
+			if(callback==null) return;
+
+			if(thisObject !=null && _ismethod_(callback) )
+			{
+				throw "When the callback argument is a method of a class, the optional this argument must be null.";
+			}
+
+			var len:uint = length;
+			for(var i:int=0;i<len;i++)
+			{
+				var e:* = this[i];
+				if (callback.call(thisObject,e,i,this))
+					return true;
+			}
+
+			return false;
+		}
+
+
+		public function splice(startIndex:int, deleteCount:uint = 4294967295, ...items):Vector.<T>
+		{
+			var result:Vector.<T> = new Vector.<T>();
+			var stidx:int=result._splice(startIndex,deleteCount,this);
+			
+			var count:int=items.length;
+			for(var i:int=0;i<count;i++,stidx++)
+			{
+				insertAt(stidx,items[i]);
+			}
+
+			return result;
+		}
+
+		[native,_vector_splice]
+		private function _splice(startIndex:int,deleteCount:uint,srcObj:*):int
+		
+
+	}
+}

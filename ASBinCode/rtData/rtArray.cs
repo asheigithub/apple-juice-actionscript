@@ -33,7 +33,7 @@ namespace ASBinCode.rtData
 
         }
 
-        internal List<IRunTimeValue> array;
+        private List<IRunTimeValue> array;
         public List<IRunTimeValue> innerArray {
             get { return array; } }
 
@@ -43,7 +43,9 @@ namespace ASBinCode.rtData
         {
             array = new List<IRunTimeValue>();
             objHandle = new arrayObjHandle();
+
             objHandle.bindArrayObject = null;
+            
         }
         
 
@@ -62,7 +64,11 @@ namespace ASBinCode.rtData
             StringBuilder asb = new StringBuilder();
             for (int i = 0; i < array.Count && i<256; i++)
             {
-                asb.Append( array[i].rtType !=RunTimeDataType.rt_void ?( array[i].rtType==RunTimeDataType.rt_string? ((rtString)array[i]).valueString() :  array[i].ToString()):String.Empty);
+                asb.Append( 
+                    array[i].rtType !=RunTimeDataType.rt_void ?
+                    ( array[i].rtType==RunTimeDataType.rt_string? 
+                    ((rtString)array[i]).valueString() :  
+                    ( array[i].rtType==RunTimeDataType.rt_null?String.Empty:array[i].ToString()  )):String.Empty);
                 asb.Append(",");
             }
 
@@ -78,18 +84,18 @@ namespace ASBinCode.rtData
 
         public object Clone()
         {
-
-            rtArray result = new rtArray();
-            result.CopyFrom(this);
-            return result;
+            return this;
+            //rtArray result = new rtArray();
+            //result.CopyFrom(this);
+            //return result;
         }
 
-        public void CopyFrom(rtArray right)
-        {
-            //_objid = right._objid;
-            array = right.array;
-            objHandle = right.objHandle;
-        }
+        //public void CopyFrom(rtArray right)
+        //{
+        //    //_objid = right._objid;
+        //    array = right.array;
+        //    objHandle = right.objHandle;
+        //}
 
         public override int GetHashCode()
         {

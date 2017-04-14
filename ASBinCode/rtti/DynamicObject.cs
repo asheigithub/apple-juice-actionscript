@@ -8,6 +8,8 @@ namespace ASBinCode.rtti
     {
         protected Dictionary<string, ISLOT> propertys;
 
+        public rtti.DynamicObject _prototype_;
+
         public DynamicObject(Class _class):base(_class)
         {
             propertys = new Dictionary<string, ISLOT>();

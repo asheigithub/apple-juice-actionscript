@@ -63,6 +63,26 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public class __buildin__
+        ///	{
+        ///		[native,__buildin__ismethod]
+        ///		public static function _ismethod_(f:Function):Boolean;
+        ///
+        ///		[native,__buildin__trace]
+        ///		public static function trace(...rest):void;
+        ///
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string @__buildin__ {
+            get {
+                return ResourceManager.GetString("__buildin__", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	
         ///	public final class int extends Object
         ///	{
@@ -140,23 +160,28 @@ namespace ASCompiler.Properties {
         ///	public final dynamic class Function extends Object
         ///	{
         ///		
-        ///		//public function get prototype () : *;
-        ///		//public function set prototype (p:*) : void;
+        ///		
+        ///		private var _func:Function;
+        ///		private var _prototype:Object;
         ///
-        ///		//public function apply (thisArg:any=null, argArray:any=null) : *;
-        ///
-        ///		//public function call (thisArg:any=null, ...rest) : *;
-        ///
-        ///		public static function createEmptyFunction () : Function
+        ///		public function Function ()
         ///		{
-        ///			return function():*{};
+        ///			_func=function():*{};
+        ///			_prototype = {constructor:this};
+        ///
         ///		}
         ///
-        ///		
-        ///		public function Function ();
-        ///	}
-        ///}
-        /// 的本地化字符串。
+        ///		public function toString():String
+        ///		{
+        ///			return &quot;function Function() {}&quot;;
+        ///		}
+        ///
+        ///
+        ///		[implicit_to]
+        ///		private static function _to_function(thisObj:*):Function{ return thisObj._func;}
+        ///
+        ///		[implicit_from]
+        ///		private static function _from_value(value:Functi [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Function {
             get {
@@ -245,6 +270,24 @@ namespace ASCompiler.Properties {
         internal static string PG1 {
             get {
                 return ResourceManager.GetString("PG1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	public class Vector.&lt;T&gt;
+        ///	{
+        ///		private const t = T;
+        ///
+        ///		[native,_vector_constructor]
+        ///		public function Vector.&lt;T&gt;(...rest);
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string Vector {
+            get {
+                return ResourceManager.GetString("Vector", resourceCulture);
             }
         }
     }

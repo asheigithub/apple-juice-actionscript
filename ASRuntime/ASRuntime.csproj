@@ -48,6 +48,8 @@
     <Compile Include="nativefuncs\Throw.cs" />
     <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="nativefuncs\Uint_buildin.cs" />
+    <Compile Include="nativefuncs\Vector_buildin.cs" />
+    <Compile Include="nativefuncs\__buildin__.cs" />
     <Compile Include="ObjectMemberSlot.cs" />
     <Compile Include="operators\FunctionCaller.cs" />
     <Compile Include="operators\InstanceCreator.cs" />
@@ -66,6 +68,7 @@
     <Compile Include="operators\OpNeg.cs" />
     <Compile Include="operators\OpPropGetSet.cs" />
     <Compile Include="operators\OpSub.cs" />
+    <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
     <Compile Include="RunTimeScope.cs" />

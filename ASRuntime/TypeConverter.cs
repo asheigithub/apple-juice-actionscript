@@ -415,6 +415,8 @@ namespace ASRuntime
             return false;
         }
 
+       
+
             /// <summary>
             /// 隐式类型转换表
             /// </summary>
@@ -483,11 +485,25 @@ namespace ASRuntime
                 
             }
 
+            if (f == rt.unknown || t == rt.unknown)
+            {
+                return false;
+            }
 
             if (f > rt.unknown || t > rt.unknown)
             {
+                var c1 = classfinder.getClassByRunTimeDataType(f);
+                var c2 = classfinder.getClassByRunTimeDataType(t);
 
+                if (ReferenceEquals(c1.staticClass, c2)
+                    ||
+                    ReferenceEquals(c2.staticClass,c1)
+                    )
+                {
+                    return false;
+                }
 
+                return false;
 #if DEBUG
                 throw new NotImplementedException();
 #else
@@ -575,12 +591,12 @@ namespace ASRuntime
             /*int*/     { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_int   ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*uint*/    { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_uint  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*number*/  { rt.rt_number  ,rt.rt_number  ,rt.rt_number   ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
-            /*string*/  { rt.rt_string  ,rt.rt_string  ,rt.rt_string   ,rt.rt_string   ,rt.rt_string   ,rt.rt_void     ,rt.rt_string,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*string*/  { rt.rt_string  ,rt.rt_string  ,rt.rt_string   ,rt.rt_string   ,rt.rt_string   ,rt.rt_void     ,rt.rt_string,rt.unknown ,rt.unknown,rt.rt_string,rt.unknown  },
             /*var_void*/{ rt.rt_void    ,rt.rt_void    ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void     ,rt.rt_void  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*null*/    { rt.rt_boolean ,rt.rt_int     ,rt.rt_uint     ,rt.rt_number   ,rt.rt_string   ,rt.rt_void     ,rt.rt_number ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*function*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*fun_void*/{ rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
-            /*array*/   { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
+            /*array*/   { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.rt_string   ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  },
             /*unknown*/ { rt.unknown    ,rt.unknown    ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown     ,rt.unknown  ,rt.unknown ,rt.unknown,rt.unknown,rt.unknown  }
             };
         //- 操作隐式类型转换表

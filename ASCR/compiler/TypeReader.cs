@@ -54,8 +54,10 @@ namespace ASCompiler.compiler
             }
             else
             {
+                
                 //***查找类定义***
-                var found = findClassFromImports(t, builder);
+                var found = findClassFromImports(t, builder,token);
+                
 
                 if (found.Count == 1)
                 {
@@ -78,8 +80,17 @@ namespace ASCompiler.compiler
         }
 
         public static List<ASBinCode.rtti.Class> findClassFromImports(string t,
-            Builder builder)
+            Builder builder,ASTool.Token token)
         {
+            if (!builder.isEval)
+            {
+                if (t.StartsWith("Vector.<"))
+                {
+                    t = builder.build_vector(t, token);    //如果是Vector,则先编译Vector类
+                }
+
+            }
+
             List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
 
 
@@ -112,7 +123,7 @@ namespace ASCompiler.compiler
                 
                 for (int i = 0; i < imports.Count; i++)
                 {
-                    if (t.IndexOf(".") > -1) //完全限定名
+                    if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
                     {
                         if ((imports[i].package + "." + imports[i].name).Equals(t, StringComparison.Ordinal))
                         {

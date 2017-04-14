@@ -30,9 +30,10 @@ namespace ASRuntime.operators
                         }
                     }
                 }
-                else if (slot.fromArray != null)
+                else if (slot.linktarget is OpAccess_Dot.arraySlot) //(slot.fromArray != null)
                 {
-                    slot.fromArray.innerArray[slot.fromArrayIndex] = rtUndefined.undefined;
+                    slot.directSet(rtUndefined.undefined);
+                    //slot.fromArray.innerArray[slot.fromArrayIndex] = rtUndefined.undefined;
                 }
                 else
                 {

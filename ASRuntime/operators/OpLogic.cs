@@ -657,6 +657,11 @@ namespace ASRuntime.operators
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
             ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
 
+            if (ReferenceEquals(v1, v2))
+            {
+                return true;
+            }
+
             ASBinCode.RunTimeDataType ot;
             if (TypeConverter.Object_CanImplicit_ToPrimitive(v1.rtType, frame.player.swc, out ot))
             {
@@ -807,6 +812,11 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeDataType t1 = v1.rtType;
             ASBinCode.RunTimeDataType t2 = v2.rtType;
+
+            if (ReferenceEquals(v1, v2))
+            {
+                return true;
+            }
 
             if (
                 (

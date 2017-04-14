@@ -123,7 +123,7 @@ namespace ASRuntime.operators
                     }
 
                     ASBinCode.rtData.rtArray arr = (ASBinCode.rtData.rtArray)slot.getValue();
-                    arr.innerArray.Add(argement);
+                    arr.innerArray.Add((IRunTimeValue)argement.Clone());    //可能从StackSlot中读的数据，因此必须Clone后再传入.
 
                 }
             }

@@ -26,6 +26,31 @@ namespace ASBinCode
                     _vt =
                         ((scopes.ObjectInstanceScope)scope.parentScope)._class.getRtType();
                 }
+                else if (!funcscope.function.IsAnonymous && funcscope.parentScope is scopes.FunctionScope)
+                {
+                    var tempscope = funcscope.parentScope;
+                    while (tempscope is scopes.FunctionScope)
+                    {
+                        
+                        if (((scopes.FunctionScope)tempscope).function.IsAnonymous)
+                        {
+                            break;
+                        }
+                        
+                        tempscope = tempscope.parentScope;
+
+                    }
+
+                    if (tempscope is scopes.ObjectInstanceScope)
+                    {
+                        _vt =
+                            ((scopes.ObjectInstanceScope)tempscope)._class.getRtType();
+                    }
+                    else
+                    {
+                        _vt = RunTimeDataType.rt_void;
+                    }
+                }
                 else if (funcscope.parentScope is scopes.OutPackageMemberScope)
                 {
                     //refblockid = ((scopes.OutPackageMemberScope)funcscope.parentScope).mainclass.outscopeblockid;

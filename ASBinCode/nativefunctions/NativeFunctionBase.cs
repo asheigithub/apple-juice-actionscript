@@ -34,9 +34,9 @@ namespace ASBinCode
         /// </summary>
         /// <param name="thisObj"></param>
         /// <returns></returns>
-        public abstract IRunTimeValue execute(rtData.rtObject thisObj,ISLOT[] argements,out string errormessage,out int errorno);
+        public abstract IRunTimeValue execute(IRunTimeValue thisObj,ISLOT[] argements,out string errormessage,out int errorno);
 
-        public virtual void executeAsync(rtData.rtObject thisObj,ISLOT[] argements,ISLOT resultSlot , 
+        public virtual void executeAsync(IRunTimeValue thisObj,ISLOT[] argements,ISLOT resultSlot , 
             object callbacker ,object stackframe,
             SourceToken token,IRunTimeScope scope)
         {

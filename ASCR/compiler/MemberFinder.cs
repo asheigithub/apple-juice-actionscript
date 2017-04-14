@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace ASCompiler.compiler
     /// </summary>
     class MemberFinder
     {
-        public static ASBinCode.IMember find(string name, CompileEnv env,bool isStaticMember)
+        public static ASBinCode.IMember find(string name, CompileEnv env,bool isStaticMember,Builder builder,ASTool.Token token)
         {
 
             ASBinCode.IScope scope = env.block.scope;
@@ -49,7 +50,23 @@ namespace ASCompiler.compiler
                 ++depth;
             }
 
-            
+            //***如果未找到，查找@__buildin__//
+            if (!env.isEval)
+            {
+                var buildin = TypeReader.findClassFromImports("@__buildin__",builder,token);
+                if (buildin.Count == 1)
+                {
+                    var bi = buildin[0].staticClass;
+
+                    var member = ClassMemberFinder.find(bi, name, bi);
+                    if (member != null)
+                    {
+                        return member.bindField;
+                    }
+
+                }
+            }
+
             return null;
         }
 

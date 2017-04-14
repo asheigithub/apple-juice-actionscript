@@ -16,7 +16,7 @@ namespace ASBinCode
 
         Dictionary<int, rtData.rtObject> static_objects { get; }
 
-        rtData.rtObject this_pointer { get; }
+        IRunTimeValue this_pointer { get; }
 
         ISLOT[] memberData { get; }
 

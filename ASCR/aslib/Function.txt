@@ -5,11 +5,20 @@
 		
 		
 		private var _func:Function;
+		private var _prototype:Object;
 
 		public function Function ()
 		{
 			_func=function():*{};
+			_prototype = {constructor:this};
+
 		}
+
+		public function toString():String
+		{
+			return "function Function() {}";
+		}
+
 
 		[implicit_to]
 		private static function _to_function(thisObj:*):Function{ return thisObj._func;}
@@ -42,12 +51,19 @@
 		[native,_function_load]
 		private static function _loadFunctionObject(value:Function):*;
 
-		public function get prototype () : *{ throw "Function 的 prototype功能未实现"};
-		public function set prototype (p:*) : void{ throw "Function 的 prototype功能未实现"};
+
+
+		
+		public function get prototype () : *{ return _prototype};
+
+		[native,_function_setPrototype]
+		public function set prototype (p:*) : void;
 
 		[native,_function_apply]
 		public function apply (thisArg:*=null, argArray:Array=null) : *;
-		//public function call (thisArg:*=null, ...rest) : *;
+		
+		[native,_function_call]
+		public function call (thisArg:*=null, ...rest) : *;
 		
 	}
 }

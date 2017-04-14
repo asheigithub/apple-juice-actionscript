@@ -44,8 +44,8 @@ namespace ASBinCode.rtData
         }
 
 
-        private rtObject _this_pointer;
-        public rtObject this_pointer
+        private IRunTimeValue _this_pointer;
+        public IRunTimeValue this_pointer
         {
             get { return _this_pointer; }
         }
@@ -94,7 +94,7 @@ namespace ASBinCode.rtData
             _bindScope = scope;
         }
 
-        public void setThis(rtObject obj)
+        public void setThis(IRunTimeValue obj)
         {
             _this_pointer = obj;
         }
@@ -139,7 +139,9 @@ namespace ASBinCode.rtData
             }
 
             return _functionid == right._functionid
-                && _bindScope.Equals(right._bindScope) && _ismethod == right._ismethod
+                //&& _bindScope.Equals(right._bindScope) 
+                && ReferenceEquals(_bindScope,right._bindScope)
+                && _ismethod == right._ismethod
                 && //_this_pointer.Equals(right._this_pointer);
                 ReferenceEquals(_this_pointer, right._this_pointer)
                 && objHandle.Equals(right.objHandle);
@@ -150,7 +152,7 @@ namespace ASBinCode.rtData
 
         public static bool isTypeEqual(rtFunction fun1,rtFunction fun2)
         {
-            return fun1._objid == fun2._objid;
+            return fun1._functionid == fun2._functionid;
         }
     }
 }

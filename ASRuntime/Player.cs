@@ -120,13 +120,13 @@ namespace ASRuntime
 
             for (int i = 0; i < stackSlots.Length; i++)
             {
-                stackSlots[i] = new StackSlot();
+                stackSlots[i] = new StackSlot(swc);
             }
 
             HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
 
             
-            var topscope = CallBlock(defaultblock,data ,new StackSlot(), null, 
+            var topscope = CallBlock(defaultblock,data ,new StackSlot(swc), null, 
                 new SourceToken(0, 0, ""),null,
                 null
                 );
@@ -192,7 +192,7 @@ namespace ASRuntime
             IRunTimeScope callerScope,
             SourceToken token,
             IBlockCallBack callbacker,
-            ASBinCode.rtData.rtObject this_pointer
+            IRunTimeValue this_pointer
             )
         {
             StackFrame frame = new StackFrame();

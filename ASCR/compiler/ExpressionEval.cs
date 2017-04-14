@@ -18,7 +18,7 @@ namespace ASCompiler.compiler
             try
             {
 
-                Builder builder = new Builder();
+                Builder builder = new Builder(true);
                 builder.isConsoleOut = false;
 
                 int bid = builder.getBlockId();

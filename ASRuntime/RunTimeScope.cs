@@ -20,7 +20,7 @@ namespace ASRuntime
             int offset, int blockid,
             IRunTimeScope parent,
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
-            ASBinCode.rtData.rtObject this_pointer
+            IRunTimeValue this_pointer
             //,
             //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
             )
@@ -87,8 +87,8 @@ namespace ASRuntime
                 return _static_scope;
             }
         }
-        private ASBinCode.rtData.rtObject _this_pointer;
-        public ASBinCode.rtData.rtObject this_pointer
+        private IRunTimeValue _this_pointer;
+        public IRunTimeValue this_pointer
         {
             get
             {

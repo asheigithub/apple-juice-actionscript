@@ -16,120 +16,79 @@ package
 	 */
 	public class Main extends Sprite 
 	{
-		var loader="loader";
+		var loader = "loader";
+		
+		
+		
 		public function Main() 
 		{
+			var v:Vector.<Vector.<int>> = Vector.<Vector.<int>>([
 			
-			var names:Array =  Array(false, "Jane", "David"); 
-			trace(names);
+			Vector.<int>([1,2,3]),
+			Vector.<int>([4,5,6])
+
+			]);
 			
-			//var oddNumbers:Array = [1, 3, 5, 7, 9, 11]; 
-			//var len:uint = oddNumbers.length; 
-			//for (var i:uint = 0; i < len; i++) 
-			//{ 
-				//trace("oddNumbers[" + i.toString() + "] = " + oddNumbers[i].toString()); 
-			//}
-			//
-			//oddNumbers[100] = 6;
-			//trace(oddNumbers.length);
-			//
-			//
-			//trace( oddNumbers.indexOf(7) );
+			var nv= v[0].concat( new <int>[7,8] , new <int>[8]);
+			trace(nv);
 			
-			var f:Function = function(...args)
+			trace(v[0]);
+			
+			//v[0] = v[1];
+			
+			//trace(v[0]);
+			//v[1].length = 0;
+			//trace(v[0]);
+			
+			//trace(v[0] == v[1]);
+			
+			trace( v.some( 
+			function( item:Vector.<int>, idx:int, v:Vector.<Vector.<int>> ):Boolean
 			{
-				//trace("f argements length:" + args.length);
-				//trace(args.length);
+				trace("item: ", item);
+				trace("idx ", idx);
+				trace("vec: ", v);
 				
+				return item[0] > 1;
 				
-				var a:* = (args);
-				//trace(a[0].length);
-				
-				//args.length = 0;
-				
-				//trace(a[0].length);
-				
-				trace(a == args);
-			}
+			} 
+			
+			) )
+			//v.fixed = true;
+			//v.insertAt(4, null);
+			
+			//trace(v.pop());
+			
+			trace(v.push( new <int>[-1] , new <int>[-2,-3]));
+			trace(v.unshift( new <int>[9] , new <int>[10,14]));
+			
+			trace(v);
+			
+			//var f = Main(this);
+			var vv=(v.removeAt(-3));
+			
+			trace(vv.reverse());
+			trace(vv);
+			
+			trace(vv.shift());
+			
+			trace(v);
+			
+			trace(v.splice(1,4,null,null,null));
+			trace(v);
+			
+			//var v:Vector.<int> = new Vector.<int>(1);
+			//trace( v.concat([3, 4, 5]));
 			
 			
-			f(1, 2, [3, 4, 5]);
 			
-			
-			names.insertAt(-100, "gg");
-			
-			trace(names.join());
-			
-			var letters:Array = new Array("a");
-			var count:uint = letters.push("b", "c");
-
-			trace(letters); // a,b,c
-			trace(count);   // 3
-			
-			trace( letters.removeAt( 5));
-			trace(letters.length);
-			
-			//loader=new Loader();
-			////Debug/GDebug.swf为GDebug.swf所在的目录，请替换成GDebug.swf的真正的路径
-			//loader.load(new URLRequest("GDebug.swf?v="+Math.random()));
-			//loader.contentLoaderInfo.addEventListener(Event.COMPLETE, complete);
-			//loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, ioError);
-
-			//var l =new int(6)-6.56;
-			////trace(Number.max(1,2,1,this));
-			//
-			//trace( Math.sin(l) * Math.PI );
-			//
-			//
-			//var t = uint(l);
-			//
-			//trace(t.toFixed(3));
-			
-			//var p = CP(5);
-			
-			//trace(p);
-			
-			//trace(t + 5);
-			
-			
-			//var t:Test = new Test(null);
-			//
-			//
-			//trace(t.i++);
-			//trace(++t.i);
-			//
-			//var t2:Test = new Test(null);
-			//t2._i = 3;
-			//trace( t2.testOut());
-			//
-			//
-			//var f1 = t.testOut;			
-			//var f2 = t2.testOut;
-			//
-			//trace(f1());
-			//trace(f2());
-			//
-			//test();
-			
-			//test2();
-			
-			//f = null;
-			
-			//f.prototype = { a:"a" };
-			
-			
-			f.p1 = "p1";
-			
-			trace(f.p1);
-			
-			
-			var fo = new f();
-			
-			
-			f.apply(5, [3,4,"tt"]);
 			
 		}
 		
+		
+		
+
+
 		
 		[ff];
 		[to]
@@ -138,9 +97,10 @@ package
 			//return "Main tostring";
 		//}
 		
+		private var _value:int = 2;
 		public function valueOf()
 		{
-			return 3;
+			return this._value;
 		}
 		
 		private function test()

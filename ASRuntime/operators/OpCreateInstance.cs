@@ -92,10 +92,11 @@ namespace ASRuntime.operators
                     {
 
                         //***创建一个Object对象，创建完毕之后，使用此函数执行初始化。将此对象作为此函数的this指针执行一次。
-                        var _class = player.swc.classes[0];
-                        frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
-                        frame.instanceCreator.constructor = (ASBinCode.rtData.rtFunction)rv;
-                        frame.instanceCreator.prepareConstructorArgements();
+                        OpCast.Primitive_to_Object((ASBinCode.rtData.rtFunction)rv,
+                            frame, step.token, scope, frame._tempSlot1, step,_func_ToObj
+                            );
+
+                        return;
                     }
 
                 }
@@ -106,6 +107,20 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
+        private static void _func_ToObj(ASBinCode.IRunTimeValue v1,
+            ASBinCode.IRunTimeValue v2,
+            StackFrame frame,
+            ASBinCode.OpStep step,
+            ASBinCode.IRunTimeScope scope)
+        {
+            var _class = frame.player.swc.classes[0];
+            frame.instanceCreator = new InstanceCreator(frame.player, frame, step, step.token, _class);
+            frame.instanceCreator.constructor = (ASBinCode.rtData.rtObject)v1;
+            frame.instanceCreator.prepareConstructorArgements();
+
+            frame.endStep(step);
+        }
+
 
         public static void push_parameter_class(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
@@ -283,7 +298,7 @@ namespace ASRuntime.operators
             //ASBinCode.rtti.Class as3class = player.swc.classes[classid];
             //exec_createinstance(as3class, player, frame, step, scope);
 
-            frame.instanceCreator.objectResult = step.reg.getISlot(scope);
+            //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
 
@@ -292,6 +307,8 @@ namespace ASRuntime.operators
             BlockCallBackBase cb = new BlockCallBackBase();
             cb.args = frame;
             cb.setCallBacker(objcreated);
+            cb.scope = scope;
+            cb.step = step;
 
             frame.instanceCreator.callbacker = cb;
             frame.instanceCreator.createInstance();
@@ -299,14 +316,16 @@ namespace ASRuntime.operators
 
         public static void exec_instanceClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            frame.instanceCreator.objectResult = step.reg.getISlot(scope);
+            //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
 
             BlockCallBackBase cb = new BlockCallBackBase();
             cb.args = frame;
             cb.setCallBacker(objcreated);
-
+            cb.scope = scope;
+            cb.step = step;
+            
             frame.instanceCreator.callbacker = cb;
             frame.instanceCreator.createInstance();
 
@@ -326,6 +345,10 @@ namespace ASRuntime.operators
         }
         private static void objcreated(BlockCallBackBase sender,object args)
         {
+            sender.step.reg.getISlot(sender.scope).directSet(
+                ((StackFrame)sender.args).instanceCreator.objectResult );
+
+
             ((StackFrame)sender.args).instanceCreator = null;
             ((StackFrame)sender.args).endStep();
         }

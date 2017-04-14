@@ -6,7 +6,7 @@ package
 	 */
 	public class Test
 	{
-		
+		public static var KV:String = "KV";
 		internal var t:Test;
 		
 		public function Test(t:Test)

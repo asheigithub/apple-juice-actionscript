@@ -142,4 +142,10 @@
   <data name="_uint" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\aslib\uint.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="__buildin__" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\__buildin__.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\vector.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

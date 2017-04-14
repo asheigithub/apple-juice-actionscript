@@ -45,6 +45,16 @@ namespace ASCompiler.compiler
 
         internal Dictionary<IRightValue, List<OpStep>> _propLines = new Dictionary<IRightValue, List<OpStep>>();
 
+        internal readonly bool isEval;
+        public Builder(bool isEval)
+        {
+            this.isEval = isEval;
+        }
+        public Builder():this(false)
+        {
+
+        }
+
 
         /// <summary>
         /// 根据类型查找的类
@@ -126,346 +136,9 @@ namespace ASCompiler.compiler
                 tobuildfiles.AddRange(lib.SrcFiles);
                 tobuildfiles.AddRange(proj.SrcFiles);
 
-                ASTool.AS3.AS3SrcFile docfile=null;
-                
-                //先编译类说明
-                for (int i = 0; i < tobuildfiles.Count; i++)
-                {
-                    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
 
-                    if (!System.IO.Path.GetDirectoryName(srcfile.srcFile)
-                        .Replace(System.IO.Path.DirectorySeparatorChar,'.')
-                        .EndsWith(srcfile.Package.Name))
-                    {
-                        throw new BuildException(0,0,srcfile.srcFile,
-                            "包名和路径不匹配"
-                            );
-                    }
-                    
-                    if (srcfile.Package.MainClass != null)
-                    {
-                        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                        var c= builder.buildClassDefine(srcfile.Package.MainClass,this,null,srcfile);
-                        
-                        if (c.isdocumentclass)
-                        {
-                            docfile = srcfile;
-                        }
-
-                        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
-                        {
-                            builder.buildClassDefine(
-                                srcfile.Package.MainClass.innerClass[j], this, buildingclasses[srcfile.Package.MainClass]
-                                ,srcfile
-                                );
-                        }
-                    }
-                }
-
-                Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>> classImports 
-                    = new Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>>();
-
-                //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
-                for (int i = 0; i < tobuildfiles.Count; i++)
-                {
-                    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
-
-                    if (srcfile.Package.MainClass != null)
-                    {
-                        var iimps = utils.ImportReader.readImports(srcfile, this);
-                        classImports.Add(buildingclasses[srcfile.Package.MainClass],iimps );
-                        _currentImports.Push(iimps);
-                        
-                        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                        builder.buildMemberType( buildingclasses[ srcfile.Package.MainClass], this,srcfile);
-
-                        _currentImports.Pop();
-
-                        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
-                        {
-                            var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
-                            classImports.Add(buildingclasses[srcfile.Package.MainClass.innerClass[j]],imports );
-                            _currentImports.Push(imports);
-
-                            builder.buildMemberType(
-                                buildingclasses[ srcfile.Package.MainClass.innerClass[j]], this,srcfile);
-
-                            _currentImports.Pop();
-                        }
-                    }
-                }
-
-                //***编译静态成员赋值代码***
-                foreach (var item in buildingclasses)
-                {
-                    ASBinCode.rtti.Class scls = item.Value.staticClass;
-
-                    _currentImports.Push(classImports[item.Value]);
-                    
-                    CompileEnv env = _classbuildingEnv[scls];
-                    for (int i = 0; i < scls.classMembers.Count; i++)
-                    {
-                        var m = scls.classMembers[i];
-                        if (m.bindField is ClassPropertyGetter)
-                        {
-                            continue;
-                        }
-                        var expr = _buildingmembers[m];
-                        IRunTimeValue defaultvalue=null;
-                        if (expr is ASTool.AS3.AS3Const)
-                        {
-                            ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
-                            if (as3const.ValueExpr != null)
-                            {
-                                defaultvalue = ExpressionEval.Eval(as3const.ValueExpr);
-                            }
-                           
-                        }
-                        else if (expr is ASTool.AS3.AS3Variable)
-                        {
-                            ASTool.AS3.AS3Variable as3var = (ASTool.AS3.AS3Variable)expr;
-                            if (as3var.ValueExpr != null)
-                            {
-                                defaultvalue = ExpressionEval.Eval(as3var.ValueExpr);
-                            }
-                            
-                        }
-                        m.defaultValue = defaultvalue;
-                        if (defaultvalue != null || expr is ASTool.AS3.AS3Function)
-                        {
-                            
-                            buildStmt(env, expr);   //先给确定值的对象赋值
-                            
-                        }
-                    }
-                    //**再给需要计算的字段赋值
-                    for (int i = 0; i < scls.classMembers.Count; i++)
-                    {
-                        var m = scls.classMembers[i];
-                        if (m.bindField is ClassPropertyGetter)
-                        {
-                            continue;
-                        }
-                        var expr = _buildingmembers[m];
-                        
-                        if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
-                        {
-                            buildStmt(env, expr);   //先给确定值的对象赋值
-                        }
-                    }
-
-                    //block必须有收尾工作
-                    {
-                        env.combieRegisters();
-                        env.block.totalRegisters = env.combieRegisters();
-                        env.completSteps();
-                    }
-
-                    _currentImports.Pop();
-                }
-
-                Dictionary<ASBinCode.rtti.Class, CodeBlock> outScopeBlock = new Dictionary<ASBinCode.rtti.Class, CodeBlock>();
-
-                //***编译包外代码***
-                for (int i = 0; i < tobuildfiles.Count; i++)
-                {
-                    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
-                    if (srcfile.Package.MainClass != null)
-                    {
-                        var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
-                        _currentImports.Push(imports);
-                        
-
-                        List<ASTool.AS3.IAS3Stmt> outstmts = srcfile.OutPackagePrivateScope.StamentsStack.Peek();
-                        ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(
-                            getBlockId(), 
-                            srcfile.Package.MainClass.Name + "::privateScope"
-                            ,
-                            buildingclasses[srcfile.Package.MainClass].classid,
-                            true
-                            );
-
-                        block.scope = new ASBinCode.scopes.OutPackageMemberScope(buildingclasses[srcfile.Package.MainClass]);
-                        ((ASBinCode.scopes.OutPackageMemberScope)block.scope).parentScope 
-                            = _classbuildingEnv[buildingclasses[srcfile.Package.MainClass].staticClass].block.scope;
-                        buildingclasses[srcfile.Package.MainClass].outscopeblockid = block.id;
-                        buildCodeBlock(outstmts, block);
-
-                        
-                        outScopeBlock.Add(buildingclasses[srcfile.Package.MainClass], block);
-                        _currentImports.Pop();
-                    }
-                }
-
-                //***编译类实例成员赋值代码
-                foreach (var item in buildingclasses)
-                {
-                    
-                    ASBinCode.rtti.Class cls = item.Value;
-                    _currentImports.Push(classImports[item.Value]);
-                    CompileEnv env = _classbuildingEnv[cls];
-
-                    if (cls.mainClass == null)
-                    {
-                        ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
-                            outScopeBlock[cls].scope;
-                    }
-                    else
-                    {
-                        ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
-                            outScopeBlock[cls.mainClass].scope;
-                    }
-
-                    for (int i = 0; i < cls.classMembers.Count; i++)
-                    {
-                        var m = cls.classMembers[i];
-
-                        if (m.bindField is ClassPropertyGetter)
-                        {
-                            continue;
-                        }
-
-                        var expr = _buildingmembers[m];
-                        IRunTimeValue defaultvalue = null;
-                        if (expr is ASTool.AS3.AS3Const)
-                        {
-                            ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
-                            if (as3const.ValueExpr != null)
-                            {
-                                defaultvalue = ExpressionEval.Eval(as3const.ValueExpr);
-                            }
-                        }
-                        else if (expr is ASTool.AS3.AS3Variable)
-                        {
-                            ASTool.AS3.AS3Variable as3var = (ASTool.AS3.AS3Variable)expr;
-                            if (as3var.ValueExpr != null)
-                            {
-                                defaultvalue = ExpressionEval.Eval(as3var.ValueExpr);
-                            }
-                        }
-                        m.defaultValue = defaultvalue;
-                        if (defaultvalue != null || expr is ASTool.AS3.AS3Function)
-                        {
-                            
-                            buildStmt(env, expr);   //先给确定值的对象赋值
-                            
-                        }
-                    }
-                    //**再给需要计算的字段赋值
-                    for (int i = 0; i < cls.classMembers.Count; i++)
-                    {
-                        var m = cls.classMembers[i];
-                        if (m.bindField is ClassPropertyGetter)
-                        {
-                            continue;
-                        }
-
-                        var expr = _buildingmembers[m];
-
-                        if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
-                        {
-                            buildStmt(env, expr);   //先给确定值的对象赋值
-                        }
-                    }
-
-                    //block必须有收尾工作
-                    {
-                        env.combieRegisters();
-                        env.block.totalRegisters = env.combieRegisters();
-                        env.completSteps();
-                    }
-                    _currentImports.Pop();
-                }
-
-                if (buildErrors.Count == 0)
-                {
-                    foreach (var item in _classbuildingEnv)
-                    {
-                        var block = item.Value.block;
-                        while (bin.blocks.Count <= block.id)
-                        {
-                            bin.blocks.Add(null);
-                        }
-                        bin.blocks[block.id] = block;
-                    }
-                    foreach (var item in outScopeBlock)
-                    {
-                        var block = item.Value;
-                        while (bin.blocks.Count <= block.id)
-                        {
-                            bin.blocks.Add(null);
-                        }
-                        bin.blocks[block.id] = block;
-                    }
-                    foreach (var item in dictfunctionblock)
-                    {
-                        var block = item.Value;
-                        while (bin.blocks.Count <= block.id)
-                        {
-                            bin.blocks.Add(null);
-                        }
-                        bin.blocks[block.id] = block;
-                    }
-                    //bin.blocks.Add(block);
-                    //bin.blocks.Sort((CodeBlock b1, CodeBlock b2) => { return b1.id - b2.id; });
-
-
-                    foreach (var item in buildoutfunctions.Values)
-                    {
-                        while (bin.functions.Count <= item.functionid)
-                        {
-                            bin.functions.Add(null);
-                        }
-                        bin.functions[item.functionid] = item;
-
-                    }
-
-                    foreach (var item in buildingclasses)
-                    {
-                        while (bin.classes.Count <= item.Value.classid)
-                        {
-                            bin.classes.Add(null);
-                        }
-                        bin.classes[item.Value.classid] = item.Value;
-
-                        if (item.Value.constructor != null)
-                        {
-                            //***查找构造函数id***
-                            //Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
-                            //    item.Value.constructor.index];
-
-                            ClassMethodGetter field = (ClassMethodGetter)item.Value.constructor.bindField;
-                            int blockid = field.refdefinedinblockid;
-                            
-                            var signature =
-                                    dictSignatures[blockid][field];
-                            foreach (var func in buildoutfunctions.Values)
-                            {
-                                if (func.signature == signature)
-                                {
-                                    item.Value.constructor_functionid = func.functionid;
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        while (bin.classes.Count <= item.Value.staticClass.classid)
-                        {
-                            bin.classes.Add(null);
-                        }
-                        bin.classes[item.Value.staticClass.classid] = item.Value.staticClass;
-                    }
-
-                }
-                if (buildErrors.Count == 0)
-                {
-                    //***编译参数默认值
-                    foreach (var item in _toEvalDefaultParameters)
-                    {
-                        builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
-                        builder.buildParameterDefaultValue(item.Key, item.Value.item1, item.Value.item2, this);
-                    }
-                }
+                //ASTool.AS3.AS3SrcFile docfile=null;
+                build_srcFiles(tobuildfiles,false,RunTimeDataType.unknown);
 
 
                 if (isConsoleOut)
@@ -479,6 +152,8 @@ namespace ASCompiler.compiler
             }
             catch (InvalidOperationException)
             {
+                pushBuildError(new BuildError(0, 0, "", "发生编译器内部错误"));
+
                 if (isConsoleOut)
                 {
                     Console.WriteLine("编译已终止");
@@ -488,7 +163,364 @@ namespace ASCompiler.compiler
 
         }
 
-        
+        private void build_srcFiles(List<ASTool.AS3.AS3SrcFile> tobuildfiles,bool isbuildvector,RunTimeDataType vectortype)
+        {
+
+            //先编译类说明
+            for (int i = 0; i < tobuildfiles.Count; i++)
+            {
+                ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+                if (!System.IO.Path.GetDirectoryName(srcfile.srcFile)
+                    .Replace(System.IO.Path.DirectorySeparatorChar, '.')
+                    .EndsWith(srcfile.Package.Name))
+                {
+                    throw new BuildException(0, 0, srcfile.srcFile,
+                        "包名和路径不匹配"
+                        );
+                }
+
+                if (srcfile.Package.MainClass != null)
+                {
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    var c = builder.buildClassDefine(srcfile.Package.MainClass, this, null, srcfile,isbuildvector,vectortype);
+
+                    if (c.isdocumentclass)
+                    {
+                        //docfile = srcfile;
+                    }
+
+                    for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+                    {
+                        builder.buildClassDefine(
+                            srcfile.Package.MainClass.innerClass[j], this, buildingclasses[srcfile.Package.MainClass]
+                            , srcfile,isbuildvector,vectortype
+                            );
+                    }
+
+                }
+            }
+
+            Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>> classImports
+                = new Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>>();
+
+            //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
+            for (int i = 0; i < tobuildfiles.Count; i++)
+            {
+                ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+                if (srcfile.Package.MainClass != null)
+                {
+                    var iimps = utils.ImportReader.readImports(srcfile, this);
+                    classImports.Add(buildingclasses[srcfile.Package.MainClass], iimps);
+                    _currentImports.Push(iimps);
+
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    builder.buildMemberType(buildingclasses[srcfile.Package.MainClass], this, srcfile);
+
+                    _currentImports.Pop();
+
+                    for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+                    {
+                        var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
+                        classImports.Add(buildingclasses[srcfile.Package.MainClass.innerClass[j]], imports);
+                        _currentImports.Push(imports);
+
+                        builder.buildMemberType(
+                            buildingclasses[srcfile.Package.MainClass.innerClass[j]], this, srcfile);
+
+                        _currentImports.Pop();
+                    }
+                }
+            }
+
+            Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> copyclasses = new Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>();
+            foreach (var item in buildingclasses)
+            {
+                copyclasses.Add(item.Key, item.Value);
+            }
+
+            //***编译静态成员赋值代码***
+            foreach (var item in copyclasses)
+            {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
+
+                ASBinCode.rtti.Class scls = item.Value.staticClass;
+
+                _currentImports.Push(classImports[item.Value]);
+
+                CompileEnv env = _classbuildingEnv[scls];
+                for (int i = 0; i < scls.classMembers.Count; i++)
+                {
+                    var m = scls.classMembers[i];
+                    if (m.bindField is ClassPropertyGetter)
+                    {
+                        continue;
+                    }
+                    var expr = _buildingmembers[m];
+                    IRunTimeValue defaultvalue = null;
+                    if (expr is ASTool.AS3.AS3Const)
+                    {
+                        ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
+                        if (as3const.ValueExpr != null)
+                        {
+                            defaultvalue = ExpressionEval.Eval(as3const.ValueExpr);
+                        }
+
+                    }
+                    else if (expr is ASTool.AS3.AS3Variable)
+                    {
+                        ASTool.AS3.AS3Variable as3var = (ASTool.AS3.AS3Variable)expr;
+                        if (as3var.ValueExpr != null)
+                        {
+                            defaultvalue = ExpressionEval.Eval(as3var.ValueExpr);
+                        }
+
+                    }
+                    m.defaultValue = defaultvalue;
+                    if (defaultvalue != null || expr is ASTool.AS3.AS3Function)
+                    {
+
+                        buildStmt(env, expr);   //先给确定值的对象赋值
+
+                    }
+                }
+                //**再给需要计算的字段赋值
+                for (int i = 0; i < scls.classMembers.Count; i++)
+                {
+                    var m = scls.classMembers[i];
+                    if (m.bindField is ClassPropertyGetter)
+                    {
+                        continue;
+                    }
+                    var expr = _buildingmembers[m];
+
+                    if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
+                    {
+                        buildStmt(env, expr);   //先给确定值的对象赋值
+                    }
+                }
+
+                //block必须有收尾工作
+                {
+                    env.combieRegisters();
+                    env.block.totalRegisters = env.combieRegisters();
+                    env.completSteps();
+                }
+
+                _currentImports.Pop();
+            }
+
+            Dictionary<ASBinCode.rtti.Class, CodeBlock> outScopeBlock = new Dictionary<ASBinCode.rtti.Class, CodeBlock>();
+
+            //***编译包外代码***
+            for (int i = 0; i < tobuildfiles.Count; i++)
+            {
+                ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+                if (srcfile.Package.MainClass != null)
+                {
+                    var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
+                    _currentImports.Push(imports);
+
+
+                    List<ASTool.AS3.IAS3Stmt> outstmts = srcfile.OutPackagePrivateScope.StamentsStack.Peek();
+                    ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(
+                        getBlockId(),
+                        srcfile.Package.MainClass.Name + "::privateScope"
+                        ,
+                        buildingclasses[srcfile.Package.MainClass].classid,
+                        true
+                        );
+
+                    block.scope = new ASBinCode.scopes.OutPackageMemberScope(buildingclasses[srcfile.Package.MainClass]);
+                    ((ASBinCode.scopes.OutPackageMemberScope)block.scope).parentScope
+                        = _classbuildingEnv[buildingclasses[srcfile.Package.MainClass].staticClass].block.scope;
+                    buildingclasses[srcfile.Package.MainClass].outscopeblockid = block.id;
+                    buildCodeBlock(outstmts, block);
+
+
+                    outScopeBlock.Add(buildingclasses[srcfile.Package.MainClass], block);
+                    _currentImports.Pop();
+                }
+            }
+
+            //***编译类实例成员赋值代码
+            foreach (var item in copyclasses)
+            {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
+
+                ASBinCode.rtti.Class cls = item.Value;
+                _currentImports.Push(classImports[item.Value]);
+                CompileEnv env = _classbuildingEnv[cls];
+
+                if (cls.mainClass == null)
+                {
+                    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
+                        outScopeBlock[cls].scope;
+                }
+                else
+                {
+                    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
+                        outScopeBlock[cls.mainClass].scope;
+                }
+
+                for (int i = 0; i < cls.classMembers.Count; i++)
+                {
+                    var m = cls.classMembers[i];
+
+                    if (m.bindField is ClassPropertyGetter)
+                    {
+                        continue;
+                    }
+
+                    var expr = _buildingmembers[m];
+                    IRunTimeValue defaultvalue = null;
+                    if (expr is ASTool.AS3.AS3Const)
+                    {
+                        ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
+                        if (as3const.ValueExpr != null)
+                        {
+                            defaultvalue = ExpressionEval.Eval(as3const.ValueExpr);
+                        }
+                    }
+                    else if (expr is ASTool.AS3.AS3Variable)
+                    {
+                        ASTool.AS3.AS3Variable as3var = (ASTool.AS3.AS3Variable)expr;
+                        if (as3var.ValueExpr != null)
+                        {
+                            defaultvalue = ExpressionEval.Eval(as3var.ValueExpr);
+                        }
+                    }
+                    m.defaultValue = defaultvalue;
+                    if (defaultvalue != null || expr is ASTool.AS3.AS3Function)
+                    {
+
+                        buildStmt(env, expr);   //先给确定值的对象赋值
+
+                    }
+                }
+                //**再给需要计算的字段赋值
+                for (int i = 0; i < cls.classMembers.Count; i++)
+                {
+                    var m = cls.classMembers[i];
+                    if (m.bindField is ClassPropertyGetter)
+                    {
+                        continue;
+                    }
+
+                    var expr = _buildingmembers[m];
+
+                    if (m.defaultValue == null && !(expr is ASTool.AS3.AS3Function))
+                    {
+                        buildStmt(env, expr);   //先给确定值的对象赋值
+                    }
+                }
+
+                //block必须有收尾工作
+                {
+                    env.combieRegisters();
+                    env.block.totalRegisters = env.combieRegisters();
+                    env.completSteps();
+                }
+                _currentImports.Pop();
+            }
+            
+            if (buildErrors.Count == 0)
+            {
+                foreach (var item in _classbuildingEnv)
+                {
+                    var block = item.Value.block;
+                    while (bin.blocks.Count <= block.id)
+                    {
+                        bin.blocks.Add(null);
+                    }
+                    bin.blocks[block.id] = block;
+                }
+                foreach (var item in outScopeBlock)
+                {
+                    var block = item.Value;
+                    while (bin.blocks.Count <= block.id)
+                    {
+                        bin.blocks.Add(null);
+                    }
+                    bin.blocks[block.id] = block;
+                }
+                foreach (var item in dictfunctionblock)
+                {
+                    var block = item.Value;
+                    while (bin.blocks.Count <= block.id)
+                    {
+                        bin.blocks.Add(null);
+                    }
+                    bin.blocks[block.id] = block;
+                }
+                //bin.blocks.Add(block);
+                //bin.blocks.Sort((CodeBlock b1, CodeBlock b2) => { return b1.id - b2.id; });
+
+
+                foreach (var item in buildoutfunctions.Values)
+                {
+                    while (bin.functions.Count <= item.functionid)
+                    {
+                        bin.functions.Add(null);
+                    }
+                    bin.functions[item.functionid] = item;
+
+                }
+
+                foreach (var item in buildingclasses)
+                {
+                    while (bin.classes.Count <= item.Value.classid)
+                    {
+                        bin.classes.Add(null);
+                    }
+                    bin.classes[item.Value.classid] = item.Value;
+
+                    if (item.Value.constructor != null)
+                    {
+                        //***查找构造函数id***
+                        //Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
+                        //    item.Value.constructor.index];
+
+                        ClassMethodGetter field = (ClassMethodGetter)item.Value.constructor.bindField;
+                        int blockid = field.refdefinedinblockid;
+
+                        var signature =
+                                dictSignatures[blockid][field];
+                        foreach (var func in buildoutfunctions.Values)
+                        {
+                            if (func.signature == signature)
+                            {
+                                item.Value.constructor_functionid = func.functionid;
+                                break;
+                            }
+                        }
+                    }
+
+                    while (bin.classes.Count <= item.Value.staticClass.classid)
+                    {
+                        bin.classes.Add(null);
+                    }
+                    bin.classes[item.Value.staticClass.classid] = item.Value.staticClass;
+                }
+
+            }
+            if (buildErrors.Count == 0)
+            {
+                //***编译参数默认值
+                foreach (var item in _toEvalDefaultParameters)
+                {
+                    builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                    builder.buildParameterDefaultValue(item.Key, item.Value.item1, item.Value.item2, this);
+                }
+            }
+        }
 
 
         internal void buildCodeBlock(List<ASTool.AS3.IAS3Stmt> statements, CodeBlock block)
@@ -527,7 +559,7 @@ namespace ASCompiler.compiler
             {
                 //之前检查过是命名函数所以不需再检查
 
-                ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                 if (member is ClassMethodGetter)
                 {
@@ -629,7 +661,7 @@ namespace ASCompiler.compiler
                         if (!as3function.IsAnonymous)
                         {
 
-                            ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                            ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                             if (!(member is Variable))
                             {
@@ -982,8 +1014,8 @@ namespace ASCompiler.compiler
 
                                     if (!ASRuntime.TypeConverter.testImplicitConvert(newtype, var.valueType,this))
                                     {
-                                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                        "不能将[" + newtype + "]类型赋值给[" + var.valueType + "]类型的变量"));
+                                        pushBuildError(new BuildTypeError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                        newtype , var.valueType ,this));
                                         return;
                                     }
                                     else
@@ -1104,7 +1136,7 @@ namespace ASCompiler.compiler
                                 {
                                     if (as3function.IsGet)
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if(
                                             !dictSignatures[env.block.id].ContainsKey(((ClassPropertyGetter)member).getter))
@@ -1119,7 +1151,7 @@ namespace ASCompiler.compiler
                                     }
                                     else if (as3function.IsSet)
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if (
                                             !dictSignatures[env.block.id].ContainsKey(
@@ -1135,7 +1167,7 @@ namespace ASCompiler.compiler
                                     }
                                     else
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if (
                                             !dictSignatures[env.block.id].ContainsKey(
@@ -1158,7 +1190,7 @@ namespace ASCompiler.compiler
                                 {
                                     
 
-                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic);
+                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                     if (as3function.IsGet)
                                     {
@@ -1283,7 +1315,7 @@ namespace ASCompiler.compiler
                         ASBinCode.IRightValue defaultv = null;
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic);
+                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
                             if (variable.ValueExpr != null) //变量值表达式
                             {
                                 var testEval = ExpressionEval.Eval(variable.ValueExpr);
@@ -1302,8 +1334,9 @@ namespace ASCompiler.compiler
                                 //**加入赋值操作***
                                 if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType,this))
                                 {
-                                    throw new BuildException(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                        "不能将[" + defaultv.valueType + "]类型赋值给[" + rtVariable.valueType + "]类型的变量");
+                                    throw new BuildException( new BuildTypeError( stmt.Token.line, 
+                                        stmt.Token.ptr, stmt.Token.sourceFile,
+                                        defaultv.valueType,rtVariable.valueType,this));
                                 }
 
                                 bool isbindscope = false;
@@ -1367,7 +1400,7 @@ namespace ASCompiler.compiler
 
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic);
+                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
                             //rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
 
                             if (variable.ValueExpr != null) //变量值表达式
@@ -1393,8 +1426,9 @@ namespace ASCompiler.compiler
                                 }
                                 else if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType,this))
                                 {
-                                    throw new BuildException(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                        "不能将[" + defaultv.valueType + "]类型赋值给[" + rtVariable.valueType + "]类型的变量");
+                                    throw new BuildException( new BuildTypeError( stmt.Token.line, 
+                                        stmt.Token.ptr, stmt.Token.sourceFile,
+                                        defaultv.valueType,rtVariable.valueType ,this));
                                 }
 
                                 bool isbindscope = false;
@@ -1551,6 +1585,165 @@ namespace ASCompiler.compiler
                 pushBuildError(ex.error);
             }
         }
+
+
+
+
+        
+        
+        internal string build_vector(string vt, ASTool.Token token)
+        {
+            string vectorType = vt.Substring(8, vt.Length - 9);
+            if (vectorType.StartsWith("Vector.<"))
+            {
+                build_vector(vectorType,token);
+            }
+
+            if (vectorType == "null" 
+                || vectorType == "undefined"
+                || vectorType == "void")
+            {
+                throw new BuildException(token.line, token.ptr, token.sourceFile,
+                    "Syntax error: '" + vectorType + "' is not allowed here");
+            }
+
+            var vector_t = TypeReader.fromSourceCodeStr(vectorType, token, this);
+
+            string fulltypename = vector_t.toAS3Name();
+            string ot = fulltypename;
+
+            ASBinCode.rtti.Class _Vector_innerClass = null;
+
+            if (vector_t > RunTimeDataType.unknown)
+            {
+                var rt_class =getClassByRunTimeDataType(vector_t);
+
+                fulltypename = rt_class.package + (String.IsNullOrEmpty( rt_class.package)?String.Empty:".")  +rt_class.name;
+                ot = fulltypename;
+
+                if (bin.dict_Vector_type.ContainsKey(rt_class))
+                {
+                    _Vector_innerClass = rt_class;
+                    
+                    string temp1 = "C1";
+
+                    while (TypeReader.findClassFromImports(temp1, this, token).Count > 0)
+                    {
+                        temp1 = temp1 + "1";
+                    }
+
+                    ot = temp1;
+                }
+                
+            }
+
+            string finalVectorName = "Vector.<" + fulltypename + ">";
+
+            foreach (var item in buildingclasses)
+            {
+                if (item.Value.name == finalVectorName)
+                {
+                    return item.Value.name;
+                }
+            }
+
+            //获取临时类名
+            string TC = finalVectorName.Replace(".","").Replace("<","_").Replace(">","_").Replace("@","");
+            while (TypeReader.findClassFromImports(TC, this, token).Count > 0)
+            {
+                TC = TC + "_";
+            }
+            
+            
+            string template= Properties.Resources.Vector;
+            template= template.Replace("Vector.<T>", TC);
+            template = template.Replace("T", ot);
+
+            string imports = string.Empty;
+
+            if (vector_t > RunTimeDataType.unknown && ot.IndexOf(".")>0)
+            {
+                imports = "import " + ot;
+            }
+
+            template = template.Replace("[imports]", imports);
+
+            if (ot == "*")
+            {
+                template = template.Replace("private const t = *;", "private const t = undefined;");
+            }
+
+
+            var lib = new ASTool.AS3.AS3Proj();
+            var grammar = Grammar.getGrammar();
+
+            List<compiler.utils.Tuple<ASTool.GrammerTree, string>> trees = new List<compiler.utils.Tuple<ASTool.GrammerTree, string>>();
+
+            {
+                //***类库源码***
+                var tree = grammar.ParseTree(template, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Vector.as3");
+
+                if (grammar.hasError)
+                {
+                    throw new BuildException(token.line, token.ptr,token.sourceFile, "Vector.<"+ vt +">编译失败");
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Vector.as3"));
+            }
+
+            foreach (var tree in trees)
+            {
+                var analyser = new ASTool.AS3FileGrammarAnalyser(lib, tree.item2);
+                if (!analyser.Analyse(grammar, tree.item1)) //生成项目的语法树
+                {
+                    throw new BuildException(token.line, token.ptr, token.sourceFile, "Vector.<" + vt + ">编译失败");
+                }
+            }
+
+
+            
+
+            //lib.SrcFiles[0].Package.MainClass.Name = finalVectorName;
+            
+
+
+
+            //***执行编译。***
+            List<ASTool.AS3.AS3SrcFile> listsrcfiles = new List<ASTool.AS3.AS3SrcFile>();
+            listsrcfiles.Add(lib.SrcFiles[0]);
+
+            if (_Vector_innerClass != null)
+            {
+                _Vector_innerClass.name = ot;
+            }
+            build_srcFiles(listsrcfiles,true,vector_t);
+
+            if (buildingclasses.ContainsKey(lib.SrcFiles[0].Package.MainClass))
+            {
+                lib.SrcFiles[0].Package.MainClass.Name = finalVectorName;
+                buildingclasses[lib.SrcFiles[0].Package.MainClass].name = finalVectorName;
+            }
+            
+
+            if (_Vector_innerClass != null)
+            {
+                _Vector_innerClass.name = fulltypename;
+            }
+
+            if (_currentImports.Count > 0)
+            {
+                if (buildingclasses.ContainsKey(lib.SrcFiles[0].Package.MainClass))
+                {
+                    _currentImports.Peek().Add(buildingclasses[lib.SrcFiles[0].Package.MainClass]);
+                }
+            }
+
+            
+
+            return lib.SrcFiles[0].Package.MainClass.Name;
+        }
+
+
 
     }
 }

@@ -205,12 +205,15 @@ namespace ASRuntime.operators
                     callbacker.isSuccess = true;
                     callbacker.call(null);
                 }
-                else if (srcValue.rtType == RunTimeDataType.rt_null
+                else if ((srcValue.rtType == RunTimeDataType.rt_null
+                        ||
+                        srcValue.rtType == RunTimeDataType.rt_void
+                    )
                     &&
                     targetType > RunTimeDataType.unknown //将null赋值给对象
                     )
                 {
-                    storeto.directSet(srcValue);
+                    storeto.directSet(rtNull.nullptr);
                     callbacker.isSuccess = true;
                     callbacker.call(null);
                 }
@@ -243,15 +246,39 @@ namespace ASRuntime.operators
                         if (obj.value is ASBinCode.rtti.DynamicObject)
                         {
                             ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
-                            if (dobj.hasproperty("toString"))
+                            bool haserror;
+                            var find = OpAccess_Dot.findInProtoType(dobj, "toString", frame, token, out haserror);
+                            if (haserror)
                             {
-                                var prop = dobj["toString"].getValue();
+                                frame.endStep();
+                                return;
+                            }
 
+                            if (find != null)
+                            {
+                                var prop = find["toString"].getValue();
                                 if (prop is rtFunction)
                                 {
                                     function = (rtFunction)prop;
+
+                                    if (!ReferenceEquals(find, dobj))
+                                    {
+                                        function = (rtFunction)function.Clone();
+                                        function.setThis(obj);
+                                    }
+
                                 }
                             }
+
+                            //if (dobj.hasproperty("toString"))
+                            //{
+                            //    var prop = dobj["toString"].getValue();
+
+                            //    if (prop is rtFunction)
+                            //    {
+                            //        function = (rtFunction)prop;
+                            //    }
+                            //}
                         }
 
                     }
@@ -693,15 +720,39 @@ namespace ASRuntime.operators
                 if (obj.value is ASBinCode.rtti.DynamicObject)
                 {
                     ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
-                    if (dobj.hasproperty("valueOf"))
-                    {
-                        var prop = dobj["valueOf"].getValue();
 
+                    bool haserror;
+                    var find= OpAccess_Dot.findInProtoType(dobj, "valueOf", frame, token, out haserror);
+                    if (haserror)
+                    {
+                        frame.endStep();
+                        return;
+                    }
+
+                    if (find != null)
+                    {
+                        var prop = find["valueOf"].getValue();
                         if (prop is rtFunction)
                         {
                             function = (rtFunction)prop;
+                            if(!ReferenceEquals(find,dobj))
+                            {
+                                function = (rtFunction)function.Clone();
+                                function.setThis(obj);
+                            }
+                            
                         }
                     }
+
+                    //if (dobj.hasproperty("valueOf"))
+                    //{
+                    //    var prop = dobj["valueOf"].getValue();
+
+                    //    if (prop is rtFunction)
+                    //    {
+                    //        function = (rtFunction)prop;
+                    //    }
+                    //}
                 }
 
             }
@@ -729,7 +780,14 @@ namespace ASRuntime.operators
             }
             else
             {
-                ((object[])callbacker.args)[6] = false;
+
+                if (
+                    callbacker.args is object[]
+                    &&
+                    ((object[])callbacker.args).Length > 6)
+                {
+                    ((object[])callbacker.args)[6] = false;
+                }
                 storeto.directSet(obj);
                 callbacker.call(null);
             }
@@ -908,15 +966,40 @@ namespace ASRuntime.operators
                 if (obj.value is ASBinCode.rtti.DynamicObject)
                 {
                     ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
-                    if (dobj.hasproperty("toString"))
-                    {
-                        var prop = dobj["toString"].getValue();
 
+                    bool haserror;
+                    var find = OpAccess_Dot.findInProtoType(dobj, "toString", frame, token, out haserror);
+                    if (haserror)
+                    {
+                        frame.endStep();
+                        return;
+                    }
+
+                    if (find != null)
+                    {
+                        var prop = find["toString"].getValue();
                         if (prop is rtFunction)
                         {
                             function = (rtFunction)prop;
+
+                            if (!ReferenceEquals(find, dobj))
+                            {
+                                function = (rtFunction)function.Clone();
+                                function.setThis(obj);
+                            }
+
                         }
                     }
+
+                    //if (dobj.hasproperty("toString"))
+                    //{
+                    //    var prop = dobj["toString"].getValue();
+
+                    //    if (prop is rtFunction)
+                    //    {
+                    //        function = (rtFunction)prop;
+                    //    }
+                    //}
                 }
 
             }

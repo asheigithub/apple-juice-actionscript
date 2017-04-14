@@ -1,19 +1,48 @@
 ﻿using ASBinCode;
+using ASBinCode.rtData;
+using ASBinCode.rtti;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using ASBinCode.rtData;
 
 namespace ASRuntime.nativefuncs
 {
-    class Array_constructor : NativeFunctionBase
+    class Vector_Util
+    {
+        public static RunTimeDataType getVectorType(IRunTimeValue thisObj, IClassFinder bin)
+        {
+            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+
+            var t = rtObj.memberData[0].getValue();
+
+            RunTimeDataType vector_type = t.rtType;
+
+            if (t.rtType > RunTimeDataType.unknown)
+            {
+                var cls = bin.getClassByRunTimeDataType(t.rtType);
+                vector_type = cls.instanceClass.getRtType();
+
+                RunTimeDataType ot;
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(vector_type, bin, out ot))
+                {
+                    vector_type = ot;
+                }
+            }
+
+            return vector_type;
+        }
+    }
+
+
+    class Vector_constructor : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_constructor()
+        public Vector_constructor()
         {
             _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_array);
+            _paras.Add(RunTimeDataType.rt_uint);
+            _paras.Add(RunTimeDataType.rt_boolean);
         }
 
         public override bool isMethod
@@ -28,7 +57,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_constructor";
+                return "_vector_constructor";
             }
         }
 
@@ -53,73 +82,42 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var newvalue = new ASBinCode.rtData.rtArray();
-            newvalue.objHandle.bindArrayObject = (rtObject)thisObj;
 
-            ((rtObject)thisObj).value.memberData[0].directSet(newvalue);
-            
+            uint length = ((rtUInt)argements[0].getValue()).value;
+            bool isfixed = ( (rtBoolean)argements[1].getValue()).value;
 
-            var args = argements[0].getValue();
-
-            if(args.rtType == RunTimeDataType.rt_array)
-            {
-                rtArray arr = (rtArray)args;
-
-                if (arr.innerArray.Count == 1)
-                {
-                    var a1 = arr.innerArray[0];
-                    if (TypeConverter.ObjectImplicit_ToNumber(a1.rtType, bin))
-                    {
-                        a1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)a1);
-                    }
-
-                    if (a1.rtType == RunTimeDataType.rt_int || a1.rtType == RunTimeDataType.rt_uint || a1.rtType == RunTimeDataType.rt_number)
-                    {
-                        int c = TypeConverter.ConvertToInt(a1, null, null);
-
-                        if (c < 0)
-                        {
-                            errormessage = "Array index is not a positive integer (" + c + ").";
-                            errorno = 1005;
-                            return ASBinCode.rtData.rtUndefined.undefined;
-                        }
-                        else
-                        {
-                            while (newvalue.innerArray.Count < c)
-                            {
-                                newvalue.innerArray.Add(rtUndefined.undefined);
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        newvalue.innerArray.Add(a1);
-                    }
-                }
-                else
-                {
-                    newvalue.innerArray.AddRange(arr.innerArray);
-                }
-
-            }
-            
             //throw new NotImplementedException();
+
+            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+
+            RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
+
+
+            Vector_Data data = new Vector_Data(vector_type);
+            data.isFixed = isfixed;
+            data.innnerList = new List<IRunTimeValue>();
+
+            while (data.innnerList.Count < length)
+            {
+                data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null));
+            }
+
+            rtObj.unmanaged_object = data;
 
             return ASBinCode.rtData.rtUndefined.undefined;
         }
     }
 
 
-    class Array_fill : NativeFunctionBase
+
+    class Vector_getIsFixed : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_fill()
+        public Vector_getIsFixed()
         {
             _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_void);
-            _paras.Add(RunTimeDataType.rt_array);
+            
         }
 
         public override bool isMethod
@@ -134,7 +132,72 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_fill";
+                return "_vector_getfixed";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return _paras;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+
+           
+            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+
+
+            if (((Vector_Data)rtObj.unmanaged_object).isFixed)
+            {
+                return rtBoolean.True;
+            }
+            else
+            {
+                return rtBoolean.False;
+            }
+           
+        }
+    }
+
+    class Vector_setIsFixed : NativeFunctionBase
+    {
+        private List<RunTimeDataType> _paras;
+
+        public Vector_setIsFixed()
+        {
+            _paras = new List<RunTimeDataType>();
+            _paras.Add(RunTimeDataType.rt_boolean);
+
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_vector_setfixed";
             }
         }
 
@@ -156,82 +219,25 @@ namespace ASRuntime.nativefuncs
 
         public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
-            ((rtObject)argements[0].getValue()).value.memberData[0].directSet(argements[1].getValue());
-            ((rtArray)argements[1].getValue()).objHandle.bindArrayObject = ((rtObject)argements[0].getValue());
-
             errormessage = null;
             errorno = 0;
+
+
+            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+
+            ((Vector_Data)rtObj.unmanaged_object).isFixed = ((rtBoolean)argements[0].getValue()).value;
+
             return rtUndefined.undefined;
-
-            //throw new NotImplementedException();
         }
     }
 
 
-    class Array_load : NativeFunctionBase
+
+    class Vector_getLength : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_load()
-        {
-            _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_array);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_array_load";
-            }
-        }
-
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return _paras;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
-
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-
-            if (((rtArray)argements[0].getValue()).objHandle.bindArrayObject == null)
-            {
-                return rtNull.nullptr;
-            }
-            else
-            {
-                return ((rtArray)argements[0].getValue()).objHandle.bindArrayObject;
-            }
-        }
-    }
-
-
-    class Array_getLength : NativeFunctionBase
-    {
-        private List<RunTimeDataType> _paras;
-
-        public Array_getLength()
+        public Vector_getLength()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -248,7 +254,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_getlength";
+                return "_vector_getlength";
             }
         }
 
@@ -273,22 +279,20 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            return 
+            return
                 new rtUInt(
-                    (uint)
-                    ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray.Count
+                    (uint)((Vector_Data)
+                    ((UnmanagedObject)(((rtObject)thisObj).value)).unmanaged_object).innnerList.Count
                 )
                 ;
         }
     }
 
-
-
-    class Array_setLength : NativeFunctionBase
+    class Vector_setLength : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_setLength()
+        public Vector_setLength()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_uint);
@@ -306,7 +310,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_setlength";
+                return "_vector_setlength";
             }
         }
 
@@ -331,15 +335,30 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var list = ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray;
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
+            {
+                errormessage = "Cannot change the length of a fixed Vector";
+                errorno = 1126;
+
+                return rtUndefined.undefined;
+            }
+
+
+
+            var list = vd.innnerList;
+
+            
 
             uint newlen = ((rtUInt)argements[0].getValue()).value;
 
             if (newlen > list.Count)
             {
+                var t = Vector_Util.getVectorType(thisObj, bin);
+
                 while (list.Count < newlen)
                 {
-                    list.Add(rtUndefined.undefined);
+                    list.Add( TypeConverter.getDefaultValue( t ).getValue(null) );
                 }
             }
             else if (newlen < list.Count)
@@ -349,15 +368,160 @@ namespace ASRuntime.nativefuncs
 
 
             return rtUndefined.undefined;
-                
+
         }
     }
 
-    class Array_insertAt : NativeFunctionBase
+
+
+
+    class Vector_toString : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_insertAt()
+        public Vector_toString()
+        {
+            _paras = new List<RunTimeDataType>();
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_vector_toString";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return _paras;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_string;
+            }
+        }
+
+
+
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            
+            var list = vd.innnerList;
+
+            StringBuilder asb = new StringBuilder();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                asb.Append(
+                    list[i].rtType != RunTimeDataType.rt_void ?
+                    (list[i].rtType == RunTimeDataType.rt_string ?
+                    ((rtString)list[i]).valueString() :
+                    (list[i].rtType == RunTimeDataType.rt_null ? String.Empty : list[i].ToString())) : String.Empty);
+                asb.Append(",");
+            }
+            if (asb.Length > 0)
+            {
+                asb.Remove(asb.Length - 1, 1);
+            }
+            return new rtString(asb.ToString());
+        }
+    }
+
+
+    class Vector__concat : NativeFunctionBase
+    {
+        private List<RunTimeDataType> _paras;
+
+        public Vector__concat()
+        {
+            _paras = new List<RunTimeDataType>();
+            _paras.Add(RunTimeDataType.rt_void);
+            _paras.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_vector__concat";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return _paras;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.fun_void;
+            }
+        }
+
+
+
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)argements[0].getValue()).value).unmanaged_object);
+
+            if (argements[1].getValue().rtType == RunTimeDataType.rt_null)
+            {
+                errormessage = "Cannot access a property or method of a null object reference.";
+                errorno = 1009;
+                return rtUndefined.undefined;
+            }
+
+            var vs = ((Vector_Data)((UnmanagedObject)((rtObject)argements[1].getValue()).value).unmanaged_object);
+
+            vd.innnerList.AddRange(vs.innnerList);
+
+
+            return rtUndefined.undefined;
+        }
+    }
+
+
+
+    class Vector_insertAt : NativeFunctionBase
+    {
+        private List<RunTimeDataType> _paras;
+
+        public Vector_insertAt()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -376,7 +540,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_insertAt";
+                return "_vector_insertat";
             }
         }
 
@@ -401,21 +565,29 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
+
+            var arr = vd.innnerList;
 
             int idx = ((rtInt)argements[0].getValue()).value;
             var toinsert = argements[1].getValue();
             if (idx < 0)
             {
-                idx = arr.innerArray.Count + idx;
+                idx = arr.Count + idx;
                 if (idx < 0) { idx = 0; }
             }
-            else if (idx > arr.innerArray.Count)
+            else if (idx > arr.Count)
             {
-                idx = arr.innerArray.Count;
+                idx = arr.Count;
             }
 
-            arr.innerArray.Insert(idx, toinsert);
+            arr.Insert(idx, toinsert);
 
 
             return rtUndefined.undefined;
@@ -423,16 +595,14 @@ namespace ASRuntime.nativefuncs
         }
     }
 
-
-
-    class Array_join : NativeFunctionBase
+    class Vector_join : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_join()
+        public Vector_join()
         {
             _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_void);
+            _paras.Add(RunTimeDataType.rt_string);
         }
 
         public override bool isMethod
@@ -447,7 +617,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_join";
+                return "_vector_join";
             }
         }
 
@@ -486,9 +656,9 @@ namespace ASRuntime.nativefuncs
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
 
-            rtArray array = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var arr = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object).innnerList;
 
-            if (array.innerArray.Count == 0)
+            if (arr.Count == 0)
             {
                 cb.call(cb.args);
                 resultSlot.directSet(new rtString(string.Empty));
@@ -502,7 +672,7 @@ namespace ASRuntime.nativefuncs
 
             object[] sendargs = new object[8];
             sendargs[0] = cb;
-            sendargs[1] = array;
+            sendargs[1] = arr;
             sendargs[2] = frame;
             sendargs[3] = token;
             sendargs[4] = scope;
@@ -526,7 +696,7 @@ namespace ASRuntime.nativefuncs
             IRunTimeValue aSep = (IRunTimeValue)receiveArgs[5];
             if (aSep.rtType != RunTimeDataType.rt_null)
             {
-                string sep = TypeConverter.ConvertToString( frame._tempSlot1.getValue(),frame,(SourceToken)receiveArgs[3]);
+                string sep = TypeConverter.ConvertToString(frame._tempSlot1.getValue(), frame, (SourceToken)receiveArgs[3]);
                 receiveArgs[5] = sep;
             }
             else
@@ -534,14 +704,14 @@ namespace ASRuntime.nativefuncs
                 receiveArgs[5] = ",";
             }
 
-            rtArray array = (rtArray)receiveArgs[1];
+            List<IRunTimeValue> array = (List<IRunTimeValue>)receiveArgs[1];
 
             BlockCallBackBase valueCB = new BlockCallBackBase();
             valueCB._intArg = sender._intArg + 1;
             valueCB.args = receiveArgs;
             valueCB.setCallBacker(_ValueToString_CB);
 
-            operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
+            operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
                 frame,
                 (SourceToken)receiveArgs[3],
                 (IRunTimeScope)receiveArgs[4],
@@ -555,15 +725,15 @@ namespace ASRuntime.nativefuncs
         {
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
-            rtArray array = (rtArray)receiveArgs[1];
-            
+            List<IRunTimeValue> array = (List<IRunTimeValue>)receiveArgs[1];
+
             StringBuilder sb = (StringBuilder)receiveArgs[6];
             SourceToken token = (SourceToken)receiveArgs[3];
 
             string aSep = (string)receiveArgs[5];
             string toappend = TypeConverter.ConvertToString(frame._tempSlot1.getValue(), frame, token);
-            sb.Append(toappend == null ? "null" : toappend);
-            if (sender._intArg < array.innerArray.Count)
+            sb.Append(toappend== null?"null":toappend);
+            if (sender._intArg < array.Count)
             {
                 sb.Append(aSep);
 
@@ -573,7 +743,7 @@ namespace ASRuntime.nativefuncs
                 valueCB.args = receiveArgs;
                 valueCB.setCallBacker(_ValueToString_CB);
 
-                operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
+                operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
                     frame,
                     (SourceToken)receiveArgs[3],
                     (IRunTimeScope)receiveArgs[4],
@@ -586,7 +756,7 @@ namespace ASRuntime.nativefuncs
             {
                 ISLOT result = (ISLOT)receiveArgs[7];
 
-                result.directSet(new rtString( sb.ToString() ));
+                result.directSet(new rtString(sb.ToString()));
 
                 IBlockCallBack cb = (IBlockCallBack)receiveArgs[0];
                 cb.call(cb.args);
@@ -595,12 +765,11 @@ namespace ASRuntime.nativefuncs
         }
     }
 
-
-    class Array_pop : NativeFunctionBase
+    class Vector_pop : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_pop()
+        public Vector_pop()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -617,7 +786,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_pop";
+                return "_vector_pop";
             }
         }
 
@@ -642,12 +811,20 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-
-            if (arr.innerArray.Count > 0)
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
             {
-                var result = arr.innerArray[arr.innerArray.Count - 1];
-                arr.innerArray.RemoveAt(arr.innerArray.Count-1);
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
+
+            var arr = vd.innnerList;
+
+            if (arr.Count > 0)
+            {
+                var result = arr[arr.Count - 1];
+                arr.RemoveAt(arr.Count - 1);
                 return result;
             }
             else
@@ -655,18 +832,17 @@ namespace ASRuntime.nativefuncs
                 return rtUndefined.undefined;
             }
 
-            
         }
     }
 
-    class Array_push : NativeFunctionBase
+    class Vector_push : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_push()
+        public Vector_push()
         {
             _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_array);
+            _paras.Add(RunTimeDataType.rt_void);
         }
 
         public override bool isMethod
@@ -681,7 +857,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_push";
+                return "_vector_push";
             }
         }
 
@@ -706,26 +882,28 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-            var args = argements[0].getValue();
-
-            if (args.rtType == RunTimeDataType.rt_array)
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
             {
-                var arglist = ((rtArray)args).innerArray;
-                arr.innerArray.AddRange(arglist);
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
             }
-            
-            return new rtUInt((uint)arr.innerArray.Count);
-            
 
+            var arr = vd.innnerList;
+
+            arr.Add(argements[0].getValue());
+
+            return new rtUInt((uint)arr.Count);
         }
     }
 
-    class Array_removeAt : NativeFunctionBase
+
+    class Vector_removeAt : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_removeAt()
+        public Vector_removeAt()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -743,7 +921,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_removeat";
+                return "_vector_removeAt";
             }
         }
 
@@ -768,31 +946,43 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
+
+            var arr = vd.innnerList;
 
             int idx = ((rtInt)argements[0].getValue()).value;
             if (idx < 0)
             {
-                idx = arr.innerArray.Count + idx;
+                idx = arr.Count + idx;
                 if (idx < 0) { idx = 0; }
             }
-            else if (idx > arr.innerArray.Count-1)
+            else if (idx > arr.Count - 1)
             {
+                errorno = 1125;
+                errormessage = "The index "+idx+" is out of range "+arr.Count+".";
+
                 return rtUndefined.undefined;
             }
 
-            var r = arr.innerArray[idx];
-            arr.innerArray.RemoveAt(idx);
+            var r = arr[idx];
+            arr.RemoveAt(idx);
             return r;
 
         }
     }
 
-    class Array_reverse : NativeFunctionBase
+
+    class Vector_reverse : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_reverse()
+        public Vector_reverse()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -809,61 +999,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_reverse";
-            }
-        }
-
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return _paras;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_array;
-            }
-        }
-
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-            arr.innerArray.Reverse();
-            return arr;
-
-
-        }
-    }
-
-    class Array_shift : NativeFunctionBase
-    {
-        private List<RunTimeDataType> _paras;
-
-        public Array_shift()
-        {
-            _paras = new List<RunTimeDataType>();
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_array_shift";
+                return "_vector_reverse";
             }
         }
 
@@ -888,12 +1024,79 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            
 
-            if (arr.innerArray.Count > 0)
+            var arr = vd.innnerList;
+
+            arr.Reverse();
+
+            return thisObj;
+        }
+    }
+
+
+
+    class Vector_shift : NativeFunctionBase
+    {
+        private List<RunTimeDataType> _paras;
+
+        public Vector_shift()
+        {
+            _paras = new List<RunTimeDataType>();
+        }
+
+        public override bool isMethod
+        {
+            get
             {
-                var result = arr.innerArray[0];
-                arr.innerArray.RemoveAt(0);
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_vector_shift";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return _paras;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
+
+            var arr = vd.innnerList;
+
+            if (arr.Count > 0)
+            {
+                var result = arr[0];
+                arr.RemoveAt(0);
                 return result;
             }
             else
@@ -901,19 +1104,20 @@ namespace ASRuntime.nativefuncs
                 return rtUndefined.undefined;
             }
 
-
         }
     }
 
-    class Array_slice : NativeFunctionBase
+
+    class Vector_slice : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_slice()
+        public Vector_slice()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
             _paras.Add(RunTimeDataType.rt_int);
+            _paras.Add(RunTimeDataType.rt_void);
         }
 
         public override bool isMethod
@@ -928,7 +1132,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_slice";
+                return "_vector_slice";
             }
         }
 
@@ -944,7 +1148,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return RunTimeDataType.rt_array;
+                return RunTimeDataType.rt_void;
             }
         }
 
@@ -953,58 +1157,61 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
 
-            int startindex =  ((rtInt)argements[0].getValue()).value;
+            var source = ((Vector_Data)((UnmanagedObject)((rtObject)argements[2].getValue()).value).unmanaged_object).innnerList;
+
+            var arr = source;
+
+            int startindex = ((rtInt)argements[0].getValue()).value;
             int endindex = ((rtInt)argements[1].getValue()).value;
 
-            if (startindex >= arr.innerArray.Count)
+            if (startindex >= arr.Count)
             {
                 return new rtArray();
             }
             else if (startindex < 0)
             {
-                startindex = arr.innerArray.Count + startindex;
+                startindex = arr.Count + startindex;
                 if (startindex < 0)
                 {
                     startindex = 0;
                 }
             }
 
-            if (endindex > arr.innerArray.Count)
+            if (endindex > arr.Count)
             {
-                endindex = arr.innerArray.Count ;
+                endindex = arr.Count;
             }
             else if (endindex < 0)
             {
-                endindex = arr.innerArray.Count + endindex;
+                endindex = arr.Count + endindex;
                 if (endindex < 0)
                 {
                     endindex = 0;
                 }
             }
 
-            rtArray newArray = new rtArray();
             for (int i = startindex; i < endindex; i++)
             {
-                newArray.innerArray.Add(arr.innerArray[i]);
+                vd.innnerList.Add(arr[i]);
             }
 
-            return newArray;
+            return thisObj;
 
         }
     }
 
-    class Array_splice : NativeFunctionBase
+    class Vector_splice : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_splice()
+        public Vector_splice()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
             _paras.Add(RunTimeDataType.rt_uint);
-            _paras.Add(RunTimeDataType.rt_array);
+            _paras.Add(RunTimeDataType.rt_void);
         }
 
         public override bool isMethod
@@ -1019,7 +1226,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return "_array_splice";
+                return "_vector_splice";
             }
         }
 
@@ -1035,7 +1242,7 @@ namespace ASRuntime.nativefuncs
         {
             get
             {
-                return RunTimeDataType.rt_array;
+                return RunTimeDataType.rt_int;
             }
         }
 
@@ -1044,7 +1251,11 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+
+            var source = ((Vector_Data)((UnmanagedObject)((rtObject)argements[2].getValue()).value).unmanaged_object);
+            
+            var arr = source.innnerList;
 
             int startindex = ((rtInt)argements[0].getValue()).value;
             uint deleteCount = ((rtUInt)argements[1].getValue()).value;
@@ -1057,227 +1268,37 @@ namespace ASRuntime.nativefuncs
 
             if (startindex < 0)
             {
-                startindex = arr.innerArray.Count + startindex;
+                startindex = arr.Count + startindex;
                 if (startindex < 0)
                 {
                     startindex = 0;
                 }
             }
 
-            rtArray newArray = new rtArray();
+            var newArray = vd.innnerList;
 
             int st = startindex;
-            while (deleteCount>0 && st< arr.innerArray.Count)
+            while (deleteCount > 0 && st < arr.Count)
             {
-                newArray.innerArray.Add(arr.innerArray[st]);
+                if (source.isFixed)
+                {
+                    errorno = 1126;
+                    errormessage = "Cannot change the length of a fixed Vector.";
+                    return rtUndefined.undefined;
+                }
+
+                newArray.Add(arr[st]);
                 st++;
                 deleteCount--;
             }
 
-            if (newArray.innerArray.Count > 0)
+            if (newArray.Count > 0)
             {
-                arr.innerArray.RemoveRange(startindex, newArray.innerArray.Count);
+                arr.RemoveRange(startindex, newArray.Count);
             }
 
-            if (insert != null)
-            {
-                arr.innerArray.InsertRange(startindex, insert);
-            }
-
-            if (newArray.innerArray.Count > 0)
-            {
-                return newArray;
-            }
-            else
-            {
-                return rtNull.nullptr;
-            }
+            return new rtInt(startindex);
 
         }
     }
-
-    class Array_unshift : NativeFunctionBase
-    {
-        private List<RunTimeDataType> _paras;
-
-        public Array_unshift()
-        {
-            _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_array);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_array_unshift";
-            }
-        }
-
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return _paras;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_uint;
-            }
-        }
-
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-            var args = argements[0].getValue();
-
-            if (args.rtType == RunTimeDataType.rt_array)
-            {
-                var arglist = ((rtArray)args).innerArray;
-                arr.innerArray.InsertRange(0,arglist);
-            }
-
-            return new rtUInt((uint)arr.innerArray.Count);
-
-
-        }
-    }
-
-
-    class Array_concat : NativeFunctionBase
-    {
-        private List<RunTimeDataType> _paras;
-
-        public Array_concat()
-        {
-            _paras = new List<RunTimeDataType>();
-            _paras.Add(RunTimeDataType.rt_array);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_array_concat";
-            }
-        }
-
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return _paras;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_array;
-            }
-        }
-
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-            var args = argements[0].getValue();
-
-            rtArray result = new rtArray();
-            result.innerArray.AddRange(arr.innerArray);
-
-            if (args.rtType == RunTimeDataType.rt_array)
-            {
-                var arglist = ((rtArray)args).innerArray;
-                result.innerArray.AddRange(arglist);
-            }
-
-            return result;
-
-        }
-    }
-
-
-
-    class Array_toString : NativeFunctionBase
-    {
-        private List<RunTimeDataType> _paras;
-
-        public Array_toString()
-        {
-            _paras = new List<RunTimeDataType>();
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_array_toString";
-            }
-        }
-
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return _paras;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_string;
-            }
-        }
-
-        
-
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-
-            return new rtString(arr.ToString());
-        }
-    }
-
-
 }

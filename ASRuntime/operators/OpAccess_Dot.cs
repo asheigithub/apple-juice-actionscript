@@ -191,6 +191,57 @@ namespace ASRuntime.operators
 
         }
 
+        /// <summary>
+        /// 从原型链中查找对象
+        /// </summary>
+        /// <returns></returns>
+        public static DynamicObject findInProtoType(DynamicObject dobj,string name,StackFrame frame,SourceToken token,out bool haserror)
+        {
+            haserror = false;
+            //***从原型链中查找对象***
+            while (dobj != null && !dobj.hasproperty(name))
+            {
+                if (dobj._prototype_ != null
+                    //&&
+                    //dobj._prototype_.value is DynamicObject
+                    )
+                {
+                    var protoObj = dobj._prototype_;
+                    //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
+                    if (protoObj._class.classid == 8) //Function 
+                    {
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
+                    }
+                    else if (protoObj._class.classid == 1) //搜索到根Object
+                    {
+                        dobj = null;
+                    }
+                    else
+                    {
+                        haserror = true;
+                        frame.throwError((new error.InternalError(token,
+                             "遭遇了异常的_prototype_"
+                             )));
+                        break;
+                    }
+                }
+                else
+                {
+                    dobj = null;
+                }
+            }
+
+            if (dobj == null || haserror)
+            {
+                return null;
+            }
+            else
+            {
+                return dobj;
+            }
+        }
+
+
         private static void _exec_dot_name(rtObject rtObj,string name,OpStep step,StackFrame frame,IRunTimeScope scope,Player player)
         {
             do
@@ -241,7 +292,7 @@ namespace ASRuntime.operators
                             }
                         }
                     }
-
+                    
 
 
                     //***从对象中查找***
@@ -264,18 +315,60 @@ namespace ASRuntime.operators
                         {
                             DynamicObject dobj = (DynamicObject)rtObj.value;
 
-                            if (!dobj.hasproperty(name))
+                            bool haserror;
+                            dobj = findInProtoType(dobj, name, frame, step.token, out haserror);
+                            if (haserror)
                             {
-                                DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj, true);
-                                heapslot._propname = name;
-                                heapslot.directSet(rtUndefined.undefined);
-                                dobj.createproperty(name, heapslot);
+                                break;
                             }
-
+                            
                             StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
                             if (dslot != null)
                             {
-                                dslot.linkTo(dobj[name]);
+                                if (dobj == null || !dobj.hasproperty(name))
+                                {
+                                    //原型链中也不存在对象
+                                    dobj = (DynamicObject)rtObj.value;
+                                    DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj, true);
+                                    heapslot._propname = name;
+                                    heapslot.directSet(rtUndefined.undefined);
+                                    dobj.createproperty(name, heapslot);
+                                }
+
+                                ISLOT v = dobj[name];
+                                if( !ReferenceEquals(dobj,rtObj.value) )
+                                {
+                                    if (v.getValue().rtType == RunTimeDataType.rt_function)
+                                    {
+                                        ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
+                                        tempslot.directSet(v.getValue());
+                                        v = tempslot;
+                                    }
+                                    else if (v.getValue().rtType > RunTimeDataType.unknown)
+                                    {
+                                        RunTimeDataType tout;
+                                        if (TypeConverter.Object_CanImplicit_ToPrimitive(v.getValue().rtType,
+                                            player.swc, out tout))
+                                        {
+                                            if (tout == RunTimeDataType.rt_function)
+                                            {
+                                                ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
+                                                tempslot.directSet(
+                                                    TypeConverter.ObjectImplicit_ToPrimitive(
+                                                    (rtObject)v.getValue()));
+
+                                                v = tempslot;
+                                            }
+                                        }
+                                    }
+
+                                    prototypeSlot pslot = new prototypeSlot(rtObj, name, v);
+                                    v = pslot;
+                                    //dslot._protoRootObj = (DynamicObject)rtObj.value;
+                                    //dslot._protoname = name;
+                                }
+
+                                dslot.linkTo(v);
                             }
                             else
                             {
@@ -372,7 +465,16 @@ namespace ASRuntime.operators
                         return;
                     }
                 }
-
+                else if (obj is rtObject)
+                {
+                    if (player.swc.dict_Vector_type.ContainsKey(((rtObject)obj).value._class))
+                    {
+                        //说明是Vector数组
+                        OpVector.exec_AccessorBind_ConvertIdx(player, frame, step, scope);
+                        return;
+                    }
+                }
+                
 
                 if (!(obj is rtObject))
                 {
@@ -467,15 +569,173 @@ namespace ASRuntime.operators
 
                     //***访问数组的内容***
                     StackSlot stackSlot= (StackSlot)step.reg.getISlot(scope);
-                    stackSlot.fromArray = (rtArray)obj;
-                    stackSlot.fromArrayIndex = (int)number;
+                    //stackSlot.fromArray = (rtArray)obj;
+                    //stackSlot.fromArrayIndex = (int)number;
 
-                    step.reg.getISlot(scope).directSet(((rtArray)obj).innerArray[(int)number]);
+                    //step.reg.getISlot(scope).directSet(((rtArray)obj).innerArray[(int)number]);
+                    stackSlot.linkTo(new arraySlot((rtArray)obj, (int)number));
+
                     frame.endStep();
                     return true;
                 }
             }
             return false;
+        }
+
+        internal class arraySlot : ISLOT
+        {
+            rtArray array;
+            int idx;
+            public arraySlot(rtArray array,int idx)
+            {
+                this.array = array;
+                this.idx = idx;
+            }
+
+            public bool isPropGetterSetter
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public void clear()
+            {
+                //throw new NotImplementedException();
+            }
+
+            public bool directSet(IRunTimeValue value)
+            {
+                array.innerArray[idx] = (IRunTimeValue)value.Clone(); //对数组的直接赋值，需要Clone
+                return true;
+                //throw new NotImplementedException();
+            }
+
+            public IRunTimeValue getValue()
+            {
+                return array.innerArray[idx];
+                //throw new NotImplementedException();
+            }
+
+            public void setValue(rtUndefined value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(rtNull value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(int value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(string value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(uint value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(double value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(rtBoolean value)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        class prototypeSlot : ISLOT
+        {
+            internal rtObject _protoRootObj;
+            internal string _protoname;
+
+            private ISLOT findSlot;
+
+            public prototypeSlot(rtObject _protoRootObj, string _protoname,
+                ISLOT findSlot
+                )
+            {
+                this._protoRootObj = _protoRootObj;
+                this._protoname = _protoname;
+                this.findSlot = findSlot;
+            }
+
+
+            public bool isPropGetterSetter
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+            public void clear()
+            {
+                //throw new NotImplementedException();
+            }
+
+            public bool directSet(IRunTimeValue value)
+            {
+                //throw new NotImplementedException();
+                DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true);
+                heapslot._propname = _protoname;
+                heapslot.directSet(value);
+                ((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
+
+                return true;
+            }
+
+            public IRunTimeValue getValue()
+            {
+                return findSlot.getValue();
+                //throw new NotImplementedException();
+            }
+
+            public void setValue(rtUndefined value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(rtNull value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(int value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(string value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(uint value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(double value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void setValue(rtBoolean value)
+            {
+                throw new NotImplementedException();
+            }
         }
 
     }

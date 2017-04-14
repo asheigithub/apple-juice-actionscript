@@ -21,12 +21,12 @@ namespace ASRuntime.operators
 
         public FunctionCaller constructorCaller;
 
-        public ISLOT objectResult;
+        public ASBinCode.rtData.rtObject objectResult;
 
         /// <summary>
         /// 是否是通过Function对象创建
         /// </summary>
-        public ASBinCode.rtData.rtFunction constructor;
+        public ASBinCode.rtData.rtObject constructor;
         private FunctionCaller _function_constructor;
 
         public InstanceCreator(Player player, StackFrame invokerFrame,OpStep step , SourceToken token,ASBinCode.rtti.Class _class)
@@ -57,7 +57,9 @@ namespace ASRuntime.operators
                 _function_constructor = new FunctionCaller(player, invokerFrame, token);
                 _function_constructor._tempSlot = invokerFrame._tempSlot1;
                 _function_constructor.toCallFunc = 
-                    player.swc.functions[constructor.functionId];
+                    player.swc.functions[ ((ASBinCode.rtData.rtFunction)
+                    TypeConverter.ObjectImplicit_ToPrimitive( constructor)).functionId];
+
                 _function_constructor.createParaScope();
             }
 
@@ -87,7 +89,7 @@ namespace ASRuntime.operators
 
                 player.static_instance.Add(cls.staticClass.classid,
                     new ASBinCode.rtData.rtObject(obj, objScope));
-
+                
                 return player.step_toblockend();
             }
             else
@@ -202,13 +204,25 @@ namespace ASRuntime.operators
             if (obj._class.classid == 0 && obj._class.staticClass != null)
             {
                 DynamicObject dobj = (DynamicObject)obj;
-                Global_Object global = (Global_Object)objScope.parent.this_pointer.value;
+                Global_Object global = (Global_Object)((ASBinCode.rtData.rtObject)objScope.parent.this_pointer).value;
 
-                dobj.createproperty("toString", new DynamicPropertySlot(_object, false));
-                dobj["toString"].directSet(global["toString"].getValue());
+                //dobj.createproperty("toString", new DynamicPropertySlot(_object, false));
+                //dobj["toString"].directSet(global["toString"].getValue());
 
-                dobj.createproperty("valueOf", new DynamicPropertySlot(_object, false));
-                dobj["valueOf"].directSet(global["valueOf"].getValue());
+                //dobj.createproperty("valueOf", new DynamicPropertySlot(_object, false));
+                //dobj["valueOf"].directSet(global["valueOf"].getValue());
+
+                
+                if (constructor == null)
+                {
+                    dobj.createproperty("constructor", new DynamicPropertySlot(_object, false));
+                    dobj["constructor"].directSet(player.static_instance[obj._class.staticClass.classid]);
+                    dobj._prototype_ = (DynamicObject)player.static_instance[_class.staticClass.classid].value;
+                }
+                else
+                {
+                    dobj._prototype_ =  (DynamicObject)constructor.value;
+                }
             }
 
 
@@ -242,11 +256,17 @@ namespace ASRuntime.operators
             }
         }
 
+        
+
+
+
+
         private void exec_step3(ASBinCode.rtData.rtObject rtobject)
         {
             if (constructor == null)
             {
-                objectResult.directSet(rtobject);
+                objectResult = rtobject;
+                //objectResult.directSet(rtobject);
                 if (callbacker != null)
                 {
                     callbacker.call(this);
@@ -256,7 +276,7 @@ namespace ASRuntime.operators
             {
                 HeapSlot _temp = new HeapSlot();
                 _function_constructor.returnSlot = _temp;
-                _function_constructor.function = (ASBinCode.rtData.rtFunction)constructor.Clone();
+                _function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
                 _function_constructor.function.setThis(rtobject);
 
                 BlockCallBackBase cb = new BlockCallBackBase();
@@ -270,7 +290,8 @@ namespace ASRuntime.operators
 
         private void _finalStep(BlockCallBackBase sender,object args)
         {
-            objectResult.directSet((ASBinCode.rtData.rtObject)sender.args);
+            objectResult = (ASBinCode.rtData.rtObject)sender.args;
+            //objectResult.directSet((ASBinCode.rtData.rtObject)sender.args);
             if (callbacker != null)
             {
                 callbacker.call(this);
@@ -289,10 +310,15 @@ namespace ASRuntime.operators
             {
                 obj = new DynamicObject(cls);
             }
+            else if (cls.isUnmanaged)
+            {
+                obj = new UnmanagedObject(cls);
+            }
             else
             {
                 obj = new ASBinCode.rtti.Object(cls);
             }
+           
 
             obj.memberData = new ObjectMemberSlot[cls.fields.Count];
 

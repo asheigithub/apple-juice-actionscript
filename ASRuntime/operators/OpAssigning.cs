@@ -21,6 +21,24 @@ namespace ASRuntime.operators
                     {
                         slot = ((StackSlot)slot).linktarget;
                     }
+
+                    if (slot is OpVector.vectorSLot)    //Vector类型不匹配
+                    {
+                        BlockCallBackBase cb = new BlockCallBackBase();
+                        cb.scope = scope;
+                        cb.step = step;
+                        cb.args = frame;
+                        cb.setCallBacker(_vectorConvertCallBacker);
+                        
+                        //***调用强制类型转换***
+                        OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
+                            frame, step.token, scope, frame._tempSlot1, cb, false);
+
+                        return;
+                    }
+
+
+
                     string ext = String.Empty;
                     if (slot is ClassMethodGetter.MethodSlot)
                     {
@@ -58,6 +76,25 @@ namespace ASRuntime.operators
 
             }
 
+        }
+
+        private static void _vectorConvertCallBacker(BlockCallBackBase sender,object args)
+        {
+            StackFrame frame = (StackFrame)sender.args;
+            OpStep step = sender.step;
+
+            ASBinCode.IRunTimeValue v = frame._tempSlot1.getValue();
+            ASBinCode.ISLOT slot = step.reg.getISlot(sender.scope);
+
+            if (!slot.directSet(v))
+            {
+                frame.throwCastException(step.token,
+                       step.arg1.getValue(sender.scope).rtType,
+                       ((OpVector.vectorSLot)((StackSlot)slot).linktarget).vector_data.vector_type
+                        );
+            }
+
+            frame.endStep(step);
         }
 
 

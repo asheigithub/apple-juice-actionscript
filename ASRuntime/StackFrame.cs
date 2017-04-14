@@ -434,6 +434,15 @@ namespace ASRuntime
                 case OpCode.array_push:
                     operators.OpArray.exec_Push(player, this, step, scope);
                     break;
+                case OpCode.array_create:
+                    operators.OpArray.exec_create(player, this, step, scope);
+                    break;
+                case OpCode.vectorAccessor_bind:
+                    operators.OpVector.exec_AccessorBind(player, this, step, scope);
+                    break;
+                case OpCode.vector_push:
+                    operators.OpVector.exec_push(player, this, step, scope);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,

@@ -10,7 +10,6 @@ namespace ASCTest
     {
         static void Main(string[] args)
         {
-            
             ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";
@@ -122,34 +121,35 @@ namespace ASCTest
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.bin;
-
-                for (int i = 0; i < swc.blocks.Count ; i++)
+                if (swc != null)
                 {
-                    var block = swc.blocks[i];
-                    if (block != null)
+                    for (int i = 0; i < swc.blocks.Count; i++)
                     {
-                        Console.WriteLine();
-                        Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
-                        Console.WriteLine();
-                        Console.WriteLine("total registers:" + block.totalRegisters);
-                        Console.WriteLine(block.ToString());
+                        var block = swc.blocks[i];
+                        if (block != null)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
+                            Console.WriteLine();
+                            Console.WriteLine("total registers:" + block.totalRegisters);
+                            Console.WriteLine(block.ToString());
+                        }
                     }
-                }
 
-                if (swc.blocks.Count > 0)
-                {
-                    ASRuntime.Player player = new ASRuntime.Player();
-                    player.loadCode(swc);
+                    if (swc.blocks.Count > 0)
+                    {
+                        ASRuntime.Player player = new ASRuntime.Player();
+                        player.loadCode(swc);
 
 
+                        Console.WriteLine();
+                        Console.WriteLine("====程序输出====");
+
+                        player.run2(null);
+
+                    }
                     Console.WriteLine();
-                    Console.WriteLine("====程序输出====");
-
-                    player.run2(null);
-
                 }
-                Console.WriteLine();
-                
 
             }
 

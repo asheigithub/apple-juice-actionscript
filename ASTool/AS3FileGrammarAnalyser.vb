@@ -1200,6 +1200,17 @@ Public Class AS3FileGrammarAnalyser
 
         func.TypeStr = getFuncTypeStr(node.Nodes(5))
 
+        If TypeOf MemberScopeStack.Peek() Is AS3Class Then
+            If CType(MemberScopeStack.Peek(), AS3Class).Name = func.TypeStr Then
+                func.TypeDefine = MemberScopeStack.Peek()
+            End If
+        ElseIf TypeOf MemberScopeStack.Peek() Is AS3Interface Then
+            If CType(MemberScopeStack.Peek(), AS3Interface).Name = func.TypeStr Then
+                func.TypeDefine = MemberScopeStack.Peek()
+            End If
+        End If
+
+
         func.FunctionBody = node.Nodes(6)
 
         func.ParentScope = MemberScopeStack.Peek()
@@ -1945,7 +1956,7 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes(0).Nodes(0).GrammerLeftNode.Name = "F_Variable" Then
             Dim tempscope As New AS3MemberListBase(Nothing)
             Dim currentno = MemberScopeStack.Peek().LastRegId()
-            While tempscope.LastRegId() <currentno
+            While tempscope.LastRegId() < currentno
                 tempscope.NextRegId()
             End While
 
@@ -3052,8 +3063,8 @@ Public Class AS3FileGrammarAnalyser
 
             'If op.OpCode <> "++" And op.OpCode <> "--" Then
             Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId())
-                op.Arg1 = arg1
-                op.Arg2 = arg2
+            op.Arg1 = arg1
+            op.Arg2 = arg2
 
             'Else
             '    op.Arg1 = arg2
@@ -3627,7 +3638,11 @@ Public Class AS3FileGrammarAnalyser
 
             End If
 
+            If MemberScopeStack.Peek().ExprDataStack.Count = 0 Then
 
+                Throw New GrammarException(node.MatchedToken, "没有发现预期的xml对象")
+
+            End If
 
 
             Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()    'xml对象
@@ -3808,9 +3823,18 @@ Public Class AS3FileGrammarAnalyser
             MemberScopeStack.Peek().ExprDataStack.Push(data)
 
         ElseIf node.Nodes.Count = 4 Then
+
+
+            If current_new_operator.Count > 0 AndAlso
+                current_new_operator.Peek().Equals(current_visiting_expression.Peek()) Then
+
+            Else
+                Throw New GrammarException(node.MatchedToken, "Syntax error: Expected SCOPE_CLOSE but reached the end of the file instead.")
+            End If
+
             vecotr.VectorTypeStr = GrammerExpr.getNodeValue(node.Nodes(1))
 
-
+            vecotr.isInitData = True
 
             VisitNodes(node.Nodes(3))
             node.exprsteplist.AddRange(node.Nodes(3).exprsteplist)

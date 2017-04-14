@@ -329,10 +329,26 @@ namespace ASBinCode
         /// </summary>
         cast_primitive=83,
 
+
+        array_create=84,
         /// <summary>
         /// 往原始数组对象中追加元素
         /// </summary>
-        array_push=84,
+        array_push=85,
 
+        ///// <summary>
+        ///// 初始化Vector
+        ///// </summary>
+        //init_vector =85,
+
+        
+        /// <summary>
+        /// 绑定Vector访问器
+        /// </summary>
+        vectorAccessor_bind=86,
+        /// <summary>
+        /// 往vector里追加元素
+        /// </summary>
+        vector_push=87,
     }
 }

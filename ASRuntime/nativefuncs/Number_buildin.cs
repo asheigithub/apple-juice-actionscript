@@ -48,7 +48,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -76,7 +76,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtNumber)thisObj.value.memberData[0].getValue()).value.ToString("g" + (r))
+                        ((rtNumber)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("g" + (r))
 
                         );
                 }
@@ -132,7 +132,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -160,7 +160,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtNumber)thisObj.value.memberData[0].getValue()).value.ToString("e" + (r + 1))
+                        ((rtNumber)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("e" + (r + 1))
 
                         );
                 }
@@ -215,7 +215,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -243,7 +243,7 @@ namespace ASRuntime.nativefuncs
                     return
                         new rtString(
 
-                        ((rtNumber)thisObj.value.memberData[0].getValue()).value.ToString("f" + (r))
+                        ((rtNumber)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("f" + (r))
 
                         );
                 }
@@ -299,7 +299,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -324,7 +324,7 @@ namespace ASRuntime.nativefuncs
                     errormessage = null;
                     errorno = 0;
 
-                    var toCastV = ((rtNumber)thisObj.value.memberData[0].getValue()).value;
+                    var toCastV = ((rtNumber)((rtObject)thisObj).value.memberData[0].getValue()).value;
 
 
 
@@ -424,7 +424,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 2)
             {
@@ -492,7 +492,7 @@ namespace ASRuntime.nativefuncs
 
 
         private static Random rnd=new Random();
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length >0)
             {
@@ -556,7 +556,7 @@ namespace ASRuntime.nativefuncs
         }
     }
 
-    public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+    public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
     {
         if (argements.Length < 1)
         {
@@ -631,7 +631,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -705,7 +705,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -780,7 +780,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -854,7 +854,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -928,7 +928,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1002,7 +1002,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1076,7 +1076,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1151,7 +1151,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 2)
             {
@@ -1217,7 +1217,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1291,7 +1291,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1365,7 +1365,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1439,7 +1439,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
@@ -1513,7 +1513,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(rtObject thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
         {
             if (argements.Length < 1)
             {
