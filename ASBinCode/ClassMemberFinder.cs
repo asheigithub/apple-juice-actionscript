@@ -13,7 +13,7 @@ namespace ASBinCode
             
             )
         {
-            for (int i = 0; i < cls.classMembers.Count; i++)
+            for (int i = cls.classMembers.Count-1; i >=0; i--)
             {
                 if (cls.classMembers[i].name == name)
                 {
@@ -21,7 +21,7 @@ namespace ASBinCode
                     if (!member.isPublic)
                     {
                         if (finder != null)
-                        { 
+                        {
                             if (member.isInternal)
                             {
                                 if (finder.package == cls.package)
@@ -35,6 +35,10 @@ namespace ASBinCode
                                 {
                                     return cls.classMembers[i];
                                 }
+                            }
+                            else if (finder == cls)
+                            {
+                                return cls.classMembers[i];
                             }
                         }
                     }

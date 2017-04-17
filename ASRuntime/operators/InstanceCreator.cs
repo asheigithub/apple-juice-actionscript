@@ -312,7 +312,7 @@ namespace ASRuntime.operators
             }
             else if (cls.isUnmanaged)
             {
-                obj = new UnmanagedObject(cls);
+                obj = new HostedObject(cls);
             }
             else
             {

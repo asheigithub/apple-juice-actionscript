@@ -76,7 +76,7 @@
     <Compile Include="rtti\Global_Object.cs" />
     <Compile Include="rtti\IImportable.cs" />
     <Compile Include="rtti\Object.cs" />
-    <Compile Include="rtti\UnmanagedObject.cs" />
+    <Compile Include="rtti\HostedObject.cs" />
     <Compile Include="rtti\Vector_Data.cs" />
     <Compile Include="RunTimeDataType.cs" />
     <Compile Include="scopes\FunctionScope.cs" />

@@ -1035,7 +1035,10 @@ namespace ASCompiler.compiler.builds
                     {
                         IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false, builder,matchtoken);
 
-                        if (member == null && builder._currentImports.Count > 0)
+                        if (member == null && builder._currentImports.Count > 0
+                            ||
+                            (member is ClassMethodGetter && ((ClassMethodGetter)member).classmember.isConstructor)
+                            )
                         {
                             string t = data.Data.Value.ToString();
                             //查找导入的类

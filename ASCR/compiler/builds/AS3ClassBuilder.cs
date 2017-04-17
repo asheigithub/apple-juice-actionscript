@@ -260,7 +260,7 @@ namespace ASCompiler.compiler.builds
                                     cls.isdocumentclass = true;
                                 }
                             }
-                            else if (m.Value.Data.Value.ToString() == "unmanaged")
+                            else if (m.Value.Data.Value.ToString() == "hosted")
                             {
                                 cls.isUnmanaged = true;
                             }
@@ -302,7 +302,7 @@ namespace ASCompiler.compiler.builds
             metaclass.package = as3class.Package.Name;
             metaclass.ispackageout = false;
             metaclass.isPublic = as3class.Access.IsPublic;
-            metaclass.name = as3class.Name + "_static";
+            metaclass.name = "$" + as3class.Name ;
             metaclass.dynamic = true;
             metaclass.final = true;
 

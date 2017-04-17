@@ -11,7 +11,7 @@ namespace ASRuntime.nativefuncs
     {
         public static RunTimeDataType getVectorType(IRunTimeValue thisObj, IClassFinder bin)
         {
-            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
             var t = rtObj.memberData[0].getValue();
 
@@ -88,7 +88,7 @@ namespace ASRuntime.nativefuncs
 
             //throw new NotImplementedException();
 
-            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
             RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
 
@@ -102,7 +102,7 @@ namespace ASRuntime.nativefuncs
                 data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null));
             }
 
-            rtObj.unmanaged_object = data;
+            rtObj.hosted_object = data;
 
             return ASBinCode.rtData.rtUndefined.undefined;
         }
@@ -159,10 +159,10 @@ namespace ASRuntime.nativefuncs
 
 
            
-            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
 
-            if (((Vector_Data)rtObj.unmanaged_object).isFixed)
+            if (((Vector_Data)rtObj.hosted_object).isFixed)
             {
                 return rtBoolean.True;
             }
@@ -223,9 +223,9 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.UnmanagedObject rtObj = (ASBinCode.rtti.UnmanagedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
-            ((Vector_Data)rtObj.unmanaged_object).isFixed = ((rtBoolean)argements[0].getValue()).value;
+            ((Vector_Data)rtObj.hosted_object).isFixed = ((rtBoolean)argements[0].getValue()).value;
 
             return rtUndefined.undefined;
         }
@@ -282,7 +282,7 @@ namespace ASRuntime.nativefuncs
             return
                 new rtUInt(
                     (uint)((Vector_Data)
-                    ((UnmanagedObject)(((rtObject)thisObj).value)).unmanaged_object).innnerList.Count
+                    ((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count
                 )
                 ;
         }
@@ -335,7 +335,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errormessage = "Cannot change the length of a fixed Vector";
@@ -423,7 +423,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             
             var list = vd.innnerList;
 
@@ -497,7 +497,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)argements[0].getValue()).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)argements[0].getValue()).value).hosted_object);
 
             if (argements[1].getValue().rtType == RunTimeDataType.rt_null)
             {
@@ -506,7 +506,7 @@ namespace ASRuntime.nativefuncs
                 return rtUndefined.undefined;
             }
 
-            var vs = ((Vector_Data)((UnmanagedObject)((rtObject)argements[1].getValue()).value).unmanaged_object);
+            var vs = ((Vector_Data)((HostedObject)((rtObject)argements[1].getValue()).value).hosted_object);
 
             vd.innnerList.AddRange(vs.innnerList);
 
@@ -565,7 +565,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errorno = 1126;
@@ -656,7 +656,7 @@ namespace ASRuntime.nativefuncs
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
 
-            var arr = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object).innnerList;
+            var arr = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object).innnerList;
 
             if (arr.Count == 0)
             {
@@ -811,7 +811,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errorno = 1126;
@@ -882,7 +882,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errorno = 1126;
@@ -946,7 +946,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errorno = 1126;
@@ -1024,7 +1024,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             
 
             var arr = vd.innnerList;
@@ -1083,7 +1083,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
             if (vd.isFixed)
             {
                 errorno = 1126;
@@ -1157,9 +1157,9 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
 
-            var source = ((Vector_Data)((UnmanagedObject)((rtObject)argements[2].getValue()).value).unmanaged_object).innnerList;
+            var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object).innnerList;
 
             var arr = source;
 
@@ -1251,9 +1251,9 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            var vd = ((Vector_Data)((UnmanagedObject)((rtObject)thisObj).value).unmanaged_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
 
-            var source = ((Vector_Data)((UnmanagedObject)((rtObject)argements[2].getValue()).value).unmanaged_object);
+            var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object);
             
             var arr = source.innnerList;
 

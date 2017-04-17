@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.UnmanagedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).unmanaged_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
             int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope), frame, step.token);
 
@@ -37,7 +37,7 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind_ConvertIdx(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.UnmanagedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).unmanaged_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
 
             var idxvalue = step.arg2.getValue(scope);
@@ -94,7 +94,7 @@ namespace ASRuntime.operators
 
         public static void exec_push(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.UnmanagedObject)((rtObject)step.arg1.getValue(scope)).value).unmanaged_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
             o.innnerList.Add((IRunTimeValue)step.arg2.getValue(scope).Clone());
 

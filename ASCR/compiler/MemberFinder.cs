@@ -25,14 +25,20 @@ namespace ASCompiler.compiler
                     {
                         cls = cls.staticClass;
                     }
-                    for (int i = 0; i < cls.classMembers.Count; i++)
+                    //for (int i = 0; i < cls.classMembers.Count; i++)
+                    //{
+                    //    if (cls.classMembers[i].name == name)
+                    //    {
+                    //        return ((ASBinCode.IMember)cls.classMembers[i].bindField);
+                    //    }
+                    //}
+
+                    var fm = ASBinCode.ClassMemberFinder.find(cls, name, cls);
+                    if (fm != null)
                     {
-                        if (cls.classMembers[i].name == name)
-                        {
-                            return ((ASBinCode.IMember)cls.classMembers[i].bindField);
-                        }
+                        return fm.bindField;
                     }
-                    
+
                 }
 
 
