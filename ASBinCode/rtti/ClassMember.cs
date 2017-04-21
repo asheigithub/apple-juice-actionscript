@@ -9,7 +9,7 @@ namespace ASBinCode.rtti
     /// </summary>
     public class ClassMember
     {
-
+        
         public bool isPublic;
         public bool isInternal;
         public bool isPrivate;
@@ -29,6 +29,8 @@ namespace ASBinCode.rtti
         /// 是否覆盖基类方法
         /// </summary>
         public bool isOverride;
+
+        public bool isFinal;
 
         /// <summary>
         /// 是否是静态成员
@@ -58,6 +60,19 @@ namespace ASBinCode.rtti
         public readonly Class refClass;
 
         public readonly IMember bindField;
+
+        /// <summary>
+        /// 从哪个类继承而来
+        /// </summary>
+        public Class inheritFrom;
+        /// <summary>
+        /// 继承源
+        /// </summary>
+        public ClassMember inheritSrcMember;
+
+
+        public ClassMember virtualLink;
+        public Class virtualLinkFromClass;
 
         public ClassMember(string name,Class refClass, IMember bindField)
         {

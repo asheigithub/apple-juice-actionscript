@@ -35,6 +35,7 @@ namespace ASRuntime
             if (value.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)getValue();
+
                 if (function.this_pointer == null || !function.ismethod)
                 {
                     function.setThis(obj);

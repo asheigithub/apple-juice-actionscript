@@ -1163,6 +1163,9 @@ Public Class AS3FileGrammarAnalyser
 
             If (funcprop.Nodes(0).Nodes.Count = 0) Then
                 func.IsAnonymous = True
+                func.IsMethod = False
+                func.Access.IsStatic = False
+
             End If
 
         Else
@@ -1171,6 +1174,8 @@ Public Class AS3FileGrammarAnalyser
 
                 If (funcprop.Nodes(0).Nodes.Count = 0) Then
                     func.IsAnonymous = True
+                    func.IsMethod = False
+                    func.Access.IsStatic = False
                 End If
 
             Else
@@ -1184,6 +1189,8 @@ Public Class AS3FileGrammarAnalyser
 
                 If (funcprop.Nodes(1).Nodes.Count = 0) Then
                     func.IsAnonymous = True
+                    func.IsMethod = False
+                    func.Access.IsStatic = False
                 End If
 
             End If
@@ -1471,12 +1478,12 @@ Public Class AS3FileGrammarAnalyser
         VisitNodes(node.Nodes(5))
 
 
-        Dim finallyblock As New List(Of IAS3Stmt)
-        MemberScopeStack.Peek().StamentsStack.Push(finallyblock)
-        VisitNodes(node.Nodes(6))
+
 
         If node.Nodes(6).MatchedToken.StringValue = "finally" Then
-
+            Dim finallyblock As New List(Of IAS3Stmt)
+            MemberScopeStack.Peek().StamentsStack.Push(finallyblock)
+            VisitNodes(node.Nodes(6))
             as3try.FinallyBlock = MemberScopeStack.Peek().StamentsStack.Pop()
 
 
@@ -1689,7 +1696,6 @@ Public Class AS3FileGrammarAnalyser
         If memberaccessStack.Count > 0 Then
             Dim temp = memberaccessStack.ToArray()
             variable.Access.SetValue(memberaccessStack)
-
             For Each t In temp
                 memberaccessStack.Push(t)
             Next

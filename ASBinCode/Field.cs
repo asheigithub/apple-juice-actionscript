@@ -7,7 +7,7 @@ namespace ASBinCode
     /// <summary>
     /// 类字段
     /// </summary>
-    public class Field : Variable
+    public sealed class Field : VariableBase
     {
         public bool isPublic;
         public bool isInternal;
@@ -21,6 +21,26 @@ namespace ASBinCode
 
         }
 
+        public override ISLOT getISlot(IRunTimeScope scope)
+        {
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
+#if DEBUG
+            //***检查类的继承关系***
+            rtData.rtObject obj = (rtData.rtObject)scope.this_pointer;
+            var cls = obj.value._class;
+
+            while (cls.blockid != refblockid)
+            {
+                cls = cls.super;
+            }
+#endif
+
+            return scope.memberData[indexOfMembers];
+        }
 
         protected override IMember _clone()
         {

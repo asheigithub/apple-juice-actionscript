@@ -21,6 +21,8 @@ namespace ASBinCode.rtti
         ///// </summary>
         //public Class bindClass;
 
+        public bool isStatic;
+
         public bool isConstructor;
 
         public FunctionSignature signature;

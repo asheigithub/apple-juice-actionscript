@@ -237,7 +237,7 @@ namespace ASRuntime.operators
 
                         )
                     {
-                        function = (rtFunction)((ILeftValue)toStr.bindField).getValue(obj.objScope);
+                        function = (rtFunction)((ClassMethodGetter)toStr.bindField).getMethod(obj.objScope);
                     }
                     else
                     {
@@ -270,15 +270,45 @@ namespace ASRuntime.operators
                                 }
                             }
 
-                            //if (dobj.hasproperty("toString"))
-                            //{
-                            //    var prop = dobj["toString"].getValue();
+                        }
+                        else
+                        {
+                            //***从Class定义的原型链中查找
+                            var dobj = (ASBinCode.rtti.DynamicObject)
+                                frame.player.static_instance[obj.value._class.staticClass.classid].value;
 
-                            //    if (prop is rtFunction)
-                            //    {
-                            //        function = (rtFunction)prop;
-                            //    }
-                            //}
+                            dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                            if (!dobj.hasproperty("toString"))
+                            {
+
+                                dobj = ((ASBinCode.rtti.DynamicObject)
+                                    frame.player.static_instance[obj.value._class.staticClass.classid].value);
+
+                                bool haserror;
+                                dobj = OpAccess_Dot.findInProtoType(dobj, "toString", 
+                                    frame, token, out haserror);
+                                if (haserror)
+                                {
+                                    frame.endStep();
+                                    return;
+                                }
+                            }
+
+                            if (dobj != null)
+                            {
+                                var prop = dobj["toString"].getValue();
+                                if (prop is rtFunction)
+                                {
+                                    function = (rtFunction)prop;
+
+                                    if (!ReferenceEquals(dobj, obj.value))
+                                    {
+                                        function = (rtFunction)function.Clone();
+                                        function.setThis(obj);
+                                    }
+
+                                }
+                            }
                         }
 
                     }
@@ -317,11 +347,79 @@ namespace ASRuntime.operators
                     }
                     #endregion
                 }
+                else if (targetType > ASBinCode.RunTimeDataType.unknown && srcValue.rtType > RunTimeDataType.unknown)
+                {
+                    if (ClassMemberFinder.check_isinherits(srcValue, targetType, frame.player.swc))
+                    {
+                        storeto.directSet(srcValue);
+                        callbacker.isSuccess = true;
+                        callbacker.call(null);
+                    }
+                    else
+                    {
+                        //**检查基类
+                        frame.throwCastException(token, srcValue.rtType, targetType);
+                        frame.endStep();
+                    }
+                }
                 else if (targetType > ASBinCode.RunTimeDataType.unknown)
                 {
-                    //**检查基类
-                    frame.throwCastException(token, srcValue.rtType, targetType);
-                    frame.endStep();
+                    //***从基本类型转换为引用类型***
+                    if (srcValue.rtType != RunTimeDataType.rt_void)
+                    {
+                        var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
+                        if (cls != null)
+                        {
+                            if (ClassMemberFinder.check_isinherits(cls.instanceClass.getRtType()
+                                ,
+                                targetType, frame.player.swc))
+                            {
+                                var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getMethod(scope);
+
+                                FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
+                                fc.function = funConv;
+                                fc.loadDefineFromFunction();
+                                fc.createParaScope();
+                                fc.pushParameter(srcValue, 0);
+                                fc._tempSlot = frame._tempSlot1;
+                                fc.returnSlot = storeto;
+
+                                BlockCallBackBase cb = new BlockCallBackBase();
+                                cb.setCallBacker(_primivite_Obj);
+
+                                object[] sendargs = new object[7];
+                                sendargs[0] = frame;
+                                sendargs[1] = token;
+                                sendargs[2] = scope;
+                                sendargs[3] = storeto;
+                                sendargs[4] = callbacker;
+                                sendargs[5] = fc;
+                                sendargs[6] = srcValue;
+                                cb.args = sendargs;
+
+                                fc.callbacker = cb;
+                                fc.call();
+
+                                return;
+
+                            }
+                            else
+                            {
+                                frame.throwCastException(token, srcValue.rtType, targetType);
+                                frame.endStep();
+                            }
+                        }
+                        else
+                        {
+                            frame.throwCastException(token, srcValue.rtType, targetType);
+                            frame.endStep();
+                        }
+                    }
+                    else
+                    {
+                        frame.throwCastException(token, srcValue.rtType, targetType);
+                        frame.endStep();
+                    }
                 }
                 else
                 {
@@ -331,7 +429,7 @@ namespace ASRuntime.operators
                     {
                         CastValue(
                             TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue),
-                            targetType, frame, token, scope, storeto, callbacker,false
+                            targetType, frame, token, scope, storeto, callbacker, false
 
                             );
                         return;
@@ -439,6 +537,19 @@ namespace ASRuntime.operators
         }
 
 
+        private static void _primivite_Obj(BlockCallBackBase sender, object args)
+        {
+            object[] a = (object[])sender.args;
+            StackFrame frame = (StackFrame)a[0];
+            FunctionCaller fc = (FunctionCaller)a[5];
+
+            frame.endStep();
+        }
+
+
+
+
+
         public static void CastTwoValue(
             ASBinCode.IRunTimeValue srcValue1,
             ASBinCode.IRunTimeValue srcValue2,
@@ -512,7 +623,7 @@ namespace ASRuntime.operators
                 var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
                 if (cls != null)
                 {
-                    var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getValue(scope);
+                    var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getMethod(scope);
 
                     FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                     fc.function = funConv;
@@ -711,7 +822,7 @@ namespace ASRuntime.operators
                 && !valueOf.isSetter
                 )
             {
-                function = (rtFunction)((ILeftValue)valueOf.bindField).getValue(obj.objScope);
+                function = (rtFunction)((ClassMethodGetter)valueOf.bindField).getMethod(obj.objScope);
             }
             else
             {
@@ -957,7 +1068,7 @@ namespace ASRuntime.operators
                 && !toString.isSetter
                 )
             {
-                function = (rtFunction)((ILeftValue)toString.bindField).getValue(obj.objScope);
+                function = (rtFunction)((ClassMethodGetter)toString.bindField).getMethod(obj.objScope);
             }
             else
             {

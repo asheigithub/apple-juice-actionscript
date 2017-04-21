@@ -1,0 +1,8 @@
+﻿package	flash.display
+{
+	//临时用于可编译通过
+	public class Sprite
+	{
+		public function Sprite ();
+	}
+}

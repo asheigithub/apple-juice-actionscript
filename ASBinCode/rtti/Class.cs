@@ -56,6 +56,10 @@ namespace ASBinCode.rtti
         public bool dynamic;
         public bool final;
 
+
+        
+
+
         /// <summary>
         /// 是否公开。如果不是，则只能在相同包内访问
         /// </summary>

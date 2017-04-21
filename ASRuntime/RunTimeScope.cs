@@ -20,7 +20,8 @@ namespace ASRuntime
             int offset, int blockid,
             IRunTimeScope parent,
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
-            IRunTimeValue this_pointer
+            IRunTimeValue this_pointer,
+            RunTimeScopeType type
             //,
             //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
             )
@@ -33,6 +34,7 @@ namespace ASRuntime
             this.memberDataList = memberDataList;
             this._static_scope = _static_scope;
             _this_pointer = this_pointer;
+            _scopeType = type;
             //this._dictMethods = dictMethods;
         }
 
@@ -95,6 +97,16 @@ namespace ASRuntime
                 return _this_pointer;
             }
         }
+
+        private RunTimeScopeType _scopeType;
+        public RunTimeScopeType scopeType
+        {
+            get
+            {
+                return _scopeType;
+            }
+        }
+
 
         //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> _dictMethods;
         //public Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods

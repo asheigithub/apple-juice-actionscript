@@ -128,7 +128,7 @@ namespace ASRuntime
             
             var topscope = CallBlock(defaultblock,data ,new StackSlot(swc), null, 
                 new SourceToken(0, 0, ""),null,
-                null
+                null, RunTimeScopeType.startup
                 );
             
             
@@ -180,7 +180,7 @@ namespace ASRuntime
             {
                 memberDataList[i] = new HeapSlot();
                 memberDataList[i].setDefaultType(
-                    ((Variable)calledblock.scope.members[i]).valueType
+                    ((VariableBase)calledblock.scope.members[i]).valueType
                     );
             }
             return memberDataList;
@@ -192,7 +192,8 @@ namespace ASRuntime
             IRunTimeScope callerScope,
             SourceToken token,
             IBlockCallBack callbacker,
-            IRunTimeValue this_pointer
+            IRunTimeValue this_pointer,
+            RunTimeScopeType type
             )
         {
             StackFrame frame = new StackFrame();
@@ -231,7 +232,8 @@ namespace ASRuntime
                 ,
                 static_instance
                 ,
-                this_pointer
+                this_pointer,
+                type
                 //,
                 //frame._dictMethods
             );
@@ -241,13 +243,19 @@ namespace ASRuntime
             return frame.scope;
         }
 
+
+        internal int getRuntimeStackFlag()
+        {
+            return runtimeStack.Count;
+        }
+
         /// <summary>
         /// 执行到当前代码块结束
         /// </summary>
         /// <returns></returns>
-        internal bool step_toblockend()
+        internal bool step_toStackflag(int stackflag)
         {
-            int f = runtimeStack.Count - 1;
+            int f = stackflag;
             while (step() && receive_error==null)
             {
                 if (runtimeStack.Count == f)

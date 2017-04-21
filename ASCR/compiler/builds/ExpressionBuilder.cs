@@ -475,11 +475,11 @@ namespace ASCompiler.compiler.builds
 
                 if (step.Arg1.IsReg) //在类似短路操作等编译过程中可能成为赋值目标
                 {
-                    
-                    IRightValue rv = getRightValue(env, step.Arg2, step.token,builder);
+
+                    IRightValue rv = getRightValue(env, step.Arg2, step.token, builder);
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-                    
+
                     //当是暂存成员访问中间结果时
                     if (eax._regMember == null)
                     {
@@ -501,6 +501,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "const成员" + eax._regMember.name + "不能在此赋值"));
                     }
+                    
 
                     ////***如果是成员访问的中间缓存，则需要转型
                     if (rv.valueType != eax.valueType)
@@ -520,15 +521,15 @@ namespace ASCompiler.compiler.builds
                     op.arg2Type = RunTimeDataType.unknown;
 
                     env.block.opSteps.Add(op);
-                    
-                    
 
-                   
+
+
+
 
                 }
                 else if (
                     step.Arg1.Data.FF1Type != ASTool.AS3.Expr.FF1DataValueType.identifier
-                    
+
                     )
                 {
                     throw new BuildException(
@@ -537,7 +538,7 @@ namespace ASCompiler.compiler.builds
                 }
                 else
                 {
-                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env,false,builder,step.token);
+                    IMember member = MemberFinder.find(step.Arg1.Data.Value.ToString(), env, false, builder, step.token);
 
                     if (member == null)
                     {
@@ -546,16 +547,90 @@ namespace ASCompiler.compiler.builds
                             "成员" + step.Arg1.Data.Value + "未找到"));
                     }
 
-                    if (member is Variable && ((Variable)member).isConst)
+                    if (member is VariableBase && ((VariableBase)member).isConst)
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "const成员" + step.Arg1.Data.Value + "不能在此赋值"));
                     }
 
-                    if (member is ASBinCode.ILeftValue)
+                    ILeftValue memberLeftValue = member as ILeftValue;
+
+                    if (member is FindStaticMember)
                     {
-                        ILeftValue lv = (ILeftValue)member;
+                        memberLeftValue = ((FindStaticMember)member).buildAccessThisMember(step.token, env);
+
+                        if (((Register)memberLeftValue)._regMember.bindField is ClassMethodGetter
+                            ||
+                            ((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
+                            ||
+                            (((Register)memberLeftValue)._regMember.bindField is VariableBase
+                                &&
+                                ((VariableBase)((Register)memberLeftValue)._regMember.bindField).isConst
+                            )
+                            )
+                        {
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "Illegal assignment to " + step.Arg1.Data.Value));
+                        }
+
+                    }
+
+                    if (member is FindOutPackageScopeMember)
+                    {
+                        var fo = (FindOutPackageScopeMember)member;
+                        if (fo.member is VariableBase)
+                        {
+                            int blockid = ((VariableBase)fo.member).refdefinedinblockid;
+                            if (builder.dictSignatures.ContainsKey(blockid))
+                            {
+                                if (builder.dictSignatures[blockid].ContainsKey(fo.member))
+                                {
+                                    var signature =
+                                         builder.dictSignatures[blockid][fo.member];
+
+                                    foreach (var item in builder.buildoutfunctions)
+                                    {
+                                        if (item.Value.signature == signature)
+                                        {
+                                            if (!item.Value.IsAnonymous)
+                                            {
+                                                throw new BuildException(
+                                                    new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                                    "Illegal assignment to function " + item.Value.name));
+                                            }
+
+                                            break;
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+
+
+
+                        memberLeftValue = ((FindOutPackageScopeMember)member).buildAccessThisMember(step.token, env);
+                    }
+
+                    if (memberLeftValue is ClassPropertyGetter)
+                    {
+                        ClassPropertyGetter prop = (ClassPropertyGetter)memberLeftValue;
+                        buildPropSet(prop, step, prop.name, env, prop._class,
+                            getRightValue(env, step.Arg2, step.token, builder),
+                            
+                            new ThisPointer(env.block.scope)
+                            ,
+                            
+                            env.getAdditionalRegister());
+                        return;
+                    }
+
+                    if (memberLeftValue !=null)//member is ASBinCode.ILeftValue)
+                    {
+                        ILeftValue lv = memberLeftValue;//(ILeftValue)member;
 
                         IRightValue rv = getRightValue(env, step.Arg2, step.token,builder);
 
@@ -586,6 +661,7 @@ namespace ASCompiler.compiler.builds
                             op.arg2Type = RunTimeDataType.unknown;
 
                             env.block.opSteps.Add(op);
+
                         }
 
                     }
@@ -1033,7 +1109,7 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false, builder,matchtoken);
+                        IMember member = MemberFinder.find(data.Data.Value.ToString(), env, false, builder, matchtoken);
 
                         if (member == null && builder._currentImports.Count > 0
                             ||
@@ -1063,6 +1139,17 @@ namespace ASCompiler.compiler.builds
                                     );
                             }
                         }
+
+                        if (member is FindStaticMember)
+                        {
+                            return ((FindStaticMember)member).buildAccessThisMember(matchtoken, env);
+                        }
+
+                        if (member is FindOutPackageScopeMember)
+                        {
+                            return ((FindOutPackageScopeMember)member).buildAccessThisMember(matchtoken, env);
+                        }
+
 
                         if (member == null && builder._currentImports.Count > 0)
                         {
@@ -1128,6 +1215,18 @@ namespace ASCompiler.compiler.builds
                         env.block.scope is ASBinCode.scopes.FunctionScope
                         )
                     {
+                        if (env.block.scope is ASBinCode.scopes.FunctionScope)
+                        {
+                            var func = ((ASBinCode.scopes.FunctionScope)env.block.scope).function;
+                            if (func.isStatic)
+                            {
+                                throw new BuildException(
+                                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                                            "The 'this' keyword can not be used in static methods.It can only be used in instance methods, function closures, and global code."));
+                            }
+                        }
+
+
                         return new ThisPointer(env.block.scope);
                     }
                     else
@@ -1135,6 +1234,41 @@ namespace ASCompiler.compiler.builds
                         throw new BuildException(
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
                             "this不能出现在这里"));
+                    }
+
+                }
+                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.super_pointer)
+                {
+                    if (env.isEval)
+                    {
+                        throw new BuildException(
+                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                            "表达式求值时不考虑super "));
+                    }
+
+                    if (env.block.scope is ASBinCode.scopes.FunctionScope
+                        &&
+                        env.block.scope.parentScope is ASBinCode.scopes.ObjectInstanceScope
+                        )
+                    {
+                        var func = ((ASBinCode.scopes.FunctionScope)env.block.scope).function;
+                        if (func.isStatic || !func.isMethod)
+                        {
+                            throw new BuildException(
+                                        new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                                        "A super expression can be used only inside class instance methods."));
+                        }
+
+                        return new SuperPointer(
+                            ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class.super,
+                            ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class
+                            );
+                    }
+                    else
+                    {
+                        throw new BuildException(
+                            new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
+                            "A super expression can be used only inside class instance methods."));
                     }
 
                 }
@@ -1161,7 +1295,7 @@ namespace ASCompiler.compiler.builds
                     Register eax = env.getAdditionalRegister();
                     //***创建对象实例
                     {
-                        var found = TypeReader.findClassFromImports("Object", builder,matchtoken);
+                        var found = TypeReader.findClassFromImports("Object", builder, matchtoken);
                         var item = found[0];
                         OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                         stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
@@ -1242,11 +1376,11 @@ namespace ASCompiler.compiler.builds
                     ASTool.AS3.AS3Vector vector = (ASTool.AS3.AS3Vector)data.Data.Value;
                     string typeStr = vector.VectorTypeStr;
 
-                    var _vector_= TypeReader.fromSourceCodeStr( "Vector.<" + typeStr + ">", matchtoken, builder);
+                    var _vector_ = TypeReader.fromSourceCodeStr("Vector.<" + typeStr + ">", matchtoken, builder);
 
                     var _class = builder.getClassByRunTimeDataType(_vector_);
 
-                    
+
 
                     if (vector.Constructor == null)
                     {
@@ -1285,8 +1419,8 @@ namespace ASCompiler.compiler.builds
                             //***强制类型转换
                             if (ASRuntime.TypeConverter.testImplicitConvert(init_data.valueType, _class.getRtType(), builder))
                             {
-                                return addCastOpStep(env, init_data, _class.getRtType(), 
-                                    new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile)
+                                return addCastOpStep(env, init_data, _class.getRtType(),
+                                    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
                                     , builder);
                             }
                             else
@@ -1328,7 +1462,7 @@ namespace ASCompiler.compiler.builds
                                         vtstr = builder.getClassByRunTimeDataType(vt).name;
                                     }
 
-                                    throw (new BuildException(new BuildError(matchtoken.line, 
+                                    throw (new BuildException(new BuildError(matchtoken.line,
                                         matchtoken.ptr, matchtoken.sourceFile,
                                                 "不能将[" + d.valueType + "]类型存入Vector.<" + vtstr + ">")));
 
@@ -1341,7 +1475,7 @@ namespace ASCompiler.compiler.builds
                                         , builder);
                                 }
 
-                                OpStep oppush = new OpStep(OpCode.vector_push, 
+                                OpStep oppush = new OpStep(OpCode.vector_push,
                                     new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                                 oppush.reg = null;
                                 oppush.regType = RunTimeDataType.unknown;
@@ -1727,10 +1861,10 @@ namespace ASCompiler.compiler.builds
                             "类型[" + v1.valueType + "]不能进行一元操作[delete]");
                     }
 
-                    if (v1 is Variable)
+                    if (v1 is VariableBase)
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "成员[" + ((Variable)v1).name + "]不能进行一元操作[delete]");
+                            "成员[" + ((VariableBase)v1).name + "]不能进行一元操作[delete]");
                     }
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);

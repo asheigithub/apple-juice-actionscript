@@ -157,6 +157,28 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public dynamic class Class extends Object
+        ///	{
+        ///		private var _protoObj:*=new Object();
+        ///		public function get prototype():*
+        ///		{
+        ///			return _protoObj;
+        ///		}
+        ///
+        ///		public function Class ();
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string Class {
+            get {
+                return ResourceManager.GetString("Class", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	public final dynamic class Function extends Object
         ///	{
         ///		
@@ -274,16 +296,44 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
+        ///   查找类似 package	flash.display
+        ///{
+        ///	//临时用于可编译通过
+        ///	public class Sprite
+        ///	{
+        ///		public function Sprite ();
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string Sprite {
+            get {
+                return ResourceManager.GetString("Sprite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 package
         ///{
+        ///	[imports]
+        ///	[hosted]
         ///	public class Vector.&lt;T&gt;
         ///	{
         ///		private const t = T;
         ///
         ///		[native,_vector_constructor]
-        ///		public function Vector.&lt;T&gt;(...rest);
-        ///	}
-        ///} 的本地化字符串。
+        ///		public function Vector.&lt;T&gt;(length:uint = 0, fixed:Boolean = false);
+        ///
+        ///		[native,_vector_getfixed]
+        ///		public function get fixed() : Boolean;
+        ///		[native,_vector_setfixed]
+        ///		public function set fixed(value:Boolean):void;
+        ///
+        ///		[native,_vector_getlength]
+        ///		public function get length():uint;
+        ///		[native,_vector_setlength]
+        ///    		public function set length(value:uint):void;
+        ///
+        ///		public function toString():S [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Vector {
             get {

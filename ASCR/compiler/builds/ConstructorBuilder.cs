@@ -91,11 +91,21 @@ namespace ASCompiler.compiler.builds
                                     new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                                     "Method cannot be used as a constructor."));
                             }
-                            else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function )
+                            else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function)
                             {
                                 //从Class对象中new
                                 build_void(env, cls, step, builder);
-                                
+
+                                return;
+                            }
+                            else if (cls.valueType > RunTimeDataType.unknown &&
+                                (builder.getClassByRunTimeDataType(cls.valueType).classid == 2
+                                ||
+                                builder.getClassByRunTimeDataType(cls.valueType).classid == 0
+                                ))
+                            {
+                                build_void(env, cls, step, builder);
+
                                 return;
                             }
                             else

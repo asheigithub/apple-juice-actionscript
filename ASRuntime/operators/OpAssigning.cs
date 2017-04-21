@@ -72,7 +72,9 @@ namespace ASRuntime.operators
                 _doPropAssigning(prop, frame, step, player, scope,
                     //propslot.bindObj
                     ((StackSlot)slot).propBindObj
-                    , v);
+                    , v,
+                    (StackSlot)slot
+                    );
 
             }
 
@@ -100,7 +102,7 @@ namespace ASRuntime.operators
 
         public static void _doPropAssigning(ClassPropertyGetter prop,StackFrame frame,
             OpStep step,Player player,IRunTimeScope scope,
-            ASBinCode.rtData.rtObject bindobj,IRunTimeValue v)
+            ASBinCode.rtData.rtObject bindobj,IRunTimeValue v , StackSlot sslot )
         {
             do
             {
@@ -137,9 +139,21 @@ namespace ASRuntime.operators
                 }
 
                 //***读取setter***
-                var func = ((ClassMethodGetter)setter.bindField).getValue(
-                    bindobj.objScope
-                    );
+                IRunTimeValue func;
+
+                if (sslot.superPropBindClass != null)
+                {
+                    func = ((ClassMethodGetter)setter.bindField).getSuperMethod(
+                        bindobj.objScope,
+                        sslot.superPropBindClass
+                        );
+                }
+                else
+                {
+                    func = ((ClassMethodGetter)setter.bindField).getMethod(
+                        bindobj.objScope
+                        );
+                }
                 //***调用设置器***
 
                 var funCaller = new FunctionCaller(player, frame, step.token);

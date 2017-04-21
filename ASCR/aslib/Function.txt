@@ -46,8 +46,10 @@
 			throw "The form function('function body') is not supported."
 		}
 
+		[novisual];
 		[native,_function_fill]
 		private static function _fill(tofill:*,value:Function):void;
+		[novisual];
 		[native,_function_load]
 		private static function _loadFunctionObject(value:Function):*;
 

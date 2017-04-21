@@ -43,7 +43,7 @@ namespace ASCompiler.compiler.builds
                             //**尝试查找类***
 
                             //查找导入的类
-                            var found = TypeReader.findClassFromImports(path, builder,step.token);
+                            var found = TypeReader.findClassFromImports(path, builder, step.token);
                             if (found.Count == 1)
                             {
                                 var item = found[0];
@@ -137,7 +137,7 @@ namespace ASCompiler.compiler.builds
                             {
                                 var cls = builder.bin.primitive_to_class_table[v1.valueType];
                                 v1 = ExpressionBuilder.addCastOpStep(env, v1, builder.bin.primitive_to_class_table[v1.valueType].getRtType(),
-                                    new SourceToken(step.token.line,step.token.ptr,step.token.sourceFile)
+                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
                                     , builder
                                     );
                                 build_class(env, step, v1, cls, builder);
@@ -314,9 +314,12 @@ namespace ASCompiler.compiler.builds
             if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
             {
                 ASBinCode.rtti.ClassMember member = null;
+
+                
+                
                 //***查找对象成员***
                 member = MemberFinder.findClassMember(cls, step.Arg3.Data.Value.ToString(), env, builder);
-
+                
                 if (member == null)
                 {
                     if (cls.dynamic
@@ -332,9 +335,18 @@ namespace ASCompiler.compiler.builds
 
                 if (member == null)
                 {
-                    throw new BuildException(
-                       new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                       cls.name + "对象成员" + step.Arg3.Data.Value + "未找到"));
+                    if (v1 is SuperPointer)
+                    {
+                        throw new BuildException(
+                           new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                           "Attempted access of inaccessible property "+ step.Arg3.Data.Value +" through a reference with static type "+ ((SuperPointer)v1).thisClass.name +"."));
+                    }
+                    else
+                    {
+                        throw new BuildException(
+                           new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                           cls.name + "对象成员" + step.Arg3.Data.Value + "未找到"));
+                    }
                 }
                 if (!member.isConst && env.isEval)
                 {
@@ -366,12 +378,18 @@ namespace ASCompiler.compiler.builds
                 OpCode.access_dot
 
                 , new SourceToken(token.line, token.ptr, token.sourceFile));
+
+
+            IRightValue field = (IRightValue)member.bindField;
+
+
+
             op.reg = eax;
             op.regType = eax.valueType;
             op.arg1 = rvObj;
             op.arg1Type = rvObj.valueType;
-            op.arg2 = (IRightValue)member.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
-            op.arg2Type = member.valueType; //RunTimeDataType.rt_int;
+            op.arg2 = field;
+            op.arg2Type = member.valueType;
 
             env.block.opSteps.Add(op);
         }

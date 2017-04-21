@@ -74,10 +74,28 @@ namespace ASRuntime.operators
                     }
 
                     //***读取getter***
-                    var func = ((ClassMethodGetter)getter.bindField).getValue(
+
+                    StackSlot sslot = (StackSlot)slot;
+                    IRunTimeValue func;
+
+                    if (sslot.superPropBindClass !=null)
+                    {
+                        func = ((ClassMethodGetter)getter.bindField).getSuperMethod(
+                        //propslot.bindObj.objScope
+                        ((StackSlot)slot).propBindObj.objScope,
+                        sslot.superPropBindClass
+
+                        );
+                    }
+                    else
+                    {
+                        func = ((ClassMethodGetter)getter.bindField).getMethod(
                         //propslot.bindObj.objScope
                         ((StackSlot)slot).propBindObj.objScope
                         );
+
+                    }
+
                     //***调用设置器***
 
                     var funCaller = new FunctionCaller(player, frame, step.token);
@@ -126,7 +144,10 @@ namespace ASRuntime.operators
                 OpAssigning._doPropAssigning(slot.propGetSet, frame, step, player, scope,
                     slot.propBindObj
                     ,
-                    slot.getValue());
+                    slot.getValue()
+                    ,
+                    slot
+                    );
             }
             else
             {

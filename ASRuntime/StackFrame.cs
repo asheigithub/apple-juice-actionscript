@@ -371,9 +371,9 @@ namespace ASRuntime
                 case OpCode.bind_scope:
                     operators.OpCallFunction.bind(player,this,step);
                     break;
-                //case OpCode.bind_this:
-                //    operators.OpCallFunction.bind_this(player, this, step);
-                //    break;
+                case OpCode.clear_thispointer:
+                    operators.OpCallFunction.clear_thispointer(player, this, step,scope);
+                    break;
                 case OpCode.make_para_scope:
                     operators.OpCallFunction.create_paraScope(player, this, step);
                     break;
@@ -443,6 +443,12 @@ namespace ASRuntime
                 case OpCode.vector_push:
                     operators.OpVector.exec_push(player, this, step, scope);
                     break;
+                case OpCode.link_outpackagevairable:
+                    operators.OpLinkOutPackageScope.exec_link(player, this, step, scope);
+                    break;
+                case OpCode.flag_call_super_constructor:
+                    endStep(step);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
@@ -493,7 +499,7 @@ namespace ASRuntime
                             {
                                 if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope))
                                 {
-                                    ((Variable)op.reg).getISlot(scope).directSet(errorValue);
+                                    ((VariableBase)op.reg).getISlot(scope).directSet(errorValue);
                                     //引导到catch块
                                     codeLinePtr = j;
                                     foundcatch = true;
@@ -768,7 +774,9 @@ namespace ASRuntime
         internal void receiveErrorFromStackFrame(error.InternalError error)
         {
             runtimeError = error;
+
             endStep(block.opSteps[codeLinePtr]);
+            
         }
 
         private void enter_try( int tryid)

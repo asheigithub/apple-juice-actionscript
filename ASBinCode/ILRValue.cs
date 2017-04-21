@@ -22,9 +22,8 @@ namespace ASBinCode
     /// <typeparam name="T"></typeparam>
     public interface ILeftValue : IRightValue
     {
-        //void setValue(IRunTimeValue value ,IRunTimeScope scope);
         /// <summary>
-        /// 或
+        /// 
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>

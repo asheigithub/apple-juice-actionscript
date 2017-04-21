@@ -492,16 +492,22 @@ namespace ASRuntime
 
             if (f > rt.unknown || t > rt.unknown)
             {
-                var c1 = classfinder.getClassByRunTimeDataType(f);
-                var c2 = classfinder.getClassByRunTimeDataType(t);
+                //var c1 = classfinder.getClassByRunTimeDataType(f);
+                //var c2 = classfinder.getClassByRunTimeDataType(t);
 
-                if (ReferenceEquals(c1.staticClass, c2)
-                    ||
-                    ReferenceEquals(c2.staticClass,c1)
-                    )
+                //if (ReferenceEquals(c1.staticClass, c2)
+                //    ||
+                //    ReferenceEquals(c2.staticClass,c1)
+                //    )
+                //{
+                //    return false;
+                //}
+
+                if (ASBinCode.ClassMemberFinder.check_isinherits(f, t, classfinder)) //检查集成关系
                 {
-                    return false;
+                    return true;
                 }
+
 
                 return false;
 #if DEBUG

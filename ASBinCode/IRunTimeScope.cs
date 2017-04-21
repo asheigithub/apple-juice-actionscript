@@ -4,6 +4,14 @@ using System.Text;
 
 namespace ASBinCode
 {
+    public enum RunTimeScopeType
+    {
+        function,
+        objectinstance,
+        outpackagemember,
+        startup,
+    }
+
     /// <summary>
     /// 定义运行时的内存数据
     /// </summary>
@@ -11,7 +19,8 @@ namespace ASBinCode
     {
         IRunTimeScope parent { get; }
 
-       
+        RunTimeScopeType scopeType { get; }
+        
         //Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtData.rtObject, ISLOT>> dictMethods { get; }
 
         Dictionary<int, rtData.rtObject> static_objects { get; }

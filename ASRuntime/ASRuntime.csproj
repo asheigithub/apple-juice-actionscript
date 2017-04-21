@@ -63,6 +63,7 @@
     <Compile Include="operators\OpCreateInstance.cs" />
     <Compile Include="operators\OpDynamicProperty.cs" />
     <Compile Include="operators\OpIncrementDecrement.cs" />
+    <Compile Include="operators\OpLinkOutPackageScope.cs" />
     <Compile Include="operators\OpLogic.cs" />
     <Compile Include="operators\OpMulti.cs" />
     <Compile Include="operators\OpNeg.cs" />

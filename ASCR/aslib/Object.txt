@@ -5,7 +5,7 @@
 		public function Object ();
 	}
 }
-
+/*
 function toString():String
 {
 	return "[object Object]";
@@ -15,3 +15,4 @@ function valueOf():Object
 {
 	return this;
 }
+*/

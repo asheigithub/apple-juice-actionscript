@@ -9,11 +9,11 @@ namespace ASCompiler.compiler.builds
     {
         public void buildFuncCall(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
         {
-            if (step.Arg2.IsReg || step.Arg2.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.as3_function)
+            if (step.Arg2.IsReg || step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function)
             {
                 IRightValue rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
 
-                
+
 
                 OpStep op = new OpStep(OpCode.call_function,
                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -32,15 +32,22 @@ namespace ASCompiler.compiler.builds
                     Register reg = (Register)rValue;
                     if (reg._regMember != null)
                     {
+                        if (reg._regMember.isConstructor)   //不能直接调用构造函数
+                        {
+                            throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                                                "Attempted access of inaccessible method " + reg._regMember.name + " through a reference with static type " + reg._regMember.refClass.name + "."
+                                                );
+                        }
+
                         build_member_parameterSteps((IRightValue)reg._regMember.bindField,
-                            builder, eax, op, step, env, null, rValue);
+                            builder, eax, op, step, env, null, rValue, null);
 
                         env.block.opSteps.Add(op);
                         return;
                     }
 
                 }
-                
+
 
                 List<ASTool.AS3.Expr.AS3DataStackElement> args
                     = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
@@ -75,27 +82,62 @@ namespace ASCompiler.compiler.builds
                 #region "查找@__buildin__"
                 {
                     string name = step.Arg2.Data.Value.ToString();
-                    
-                        //***从__buildin__中查找
-                        var buildin = TypeReader.findClassFromImports("@__buildin__", builder,step.token);
-                        if (buildin.Count == 1)
+
+                    //***从__buildin__中查找
+                    var buildin = TypeReader.findClassFromImports("@__buildin__", builder, step.token);
+                    if (buildin.Count == 1)
+                    {
+                        if (env.isEval)
                         {
-                            if (env.isEval)
-                            {
-                                return;
-                            }
-
-                            var bi = buildin[0].staticClass;
-
-                            var member = ClassMemberFinder.find(bi, name, bi);
-                            if (member != null)
-                            {
-                                build_member(member.bindField, step, builder, env, bi, name);
-                                return;
-                            }
-
+                            return;
                         }
-                    
+
+                        var bi = buildin[0].staticClass;
+
+                        var member = ClassMemberFinder.find(bi, name, bi);
+                        if (member != null && member.valueType == RunTimeDataType.rt_function)
+                        {
+                            OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                            stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                                new ASBinCode.rtData.rtInt(bi.instanceClass.classid));
+                            stepInitClass.arg1Type = bi.getRtType();
+                            env.block.opSteps.Add(stepInitClass);
+
+                            var _buildin_ = new StaticClassDataGetter(bi);
+                            var eaxfunc = env.getAdditionalRegister();
+                            {
+
+                                eaxfunc.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                                AccessBuilder.make_dotStep(env, member, step.token, eaxfunc, _buildin_);
+
+                            }
+                            {
+                                OpStep op = new OpStep(OpCode.call_function,
+                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+                                var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                                op.reg = eax;
+                                op.regType = RunTimeDataType.rt_void;
+
+
+                                op.arg1 = eaxfunc;
+                                op.arg1Type = RunTimeDataType.rt_function;
+
+                                build_member_parameterSteps((IRightValue)member.bindField,
+                                    builder, eax, op, step, env, null, eaxfunc, null);
+
+                                env.block.opSteps.Add(op);
+
+                            }
+
+                            //build_member(member.bindField, step, builder, env, bi, name);
+                            return;
+                        }
+
+                    }
+
                 }
                 #endregion
                 //if (step.Arg2.Data.Value.ToString() == "trace")
@@ -144,7 +186,7 @@ namespace ASCompiler.compiler.builds
 
                     ASBinCode.rtti.Class _cls = null;
 
-                    IMember member = MemberFinder.find(name, env,false,builder,step.token);
+                    IMember member = MemberFinder.find(name, env, false, builder, step.token);
 
                     if (member == null
                         ||
@@ -152,10 +194,10 @@ namespace ASCompiler.compiler.builds
                         &&
                         ((ClassMethodGetter)member).classmember.isConstructor
                         )
-                        
+
                         )     //检查是否强制类型转换
                     {
-                        var found= TypeReader.findClassFromImports(name, builder,step.token);
+                        var found = TypeReader.findClassFromImports(name, builder, step.token);
                         if (found.Count == 1)   //说明为强制类型转换
                         {
                             ASBinCode.rtti.Class cls = found[0];
@@ -165,7 +207,7 @@ namespace ASCompiler.compiler.builds
 
                                 List<ASTool.AS3.Expr.AS3DataStackElement> args
                                 = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
-                                
+
                                 RunTimeDataType targettype = cls.instanceClass.getRtType();
                                 if (cls.implicit_from != null)      //将目标转换为原始对象
                                 {
@@ -182,7 +224,7 @@ namespace ASCompiler.compiler.builds
                                     member = cls.explicit_from.bindField;
                                     goto memberfinded;
                                 }
-                               
+
                                 {
                                     if (args.Count != 1)
                                     {
@@ -192,7 +234,7 @@ namespace ASCompiler.compiler.builds
                                     }
 
                                     IRightValue src = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
-                                    IRightValue ct= ExpressionBuilder.addCastOpStep(env, src, 
+                                    IRightValue ct = ExpressionBuilder.addCastOpStep(env, src,
                                         targettype, //cls.instanceClass.getRtType(), 
                                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
 
@@ -216,7 +258,71 @@ namespace ASCompiler.compiler.builds
                         }
                     }
 
-                memberfinded:
+                    if (member is FindStaticMember)
+                    {
+                        FindStaticMember fm = (FindStaticMember)member;
+                        if (ASRuntime.TypeConverter.testImplicitConvert(fm.classMember.valueType, RunTimeDataType.rt_function, builder))
+                        {
+                            IRightValue eaxfunc = fm.buildAccessThisMember(step.token, env);
+
+                            if (eaxfunc.valueType != RunTimeDataType.rt_function)
+                            {
+                                eaxfunc = ExpressionBuilder.addCastOpStep(env, eaxfunc, RunTimeDataType.rt_function,
+                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+                                    , builder);
+                            }
+
+                            {
+                                var oc = getOutPackageClass(env);
+
+                                OpStep clear = new OpStep(OpCode.clear_thispointer,
+                                     new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                                clear.arg1 = eaxfunc;
+                                clear.arg1Type = RunTimeDataType.rt_function;
+                                clear.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(oc.classid));
+                                clear.arg2Type = RunTimeDataType.rt_int;
+
+
+                                eaxfunc = env.getAdditionalRegister();
+                                ((Register)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                                clear.reg = (Register)eaxfunc;
+                                clear.regType = eaxfunc.valueType;
+
+
+                                env.block.opSteps.Add(clear);
+
+
+                                OpStep op = new OpStep(OpCode.call_function,
+                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+                                var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                                op.reg = eax;
+                                op.regType = RunTimeDataType.rt_void;
+
+
+                                op.arg1 = eaxfunc;
+                                op.arg1Type = RunTimeDataType.rt_function;
+
+                                build_member_parameterSteps((IRightValue)fm.classMember.bindField,
+                                    builder, eax, op, step, env, null, eaxfunc, null);
+
+                                env.block.opSteps.Add(op);
+
+                            }
+
+                            //build_member(member.bindField, step, builder, env, bi, name);
+                            return;
+                        }
+                        else
+                        {
+                            throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                                fm.static_class._class.name + "." + name + "不是一个function"
+                            );
+                        }
+                    }
+
+                    memberfinded:
 
                     if (member == null)
                     {
@@ -224,11 +330,48 @@ namespace ASCompiler.compiler.builds
                             "成员" + name + "没有找到"
                             );
                     }
-                    
+
                     build_member(member, step, builder, env, _cls, name);
 
 
                 }
+            }
+            else if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.super_pointer)
+            {
+                //***调用父类的构造函数***
+                //**首先自己必须是构造函数***
+                if (env.block.scope is ASBinCode.scopes.FunctionScope
+                    &&
+                     ((ASBinCode.scopes.FunctionScope)env.block.scope).function.isConstructor
+                    )
+                {
+                    OpStep f = new OpStep(OpCode.flag_call_super_constructor,new SourceToken(step.token.line,step.token.ptr,step.token.sourceFile));
+                    env.block.opSteps.Add(f);
+
+                    var superclass =
+                        ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class.super;
+                    while ( superclass !=null && superclass.constructor==null)
+                    {
+                        superclass = superclass.super;
+                    }
+
+                    if (superclass != null)
+                    {
+                        var c = superclass.constructor;
+                        build_member(c.bindField, step, builder, env,superclass, superclass.constructor.name);
+                    }
+
+
+                }
+                else
+                {
+                    throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                " A super statement can be used only inside class instance constructors."));
+                }
+                //throw new BuildException(
+                //            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                //            "super_pointer未实现"));
             }
             else
             {
@@ -240,14 +383,94 @@ namespace ASCompiler.compiler.builds
 
 
 
+        private ASBinCode.rtti.Class getOutPackageClass(CompileEnv env)
+        {
+            IScope scope = env.block.scope;
+            ASBinCode.rtti.Class oc = null;
 
+            while (true)
+            {
+                if (scope is ASBinCode.scopes.OutPackageMemberScope)
+                {
+                    oc = ((ASBinCode.scopes.OutPackageMemberScope)scope).mainclass;
+                    break;
+                }
+                else if (scope is ASBinCode.scopes.ObjectInstanceScope)
+                {
+                    oc = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                    if (oc.staticClass == null)
+                    {
+                        oc = oc.instanceClass;
+                    }
+                    if (oc.mainClass != null)
+                    {
+                        oc = oc.mainClass;
+                    }
+
+                    break;
+                }
+                else if (scope is ASBinCode.scopes.FunctionScope)
+                {
+                    scope = scope.parentScope;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            return oc;
+        }
 
 
         private void build_member(IMember member, ASTool.AS3.Expr.AS3ExprStep step, Builder builder,CompileEnv env,
             ASBinCode.rtti.Class _cls , string name
             )
         {
-            IRightValue rFunc = (IRightValue)member;
+
+            IRightValue rFunc;
+
+            IMember originMember = member;
+
+            if (member is FindOutPackageScopeMember)
+            {
+                rFunc=((FindOutPackageScopeMember)member).buildAccessThisMember(step.token, env);
+
+                originMember = ((FindOutPackageScopeMember)member).member;
+
+            }
+            else
+            {
+                rFunc = (IRightValue)member;
+            }
+            if (member is VariableBase || member is FindOutPackageScopeMember)
+            {
+
+                var oc = getOutPackageClass(env);
+
+                OpStep clear = new OpStep(OpCode.clear_thispointer,
+                             new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                clear.arg1 = rFunc;
+                clear.arg1Type = RunTimeDataType.rt_function;
+
+                clear.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(oc.classid));
+                clear.arg2Type = RunTimeDataType.rt_int;
+
+                var eaxfunc = env.getAdditionalRegister();
+                ((Register)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                clear.reg = (Register)eaxfunc;
+                clear.regType = eaxfunc.valueType;
+
+                
+
+                env.block.opSteps.Add(clear);
+
+                rFunc = eaxfunc;
+
+            }
+
+
+
             if (ASRuntime.TypeConverter.testImplicitConvert(rFunc.valueType, RunTimeDataType.rt_function, builder))
             {
                 OpStep op = new OpStep(OpCode.call_function,
@@ -258,7 +481,7 @@ namespace ASCompiler.compiler.builds
                 op.reg = eax;
                 op.regType = RunTimeDataType.rt_void;
 
-                build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null);
+                build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null,originMember);
                 
                 env.block.opSteps.Add(op);
 
@@ -275,28 +498,44 @@ namespace ASCompiler.compiler.builds
 
         private void build_member_parameterSteps(IRightValue rFunc,Builder builder,Register eax,OpStep op,
             ASTool.AS3.Expr.AS3ExprStep step,CompileEnv env,ASBinCode.rtti.Class _cls,
-            IRightValue makeParaArg1
+            IRightValue makeParaArg1 ,IMember funcOriginMember
             )
         {
             ASBinCode.rtti.FunctionSignature signature = null;
 
             int blockid = env.block.id;
-            if (rFunc is Variable)
+            if (rFunc is VariableBase)
             {
-                blockid = ((Variable)rFunc).refdefinedinblockid;
+                blockid = ((VariableBase)rFunc).refdefinedinblockid;
             }
             else if (rFunc is ClassMethodGetter)
             {
                 blockid = ((ClassMethodGetter)rFunc).refdefinedinblockid;
             }
 
+            if (funcOriginMember == null)
+            {
+                funcOriginMember = (IMember)rFunc;
+            }
+            else
+            {
+                if (funcOriginMember is VariableBase)
+                {
+                    blockid = ((VariableBase)funcOriginMember).refdefinedinblockid;
+                }
+                else if (funcOriginMember is ClassMethodGetter)
+                {
+                    blockid = ((ClassMethodGetter)funcOriginMember).refdefinedinblockid;
+                }
+            }
+
             if (builder.dictSignatures.ContainsKey(blockid))
             {
-                if (builder.dictSignatures[blockid].ContainsKey((IMember)rFunc))
+                if (builder.dictSignatures[blockid].ContainsKey( funcOriginMember ))
                 {
 
                     signature =
-                         builder.dictSignatures[blockid][(IMember)rFunc];
+                         builder.dictSignatures[blockid][funcOriginMember];
                     var returnvalueType = signature.returnType;
 
                     op.regType = RunTimeDataType.rt_void;

@@ -99,7 +99,7 @@ namespace ASCompiler.compiler.builds
                 //c.CatchVariable.Name = "0"+c.CatchVariable.Name + "_" + i;
 
 
-                Variable rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true , env.block.id );
+                VariableBase rtVariable = new Variable(c.CatchVariable.Name, env.block.scope.members.Count,true , env.block.id );
                 rtVariable.valueType = TypeReader.fromSourceCodeStr(c.CatchVariable.TypeStr, c.CatchVariable.token,builder);
                 env.block.scope.members.Add(rtVariable);
 

@@ -36,7 +36,15 @@ namespace ASBinCode
                                     return cls.classMembers[i];
                                 }
                             }
-                            else if (finder == cls)
+                            else if (member.isProtectd)
+                            {
+                                if (isInherits(finder, cls))
+                                {
+                                    return cls.classMembers[i];
+                                }
+                            }
+
+                            if (finder == cls)
                             {
                                 return cls.classMembers[i];
                             }
@@ -51,6 +59,40 @@ namespace ASBinCode
 
             return null;
         }
+
+
+        public static bool check_isinherits(IRunTimeValue value,RunTimeDataType type,IClassFinder classfinder)
+        {
+            var cls = classfinder.getClassByRunTimeDataType(type);
+            return isInherits(((rtData.rtObject)value).value._class, cls);
+        }
+
+        public static bool check_isinherits(RunTimeDataType srcType, RunTimeDataType type, IClassFinder classfinder)
+        {
+            var srcCls = classfinder.getClassByRunTimeDataType(srcType);
+            var cls = classfinder.getClassByRunTimeDataType(type);
+            return isInherits(srcCls, cls);
+        }
+
+
+
+        public static bool isInherits(Class extendsClass,Class super)
+        {
+            var t = extendsClass;
+
+            while (t !=null)
+            {
+                if (t == super)
+                {
+                    return true;
+                }
+
+                t = t.super;
+            }
+
+            return false;
+        }
+
 
     }
 }

@@ -12,7 +12,6 @@ namespace ASRuntime.operators
         public static void exec_dot(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
             IRunTimeValue obj = step.arg1.getValue(scope);
-
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -42,6 +41,10 @@ namespace ASRuntime.operators
                     {
                         slot.propGetSet = (ClassPropertyGetter)step.arg2;
                         slot.propBindObj = rtObj;
+                        if (step.arg1 is SuperPointer)
+                        {
+                            slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                        }
                     }
                     
 
@@ -81,7 +84,16 @@ namespace ASRuntime.operators
                 StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                 if (slot != null)
                 {
-                    ISLOT lintoslot = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
+                    ISLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
+                    if (step.arg1 is SuperPointer)
+                    {
+                        lintoslot = ((ClassMethodGetter)step.arg2).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass );
+                    }
+                    else
+                    {
+                        lintoslot = ((ClassMethodGetter)step.arg2).getVirtualSlot(rtObj.objScope );
+                    }
+
                     if (lintoslot == null)
                     {
                         frame.throwError((new error.InternalError(step.token,
@@ -208,13 +220,29 @@ namespace ASRuntime.operators
                 {
                     var protoObj = dobj._prototype_;
                     //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
-                    if (protoObj._class.classid == 8) //Function 
+                    if (protoObj._class.classid == 10) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
                     }
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
-                        dobj = null;
+                        //***根Object有继承自Class的prototype,再没有就没有了
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        if (!dobj.hasproperty(name))
+                        {
+                            dobj = null;
+                        }
+                        //dobj = null;
+                    }
+                    else if (protoObj._class.staticClass == null)
+                    {
+                        //**
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        if (!dobj.hasproperty(name))
+                        {
+                            dobj = protoObj;
+                        }
+
                     }
                     else
                     {
@@ -321,7 +349,7 @@ namespace ASRuntime.operators
                             {
                                 break;
                             }
-                            
+
                             StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
                             if (dslot != null)
                             {
@@ -335,40 +363,7 @@ namespace ASRuntime.operators
                                     dobj.createproperty(name, heapslot);
                                 }
 
-                                ISLOT v = dobj[name];
-                                if( !ReferenceEquals(dobj,rtObj.value) )
-                                {
-                                    if (v.getValue().rtType == RunTimeDataType.rt_function)
-                                    {
-                                        ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
-                                        tempslot.directSet(v.getValue());
-                                        v = tempslot;
-                                    }
-                                    else if (v.getValue().rtType > RunTimeDataType.unknown)
-                                    {
-                                        RunTimeDataType tout;
-                                        if (TypeConverter.Object_CanImplicit_ToPrimitive(v.getValue().rtType,
-                                            player.swc, out tout))
-                                        {
-                                            if (tout == RunTimeDataType.rt_function)
-                                            {
-                                                ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
-                                                tempslot.directSet(
-                                                    TypeConverter.ObjectImplicit_ToPrimitive(
-                                                    (rtObject)v.getValue()));
-
-                                                v = tempslot;
-                                            }
-                                        }
-                                    }
-
-                                    prototypeSlot pslot = new prototypeSlot(rtObj, name, v);
-                                    v = pslot;
-                                    //dslot._protoRootObj = (DynamicObject)rtObj.value;
-                                    //dslot._protoname = name;
-                                }
-
-                                dslot.linkTo(v);
+                                linkProtoTypeMember(dobj, rtObj, player, dslot, name);
                             }
                             else
                             {
@@ -379,6 +374,43 @@ namespace ASRuntime.operators
 
 
                             break;
+                        }
+                        else
+                        {
+                            //***从Class定义的原型链中查找
+                            var dobj = (DynamicObject)
+                                player.static_instance[ rtObj.value._class.staticClass.classid].value ;
+
+                            dobj = (DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                            if (!dobj.hasproperty(name))
+                            {
+
+                                dobj = ((DynamicObject)
+                                    player.static_instance[rtObj.value._class.staticClass.classid].value);
+
+                                bool haserror;
+                                dobj = findInProtoType(dobj, name, frame, step.token, out haserror);
+                                if (haserror)
+                                {
+                                    break;
+                                }
+                            }
+                            
+                            if (dobj != null)
+                            {
+                                StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
+                                if (dslot != null)
+                                {
+                                    linkProtoTypeMember(dobj, rtObj, player, dslot, name);
+                                }
+                                else
+                                {
+                                    frame.throwError((new error.InternalError(step.token,
+                                         "dot操作结果必然是一个StackSlot"
+                                         )));
+                                }
+                                break;
+                            }
                         }
                     }
 
@@ -408,12 +440,40 @@ namespace ASRuntime.operators
                         StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                         if (slot != null)
                         {
-                            ISLOT linkto = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                            ISLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+
+                            if (step.arg1 is SuperPointer)
+                            {
+                                if (member.bindField is ClassMethodGetter)
+                                {
+                                    linkto = ((ClassMethodGetter)member.bindField).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+                                }
+                                else
+                                {
+                                    linkto = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                                }
+                            }
+                            else
+                            {
+                                if (member.bindField is ClassMethodGetter)
+                                {
+                                    linkto = ((ClassMethodGetter)member.bindField).getVirtualSlot(rtObj.objScope);
+                                }
+                                else
+                                {
+                                    linkto = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                                }
+                            }
+
                             slot.linkTo(linkto);
                             if (linkto is ClassPropertyGetter.PropertySlot)
                             {
                                 slot.propBindObj = rtObj;
                                 slot.propGetSet = (ClassPropertyGetter)member.bindField;
+                                if (step.arg1 is SuperPointer)
+                                {
+                                    slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                                }
                             }
                         }
                         else
@@ -432,7 +492,43 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
+        private static void linkProtoTypeMember(DynamicObject dobj,rtObject rtObj,Player player,StackSlot dslot,string name)
+        {
+            ISLOT v = dobj[name];
+            if (!ReferenceEquals(dobj, rtObj.value))
+            {
+                if (v.getValue().rtType == RunTimeDataType.rt_function)
+                {
+                    ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
+                    tempslot.directSet(v.getValue());
+                    v = tempslot;
+                }
+                else if (v.getValue().rtType > RunTimeDataType.unknown)
+                {
+                    RunTimeDataType tout;
+                    if (TypeConverter.Object_CanImplicit_ToPrimitive(v.getValue().rtType,
+                        player.swc, out tout))
+                    {
+                        if (tout == RunTimeDataType.rt_function)
+                        {
+                            ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj);
+                            tempslot.directSet(
+                                TypeConverter.ObjectImplicit_ToPrimitive(
+                                (rtObject)v.getValue()));
 
+                            v = tempslot;
+                        }
+                    }
+                }
+
+                prototypeSlot pslot = new prototypeSlot(rtObj, name, v);
+                v = pslot;
+                //dslot._protoRootObj = (DynamicObject)rtObj.value;
+                //dslot._protoname = name;
+            }
+
+            dslot.linkTo(v);
+        }
 
 
         /// <summary>

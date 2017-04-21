@@ -18,72 +18,43 @@ package
 	{
 		var loader = "loader";
 		
+		public static const TP:String = "TTP";
 		
+		public static var JJ:Function = function() { trace(this,"JJ"); };
+		
+		
+		
+		private var JF;
 		
 		public function Main() 
 		{
-			var v:Vector.<Vector.<int>> = Vector.<Vector.<int>>([
+			var p = new ExtCP();
 			
-			Vector.<int>([1,2,3]),
-			Vector.<int>([4,5,6])
-
-			]);
 			
-			var nv= v[0].concat( new <int>[7,8] , new <int>[8]);
-			trace(nv);
+			CP.prototype.toString=function(){
+				return "ExtCP toString"
+			}
 			
-			trace(v[0]);
+			trace(p.toString());
 			
-			//v[0] = v[1];
 			
-			//trace(v[0]);
-			//v[1].length = 0;
-			//trace(v[0]);
 			
-			//trace(v[0] == v[1]);
-			
-			trace( v.some( 
-			function( item:Vector.<int>, idx:int, v:Vector.<Vector.<int>> ):Boolean
-			{
-				trace("item: ", item);
-				trace("idx ", idx);
-				trace("vec: ", v);
-				
-				return item[0] > 1;
-				
-			} 
-			
-			) )
-			//v.fixed = true;
-			//v.insertAt(4, null);
-			
-			//trace(v.pop());
-			
-			trace(v.push( new <int>[-1] , new <int>[-2,-3]));
-			trace(v.unshift( new <int>[9] , new <int>[10,14]));
-			
-			trace(v);
-			
-			//var f = Main(this);
-			var vv=(v.removeAt(-3));
-			
-			trace(vv.reverse());
-			trace(vv);
-			
-			trace(vv.shift());
-			
-			trace(v);
-			
-			trace(v.splice(1,4,null,null,null));
-			trace(v);
-			
-			//var v:Vector.<int> = new Vector.<int>(1);
-			//trace( v.concat([3, 4, 5]));
+			//Main.prototype.toStrin = function(){
+				//
+				//return "toString Main";
+			//};
+			//
+			//var k = this;
+			//
+			//trace(k.toStrin());
 			
 		}
 		
 		
-		
+		private function testVector()
+		{
+			
+		}
 
 
 		
@@ -102,19 +73,7 @@ package
 		
 		private function test()
 		{
-			trace("动态对象加载");
 			
-			var myAssocArray:Object = { fname:"John", lname:"Public", ff:valueOf , 
-			innerObj : { p1:this+"3", p2:"p2" } };
-			
-			
-			 trace(myAssocArray.fname);     // John
-			 trace(myAssocArray["lname"]);  // Public
-			 myAssocArray.initial = "Q";
-			 
-			 trace( myAssocArray.innerObj.p1 );
-			 
-			 trace(myAssocArray.initial);   // Q
 		}
 		
 		private function test2()

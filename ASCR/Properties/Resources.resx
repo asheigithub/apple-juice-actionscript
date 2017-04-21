@@ -148,4 +148,10 @@
   <data name="Vector" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\aslib\vector.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="Sprite" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\sprite.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Class" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\class.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

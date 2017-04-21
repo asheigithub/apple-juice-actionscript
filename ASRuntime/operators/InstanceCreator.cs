@@ -82,6 +82,7 @@ namespace ASRuntime.operators
         {
             if (!player.static_instance.ContainsKey(cls.staticClass.classid))
             {
+                int f = player.getRuntimeStackFlag();
 
                 ASBinCode.IRunTimeScope objScope;
                 ASBinCode.rtti.Object obj = makeObj(cls.staticClass,
@@ -89,8 +90,27 @@ namespace ASRuntime.operators
 
                 player.static_instance.Add(cls.staticClass.classid,
                     new ASBinCode.rtData.rtObject(obj, objScope));
+
+                if (cls.super != null)
+                {
+                    bool s = init_static_class(cls.super);
+
+                    if (s)
+                    {
+                        ((DynamicObject)obj)._prototype_ = (DynamicObject)(player.static_instance[cls.super.staticClass.classid]).value;
+
+                        return player.step_toStackflag(f);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return player.step_toStackflag(f);
+                }
                 
-                return player.step_toblockend();
             }
             else
             {
@@ -101,6 +121,34 @@ namespace ASRuntime.operators
 
         public void createInstance()
         {
+            //if (!player.static_instance.ContainsKey(1))
+            //{
+            //    var c = player.swc.getClassByRunTimeDataType(RunTimeDataType._OBJECT);
+            //    init_static_class(c);
+
+            //    if (!player.outpackage_runtimescope.ContainsKey(c.classid))
+            //    {
+            //        int flag = player.getRuntimeStackFlag();
+            //        make_outpackage_scope(c, null);
+            //        player.step_toStackflag(flag);
+            //    }
+            //}
+            //if (!player.static_instance.ContainsKey(3))
+            //{
+            //    var c = player.swc.getClassByRunTimeDataType(RunTimeDataType._OBJECT + 2);
+            //    init_static_class(c);
+
+            //    if (!player.outpackage_runtimescope.ContainsKey(c.classid))
+            //    {
+            //        int flag = player.getRuntimeStackFlag();
+            //        make_outpackage_scope(c, null);
+            //        player.step_toStackflag(flag);
+            //    }
+
+
+            //}
+
+
             if (!player.static_instance.ContainsKey(_class.staticClass.classid))
             {
 
@@ -112,6 +160,26 @@ namespace ASRuntime.operators
 
                 player.static_instance.Add(_class.staticClass.classid,
                     obj);
+
+                if (_class.super != null)
+                {
+                    bool s = init_static_class(_class.super);
+
+                    if (s)
+                    {
+                        ((DynamicObject)obj.value)._prototype_ 
+                            = (DynamicObject)(player.static_instance[_class.super.staticClass.classid]).value;
+
+                        
+                    }
+                    else
+                    {
+                        invokerFrame.endStep();
+                    }
+                }
+                
+
+
             }
             else
             {
@@ -134,50 +202,39 @@ namespace ASRuntime.operators
 
             if (!player.outpackage_runtimescope.ContainsKey(cls.classid))
             {
-                ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.outscopeblockid];
-
-
                 afterCreateOutScope callbacker = new afterCreateOutScope();
                 callbacker.args = this;
 
-                HeapSlot[] globaldata = player.genHeapFromCodeBlock(codeblock);
-                Global_Object global = Global_Object.formCodeBlock(codeblock, globaldata, player.swc.classes[0]);
-                ASBinCode.rtData.rtObject globalObj = new ASBinCode.rtData.rtObject(global, null);
-
-                ASBinCode.IRunTimeScope rtscope = player.CallBlock(
-                    codeblock, globaldata, null,
-                    player.static_instance[cls.staticClass.classid].objScope,
-
-                    step.token,
-                    callbacker,
-                    globalObj
-                    );
-
-                globalObj.objScope = rtscope;
-                player.outpackage_runtimescope.Add(cls.classid, rtscope);
-
+                if (make_outpackage_scope(cls, callbacker))
                 {
-                    var slot = new HeapSlot();
-                    slot.directSet(player.static_instance[cls.staticClass.classid]);
-                    global.createproperty(cls.name, slot);
-                }
-                for (int i = 0; i < player.swc.classes.Count; i++)
-                {
-                    if (player.swc.classes[i].mainClass == cls)
+                    var ss = cls.super;
+
+                    while (ss !=null)   //建立父类的包外对象
                     {
-                        if (init_static_class(player.swc.classes[i]))
+                        if (!player.outpackage_runtimescope.ContainsKey(ss.classid))
                         {
-                            var slot = new HeapSlot();
-                            slot.directSet(player.static_instance[player.swc.classes[i].staticClass.classid]);
-                            global.createproperty(player.swc.classes[i].name, slot);
+                            if (init_static_class(ss))
+                            {
+                                if (!player.outpackage_runtimescope.ContainsKey(ss.classid))
+                                {
+                                    bool add = make_outpackage_scope(ss, null);
+
+                                    if (!add)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                invokerFrame.endStep();
+                                break;
+                            }
                         }
-                        else
-                        {
-                            //***出错了
-                            invokerFrame.endStep(step);
-                            return;
-                        }
+
+                        ss = ss.super;
                     }
+
                 }
 
             }
@@ -186,6 +243,56 @@ namespace ASRuntime.operators
                 exec_step1();
             }
         }
+
+        private bool make_outpackage_scope(Class cls,IBlockCallBack cb)
+        {
+            
+            ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.outscopeblockid];
+
+            HeapSlot[] globaldata = player.genHeapFromCodeBlock(codeblock);
+            Global_Object global = Global_Object.formCodeBlock(codeblock, globaldata, player.swc.classes[0]);
+            ASBinCode.rtData.rtObject globalObj = new ASBinCode.rtData.rtObject(global, null);
+
+            ASBinCode.IRunTimeScope rtscope = player.CallBlock(
+                codeblock, globaldata, null,
+                null, //player.static_instance[cls.staticClass.classid].objScope,
+
+                step.token,
+                cb,
+                globalObj,
+                RunTimeScopeType.outpackagemember
+                );
+
+            globalObj.objScope = rtscope;
+            player.outpackage_runtimescope.Add(cls.classid, rtscope);
+            {
+                var slot = new HeapSlot();
+                slot.directSet(player.static_instance[cls.staticClass.classid]);
+                global.createproperty(cls.name, slot);
+            }
+            for (int i = 0; i < player.swc.classes.Count; i++)
+            {
+                if (player.swc.classes[i].mainClass == cls)
+                {
+                    if (init_static_class(player.swc.classes[i]))
+                    {
+                        var slot = new HeapSlot();
+                        slot.directSet(player.static_instance[player.swc.classes[i].staticClass.classid]);
+                        global.createproperty(player.swc.classes[i].name, slot);
+                    }
+                    else
+                    {
+                        //***出错了
+                        invokerFrame.endStep(step);
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+
 
         private void exec_step1()
         {
@@ -201,18 +308,13 @@ namespace ASRuntime.operators
             IRunTimeScope objScope, ASBinCode.rtData.rtObject _object)
         {
             //***添加Object的动态对象****
-            if (obj._class.classid == 0 && obj._class.staticClass != null)
+            if (
+                //(obj._class.classid == 0) 
+                obj is DynamicObject
+                && obj._class.staticClass != null)
             {
                 DynamicObject dobj = (DynamicObject)obj;
-                Global_Object global = (Global_Object)((ASBinCode.rtData.rtObject)objScope.parent.this_pointer).value;
-
-                //dobj.createproperty("toString", new DynamicPropertySlot(_object, false));
-                //dobj["toString"].directSet(global["toString"].getValue());
-
-                //dobj.createproperty("valueOf", new DynamicPropertySlot(_object, false));
-                //dobj["valueOf"].directSet(global["valueOf"].getValue());
-
-                
+               
                 if (constructor == null)
                 {
                     dobj.createproperty("constructor", new DynamicPropertySlot(_object, false));
@@ -224,13 +326,13 @@ namespace ASRuntime.operators
                     dobj._prototype_ =  (DynamicObject)constructor.value;
                 }
             }
-
+            
 
             //调用构造函数
             if (obj._class.constructor != null)
             {
                 ASBinCode.rtData.rtFunction function =
-                    (ASBinCode.rtData.rtFunction)((ILeftValue)obj._class.constructor.bindField).getValue(objScope);
+                    (ASBinCode.rtData.rtFunction)((ClassMethodGetter)obj._class.constructor.bindField).getConstructor(objScope);
                 //(ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
 
 
@@ -305,6 +407,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.Class cls,
             baseinstancecallbacker callbacker, out ASBinCode.IRunTimeScope objScope)
         {
+            
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
             if (cls.dynamic)
             {
@@ -339,36 +442,33 @@ namespace ASRuntime.operators
 
             ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.blockid];
 
-            if (callbacker != null)
-            {
-                callbacker.obj = obj;
-            }
-
-            ASBinCode.IRunTimeScope outpackagescope = null;
-            if (cls.staticClass != null)
-            {
-                if (cls.mainClass == null)
-                {
-                    outpackagescope = player.outpackage_runtimescope[cls.classid];
-                }
-                else
-                {
-                    outpackagescope = player.outpackage_runtimescope[cls.mainClass.classid];
-                }
-            }
-
-
-
             objScope = player.CallBlock(codeblock,
-                (ObjectMemberSlot[])obj.memberData, null, outpackagescope, token, callbacker
+                (ObjectMemberSlot[])obj.memberData, null,  
+                null
+                , token, callbacker
                 ,
-                result
+                result, RunTimeScopeType.objectinstance
                 );
 
             result.objScope = objScope;
-            
+
+            //***把父类的初始化函数推到栈上去***
+            var ss = cls.super;
+            while (ss != null)
+            {
+                player.CallBlock(player.swc.blocks[ss.blockid],
+                    (ObjectMemberSlot[])obj.memberData,
+                    null, null, token, null, result, RunTimeScopeType.objectinstance
+                    );
+
+                ss = ss.super;
+            }
+
+
+
             if (callbacker != null)
             {
+                callbacker.obj = obj;
                 callbacker.rtObject = result;
                 callbacker.objScope = objScope;
             }

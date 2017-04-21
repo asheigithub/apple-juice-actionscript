@@ -20,6 +20,15 @@ namespace ASBinCode
             this.functionid = functionid;
         }
 
+        /// <summary>
+        /// 比如说，私有方法就肯定不是虚方法
+        /// </summary>
+        private bool isNotReadVirtual = false;
+        public void setNotReadVirtual()
+        {
+            isNotReadVirtual = true;
+        }
+
         public ClassMethodGetter(string name, rtti.Class _class,int indexofMember
             ,int refdefinedinblockid
             )
@@ -64,50 +73,22 @@ namespace ASBinCode
 
         public ISLOT getISlot(IRunTimeScope scope)
         {
-            //if (_tempSlot == null)
-            //{
-            rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-            method.bind(scope);
-            method.setThis(scope.this_pointer);
-            return new MethodSlot(method);
-            //    _tempSlot = new MethodSlot(method);
+            throw new NotImplementedException();
 
-            //}
-            //else if( !
-            //    (_tempSlot.method.bindScope.Equals( scope )
-            //    &&
-            //    _tempSlot.method.this_pointer.Equals( scope.this_pointer )
-            //    ) )
-            //{
-            //    rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-            //    method.bind(scope);
-            //    method.setThis(scope.this_pointer);
-            //    _tempSlot.method = method;
-            //}
 
-            //return _tempSlot;
+            //var vmember=(ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
 
-            //Dictionary<rtObject, ISLOT> slots;
+            //rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
+            //method.bind(scope);
+            //method.setThis(scope.this_pointer);
+            //return new MethodSlot(method);
 
-            //if (!scope.dictMethods.TryGetValue(this, out slots))
-            //{
-            //    slots = new Dictionary<rtObject, ISLOT>();
-            //    scope.dictMethods.Add(this, slots);
-            //}
 
-            //ISLOT slot;
-            //if (!slots.TryGetValue(scope.this_pointer, out slot))
-            //{
-            //    rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-            //    method.bind(scope);
-            //    method.setThis(scope.this_pointer);
-            //    slot = new MethodSlot(method);
-            //    slots.Add( scope.this_pointer,slot );
+            //rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            //method.bind(scope);
+            //method.setThis(scope.this_pointer);
+            //return new MethodSlot(method);
 
-            //}
-            //return slot;
-
-            //throw new NotImplementedException();    
         }
 
 
@@ -115,11 +96,115 @@ namespace ASBinCode
 
         public IRunTimeValue getValue(IRunTimeScope scope)
         {
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
+
             //return getISlot(scope).getValue();
-            return getISlot(scope).getValue();
-            
+            //return getISlot(scope).getValue();
         }
+
+        
+
+
+        /// <summary>
+        /// 如果此方法是一个构造函数。。在InstanceCreator中调用
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        public IRunTimeValue getConstructor(IRunTimeScope scope)
+        {
+            rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return method;
+        }
+
+        public IRunTimeValue getMethod(IRunTimeScope scope)
+        {
+            if (!isNotReadVirtual)
+            {
+
+                var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
+
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
+                method.bind(scope);
+                method.setThis(scope.this_pointer);
+                return method;
+
+            }
+            else
+            {
+                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+                method.bind(scope);
+                method.setThis(scope.this_pointer);
+                return method;
+            }
+
+            //rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            //method.bind(scope);
+            //method.setThis(scope.this_pointer);
+            //return method;
+        }
+
+        public IRunTimeValue getSuperMethod(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
+        {
+            var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
+            while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
+            {
+                m = m.virtualLink;
+            }
+
+
+            rtData.rtFunction method = new rtData.rtFunction(((ClassMethodGetter)m.bindField).functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return method;
+        }
+
+
+        public ISLOT getVirtualSlot(IRunTimeScope scope)
+        {
+            if (!isNotReadVirtual)
+            {
+                var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
+
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
+                method.bind(scope);
+                method.setThis(scope.this_pointer);
+                return new MethodSlot(method);
+            }
+            else
+            {
+                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+                method.bind(scope);
+                method.setThis(scope.this_pointer);
+                return new MethodSlot(method);
+            }
+        }
+
+        public ISLOT getSuperSlot(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
+        {
+            //var vmember = (ClassMethodGetter)
+            //    ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember]
+            //    .overrideTargetMember
+            //    .bindField;
+
+            var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
+            while (!ReferenceEquals(m.virtualLinkFromClass,superClass))
+            {
+                m = m.virtualLink;
+            }
+
+
+            rtData.rtFunction method = new rtData.rtFunction(((ClassMethodGetter)m.bindField).functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return new MethodSlot(method);
+        }
+
+
+
+
+
 
         public IMember clone()
         {

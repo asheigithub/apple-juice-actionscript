@@ -86,8 +86,10 @@
     <Compile Include="scopes\StartUpBlockScope.cs" />
     <Compile Include="SourceToken.cs" />
     <Compile Include="StaticClassDataGetter.cs" />
+    <Compile Include="SuperPointer.cs" />
     <Compile Include="ThisPointer.cs" />
     <Compile Include="Variable.cs" />
+    <Compile Include="VariableBase.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

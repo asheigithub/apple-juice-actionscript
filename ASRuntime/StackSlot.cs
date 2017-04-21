@@ -31,6 +31,7 @@ namespace ASRuntime
         }
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
+        internal ASBinCode.rtti.Class superPropBindClass;
 
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         
@@ -282,6 +283,7 @@ namespace ASRuntime
             linktarget = null;
             propGetSet = null;
             propBindObj = null;
+            superPropBindClass = null;
 
             //fromArray = null;
             //fromArrayIndex = -1;

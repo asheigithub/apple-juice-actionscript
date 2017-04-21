@@ -108,11 +108,23 @@ namespace ASCompiler.compiler.builds
 
         }
 
-        private bool detectingReturn(CodeBlock block)
+        private bool existsOperator(CodeBlock block, OpCode operatorCode)
         {
-            return findReturn(block.opSteps,0,new int[] { });
+            for (int i = 0; i < block.opSteps.Count; i++)
+            {
+                if (block.opSteps[i].opCode == operatorCode)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
-        private bool findReturn(List<OpStep> commands,int st,int[] hasvisited)
+
+        private bool detectingOperator(CodeBlock block,OpCode operatorCode)
+        {
+            return findReturn(block.opSteps,0,new int[] { },operatorCode);
+        }
+        private bool findReturn(List<OpStep> commands,int st,int[] hasvisited, OpCode operatorCode)
         {
             Dictionary<int, object> visited = new Dictionary<int, object>();
             for (int i = 0; i < hasvisited.Length; i++)
@@ -131,7 +143,7 @@ namespace ASCompiler.compiler.builds
 
                 visited.Add(i, null);
 
-                if (op.opCode == OpCode.function_return || op.opCode == OpCode.raise_error)
+                if (op.opCode == operatorCode || op.opCode == OpCode.raise_error)
                 {
                     return true;
                 }
@@ -146,7 +158,7 @@ namespace ASCompiler.compiler.builds
                     int[] add = new int[visited.Keys.Count ];
                     visited.Keys.CopyTo(add, 0);
 
-                    return findReturn(commands, i + 1,add) && findReturn(commands, line,add);
+                    return findReturn(commands, i + 1,add,operatorCode) && findReturn(commands, line,add,operatorCode);
                 }
                 
             }
@@ -368,6 +380,7 @@ namespace ASCompiler.compiler.builds
             function.signature = signature;
             function.isConstructor = as3function.IsConstructor;
             function.isMethod = as3function.IsMethod;
+            function.isStatic = as3function.Access.IsStatic;
 
             if (function.isConstructor && function.signature.returnType != RunTimeDataType.rt_void)
             {
@@ -444,6 +457,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
+                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
                                             iclass.implicit_to = member;
                                             iclass.implicit_to_functionid = function.functionid;
                                             iclass.implicit_to_type = function.signature.returnType;
@@ -504,6 +518,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
+                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
                                             iclass.implicit_from = member;
                                             iclass.implicit_from_functionid = function.functionid;
                                             iclass.implicit_from_type = function.signature.parameters[0].type;
@@ -575,6 +590,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
+                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
                                             iclass.explicit_from = member;
                                             iclass.explicit_from_functionid = function.functionid;
                                             iclass.explicit_from_type = function.signature.parameters[0].type;
@@ -586,6 +602,30 @@ namespace ASCompiler.compiler.builds
 
                                 }
                                 #endregion
+                            }
+                            else if (meta == "novisual")
+                            {
+                                if (isoutclass)
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "novisual特性不能在包外定义");
+                                }
+                                else
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                             else if (meta == "native")
                             {
@@ -615,9 +655,9 @@ namespace ASCompiler.compiler.builds
                                         {
                                             if (signature.returnType != nf.returnType
                                                 &&
-                                                !(isvectorScope && nf.returnType==RunTimeDataType.rt_void
+                                                !(isvectorScope && nf.returnType == RunTimeDataType.rt_void
                                                     &&
-                                                    signature.returnType==vt
+                                                    signature.returnType == vt
                                                 )
                                                 &&
                                                 !(
@@ -639,11 +679,11 @@ namespace ASCompiler.compiler.builds
 
                                             for (int j = 0; j < signature.parameters.Count; j++)
                                             {
-                                               
+
 
                                                 if (signature.parameters[j].type != nf.parameters[j]
                                                     &&
-                                                    !(!signature.parameters[j].isPara && isvectorScope && nf.parameters[j]==RunTimeDataType.rt_void )
+                                                    !(!signature.parameters[j].isPara && isvectorScope && nf.parameters[j] == RunTimeDataType.rt_void)
                                                     &&
                                                     !(signature.parameters[j].isPara && nf.parameters[j] == RunTimeDataType.rt_array)
                                                     )
@@ -696,6 +736,9 @@ namespace ASCompiler.compiler.builds
                 buildParameter(block, as3function.Parameters[i],builder, env);
             }
 
+            
+
+
             if (!function.isNative)
             {
                 builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
@@ -705,12 +748,77 @@ namespace ASCompiler.compiler.builds
                     )
                 {
                     //查找是否所有分支均有return.
-                    if (!detectingReturn(block))
+                    if (!detectingOperator(block, OpCode.function_return))
                     {
                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                    "Function does not return a value.");
                     }
                 }
+
+                if (function.isConstructor)
+                {
+                    if (!existsOperator(block, OpCode.flag_call_super_constructor))
+                    {
+                        var pc = ((ASBinCode.scopes.ObjectInstanceScope)funcscope.parentScope)._class.super;
+                        if (pc != null)
+                        {
+                            while (pc !=null && pc.constructor ==null )
+                            {
+                                pc = pc.super;
+                            }
+
+                            if (pc != null)
+                            {
+                                //有父类构造函数需要调。
+                                var sig = builder.dictSignatures[pc.classid][pc.constructor.bindField];
+
+                                if (sig.parameters.Count != 0
+                                    &&
+                                    sig.parameters[0].defaultValue == null
+                                    )
+                                {
+                                    //***需要显式调用***
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "No default constructor found in base class "+ pc.name +".");
+                                }
+                                else
+                                {
+                                    //***自动在第一行加入调用代码****
+                                    var c = pc.constructor;
+                                    OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                                    opMakeArgs.arg1 = (ClassMethodGetter)c.bindField;
+                                    opMakeArgs.arg1Type = RunTimeDataType.rt_function;
+
+                                   
+
+                                    OpStep op = new OpStep(OpCode.call_function,
+                                            new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                                    var eax = env.getAdditionalRegister();
+                                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                                    op.reg = eax;
+                                    op.regType = RunTimeDataType.rt_void;
+
+                                    op.arg1 = (ClassMethodGetter)c.bindField;
+                                    op.arg1Type = RunTimeDataType.rt_function;
+
+
+                                    env.block.opSteps.Insert(0, op);
+                                    env.block.opSteps.Insert(0, opMakeArgs);
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        if (!detectingOperator(block, OpCode.flag_call_super_constructor))  //不是所有路径都调用构造
+                        {
+                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "构造函数需要在所有路径调用");
+                        }
+                    }
+                }
+
             }
             builder.dictfunctionblock.Add(function, block);
             
@@ -738,7 +846,7 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
-            Variable argement = new Variable(parameter.Name, block.scope.members.Count, block.id);
+            VariableBase argement = new Variable(parameter.Name, block.scope.members.Count, block.id);
             block.scope.members.Add(argement);
 
             if (parameter.IsArrPara)

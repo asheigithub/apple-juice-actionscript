@@ -36,6 +36,19 @@ namespace ASCompiler
             }
 
             {
+                string _Class = Properties.Resources.Class;
+                //***类库源码***
+                var tree = grammar.ParseTree(_Class, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Class.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Class.as3"));
+            }
+
+            {
                 string _int = Properties.Resources._int;
                 var tree = grammar.ParseTree(_int, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "int.as3");
@@ -117,6 +130,20 @@ namespace ASCompiler
                     return null;
                 }
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Math.as3"));
+            }
+
+
+
+            {
+                string _sprite = Properties.Resources.Sprite;
+                var tree = grammar.ParseTree(_sprite, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Sprite.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "flash/display/Sprite.as3"));
             }
 
 

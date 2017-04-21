@@ -36,11 +36,32 @@ namespace ASRuntime.operators
                         var s = frame.scope;
                         if (s.this_pointer != null && s.this_pointer is ASBinCode.rtData.rtObject)
                         {
-                            while (!(((ASBinCode.rtData.rtObject)s.this_pointer).value is ASBinCode.rtti.Global_Object))
+                            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)s.this_pointer;
+
+                            if (obj.value is Global_Object)
                             {
-                                s = s.parent;
+                                function.setThis(obj);
                             }
-                            function.setThis(s.this_pointer);
+                            else
+                            {
+                                var cls = obj.value._class;
+                                if (cls.staticClass == null)
+                                {
+                                    cls = cls.instanceClass;
+                                }
+                                if (cls.mainClass != null)
+                                {
+                                    cls = cls.mainClass;
+                                }
+
+                                var ot = player.outpackage_runtimescope[cls.classid];
+                                function.setThis(ot.this_pointer);
+                            }
+                            //while (!(((ASBinCode.rtData.rtObject)s.this_pointer).value is ASBinCode.rtti.Global_Object))
+                            //{
+                            //    s = s.parent;
+                            //}
+                            //function.setThis(s.this_pointer);
                         }
                         else
                         {
@@ -56,6 +77,45 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
+
+        private static void _do_clear_thispointer(Player player, 
+            ASBinCode.rtData.rtFunction function, StackFrame frame,IRunTimeValue outscope)
+        {
+
+            if (!function.ismethod)
+            {
+                function.setThis(outscope);
+            }
+        }
+
+        public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step,IRunTimeScope scope)
+        {
+            var rv = step.arg1.getValue(frame.scope);
+            if (rv.rtType != RunTimeDataType.rt_function)
+            {
+                frame.throwError(
+                    new error.InternalError(step.token, "value is not a function",
+                    new ASBinCode.rtData.rtString("value is not a function")));
+            }
+            else
+            {
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+
+                step.reg.getISlot(scope).directSet(rv);
+
+                if (!function.ismethod)
+                {
+                    int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope)).value;
+
+                    var o = player.outpackage_runtimescope[classid];
+                    _do_clear_thispointer(player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope), frame,o.this_pointer);
+                }
+
+                
+            }
+            frame.endStep(step);
+        }
+
 
         //public static void bind_this(Player player, StackFrame frame, ASBinCode.OpStep step)
         //{
@@ -76,7 +136,15 @@ namespace ASRuntime.operators
 
         public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
-            var rv = step.arg1.getValue(frame.scope);
+            IRunTimeValue rv;
+            if (step.arg1 is ClassMethodGetter)
+            {
+                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+            }
+            else
+            {
+                rv = step.arg1.getValue(frame.scope);
+            }
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
@@ -107,10 +175,20 @@ namespace ASRuntime.operators
 
 
 
-        public static void exec(Player player,StackFrame frame,ASBinCode.OpStep step)
+        public static void exec(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
 #if DEBUG
-            var rv = step.arg1.getValue(frame.scope);
+
+            IRunTimeValue rv;
+            if (step.arg1 is ClassMethodGetter)
+            {
+                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+            }
+            else
+            {
+                rv = step.arg1.getValue(frame.scope);
+            }
+
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
@@ -140,10 +218,10 @@ namespace ASRuntime.operators
             frame.funCaller.callbacker = cb;
             frame.funCaller.returnSlot = step.reg.getISlot(frame.scope);
             frame.funCaller.call();
-            
+
             frame.funCaller = null;
 
-            
+
         }
 
         class funbacker : IBlockCallBack
@@ -156,7 +234,7 @@ namespace ASRuntime.operators
                 set
                 ;
             }
-            
+
             public void call(object args)
             {
                 object[] a = (object[])args;
@@ -168,7 +246,7 @@ namespace ASRuntime.operators
         public static void exec_return(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
             IRunTimeValue result = step.arg1.getValue(frame.scope);
-            if (result.rtType == RunTimeDataType.rt_function) 
+            if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
                 if (!function.ismethod)//闭包

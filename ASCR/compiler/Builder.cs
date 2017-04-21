@@ -39,11 +39,20 @@ namespace ASCompiler.compiler
         internal Dictionary<ASBinCode.rtti.Class, CompileEnv> _classbuildingEnv =
             new Dictionary<ASBinCode.rtti.Class, CompileEnv>();
 
+        internal Dictionary<ASBinCode.rtti.Class, CodeBlock> _class_outScopeBlock 
+            = new Dictionary<ASBinCode.rtti.Class, CodeBlock>();
+
+
 
         internal Dictionary<ASTool.AS3.AS3Parameter,utils.Tuple< ASBinCode.rtti.FunctionParameter,List<ASBinCode.rtti.Class>>>
             _toEvalDefaultParameters = new Dictionary<ASTool.AS3.AS3Parameter, utils.Tuple<ASBinCode.rtti.FunctionParameter, List<ASBinCode.rtti.Class>>>();
 
         internal Dictionary<IRightValue, List<OpStep>> _propLines = new Dictionary<IRightValue, List<OpStep>>();
+
+        internal Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>
+            _overridefunctions = new Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>();
+
+
 
         internal readonly bool isEval;
         public Builder(bool isEval)
@@ -204,7 +213,7 @@ namespace ASCompiler.compiler
             Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>> classImports
                 = new Dictionary<ASBinCode.rtti.Class, List<ASBinCode.rtti.Class>>();
 
-            //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
+            //****确定继承关系****
             for (int i = 0; i < tobuildfiles.Count; i++)
             {
                 ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
@@ -216,8 +225,7 @@ namespace ASCompiler.compiler
                     _currentImports.Push(iimps);
 
                     builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                    builder.buildMemberType(buildingclasses[srcfile.Package.MainClass], this, srcfile);
-
+                    builder.buildClassExtends(srcfile.Package.MainClass,this);
                     _currentImports.Pop();
 
                     for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
@@ -226,19 +234,131 @@ namespace ASCompiler.compiler
                         classImports.Add(buildingclasses[srcfile.Package.MainClass.innerClass[j]], imports);
                         _currentImports.Push(imports);
 
-                        builder.buildMemberType(
-                            buildingclasses[srcfile.Package.MainClass.innerClass[j]], this, srcfile);
+                        builder.buildClassExtends(srcfile.Package.MainClass.innerClass[j], this);
 
                         _currentImports.Pop();
+
                     }
                 }
             }
 
-            Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> copyclasses = new Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>();
+            //Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> copyclasses = new Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>();
+            List<KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>> copyclasses = new List<KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>>();
             foreach (var item in buildingclasses)
             {
-                copyclasses.Add(item.Key, item.Value);
+                copyclasses.Add(item);
             }
+            //***按继承深度排序。
+            copyclasses.Sort((
+                KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> c1,
+                KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> c2
+                ) =>
+            {
+                {
+                    var inhc1 = c1.Value.super;
+                    while (inhc1 !=null)
+                    {
+                        if (inhc1 == c2.Value)
+                        {
+                            return 1;
+                        }
+                        inhc1 = inhc1.super;
+                    }
+                }
+                {
+                    var inhc2 = c2.Value.super;
+                    while (inhc2 != null)
+                    {
+                        if (inhc2 == c1.Value)
+                        {
+                            return -1;
+                        }
+                        inhc2 = inhc2.super;
+                    }
+                }
+
+
+                return c1.Value.getRtType() - c2.Value.getRtType();
+            });
+
+
+            //***确定类成员****
+            //for (int i = 0; i < tobuildfiles.Count; i++)
+            //{
+            //    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+            //    if (srcfile.Package.MainClass != null)
+            //    {
+            //        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+            //        builder.buildClassDefineMembers(srcfile.Package.MainClass, this);
+            //        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+            //        {
+            //            builder.buildClassDefineMembers(srcfile.Package.MainClass.innerClass[j], this);
+            //        }
+            //    }
+            //}
+            foreach (var item in copyclasses)
+            {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
+                builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                builder.buildClassDefineMembers(item.Key, this,false);
+            }
+
+            foreach (var item in copyclasses)
+            {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
+                builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                builder.buildClassDefineMembers(item.Key, this,true);
+            }
+
+
+            //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
+            //for (int i = 0; i < tobuildfiles.Count; i++)
+            //{
+            //    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+            //    if (srcfile.Package.MainClass != null)
+            //    {
+
+            //        _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass]]);
+
+            //        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+            //        builder.buildMemberType(buildingclasses[srcfile.Package.MainClass], this, srcfile);
+
+            //        _currentImports.Pop();
+
+            //        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+            //        {
+
+            //            _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass.innerClass[j]]]);
+
+            //            builder.buildMemberType(
+            //                buildingclasses[srcfile.Package.MainClass.innerClass[j]], this, srcfile);
+
+            //            _currentImports.Pop();
+            //        }
+            //    }
+            //}
+            foreach (var item in copyclasses)
+            {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
+                _currentImports.Push(classImports[item.Value]);
+                builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                builder.buildMemberType(
+                    buildingclasses[item.Key]
+                    , this,item.Key.Package.AS3File);
+                _currentImports.Pop();
+            }
+
 
             //***编译静态成员赋值代码***
             foreach (var item in copyclasses)
@@ -256,10 +376,12 @@ namespace ASCompiler.compiler
                 for (int i = 0; i < scls.classMembers.Count; i++)
                 {
                     var m = scls.classMembers[i];
-                    if (m.bindField is ClassPropertyGetter)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom != null)
                     {
                         continue;
                     }
+                    
+
                     var expr = _buildingmembers[m];
                     IRunTimeValue defaultvalue = null;
                     if (expr is ASTool.AS3.AS3Const)
@@ -292,7 +414,7 @@ namespace ASCompiler.compiler
                 for (int i = 0; i < scls.classMembers.Count; i++)
                 {
                     var m = scls.classMembers[i];
-                    if (m.bindField is ClassPropertyGetter)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom !=null)
                     {
                         continue;
                     }
@@ -336,13 +458,16 @@ namespace ASCompiler.compiler
                         );
 
                     block.scope = new ASBinCode.scopes.OutPackageMemberScope(buildingclasses[srcfile.Package.MainClass]);
-                    ((ASBinCode.scopes.OutPackageMemberScope)block.scope).parentScope
-                        = _classbuildingEnv[buildingclasses[srcfile.Package.MainClass].staticClass].block.scope;
+                    //((ASBinCode.scopes.OutPackageMemberScope)block.scope).parentScope
+                    //    = _classbuildingEnv[buildingclasses[srcfile.Package.MainClass].staticClass].block.scope;
+
                     buildingclasses[srcfile.Package.MainClass].outscopeblockid = block.id;
                     buildCodeBlock(outstmts, block);
 
 
                     outScopeBlock.Add(buildingclasses[srcfile.Package.MainClass], block);
+                    _class_outScopeBlock.Add(buildingclasses[srcfile.Package.MainClass], block);
+
                     _currentImports.Pop();
                 }
             }
@@ -359,22 +484,22 @@ namespace ASCompiler.compiler
                 _currentImports.Push(classImports[item.Value]);
                 CompileEnv env = _classbuildingEnv[cls];
 
-                if (cls.mainClass == null)
-                {
-                    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
-                        outScopeBlock[cls].scope;
-                }
-                else
-                {
-                    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
-                        outScopeBlock[cls.mainClass].scope;
-                }
+                //if (cls.mainClass == null)
+                //{
+                //    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
+                //        outScopeBlock[cls].scope;
+                //}
+                //else
+                //{
+                //    ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope).parentScope =
+                //        outScopeBlock[cls.mainClass].scope;
+                //}
 
                 for (int i = 0; i < cls.classMembers.Count; i++)
                 {
                     var m = cls.classMembers[i];
 
-                    if (m.bindField is ClassPropertyGetter)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom !=null)
                     {
                         continue;
                     }
@@ -409,7 +534,7 @@ namespace ASCompiler.compiler
                 for (int i = 0; i < cls.classMembers.Count; i++)
                 {
                     var m = cls.classMembers[i];
-                    if (m.bindField is ClassPropertyGetter)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom !=null)
                     {
                         continue;
                     }
@@ -421,6 +546,114 @@ namespace ASCompiler.compiler
                         buildStmt(env, expr);   //先给确定值的对象赋值
                     }
                 }
+
+                //***检查Override***
+                if (_overridefunctions.ContainsKey(cls) && buildErrors.Count ==0)
+                {
+                    var ov = _overridefunctions[cls];
+                    foreach (var ovt in ov)
+                    {
+                        var nf = ovt.Key;
+
+                        var nfs = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[nf]].signature;
+
+                        bool ispass = true;
+                        for (int i = 0; i < ovt.Value.Count; i++)
+                        {
+                            var toovf = ovt.Value[i];   //***要重写的目标***
+                            var otovfs = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[toovf.inheritSrcMember]].signature;
+
+                            if (otovfs.returnType != nfs.returnType)
+                            {
+                                pushBuildError(
+                                    new BuildError(_buildingmembers[nf].Token.line,
+                                        _buildingmembers[nf].Token.ptr,
+                                        _buildingmembers[nf].Token.sourceFile,
+                                        "Incompatible override."
+                                    )
+                                    );
+
+                            }
+                            else if (otovfs.parameters.Count != nfs.parameters.Count)
+                            {
+                                pushBuildError(
+                                    new BuildError(_buildingmembers[nf].Token.line,
+                                        _buildingmembers[nf].Token.ptr,
+                                        _buildingmembers[nf].Token.sourceFile,
+                                        "Incompatible override."
+                                    )
+                                    );
+                            }
+                            else
+                            {
+                                
+                                //***比较所有参数***
+                                for (int j = 0; j < nfs.parameters.Count ; j++)
+                                {
+                                    if (nfs.parameters[j].type != otovfs.parameters[j].type
+                                        ||
+                                        nfs.parameters[j].isPara != otovfs.parameters[j].isPara
+                                        )
+                                    {
+                                        ispass = false;
+                                        pushBuildError(
+                                            new BuildError(_buildingmembers[nf].Token.line,
+                                                _buildingmembers[nf].Token.ptr,
+                                                _buildingmembers[nf].Token.sourceFile,
+                                                "Incompatible override."
+                                            )
+                                        );
+                                    }
+                                }
+                            }
+                        }
+
+                        if (ispass) //检查通过，覆盖原函数
+                        {
+                            for (int i = 0; i < ovt.Value.Count; i++)
+                            {
+                                
+                                var tooverridefunc = ovt.Value[i];
+                                
+                                if (cls.classMembers.Contains(tooverridefunc))
+                                {
+                                    for (int j = 0; j < cls.classMembers.Count; j++)
+                                    {
+                                        if (cls.classMembers[j] == tooverridefunc)
+                                        {
+                                            cls.classMembers[j] = nf;
+                                            
+                                        }
+
+                                        if (cls.classMembers[j].bindField is ClassPropertyGetter)
+                                        {
+                                            ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
+                                            if (pg.getter == tooverridefunc.bindField)
+                                            {
+                                                pg.getter = (ClassMethodGetter)nf.bindField;
+                                            }
+                                            if (pg.setter == tooverridefunc.bindField)
+                                            {
+                                                pg.setter = (ClassMethodGetter)nf.bindField;
+                                            }
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException();
+                                }
+
+                            }
+                        }
+
+
+                    }
+
+                }
+
+
 
                 //block必须有收尾工作
                 {
@@ -583,7 +816,7 @@ namespace ASCompiler.compiler
                         return;
                     }
                 }
-                else if (!(member is Variable))
+                else if (!(member is VariableBase))
                 {
                     pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                         "此处应该是个Variable"));
@@ -663,14 +896,14 @@ namespace ASCompiler.compiler
 
                             ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
-                            if (!(member is Variable))
+                            if (!(member is VariableBase))
                             {
                                 pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                     "此处应该是个Variable"));
                                 return;
                             }
 
-                            var rtVariable = (Variable)member;
+                            var rtVariable = (VariableBase)member;
 
                             builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
                             var func = builder.buildAS3Function(env,
@@ -790,7 +1023,7 @@ namespace ASCompiler.compiler
                                 }
                             }
 
-                            Variable rtVariable = new Variable(as3function.Name, env.block.scope.members.Count, env.block.id);
+                            VariableBase rtVariable = new Variable(as3function.Name, env.block.scope.members.Count, env.block.id);
                             env.block.scope.members.Add(rtVariable);
                             rtVariable.valueType = RunTimeDataType.rt_function;
 
@@ -933,7 +1166,7 @@ namespace ASCompiler.compiler
                         }
                     }
                     {
-                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id, true);
+                        VariableBase rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id, true);
 
                         env.block.scope.members.Add(rtVariable);
                         try
@@ -966,14 +1199,14 @@ namespace ASCompiler.compiler
                         IMember member = env.block.scope.members[i];
                         if (member.name == variable.Name)
                         {
-                            if (!(member is Variable) || ((Variable)member).isConst)
+                            if (!(member is VariableBase) || ((VariableBase)member).isConst)
                             {
                                 pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
                                     "重复声明 " + variable.Name));
                                 return;
                             }
 
-                            Variable var = (Variable)member;
+                            VariableBase var = (VariableBase)member;
 
                             var newtype = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token,this);
 
@@ -1007,7 +1240,7 @@ namespace ASCompiler.compiler
                                         CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp",-65535,true), false);
                                         buildExpression(tempEnv, variable.ValueExpr);
                                         IRightValue tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
-                                            stmt.Token, new Builder()
+                                            stmt.Token, new Builder(true)
                                             );
                                         newtype = tempRv.valueType;
                                     }
@@ -1032,7 +1265,7 @@ namespace ASCompiler.compiler
                     }
 
                     {
-                        Variable rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id,false);
+                        VariableBase rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id,false);
                         env.block.scope.members.Add(rtVariable);
                         try
                         {
@@ -1139,6 +1372,8 @@ namespace ASCompiler.compiler
                                         IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if(
+                                            !dictSignatures.ContainsKey(env.block.id )
+                                            ||
                                             !dictSignatures[env.block.id].ContainsKey(((ClassPropertyGetter)member).getter))
                                             {
                                             pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
@@ -1154,6 +1389,8 @@ namespace ASCompiler.compiler
                                         IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if (
+                                            !dictSignatures.ContainsKey(env.block.id)
+                                            ||
                                             !dictSignatures[env.block.id].ContainsKey(
                                                 ((ClassPropertyGetter)member).setter))
                                         {
@@ -1170,6 +1407,8 @@ namespace ASCompiler.compiler
                                         IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
                                         if (
+                                            !dictSignatures.ContainsKey(env.block.id)
+                                            ||
                                             !dictSignatures[env.block.id].ContainsKey(
                                                 (member)))
                                         {
@@ -1204,38 +1443,7 @@ namespace ASCompiler.compiler
                                     {
                                         ((ClassMethodGetter)member).setFunctionId(func.functionId);
                                     }
-                                    //var rtVariable = (ILeftValue)member;
-
-                                    //OpStep step = new OpStep(OpCode.assigning, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    //step.reg = rtVariable;
-                                    //step.regType = RunTimeDataType.rt_function;
-                                    //step.arg1 = new ASBinCode.rtData.RightValue(func);
-                                    //step.arg1Type = RunTimeDataType.rt_function;
-                                    //step.arg2 = null;
-                                    //step.arg2Type = RunTimeDataType.unknown;
-
-                                    //env.block.opSteps.Add(step);
-
-                                    //OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    //stepbind.reg = null;
-                                    //stepbind.regType = RunTimeDataType.unknown;
-                                    //stepbind.arg1 = rtVariable;
-                                    //stepbind.arg1Type = rtVariable.valueType;
-                                    //stepbind.arg2 = null;
-                                    //stepbind.arg2Type = RunTimeDataType.unknown;
-
-                                    //env.block.opSteps.Add(stepbind);
-
-                                    //OpStep stepbindthis = new OpStep(OpCode.bind_this, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    //stepbindthis.reg = null;
-                                    //stepbindthis.regType = RunTimeDataType.unknown;
-                                    //stepbindthis.arg1 = rtVariable;
-                                    //stepbindthis.arg1Type = rtVariable.valueType;
-                                    //stepbindthis.arg2 = null;
-                                    //stepbindthis.arg2Type = RunTimeDataType.unknown;
-
-                                    //env.block.opSteps.Add(stepbindthis);
-
+                                    
                                 }
 
                             }
@@ -1315,7 +1523,7 @@ namespace ASCompiler.compiler
                         ASBinCode.IRightValue defaultv = null;
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
+                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
                             if (variable.ValueExpr != null) //变量值表达式
                             {
                                 var testEval = ExpressionEval.Eval(variable.ValueExpr);
@@ -1363,9 +1571,10 @@ namespace ASCompiler.compiler
                                     step.regType = rtVariable.valueType;
                                     step.arg1 = defaultv;
                                     step.arg1Type = defaultv.valueType;
+                                    
                                     step.arg2 = null;
                                     step.arg2Type = RunTimeDataType.unknown;
-
+                                    
                                     env.block.opSteps.Add(step);
                                 }
                                 if (isbindscope && (rtVariable.valueType == RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void))
@@ -1400,7 +1609,7 @@ namespace ASCompiler.compiler
 
                         try
                         {
-                            Variable rtVariable = (Variable)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
+                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
                             //rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
 
                             if (variable.ValueExpr != null) //变量值表达式
@@ -1455,9 +1664,12 @@ namespace ASCompiler.compiler
                                     step.regType = rtVariable.valueType;
                                     step.arg1 = defaultv;
                                     step.arg1Type = defaultv.valueType;
+
+                                    
                                     step.arg2 = null;
                                     step.arg2Type = RunTimeDataType.unknown;
-
+                                    
+                                    
                                     env.block.opSteps.Add(step);
                                 }
                                 if (isbindscope && (rtVariable.valueType== RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void   ))
@@ -1468,8 +1680,8 @@ namespace ASCompiler.compiler
                                     stepbind.regType = RunTimeDataType.unknown;
                                     stepbind.arg1 = rtVariable;
                                     stepbind.arg1Type = rtVariable.valueType;
-                                    stepbind.arg2 = null;
-                                    stepbind.arg2Type = RunTimeDataType.unknown;
+                                    stepbind.arg2 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtBoolean.True);
+                                    stepbind.arg2Type = RunTimeDataType.rt_boolean;
 
                                     env.block.opSteps.Add(stepbind);
                                 }

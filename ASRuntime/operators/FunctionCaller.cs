@@ -230,7 +230,7 @@ namespace ASRuntime.operators
                     CallFuncHeap,
                     returnSlot,
                     function.bindScope,
-                    token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer);
+                    token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
             }
             else
             {

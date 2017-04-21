@@ -65,6 +65,12 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < cls.staticClass.classMembers.Count; i++)
             {
                 ASBinCode.rtti.ClassMember member = cls.staticClass.classMembers[i];
+                if (member.inheritFrom != null)
+                {
+                    member.setTypeWhenCompile(cls.staticClass.super.classMembers[i].valueType);
+                    continue;
+                }
+
                 if (member.bindField is ClassPropertyGetter)
                 {
                     ClassPropertyGetter pg = (ClassPropertyGetter)member.bindField;
@@ -98,6 +104,11 @@ namespace ASCompiler.compiler.builds
                 for (int i = 0; i < cls.staticClass.classMembers.Count; i++) //检查访问器类型
                 {
                     ASBinCode.rtti.ClassMember member = cls.staticClass.classMembers[i];
+                    if (member.inheritFrom != null)
+                    {
+                        member.setTypeWhenCompile(cls.staticClass.super.classMembers[i].valueType);
+                        continue;
+                    }
                     CheckProp(member, builder);
                 }
             }
@@ -108,6 +119,11 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < cls.classMembers.Count; i++)
             {
                 ASBinCode.rtti.ClassMember member = cls.classMembers[i];
+                if (member.inheritFrom != null)
+                {
+                    member.setTypeWhenCompile(cls.super.classMembers[i].valueType);
+                    continue;
+                }
                 if (member.bindField is ClassPropertyGetter)
                 {
                     ClassPropertyGetter pg = (ClassPropertyGetter)member.bindField;
@@ -138,6 +154,12 @@ namespace ASCompiler.compiler.builds
             {
                 for (int i = 0; i < cls.classMembers.Count; i++) //检查访问器类型
                 {
+                    if (cls.classMembers[i].inheritFrom != null)
+                    {
+                        cls.classMembers[i].setTypeWhenCompile(cls.super.classMembers[i].valueType);
+                        continue;
+                    }
+
                     CheckProp( cls.classMembers[i],  builder);
                 }
             }
@@ -154,6 +176,11 @@ namespace ASCompiler.compiler.builds
                 if (pg.setter != null)
                 {
                     var g = member.refClass.classMembers[pg.setter.indexOfMembers];
+                    if (g.inheritFrom != null)
+                    {
+                        return;
+                    }
+
                     var sig =
                         builder.dictSignatures[builder._classbuildingEnv[member.refClass].block.id][g.bindField];
 
@@ -280,18 +307,18 @@ namespace ASCompiler.compiler.builds
 
 
 
-            List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
+            //List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
 
-            ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(blockid, cls.name,cls.classid,false);
-            block.scope = new ASBinCode.scopes.ObjectInstanceScope(cls);
+            //ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(blockid, cls.name,cls.classid,false);
+            //block.scope = new ASBinCode.scopes.ObjectInstanceScope(cls);
 
-            CompileEnv env = new CompileEnv(block, false);
-            builder._classbuildingEnv.Add(cls, env);
+            //CompileEnv env = new CompileEnv(block, false);
+            //builder._classbuildingEnv.Add(cls, env);
 
-            for (int i = 0; i < classstmts.Count; i++)
-            {
-                buildClassMember(env, classstmts[i], cls, builder, false);
-            }
+            //for (int i = 0; i < classstmts.Count; i++)
+            //{
+            //    buildClassMember(env, classstmts[i], cls, builder, false);
+            //}
 
 
             //****编译metaclass***
@@ -309,19 +336,194 @@ namespace ASCompiler.compiler.builds
             cls.staticClass = metaclass;
             metaclass.instanceClass = cls;
 
-            ASBinCode.CodeBlock metablock = new ASBinCode.CodeBlock(metablockid, metaclass.name,metaclass.classid,false);
-            metablock.scope = new ASBinCode.scopes.ObjectInstanceScope(metaclass);
+            //ASBinCode.CodeBlock metablock = new ASBinCode.CodeBlock(metablockid, metaclass.name,metaclass.classid,false);
+            //metablock.scope = new ASBinCode.scopes.ObjectInstanceScope(metaclass);
 
-            CompileEnv envMeta = new CompileEnv(metablock, false);
-            builder._classbuildingEnv.Add(metaclass, envMeta);
+            //CompileEnv envMeta = new CompileEnv(metablock, false);
+            //builder._classbuildingEnv.Add(metaclass, envMeta);
 
-            for (int i = 0; i < classstmts.Count; i++)
-            {
-                buildClassMember(envMeta, classstmts[i], metaclass, builder, true);
-            }
+            //for (int i = 0; i < classstmts.Count; i++)
+            //{
+            //    buildClassMember(envMeta, classstmts[i], metaclass, builder, true);
+            //}
 
             return cls;
         }
+
+        public void buildClassExtends(ASTool.AS3.AS3Class as3class, Builder builder)
+        {
+            var cls = builder.buildingclasses[as3class];
+            if (cls.getRtType() != RunTimeDataType._OBJECT+3)
+            {
+                cls.staticClass.super = builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT+2);
+            }
+            if (as3class.ExtendsNames.Count > 0)
+            {
+                string extendName = as3class.ExtendsNames[0];
+                var find= TypeReader.findClassFromImports(extendName, builder, as3class.token);
+
+                if (find.Count == 1)
+                {
+                    if (find[0].mainClass == cls)
+                    {
+                        throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "Forward reference to base class ." + extendName + "."
+                        );
+                        //
+                    }
+
+                    cls.super = find[0];
+                }
+                else if (find.Count == 0)
+                {
+                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "The definition of base class " + extendName + " was not found."
+                        );
+                }
+                else
+                {
+                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "Ambiguous reference to " + extendName
+                        );
+                }
+
+            }
+            else
+            {
+
+                var OBJECT = builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT);
+                if (cls != OBJECT)
+                {
+                    cls.super = OBJECT;
+                }
+            }
+        }
+
+        private void copyInheritsFromSuper(ASBinCode.rtti.Class cls,CompileEnv env)
+        {
+            var supercls = cls.super;
+            if (supercls == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < supercls.classMembers.Count; i++)
+            {
+                var sm = supercls.classMembers[i];
+                var bf = sm.bindField;
+
+
+
+
+                ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(sm.name, cls, bf);
+                member.defaultValue = sm.defaultValue;
+                member.isConst = sm.isConst;
+                member.isConstructor = false;
+                member.isGetter = sm.isGetter;
+                member.isInternal = sm.isInternal;
+                member.isOverride = sm.isOverride;
+                member.isFinal = sm.isFinal;
+                member.isPrivate = sm.isPrivate;
+                member.isProtectd = sm.isProtectd;
+                member.isPublic = sm.isPublic;
+                member.isSetter = sm.isSetter;
+                member.isStatic = sm.isStatic;
+                member.setTypeWhenCompile(sm.valueType);
+
+                member.virtualLink = sm;
+                member.virtualLinkFromClass = supercls;
+
+                if (sm.inheritFrom == null)
+                {
+                    member.inheritFrom = supercls;
+                }
+                else
+                {
+                    member.inheritFrom = sm.inheritFrom;
+                }
+                if (sm.inheritSrcMember == null)
+                {
+                    member.inheritSrcMember = sm;
+                }
+                else
+                {
+                    member.inheritSrcMember = sm.inheritSrcMember;
+                }
+
+                cls.classMembers.Add(member);
+
+                if (supercls.fields.Contains(sm))
+                {
+                    env.block.scope.members.Add(bf);
+
+                    cls.fields.Add(member);
+                }
+
+
+            }
+
+
+
+        }
+        
+
+        public void buildClassDefineMembers(ASTool.AS3.AS3Class as3class, Builder builder,bool isstatic)
+        {
+            List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
+
+            var cls = builder.buildingclasses[as3class];
+            if (!isstatic)
+            {
+                ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(cls.blockid, cls.name, cls.classid, false);
+                block.scope = new ASBinCode.scopes.ObjectInstanceScope(cls);
+
+                CompileEnv env = new CompileEnv(block, false);
+                builder._classbuildingEnv.Add(cls, env);
+
+                copyInheritsFromSuper(cls, env);
+
+                for (int i = 0; i < classstmts.Count; i++)
+                {
+                    buildClassMember(env, classstmts[i], cls, builder, false);
+                }
+
+                if (cls.constructor == null)
+                {
+                    ASTool.AS3.AS3Function fc = new ASTool.AS3.AS3Function(new ASTool.Token());
+                    fc.Access = new ASTool.AS3.AS3Access();
+                    fc.Access.IsPublic = true;
+                    fc.IsConstructor = true;
+                    fc.Name = cls.name;
+                    fc.TypeStr = "*";
+                    fc.IsMethod = true;
+
+                    fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
+                    fc.ParentScope = as3class;
+                    fc.StamentsStack.Push(new List<ASTool.AS3.IAS3Stmt>());
+
+
+                    buildClassMember(env, fc, cls, builder, false);
+                }
+            }
+            else
+            {
+                var metaclass = cls.staticClass;
+
+                ASBinCode.CodeBlock metablock = new ASBinCode.CodeBlock(metaclass.blockid, metaclass.name, metaclass.classid, false);
+                metablock.scope = new ASBinCode.scopes.ObjectInstanceScope(metaclass);
+
+                CompileEnv envMeta = new CompileEnv(metablock, false);
+                builder._classbuildingEnv.Add(metaclass, envMeta);
+
+                copyInheritsFromSuper(metaclass, envMeta);
+
+                for (int i = 0; i < classstmts.Count; i++)
+                {
+                    buildClassMember(envMeta, classstmts[i], metaclass, builder, true);
+                }
+            }
+        }
+
 
 
         private void buildClassMember(CompileEnv env,
@@ -345,37 +547,116 @@ namespace ASCompiler.compiler.builds
                 {
                     if (!as3function.IsAnonymous)
                     {
+                        List<ASBinCode.rtti.ClassMember> tooverridefunctions = new List<ASBinCode.rtti.ClassMember>();
+
+
+                        string funcname = as3function.Name;
+                        if (as3function.IsGet || as3function.IsSet)
+                        {
+                            funcname = "@" + as3function.Name + (as3function.IsGet ? "_get" : "_set");
+                        }
+
                         for (int j = 0; j < cls.classMembers.Count; j++)
                         {
-                            if (cls.classMembers[j].name == as3function.Name)
+                            if (cls.classMembers[j].name == funcname //as3function.Name
+                                &&
+                                (
+                                    cls.classMembers[j].inheritFrom == null
+                                    ||
+                                    (cls.classMembers[j].isPublic && as3function.Access.IsPublic
+                                    )
+                                )
+                                &&
+                                (
+                                cls.classMembers[j].inheritFrom !=null 
+                                &&
+                                !cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
+                                )
+                                )
                             {
-                                if (
-                                    cls.classMembers[j].bindField is ClassPropertyGetter 
-                                    //||
-                                    //builder._buildingmembers[cls.classMembers[j]] is ASTool.AS3.AS3Function
-                                    
+                                if (as3function.Access.IsOverride
                                     )
                                 {
-                                    ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
-
-                                    //ASTool.AS3.AS3Function pf = 
-                                    //    (ASTool.AS3.AS3Function)builder._buildingmembers[cls.classMembers[j]];
-                                    if ((pg.getter ==null && as3function.IsGet)
+                                    if (!(cls.classMembers[j].bindField is ClassMethodGetter)
                                         ||
-                                        (pg.setter ==null && as3function.IsSet)
+                                        cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
+
                                         )
                                     {
-                                        continue;
+                                        throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "Method marked override must override another method.")
+                                            );
                                     }
 
+                                    if (cls.classMembers[j].isFinal)
+                                    {
+                                        throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "Cannot redefine a final method.")
+                                            );
+                                    }
+
+
+                                    tooverridefunctions.Add(cls.classMembers[j]);
+                                    continue;
                                 }
 
-                                throw new BuildException(
-                                    new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                            "重复的类成员:" + as3function.Name)
-                                    );
+                                //if (
+                                //    cls.classMembers[j].bindField is ClassPropertyGetter 
+
+                                //    )
+                                //{
+                                //    ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
+
+                                //    //ASTool.AS3.AS3Function pf = 
+                                //    //    (ASTool.AS3.AS3Function)builder._buildingmembers[cls.classMembers[j]];
+                                //    if ((pg.getter ==null && as3function.IsGet)
+                                //        ||
+                                //        (pg.setter ==null && as3function.IsSet)
+                                //        )
+                                //    {
+                                //        continue;
+                                //    }
+
+                                //}
+
+                                if (cls.classMembers[j].inheritFrom == null                                   
+                                    )
+                                {
+                                    throw new BuildException(
+                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                "重复的类成员:" + as3function.Name)
+                                        );
+                                }
+                                else
+                                {
+                                    throw new BuildException(
+                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                "Overriding a function that is not marked for override")
+                                        );
+                                }
                             }
                         }
+
+                        if (as3function.Access.IsOverride && as3function.Access.IsStatic)
+                        {
+                            throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                     "Functions cannot be both static and override.")
+                                            );
+                        }
+
+
+                        if (as3function.Access.IsOverride && tooverridefunctions.Count == 0)
+                        {
+                            throw new BuildException(
+                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                "Method marked override must override another method.")
+                                        );
+
+                        }
+
 
                         //***非访问器***
                         if (!as3function.IsGet && !as3function.IsSet)
@@ -396,11 +677,18 @@ namespace ASCompiler.compiler.builds
                             member.isConst = true;
 
                             member.isOverride = as3function.Access.IsOverride;
+                            member.isFinal = as3function.Access.IsFinal;
 
                             member.isGetter = as3function.IsGet;
                             member.isSetter = as3function.IsSet;
 
                             member.isConstructor = as3function.IsConstructor;
+
+                            if (member.isPrivate)
+                            {
+                                ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                            }
+
                             if (member.isConstructor)
                             {
                                 if (member.isStatic)
@@ -422,9 +710,43 @@ namespace ASCompiler.compiler.builds
                                 cls.constructor = member;
                             }
 
+                            int s = 0;
+                            if (member.isPrivate) s++;
+                            if (member.isPublic) s++;
+                            if (member.isProtectd) s++;
+                            if (member.isInternal) s++;
+
+                            if (s > 1)
+                            {
+                                throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "Only one of public, private, protected, or internal can be specified on a definition.")
+                                            );
+                                
+                            }
+                            
+
+
                             cls.classMembers.Add(member);
 
                             builder._buildingmembers.Add(member, as3function);
+
+                            if (as3function.Access.IsOverride)
+                            {
+                                Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>
+                                    dictOvs = new Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>();
+                                if (!builder._overridefunctions.ContainsKey(cls))
+                                {
+                                    builder._overridefunctions.Add(cls,
+                                        dictOvs);
+                                }
+
+                                member.virtualLink = tooverridefunctions[tooverridefunctions.Count -1];
+                                builder._overridefunctions[cls].Add(
+                                    member, tooverridefunctions
+                                    );
+                            }
+
                         }
                         else
                         {
@@ -444,6 +766,7 @@ namespace ASCompiler.compiler.builds
                             member.isConst = true;
 
                             member.isOverride = as3function.Access.IsOverride;
+                            member.isFinal = as3function.Access.IsFinal;
 
                             member.isGetter = as3function.IsGet;
                             member.isSetter = as3function.IsSet;
@@ -464,29 +787,77 @@ namespace ASCompiler.compiler.builds
                                                                      "不能同时是getter和setter")
                                              );
                             }
+
+                            if (member.isPrivate)
+                            {
+                                ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                            }
+
+                            int s = 0;
+                            if (member.isPrivate) s++;
+                            if (member.isPublic) s++;
+                            if (member.isProtectd) s++;
+                            if (member.isInternal) s++;
+
+                            if (s > 1)
+                            {
+                                throw new BuildException(
+                                            new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                                    "Only one of public, private, protected, or internal can be specified on a definition.")
+                                            );
+
+                            }
+
                             
+
+
+
                             cls.classMembers.Add(member);
                             builder._buildingmembers.Add(member, as3function);
+
+                            if (as3function.Access.IsOverride)
+                            {
+                                Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>
+                                    dictOvs = new Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>();
+                                if (!builder._overridefunctions.ContainsKey(cls))
+                                {
+                                    builder._overridefunctions.Add(cls,
+                                        dictOvs);
+                                }
+
+                                member.virtualLink = tooverridefunctions[tooverridefunctions.Count -1];
+
+                                builder._overridefunctions[cls].Add(
+                                    member, tooverridefunctions
+                                    );
+                            }
 
                             //***查找ClassPropertyGetter****
                             ClassPropertyGetter pg = null;
 
                             for (int i = 0; i < cls.classMembers.Count; i++)
                             {
-                                if (cls.classMembers[i].name== as3function.Name)
+                                if (cls.classMembers[i].name== as3function.Name && cls.classMembers[i].inheritFrom==null )
                                 {
                                     if (cls.classMembers[i].bindField is ClassPropertyGetter)
                                     {
                                         pg = (ClassPropertyGetter)cls.classMembers[i].bindField;
 
-                                        if (member.isGetter && pg.getter != null)
+                                        if (member.isGetter && pg.getter != null 
+                                            &&
+                                            cls.classMembers[  pg.getter.indexOfMembers ].inheritFrom ==null
+                                            
+                                            )
                                         {
                                             throw new BuildException(
                                                 new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
                                                                         "属性访问器重复")
                                                 );
                                         }
-                                        else if (member.isSetter && pg.setter != null)
+                                        else if (member.isSetter && pg.setter != null
+                                            &&
+                                            cls.classMembers[pg.setter.indexOfMembers].inheritFrom==null
+                                            )
                                         {
                                             throw new BuildException(
                                                 new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
@@ -509,9 +880,36 @@ namespace ASCompiler.compiler.builds
                             {
                                 pg = new ClassPropertyGetter(as3function.Name, cls, cls.classMembers.Count);
                                 ASBinCode.rtti.ClassMember m = new ASBinCode.rtti.ClassMember(as3function.Name, cls, pg);
-
-                                cls.classMembers.Add(m);
                                 
+                                cls.classMembers.Add(m);
+                                m.isPublic = true;
+                                //***从拷贝过来的成员中复制继承的访问器属性***
+                                for (int i = cls.classMembers.Count-1; i >=0; i--)
+                                {
+                                    if (cls.classMembers[i].inheritFrom != null)
+                                    {
+                                        if (cls.classMembers[i].name == pg.name
+                                            &&
+                                            cls.classMembers[i].bindField is ClassPropertyGetter
+                                            )
+                                        {
+                                            ClassPropertyGetter copyed =
+                                                (ClassPropertyGetter)cls.classMembers[i].bindField;
+
+                                            pg.getter = copyed.getter;
+                                            pg.setter = copyed.setter;
+
+                                            m.setTypeWhenCompile(cls.classMembers[i].valueType);
+
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+
+
+
                             }
                             if (member.isGetter)
                             {
@@ -543,7 +941,15 @@ namespace ASCompiler.compiler.builds
                 {
                     for (int j = 0; j < cls.classMembers.Count; j++)
                     {
-                        if (cls.classMembers[j].name == variable.Name)
+                        if (cls.classMembers[j].name == variable.Name
+                            &&
+                                (
+                                    cls.classMembers[j].inheritFrom == null
+                                    ||
+                                    (cls.classMembers[j].isPublic && variable.Access.IsPublic )
+                                )
+
+                            )
                         {
                             throw new BuildException(
                                 new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
@@ -574,6 +980,21 @@ namespace ASCompiler.compiler.builds
 
                     cls.fields.Add(member);
 
+                    int s = 0;
+                    if (member.isPrivate) s++;
+                    if (member.isPublic) s++;
+                    if (member.isProtectd) s++;
+                    if (member.isInternal) s++;
+
+                    if (s > 1)
+                    {
+                        throw new BuildException(
+                                    new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                            "Only one of public, private, protected, or internal can be specified on a definition.")
+                                    );
+
+                    }
+
                     builder._buildingmembers.Add(member,variable);
                 }
             }
@@ -585,7 +1006,14 @@ namespace ASCompiler.compiler.builds
                 {
                     for (int j = 0; j < cls.classMembers.Count; j++)
                     {
-                        if (cls.classMembers[j].name == constant.Name)
+                        if (cls.classMembers[j].name == constant.Name
+                            &&
+                                (
+                                    cls.classMembers[j].inheritFrom == null
+                                    ||
+                                    (cls.classMembers[j].isPublic && constant.Access.IsPublic)
+                                )
+                            )
                         {
                             throw new BuildException(
                                 new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
@@ -615,6 +1043,21 @@ namespace ASCompiler.compiler.builds
                     cls.classMembers.Add(member);
 
                     cls.fields.Add(member);
+
+                    int s = 0;
+                    if (member.isPrivate) s++;
+                    if (member.isPublic) s++;
+                    if (member.isProtectd) s++;
+                    if (member.isInternal) s++;
+
+                    if (s > 1)
+                    {
+                        throw new BuildException(
+                                    new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                            "Only one of public, private, protected, or internal can be specified on a definition.")
+                                    );
+
+                    }
 
                     builder._buildingmembers.Add(member,constant);
                 }

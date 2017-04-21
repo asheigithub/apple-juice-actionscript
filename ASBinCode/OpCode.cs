@@ -300,9 +300,9 @@ namespace ASBinCode
         access_method =77,
 
         /// <summary>
-        /// method绑定this
+        /// 如果不是method,则清空this指针
         /// </summary>
-        bind_this=78,
+        clear_thispointer=78,
 
         /// <summary>
         /// 如果是一个属性，则尝试从属性中读取值。
@@ -350,5 +350,16 @@ namespace ASBinCode
         /// 往vector里追加元素
         /// </summary>
         vector_push=87,
+
+        /// <summary>
+        /// 链接到包外成员
+        /// </summary>
+        link_outpackagevairable=88,
+
+        /// <summary>
+        /// 标记准备调父类的构造函数
+        /// </summary>
+        flag_call_super_constructor =89,
+
     }
 }

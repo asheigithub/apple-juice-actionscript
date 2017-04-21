@@ -61,6 +61,8 @@
     <Compile Include="compiler\BuildTypeError.cs" />
     <Compile Include="compiler\CompileEnv.cs" />
     <Compile Include="compiler\ExpressionEval.cs" />
+    <Compile Include="compiler\FindOutPackageScopeMember.cs" />
+    <Compile Include="compiler\FindStaticMember.cs" />
     <Compile Include="compiler\TypeReader.cs" />
     <Compile Include="compiler\MemberFinder.cs" />
     <Compile Include="compiler\utils\ImportReader.cs" />
@@ -100,11 +102,13 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="aslib\Array.txt" />
+    <Content Include="aslib\Class.txt" />
     <Content Include="aslib\Function.txt" />
     <Content Include="aslib\int.txt" />
     <Content Include="aslib\Math.txt" />
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
+    <Content Include="aslib\Sprite.txt" />
     <Content Include="aslib\uint.txt" />
     <Content Include="aslib\Vector.txt" />
     <Content Include="aslib\__buildin__.txt" />
