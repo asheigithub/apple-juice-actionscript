@@ -17,6 +17,7 @@ namespace ASRuntime
             index = (int)RunTimeDataType.unknown;
 
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
+            _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
 
             //存储器设置初始值
             for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
@@ -34,7 +35,7 @@ namespace ASRuntime
         internal ASBinCode.rtti.Class superPropBindClass;
 
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
-        
+        internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
 
         internal ISLOT linktarget;
         public void linkTo(ISLOT linktarget)
@@ -288,6 +289,7 @@ namespace ASRuntime
             //fromArray = null;
             //fromArrayIndex = -1;
             _cache_vectorSlot.clear();
+            _cache_prototypeSlot.clear();
 
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;

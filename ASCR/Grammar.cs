@@ -111,13 +111,13 @@ namespace ASCompiler
             {
                 string _buildin_ = Properties.Resources.__buildin__;
                 var tree = grammar.ParseTree(_buildin_, ASTool.AS3LexKeywords.LEXKEYWORDS,
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "__buildin__.as3");
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "@__buildin__.as3");
 
                 if (grammar.hasError)
                 {
                     return null;
                 }
-                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "__buildin__.as3"));
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "@__buildin__.as3"));
             }
 
             {

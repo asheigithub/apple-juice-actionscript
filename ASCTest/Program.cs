@@ -44,7 +44,7 @@ namespace ASCTest
                 }
                 else if (System.IO.Directory.Exists(path))
                 {
-                    Console.WriteLine(path);
+                    //Console.WriteLine(path);
                     //teststring = System.IO.File.ReadAllText(args[0]);
                     files = System.IO.Directory.GetFiles(path, "*.as", System.IO.SearchOption.AllDirectories );
                 }
@@ -97,10 +97,12 @@ namespace ASCTest
                     Console.ReadLine();
                     return;
                 }
-
+#if DEBUG
                 Console.Clear();
-
+#endif
             }
+
+#if DEBUG
 
             Console.WriteLine();
             Console.WriteLine("====语法树翻译====");
@@ -110,6 +112,8 @@ namespace ASCTest
             {
                 p.Write(0, srcout);
             }
+
+#endif
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
@@ -123,6 +127,8 @@ namespace ASCTest
                 ASBinCode.CSWC swc = builder.bin;
                 if (swc != null)
                 {
+#if DEBUG
+
                     for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];
@@ -135,6 +141,8 @@ namespace ASCTest
                             Console.WriteLine(block.ToString());
                         }
                     }
+
+#endif
 
                     if (swc.blocks.Count > 0)
                     {

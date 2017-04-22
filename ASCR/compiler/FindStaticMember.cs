@@ -41,25 +41,39 @@ namespace ASCompiler.compiler
             throw new NotImplementedException();
         }
 
-        public Register buildAccessThisMember(ASTool.Token matchtoken , CompileEnv env)
+        public ILeftValue buildAccessThisMember(ASTool.Token matchtoken , CompileEnv env)
         {
-            OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
-                                        new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
-            stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
-                new ASBinCode.rtData.rtInt(static_class._class.instanceClass.classid));
-            stepInitClass.arg1Type = static_class._class.getRtType();
-            env.block.opSteps.Add(stepInitClass);
+            if (
+                !(classMember.bindField is VariableBase)
+                &&
+                env.block.scope is ASBinCode.scopes.FunctionScope &&
+                env.block.scope.parentScope is ASBinCode.scopes.ObjectInstanceScope
+                &&
+                ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class == static_class._class
+                )
+            {
+                return (ILeftValue)classMember.bindField;
+            }
+            else
+            {
+                OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+                                            new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                    new ASBinCode.rtData.rtInt(static_class._class.instanceClass.classid));
+                stepInitClass.arg1Type = static_class._class.getRtType();
+                env.block.opSteps.Add(stepInitClass);
 
-            var _buildin_ = static_class;
-            var eax_member = env.getAdditionalRegister();
-            eax_member.setEAXTypeWhenCompile(classMember.valueType);
+                var _buildin_ = static_class;
+                var eax_member = env.getAdditionalRegister();
+                eax_member.setEAXTypeWhenCompile(classMember.valueType);
 
-            eax_member._regMember = classMember;
-            eax_member._regMemberSrcObj = _buildin_;
-            
-            AccessBuilder.make_dotStep(env, classMember, matchtoken, eax_member, _buildin_);
+                eax_member._regMember = classMember;
+                eax_member._regMemberSrcObj = _buildin_;
 
-            return eax_member;
+                AccessBuilder.make_dotStep(env, classMember, matchtoken, eax_member, _buildin_);
+
+                return eax_member;
+            }
         }
 
 

@@ -560,9 +560,12 @@ namespace ASCompiler.compiler.builds
                     {
                         memberLeftValue = ((FindStaticMember)member).buildAccessThisMember(step.token, env);
 
-                        if (((Register)memberLeftValue)._regMember.bindField is ClassMethodGetter
+                        if (
+                            memberLeftValue is ClassMethodGetter
                             ||
-                            ((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
+                            ((Register)memberLeftValue)._regMember.bindField is ClassMethodGetter
+                            //||
+                            //((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
                             ||
                             (((Register)memberLeftValue)._regMember.bindField is VariableBase
                                 &&
@@ -574,7 +577,26 @@ namespace ASCompiler.compiler.builds
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                                 "Illegal assignment to " + step.Arg1.Data.Value));
                         }
+                        else if (((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter)
+                        {
+                            var eaxsp = env.getAdditionalRegister();
 
+                            AccessBuilder.make_dotStep(env, ((Register)memberLeftValue)._regMember, 
+                                step.token, eaxsp,
+                                ((FindStaticMember)member).static_class
+                                );
+
+                            ClassPropertyGetter prop = (ClassPropertyGetter)
+                                ((Register)memberLeftValue)._regMember.bindField;
+                            buildPropSet(prop, step, prop.name, env,
+                                ((Register)memberLeftValue)._regMember.refClass, 
+                                getRightValue(env,step.Arg2 ,step.token,builder) ,
+                                ((Register)memberLeftValue)._regMemberSrcObj, eaxsp);
+
+                            return;
+
+
+                        }
                     }
 
                     if (member is FindOutPackageScopeMember)
@@ -918,7 +940,9 @@ namespace ASCompiler.compiler.builds
             {
                 throw new BuildException(
                     new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
-                    "Property " + propname + " is write-only."));
+                    //"Property " + propname + " is write-only."
+                    "Attempted access of inaccessible property "+propname+" through a reference with static type " + refClass + "."
+                    ));
             }
 
             if (prop.setter != null)
@@ -1142,7 +1166,21 @@ namespace ASCompiler.compiler.builds
 
                         if (member is FindStaticMember)
                         {
-                            return ((FindStaticMember)member).buildAccessThisMember(matchtoken, env);
+                            if (((FindStaticMember)member).classMember.bindField is ClassPropertyGetter)
+                            {
+                                ClassPropertyGetter prop = (ClassPropertyGetter)
+                                    ((FindStaticMember)member).classMember.bindField;
+                                //***调用属性访问器***
+                                return addOpPropGet(prop, matchtoken, prop.name,
+                                    ((FindStaticMember)member).classMember.refClass, 
+                                    ((FindStaticMember)member).static_class , env, builder);
+                            }
+                            else
+                            {
+                                return ((FindStaticMember)member).buildAccessThisMember(matchtoken, env);
+                            }
+
+
                         }
 
                         if (member is FindOutPackageScopeMember)

@@ -353,7 +353,7 @@ namespace ASCompiler.compiler.builds
         public void buildClassExtends(ASTool.AS3.AS3Class as3class, Builder builder)
         {
             var cls = builder.buildingclasses[as3class];
-            if (cls.getRtType() != RunTimeDataType._OBJECT+3)
+            if (cls.getRtType() > RunTimeDataType._OBJECT+1)
             {
                 cls.staticClass.super = builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT+2);
             }
@@ -716,6 +716,11 @@ namespace ASCompiler.compiler.builds
                             if (member.isProtectd) s++;
                             if (member.isInternal) s++;
 
+                            if (s == 0)
+                            {
+                                member.isInternal = true;
+                            }
+
                             if (s > 1)
                             {
                                 throw new BuildException(
@@ -798,6 +803,11 @@ namespace ASCompiler.compiler.builds
                             if (member.isPublic) s++;
                             if (member.isProtectd) s++;
                             if (member.isInternal) s++;
+
+                            if (s == 0)
+                            {
+                                member.isInternal = true;
+                            }
 
                             if (s > 1)
                             {
@@ -883,6 +893,9 @@ namespace ASCompiler.compiler.builds
                                 
                                 cls.classMembers.Add(m);
                                 m.isPublic = true;
+
+                                m.isStatic = member.isStatic;
+
                                 //***从拷贝过来的成员中复制继承的访问器属性***
                                 for (int i = cls.classMembers.Count-1; i >=0; i--)
                                 {
@@ -986,6 +999,11 @@ namespace ASCompiler.compiler.builds
                     if (member.isProtectd) s++;
                     if (member.isInternal) s++;
 
+                    if (s == 0)
+                    {
+                        member.isInternal = true;
+                    }
+
                     if (s > 1)
                     {
                         throw new BuildException(
@@ -1049,6 +1067,11 @@ namespace ASCompiler.compiler.builds
                     if (member.isPublic) s++;
                     if (member.isProtectd) s++;
                     if (member.isInternal) s++;
+
+                    if (s == 0)
+                    {
+                        member.isInternal = true;
+                    }
 
                     if (s > 1)
                     {

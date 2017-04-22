@@ -101,7 +101,7 @@ namespace ASCompiler.compiler
 
 
             //}
-
+            bool skipoutpackagescope = false;
 
             ASBinCode.rtti.Class defineClass = null;
 
@@ -113,21 +113,37 @@ namespace ASCompiler.compiler
                 {
                     //查找类方法
                     ASBinCode.rtti.Class cls = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
-                    if (isStaticMember && cls.staticClass != null)
-                    {
-                        cls = cls.staticClass;
-                    }
+                    //if (isStaticMember && cls.staticClass != null)
+                    //{
+                    //    cls = cls.staticClass;
+                    //}
+
+
                     if (defineClass == null)
                     {
                         defineClass = cls;
+                        
                     }
 
-                    var fm = ASBinCode.ClassMemberFinder.find(cls, name, defineClass);
-                    if (fm != null)
+                    if (!isStaticMember && cls.staticClass == null)
                     {
-                        return fm.bindField;
+                        
+                        defineClass = defineClass.instanceClass;
+                        skipoutpackagescope = true;
+                        break;
                     }
-
+                    else
+                    {
+                        var fm = ASBinCode.ClassMemberFinder.find(cls, name, defineClass);
+                        if (fm != null)
+                        {
+                            return fm.bindField;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
 
                 if (!(scope is ASBinCode.scopes.OutPackageMemberScope)
@@ -162,7 +178,7 @@ namespace ASCompiler.compiler
                     var bi = buildin[0].staticClass;
 
                     var member = ClassMemberFinder.find(bi, name, bi);
-                    if (member != null)
+                    if (member != null && !(member.bindField is ClassPropertyGetter) && member.inheritFrom==null)
                     {
                         FindStaticMember sm = new FindStaticMember();
                         sm.classMember = member;
@@ -185,6 +201,11 @@ namespace ASCompiler.compiler
                 var member = ClassMemberFinder.find(bi, name, defineClass.staticClass);
                 if (member != null)
                 {
+                    if (member != null && member.bindField is ClassPropertyGetter && name == "prototype")
+                    {
+                        throw new BuildException(token.line,token.ptr,token.sourceFile, "Access of possibly undefined property prototype.");
+                    }
+
                     FindStaticMember sm = new FindStaticMember();
                     sm.classMember = member;
                     sm.static_class = new StaticClassDataGetter(bi);
@@ -196,6 +217,11 @@ namespace ASCompiler.compiler
                 findstaticclass = findstaticclass.super;
             }
 
+            if (skipoutpackagescope)
+            {
+                return null;
+            }
+            
 
             if (defineClass !=null && defineClass.mainClass != null)
             {
@@ -263,6 +289,7 @@ namespace ASCompiler.compiler
                 }
                 
             }
+
             
             return ASBinCode.ClassMemberFinder.find(cls, name,
                 builder.getClassByRunTimeDataType(ASBinCode.RunTimeDataType._OBJECT)

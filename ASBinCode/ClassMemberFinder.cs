@@ -18,6 +18,12 @@ namespace ASBinCode
                 if (cls.classMembers[i].name == name)
                 {
                     var member = cls.classMembers[i];
+
+                    if (member.inheritSrcMember != null && member.inheritSrcMember.isConstructor)
+                    {
+                        continue;
+                    }
+
                     if (!member.isPublic)
                     {
                         if (finder != null)
@@ -31,7 +37,7 @@ namespace ASBinCode
                             }
                             else if (member.isPrivate)
                             {
-                                if (finder == cls)
+                                if (finder == (member.inheritFrom==null? cls :member.inheritSrcMember.refClass))
                                 {
                                     return cls.classMembers[i];
                                 }
@@ -44,7 +50,7 @@ namespace ASBinCode
                                 }
                             }
 
-                            if (finder == cls)
+                            if (finder == (member.inheritFrom == null ? cls : member.inheritSrcMember.refClass))
                             {
                                 return cls.classMembers[i];
                             }

@@ -2,6 +2,36 @@
 {
 	public dynamic class Object
 	{
+		[native,_Object_toString]
+		private static var toString= function():String;
+		
+		private static var valueOf = function():*{ return this };
+
+
+		private static var _prototype:*=
+		{
+			"toString":toString
+			,
+			"valueOf":valueOf
+			,
+			"toLocaleString":function toLocaleString()
+			{
+				return toString();
+			}
+
+		};
+
+		public static function get prototype():*
+		{
+			return _prototype;
+		}
+		
+		
+
+
+		
+		
+
 		public function Object ();
 	}
 }

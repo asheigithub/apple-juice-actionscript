@@ -1,5 +1,9 @@
 ﻿package
 {
+	/*
+	不要在这个类里编写属性访问器
+	*/
+
 	public class __buildin__
 	{
 		[native,__buildin__ismethod]

@@ -191,6 +191,16 @@ namespace ASCompiler.compiler
 
                 if (srcfile.Package.MainClass != null)
                 {
+                    if (System.IO.Path.GetFileNameWithoutExtension(srcfile.srcFile)
+                        != srcfile.Package.MainClass.Name
+                        )
+                    {
+                        throw new BuildException(0, 0, srcfile.srcFile,
+                            "文件名和类名不匹配"
+                        );
+                    }
+
+
                     builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
                     var c = builder.buildClassDefine(srcfile.Package.MainClass, this, null, srcfile,isbuildvector,vectortype);
 
@@ -255,30 +265,43 @@ namespace ASCompiler.compiler
                 ) =>
             {
                 {
-                    var inhc1 = c1.Value.super;
-                    while (inhc1 !=null)
+                    if (ClassMemberFinder.isInherits(c1.Value, c2.Value))
                     {
-                        if (inhc1 == c2.Value)
-                        {
-                            return 1;
-                        }
-                        inhc1 = inhc1.super;
+                        return 1;
                     }
                 }
                 {
-                    var inhc2 = c2.Value.super;
-                    while (inhc2 != null)
+                    if (ClassMemberFinder.isInherits(c2.Value, c1.Value))
                     {
-                        if (inhc2 == c1.Value)
-                        {
-                            return -1;
-                        }
-                        inhc2 = inhc2.super;
+                        return -1;
                     }
                 }
 
+                //比较继承深度
 
-                return c1.Value.getRtType() - c2.Value.getRtType();
+                int d1 = 0;
+                var ds = c1.Value.super;
+                while (ds !=null)
+                {
+                    d1++;
+                    ds = ds.super;
+                }
+
+                int d2 = 0;
+                var d2s = c2.Value.super;
+                while (d2s != null)
+                {
+                    d2++;
+                    d2s = d2s.super;
+                }
+
+                if (d1 != d2)
+                {
+                    return d1 - d2;
+                }
+
+
+                return  c1.Value.getRtType() - c2.Value.getRtType();
             });
 
 
@@ -1894,13 +1917,13 @@ namespace ASCompiler.compiler
             {
                 //***类库源码***
                 var tree = grammar.ParseTree(template, ASTool.AS3LexKeywords.LEXKEYWORDS,
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Vector.as3");
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, TC+".as3");
 
                 if (grammar.hasError)
                 {
                     throw new BuildException(token.line, token.ptr,token.sourceFile, "Vector.<"+ vt +">编译失败");
                 }
-                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Vector.as3"));
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, TC+".as3"));
             }
 
             foreach (var tree in trees)

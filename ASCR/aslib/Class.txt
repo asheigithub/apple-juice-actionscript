@@ -4,19 +4,8 @@
 	public dynamic class Class extends Object
 	{
 		
-		private var _protoObj=
-		{
-			/*"toString":function toString():String
-				{
-					return "[object Object]";
-				}
-			,
-			"valueOf":function valueOf():Object
-			{
-				return this;
-			}
-			*/
-		};
+		private var _protoObj:*={};
+		
 
 		public function get prototype():*
 		{

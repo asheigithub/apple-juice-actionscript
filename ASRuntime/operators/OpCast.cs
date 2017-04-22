@@ -833,7 +833,7 @@ namespace ASRuntime.operators
                     ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
 
                     bool haserror;
-                    var find= OpAccess_Dot.findInProtoType(dobj, "valueOf", frame, token, out haserror);
+                    var find = OpAccess_Dot.findInProtoType(dobj, "valueOf", frame, token, out haserror);
                     if (haserror)
                     {
                         frame.endStep();
@@ -846,12 +846,12 @@ namespace ASRuntime.operators
                         if (prop is rtFunction)
                         {
                             function = (rtFunction)prop;
-                            if(!ReferenceEquals(find,dobj))
+                            if (!ReferenceEquals(find, dobj))
                             {
                                 function = (rtFunction)function.Clone();
                                 function.setThis(obj);
                             }
-                            
+
                         }
                     }
 
@@ -864,6 +864,45 @@ namespace ASRuntime.operators
                     //        function = (rtFunction)prop;
                     //    }
                     //}
+                }
+                else
+                {
+                    //***从Class定义的原型链中查找
+                    var dobj = (ASBinCode.rtti.DynamicObject)
+                        frame.player.static_instance[obj.value._class.staticClass.classid].value;
+
+                    dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                    if (!dobj.hasproperty("valueOf"))
+                    {
+
+                        dobj = ((ASBinCode.rtti.DynamicObject)
+                            frame.player.static_instance[obj.value._class.staticClass.classid].value);
+
+                        bool haserror;
+                        dobj = OpAccess_Dot.findInProtoType(dobj, "valueOf",
+                            frame, token, out haserror);
+                        if (haserror)
+                        {
+                            frame.endStep();
+                            return;
+                        }
+                    }
+
+                    if (dobj != null)
+                    {
+                        var prop = dobj["valueOf"].getValue();
+                        if (prop is rtFunction)
+                        {
+                            function = (rtFunction)prop;
+
+                            if (!ReferenceEquals(dobj, obj.value))
+                            {
+                                function = (rtFunction)function.Clone();
+                                function.setThis(obj);
+                            }
+
+                        }
+                    }
                 }
 
             }
@@ -1101,16 +1140,45 @@ namespace ASRuntime.operators
 
                         }
                     }
+                }
+                else
+                {
+                    //***从Class定义的原型链中查找
+                    var dobj = (ASBinCode.rtti.DynamicObject)
+                        frame.player.static_instance[obj.value._class.staticClass.classid].value;
 
-                    //if (dobj.hasproperty("toString"))
-                    //{
-                    //    var prop = dobj["toString"].getValue();
+                    dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                    if (!dobj.hasproperty("toString"))
+                    {
 
-                    //    if (prop is rtFunction)
-                    //    {
-                    //        function = (rtFunction)prop;
-                    //    }
-                    //}
+                        dobj = ((ASBinCode.rtti.DynamicObject)
+                            frame.player.static_instance[obj.value._class.staticClass.classid].value);
+
+                        bool haserror;
+                        dobj = OpAccess_Dot.findInProtoType(dobj, "toString",
+                            frame, token, out haserror);
+                        if (haserror)
+                        {
+                            frame.endStep();
+                            return;
+                        }
+                    }
+
+                    if (dobj != null)
+                    {
+                        var prop = dobj["toString"].getValue();
+                        if (prop is rtFunction)
+                        {
+                            function = (rtFunction)prop;
+
+                            if (!ReferenceEquals(dobj, obj.value))
+                            {
+                                function = (rtFunction)function.Clone();
+                                function.setThis(obj);
+                            }
+
+                        }
+                    }
                 }
 
             }

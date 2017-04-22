@@ -90,7 +90,16 @@ namespace ASRuntime.operators
 
         public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step,IRunTimeScope scope)
         {
-            var rv = step.arg1.getValue(frame.scope);
+            IRunTimeValue rv;
+            if (step.arg1 is ClassMethodGetter)
+            {
+                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+            }
+            else
+            {
+                rv= step.arg1.getValue(frame.scope);
+            }
+
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(

@@ -28,25 +28,7 @@ package
 		
 		public function Main() 
 		{
-			var p = new ExtCP();
 			
-			
-			CP.prototype.toString=function(){
-				return "ExtCP toString"
-			}
-			
-			trace(p.toString());
-			
-			
-			
-			//Main.prototype.toStrin = function(){
-				//
-				//return "toString Main";
-			//};
-			//
-			//var k = this;
-			//
-			//trace(k.toStrin());
 			
 		}
 		
@@ -92,3 +74,29 @@ package
 	}
 	
 }
+class A {
+     var x = 1
+	 public function A()
+	 {
+     A.prototype.px = 2
+	 }
+ }
+ dynamic class B extends A {
+     var y = 3
+	 public function B()
+	 {
+     B.prototype.py = 4
+	 }
+ }
+  
+ var b = new B()
+ trace(b.x) // 1 via class inheritance
+  trace(b.px) // 2 via prototype inheritance from A.prototype
+  trace(b.y) // 3
+  trace(b.py) // 4 via prototype inheritance from B.prototype
+  
+ B.prototype.px = 5
+  trace(b.px) // now 5 because B.prototype hides A.prototype
+  
+ b.px = 6
+  trace(b.px) // now 6 because b hides B.prototype

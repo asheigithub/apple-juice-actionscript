@@ -58,8 +58,15 @@ namespace ASRuntime.operators
 
             DynamicPropertySlot heapslot = new DynamicPropertySlot(obj, true);
             heapslot._propname = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value;
-            heapslot.directSet( step.arg2.getValue(scope) );
 
+            if (step.arg2 is ClassMethodGetter)
+            {
+                heapslot.directSet( ((ClassMethodGetter)step.arg2).getMethod(scope));
+            }
+            else
+            {
+                heapslot.directSet(step.arg2.getValue(scope));
+            }
 
             dobj.createOrReplaceproperty(heapslot._propname,heapslot);
 

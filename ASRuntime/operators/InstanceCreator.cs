@@ -99,7 +99,15 @@ namespace ASRuntime.operators
                     {
                         ((DynamicObject)obj)._prototype_ = (DynamicObject)(player.static_instance[cls.super.staticClass.classid]).value;
 
-                        return player.step_toStackflag(f);
+                        bool result= player.step_toStackflag(f);
+
+                        if (cls.classid > 0)
+                        {
+                            ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
+                                
+                        }
+
+                        return result;
                     }
                     else
                     {
@@ -108,7 +116,9 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    return player.step_toStackflag(f);
+                    bool result= player.step_toStackflag(f);
+
+                    return result;
                 }
                 
             }
@@ -169,8 +179,6 @@ namespace ASRuntime.operators
                     {
                         ((DynamicObject)obj.value)._prototype_ 
                             = (DynamicObject)(player.static_instance[_class.super.staticClass.classid]).value;
-
-                        
                     }
                     else
                     {
@@ -186,6 +194,21 @@ namespace ASRuntime.operators
                 //exec_step1(player,frame,step,as3class,scope);
                 exec_step0();
             }
+        }
+
+        private void set_Class_constructor()
+        {
+            if (_class.classid > 0)
+            {
+                var obj = player.static_instance[_class.staticClass.classid];
+
+                ((DynamicObject)
+                    ((ASBinCode.rtData.rtObject)obj.value.memberData[0].getValue()).value)
+                    ["constructor"].directSet(player.static_instance[_class.staticClass.classid]);
+
+            }
+
+            exec_step0();
         }
 
         private void exec_step0()
@@ -516,7 +539,7 @@ namespace ASRuntime.operators
               
                 InstanceCreator ic = ((InstanceCreator)this.args);
 
-                ic.exec_step0();
+                ic.set_Class_constructor();
             }
         }
     }

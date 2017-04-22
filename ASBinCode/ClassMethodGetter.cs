@@ -96,11 +96,14 @@ namespace ASBinCode
 
         public IRunTimeValue getValue(IRunTimeScope scope)
         {
-            throw new NotImplementedException();
-
+            return getMethod(scope);
+            //throw new NotImplementedException();
+            //return getMethod(scope);
             //return getISlot(scope).getValue();
             //return getISlot(scope).getValue();
         }
+
+        
 
         
 
@@ -120,9 +123,15 @@ namespace ASBinCode
 
         public IRunTimeValue getMethod(IRunTimeScope scope)
         {
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
+
             if (!isNotReadVirtual)
             {
-
+                
                 var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
 
                 rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
@@ -133,6 +142,7 @@ namespace ASBinCode
             }
             else
             {
+                
                 rtData.rtFunction method = new rtData.rtFunction(functionid, true);
                 method.bind(scope);
                 method.setThis(scope.this_pointer);
@@ -147,6 +157,12 @@ namespace ASBinCode
 
         public IRunTimeValue getSuperMethod(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
         {
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
+
             var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
             while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
             {
@@ -163,6 +179,11 @@ namespace ASBinCode
 
         public ISLOT getVirtualSlot(IRunTimeScope scope)
         {
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
             if (!isNotReadVirtual)
             {
                 var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
@@ -183,11 +204,11 @@ namespace ASBinCode
 
         public ISLOT getSuperSlot(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
         {
-            //var vmember = (ClassMethodGetter)
-            //    ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember]
-            //    .overrideTargetMember
-            //    .bindField;
-
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+            
             var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
             while (!ReferenceEquals(m.virtualLinkFromClass,superClass))
             {

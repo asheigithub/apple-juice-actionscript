@@ -11,6 +11,8 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new __buildin__ismethod());
             bin.regNativeFunction(new __buildin__trace());
 
+            bin.regNativeFunction(new Object_toString());
+
 
             bin.regNativeFunction(new Int_toPrecision());
             bin.regNativeFunction(new Int_toExponential());

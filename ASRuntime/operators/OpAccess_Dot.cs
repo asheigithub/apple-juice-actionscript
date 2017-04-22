@@ -227,7 +227,7 @@ namespace ASRuntime.operators
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[2].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
                             dobj = null;
@@ -328,7 +328,18 @@ namespace ASRuntime.operators
                     Class finder;
                     if (block.isoutclass)
                     {
-                        finder = null;
+                        finder = player.swc.classes[block.define_class_id];
+                        //if (rtObj.value._class.mainClass != null
+                        //    &&
+                        //    rtObj.value._class.mainClass.outscopeblockid
+                        //        == block.id)
+                        //{
+                        //    finder = rtObj.value._class;
+                        //}
+                        //else
+                        //{
+                        //    finder = null;
+                        //}
                     }
                     else
                     {
@@ -521,7 +532,11 @@ namespace ASRuntime.operators
                     }
                 }
 
-                prototypeSlot pslot = new prototypeSlot(rtObj, name, v);
+                prototypeSlot pslot = dslot._cache_prototypeSlot; //new prototypeSlot(rtObj, name, v);
+                pslot._protoRootObj = rtObj;
+                pslot._protoname = name;
+                pslot.findSlot = v;
+
                 v = pslot;
                 //dslot._protoRootObj = (DynamicObject)rtObj.value;
                 //dslot._protoname = name;
@@ -751,12 +766,12 @@ namespace ASRuntime.operators
         }
 
 
-        class prototypeSlot : ISLOT
+        internal class prototypeSlot : ISLOT
         {
             internal rtObject _protoRootObj;
             internal string _protoname;
 
-            private ISLOT findSlot;
+            internal ISLOT findSlot;
 
             public prototypeSlot(rtObject _protoRootObj, string _protoname,
                 ISLOT findSlot
@@ -778,18 +793,31 @@ namespace ASRuntime.operators
 
             public void clear()
             {
+                _protoRootObj = null;
+                _protoname = null;
+                findSlot = null;
+
                 //throw new NotImplementedException();
             }
 
             public bool directSet(IRunTimeValue value)
             {
                 //throw new NotImplementedException();
-                DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true);
-                heapslot._propname = _protoname;
-                heapslot.directSet(value);
-                ((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
+                
+                if (_protoRootObj.value._class.dynamic)
+                {
+                    DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true);
+                    heapslot._propname = _protoname;
+                    heapslot.directSet(value);
 
-                return true;
+                    ((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
             }
 
             public IRunTimeValue getValue()

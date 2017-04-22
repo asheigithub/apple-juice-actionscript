@@ -54,6 +54,12 @@ namespace ASRuntime.operators
                     {
                         ext = "Illegal write to read-only property ";
                     }
+                    else if (slot is OpAccess_Dot.prototypeSlot)
+                    {
+                        ext = "Cannot create property "
+                            + ((OpAccess_Dot.prototypeSlot)slot)._protoname +
+                            " on " + ((OpAccess_Dot.prototypeSlot)slot)._protoRootObj.value._class.name ;
+                    }
 
                     frame.throwError(
                         new error.InternalError(step.token, ext, new ASBinCode.rtData.rtString(ext))
