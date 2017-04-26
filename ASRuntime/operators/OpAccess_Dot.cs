@@ -227,10 +227,14 @@ namespace ASRuntime.operators
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[2].getValue()).value;
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[3].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
-                            dobj = null;
+                            dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                            if (!dobj.hasproperty(name))
+                            {
+                                dobj = null;
+                            }
                         }
                         //dobj = null;
                     }
@@ -590,6 +594,7 @@ namespace ASRuntime.operators
                 if (!(obj is rtObject))
                 {
                     var objtype = obj.rtType;
+
                     if (objtype < RunTimeDataType.unknown
                         &&
                         player.swc.primitive_to_class_table[objtype] != null

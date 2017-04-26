@@ -467,26 +467,45 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.rtti.Class vector = builder.getClassByRunTimeDataType(v1.valueType);
                 RunTimeDataType vt = builder.bin.dict_Vector_type[vector];
 
-                if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int, builder))
+                //if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int, builder))
+                //{
+                //    throw new BuildException(
+                //        step.token.line, step.token.ptr, step.token.sourceFile,
+                //        "不能将 " + vector + " 的访问索引类型 " + v2.valueType + " 转换为 int"
+                //        );
+                //}
+
+                if (v2.valueType > RunTimeDataType.unknown)
                 {
-                    throw new BuildException(
-                        step.token.line,step.token.ptr,step.token.sourceFile,
-                        "不能将 "+vector+" 的访问索引类型 " + v2.valueType + " 转换为 int"
-                        );
+                    v2 = ExpressionBuilder.addCastToPrimitive(env, v2, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                 }
 
-                if (v2.valueType != RunTimeDataType.rt_int)
+                if (v2.valueType == RunTimeDataType.rt_int ||
+                    v2.valueType == RunTimeDataType.rt_number ||
+                    v2.valueType == RunTimeDataType.rt_uint
+                    )
                 {
-                    ExpressionBuilder.addCastOpStep(env, v2, RunTimeDataType.rt_int,
+                    v2 = ExpressionBuilder.addCastOpStep(env, v2, RunTimeDataType.rt_int,
                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
                         , builder);
+                    eax.setEAXTypeWhenCompile(vt);
+                    
+                    {
+                        
+                        OpStep op = new OpStep(OpCode.vectorAccessor_bind, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        op.reg = eax;
+                        op.regType = eax.valueType;
+                        op.arg1 = v1;
+                        op.arg1Type = v1.valueType;
+                        op.arg2 = v2;
+                        op.arg2Type = v2.valueType;
+                        env.block.opSteps.Add(op);
+                    }
                 }
-
-                eax.setEAXTypeWhenCompile(vt);
-                eax._vector_Type = vt;
+                else
                 {
-
-                    OpStep op = new OpStep(OpCode.vectorAccessor_bind, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    
+                    OpStep op = new OpStep(OpCode.vectorAccessor_convertidx, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     op.reg = eax;
                     op.regType = eax.valueType;
                     op.arg1 = v1;
@@ -495,6 +514,27 @@ namespace ASCompiler.compiler.builds
                     op.arg2Type = v2.valueType;
                     env.block.opSteps.Add(op);
                 }
+
+                //if (v2.valueType != RunTimeDataType.rt_int)
+                //{
+                //    v2=ExpressionBuilder.addCastOpStep(env, v2, RunTimeDataType.rt_int,
+                //        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+                //        , builder);
+                //}
+
+                //eax.setEAXTypeWhenCompile(vt);
+                //eax._vector_Type = vt;
+                //{
+
+                //    OpStep op = new OpStep(OpCode.vectorAccessor_bind, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                //    op.reg = eax;
+                //    op.regType = eax.valueType;
+                //    op.arg1 = v1;
+                //    op.arg1Type = v1.valueType;
+                //    op.arg2 = v2;
+                //    op.arg2Type = v2.valueType;
+                //    env.block.opSteps.Add(op);
+                //}
 
             }
             else

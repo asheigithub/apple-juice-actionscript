@@ -60,7 +60,7 @@
 
 		
 		[explicit_from];
-		private static function _explicit_from_value(...rest):*
+		private static function _explicit_from_value(...rest):Object
 		{
 			var result:*
 				=new Array();

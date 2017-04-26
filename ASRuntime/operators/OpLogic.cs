@@ -84,14 +84,16 @@ namespace ASRuntime.operators
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 ||
                 (
-                v1.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
-                    )
-                ||
-                (v2.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                needInvokeToString(v1,v2,frame.player)
+                //v1.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                //    )
+                //||
+                //(v2.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                //)
                 )
                 )
             {
@@ -197,16 +199,17 @@ namespace ASRuntime.operators
                 &&
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 ||
-                (
-                v1.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
-                    )
-                ||
-                (v2.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
-                )
+                //(
+                needInvokeToString(v1,v2,frame.player)
+                //v1.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                //    )
+                //||
+                //(v2.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                //)
                 )
             {
                 
@@ -317,16 +320,17 @@ namespace ASRuntime.operators
                (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
 
                ||
-               (
-               v1.rtType > ASBinCode.RunTimeDataType.unknown
-                   &&
-                   !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
-                   )
-               ||
-               (v2.rtType > ASBinCode.RunTimeDataType.unknown
-                   &&
-                   !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
-               )
+               needInvokeToString(v1, v2, frame.player)
+               //(
+               //v1.rtType > ASBinCode.RunTimeDataType.unknown
+               //    &&
+               //    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+               //    )
+               //||
+               //(v2.rtType > ASBinCode.RunTimeDataType.unknown
+               //    &&
+               //    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+               //)
 
                )
             {
@@ -399,16 +403,17 @@ namespace ASRuntime.operators
                 &&
                 (v1.rtType == ASBinCode.RunTimeDataType.rt_string || v1.rtType == ASBinCode.RunTimeDataType.rt_null)
                 ||
-                (
-                v1.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
-                    )
-                ||
-                (v2.rtType > ASBinCode.RunTimeDataType.unknown
-                    &&
-                    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
-                )
+                needInvokeToString(v1, v2, frame.player)
+                //(
+                //v1.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc)
+                //    )
+                //||
+                //(v2.rtType > ASBinCode.RunTimeDataType.unknown
+                //    &&
+                //    !TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc)
+                //)
                 )
             {
                 BlockCallBackBase cb = new BlockCallBackBase();
@@ -464,6 +469,7 @@ namespace ASRuntime.operators
         {
             var v1 = step.arg1.getValue(scope);
             var v2 = step.arg2.getValue(scope);
+
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _EQ_ValueOf_Callbacker);
         }
         private static void _EQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -477,7 +483,8 @@ namespace ASRuntime.operators
                 v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
             }
 
-            if (v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
+
+            if (needInvokeToString(v1, v2, frame.player))
             {
                 //***转成字符串比较***
                 BlockCallBackBase cb = new BlockCallBackBase();
@@ -541,7 +548,7 @@ namespace ASRuntime.operators
                 v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
             }
 
-            if (v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
+            if (needInvokeToString(v1, v2, frame.player))//v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
                 //***转成字符串比较***
                 BlockCallBackBase cb = new BlockCallBackBase();
@@ -782,6 +789,42 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
+
+        private static bool needInvokeToString(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,Player player)
+        {
+            if ((v1.rtType < ASBinCode.RunTimeDataType.unknown && v2.rtType > ASBinCode.RunTimeDataType.unknown)
+                ||
+                (v1.rtType > ASBinCode.RunTimeDataType.unknown && v2.rtType < ASBinCode.RunTimeDataType.unknown)
+                )
+            {
+                //***如果有任一类型为array或者是vector,则返回false***
+                if (v1.rtType == ASBinCode.RunTimeDataType.rt_array
+                    ||
+                    v2.rtType == ASBinCode.RunTimeDataType.rt_array
+                    ||
+                    (v1.rtType>ASBinCode.RunTimeDataType.unknown
+                        &&
+                        player.swc.dict_Vector_type.ContainsKey( player.swc.getClassByRunTimeDataType(v1.rtType) )
+                    )
+                    ||
+                    (v2.rtType > ASBinCode.RunTimeDataType.unknown
+                        &&
+                        player.swc.dict_Vector_type.ContainsKey(player.swc.getClassByRunTimeDataType(v2.rtType))
+                    )
+                    )
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
 
         /// <summary>
         ///测试两个表达式是否相等。如果表达式相等，则结果为 true。 

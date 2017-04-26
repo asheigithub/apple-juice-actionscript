@@ -113,11 +113,6 @@ namespace ASCompiler.compiler
                 {
                     //查找类方法
                     ASBinCode.rtti.Class cls = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
-                    //if (isStaticMember && cls.staticClass != null)
-                    //{
-                    //    cls = cls.staticClass;
-                    //}
-
 
                     if (defineClass == null)
                     {
@@ -178,7 +173,10 @@ namespace ASCompiler.compiler
                     var bi = buildin[0].staticClass;
 
                     var member = ClassMemberFinder.find(bi, name, bi);
-                    if (member != null && !(member.bindField is ClassPropertyGetter) && member.inheritFrom==null)
+                    if (member != null && !(member.bindField is ClassPropertyGetter) && member.inheritFrom==null
+                        &&
+                        member.name !="Object"
+                        )
                     {
                         FindStaticMember sm = new FindStaticMember();
                         sm.classMember = member;

@@ -576,10 +576,10 @@ namespace ASCompiler.compiler.builds
                                     //    "explicit_from特性函数必须有1个参数,且确定为原始数据类型");
                                     //}
 
-                                    if (function.signature.returnType != RunTimeDataType.rt_void)
+                                    if (function.signature.returnType != RunTimeDataType._OBJECT)
                                     {
                                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                        "explicit_from特性函数返回类型必须是void"); //将来做了继承后可能会改为Object
+                                        "explicit_from特性函数返回类型必须是Object"); //将来做了继承后可能会改为Object
                                     }
 
                                     for (int j = 0; j < iclass.classMembers.Count; j++)

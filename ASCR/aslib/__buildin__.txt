@@ -12,5 +12,8 @@
 		[native,__buildin__trace]
 		public static function trace(...rest):void;
 
+		[native,__buildin__isnan]
+		public static function isNaN(value:Number):Boolean;
+
 	}
 }

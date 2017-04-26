@@ -8,6 +8,7 @@
 		private static var valueOf = function():*{ return this };
 
 
+		
 		private static var _prototype:*=
 		{
 			"toString":toString
@@ -20,15 +21,29 @@
 			}
 
 		};
-
+		
+		/*
 		public static function get prototype():*
 		{
 			return _prototype;
 		}
-		
+		*/
 		
 
+		[explicit_from];
+		private static function _explicit_from_value(value:Object):Object
+		{
+			if(value==null || value==undefined)
+			{
+				return new Object();
+			}
+			else
+			{
+				return value;
+			}
 
+
+		}
 		
 		
 

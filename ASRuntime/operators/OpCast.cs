@@ -502,7 +502,7 @@ namespace ASRuntime.operators
             RunTimeDataType targetType = sender._intArg;
             if (rv.rtType > RunTimeDataType.unknown)
             {
-                if ((bool)a[6])
+                if ((bool)a[6] && rv !=a[5])
                 {
                     frame.throwCastException((SourceToken)a[1], ((IRunTimeValue)a[5]).rtType,
                        targetType);
@@ -540,10 +540,15 @@ namespace ASRuntime.operators
         private static void _primivite_Obj(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
-            StackFrame frame = (StackFrame)a[0];
-            FunctionCaller fc = (FunctionCaller)a[5];
 
-            frame.endStep();
+            BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
+            callbacker.isSuccess = true;
+            callbacker.call(null);
+
+            //StackFrame frame = (StackFrame)a[0];
+            //FunctionCaller fc = (FunctionCaller)a[5];
+
+            //frame.endStep();
         }
 
 

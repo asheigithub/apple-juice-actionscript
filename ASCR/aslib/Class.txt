@@ -4,7 +4,7 @@
 	public dynamic class Class extends Object
 	{
 		
-		private var _protoObj:*={};
+		protected var _protoObj:*={};
 		
 
 		public function get prototype():*

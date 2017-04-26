@@ -501,7 +501,8 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "const成员" + eax._regMember.name + "不能在此赋值"));
                     }
-                    
+
+                    eax._isassigntarget = true;
 
                     ////***如果是成员访问的中间缓存，则需要转型
                     if (rv.valueType != eax.valueType)
@@ -1451,18 +1452,80 @@ namespace ASCompiler.compiler.builds
                         }
 
                         var init_data = getRightValue(env, args[0], matchtoken, builder);
-
+                        RunTimeDataType ot;
+                        if (ASRuntime.TypeConverter.Object_CanImplicit_ToPrimitive(init_data.valueType, builder, out ot))
+                        {
+                            if (ot == RunTimeDataType.rt_array)
+                            {
+                                init_data = addCastOpStep(env, init_data, RunTimeDataType.rt_array,
+                                    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile),
+                                    builder
+                                    );
+                            }
+                        }
                         if (init_data.valueType != RunTimeDataType.rt_array)
                         {
                             //***强制类型转换
-                            if (ASRuntime.TypeConverter.testImplicitConvert(init_data.valueType, _class.getRtType(), builder))
+                            if (init_data.valueType == RunTimeDataType.rt_void)//ASRuntime.TypeConverter.testImplicitConvert(init_data.valueType, _class.getRtType(), builder))
                             {
-                                return addCastOpStep(env, init_data, _class.getRtType(),
-                                    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
-                                    , builder);
+                                //准备转换数据到Vector.或者是从Vector转成Vector,或者是从数组中拷贝元素过去
+                                Register eax = env.getAdditionalRegister();
+                                eax.setEAXTypeWhenCompile(_class.getRtType());
+
+                                OpStep op = new OpStep(OpCode.vector_initfrmdata, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+
+                                op.reg = eax;
+                                op.regType = eax.valueType;
+                                op.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(_class.getRtType()));
+                                op.arg1Type = RunTimeDataType.rt_int;
+
+                                op.arg2 = init_data;
+                                op.arg2Type = init_data.valueType;
+
+                                env.block.opSteps.Add(op);
+                                return eax;
+
+                                //return addCastOpStep(env, init_data, _class.getRtType(),
+                                //    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
+                                //    , builder);
                             }
                             else
                             {
+                                if (init_data.valueType > RunTimeDataType.unknown)
+                                {
+                                    //
+
+                                    var cls = builder.getClassByRunTimeDataType(init_data.valueType);
+                                    if (builder.bin.dict_Vector_type.ContainsKey(cls))
+                                    {
+                                        var type = builder.bin.dict_Vector_type[cls];
+                                        var totype = builder.bin.dict_Vector_type[_class];
+
+                                        if (ASRuntime.TypeConverter.testImplicitConvert(type, totype, builder))
+                                        {
+                                            Register eax = env.getAdditionalRegister();
+                                            eax.setEAXTypeWhenCompile(_class.getRtType());
+                                            ConstructorBuilder cb = new ConstructorBuilder();
+                                            cb.build_class(env, _class, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
+
+                                            OpStep oppush = 
+                                                new OpStep(OpCode.vector_pushvector, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                                            oppush.reg = null;
+                                            oppush.regType = RunTimeDataType.unknown;
+                                            oppush.arg1 = eax;
+                                            oppush.arg1Type = eax.valueType;
+                                            oppush.arg2 = init_data;
+                                            oppush.arg2Type = init_data.valueType;
+
+                                            env.block.opSteps.Add(oppush);
+
+
+                                            return eax;
+                                        }
+                                    }
+                                }
+
+
                                 throw new BuildException(
                                     new BuildTypeError(
                                         matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
@@ -1483,49 +1546,66 @@ namespace ASCompiler.compiler.builds
                             ConstructorBuilder cb = new ConstructorBuilder();
                             cb.build_class(env, _class, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
 
-                            //****追加初始值****
-                            var vt = builder.bin.dict_Vector_type[_class];
-
-                            List<ASTool.AS3.Expr.AS3DataStackElement> initdata = (List<ASTool.AS3.Expr.AS3DataStackElement>)args[0].Data.Value;
-
-                            for (int i = 0; i < initdata.Count; i++)
+                            if (!args[0].IsReg && args[0].Data.Value is List<ASTool.AS3.Expr.AS3DataStackElement>)
                             {
-                                var d = ExpressionBuilder.getRightValue(env, initdata[i], matchtoken, builder);
+                                //****追加初始值****
+                                var vt = builder.bin.dict_Vector_type[_class];
 
-                                if (!ASRuntime.TypeConverter.testImplicitConvert(d.valueType, vt, builder))
+                                List<ASTool.AS3.Expr.AS3DataStackElement> initdata =
+                                    (List<ASTool.AS3.Expr.AS3DataStackElement>)args[0].Data.Value;
+
+                                for (int i = 0; i < initdata.Count; i++)
                                 {
-                                    string vtstr = vt.toAS3Name();
-                                    if (vt > RunTimeDataType.unknown)
+                                    var d = ExpressionBuilder.getRightValue(env, initdata[i], matchtoken, builder);
+
+                                    if (!ASRuntime.TypeConverter.testImplicitConvert(d.valueType, vt, builder))
                                     {
-                                        vtstr = builder.getClassByRunTimeDataType(vt).name;
+                                        string vtstr = vt.toAS3Name();
+                                        if (vt > RunTimeDataType.unknown)
+                                        {
+                                            vtstr = builder.getClassByRunTimeDataType(vt).name;
+                                        }
+
+                                        throw (new BuildException(new BuildError(matchtoken.line,
+                                            matchtoken.ptr, matchtoken.sourceFile,
+                                                    "不能将[" + d.valueType + "]类型存入Vector.<" + vtstr + ">")));
+
                                     }
 
-                                    throw (new BuildException(new BuildError(matchtoken.line,
-                                        matchtoken.ptr, matchtoken.sourceFile,
-                                                "不能将[" + d.valueType + "]类型存入Vector.<" + vtstr + ">")));
+                                    if (d.valueType != vt)
+                                    {
+                                        d = addCastOpStep(env, d, vt,
+                                            new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
+                                            , builder);
+                                    }
 
+                                    OpStep oppush = new OpStep(OpCode.vector_push,
+                                        new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                                    oppush.reg = null;
+                                    oppush.regType = RunTimeDataType.unknown;
+                                    oppush.arg1 = eax;
+                                    oppush.arg1Type = eax.valueType;
+                                    oppush.arg2 = d;
+                                    oppush.arg2Type = d.valueType;
+
+                                    env.block.opSteps.Add(oppush);
                                 }
 
-                                if (d.valueType != vt)
-                                {
-                                    d = addCastOpStep(env, d, vt,
-                                        new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile)
-                                        , builder);
-                                }
+                            }
+                            else
+                            {
 
-                                OpStep oppush = new OpStep(OpCode.vector_push,
-                                    new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+                                OpStep oppush = new OpStep(OpCode.vector_pusharray, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                                 oppush.reg = null;
                                 oppush.regType = RunTimeDataType.unknown;
                                 oppush.arg1 = eax;
                                 oppush.arg1Type = eax.valueType;
-                                oppush.arg2 = d;
-                                oppush.arg2Type = d.valueType;
+                                oppush.arg2 = init_data;
+                                oppush.arg2Type = init_data.valueType;
 
                                 env.block.opSteps.Add(oppush);
+
                             }
-
-
 
                             return eax;
                         }

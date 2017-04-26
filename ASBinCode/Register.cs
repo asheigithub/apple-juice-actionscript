@@ -20,14 +20,17 @@ namespace ASBinCode
         /// </summary>
         public IRightValue _regMemberSrcObj;
 
+        
+        
         /// <summary>
-        /// 指示中间访问的Vector的类型
+        /// 指示是否对其有=赋值操作
         /// </summary>
-        public RunTimeDataType _vector_Type;
-
+        public bool _isassigntarget;
 
 
         public PackagePathGetter _pathGetter;
+
+        
 
         public void setEAXTypeWhenCompile(RunTimeDataType t)
         {
@@ -40,7 +43,7 @@ namespace ASBinCode
         {
             this.Id = id;
             type = RunTimeDataType.unknown;
-            _vector_Type = RunTimeDataType.unknown;
+            
         }
 
         public RunTimeDataType valueType

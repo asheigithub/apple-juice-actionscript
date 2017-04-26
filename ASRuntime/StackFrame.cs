@@ -34,6 +34,7 @@ namespace ASRuntime
 
         internal operators.InstanceCreator instanceCreator;
         internal operators.FunctionCaller funCaller;
+        internal operators.OpCallFunction.typeConvertOperator typeconvertoperator;
         internal StackSlot _tempSlot1;
         internal StackSlot _tempSlot2;
 
@@ -442,6 +443,18 @@ namespace ASRuntime
                     break;
                 case OpCode.vector_push:
                     operators.OpVector.exec_push(player, this, step, scope);
+                    break;
+                case OpCode.vector_pusharray:
+                    operators.OpVector.exec_pusharray(player, this, step, scope);
+                    break;
+                case OpCode.vector_pushvector:
+                    operators.OpVector.exec_pushVector(player, this, step, scope);
+                    break;
+                case OpCode.vectorAccessor_convertidx:
+                    operators.OpVector.exec_AccessorBind_ConvertIdx(player, this, step, scope);
+                    break;
+                case OpCode.vector_initfrmdata:
+                    operators.OpVector.exec_initfromdata(player, this, step, scope);
                     break;
                 case OpCode.link_outpackagevairable:
                     operators.OpLinkOutPackageScope.exec_link(player, this, step, scope);
@@ -899,6 +912,10 @@ namespace ASRuntime
         /// </summary>
         public void close()
         {
+            typeconvertoperator = null;
+            funCaller = null;
+            instanceCreator = null;
+
             isclosed = true;
             int offset = scope.offset;
             //清除执行栈

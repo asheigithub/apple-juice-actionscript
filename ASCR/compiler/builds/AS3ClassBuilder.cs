@@ -353,7 +353,7 @@ namespace ASCompiler.compiler.builds
         public void buildClassExtends(ASTool.AS3.AS3Class as3class, Builder builder)
         {
             var cls = builder.buildingclasses[as3class];
-            if (cls.getRtType() > RunTimeDataType._OBJECT+1)
+            if (cls.getRtType() != RunTimeDataType._OBJECT+2)
             {
                 cls.staticClass.super = builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT+2);
             }
@@ -639,7 +639,7 @@ namespace ASCompiler.compiler.builds
                             }
                         }
 
-                        if (as3function.Access.IsOverride && as3function.Access.IsStatic)
+                        if (as3function.Access.IsOverride && as3function.Access.IsStatic )
                         {
                             throw new BuildException(
                                             new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,

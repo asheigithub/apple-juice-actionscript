@@ -55,7 +55,7 @@ namespace ASRuntime.operators
                     var dv = signature.parameters[i].defaultValue.getValue(null);
 
 
-                    if (dv.rtType != dt && dt !=RunTimeDataType.rt_void)
+                    if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
                     {
                         if (dt == RunTimeDataType.rt_int)
                         {
@@ -82,9 +82,16 @@ namespace ASRuntime.operators
 
                     CallFuncHeap[i].directSet(
                         dv
-                        
+
                         );
                 }
+                else if (signature.parameters[i].isPara)
+                {
+                    CallFuncHeap[i].directSet(
+                       new ASBinCode.rtData.rtArray()
+                       );
+                }
+
             }
             
         }

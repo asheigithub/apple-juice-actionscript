@@ -465,6 +465,11 @@ namespace ASRuntime
 
             if (f < rt.unknown && t > rt.unknown)
             {
+                if (t == rt._OBJECT)
+                {
+                    return true;
+                }
+
                 var tc = classfinder.getClassByRunTimeDataType(t);
                 if (tc.implicit_from != null)
                 {

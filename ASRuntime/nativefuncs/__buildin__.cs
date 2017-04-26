@@ -237,4 +237,66 @@ namespace ASRuntime.nativefuncs
         }
     }
 
+
+
+    class __buildin__isnan : NativeFunctionBase
+    {
+        List<RunTimeDataType> para;
+        public __buildin__isnan()
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "__buildin__isnan";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            double num = TypeConverter.ConvertToNumber(argements[0].getValue(), null, null);
+
+            if (double.IsNaN(num))
+            {
+                return rtBoolean.True;
+            }
+            else
+            {
+                return rtBoolean.False;
+            }
+
+        }
+    }
+
 }

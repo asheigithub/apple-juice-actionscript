@@ -347,19 +347,38 @@ namespace ASBinCode
         /// </summary>
         vectorAccessor_bind=86,
         /// <summary>
+        /// 先转换索引，再绑定Vector访问器
+        /// </summary>
+        vectorAccessor_convertidx=87,
+
+        /// <summary>
         /// 往vector里追加元素
         /// </summary>
-        vector_push=87,
+        vector_push=88,
+        /// <summary>
+        /// 把数组的内容拷贝到Vector
+        /// </summary>
+        vector_pusharray=89,
+        /// <summary>
+        /// 把Vector的内容拷贝到Vector
+        /// </summary>
+        vector_pushvector = 90,
+
+        /// <summary>
+        /// 从初始数据中构造Vector
+        /// 要么是数组，要么是完全匹配的Vector,要么是T要创建的Vector的T的子类的Vector
+        /// </summary>
+        vector_initfrmdata=91,
 
         /// <summary>
         /// 链接到包外成员
         /// </summary>
-        link_outpackagevairable=88,
+        link_outpackagevairable=92,
 
         /// <summary>
         /// 标记准备调父类的构造函数
         /// </summary>
-        flag_call_super_constructor =89,
+        flag_call_super_constructor =93,
 
     }
 }

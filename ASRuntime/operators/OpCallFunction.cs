@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ASBinCode.rtti;
+using ASBinCode.rtData;
 
 namespace ASRuntime.operators
 {
@@ -100,6 +101,40 @@ namespace ASRuntime.operators
                 rv= step.arg1.getValue(frame.scope);
             }
 
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
+            {
+                //***说明要调用强制类型转换***
+                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+
+                if (cls.explicit_from != null)
+                {
+
+                    var member = (ClassMethodGetter)cls.explicit_from.bindField;
+                    var func = member.getValue(((rtObject)rv).objScope);
+
+                    step.reg.getISlot(scope).directSet(func);
+
+                }
+                else if (cls.implicit_from != null)
+                {
+                    var member = (ClassMethodGetter)cls.implicit_from.bindField;
+                    var func = member.getValue(((rtObject)rv).objScope);
+
+                    step.reg.getISlot(scope).directSet(func);
+                }
+                else
+                {
+                    frame.typeconvertoperator = new typeConvertOperator();
+                    frame.typeconvertoperator.targettype = cls;
+
+                    step.reg.getISlot(scope).directSet(rv);
+                }
+
+                frame.endStep(step);
+                return;
+            }
+
+
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(
@@ -154,6 +189,28 @@ namespace ASRuntime.operators
             {
                 rv = step.arg1.getValue(frame.scope);
             }
+
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
+            {
+                //***说明要调用强制类型转换***
+                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+                if (frame.typeconvertoperator != null)
+                {
+                    frame.endStep(step);
+                    return;
+                }
+                else if (frame.typeconvertoperator.targettype.instanceClass == null
+                    ||
+                    frame.typeconvertoperator.targettype !=cls
+                    )
+                {
+                    frame.throwError(new error.InternalError(step.token, "类型转换函数发现内部错误",
+                        new ASBinCode.rtData.rtString("类型转换函数发现内部错误")));
+                    return;
+                }
+            }
+
+
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(new error.InternalError(step.token, "value is not a function",
@@ -177,8 +234,17 @@ namespace ASRuntime.operators
             int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
             IRunTimeValue arg = step.arg1.getValue(frame.scope);
 
-            frame.funCaller.pushParameter(arg, id);
-
+            if (frame.typeconvertoperator != null)
+            {
+                if (frame.typeconvertoperator.inputvalue == null && id==0)
+                {
+                    frame.typeconvertoperator.inputvalue = arg;
+                }
+            }
+            else
+            {
+                frame.funCaller.pushParameter(arg, id);
+            }
             frame.endStep(step);
         }
 
@@ -198,40 +264,101 @@ namespace ASRuntime.operators
                 rv = step.arg1.getValue(frame.scope);
             }
 
-            if (rv.rtType != RunTimeDataType.rt_function)
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
             {
-                frame.throwError(new error.InternalError(step.token, "value is not a function",
-                    new ASBinCode.rtData.rtString("value is not a function")));
+                //***说明要调用强制类型转换***
+                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+                if (frame.typeconvertoperator == null || frame.typeconvertoperator.targettype != cls
 
-                frame.endStep(step);
-                return;
+                    )
+                {
+                    frame.throwError(new error.InternalError(step.token, "应该是强制类型转换，内部异常",
+                        new ASBinCode.rtData.rtString("应该是强制类型转换，内部异常")));
+
+                    frame.endStep(step);
+                    return;
+                }
+                else if (frame.typeconvertoperator.inputvalue == null)
+                {
+                    frame.throwError(new error.InternalError(step.token, "Argument count mismatch on class coercion.  Expected 1, got 0.",
+                        new ASBinCode.rtData.rtString("Argument count mismatch on class coercion.  Expected 1, got 0.")));
+
+                    frame.endStep(step);
+                    return;
+                }
             }
-
-            ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-            ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
-
-
-            if (!frame.funCaller.function.Equals(function))
+            else
             {
-                frame.throwError(new error.InternalError(step.token, "运行时异常，调用函数不对"));
-                frame.endStep(step);
-                return;
+                if (rv.rtType != RunTimeDataType.rt_function)
+                {
+                    frame.throwError(new error.InternalError(step.token, "value is not a function",
+                        new ASBinCode.rtData.rtString("value is not a function")));
+
+                    frame.endStep(step);
+                    return;
+                }
+
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+                ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
+
+
+                if (!frame.funCaller.function.Equals(function))
+                {
+                    frame.throwError(new error.InternalError(step.token, "运行时异常，调用函数不对"));
+                    frame.endStep(step);
+                    return;
+                }
             }
 #endif
-            funbacker cb = new funbacker();
-            object[] args = new object[2];
-            args[0] = frame;
-            args[1] = step;
-            cb.args = args;
 
-            frame.funCaller.callbacker = cb;
-            frame.funCaller.returnSlot = step.reg.getISlot(frame.scope);
-            frame.funCaller.call();
+            if (frame.typeconvertoperator == null)
+            {
+                funbacker cb = new funbacker();
+                object[] args = new object[2];
+                args[0] = frame;
+                args[1] = step;
+                cb.args = args;
 
-            frame.funCaller = null;
+                frame.funCaller.callbacker = cb;
+                frame.funCaller.returnSlot = step.reg.getISlot(frame.scope);
+                frame.funCaller.call();
 
+                frame.funCaller = null;
+            }
+            else
+            {
+                if (frame.typeconvertoperator.targettype.instanceClass == null)
+                {
+                    frame.throwError(new error.InternalError(step.token, "强制类型转换类型错误",
+                        new ASBinCode.rtData.rtString("强制类型转换类型错误")));
+
+                    frame.endStep(step);
+                    return;
+                }
+                else
+                {
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.step = step;
+                    cb.args = frame;
+                    cb.setCallBacker(_convert_cb);
+
+                    
+
+                    OpCast.CastValue(frame.typeconvertoperator.inputvalue,
+                        frame.typeconvertoperator.targettype.instanceClass.getRtType(),
+                        frame, step.token, frame.scope, step.reg.getISlot(frame.scope),
+                        cb,
+                        false);
+                    frame.typeconvertoperator = null;
+                }
+            }
 
         }
+        private static void _convert_cb(BlockCallBackBase sender,object args)
+        {
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
+
 
         class funbacker : IBlockCallBack
         {
@@ -266,6 +393,13 @@ namespace ASRuntime.operators
 
             frame.returnSlot.directSet(result);
             frame.endStep(step);
+        }
+
+
+        public class typeConvertOperator
+        {
+            public Class targettype;
+            public IRunTimeValue inputvalue;
         }
 
     }
