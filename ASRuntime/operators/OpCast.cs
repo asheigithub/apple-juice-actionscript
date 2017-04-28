@@ -237,7 +237,7 @@ namespace ASRuntime.operators
 
                         )
                     {
-                        function = (rtFunction)((ClassMethodGetter)toStr.bindField).getMethod(obj.objScope);
+                        function = (rtFunction)((MethodGetterBase)toStr.bindField).getMethod(obj.objScope);
                     }
                     else
                     {
@@ -349,7 +349,10 @@ namespace ASRuntime.operators
                 }
                 else if (targetType > ASBinCode.RunTimeDataType.unknown && srcValue.rtType > RunTimeDataType.unknown)
                 {
-                    if (ClassMemberFinder.check_isinherits(srcValue, targetType, frame.player.swc))
+                    if (ClassMemberFinder.check_isinherits(srcValue, targetType, frame.player.swc)
+                        ||
+                        ClassMemberFinder.check_isImplements(srcValue,targetType,frame.player.swc)
+                        )
                     {
                         storeto.directSet(srcValue);
                         callbacker.isSuccess = true;
@@ -374,7 +377,7 @@ namespace ASRuntime.operators
                                 ,
                                 targetType, frame.player.swc))
                             {
-                                var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getMethod(scope);
+                                var funConv = (rtFunction)((MethodGetterBase)cls.implicit_from.bindField).getMethod(scope);
 
                                 FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                                 fc.function = funConv;
@@ -628,7 +631,7 @@ namespace ASRuntime.operators
                 var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
                 if (cls != null)
                 {
-                    var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getMethod(scope);
+                    var funConv = (rtFunction)((MethodGetterBase)cls.implicit_from.bindField).getMethod(scope);
 
                     FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                     fc.function = funConv;
@@ -827,7 +830,7 @@ namespace ASRuntime.operators
                 && !valueOf.isSetter
                 )
             {
-                function = (rtFunction)((ClassMethodGetter)valueOf.bindField).getMethod(obj.objScope);
+                function = (rtFunction)((MethodGetterBase)valueOf.bindField).getMethod(obj.objScope);
             }
             else
             {
@@ -1112,7 +1115,7 @@ namespace ASRuntime.operators
                 && !toString.isSetter
                 )
             {
-                function = (rtFunction)((ClassMethodGetter)toString.bindField).getMethod(obj.objScope);
+                function = (rtFunction)((MethodGetterBase)toString.bindField).getMethod(obj.objScope);
             }
             else
             {

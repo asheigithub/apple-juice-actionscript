@@ -154,4 +154,13 @@
   <data name="Class" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\aslib\class.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\error.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="TypeError" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\typeerror.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Dictionary" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\dictionary.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

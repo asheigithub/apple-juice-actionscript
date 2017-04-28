@@ -298,7 +298,14 @@ namespace ASCompiler.compiler.builds
                                     cls.no_constructor = true;
                                 }
                             }
-
+                            else if (m.Value.Data.Value.ToString() == "_error_class_")
+                            {
+                                builder.bin.ErrorClass = cls;
+                            }
+                            else if (m.Value.Data.Value.ToString() == "_dictionary_")
+                            {
+                                builder.bin.DictionaryClass = cls;
+                            }
                         }
                     }
                 }
@@ -359,6 +366,13 @@ namespace ASCompiler.compiler.builds
             }
             if (as3class.ExtendsNames.Count > 0)
             {
+                if (as3class.ExtendsNames.Count > 1)
+                {
+                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        as3class.Name + " 只能继承1个类"
+                        );
+                }
+
                 string extendName = as3class.ExtendsNames[0];
                 var find= TypeReader.findClassFromImports(extendName, builder, as3class.token);
 
@@ -396,6 +410,97 @@ namespace ASCompiler.compiler.builds
                 {
                     cls.super = OBJECT;
                 }
+            }
+        }
+
+        public void checkCircularReference(ASTool.AS3.AS3Class as3class, Builder builder)
+        {
+            var cls = builder.buildingclasses[as3class];
+
+            var supser = cls.super;
+            while (supser !=null)
+            {
+                if (ReferenceEquals(cls, supser))
+                {
+                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "Circular type reference was detected in " + cls.name);
+                }
+                supser = supser.super;
+            }
+
+
+        }
+
+        public void buildClassImplements(ASTool.AS3.AS3Class as3class, Builder builder)
+        {
+            var cls = builder.buildingclasses[as3class];
+            if (as3class.ImplementsNames.Count > 0)
+            {
+                for (int i = 0; i < as3class.ImplementsNames.Count; i++)
+                {
+                    string extendName = as3class.ImplementsNames[i];
+                    var find = TypeReader.findClassFromImports(extendName, builder, as3class.token);
+
+                    if (find.Count == 1)
+                    {
+                        if (!find[0].isInterface)
+                        {
+                            throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                                "An interface can only extend other interfaces, but " + extendName + " is a class.");
+                        }
+                        else
+                        {
+                            if (cls.implements.ContainsKey(find[0]))
+                            {
+                                throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                                "class "+cls.name+" implements interface "+ find[0].name +" multiple times.");
+                            }
+                            else
+                            {
+                                cls.implements.Add(find[0], null);
+                            }
+                        }
+                    }
+                    else if (find.Count == 0)
+                    {
+                        throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                            "interface " + extendName + " was not found."
+                            );
+                    }
+                    else
+                    {
+                        throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                            "Ambiguous reference to " + extendName
+                            );
+                    }
+                }
+
+                List<ASBinCode.rtti.Class> implist = new List<ASBinCode.rtti.Class>();
+                foreach(var impl in cls.implements )
+                {
+                    implist.Add(impl.Key);
+                }
+                for (int i = 0; i < implist.Count; i++)
+                {
+                    copyextendImplements(cls, implist[i]);
+                }
+
+            }
+        }
+        private void copyextendImplements(ASBinCode.rtti.Class cls,ASBinCode.rtti.Class impl)
+        {
+            List<ASBinCode.rtti.Class> implist = new List<ASBinCode.rtti.Class>();
+            foreach (var impls in impl.implements)
+            {
+                if (!cls.implements.ContainsKey(impls.Key))
+                {
+                    cls.implements.Add(impls.Key,null);
+                    implist.Add(impls.Key);
+                }
+            }
+            for (int i = 0; i < implist.Count; i++)
+            {
+                copyextendImplements(cls, implist[i]);
             }
         }
 
@@ -467,7 +572,7 @@ namespace ASCompiler.compiler.builds
         }
         
 
-        public void buildClassDefineMembers(ASTool.AS3.AS3Class as3class, Builder builder,bool isstatic)
+        public void buildClassDefineMembers(ASTool.AS3.AS3ClassInterfaceBase as3class, Builder builder,bool isstatic)
         {
             List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
 
@@ -563,21 +668,21 @@ namespace ASCompiler.compiler.builds
                                 (
                                     cls.classMembers[j].inheritFrom == null
                                     ||
-                                    (cls.classMembers[j].isPublic && as3function.Access.IsPublic
+                                    (
+                                        cls.classMembers[j].isPublic 
+                                        && 
+                                        as3function.Access.IsPublic
+                                        &&
+                                        !cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
                                     )
+
                                 )
-                                &&
-                                (
-                                cls.classMembers[j].inheritFrom !=null 
-                                &&
-                                !cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
-                                )
-                                )
+                            )
                             {
                                 if (as3function.Access.IsOverride
                                     )
                                 {
-                                    if (!(cls.classMembers[j].bindField is ClassMethodGetter)
+                                    if (!(cls.classMembers[j].bindField is MethodGetterBase)
                                         ||
                                         cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
 
@@ -686,7 +791,7 @@ namespace ASCompiler.compiler.builds
 
                             if (member.isPrivate)
                             {
-                                ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                ((MethodGetterBase)member.bindField).setNotReadVirtual();
                             }
 
                             if (member.isConstructor)
@@ -795,7 +900,7 @@ namespace ASCompiler.compiler.builds
 
                             if (member.isPrivate)
                             {
-                                ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                ((MethodGetterBase)member.bindField).setNotReadVirtual();
                             }
 
                             int s = 0;
@@ -926,11 +1031,11 @@ namespace ASCompiler.compiler.builds
                             }
                             if (member.isGetter)
                             {
-                                pg.getter = (ClassMethodGetter)member.bindField;
+                                pg.getter = (MethodGetterBase)member.bindField;
                             }
                             else
                             {
-                                pg.setter = (ClassMethodGetter)member.bindField;
+                                pg.setter = (MethodGetterBase)member.bindField;
                             }
 
                             

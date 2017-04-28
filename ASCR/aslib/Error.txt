@@ -1,0 +1,56 @@
+﻿package
+{
+	[_error_class_]
+	public dynamic class Error extends Object
+	{
+		
+		public var message : String;
+
+		public var name : String;
+
+		private var _errorid:int;
+
+		private var _stacktrace:String;
+
+		public function get errorID () : int
+		{
+			return _errorid;
+		}
+
+		public function Error (message:String="", id:int=0)
+		{
+			name="Error";
+			this.message=message;
+			_errorid=id;
+			_stacktrace=_getstack();
+		}
+
+		//public static function getErrorMessage (index:int) : String;
+
+		[native,Error_getstack]
+		private function _getstack():String;
+
+		public function getStackTrace () : String
+		{
+			return _stacktrace;
+		}
+
+		public function toString():String
+		{
+			if(message=="")
+			{
+				return "Error";
+			}
+			else
+			{
+				return message;
+			}
+
+		}
+
+
+	}
+}
+
+var err:Error=new Error();
+var typeerr:TypeError=new TypeError();

@@ -102,7 +102,8 @@ namespace ASRuntime
         /// </summary>
         private Stack<StackFrame> runtimeStack;
         StackSlot[] stackSlots;
-
+        private StackFrame displayStackFrame;
+        
         public IRunTimeValue run2(IRightValue result)
         {
 
@@ -123,16 +124,28 @@ namespace ASRuntime
                 stackSlots[i] = new StackSlot(swc);
             }
 
-            HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
+            if(swc.ErrorClass !=null)
+            {
+                //***先执行必要代码初始化****
+                var block = swc.blocks[swc.ErrorClass.outscopeblockid];
+                HeapSlot[] initdata = genHeapFromCodeBlock(block);
+                CallBlock(block, initdata, new StackSlot(swc), null,
+                    new SourceToken(0, 0, ""), null,
+                    null, RunTimeScopeType.startup
+                    );
+                while (step())
+                {
 
-            
+                }
+            }
+
+
+            HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
             var topscope = CallBlock(defaultblock,data ,new StackSlot(swc), null, 
                 new SourceToken(0, 0, ""),null,
                 null, RunTimeScopeType.startup
                 );
-            
-            
-
+            displayStackFrame = runtimeStack.Peek();
             while (step())
             {
 
@@ -143,25 +156,30 @@ namespace ASRuntime
                 outPutErrorMessage(runtimeError);
             }
 
+#if DEBUG
             if (isConsoleOut)
             {
                 Console.WriteLine();
                 Console.WriteLine("====程序状态====");
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Variables:");
-                for (int i = 0; i < defaultblock.scope.members.Count; i++)
+
+                for (int i = 0; i < displayStackFrame.block.scope.members.Count; i++)
                 {
-                    Console.WriteLine("\t" + defaultblock.scope.members[i].name + "\t|\t" + topscope.memberData[i].getValue());
+                    Console.WriteLine("\t" + displayStackFrame.block.scope.members[i].name + "\t|\t" + displayStackFrame.scope.memberData[i].getValue());
                 }
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Registers:");
-                for (int i = 0; i < defaultblock.totalRegisters; i++)
+                for (int i = 0; i < displayStackFrame.block.totalRegisters; i++)
                 {
-                    Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
+                    if (stackSlots[i].getValue()!=null)
+                    {
+                        Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
+                    }
                 }
                 Console.ResetColor();
             }
-
+#endif
             if (result != null && runtimeError==null)
             {
                 return result.getValue(topscope);
@@ -361,7 +379,20 @@ namespace ASRuntime
 
                 if (err.errorValue != null)
                 {
-                    Console.WriteLine("[故障] " + "信息=" + err.errorValue);
+                    string errinfo= err.errorValue.ToString();
+                    if (err.errorValue.rtType > RunTimeDataType.unknown && swc.ErrorClass !=null)
+                    {
+                        if (ClassMemberFinder.check_isinherits(err.errorValue, swc.ErrorClass.getRtType(), swc))
+                        {
+                            errinfo =
+                                ((rtObject)err.errorValue).value.memberData[1].getValue().ToString()+" #"+
+                                ((rtObject)err.errorValue).value.memberData[2].getValue().ToString()+" " +
+                                ((rtObject)err.errorValue).value.memberData[0].getValue().ToString();
+                        }
+                    }
+
+
+                    Console.WriteLine("[故障] " + "信息=" + errinfo);
                 }
                 else
                 {
@@ -373,6 +404,7 @@ namespace ASRuntime
                 while (err.callStack !=null && err.callStack.Count>0)
                 {
                     _temp.Push(err.callStack.Pop());
+                    displayStackFrame = _temp.Peek();
                 }
 
                 foreach (var item in _temp)
@@ -393,6 +425,46 @@ namespace ASRuntime
 
                 Console.ResetColor();
             }
+        }
+
+
+        StringBuilder sb = new StringBuilder();
+        internal string stackTrace(int skipline)
+        {
+            foreach (var item in runtimeStack)
+            {
+                if (skipline > 0)
+                { 
+                    skipline--;
+                    continue;
+                }
+
+                if (item.codeLinePtr < item.block.opSteps.Count)
+                {
+                    sb.Append("\tat ");
+                    sb.Append(item.block.name);
+                    sb.Append(" [");
+                    sb.Append(item.block.opSteps[item.codeLinePtr].token.sourceFile);
+                    sb.Append(" ");
+                    sb.Append(item.block.opSteps[item.codeLinePtr].token.line+1);
+                    sb.Append(" ptr:");
+                    sb.Append(  item.block.opSteps[item.codeLinePtr].token.ptr+1);
+                    sb.AppendLine();
+                }
+                else
+                {
+                    sb.Append("\tat ");
+                    sb.AppendLine(item.block.name);
+                }
+
+                
+            }
+
+            
+
+            string t = sb.ToString();
+            sb.Remove(0, sb.Length);
+            return t;
         }
 
     }

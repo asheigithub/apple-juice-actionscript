@@ -1,5 +1,6 @@
 package
 {
+	import adobe.utils.CustomActions;
 	import flash.accessibility.Accessibility;
 	import flash.display.Loader;
 	import flash.display.Sprite;
@@ -7,6 +8,9 @@ package
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	import flash.sampler.NewObjectSample;
+	import flash.utils.Dictionary;
+	import ppp.IPPP;
+	import ppp.it;
 	import ppp.pp2.CP;
 	
 	[Doc]
@@ -14,7 +18,7 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class Main extends Sprite 
+	public class Main extends Sprite implements IPPP
 	{
 		var loader = "loader";
 		
@@ -22,23 +26,69 @@ package
 		
 		public static var JJ:Function = function() { trace(this,"JJ"); };
 		
+		/* INTERFACE ppp.IPPP */
+		
+		public function get p() 
+		{
+			return 6;
+		}
+		
+		public function set p(v):void 
+		{
+			trace("invoke set ", v);
+		}
+		
+		public function kkk(k:Vector.<IPPP>) 
+		{
+			
+		}
+		
+		
+		
+		/* INTERFACE ppp.IPPP */
+		
+		
+		
+		
+		
+		public function jk() 
+		{
+			trace("impl JK");
+		}
+		
+		
 		
 		
 		private var JF;
 		
 		public function Main() 
 		{
-			var ot:* = Main;
+			var dict = new Dictionary();
+			 var obj = new Object();
+			 var key:Object = new Object();
+			 key.toString = function() { return "key" }
+			 //
+			 dict[key] = "Letters";
+			 obj["key"] = "Letters";
+			 //
+			trace( dict[key] == "Letters"); // true
+			trace( obj["key"] == "Letters"); // true
+			trace( obj[key] == "Letters"); // true because key == "key" is true b/c key.toString == "key"
+			trace( dict["key"] == "Letters"); // false because "key" === key is false
 			
-			var p = ot(this);
+			trace(dict[key]);
 			
-			trace(p);
+			//delete dict[key]; //removes the key
+				
+			trace(dict[key]);
 			
-			ot.prototype.a="a";
+			dict[this] = this;
 			
-			trace(p["a"]);
-			
-			trace(ot.prototype.toString);
+			for (var m in dict)
+			{
+				trace("d",m);
+				
+			}
 		}
 		
 		
@@ -81,5 +131,9 @@ package
 		}
 		
 	}
+	
+}
+interface iip
+{
 	
 }

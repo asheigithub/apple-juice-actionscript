@@ -23,9 +23,9 @@ namespace ASRuntime.operators
                 if (_class.instanceClass == null)
                 {
                     frame.throwError(
-                        new error.InternalError(step.token,
+                        step.token,0,
                                     "不是Class类型对象不能new"
-                                    )
+                                    
                         );
                     return null;
                 }
@@ -35,9 +35,9 @@ namespace ASRuntime.operators
             else
             {
                 frame.throwError(
-                    new error.InternalError(step.token,
+                    step.token,0,
                                 "此类型不能new" + rv.rtType
-                                )
+                                
                     );
                 return null;
             }
@@ -70,11 +70,15 @@ namespace ASRuntime.operators
                     //}
 
                 }
+                else if (_class.isInterface)
+                {
+                    frame.throwError(step.token,0, _class.name + " Interfaces cannot be instantiated with the new operator.");
+                }
                 else
                 {
-                    
-                    frame.throwError(new error.InternalError(step.token, _class.name + " is not a constructor", new ASBinCode.rtData.rtString(_class.name + " is not a constructor")));
-                   
+
+                    frame.throwError(step.token,0, _class.name + " is not a constructor");
+
                 }
             }
             else
@@ -84,9 +88,9 @@ namespace ASRuntime.operators
                     ASBinCode.rtData.rtFunction func = (ASBinCode.rtData.rtFunction)rv;
                     if (func.ismethod)
                     {
-                        frame.throwError(new error.InternalError(step.token, 
-                            "Method cannot be used as a constructor.", 
-                            new ASBinCode.rtData.rtString("Method cannot be used as a constructor.")));
+                        frame.throwError(step.token, 0,
+                            "Method cannot be used as a constructor."
+                            );
                     }
                     else
                     {
@@ -102,7 +106,9 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    frame.throwError(new error.InternalError( step.token,"原始类型转对象未实现",new ASBinCode.rtData.rtString("原始类型转对象未实现") ));
+                    frame.throwCastException(step.token,rv.rtType,RunTimeDataType.rt_function);
+                        
+                        //new error.InternalError( step.token,"原始类型转对象未实现",new ASBinCode.rtData.rtString("原始类型转对象未实现") ));
                 }
             }
             frame.endStep(step);
@@ -149,9 +155,14 @@ namespace ASRuntime.operators
             int classid = ((ASBinCode.rtData.rtInt)rv).value;
 
             var _class = player.swc.classes[classid];
-            if (_class.no_constructor)
+
+            if (_class.isInterface)
             {
-                frame.throwError(new error.InternalError(step.token, _class.name + " is not a constructor", new ASBinCode.rtData.rtString(_class.name + " is not a constructor")));
+                frame.throwError(step.token,0, _class.name + " Interfaces cannot be instantiated with the new operator.");
+            }
+            else if (_class.no_constructor)
+            {
+                frame.throwError(step.token,0, _class.name + " is not a constructor");
             }
             else
             {

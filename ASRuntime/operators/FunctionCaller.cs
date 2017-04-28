@@ -202,20 +202,13 @@ namespace ASRuntime.operators
                     )
                     {
                         invokerFrame.throwError(
-                            new error.InternalError(token,
+                            token,
+                           0,
                             string.Format(
                             "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
                             player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs
                             )
-                            ,
-                            new ASBinCode.rtData.rtString(
-                                string.Format(
-                                    "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
-                                    player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs
-                                    )
-                                )
-
-                            )
+                            
                             );
 
                         //***中断本帧本次代码执行进入try catch阶段
@@ -223,8 +216,6 @@ namespace ASRuntime.operators
                         return;
                     }
                 }
-
-
             }
 
             
@@ -256,7 +247,7 @@ namespace ASRuntime.operators
                 {
                     var result = nf.execute(
                         function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
-                        CallFuncHeap,
+                        CallFuncHeap,invokerFrame,
                         out errormsg,
                         out errorno
                         );
@@ -273,7 +264,7 @@ namespace ASRuntime.operators
                     else
                     {
                         invokerFrame.throwError(
-                            new error.InternalError(token, errormsg, new ASBinCode.rtData.rtString(errormsg))
+                            token,0, errormsg
                             );
 
                         invokerFrame.endStep();

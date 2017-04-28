@@ -46,8 +46,7 @@ namespace ASRuntime.operators
                     if (prop.getter == null)
                     {
                         frame.throwError(
-                            new error.InternalError(step.token, "Illegal read of write-only property",
-                            new ASBinCode.rtData.rtString("Illegal read of write-only property"))
+                            step.token,0, "Illegal read of write-only property"
                             );
                         break;
                     }
@@ -67,8 +66,7 @@ namespace ASRuntime.operators
                     if (getter == null || getter.bindField != prop.getter)
                     {
                         frame.throwError(
-                            new error.InternalError(step.token, "Illegal read of write-only property",
-                            new ASBinCode.rtData.rtString("Illegal read of write-only property"))
+                            step.token,0, "Illegal read of write-only property"
                             );
                         break;
                     }
@@ -80,7 +78,7 @@ namespace ASRuntime.operators
 
                     if (sslot.superPropBindClass !=null)
                     {
-                        func = ((ClassMethodGetter)getter.bindField).getSuperMethod(
+                        func = ((MethodGetterBase)getter.bindField).getSuperMethod(
                         //propslot.bindObj.objScope
                         ((StackSlot)slot).propBindObj.objScope,
                         sslot.superPropBindClass
@@ -89,7 +87,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        func = ((ClassMethodGetter)getter.bindField).getMethod(
+                        func = ((MethodGetterBase)getter.bindField).getMethod(
                         //propslot.bindObj.objScope
                         ((StackSlot)slot).propBindObj.objScope
                         );

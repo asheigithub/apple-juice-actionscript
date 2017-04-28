@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
     <Compile Include="error\InternalError.cs" />
     <Compile Include="HeapSlot.cs" />
@@ -42,6 +43,7 @@
     <Compile Include="nativefuncs\Array_buildin.cs" />
     <Compile Include="nativefuncs\BuildInFunctionLoader.cs" />
     <Compile Include="nativefuncs\Catch.cs" />
+    <Compile Include="nativefuncs\Error_buildin.cs" />
     <Compile Include="nativefuncs\Function_buildin.cs" />
     <Compile Include="nativefuncs\Int_buildin.cs" />
     <Compile Include="nativefuncs\Number_buildin.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="operators\OpCast.cs" />
     <Compile Include="operators\OpCreateInstance.cs" />
     <Compile Include="operators\OpDynamicProperty.cs" />
+    <Compile Include="operators\OpForIn.cs" />
     <Compile Include="operators\OpIncrementDecrement.cs" />
     <Compile Include="operators\OpLinkOutPackageScope.cs" />
     <Compile Include="operators\OpLogic.cs" />

@@ -50,6 +50,7 @@
     <Compile Include="compiler\builds\AS3ClassBuilder.cs" />
     <Compile Include="compiler\builds\AS3ContinueBuilder.cs" />
     <Compile Include="compiler\builds\AS3FunctionBuilder.cs" />
+    <Compile Include="compiler\builds\AS3InterfaceBuilder.cs" />
     <Compile Include="compiler\builds\AS3LoopBuilder.cs" />
     <Compile Include="compiler\builds\AS3IFBuilder.cs" />
     <Compile Include="compiler\builds\AS3SwitchBuilder.cs" />
@@ -103,12 +104,15 @@
   <ItemGroup>
     <Content Include="aslib\Array.txt" />
     <Content Include="aslib\Class.txt" />
+    <Content Include="aslib\Dictionary.txt" />
+    <Content Include="aslib\Error.txt" />
     <Content Include="aslib\Function.txt" />
     <Content Include="aslib\int.txt" />
     <Content Include="aslib\Math.txt" />
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
     <Content Include="aslib\Sprite.txt" />
+    <Content Include="aslib\TypeError.txt" />
     <Content Include="aslib\uint.txt" />
     <Content Include="aslib\Vector.txt" />
     <Content Include="aslib\__buildin__.txt" />

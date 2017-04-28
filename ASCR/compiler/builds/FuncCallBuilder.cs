@@ -190,9 +190,9 @@ namespace ASCompiler.compiler.builds
 
                     if (member == null
                         ||
-                        (member is ClassMethodGetter
+                        (member is MethodGetterBase
                         &&
-                        ((ClassMethodGetter)member).classmember.isConstructor
+                        ((MethodGetterBase)member).classmember.isConstructor
                         )
 
                         )     //检查是否强制类型转换
@@ -508,9 +508,9 @@ namespace ASCompiler.compiler.builds
             {
                 blockid = ((VariableBase)rFunc).refdefinedinblockid;
             }
-            else if (rFunc is ClassMethodGetter)
+            else if (rFunc is MethodGetterBase)
             {
-                blockid = ((ClassMethodGetter)rFunc).refdefinedinblockid;
+                blockid = ((MethodGetterBase)rFunc).refdefinedinblockid;
             }
 
             if (funcOriginMember == null)
@@ -523,9 +523,9 @@ namespace ASCompiler.compiler.builds
                 {
                     blockid = ((VariableBase)funcOriginMember).refdefinedinblockid;
                 }
-                else if (funcOriginMember is ClassMethodGetter)
+                else if (funcOriginMember is MethodGetterBase)
                 {
-                    blockid = ((ClassMethodGetter)funcOriginMember).refdefinedinblockid;
+                    blockid = ((MethodGetterBase)funcOriginMember).refdefinedinblockid;
                 }
             }
 

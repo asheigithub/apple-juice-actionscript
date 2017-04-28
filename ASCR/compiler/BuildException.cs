@@ -18,4 +18,10 @@ namespace ASCompiler.compiler
             this.error = error;
         }
     }
+
+    class TooManyBuildErrorException : Exception
+    {
+
+    }
+
 }

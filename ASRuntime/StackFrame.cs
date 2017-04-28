@@ -462,6 +462,18 @@ namespace ASRuntime
                 case OpCode.flag_call_super_constructor:
                     endStep(step);
                     break;
+                case OpCode.forin_get_enumerator:
+                    operators.OpForIn.forin_get_enumerator(player, this, step, scope);
+                    break;
+                case OpCode.enumerator_movenext:
+                    operators.OpForIn.enumerator_movenext(player, this, step, scope);
+                    break;
+                case OpCode.enumerator_current:
+                    operators.OpForIn.enumerator_current(player, this, step, scope);
+                    break;
+                case OpCode.enumerator_close:
+                    operators.OpForIn.enumerator_close(player, this, step, scope);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
@@ -510,7 +522,7 @@ namespace ASRuntime
                             if (op.opCode == OpCode.catch_error
                                 )
                             {
-                                if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope))
+                                if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope,this))
                                 {
                                     ((VariableBase)op.reg).getISlot(scope).directSet(errorValue);
                                     //引导到catch块
@@ -893,18 +905,76 @@ namespace ASRuntime
                 dst = player.swc.classes[dsttype - RunTimeDataType._OBJECT].name;
             }
 
-            runtimeError = (new error.InternalError(token, "类型转换失败:" + src + "->" + dst));
+            string message = "类型转换失败:" + src + "->" + dst;
+
+            if (player.swc.ErrorClass != null)
+            {
+                //***直接开上帝视角从对象里取值赋值***
+                var errorinstance =
+                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[1].getValue());
+
+                errorinstance.value.memberData[0].directSet(new rtString(message));
+                errorinstance.value.memberData[1].directSet(new rtString("TypeError"));
+                errorinstance.value.memberData[2].directSet(new rtInt(1034));
+                errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
+                runtimeError = (new error.InternalError(token,message,errorinstance));
+
+            }
+            else
+            {
+                runtimeError = (new error.InternalError(token, "类型转换失败:" + src + "->" + dst));
+            }
         }
 
         internal void throwOpException(ASBinCode.SourceToken token, OpCode opcode)
         {
-            runtimeError = (new error.InternalError(token, "无法执行操作" + opcode));
+            if (player.swc.ErrorClass != null)
+            {
+                //***直接开上帝视角从对象里取值赋值***
+                var errorinstance =
+                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
+
+                errorinstance.value.memberData[0].directSet(new rtString("无法执行操作" + opcode));
+                errorinstance.value.memberData[1].directSet(new rtString("Error"));
+                errorinstance.value.memberData[2].directSet(new rtInt(0));
+
+                runtimeError = (new error.InternalError(token, "无法执行操作" + opcode, errorinstance));
+
+            }
+            else
+            {
+                runtimeError = (new error.InternalError(token, "无法执行操作" + opcode));
+            }
         }
 
         internal void throwError(error.InternalError err)
         {
             runtimeError = err;
         }
+
+        internal void throwError(SourceToken token,int code,string errormessage)
+        {
+            if (player.swc.ErrorClass != null)
+            {
+                //***直接开上帝视角从对象里取值赋值***
+                var errorinstance =
+                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
+
+                errorinstance.value.memberData[0].directSet(new rtString(errormessage));
+                errorinstance.value.memberData[1].directSet(new rtString("Error"));
+                errorinstance.value.memberData[2].directSet(new rtInt(code));
+
+                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+
+            }
+            else
+            {
+                runtimeError = (new error.InternalError(token, errormessage));
+            }
+
+            
+        }
+
 
         private bool isclosed;
         /// <summary>

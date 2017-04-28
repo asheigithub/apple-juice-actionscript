@@ -14,7 +14,17 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
                     ASBinCode.IRightValue v1 = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
-                    //ASBinCode.IRightValue v2 = ExpressionBuilder.getRightValue(env, step.Arg3, step.token, builder);
+                    if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
+                    {
+                        if (step.Arg3.Data.Value.ToString() == "null")
+                        {
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "Syntax error: 'null' is not allowed here"));
+                        }
+                    }
+
+                        //ASBinCode.IRightValue v2 = ExpressionBuilder.getRightValue(env, step.Arg3, step.token, builder);
                     if (v1 is ASBinCode.StaticClassDataGetter)
                     {
                         if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
@@ -372,7 +382,7 @@ namespace ASCompiler.compiler.builds
             )
         {
             OpStep op = new OpStep(
-                member.bindField is ClassMethodGetter ?
+                member.bindField is MethodGetterBase ?
                 OpCode.access_method
                 :
                 OpCode.access_dot
@@ -466,15 +476,7 @@ namespace ASCompiler.compiler.builds
             {
                 ASBinCode.rtti.Class vector = builder.getClassByRunTimeDataType(v1.valueType);
                 RunTimeDataType vt = builder.bin.dict_Vector_type[vector];
-
-                //if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int, builder))
-                //{
-                //    throw new BuildException(
-                //        step.token.line, step.token.ptr, step.token.sourceFile,
-                //        "不能将 " + vector + " 的访问索引类型 " + v2.valueType + " 转换为 int"
-                //        );
-                //}
-
+                
                 if (v2.valueType > RunTimeDataType.unknown)
                 {
                     v2 = ExpressionBuilder.addCastToPrimitive(env, v2, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);

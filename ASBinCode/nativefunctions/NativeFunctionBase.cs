@@ -28,13 +28,12 @@ namespace ASBinCode
             get { return false; }
         }
         
-
         /// <summary>
         /// 调用函数
         /// </summary>
         /// <param name="thisObj"></param>
         /// <returns></returns>
-        public abstract IRunTimeValue execute(IRunTimeValue thisObj,ISLOT[] argements,out string errormessage,out int errorno);
+        public abstract IRunTimeValue execute(IRunTimeValue thisObj,ISLOT[] argements,object stackframe,out string errormessage,out int errorno);
 
         public virtual void executeAsync(IRunTimeValue thisObj,ISLOT[] argements,ISLOT resultSlot , 
             object callbacker ,object stackframe,

@@ -6,9 +6,15 @@ namespace ASBinCode.rtti
 {
     /// <summary>
     /// 类定义
+    /// (或者接口定义)接口定义也继承自Class的。
     /// </summary>
     public class Class :IImportable
     {
+        /// <summary>
+        /// 指明这是否是一个接口定义
+        /// </summary>
+        public bool isInterface;
+
         /// <summary>
         /// 是否文档类
         /// </summary>
@@ -32,6 +38,7 @@ namespace ASBinCode.rtti
             this.blockid = blockid;
             classMembers = new List<ClassMember>();
             fields = new List<ClassMember>();
+            implements = new Dictionary<Class, int[]>();
 
             implicit_to_type = RunTimeDataType.unknown;
             implicit_to_functionid = -1;
@@ -130,6 +137,12 @@ namespace ASBinCode.rtti
         /// </summary>
         public Class super;
 
+        /// <summary>
+        /// 实现的各种接口
+        /// 记录了接口的一个方法对应类的哪个成员实现
+        /// </summary>
+        public Dictionary<Class, int[]> implements;
+
         private CSWC _swc;
         public CSWC assembly
         {
@@ -146,7 +159,14 @@ namespace ASBinCode.rtti
 
         public override string ToString()
         {
-            return "Class [" + package + (string.IsNullOrEmpty(package)?"":".") + name + "] " + (isdocumentclass?"doc":"") ;  //base.ToString();
+            if (!isInterface)
+            {
+                return "Class [" + package + (string.IsNullOrEmpty(package) ? "" : ".") + name + "] " + (isdocumentclass ? "doc" : "");  //base.ToString();
+            }
+            else
+            {
+                return "Interface [" + package + (string.IsNullOrEmpty(package) ? "" : ".") + name + "] ";  //base.ToString();
+            }
         }
 
     }

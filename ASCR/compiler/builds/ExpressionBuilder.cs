@@ -129,7 +129,7 @@ namespace ASCompiler.compiler.builds
                             op_dot.regType = eax_dot.valueType;
                             op_dot.arg1 = new StaticClassDataGetter(cls.staticClass);
                             op_dot.arg1Type = cls.staticClass.getRtType();
-                            op_dot.arg2 = (ClassMethodGetter)cls.staticClass.implicit_from.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+                            op_dot.arg2 = (MethodGetterBase)cls.staticClass.implicit_from.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
                             op_dot.arg2Type = ASBinCode.RunTimeDataType.rt_function; //RunTimeDataType.rt_int;
                             env.block.opSteps.Add(op_dot);
                         }
@@ -228,10 +228,10 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.rtti.Class _class = (builder.getClassByRunTimeDataType(src.valueType));
                 var valueOf= ClassMemberFinder.find(_class, "valueOf", _class);
                 ASBinCode.rtti.FunctionSignature signature = null;
-                if (valueOf != null && valueOf.bindField is ClassMethodGetter)
+                if (valueOf != null && valueOf.bindField is MethodGetterBase)
                 {
                     signature = builder.dictSignatures[
-                        ((ClassMethodGetter)valueOf.bindField).refdefinedinblockid][(ClassMethodGetter)valueOf.bindField];
+                        ((MethodGetterBase)valueOf.bindField).refdefinedinblockid][(MethodGetterBase)valueOf.bindField];
                 }
                 else
                 {
@@ -262,7 +262,7 @@ namespace ASCompiler.compiler.builds
                         op.regType = eax.valueType;
                         op.arg1 = src;
                         op.arg1Type = src.valueType;
-                        op.arg2 = (ClassMethodGetter)valueOf.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
+                        op.arg2 = (MethodGetterBase)valueOf.bindField; //new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(member.index));
                         op.arg2Type = valueOf.valueType; //RunTimeDataType.rt_int;
 
                         env.block.opSteps.Add(op);
@@ -562,9 +562,9 @@ namespace ASCompiler.compiler.builds
                         memberLeftValue = ((FindStaticMember)member).buildAccessThisMember(step.token, env);
 
                         if (
-                            memberLeftValue is ClassMethodGetter
+                            memberLeftValue is MethodGetterBase
                             ||
-                            ((Register)memberLeftValue)._regMember.bindField is ClassMethodGetter
+                            ((Register)memberLeftValue)._regMember.bindField is MethodGetterBase
                             //||
                             //((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
                             ||
@@ -1138,7 +1138,7 @@ namespace ASCompiler.compiler.builds
 
                         if (member == null && builder._currentImports.Count > 0
                             ||
-                            (member is ClassMethodGetter && ((ClassMethodGetter)member).classmember.isConstructor)
+                            (member is MethodGetterBase && ((MethodGetterBase)member).classmember.isConstructor)
                             )
                         {
                             string t = data.Data.Value.ToString();
@@ -1983,6 +1983,16 @@ namespace ASCompiler.compiler.builds
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "成员[" + ((VariableBase)v1).name + "]不能进行一元操作[delete]");
+                    }
+
+                    if (v1 is Register)
+                    {
+                        Register r = (Register)v1;
+                        if (r._regMember != null)
+                        {
+                            throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "Attempt to delete the fixed property prototype.  Only dynamically defined properties can be deleted.");
+                        }
                     }
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);

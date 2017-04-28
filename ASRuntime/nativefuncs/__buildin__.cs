@@ -47,7 +47,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -112,7 +112,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             throw new NotImplementedException();
         }
@@ -280,7 +280,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;

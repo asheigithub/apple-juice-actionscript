@@ -73,6 +73,12 @@ namespace ASBinCode
             return isInherits(((rtData.rtObject)value).value._class, cls);
         }
 
+        public static bool check_isImplements(IRunTimeValue value, RunTimeDataType type, IClassFinder classfinder)
+        {
+            var cls = classfinder.getClassByRunTimeDataType(type);
+            return isImplements(((rtData.rtObject)value).value._class, cls);
+        }
+
         public static bool check_isinherits(RunTimeDataType srcType, RunTimeDataType type, IClassFinder classfinder)
         {
             var srcCls = classfinder.getClassByRunTimeDataType(srcType);
@@ -80,10 +86,10 @@ namespace ASBinCode
             return isInherits(srcCls, cls);
         }
 
-
-
         public static bool isInherits(Class extendsClass,Class super)
         {
+
+
             var t = extendsClass;
 
             while (t !=null)
@@ -99,6 +105,18 @@ namespace ASBinCode
             return false;
         }
 
+
+        public static bool isImplements(Class implCls, Class _interface)
+        {
+            if (!implCls.isInterface && _interface.isInterface)
+            {
+                return implCls.implements.ContainsKey(_interface);
+            }
+            else
+            {
+                return false;
+            }
+        }
 
     }
 }

@@ -48,7 +48,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -154,7 +154,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             ((rtObject)argements[0].getValue()).value.memberData[0].directSet(argements[1].getValue());
             ((rtArray)argements[1].getValue()).objHandle.bindArrayObject = ((rtObject)argements[0].getValue());
@@ -210,7 +210,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -268,7 +268,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -326,7 +326,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -396,7 +396,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -475,7 +475,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             throw new InvalidOperationException();
         }
@@ -637,7 +637,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -701,7 +701,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -763,7 +763,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -829,7 +829,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -883,7 +883,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -948,7 +948,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1039,7 +1039,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1138,7 +1138,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1201,7 +1201,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1268,7 +1268,7 @@ namespace ASRuntime.nativefuncs
 
         
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, out string errormessage, out int errorno)
+        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;

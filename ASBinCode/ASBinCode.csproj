@@ -38,6 +38,9 @@
   <ItemGroup>
     <Compile Include="ClassMemberFinder.cs" />
     <Compile Include="ClassMethodGetter.cs" />
+    <Compile Include="ILinkSlot.cs" />
+    <Compile Include="InterfaceMethodGetter.cs" />
+    <Compile Include="MethodGetterBase.cs" />
     <Compile Include="ClassPropertyGetter.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CSWC.cs" />
@@ -68,8 +71,8 @@
     <Compile Include="rtData\rtUndefined.cs" />
     <Compile Include="rtti\Class.cs" />
     <Compile Include="rtti\ClassMember.cs" />
+    <Compile Include="rtti\DictionaryObject.cs" />
     <Compile Include="rtti\DynamicObject.cs" />
-    <Compile Include="rtti\DynamicPropertySlot.cs" />
     <Compile Include="rtti\FunctionDefine.cs" />
     <Compile Include="rtti\FunctionParameter.cs" />
     <Compile Include="rtti\FunctionSignature.cs" />

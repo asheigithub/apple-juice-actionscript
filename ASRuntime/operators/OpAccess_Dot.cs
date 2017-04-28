@@ -15,10 +15,10 @@ namespace ASRuntime.operators
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
-                    new error.InternalError(
-                        step.token, "Cannot access a property or method of a null object reference.",
-                            new ASBinCode.rtData.rtString("Cannot access a property or method of a null object reference.")
-                        ));
+                    
+                        step.token,1009, "Cannot access a property or method of a null object reference."
+                            
+                        );
                 
             }
             else
@@ -70,10 +70,10 @@ namespace ASRuntime.operators
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
-                    new error.InternalError(
-                        step.token, "Cannot access a property or method of a null object reference.",
-                            new ASBinCode.rtData.rtString("Cannot access a property or method of a null object reference.")
-                        ));
+                     
+                        step.token,1009, "Cannot access a property or method of a null object reference."
+                           
+                        );
 
             }
             else
@@ -87,11 +87,11 @@ namespace ASRuntime.operators
                     ISLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
                     if (step.arg1 is SuperPointer)
                     {
-                        lintoslot = ((ClassMethodGetter)step.arg2).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass );
+                        lintoslot = ((MethodGetterBase)step.arg2).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass );
                     }
                     else
                     {
-                        lintoslot = ((ClassMethodGetter)step.arg2).getVirtualSlot(rtObj.objScope );
+                        lintoslot = ((MethodGetterBase)step.arg2).getVirtualSlot(rtObj.objScope );
                     }
 
                     if (lintoslot == null)
@@ -121,11 +121,8 @@ namespace ASRuntime.operators
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
-                    new error.InternalError(
-                        step.token, "Cannot access a property or method of a null object reference.",
-                        new rtString("Cannot access a property or method of a null object reference."
-                        )
-                        )
+                    
+                        step.token,1009, "Cannot access a property or method of a null object reference."
                         );
                 frame.endStep(step);
             }
@@ -164,30 +161,85 @@ namespace ASRuntime.operators
         private static void _loadname_dot(rtObject rtObj,OpStep step,StackFrame frame,IRunTimeScope scope,Player player)
         {
             var v2 = step.arg2.getValue(scope);
+            
+            //**先转换为基础类型***
+            if (v2.rtType > RunTimeDataType.unknown)
+            {
+                var cls = ((rtObject)v2).value._class;
+                RunTimeDataType ot;
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(cls, out ot))
+                {
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)v2);
+                }
+            }
+
             if (v2.rtType == RunTimeDataType.rt_string)
             {
                 _exec_dot_name(rtObj, ((rtString)v2).value, step, frame, scope, player);
             }
             else
             {
-                BlockCallBackBase cb = new BlockCallBackBase();
-                cb.setCallBacker(_convert_callbacker);
-                cb.scope = scope;
-                cb.step = step;
+                if (rtObj.value is DictionaryObject)
+                {
+                    if (v2.rtType == RunTimeDataType.rt_boolean ||
+                       v2.rtType == RunTimeDataType.rt_int ||
+                       v2.rtType == RunTimeDataType.rt_number ||
+                       v2.rtType == RunTimeDataType.rt_uint ||
+                       v2.rtType == RunTimeDataType.rt_void ||
+                       v2.rtType == RunTimeDataType.rt_null
+                        )
+                    {
+                        _exec_dot_name(rtObj,TypeConverter.ConvertToString(v2,null,null) , step, frame, scope, player);
+                        return;
+                    }
 
-                object[] args = new object[5];
-                args[0] = rtObj;
-                args[1] = frame;
-                args[2] = player;
+                    //***访问动态类型
+                    DictionaryObject dict = (DictionaryObject)rtObj.value;
+                    var key = new DictionaryKey(v2);
+                    if (!dict.isContainsKey(key))
+                    {
+                        DictionarySlot dictslot = new DictionarySlot(rtObj);
+                        dictslot._key = key;
+                        dictslot.directSet(rtUndefined.undefined);
+                        dict.createKeyValue(key, dictslot);
+                    }
 
-                cb.args = args;
+                    var slot = dict.getValue(key);
+                    StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
+                    if (dslot != null)
+                    {
+                        dslot.linkTo(slot);
+                    }
+                    else
+                    {
+                        frame.throwError((new error.InternalError(step.token,
+                             "dot操作结果必然是一个StackSlot"
+                             )));
+                    }
+                    frame.endStep(step);
 
-                //**获取name
-                OpCast.CastValue(step.arg2.getValue(scope), RunTimeDataType.rt_string, frame, step.token, scope
-                    ,
-                    frame._tempSlot1, cb,false
-                    );
+                }
+                else
+                {
 
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_convert_callbacker);
+                    cb.scope = scope;
+                    cb.step = step;
+
+                    object[] args = new object[5];
+                    args[0] = rtObj;
+                    args[1] = frame;
+                    args[2] = player;
+
+                    cb.args = args;
+
+                    //**获取name
+                    OpCast.CastValue(step.arg2.getValue(scope), RunTimeDataType.rt_string, frame, step.token, scope
+                        ,
+                        frame._tempSlot1, cb, false
+                        );
+                }
             }
         }
 
@@ -199,7 +251,7 @@ namespace ASRuntime.operators
             StackFrame frame = (StackFrame)a[1];
             var nv = TypeConverter.ConvertToString( frame._tempSlot1.getValue(),frame,sender.step.token);
 
-            _exec_dot_name((rtObject)a[0], nv, sender.step, frame, sender.scope, (Player)a[2]);
+            _exec_dot_name((rtObject)a[0], nv==null?"null":nv, sender.step, frame, sender.scope, (Player)a[2]);
 
         }
 
@@ -227,10 +279,11 @@ namespace ASRuntime.operators
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[3].getValue()).value;
+                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
-                            dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                            dobj = (DynamicObject)((rtObject)protoObj.memberData[3].getValue()).value;
+                            
                             if (!dobj.hasproperty(name))
                             {
                                 dobj = null;
@@ -286,10 +339,8 @@ namespace ASRuntime.operators
                     if (!gobj.hasproperty(name))//propSlot == null)
                     {
                         frame.throwError(
-                        new error.InternalError(
-                           step.token, rtObj.ToString() + "找不到" + name,
-                           new rtString(rtObj.ToString() + "找不到" + name)
-                           ));
+                        
+                           step.token,1009, rtObj.ToString() + "找不到" + name);
 
                         break;
                     }
@@ -432,10 +483,10 @@ namespace ASRuntime.operators
                     if (member == null)
                     {
                         frame.throwError(
-                        new error.InternalError(
-                           step.token, rtObj.ToString() + "找不到" + name,
-                           new rtString(rtObj.ToString() + "找不到" + name)
-                           ));
+                        
+                           step.token,0, rtObj.ToString() + "找不到" + name
+                           
+                           );
 
                         break;
                     }
@@ -443,10 +494,9 @@ namespace ASRuntime.operators
                     if (member.isConstructor)
                     {
                         frame.throwError(
-                        new error.InternalError(
-                           step.token, rtObj.ToString() + "找不到" + name,
-                           new rtString(rtObj.ToString() + "找不到" + name)
-                           ));
+                        
+                           step.token,1009, rtObj.ToString() + "找不到" + name
+                           );
 
                         break;
                     }
@@ -459,9 +509,9 @@ namespace ASRuntime.operators
 
                             if (step.arg1 is SuperPointer)
                             {
-                                if (member.bindField is ClassMethodGetter)
+                                if (member.bindField is MethodGetterBase)
                                 {
-                                    linkto = ((ClassMethodGetter)member.bindField).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+                                    linkto = ((MethodGetterBase)member.bindField).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
                                 }
                                 else
                                 {
@@ -470,9 +520,9 @@ namespace ASRuntime.operators
                             }
                             else
                             {
-                                if (member.bindField is ClassMethodGetter)
+                                if (member.bindField is MethodGetterBase)
                                 {
-                                    linkto = ((ClassMethodGetter)member.bindField).getVirtualSlot(rtObj.objScope);
+                                    linkto = ((MethodGetterBase)member.bindField).getVirtualSlot(rtObj.objScope);
                                 }
                                 else
                                 {
@@ -542,8 +592,6 @@ namespace ASRuntime.operators
                 pslot.findSlot = v;
 
                 v = pslot;
-                //dslot._protoRootObj = (DynamicObject)rtObj.value;
-                //dslot._protoname = name;
             }
 
             dslot.linkTo(v);
@@ -563,11 +611,9 @@ namespace ASRuntime.operators
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
-                    new error.InternalError(
-                        step.token, "Cannot access a property or method of a null object reference.",
-                        new rtString("Cannot access a property or method of a null object reference."
-                        )
-                        )
+                    
+                        step.token,1009, "Cannot access a property or method of a null object reference."
+                        
                         );
 
             }
@@ -609,10 +655,10 @@ namespace ASRuntime.operators
                     }
                     else if (obj == rtUndefined.undefined)
                     {
-                        frame.throwError(new error.InternalError(step.token,
-                            "A term is undefined and has no properties",
-                            new rtString("A term is undefined and has no properties")
-                            ));
+                        frame.throwError(step.token,1009,
+                            "A term is undefined and has no properties"
+                           
+                            );
                         frame.endStep();
                         return;
                     }

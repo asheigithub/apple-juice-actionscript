@@ -376,15 +376,11 @@ namespace ASRuntime
         /// <param name="src"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype)
+        public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype,ASBinCode.IClassFinder classfinder)
         {
-            if (src.rtType >rt.unknown || dsttype >rt.unknown)
+            if (src.rtType >rt.unknown && dsttype >rt.unknown)
             {
-#if DEBUG
-                throw new NotImplementedException();
-#else
-                return false;
-#endif
+                return ASBinCode.ClassMemberFinder.check_isinherits(src, dsttype, classfinder);
             }
 
             if (dsttype == rt.rt_void || src.rtType == dsttype)
@@ -482,14 +478,6 @@ namespace ASRuntime
             }
 
 
-            if (f > rt.unknown && t > rt.unknown)
-            {
-                ASBinCode.rtti.Class cls1 = classfinder.getClassByRunTimeDataType(f);
-                ASBinCode.rtti.Class cls2 = classfinder.getClassByRunTimeDataType(t);
-                //检查继承关系
-                
-            }
-
             if (f == rt.unknown || t == rt.unknown)
             {
                 return false;
@@ -497,8 +485,8 @@ namespace ASRuntime
 
             if (f > rt.unknown || t > rt.unknown)
             {
-                //var c1 = classfinder.getClassByRunTimeDataType(f);
-                //var c2 = classfinder.getClassByRunTimeDataType(t);
+                var c1 = classfinder.getClassByRunTimeDataType(f);
+                var c2 = classfinder.getClassByRunTimeDataType(t);
 
                 //if (ReferenceEquals(c1.staticClass, c2)
                 //    ||
@@ -508,7 +496,11 @@ namespace ASRuntime
                 //    return false;
                 //}
 
-                if (ASBinCode.ClassMemberFinder.check_isinherits(f, t, classfinder)) //检查集成关系
+                if (ASBinCode.ClassMemberFinder.isInherits(c1, c2)) //检查集成关系
+                {
+                    return true;
+                }
+                if (ASBinCode.ClassMemberFinder.isImplements(c1, c2)) //检查接口实现关系
                 {
                     return true;
                 }
@@ -646,7 +638,10 @@ namespace ASRuntime
             };
 
 
-       
+
+        
+
+
         public static bool ObjectImplicit_ToNumber(rt classtype ,ASBinCode.IClassFinder bin)
         {
             if (classtype < rt.unknown)
@@ -671,18 +666,8 @@ namespace ASRuntime
             return false;
         }
 
-
-        public static bool Object_CanImplicit_ToPrimitive(rt classtype, ASBinCode.IClassFinder bin,out rt primitiveType)
+        public static bool Object_CanImplicit_ToPrimitive(ASBinCode.rtti.Class _class, out rt primitiveType)
         {
-            if (classtype < rt.unknown)
-            {
-                primitiveType = rt.unknown;
-                return false;
-            }
-
-
-            var _class = bin.getClassByRunTimeDataType(classtype);
-
             if (_class.staticClass == null)
             {
                 primitiveType = rt.unknown;
@@ -697,6 +682,20 @@ namespace ASRuntime
 
             primitiveType = rt.unknown;
             return false;
+        }
+
+        public static bool Object_CanImplicit_ToPrimitive(rt classtype, ASBinCode.IClassFinder bin,out rt primitiveType)
+        {
+            if (classtype < rt.unknown)
+            {
+                primitiveType = rt.unknown;
+                return false;
+            }
+
+
+            var _class = bin.getClassByRunTimeDataType(classtype);
+
+            return Object_CanImplicit_ToPrimitive(_class, out primitiveType);
         }
 
         /// <summary>

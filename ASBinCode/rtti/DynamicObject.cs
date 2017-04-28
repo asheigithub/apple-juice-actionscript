@@ -29,23 +29,72 @@ namespace ASBinCode.rtti
         }
 
 
-        public void createproperty(string name,ISLOT slot)
+        private ILinkSlot rootSlot;
+
+        public IEnumerator<ILinkSlot> eachSlot()
+        {
+            var root = rootSlot;
+
+            while(root !=null)
+            {
+                if (root.propertyIsEnumerable && !root.isDeleted )
+                {
+                    yield return root;
+                }
+                root = root.nextSlot;
+            }
+            yield break;
+        }
+
+
+        public void createproperty(string name,ILinkSlot slot)
         {
             if (!propertys.ContainsKey(name))
             {
                 propertys.Add(name, slot);
+
+                if (rootSlot == null)
+                {
+                    rootSlot = slot;
+                }
+                else
+                {
+                    rootSlot.preSlot = slot;
+                    slot.nextSlot = rootSlot;
+                    rootSlot = slot;
+
+                }
+
             }
         }
 
-        public void createOrReplaceproperty(string name, ISLOT slot)
+        public void createOrReplaceproperty(string name, ILinkSlot slot)
         {
             if (!propertys.ContainsKey(name))
             {
                 propertys.Add(name, slot);
+
+                
+                if (rootSlot == null)
+                {
+                    rootSlot = slot;
+                }
+                else
+                {
+                    rootSlot.preSlot = slot;
+                    slot.nextSlot = rootSlot;
+                    rootSlot = slot;
+
+                }
+
             }
             else
             {
+                ISLOT oldslot = propertys[name];
                 propertys[name] = slot;
+
+                
+
             }
         }
 
@@ -55,7 +104,34 @@ namespace ASBinCode.rtti
         {
             if (propertys.ContainsKey(name))
             {
+                ISLOT slot = propertys[name];
                 propertys.Remove(name);
+
+                ILinkSlot ls = slot as ILinkSlot;
+                if (ls != null)
+                {
+                    ls.isDeleted = true;
+                    if (ls.preSlot != null)
+                    {
+                        ls.preSlot.nextSlot = ls.nextSlot;
+
+                        if (ls.nextSlot != null)
+                        {
+                            ls.nextSlot.preSlot = ls.preSlot;
+                        }
+
+                        ls.preSlot = null;
+                    }
+                    else
+                    {
+                        if (ls.nextSlot != null)
+                        {
+                            ls.nextSlot.preSlot = null;
+                        }
+                    }
+
+                }
+
             }
         }
 

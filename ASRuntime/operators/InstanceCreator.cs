@@ -289,7 +289,7 @@ namespace ASRuntime.operators
             globalObj.objScope = rtscope;
             player.outpackage_runtimescope.Add(cls.classid, rtscope);
             {
-                var slot = new HeapSlot();
+                var slot = new DynamicPropertySlot(globalObj,true);
                 slot.directSet(player.static_instance[cls.staticClass.classid]);
                 global.createproperty(cls.name, slot);
             }
@@ -299,7 +299,7 @@ namespace ASRuntime.operators
                 {
                     if (init_static_class(player.swc.classes[i]))
                     {
-                        var slot = new HeapSlot();
+                        var slot = new DynamicPropertySlot(globalObj,true);
                         slot.directSet(player.static_instance[player.swc.classes[i].staticClass.classid]);
                         global.createproperty(player.swc.classes[i].name, slot);
                     }
@@ -355,7 +355,7 @@ namespace ASRuntime.operators
             if (obj._class.constructor != null)
             {
                 ASBinCode.rtData.rtFunction function =
-                    (ASBinCode.rtData.rtFunction)((ClassMethodGetter)obj._class.constructor.bindField).getConstructor(objScope);
+                    (ASBinCode.rtData.rtFunction)((MethodGetterBase)obj._class.constructor.bindField).getConstructor(objScope);
                 //(ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
 
 
@@ -432,7 +432,14 @@ namespace ASRuntime.operators
         {
             
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
-            if (cls.dynamic)
+            if (
+                player.swc.DictionaryClass !=null
+                &&
+                ClassMemberFinder.isInherits(cls, player.swc.DictionaryClass))
+            {
+                obj = new DictionaryObject(cls);
+            }
+            else if (cls.dynamic)
             {
                 obj = new DynamicObject(cls);
             }

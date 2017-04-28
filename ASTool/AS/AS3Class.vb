@@ -1,29 +1,7 @@
 ﻿Namespace AS3
     Public Class AS3Class
-        Inherits AS3MemberListBase
-        Implements IMemberDataType
-        
-
-
-        Public Name As String
-        'Public Import As New List(Of AS3Import)
-        Public Package As AS3Package
-
-        Public ExtendsNames As New List(Of String)
+        Inherits AS3ClassInterfaceBase
         Public ImplementsNames As New List(Of String)
-
-
-        Public innerClass As New List(Of AS3Class)()
-        Public innerInterface As New List(Of AS3Interface)()
-
-        'Public outpackageinnermembers As New List(Of AS3Member)()
-
-        ''' <summary>
-        ''' 是否是包外类
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public IsOutPackage As Boolean
-
 
         Public Sub New(token As Token)
             MyBase.New(token)

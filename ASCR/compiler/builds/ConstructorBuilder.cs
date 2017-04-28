@@ -26,7 +26,7 @@ namespace ASCompiler.compiler.builds
                             build_class(env, _class, step, builder);
                             return;
                         }
-                        else if (cls is ClassMethodGetter)
+                        else if (cls is MethodGetterBase)
                         { 
                             throw new BuildException(
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -42,7 +42,13 @@ namespace ASCompiler.compiler.builds
                         {
                             _class = builder.getClassByRunTimeDataType(cls.valueType);
 
-                            if (_class.staticClass != null)
+                            if (_class.isInterface)
+                            {
+                                throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                _class.name+" Interfaces cannot be instantiated with the new operator."));
+                            }
+                            else if (_class.staticClass != null)
                             {
                                 build_class(env, _class, step, builder);
                             }
@@ -71,6 +77,17 @@ namespace ASCompiler.compiler.builds
                         if (find.Count == 1)
                         {
                             _class = find[0];
+
+                            if (_class.isInterface)
+                            {
+                                throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                _class.name + " Interfaces cannot be instantiated with the new operator."));
+                            }
+                            else if (_class.no_constructor)
+                            {
+
+                            }
                             build_class(env, _class, step, builder);
                             return;
                         }
@@ -85,7 +102,7 @@ namespace ASCompiler.compiler.builds
                                 build_class(env, _class, step, builder);
                                 return;
                             }
-                            else if (cls is ClassMethodGetter)
+                            else if (cls is MethodGetterBase)
                             {
                                 throw new BuildException(
                                     new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -142,7 +159,7 @@ namespace ASCompiler.compiler.builds
             //***查找构造函数**
             if (_class.constructor != null)
             {
-                ClassMethodGetter field = (ClassMethodGetter)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
+                MethodGetterBase field = (MethodGetterBase)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
                 int blockid = field.refdefinedinblockid;
 
                 var signature =

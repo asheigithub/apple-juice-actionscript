@@ -82,16 +82,21 @@ namespace ASCompiler.compiler
         public static List<ASBinCode.rtti.Class> findClassFromImports(string t,
             Builder builder,ASTool.Token token)
         {
+            List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
+
             if (!builder.isEval)
             {
                 if (t.StartsWith("Vector.<"))
                 {
-                    t = builder.build_vector(t, token);    //如果是Vector,则先编译Vector类
-                }
+                    ASBinCode.rtti.Class outvectortype = null;
+                    t = builder.build_vector(t, token,out outvectortype);    //如果是Vector,则先编译Vector类
 
+                    result.Add(outvectortype);
+                    return result;
+                }
             }
 
-            List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
+            
 
 
             //***查找类定义***

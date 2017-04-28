@@ -21,8 +21,8 @@ namespace ASBinCode
         }
 
         
-        public ClassMethodGetter getter;
-        public ClassMethodGetter setter;
+        public MethodGetterBase getter;
+        public MethodGetterBase setter;
 
 
         public int indexOfMembers

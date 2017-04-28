@@ -132,7 +132,41 @@ namespace ASCompiler
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Math.as3"));
             }
 
+            {
+                string _error = Properties.Resources.Error;
+                var tree = grammar.ParseTree(_error, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Error.as3");
 
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Error.as3"));
+            }
+
+            {
+                string _error = Properties.Resources.TypeError;
+                var tree = grammar.ParseTree(_error, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "TypeError.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "TypeError.as3"));
+            }
+
+            {
+                string _dictionary = Properties.Resources.Dictionary;
+                var tree = grammar.ParseTree(_dictionary, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "flash/utils/Dictionary.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "flash/utils/Dictionary.as3"));
+            }
 
             {
                 string _sprite = Properties.Resources.Sprite;

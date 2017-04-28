@@ -63,6 +63,10 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	/*
+        ///	不要在这个类里编写属性访问器
+        ///	*/
+        ///
         ///	public class __buildin__
         ///	{
         ///		[native,__buildin__ismethod]
@@ -70,6 +74,9 @@ namespace ASCompiler.Properties {
         ///
         ///		[native,__buildin__trace]
         ///		public static function trace(...rest):void;
+        ///
+        ///		[native,__buildin__isnan]
+        ///		public static function isNaN(value:Number):Boolean;
         ///
         ///	}
         ///} 的本地化字符串。
@@ -157,22 +164,82 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	[no_constructor]
         ///	public dynamic class Class extends Object
         ///	{
-        ///		private var _protoObj:*=new Object();
+        ///		
+        ///		protected var _protoObj:*={};
+        ///		
+        ///
         ///		public function get prototype():*
         ///		{
         ///			return _protoObj;
         ///		}
         ///
+        ///		
+        ///
+        ///
         ///		public function Class ();
         ///	}
-        ///}
-        /// 的本地化字符串。
+        ///} 的本地化字符串。
         /// </summary>
         internal static string Class {
             get {
                 return ResourceManager.GetString("Class", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.utils
+        ///{
+        ///	[_dictionary_]
+        ///	public dynamic class Dictionary extends Object
+        ///	{
+        ///		public function Dictionary (weakKeys:Boolean=false);
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string Dictionary {
+            get {
+                return ResourceManager.GetString("Dictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	[_error_class_]
+        ///	public dynamic class Error extends Object
+        ///	{
+        ///		
+        ///		public var message : String;
+        ///
+        ///		public var name : String;
+        ///
+        ///		private var _errorid:int;
+        ///
+        ///		private var _stacktrace:String;
+        ///
+        ///		public function get errorID () : int
+        ///		{
+        ///			return _errorid;
+        ///		}
+        ///
+        ///		public function Error (message:String=&quot;&quot;, id:int=0)
+        ///		{
+        ///			name=&quot;Error&quot;;
+        ///			this.message=message;
+        ///			_errorid=id;
+        ///			_stacktrace=_getstack();
+        ///		}
+        ///
+        ///		//public static function getErrorMessage (index:int) : String;
+        ///        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
             }
         }
         
@@ -242,19 +309,36 @@ namespace ASCompiler.Properties {
         ///{
         ///	public dynamic class Object
         ///	{
-        ///		public function Object ();
-        ///	}
-        ///}
+        ///		[native,_Object_toString]
+        ///		private static var toString= function():String;
+        ///		
+        ///		private static var valueOf = function():*{ return this };
         ///
-        ///function toString():String
-        ///{
-        ///	return &quot;[object Object]&quot;;
-        ///}
         ///
-        ///function valueOf():Object
-        ///{
-        ///	return this;
-        ///} 的本地化字符串。
+        ///		
+        ///		private static var _prototype:*=
+        ///		{
+        ///			&quot;toString&quot;:toString
+        ///			,
+        ///			&quot;valueOf&quot;:valueOf
+        ///			,
+        ///			&quot;toLocaleString&quot;:function toLocaleString()
+        ///			{
+        ///				return toString();
+        ///			}
+        ///
+        ///		};
+        ///		
+        ///		/*
+        ///		public static function get prototype():*
+        ///		{
+        ///			return _prototype;
+        ///		}
+        ///		*/
+        ///		
+        ///
+        ///		[explicit_from];
+        ///		private static function _explicit_ [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Object {
             get {
@@ -308,6 +392,22 @@ namespace ASCompiler.Properties {
         internal static string Sprite {
             get {
                 return ResourceManager.GetString("Sprite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	public dynamic class TypeError extends Error
+        ///	{
+        ///		public function TypeError (message:String=&quot;&quot;, id:int=0);
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string TypeError {
+            get {
+                return ResourceManager.GetString("TypeError", resourceCulture);
             }
         }
         

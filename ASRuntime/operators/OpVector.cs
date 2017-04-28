@@ -17,19 +17,16 @@ namespace ASRuntime.operators
 
             if (idx < 0 || idx > vector.innnerList.Count )
             {
-                frame.throwError(new error.InternalError(step.token,
-                    "The index "+idx+" is out of range "+ vector.innnerList.Count +".",
-                    new rtString("The index " + idx + " is out of range " + vector.innnerList.Count + ".")
-                    ));
+                frame.throwError(step.token,1125,
+                    "The index "+idx+" is out of range "+ vector.innnerList.Count +".");
             }
             if (idx == vector.innnerList.Count)
             {
                 if (vector.isFixed || !((Register)step.reg)._isassigntarget)
                 {
-                    frame.throwError(new error.InternalError(step.token,
-                    "The index " + idx + " is out of range " + vector.innnerList.Count + ".",
-                    new rtString("The index " + idx + " is out of range " + vector.innnerList.Count + ".")
-                    ));
+                    frame.throwError(step.token,1125,
+                    "The index " + idx + " is out of range " + vector.innnerList.Count + "."
+                    );
                 }
                 else
                 {
@@ -81,11 +78,10 @@ namespace ASRuntime.operators
             if (double.IsNaN(idx))
             {
                 frame.throwError(
-                    new error.InternalError(
-                        step.token,
-                        "索引" + idxvalue + "不能转为int",
-                        new rtString("索引" + idxvalue + "不能转为int")
-                        )
+                    
+                        step.token,0,
+                        "索引" + idxvalue + "不能转为int"
+                        
                     );
             }
             else
@@ -94,19 +90,16 @@ namespace ASRuntime.operators
 
                 if (index < 0 || index > vector.innnerList.Count)
                 {
-                    frame.throwError(new error.InternalError(step.token,
-                        "The index " + index + " is out of range " + vector.innnerList.Count + ".",
-                        new rtString("The index " + index + " is out of range " + vector.innnerList.Count + ".")
-                        ));
+                    frame.throwError(step.token,1125,
+                        "The index " + index + " is out of range " + vector.innnerList.Count + ".");
                 }
                 if (idx == vector.innnerList.Count)
                 {
                     if (vector.isFixed || !((Register)step.reg)._isassigntarget)
                     {
-                        frame.throwError(new error.InternalError(step.token,
-                        "The index " + idx + " is out of range " + vector.innnerList.Count + ".",
-                        new rtString("The index " + idx + " is out of range " + vector.innnerList.Count + ".")
-                        ));
+                        frame.throwError(step.token,
+                            1125,
+                        "The index " + idx + " is out of range " + vector.innnerList.Count + ".");
                     }
                     else
                     {
@@ -398,8 +391,11 @@ namespace ASRuntime.operators
                         //***检查子类关系****
                         (vector_data.vector_type > RunTimeDataType.unknown &&
                         value.rtType > RunTimeDataType.unknown &&
-                        //TypeConverter.testImplicitConvert(value.rtType,vector_data.vector_type,classfinder)
+                        (
                         ClassMemberFinder.check_isinherits(value,vector_data.vector_type, classfinder)
+                        ||
+                        ClassMemberFinder.check_isImplements(value, vector_data.vector_type, classfinder)
+                        )
                         )
                         ||
                         (

@@ -15,8 +15,7 @@ namespace ASRuntime.operators
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(
-                    new error.InternalError(step.token, "value is not a function",
-                    new ASBinCode.rtData.rtString("value is not a function")));
+                    step.token,0, "value is not a function");
             }
             else
             {
@@ -92,9 +91,9 @@ namespace ASRuntime.operators
         public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step,IRunTimeScope scope)
         {
             IRunTimeValue rv;
-            if (step.arg1 is ClassMethodGetter)
+            if (step.arg1 is MethodGetterBase)
             {
-                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
             }
             else
             {
@@ -109,7 +108,7 @@ namespace ASRuntime.operators
                 if (cls.explicit_from != null)
                 {
 
-                    var member = (ClassMethodGetter)cls.explicit_from.bindField;
+                    var member = (MethodGetterBase)cls.explicit_from.bindField;
                     var func = member.getValue(((rtObject)rv).objScope);
 
                     step.reg.getISlot(scope).directSet(func);
@@ -117,7 +116,7 @@ namespace ASRuntime.operators
                 }
                 else if (cls.implicit_from != null)
                 {
-                    var member = (ClassMethodGetter)cls.implicit_from.bindField;
+                    var member = (MethodGetterBase)cls.implicit_from.bindField;
                     var func = member.getValue(((rtObject)rv).objScope);
 
                     step.reg.getISlot(scope).directSet(func);
@@ -138,8 +137,7 @@ namespace ASRuntime.operators
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(
-                    new error.InternalError(step.token, "value is not a function",
-                    new ASBinCode.rtData.rtString("value is not a function")));
+                    step.token,0, "value is not a function");
             }
             else
             {
@@ -181,9 +179,9 @@ namespace ASRuntime.operators
         public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
             IRunTimeValue rv;
-            if (step.arg1 is ClassMethodGetter)
+            if (step.arg1 is MethodGetterBase)
             {
-                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
             }
             else
             {
@@ -204,8 +202,8 @@ namespace ASRuntime.operators
                     frame.typeconvertoperator.targettype !=cls
                     )
                 {
-                    frame.throwError(new error.InternalError(step.token, "类型转换函数发现内部错误",
-                        new ASBinCode.rtData.rtString("类型转换函数发现内部错误")));
+                    frame.throwError(new error.InternalError(step.token, "类型转换函数发现内部错误"
+                        ));
                     return;
                 }
             }
@@ -213,8 +211,7 @@ namespace ASRuntime.operators
 
             if (rv.rtType != RunTimeDataType.rt_function)
             {
-                frame.throwError(new error.InternalError(step.token, "value is not a function",
-                    new ASBinCode.rtData.rtString("value is not a function")));
+                frame.throwError(step.token,0, "value is not a function");
             }
             else
             {
@@ -255,9 +252,9 @@ namespace ASRuntime.operators
 #if DEBUG
 
             IRunTimeValue rv;
-            if (step.arg1 is ClassMethodGetter)
+            if (step.arg1 is MethodGetterBase)
             {
-                rv = ((ClassMethodGetter)step.arg1).getMethod(frame.scope);
+                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
             }
             else
             {
@@ -272,16 +269,15 @@ namespace ASRuntime.operators
 
                     )
                 {
-                    frame.throwError(new error.InternalError(step.token, "应该是强制类型转换，内部异常",
-                        new ASBinCode.rtData.rtString("应该是强制类型转换，内部异常")));
+                    frame.throwError(new error.InternalError(step.token, "应该是强制类型转换，内部异常"));
 
                     frame.endStep(step);
                     return;
                 }
                 else if (frame.typeconvertoperator.inputvalue == null)
                 {
-                    frame.throwError(new error.InternalError(step.token, "Argument count mismatch on class coercion.  Expected 1, got 0.",
-                        new ASBinCode.rtData.rtString("Argument count mismatch on class coercion.  Expected 1, got 0.")));
+                    frame.throwError(step.token,0, "Argument count mismatch on class coercion.  Expected 1, got 0."
+                        );
 
                     frame.endStep(step);
                     return;
@@ -291,8 +287,8 @@ namespace ASRuntime.operators
             {
                 if (rv.rtType != RunTimeDataType.rt_function)
                 {
-                    frame.throwError(new error.InternalError(step.token, "value is not a function",
-                        new ASBinCode.rtData.rtString("value is not a function")));
+                    frame.throwError(step.token,0, "value is not a function"
+                        );
 
                     frame.endStep(step);
                     return;

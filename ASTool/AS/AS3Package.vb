@@ -12,6 +12,17 @@
         Public MainClass As AS3Class
         Public MainInterface As AS3Interface
 
+        Public ReadOnly Property MainClassOrInterface As AS3ClassInterfaceBase
+            Get
+                If MainClass Is Nothing Then
+                    Return MainInterface
+                Else
+                    Return MainClass
+                End If
+            End Get
+        End Property
+
+
         Public Sub New(token As Token)
             MyBase.New(token)
 

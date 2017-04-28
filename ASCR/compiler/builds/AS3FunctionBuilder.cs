@@ -347,9 +347,10 @@ namespace ASCompiler.compiler.builds
                 scope = scope.parentScope;
             }
 
-            int defineclassid; bool isoutclass;
+            int defineclassid; bool isoutclass;ASBinCode.rtti.Class refClass = null;
             if (scope is ASBinCode.scopes.ObjectInstanceScope)
             {
+                refClass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
                 defineclassid = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class.classid;
                 isoutclass = false;
             }
@@ -457,7 +458,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
-                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                            ((MethodGetterBase)member.bindField).setNotReadVirtual();
                                             iclass.implicit_to = member;
                                             iclass.implicit_to_functionid = function.functionid;
                                             iclass.implicit_to_type = function.signature.returnType;
@@ -518,7 +519,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
-                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                            ((MethodGetterBase)member.bindField).setNotReadVirtual();
                                             iclass.implicit_from = member;
                                             iclass.implicit_from_functionid = function.functionid;
                                             iclass.implicit_from_type = function.signature.parameters[0].type;
@@ -579,7 +580,7 @@ namespace ASCompiler.compiler.builds
                                     if (function.signature.returnType != RunTimeDataType._OBJECT)
                                     {
                                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                        "explicit_from特性函数返回类型必须是Object"); //将来做了继承后可能会改为Object
+                                        "explicit_from特性函数返回类型必须是Object"); 
                                     }
 
                                     for (int j = 0; j < iclass.classMembers.Count; j++)
@@ -590,7 +591,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
-                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                            ((MethodGetterBase)member.bindField).setNotReadVirtual();
                                             iclass.explicit_from = member;
                                             iclass.explicit_from_functionid = function.functionid;
                                             iclass.explicit_from_type = function.signature.parameters[0].type;
@@ -621,7 +622,7 @@ namespace ASCompiler.compiler.builds
                                             member.name == function.name
                                             )
                                         {
-                                            ((ClassMethodGetter)member.bindField).setNotReadVirtual();
+                                            ((MethodGetterBase)member.bindField).setNotReadVirtual();
                                             break;
                                         }
                                     }
@@ -736,10 +737,15 @@ namespace ASCompiler.compiler.builds
                 buildParameter(block, as3function.Parameters[i],builder, env);
             }
 
-            
+            bool isinterface = false;
+            if (refClass != null && refClass.isInterface)
+            {
+                //**接口不检查函数返回
+                isinterface = true;
+            }
 
 
-            if (!function.isNative)
+            if (!function.isNative && !isinterface)
             {
                 builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
                 if (function.signature.returnType != RunTimeDataType.fun_void &&
@@ -770,7 +776,7 @@ namespace ASCompiler.compiler.builds
                             if (pc != null)
                             {
                                 //有父类构造函数需要调。
-                                var sig = builder.dictSignatures[pc.classid][pc.constructor.bindField];
+                                var sig = builder.dictSignatures[pc.blockid][pc.constructor.bindField];
 
                                 if (sig.parameters.Count != 0
                                     &&
@@ -786,7 +792,7 @@ namespace ASCompiler.compiler.builds
                                     //***自动在第一行加入调用代码****
                                     var c = pc.constructor;
                                     OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
-                                    opMakeArgs.arg1 = (ClassMethodGetter)c.bindField;
+                                    opMakeArgs.arg1 = (MethodGetterBase)c.bindField;
                                     opMakeArgs.arg1Type = RunTimeDataType.rt_function;
 
                                    
@@ -798,7 +804,7 @@ namespace ASCompiler.compiler.builds
                                     op.reg = eax;
                                     op.regType = RunTimeDataType.rt_void;
 
-                                    op.arg1 = (ClassMethodGetter)c.bindField;
+                                    op.arg1 = (MethodGetterBase)c.bindField;
                                     op.arg1Type = RunTimeDataType.rt_function;
 
 

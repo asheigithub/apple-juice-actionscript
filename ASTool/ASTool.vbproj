@@ -94,6 +94,7 @@
     <Compile Include="AS\AS3Block.vb" />
     <Compile Include="AS\AS3Break.vb" />
     <Compile Include="AS\AS3Class.vb" />
+    <Compile Include="AS\AS3ClassInterfaceBase.vb" />
     <Compile Include="AS\AS3Const.vb" />
     <Compile Include="AS\AS3Continue.vb" />
     <Compile Include="AS\AS3MemberDateType.vb" />

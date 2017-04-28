@@ -474,14 +474,22 @@ namespace ASRuntime.operators
         }
         private static void _EQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc))
-            {
-                v1 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v1, frame, step.token));
-            }
-            if (TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc))
-            {
-                v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
-            }
+            //if (TypeConverter.ObjectImplicit_ToNumber(v1))
+            //{
+            //    v1 = new ASBinCode.rtData.rtNumber(
+            //        TypeConverter.ConvertToNumber(
+                        
+            //            TypeConverter.ObjectImplicit_ToPrimitive( (ASBinCode.rtData.rtObject)v1)
+                        
+            //            , frame, step.token));
+            //}
+            //if (TypeConverter.ObjectImplicit_ToNumber(v2))
+            //{
+            //    v2 = new ASBinCode.rtData.rtNumber(
+            //        TypeConverter.ConvertToNumber(
+            //            TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2)
+            //            , frame, step.token));
+            //}
 
 
             if (needInvokeToString(v1, v2, frame.player))
@@ -539,14 +547,23 @@ namespace ASRuntime.operators
 
         private static void _NotEQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            if (TypeConverter.ObjectImplicit_ToNumber(v1.rtType, frame.player.swc))
-            {
-                v1 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v1, frame, step.token));
-            }
-            if (TypeConverter.ObjectImplicit_ToNumber(v2.rtType, frame.player.swc))
-            {
-                v2 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(v2, frame, step.token));
-            }
+            //***能转换基本类型的肯定已经转了
+            //if (TypeConverter.ObjectImplicit_ToNumber(v1))
+            //{
+            //    v1 = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(
+                    
+            //        TypeConverter.ObjectImplicit_ToPrimitive( (ASBinCode.rtData.rtObject)v1)
+                    
+            //        , frame, step.token));
+            //}
+            //if (TypeConverter.ObjectImplicit_ToNumber(v2))
+            //{
+            //    v2 = new ASBinCode.rtData.rtNumber(
+            //        TypeConverter.ConvertToNumber(
+            //            TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2)
+
+            //            , frame, step.token));
+            //}
 
             if (needInvokeToString(v1, v2, frame.player))//v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
@@ -658,33 +675,32 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static bool StrictEqual(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2)
         {
-            //strict equality 运算符仅针对数字类型（Number、int 和 uint）执行自动数据转换
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
-
             if (ReferenceEquals(v1, v2))
             {
                 return true;
             }
 
             ASBinCode.RunTimeDataType ot;
-            if (TypeConverter.Object_CanImplicit_ToPrimitive(v1.rtType, frame.player.swc, out ot))
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                {
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                }
             }
-            if (TypeConverter.Object_CanImplicit_ToPrimitive(v2.rtType, frame.player.swc, out ot))
+            if (v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+                {
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                }
             }
-
             if ((
                 v1.rtType == ASBinCode.RunTimeDataType.rt_number || v1.rtType == ASBinCode.RunTimeDataType.rt_int
                 ||
                 v1.rtType == ASBinCode.RunTimeDataType.rt_uint
-                ||
-                TypeConverter.ObjectImplicit_ToNumber(v1.rtType,frame.player.swc)
                 )
 
                 &&
@@ -692,13 +708,11 @@ namespace ASRuntime.operators
                 v2.rtType == ASBinCode.RunTimeDataType.rt_number || v2.rtType == ASBinCode.RunTimeDataType.rt_int
                 ||
                 v2.rtType == ASBinCode.RunTimeDataType.rt_uint
-                ||
-                TypeConverter.ObjectImplicit_ToNumber(v2.rtType,frame.player.swc)
                 )
                 )
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1, null, null);
+                double n2 = TypeConverter.ConvertToNumber(v2, null, null);
 
                 if (n1 == n2)
                 {
@@ -711,10 +725,9 @@ namespace ASRuntime.operators
             }
             else if (v1.rtType == ASBinCode.RunTimeDataType.rt_string && v2.rtType == ASBinCode.RunTimeDataType.rt_string)
             {
-                //string s1 = TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
-                //string s2 = TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
-                string s1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value;
-                string s2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value;
+                
+                string s1 = TypeConverter.ConvertToString(v1, null, null);
+                string s2 = TypeConverter.ConvertToString(v2, null, null);
 
                 if (string.CompareOrdinal(s1, s2) == 0)
                 {
@@ -754,7 +767,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                if (object.ReferenceEquals(v1, v2))
+                if (ReferenceEquals(v1, v2))
                 {
                     return true;
                 }
@@ -763,6 +776,16 @@ namespace ASRuntime.operators
                     return false;
                 }
             }
+        }
+
+
+        private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            //strict equality 运算符仅针对数字类型（Number、int 和 uint）执行自动数据转换
+            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
+            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+
+            return StrictEqual(v1, v2);
         }
 
         public static void execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
@@ -853,26 +876,42 @@ namespace ASRuntime.operators
         /// <returns></returns>
         public static bool testEquals(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            ASBinCode.RunTimeDataType t1 = v1.rtType;
-            ASBinCode.RunTimeDataType t2 = v2.rtType;
-
+            
             if (ReferenceEquals(v1, v2))
             {
                 return true;
             }
+
+            ASBinCode.RunTimeDataType ot;
+            if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                {
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                }
+            }
+            if (v2.rtType > ASBinCode.RunTimeDataType.unknown)
+            {
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+                {
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                }
+            }
+
+            ASBinCode.RunTimeDataType t1 = v1.rtType;
+            ASBinCode.RunTimeDataType t2 = v2.rtType;
+
 
             if (
                 (
                 t1 == ASBinCode.RunTimeDataType.rt_int
                 || t1 == ASBinCode.RunTimeDataType.rt_uint || t1 == ASBinCode.RunTimeDataType.rt_boolean
                 || t1 == ASBinCode.RunTimeDataType.rt_number
-                || TypeConverter.ObjectImplicit_ToNumber(t1, frame.player.swc)
                 )
                 &&
                 (t2 == ASBinCode.RunTimeDataType.rt_int
                 || t2 == ASBinCode.RunTimeDataType.rt_uint || t2 == ASBinCode.RunTimeDataType.rt_boolean
                 || t2 == ASBinCode.RunTimeDataType.rt_number
-                || TypeConverter.ObjectImplicit_ToNumber(t2, frame.player.swc)
                 )
                 )
             {

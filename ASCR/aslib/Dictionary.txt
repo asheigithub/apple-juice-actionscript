@@ -1,0 +1,8 @@
+﻿package flash.utils
+{
+	[_dictionary_]
+	public dynamic class Dictionary extends Object
+	{
+		public function Dictionary (weakKeys:Boolean=false);
+	}
+}

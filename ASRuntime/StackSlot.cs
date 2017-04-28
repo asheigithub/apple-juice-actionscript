@@ -30,6 +30,9 @@ namespace ASRuntime
             }
 
         }
+
+        internal IEnumerator<IRunTimeValue> cache_enumerator;
+
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
@@ -285,7 +288,7 @@ namespace ASRuntime
             propGetSet = null;
             propBindObj = null;
             superPropBindClass = null;
-
+            cache_enumerator = null;
             //fromArray = null;
             //fromArrayIndex = -1;
             _cache_vectorSlot.clear();

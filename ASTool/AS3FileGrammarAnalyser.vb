@@ -1149,7 +1149,7 @@ Public Class AS3FileGrammarAnalyser
                 Next
             End If
         Else
-            If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
+            If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) And Not (TypeOf MemberScopeStack.Peek() Is AS3Interface) Then
                 func.Access.IsInternal = True
             End If
             If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
@@ -2075,12 +2075,24 @@ Public Class AS3FileGrammarAnalyser
                         End While
 
                         forinArg = tempscope(tempscope.Count - 1)
+
+                        If tempscope.Count <> 1 Then
+                            Throw New GrammarException(node.MatchedToken, "Syntax error: invalid for-in initializer, only 1 expression expected.")
+
+                        End If
+
                     Else
                         '**F_ExpressionList**
                         Dim exprs As New AS3StmtExpressions(node.MatchedToken)
                         VisitNodes(node.Nodes(0))
                         exprs.as3exprlist = currentparseExprListStack.Pop()
                         forinArg = exprs
+
+                        If exprs.as3exprlist.Count <> 1 Then
+                            Throw New GrammarException(node.MatchedToken, "Syntax error: invalid for-in initializer, only 1 expression expected.")
+
+                        End If
+
                     End If
 
 
@@ -2212,7 +2224,7 @@ Public Class AS3FileGrammarAnalyser
 
         Dim tempscope As New AS3MemberListBase(node.MatchedToken)
         Dim currentno = MemberScopeStack.Peek().LastRegId()
-        While tempscope.LastRegId() < currentno
+        While tempscope.LastRegId() <currentno
             tempscope.NextRegId()
         End While
 

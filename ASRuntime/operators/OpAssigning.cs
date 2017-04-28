@@ -22,7 +22,13 @@ namespace ASRuntime.operators
                         slot = ((StackSlot)slot).linktarget;
                     }
 
-                    if (slot is OpVector.vectorSLot)    //Vector类型不匹配
+                    if (slot is ILinkSlot)  //需要更新可枚举属性
+                    {
+                        ((ILinkSlot)slot).propertyIsEnumerable = true;
+                        frame.endStep(step);
+                        return;
+                    }
+                    else if (slot is OpVector.vectorSLot)    //Vector类型不匹配
                     {
                         BlockCallBackBase cb = new BlockCallBackBase();
                         cb.scope = scope;
@@ -40,7 +46,7 @@ namespace ASRuntime.operators
 
 
                     string ext = String.Empty;
-                    if (slot is ClassMethodGetter.MethodSlot)
+                    if (slot is MethodGetterBase.MethodSlot)
                     {
                         ext = "Cannot assign to a method ";// + ((ASBinCode.ClassMethodGetter.MethodSlot)slot).method;
                     }
@@ -62,9 +68,22 @@ namespace ASRuntime.operators
                     }
 
                     frame.throwError(
-                        new error.InternalError(step.token, ext, new ASBinCode.rtData.rtString(ext))
+                        step.token,0, ext
                         );
                 }
+
+                //if (
+                //    slot is StackSlot 
+                //    &&
+                //    ((StackSlot)slot).linktarget != null
+                //    )
+                //{
+                //    slot = ((StackSlot)slot).linktarget;
+                //    if (slot is ILinkSlot)
+                //    {
+                //        ((ILinkSlot)slot).propertyIsEnumerable = true;
+                //    }
+                //}
 
                 frame.endStep(step);
             }
@@ -117,8 +136,7 @@ namespace ASRuntime.operators
                 if (prop.setter == null)
                 {
                     frame.throwError(
-                        new error.InternalError(step.token, "Illegal write to read-only property ",
-                        new ASBinCode.rtData.rtString("Illegal write to read-only property "))
+                        step.token,0, "Illegal write to read-only property "
                         );
                     break;
                 }
@@ -138,8 +156,7 @@ namespace ASRuntime.operators
                 if (setter == null || setter.bindField != prop.setter)
                 {
                     frame.throwError(
-                        new error.InternalError(step.token, "Illegal write to read-only property ",
-                        new ASBinCode.rtData.rtString("Illegal write to read-only property "))
+                        step.token,0, "Illegal write to read-only property "
                         );
                     break;
                 }
@@ -149,14 +166,14 @@ namespace ASRuntime.operators
 
                 if (sslot.superPropBindClass != null)
                 {
-                    func = ((ClassMethodGetter)setter.bindField).getSuperMethod(
+                    func = ((MethodGetterBase)setter.bindField).getSuperMethod(
                         bindobj.objScope,
                         sslot.superPropBindClass
                         );
                 }
                 else
                 {
-                    func = ((ClassMethodGetter)setter.bindField).getMethod(
+                    func = ((MethodGetterBase)setter.bindField).getMethod(
                         bindobj.objScope
                         );
                 }

@@ -35,7 +35,7 @@ namespace ASCompiler.compiler.utils
 
             //***导入当前类的包外类***
             {
-                var _class = builder.buildingclasses[srcfile.Package.MainClass];
+                var _class = builder.buildingclasses[srcfile.Package.MainClassOrInterface];
                 foreach (var item in builder.buildingclasses)
                 {
                     if (item.Value.mainClass == _class)
@@ -44,6 +44,21 @@ namespace ASCompiler.compiler.utils
                         {
                             imports.Add(item.Value);
                         }
+                    }
+                }
+
+                //***如果当前在编译Vector
+                if (builder.bin.dict_Vector_type.ContainsKey(_class))
+                {
+                    var c = builder.bin.dict_Vector_type[_class];
+                    if (c > ASBinCode.RunTimeDataType.unknown)
+                    {
+                        var oc= builder.getClassByRunTimeDataType(c);
+                        if (!imports.Contains(oc))
+                        {
+                            imports.Add(oc);
+                        }
+
                     }
                 }
 
@@ -129,9 +144,9 @@ namespace ASCompiler.compiler.utils
 
             //**加入主类***
 
-            if (!imports.Contains(builder.buildingclasses[srcfile.Package.MainClass]))
+            if (!imports.Contains(builder.buildingclasses[srcfile.Package.MainClassOrInterface]))
             {
-                imports.Add(builder.buildingclasses[srcfile.Package.MainClass]);
+                imports.Add(builder.buildingclasses[srcfile.Package.MainClassOrInterface]);
             }
 
 

@@ -32,8 +32,8 @@ namespace ASCompiler.compiler
             buildoutfunctions = new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>();
 
 
-        internal Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>
-            buildingclasses = new Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>();
+        internal Dictionary<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>
+            buildingclasses = new Dictionary<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>();
         internal Dictionary<ASBinCode.rtti.ClassMember,ASTool.AS3.IAS3Stmt>
             _buildingmembers = new Dictionary< ASBinCode.rtti.ClassMember,ASTool.AS3.IAS3Stmt>();
         internal Dictionary<ASBinCode.rtti.Class, CompileEnv> _classbuildingEnv =
@@ -112,7 +112,7 @@ namespace ASCompiler.compiler
 
             if (buildErrors.Count > 10)
             {
-                throw new InvalidOperationException();
+                throw new TooManyBuildErrorException();
             }
 
         }
@@ -138,16 +138,18 @@ namespace ASCompiler.compiler
             bin = new CSWC();
             ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
 
-            
+
             try
             {
                 List<ASTool.AS3.AS3SrcFile> tobuildfiles = new List<ASTool.AS3.AS3SrcFile>();
                 tobuildfiles.AddRange(lib.SrcFiles);
+                build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
+                //lib库代码编译
+
+                tobuildfiles.Clear();
                 tobuildfiles.AddRange(proj.SrcFiles);
-
-
                 //ASTool.AS3.AS3SrcFile docfile=null;
-                build_srcFiles(tobuildfiles,false,RunTimeDataType.unknown);
+                build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
 
 
                 if (isConsoleOut)
@@ -158,6 +160,13 @@ namespace ASCompiler.compiler
             catch (BuildException ex)
             {
                 pushBuildError(ex.error);
+            }
+            catch (TooManyBuildErrorException)
+            {
+                if (isConsoleOut)
+                {
+                    Console.WriteLine("编译错误过多，编译已终止");
+                }
             }
             catch (InvalidOperationException)
             {
@@ -202,7 +211,7 @@ namespace ASCompiler.compiler
 
 
                     builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                    var c = builder.buildClassDefine(srcfile.Package.MainClass, this, null, srcfile,isbuildvector,vectortype);
+                    var c = builder.buildClassDefine(srcfile.Package.MainClass, this, null, srcfile, isbuildvector, vectortype);
 
                     if (c.isdocumentclass)
                     {
@@ -213,7 +222,52 @@ namespace ASCompiler.compiler
                     {
                         builder.buildClassDefine(
                             srcfile.Package.MainClass.innerClass[j], this, buildingclasses[srcfile.Package.MainClass]
-                            , srcfile,isbuildvector,vectortype
+                            , srcfile, isbuildvector, vectortype
+                            );
+                    }
+
+                    builds.AS3InterfaceBuilder interfacebulder = new builds.AS3InterfaceBuilder();
+                    for (int j = 0; j < srcfile.Package.MainClass.innerInterface.Count; j++)
+                    {
+                        interfacebulder.buildInterfaceDefine(
+                            srcfile.Package.MainClass.innerInterface[j],
+                            this, buildingclasses[srcfile.Package.MainClass]
+                            , srcfile, isbuildvector, vectortype
+                            );
+                    }
+
+                }
+                if (srcfile.Package.MainInterface != null)
+                {
+                    if (System.IO.Path.GetFileNameWithoutExtension(srcfile.srcFile)
+                        != srcfile.Package.MainInterface.Name
+                        )
+                    {
+                        throw new BuildException(0, 0, srcfile.srcFile,
+                            "文件名和接口名不匹配"
+                        );
+                    }
+                    builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
+                    var c = builder.buildInterfaceDefine(
+                        srcfile.Package.MainInterface, this, null, srcfile, isbuildvector, vectortype);
+
+                    builds.AS3ClassBuilder cb = new builds.AS3ClassBuilder();
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerClass.Count; j++)
+                    {
+                        
+                        cb.buildClassDefine(
+                            srcfile.Package.MainInterface.innerClass[j], 
+                            this, buildingclasses[srcfile.Package.MainInterface]
+                            , srcfile, isbuildvector, vectortype
+                            );
+                    }
+
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerInterface.Count; j++)
+                    {
+                        builder.buildInterfaceDefine(
+                            srcfile.Package.MainInterface.innerInterface[j],
+                            this, buildingclasses[srcfile.Package.MainInterface]
+                            , srcfile, isbuildvector, vectortype
                             );
                     }
 
@@ -249,21 +303,197 @@ namespace ASCompiler.compiler
                         _currentImports.Pop();
 
                     }
+
+                    for (int j = 0; j < srcfile.Package.MainClass.innerInterface.Count; j++)
+                    {
+                        var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
+                        classImports.Add(buildingclasses[srcfile.Package.MainClass.innerInterface[j]], imports);
+                        _currentImports.Push(imports);
+
+                        builds.AS3InterfaceBuilder ib = new builds.AS3InterfaceBuilder();
+                        ib.buildInterfaceExtends(srcfile.Package.MainClass.innerInterface[j], this);
+
+                        _currentImports.Pop();
+
+                    }
+                }
+
+                if (srcfile.Package.MainInterface != null)
+                {
+                    var iimps = utils.ImportReader.readImports(srcfile, this);
+                    classImports.Add(buildingclasses[srcfile.Package.MainInterface], iimps);
+                    _currentImports.Push(iimps);
+
+                    builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
+                    builder.buildInterfaceExtends(srcfile.Package.MainInterface, this);
+                    _currentImports.Pop();
+
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerClass.Count; j++)
+                    {
+                        var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
+                        classImports.Add(buildingclasses[srcfile.Package.MainInterface.innerClass[j]], imports);
+                        _currentImports.Push(imports);
+
+                        builds.AS3ClassBuilder cb = new builds.AS3ClassBuilder();
+                        cb.buildClassExtends(srcfile.Package.MainInterface.innerClass[j], this);
+
+                        _currentImports.Pop();
+
+                    }
+
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerInterface.Count; j++)
+                    {
+                        var imports = utils.ImportReader.readOutPackageImports(srcfile, this);
+                        classImports.Add(buildingclasses[srcfile.Package.MainInterface.innerInterface[j]], imports);
+                        _currentImports.Push(imports);
+
+                        builder.buildInterfaceExtends(srcfile.Package.MainInterface.innerInterface[j], this);
+
+                        _currentImports.Pop();
+
+                    }
+                }
+            }
+            //****查找循环继承***
+            #region 循环继承检查
+            for (int i = 0; i < tobuildfiles.Count; i++)
+            {
+                ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+                if (srcfile.Package.MainClass != null)
+                {
+                   
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    builder.checkCircularReference(srcfile.Package.MainClass,this);
+                    
+                    for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+                    {
+                        builder.checkCircularReference(srcfile.Package.MainClass.innerClass[j], this);
+                    }
+
+                    for (int j = 0; j < srcfile.Package.MainClass.innerInterface.Count; j++)
+                    {
+                        
+                        builds.AS3InterfaceBuilder ib = new builds.AS3InterfaceBuilder();
+                        ib.checkCircularReference(srcfile.Package.MainClass.innerInterface[j], this);
+                        ib.copyImplements(srcfile.Package.MainClass.innerInterface[j], this);
+
+                    }
+                }
+
+                if (srcfile.Package.MainInterface != null)
+                {
+                    
+                    builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
+                    builder.checkCircularReference(srcfile.Package.MainInterface, this);
+                    builder.copyImplements(srcfile.Package.MainInterface, this);
+
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerClass.Count; j++)
+                    {
+                        
+                        builds.AS3ClassBuilder cb = new builds.AS3ClassBuilder();
+                        cb.checkCircularReference(srcfile.Package.MainInterface.innerClass[j], this);
+                        
+                    }
+
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerInterface.Count; j++)
+                    {                      
+                        builder.checkCircularReference(srcfile.Package.MainInterface.innerInterface[j], this);
+                        builder.copyImplements(srcfile.Package.MainInterface.innerInterface[j], this);
+                    }
+                }
+            }
+            #endregion
+            //***确定接口***
+            for (int i = 0; i < tobuildfiles.Count; i++)
+            {
+                ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
+
+                if (srcfile.Package.MainClass != null)
+                {
+                    
+                    _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass]]);
+
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    builder.buildClassImplements(srcfile.Package.MainClass, this);
+                    _currentImports.Pop();
+
+                    for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
+                    {
+                        _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass.innerClass[j]]]);
+
+                        builder.buildClassImplements(srcfile.Package.MainClass.innerClass[j], this);
+
+                        _currentImports.Pop();
+                    }
+                }
+
+                if (srcfile.Package.MainInterface != null)
+                {
+                    for (int j = 0; j < srcfile.Package.MainInterface.innerClass.Count; j++)
+                    {
+                        
+                        _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainInterface.innerClass[j]]]);
+
+                        builds.AS3ClassBuilder cb = new builds.AS3ClassBuilder();
+                        cb.buildClassImplements(srcfile.Package.MainInterface.innerClass[j], this);
+                        _currentImports.Pop();
+
+                    }
                 }
             }
 
             //Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> copyclasses = new Dictionary<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>();
-            List<KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>> copyclasses = new List<KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class>>();
+            List<KeyValuePair<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>> copyclasses = new List<KeyValuePair<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>>();
             foreach (var item in buildingclasses)
             {
+                if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                {
+                    continue;
+                }
                 copyclasses.Add(item);
             }
             //***按继承深度排序。
             copyclasses.Sort((
-                KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> c1,
-                KeyValuePair<ASTool.AS3.AS3Class, ASBinCode.rtti.Class> c2
+                KeyValuePair<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class> c1,
+                KeyValuePair<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class> c2
                 ) =>
             {
+                if (c1.Value.isInterface && !c2.Value.isInterface)
+                {
+                    //if (c2.Value.implements.ContainsKey(c1.Value))
+                    {
+                        return -1;
+                    }
+                    //else
+                    {
+                        //return c1.Value.getRtType() - c2.Value.getRtType();
+                    }
+                }
+                else if (!c1.Value.isInterface && c2.Value.isInterface)
+                {
+                    //if (c1.Value.implements.ContainsKey(c2.Value))
+                    {
+                        return 1;
+                    }
+                    //else
+                    {
+                        //return c1.Value.getRtType() - c2.Value.getRtType();
+                    }
+                }
+                else if (c1.Value.isInterface && c2.Value.isInterface)
+                {
+                    if (c1.Value.implements.ContainsKey(c2.Value))
+                    {
+                        return 1;
+                    }
+                    else if (c2.Value.implements.ContainsKey(c1.Value))
+                    {
+                        return -1;
+                    }
+                }
+
+
                 {
                     if (ClassMemberFinder.isInherits(c1.Value, c2.Value))
                     {
@@ -305,29 +535,23 @@ namespace ASCompiler.compiler
             });
 
 
-            //***确定类成员****
-            //for (int i = 0; i < tobuildfiles.Count; i++)
-            //{
-            //    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
-
-            //    if (srcfile.Package.MainClass != null)
-            //    {
-            //        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-            //        builder.buildClassDefineMembers(srcfile.Package.MainClass, this);
-            //        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
-            //        {
-            //            builder.buildClassDefineMembers(srcfile.Package.MainClass.innerClass[j], this);
-            //        }
-            //    }
-            //}
             foreach (var item in copyclasses)
             {
                 if (!tobuildfiles.Contains(item.Key.Package.AS3File))
                 {
                     continue;
                 }
-                builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                builder.buildClassDefineMembers(item.Key, this,false);
+
+                if (item.Key is ASTool.AS3.AS3Class)
+                {
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    builder.buildClassDefineMembers(item.Key, this, false);
+                }
+                else
+                {
+                    builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
+                    builder.buildInterfaceMembers(item.Key, this);
+                }
             }
 
             foreach (var item in copyclasses)
@@ -342,32 +566,6 @@ namespace ASCompiler.compiler
 
 
             //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
-            //for (int i = 0; i < tobuildfiles.Count; i++)
-            //{
-            //    ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
-
-            //    if (srcfile.Package.MainClass != null)
-            //    {
-
-            //        _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass]]);
-
-            //        builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-            //        builder.buildMemberType(buildingclasses[srcfile.Package.MainClass], this, srcfile);
-
-            //        _currentImports.Pop();
-
-            //        for (int j = 0; j < srcfile.Package.MainClass.innerClass.Count; j++)
-            //        {
-
-            //            _currentImports.Push(classImports[buildingclasses[srcfile.Package.MainClass.innerClass[j]]]);
-
-            //            builder.buildMemberType(
-            //                buildingclasses[srcfile.Package.MainClass.innerClass[j]], this, srcfile);
-
-            //            _currentImports.Pop();
-            //        }
-            //    }
-            //}
             foreach (var item in copyclasses)
             {
                 if (!tobuildfiles.Contains(item.Key.Package.AS3File))
@@ -375,10 +573,22 @@ namespace ASCompiler.compiler
                     continue;
                 }
                 _currentImports.Push(classImports[item.Value]);
-                builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
-                builder.buildMemberType(
-                    buildingclasses[item.Key]
-                    , this,item.Key.Package.AS3File);
+
+                if (!buildingclasses[item.Key].isInterface)
+                {
+                    builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+                    builder.buildMemberType(
+                        buildingclasses[item.Key]
+                        , this, item.Key.Package.AS3File);
+                }
+                else
+                {
+                    builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
+                    builder.buildInterfaceMemberType(
+                        buildingclasses[item.Key]
+                        , this, item.Key.Package.AS3File);
+                }
+
                 _currentImports.Pop();
             }
 
@@ -522,7 +732,7 @@ namespace ASCompiler.compiler
                 {
                     var m = cls.classMembers[i];
 
-                    if (m.bindField is ClassPropertyGetter || m.inheritFrom !=null)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom != null)
                     {
                         continue;
                     }
@@ -557,7 +767,7 @@ namespace ASCompiler.compiler
                 for (int i = 0; i < cls.classMembers.Count; i++)
                 {
                     var m = cls.classMembers[i];
-                    if (m.bindField is ClassPropertyGetter || m.inheritFrom !=null)
+                    if (m.bindField is ClassPropertyGetter || m.inheritFrom != null)
                     {
                         continue;
                     }
@@ -571,7 +781,7 @@ namespace ASCompiler.compiler
                 }
 
                 //***检查Override***
-                if (_overridefunctions.ContainsKey(cls) && buildErrors.Count ==0)
+                if (_overridefunctions.ContainsKey(cls) && buildErrors.Count == 0)
                 {
                     var ov = _overridefunctions[cls];
                     foreach (var ovt in ov)
@@ -609,9 +819,9 @@ namespace ASCompiler.compiler
                             }
                             else
                             {
-                                
+
                                 //***比较所有参数***
-                                for (int j = 0; j < nfs.parameters.Count ; j++)
+                                for (int j = 0; j < nfs.parameters.Count; j++)
                                 {
                                     if (nfs.parameters[j].type != otovfs.parameters[j].type
                                         ||
@@ -635,9 +845,9 @@ namespace ASCompiler.compiler
                         {
                             for (int i = 0; i < ovt.Value.Count; i++)
                             {
-                                
+
                                 var tooverridefunc = ovt.Value[i];
-                                
+
                                 if (cls.classMembers.Contains(tooverridefunc))
                                 {
                                     for (int j = 0; j < cls.classMembers.Count; j++)
@@ -645,7 +855,7 @@ namespace ASCompiler.compiler
                                         if (cls.classMembers[j] == tooverridefunc)
                                         {
                                             cls.classMembers[j] = nf;
-                                            
+
                                         }
 
                                         if (cls.classMembers[j].bindField is ClassPropertyGetter)
@@ -653,11 +863,11 @@ namespace ASCompiler.compiler
                                             ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
                                             if (pg.getter == tooverridefunc.bindField)
                                             {
-                                                pg.getter = (ClassMethodGetter)nf.bindField;
+                                                pg.getter = (MethodGetterBase)nf.bindField;
                                             }
                                             if (pg.setter == tooverridefunc.bindField)
                                             {
-                                                pg.setter = (ClassMethodGetter)nf.bindField;
+                                                pg.setter = (MethodGetterBase)nf.bindField;
                                             }
                                         }
 
@@ -674,6 +884,123 @@ namespace ASCompiler.compiler
 
                     }
 
+                }
+                //***确定类实现的接口****
+                if (!cls.isInterface && buildErrors.Count==0)
+                {
+                    List<ASBinCode.rtti.Class> implinterfaces = new List<ASBinCode.rtti.Class>();
+                    foreach (var impl in cls.implements)
+                    {
+                        implinterfaces.Add(impl.Key);
+                    }
+
+                    foreach (var impls in implinterfaces)
+                    {
+                        int[] idxlist=new int[ impls.classMembers.Count ];
+                        cls.implements[impls] = idxlist;
+
+                        for (int i = 0; i < idxlist.Length; i++)
+                        {
+                            var implmember = impls.classMembers[i];
+
+                            bool found = false; //查找接口实现
+                            for (int j = 0; j < cls.classMembers.Count; j++)
+                            {
+                                var clsmember = cls.classMembers[j];
+                                if (clsmember.name == implmember.name)
+                                {
+                                    found = true;
+                                    if (!clsmember.isPublic)
+                                    {
+                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                            "interface method "
+                                            + implmember.name + " in interface " + impls.name +
+                                            " not implemented by class " + cls.name 
+                                            + ". (实现接口的方法必须是public)");
+                                    }
+
+                                    if (clsmember.bindField is ClassPropertyGetter 
+                                        || 
+                                        implmember.bindField is ClassPropertyGetter)
+                                    {
+                                        if (!(clsmember.bindField is ClassPropertyGetter
+                                        && implmember.bindField is ClassPropertyGetter))
+                                        {
+                                            throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                            "interface method "
+                                            + implmember.name + " in interface " + impls.name +
+                                            " not implemented by class " + cls.name
+                                            + ". (一个是访问器一个不是)");
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    //***比较签名***
+                                    var clssig = 
+                                        buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]].signature;
+                                    ASBinCode.rtti.FunctionSignature interfacesig;
+                                    if (implmember.inheritFrom == null)
+                                    {
+                                        interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember]].signature;
+                                    }
+                                    else
+                                    {
+                                        interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember.inheritSrcMember]].signature;
+                                    }
+
+                                    if (clssig.returnType != interfacesig.returnType)
+                                    {
+                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                            "interface method "
+                                            + implmember.name + " in interface " + impls.name +
+                                            " not implemented by class " + cls.name
+                                            + ". (返回类型不符)");
+
+                                    }
+                                    else if (clssig.parameters.Count != interfacesig.parameters.Count)
+                                    {
+                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                            "interface method "
+                                            + implmember.name + " in interface " + impls.name +
+                                            " not implemented by class " + cls.name
+                                            + ". (参数签名不符)");
+                                    }
+                                    else
+                                    {
+
+                                        //***比较所有参数***
+                                        for (int k = 0; k < clssig.parameters.Count; k++)
+                                        {
+                                            if (clssig.parameters[k].type != interfacesig.parameters[k].type
+                                                ||
+                                                clssig.parameters[k].isPara != interfacesig.parameters[k].isPara
+                                                )
+                                            {
+                                                throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                                     "interface method "
+                                                     + implmember.name + " in interface " + impls.name +
+                                                     " not implemented by class " + cls.name
+                                                     + ". (参数签名不符)");
+                                            }
+                                        }
+                                    }
+
+                                    idxlist[i] = j;
+
+                                }
+                            }
+                            if (!found)
+                            {
+                                throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                    "interface method "
+                                    + implmember.name + " in interface " + impls.name +
+                                    " not implemented by class " + cls.name);
+                            }
+                        }
+
+                    }
                 }
 
 
@@ -732,6 +1059,11 @@ namespace ASCompiler.compiler
 
                 foreach (var item in buildingclasses)
                 {
+                    if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+                    {
+                        continue;
+                    }
+
                     while (bin.classes.Count <= item.Value.classid)
                     {
                         bin.classes.Add(null);
@@ -744,7 +1076,7 @@ namespace ASCompiler.compiler
                         //Field field = (Field)_classbuildingEnv[item.Value].block.scope.members[
                         //    item.Value.constructor.index];
 
-                        ClassMethodGetter field = (ClassMethodGetter)item.Value.constructor.bindField;
+                        MethodGetterBase field = (MethodGetterBase)item.Value.constructor.bindField;
                         int blockid = field.refdefinedinblockid;
 
                         var signature =
@@ -775,6 +1107,7 @@ namespace ASCompiler.compiler
                     builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
                     builder.buildParameterDefaultValue(item.Key, item.Value.item1, item.Value.item2, this);
                 }
+                _toEvalDefaultParameters.Clear();
             }
         }
 
@@ -817,7 +1150,7 @@ namespace ASCompiler.compiler
 
                 ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
 
-                if (member is ClassMethodGetter)
+                if (member is MethodGetterBase)
                 {
 
                 }
@@ -1093,6 +1426,18 @@ namespace ASCompiler.compiler
                         }
                     }
                 }
+                else if (stmt is ASTool.AS3.AS3ForIn)
+                {
+                    ASTool.AS3.AS3ForIn as3forin = (ASTool.AS3.AS3ForIn)stmt;
+                    buildVariables(env, as3forin.ForArg);
+                    if (as3forin.Body != null)
+                    {
+                        for (int i = 0; i < as3forin.Body.Count; i++)
+                        {
+                            buildVariables(env, as3forin.Body[i]);
+                        }
+                    }
+                }
                 else if (stmt is ASTool.AS3.AS3While)
                 {
                     ASTool.AS3.AS3While as3while = (ASTool.AS3.AS3While)stmt;
@@ -1231,7 +1576,7 @@ namespace ASCompiler.compiler
 
                             VariableBase var = (VariableBase)member;
 
-                            var newtype = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token,this);
+                            var newtype = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token, this);
 
                             if (newtype == var.valueType)
                             {
@@ -1260,7 +1605,7 @@ namespace ASCompiler.compiler
                                     {
                                         //读取测试
 
-                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp",-65535,true), false);
+                                        CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp", -65535, true), false);
                                         buildExpression(tempEnv, variable.ValueExpr);
                                         IRightValue tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
                                             stmt.Token, new Builder(true)
@@ -1268,10 +1613,10 @@ namespace ASCompiler.compiler
                                         newtype = tempRv.valueType;
                                     }
 
-                                    if (!ASRuntime.TypeConverter.testImplicitConvert(newtype, var.valueType,this))
+                                    if (!ASRuntime.TypeConverter.testImplicitConvert(newtype, var.valueType, this))
                                     {
                                         pushBuildError(new BuildTypeError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                        newtype , var.valueType ,this));
+                                        newtype, var.valueType, this));
                                         return;
                                     }
                                     else
@@ -1288,11 +1633,11 @@ namespace ASCompiler.compiler
                     }
 
                     {
-                        VariableBase rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id,false);
+                        VariableBase rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id, false);
                         env.block.scope.members.Add(rtVariable);
                         try
                         {
-                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token,this);
+                            rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, stmt.Token, this);
                         }
                         catch (BuildException ex)
                         {
@@ -1392,24 +1737,24 @@ namespace ASCompiler.compiler
                                 {
                                     if (as3function.IsGet)
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
+                                        IMember member = MemberFinder.find(as3function.Name, env, as3function.Access.IsStatic, this, as3function.token);
 
-                                        if(
-                                            !dictSignatures.ContainsKey(env.block.id )
+                                        if (
+                                            !dictSignatures.ContainsKey(env.block.id)
                                             ||
                                             !dictSignatures[env.block.id].ContainsKey(((ClassPropertyGetter)member).getter))
-                                            {
+                                        {
                                             pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
                                                 "访问器未找到"));
                                             return;
-                                            }
+                                        }
 
-                                        signature = dictSignatures[env.block.id][ 
+                                        signature = dictSignatures[env.block.id][
                                             ((ClassPropertyGetter)member).getter];
                                     }
                                     else if (as3function.IsSet)
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
+                                        IMember member = MemberFinder.find(as3function.Name, env, as3function.Access.IsStatic, this, as3function.token);
 
                                         if (
                                             !dictSignatures.ContainsKey(env.block.id)
@@ -1427,7 +1772,7 @@ namespace ASCompiler.compiler
                                     }
                                     else
                                     {
-                                        IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
+                                        IMember member = MemberFinder.find(as3function.Name, env, as3function.Access.IsStatic, this, as3function.token);
 
                                         if (
                                             !dictSignatures.ContainsKey(env.block.id)
@@ -1445,14 +1790,14 @@ namespace ASCompiler.compiler
                                 }
 
                                 builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
-                                var func= builder.buildAS3Function(env,
+                                var func = builder.buildAS3Function(env,
                                 as3function, this, signature);
 
                                 if (as3function.IsMethod)
                                 {
-                                    
 
-                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env,as3function.Access.IsStatic,this,as3function.token);
+
+                                    ASBinCode.IMember member = MemberFinder.find(as3function.Name, env, as3function.Access.IsStatic, this, as3function.token);
 
                                     if (as3function.IsGet)
                                     {
@@ -1464,9 +1809,9 @@ namespace ASCompiler.compiler
                                     }
                                     else
                                     {
-                                        ((ClassMethodGetter)member).setFunctionId(func.functionId);
+                                        ((MethodGetterBase)member).setFunctionId(func.functionId);
                                     }
-                                    
+
                                 }
 
                             }
@@ -1508,6 +1853,11 @@ namespace ASCompiler.compiler
                     builds.AS3LoopBuilder builder = new builds.AS3LoopBuilder();
                     builder.buildAS3For(env, (ASTool.AS3.AS3For)stmt, this);
                 }
+                else if (stmt is ASTool.AS3.AS3ForIn)
+                {
+                    builds.AS3LoopBuilder builder = new builds.AS3LoopBuilder();
+                    builder.buildAS3ForIn(env, (ASTool.AS3.AS3ForIn)stmt, this);
+                }
                 else if (stmt is ASTool.AS3.AS3While)
                 {
                     builds.AS3LoopBuilder builder = new builds.AS3LoopBuilder();
@@ -1546,7 +1896,7 @@ namespace ASCompiler.compiler
                         ASBinCode.IRightValue defaultv = null;
                         try
                         {
-                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
+                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env, variable.Access.IsStatic, this, variable.token);
                             if (variable.ValueExpr != null) //变量值表达式
                             {
                                 var testEval = ExpressionEval.Eval(variable.ValueExpr);
@@ -1563,11 +1913,11 @@ namespace ASCompiler.compiler
                                 }
 
                                 //**加入赋值操作***
-                                if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType,this))
+                                if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType, this))
                                 {
-                                    throw new BuildException( new BuildTypeError( stmt.Token.line, 
+                                    throw new BuildException(new BuildTypeError(stmt.Token.line,
                                         stmt.Token.ptr, stmt.Token.sourceFile,
-                                        defaultv.valueType,rtVariable.valueType,this));
+                                        defaultv.valueType, rtVariable.valueType, this));
                                 }
 
                                 bool isbindscope = false;
@@ -1582,9 +1932,9 @@ namespace ASCompiler.compiler
                                     defaultv =
                                         builds.ExpressionBuilder.addCastOpStep(
                                             env, defaultv, rtVariable.valueType,
-                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile),this
+                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile), this
                                             );
-                                    
+
                                 }
 
                                 //赋初始值
@@ -1594,10 +1944,10 @@ namespace ASCompiler.compiler
                                     step.regType = rtVariable.valueType;
                                     step.arg1 = defaultv;
                                     step.arg1Type = defaultv.valueType;
-                                    
+
                                     step.arg2 = null;
                                     step.arg2Type = RunTimeDataType.unknown;
-                                    
+
                                     env.block.opSteps.Add(step);
                                 }
                                 if (isbindscope && (rtVariable.valueType == RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void))
@@ -1614,7 +1964,7 @@ namespace ASCompiler.compiler
                                     env.block.opSteps.Add(stepbind);
                                 }
                             }
-                            
+
                         }
                         catch (BuildException ex)
                         {
@@ -1632,7 +1982,7 @@ namespace ASCompiler.compiler
 
                         try
                         {
-                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env,variable.Access.IsStatic,this,variable.token);
+                            VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env, variable.Access.IsStatic, this, variable.token);
                             //rtVariable.valueType = TypeReader.fromSourceCodeStr(variable.TypeStr, env, stmt.Token);
 
                             if (variable.ValueExpr != null) //变量值表达式
@@ -1656,11 +2006,11 @@ namespace ASCompiler.compiler
                                 {
                                     //而且只在此处场合忽略检查
                                 }
-                                else if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType,this))
+                                else if (!ASRuntime.TypeConverter.testImplicitConvert(defaultv.valueType, rtVariable.valueType, this))
                                 {
-                                    throw new BuildException( new BuildTypeError( stmt.Token.line, 
+                                    throw new BuildException(new BuildTypeError(stmt.Token.line,
                                         stmt.Token.ptr, stmt.Token.sourceFile,
-                                        defaultv.valueType,rtVariable.valueType ,this));
+                                        defaultv.valueType, rtVariable.valueType, this));
                                 }
 
                                 bool isbindscope = false;
@@ -1675,9 +2025,9 @@ namespace ASCompiler.compiler
                                     defaultv =
                                         builds.ExpressionBuilder.addCastOpStep(
                                             env, defaultv, rtVariable.valueType,
-                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile),this
+                                            new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile), this
                                             );
-                                    
+
                                 }
 
                                 //赋初始值
@@ -1688,14 +2038,14 @@ namespace ASCompiler.compiler
                                     step.arg1 = defaultv;
                                     step.arg1Type = defaultv.valueType;
 
-                                    
+
                                     step.arg2 = null;
                                     step.arg2Type = RunTimeDataType.unknown;
-                                    
-                                    
+
+
                                     env.block.opSteps.Add(step);
                                 }
-                                if (isbindscope && (rtVariable.valueType== RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void   ))
+                                if (isbindscope && (rtVariable.valueType == RunTimeDataType.rt_function || rtVariable.valueType == RunTimeDataType.rt_void))
                                 {
                                     //***需追加绑定scope***
                                     OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile));
@@ -1826,12 +2176,13 @@ namespace ASCompiler.compiler
 
         
         
-        internal string build_vector(string vt, ASTool.Token token)
+        internal string build_vector(string vt, ASTool.Token token,out ASBinCode.rtti.Class vc)
         {
             string vectorType = vt.Substring(8, vt.Length - 9);
             if (vectorType.StartsWith("Vector.<"))
             {
-                build_vector(vectorType,token);
+                ASBinCode.rtti.Class tvc;
+                build_vector(vectorType,token,out tvc);
             }
 
             if (vectorType == "null" 
@@ -1878,6 +2229,7 @@ namespace ASCompiler.compiler
             {
                 if (item.Value.name == finalVectorName)
                 {
+                    vc = item.Value;
                     return item.Value.name;
                 }
             }
@@ -1973,7 +2325,7 @@ namespace ASCompiler.compiler
                 }
             }
 
-            
+            vc = buildingclasses[lib.SrcFiles[0].Package.MainClass];
 
             return lib.SrcFiles[0].Package.MainClass.Name;
         }

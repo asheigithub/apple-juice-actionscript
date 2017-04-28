@@ -27,6 +27,17 @@ namespace ASBinCode
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
 
+
+        /// <summary>
+        /// 异常类
+        /// </summary>
+        public Class ErrorClass;
+
+        /// <summary>
+        /// 字典特殊类
+        /// </summary>
+        public Class DictionaryClass;
+
         public CSWC()
         {
             for (int i = 0; i < RunTimeDataType.unknown; i++)
@@ -35,7 +46,7 @@ namespace ASBinCode
             }
 
             loadBuildinNativeFunctions();
-
+            
         }
 
         public void regNativeFunction(NativeFunctionBase nativefunction)

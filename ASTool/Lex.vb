@@ -56,6 +56,7 @@ Public Class Lex
         input = input.Replace(vbCrLf, vbLf)
         input = input.Replace(vbCr, vbLf)
 
+
         Dim ptr As Integer = 0
 
         Dim word As Token
