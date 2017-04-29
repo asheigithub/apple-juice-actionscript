@@ -455,7 +455,7 @@ Public Class Grammar
 
 
 
-#Region "检查 this 和 super关键字"
+        '#Region "检查 this 和 super关键字"
         For index = 0 To words.Count - 1
             Dim token = words(index)
             If token.Type = Token.TokenType.identifier Then
@@ -467,10 +467,10 @@ Public Class Grammar
             End If
         Next
 
-#End Region
+        '#End Region
 
 
-#Region "检测语句label"
+        '#Region "检测语句label"
 
         '***检测label  label:for label:while label:do label:switch***
         '这些关键字前出现 identifier ":" 说明是一个label标记
@@ -547,9 +547,9 @@ Public Class Grammar
                 End If
             End If
         Next
-#End Region
+        '#End Region
 
-#Region "查找代码块label"
+        '#Region "查找代码块label"
         ' label:{
 
         For i = 2 To words.Count - 1
@@ -634,7 +634,7 @@ Public Class Grammar
         Next
 
 
-#End Region
+        '#End Region
 
 
 

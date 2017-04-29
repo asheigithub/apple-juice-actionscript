@@ -198,10 +198,20 @@ namespace ASRuntime.operators
                     var key = new DictionaryKey(v2);
                     if (!dict.isContainsKey(key))
                     {
-                        DictionarySlot dictslot = new DictionarySlot(rtObj);
-                        dictslot._key = key;
-                        dictslot.directSet(rtUndefined.undefined);
-                        dict.createKeyValue(key, dictslot);
+                        if (((Register)step.reg)._isassigntarget)
+                        {
+                            DictionarySlot dictslot = new DictionarySlot(rtObj);
+                            dictslot._key = key;
+                            dictslot.directSet(rtUndefined.undefined);
+                            dictslot.propertyIsEnumerable = true;
+                            dict.createKeyValue(key, dictslot);
+                        }
+                        else
+                        {
+                            step.reg.getISlot(scope).directSet(rtUndefined.undefined);
+                            frame.endStep(step);
+                            return;
+                        }
                     }
 
                     var slot = dict.getValue(key);
@@ -421,12 +431,22 @@ namespace ASRuntime.operators
                             {
                                 if (dobj == null || !dobj.hasproperty(name))
                                 {
-                                    //原型链中也不存在对象
-                                    dobj = (DynamicObject)rtObj.value;
-                                    DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj, true);
-                                    heapslot._propname = name;
-                                    heapslot.directSet(rtUndefined.undefined);
-                                    dobj.createproperty(name, heapslot);
+                                    if (((Register)step.reg)._isassigntarget)
+                                    {
+
+                                        //原型链中也不存在对象
+                                        dobj = (DynamicObject)rtObj.value;
+                                        DynamicPropertySlot heapslot = new DynamicPropertySlot(rtObj, true);
+                                        heapslot._propname = name;
+                                        heapslot.directSet(rtUndefined.undefined);
+                                        heapslot.propertyIsEnumerable = true;
+                                        dobj.createproperty(name, heapslot);
+                                    }
+                                    else
+                                    {
+                                        dslot.directSet(rtUndefined.undefined);
+                                        break;
+                                    }
                                 }
 
                                 linkProtoTypeMember(dobj, rtObj, player, dslot, name);

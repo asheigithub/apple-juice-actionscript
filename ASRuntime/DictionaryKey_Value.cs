@@ -109,7 +109,7 @@ namespace ASRuntime
         public override bool directSet(IRunTimeValue value)
         {
             base.directSet(value);
-            return false;
+            return true;
         }
 
     }

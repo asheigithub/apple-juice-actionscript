@@ -22,26 +22,26 @@ namespace ASRuntime.operators
                         slot = ((StackSlot)slot).linktarget;
                     }
 
-                    if (slot is ILinkSlot)  //需要更新可枚举属性
-                    {
-                        ((ILinkSlot)slot).propertyIsEnumerable = true;
-                        frame.endStep(step);
-                        return;
-                    }
-                    else if (slot is OpVector.vectorSLot)    //Vector类型不匹配
-                    {
-                        BlockCallBackBase cb = new BlockCallBackBase();
-                        cb.scope = scope;
-                        cb.step = step;
-                        cb.args = frame;
-                        cb.setCallBacker(_vectorConvertCallBacker);
+                    //if (slot is ILinkSlot)  //需要更新可枚举属性
+                    //{
+                    //    ((ILinkSlot)slot).propertyIsEnumerable = true;
+                    //    frame.endStep(step);
+                    //    return;
+                    //}
+                    //else if (slot is OpVector.vectorSLot)    //Vector类型不匹配
+                    //{
+                    //    BlockCallBackBase cb = new BlockCallBackBase();
+                    //    cb.scope = scope;
+                    //    cb.step = step;
+                    //    cb.args = frame;
+                    //    cb.setCallBacker(_vectorConvertCallBacker);
                         
-                        //***调用强制类型转换***
-                        OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
-                            frame, step.token, scope, frame._tempSlot1, cb, false);
+                    //    //***调用强制类型转换***
+                    //    OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
+                    //        frame, step.token, scope, frame._tempSlot1, cb, false);
 
-                        return;
-                    }
+                    //    return;
+                    //}
 
 
 

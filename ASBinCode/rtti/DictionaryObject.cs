@@ -61,29 +61,7 @@ namespace ASBinCode.rtti
             }
         }
 
-        public void createOrReplaceKeyValue(IDictionaryKey key, ILinkSlot value)
-        {
-            
-            if (!isContainsKey(key))
-            {
-                innerDictionary.Add(key, value);
-                if (rootSlot == null)
-                {
-                    rootSlot = value;
-                }
-                else
-                {
-                    rootSlot.preSlot = value;
-                    value.nextSlot = rootSlot;
-                    rootSlot = value;
-
-                }
-            }
-            else
-            {
-                innerDictionary[key] = value;
-            }
-        }
+        
 
         public void RemoveKey(IDictionaryKey key)
         {

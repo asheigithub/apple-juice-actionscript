@@ -68,35 +68,35 @@ namespace ASBinCode.rtti
             }
         }
 
-        public void createOrReplaceproperty(string name, ILinkSlot slot)
-        {
-            if (!propertys.ContainsKey(name))
-            {
-                propertys.Add(name, slot);
+        //public void createOrReplaceproperty(string name, ILinkSlot slot)
+        //{
+        //    if (!propertys.ContainsKey(name))
+        //    {
+        //        propertys.Add(name, slot);
 
                 
-                if (rootSlot == null)
-                {
-                    rootSlot = slot;
-                }
-                else
-                {
-                    rootSlot.preSlot = slot;
-                    slot.nextSlot = rootSlot;
-                    rootSlot = slot;
+        //        if (rootSlot == null)
+        //        {
+        //            rootSlot = slot;
+        //        }
+        //        else
+        //        {
+        //            rootSlot.preSlot = slot;
+        //            slot.nextSlot = rootSlot;
+        //            rootSlot = slot;
 
-                }
+        //        }
 
-            }
-            else
-            {
-                ISLOT oldslot = propertys[name];
-                propertys[name] = slot;
+        //    }
+        //    else
+        //    {
+        //        ISLOT oldslot = propertys[name];
+        //        propertys[name] = slot;
 
                 
 
-            }
-        }
+        //    }
+        //}
 
 
 

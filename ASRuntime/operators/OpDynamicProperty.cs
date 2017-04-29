@@ -75,9 +75,12 @@ namespace ASRuntime.operators
                 heapslot.directSet(step.arg2.getValue(scope));
             }
 
-            dobj.createOrReplaceproperty(heapslot._propname,heapslot);
-
-
+            //dobj.createOrReplaceproperty(heapslot._propname,heapslot);
+            if (dobj.hasproperty(heapslot._propname))
+            {
+                dobj.deleteProperty(heapslot._propname);
+            }
+            dobj.createproperty(heapslot._propname, heapslot);
 
             frame.endStep(step);
         }

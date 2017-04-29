@@ -60,7 +60,7 @@ namespace ASRuntime
             {
                 backup = value;
             }
-            return false;
+            return true;
         }
 
     }
