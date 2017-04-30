@@ -81,7 +81,8 @@ namespace ASRuntime.operators
                 dobj.deleteProperty(heapslot._propname);
             }
             dobj.createproperty(heapslot._propname, heapslot);
-
+            //直接初始化，可枚举
+            heapslot.propertyIsEnumerable = true;
             frame.endStep(step);
         }
     }

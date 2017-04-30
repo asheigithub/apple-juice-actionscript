@@ -442,7 +442,7 @@ Public Class Grammar
 
         Dim words As TokenList
         Try
-            words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input.Trim())
+            words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input)
         Catch ex As LexException
 
             hasError = True

@@ -385,20 +385,23 @@ namespace ASBinCode
         /// 获取forin的enumerator
         /// </summary>
         forin_get_enumerator=94,
-
+        /// <summary>
+        /// 获取foreach的enumerator
+        /// </summary>
+        foreach_get_enumerator=95,
         /// <summary>
         /// 调movenext
         /// </summary>
-        enumerator_movenext=95,
+        enumerator_movenext=96,
 
         /// <summary>
         /// 调用读取当前值
         /// </summary>
-        enumerator_current=96,
+        enumerator_current=97,
 
         /// <summary>
         /// 关闭枚举器
         /// </summary>
-        enumerator_close = 97,
+        enumerator_close = 98,
     }
 }

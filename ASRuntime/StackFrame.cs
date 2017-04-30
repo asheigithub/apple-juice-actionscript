@@ -474,6 +474,9 @@ namespace ASRuntime
                 case OpCode.enumerator_close:
                     operators.OpForIn.enumerator_close(player, this, step, scope);
                     break;
+                case OpCode.foreach_get_enumerator:
+                    operators.OpForIn.foreach_get_enumerator(player, this, step, scope);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,

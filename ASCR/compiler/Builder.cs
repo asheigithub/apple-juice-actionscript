@@ -1438,6 +1438,18 @@ namespace ASCompiler.compiler
                         }
                     }
                 }
+                else if (stmt is ASTool.AS3.AS3ForEach)
+                {
+                    ASTool.AS3.AS3ForEach as3foreach = (ASTool.AS3.AS3ForEach)stmt;
+                    buildVariables(env, as3foreach.ForArg);
+                    if (as3foreach.Body != null)
+                    {
+                        for (int i = 0; i < as3foreach.Body.Count; i++)
+                        {
+                            buildVariables(env, as3foreach.Body[i]);
+                        }
+                    }
+                }
                 else if (stmt is ASTool.AS3.AS3While)
                 {
                     ASTool.AS3.AS3While as3while = (ASTool.AS3.AS3While)stmt;
@@ -1857,6 +1869,11 @@ namespace ASCompiler.compiler
                 {
                     builds.AS3LoopBuilder builder = new builds.AS3LoopBuilder();
                     builder.buildAS3ForIn(env, (ASTool.AS3.AS3ForIn)stmt, this);
+                }
+                else if (stmt is ASTool.AS3.AS3ForEach)
+                {
+                    builds.AS3LoopBuilder builder = new builds.AS3LoopBuilder();
+                    builder.buildAS3ForEach(env, (ASTool.AS3.AS3ForEach)stmt, this);
                 }
                 else if (stmt is ASTool.AS3.AS3While)
                 {

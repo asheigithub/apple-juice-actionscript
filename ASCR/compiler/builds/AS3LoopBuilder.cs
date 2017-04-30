@@ -381,6 +381,244 @@ namespace ASCompiler.compiler.builds
             }
         }
 
+        public void buildAS3ForEach(CompileEnv env, ASTool.AS3.AS3ForEach as3foreach, Builder builder)
+        {
+            if (!string.IsNullOrEmpty(as3foreach.label))
+            {
+                //**包装一个block**
+                ASTool.AS3.AS3Block tempblock = new ASTool.AS3.AS3Block(as3foreach.Token);
+                tempblock.CodeList = new List<ASTool.AS3.IAS3Stmt>();
+                tempblock.CodeList.Add(as3foreach);
+                tempblock.label = as3foreach.label;
+                as3foreach.label = null;
+
+
+                OpStep lbl_forlabel = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                lbl_forlabel.flag = "LOOP_LABEL_START_" + tempblock.label;
+                env.block.opSteps.Add(lbl_forlabel);
+
+                builder.buildStmt(env, tempblock);
+
+
+                OpStep lbl_forlabel_end = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                lbl_forlabel_end.flag = "LOOP_LABEL_END_" + tempblock.label;
+                env.block.opSteps.Add(lbl_forlabel_end);
+            }
+            else
+            {
+                int lblid = env.getLabelId();
+
+                builder.buildStmt(env, as3foreach.ForArg);
+
+                ILeftValue varvalue = null;
+
+                if (as3foreach.ForArg is ASTool.AS3.AS3StmtExpressions)
+                {
+                    ASTool.AS3.AS3StmtExpressions exprs = (ASTool.AS3.AS3StmtExpressions)as3foreach.ForArg;
+                    if (exprs.as3exprlist.Count != 1)
+                    {
+                        throw new BuildException(
+                            as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile, "Syntax error: invalid for-in initializer, only 1 expression expected.");
+                    }
+
+                    ASTool.AS3.AS3Expression expr = exprs.as3exprlist[0];
+                    varvalue = (ILeftValue)ExpressionBuilder.getRightValue(env, expr.Value, expr.token, builder);
+                }
+                else if (as3foreach.ForArg is ASTool.AS3.AS3Variable)
+                {
+                    ASTool.AS3.AS3Variable v = (ASTool.AS3.AS3Variable)as3foreach.ForArg;
+                    varvalue = (VariableBase)MemberFinder.find(v.Name, env, false, builder, v.token);
+                }
+                else
+                {
+                    throw new BuildException(
+                            as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile, "异常错误，获得的变量类型不正确");
+                }
+
+                builder.buildExpression(env, as3foreach.ForExpr);
+                IRightValue enumerator = ExpressionBuilder.getRightValue(env, as3foreach.ForExpr.Value, as3foreach.ForExpr.token, builder);
+
+                if (enumerator.valueType == RunTimeDataType.rt_void
+                    ||
+                    enumerator.valueType < RunTimeDataType.unknown
+                    )
+                {
+                    enumerator = ExpressionBuilder.addCastOpStep(env, enumerator, RunTimeDataType._OBJECT,
+                        new SourceToken(as3foreach.ForExpr.token.line,
+                         as3foreach.ForExpr.token.ptr,
+                          as3foreach.ForExpr.token.sourceFile)
+                        ,
+                        builder);
+                }
+
+                Register regSaveEnumerator = env.getAdditionalRegister();
+                regSaveEnumerator.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                {
+                    //**IEnumerator Get And Reset();
+                    OpStep opGetEnumerator = new OpStep(OpCode.foreach_get_enumerator,
+                        new SourceToken(as3foreach.Token.line,
+                         as3foreach.Token.ptr,
+                          as3foreach.Token.sourceFile)
+                        );
+
+                    opGetEnumerator.reg = regSaveEnumerator;
+                    opGetEnumerator.regType = RunTimeDataType.rt_void;
+                    opGetEnumerator.arg1 = enumerator;
+                    opGetEnumerator.arg1Type = enumerator.valueType;
+
+                    env.block.opSteps.Add(opGetEnumerator);
+                }
+
+                string loopstart = "LOOP_START_" + lblid;
+                string loopbody = "LOOP_BODY_" + lblid;
+                string loopcontinue = "LOOP_CONTINUE_" + lblid;
+                string loopend = "LOOP_END_" + lblid;
+
+                {
+                    OpStep lbl_loopstart = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    lbl_loopstart.flag = loopstart;
+                    env.block.opSteps.Add(lbl_loopstart);
+                }
+
+                Register eaxismovenext = env.getAdditionalRegister();
+                eaxismovenext.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
+                {
+                    //**IEnumerator MoveNext()
+                    OpStep opMoveNext = new OpStep(OpCode.enumerator_movenext,
+                        new SourceToken(as3foreach.Token.line,
+                         as3foreach.Token.ptr,
+                          as3foreach.Token.sourceFile)
+                        );
+
+                    opMoveNext.reg = eaxismovenext;
+                    opMoveNext.regType = RunTimeDataType.rt_boolean;
+                    opMoveNext.arg1 = regSaveEnumerator;
+                    opMoveNext.arg1Type = regSaveEnumerator.valueType;
+
+                    env.block.opSteps.Add(opMoveNext);
+                }
+
+                {
+                    OpStep op = new OpStep(OpCode.if_jmp, new SourceToken(as3foreach.ForExpr.token.line,
+                        as3foreach.ForExpr.token.ptr, as3foreach.ForExpr.token.sourceFile));
+                    op.reg = null;
+                    op.regType = RunTimeDataType.unknown;
+                    op.arg1 = eaxismovenext;
+                    op.arg1Type = eaxismovenext.valueType;
+                    op.arg2 = new ASBinCode.rtData.RightValue(
+                        new ASBinCode.rtData.rtString(loopbody));
+                    op.arg2Type = RunTimeDataType.rt_string;
+
+                    env.block.opSteps.Add(op);
+                }
+                {
+                    ASTool.AS3.AS3StmtExpressions jumptoend = new ASTool.AS3.AS3StmtExpressions(as3foreach.Token);
+                    jumptoend.as3exprlist = new List<ASTool.AS3.AS3Expression>();
+
+                    ASTool.AS3.AS3Expression expression = new ASTool.AS3.AS3Expression(as3foreach.Token);
+                    expression.exprStepList = new ASTool.AS3.Expr.AS3ExprStepList();
+
+                    ASTool.AS3.Expr.AS3ExprStep step = new ASTool.AS3.Expr.AS3ExprStep(as3foreach.Token);
+                    step.Type = ASTool.AS3.Expr.OpType.GotoFlag;
+                    step.OpCode = loopend;
+                    expression.exprStepList.Add(step);
+
+                    jumptoend.as3exprlist.Add(expression);
+                    builder.buildStmt(env, jumptoend);
+                }
+                {
+                    OpStep lbl_loopbody = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    lbl_loopbody.flag = loopbody;
+                    env.block.opSteps.Add(lbl_loopbody);
+                }
+
+                {
+                    IRightValue loadValue = env.getAdditionalRegister();
+                    ((Register)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+
+                    //**IEnumerator Current()
+                    OpStep opCurrent = new OpStep(OpCode.enumerator_current,
+                        new SourceToken(as3foreach.Token.line,
+                         as3foreach.Token.ptr,
+                          as3foreach.Token.sourceFile)
+                        );
+
+                    opCurrent.reg = (Register)loadValue;
+                    opCurrent.regType = RunTimeDataType.rt_void;
+                    opCurrent.arg1 = regSaveEnumerator;
+                    opCurrent.arg1Type = regSaveEnumerator.valueType;
+
+                    env.block.opSteps.Add(opCurrent);
+
+                    if (varvalue.valueType != RunTimeDataType.rt_void)
+                    {
+                        loadValue = ExpressionBuilder.addCastOpStep(env, loadValue, varvalue.valueType,
+                            new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile)
+                            ,
+                            builder
+                            );
+                    }
+
+                    var op = new OpStep(OpCode.assigning, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    op.reg = varvalue;
+                    op.regType = varvalue.valueType;
+                    op.arg1 = loadValue;
+                    op.arg1Type = loadValue.valueType;
+                    op.arg2 = null;
+                    op.arg2Type = RunTimeDataType.unknown;
+
+                    env.block.opSteps.Add(op);
+                }
+                if (as3foreach.Body != null)
+                {
+                    for (int i = 0; i < as3foreach.Body.Count; i++)
+                    {
+                        builder.buildStmt(env, as3foreach.Body[i]);
+                    }
+                }
+                {
+                    OpStep lbl_loopcontinue = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    lbl_loopcontinue.flag = loopcontinue;
+                    env.block.opSteps.Add(lbl_loopcontinue);
+                }
+                {
+                    //强行跳回开始
+                    ASTool.AS3.AS3StmtExpressions jumptostart = new ASTool.AS3.AS3StmtExpressions(as3foreach.Token);
+                    jumptostart.as3exprlist = new List<ASTool.AS3.AS3Expression>();
+
+                    ASTool.AS3.AS3Expression expression = new ASTool.AS3.AS3Expression(as3foreach.Token);
+                    expression.exprStepList = new ASTool.AS3.Expr.AS3ExprStepList();
+
+                    ASTool.AS3.Expr.AS3ExprStep step = new ASTool.AS3.Expr.AS3ExprStep(as3foreach.Token);
+                    step.Type = ASTool.AS3.Expr.OpType.GotoFlag;
+                    step.OpCode = loopstart;
+                    expression.exprStepList.Add(step);
+
+                    jumptostart.as3exprlist.Add(expression);
+                    builder.buildStmt(env, jumptostart);
+                }
+                {
+                    //结束标记
+                    OpStep lbl_loopend = new OpStep(OpCode.flag, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    lbl_loopend.flag = loopend;
+                    env.block.opSteps.Add(lbl_loopend);
+                }
+                {
+                    OpStep opClose = new OpStep(OpCode.enumerator_close, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
+                    opClose.reg = null;
+                    opClose.regType = RunTimeDataType.unknown;
+                    opClose.arg1 = regSaveEnumerator;
+                    opClose.arg1Type = RunTimeDataType.rt_void;
+                    opClose.arg2 = null;
+                    opClose.arg2Type = RunTimeDataType.rt_void;
+
+                    env.block.opSteps.Add(opClose);
+
+                }
+
+            }
+        }
+
         public void buildAS3While(CompileEnv env, ASTool.AS3.AS3While as3while, Builder builder)
         {
             if (!string.IsNullOrEmpty(as3while.label))
