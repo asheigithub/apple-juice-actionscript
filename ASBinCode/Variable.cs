@@ -33,7 +33,7 @@ namespace ASBinCode
         { }
 
 
-        public override ISLOT getISlot(IRunTimeScope scope)
+        public sealed override ISLOT getISlot(IRunTimeScope scope)
         {
             while (refblockid != scope.blockId)
             {
@@ -42,7 +42,7 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        protected override IMember _clone()
+        protected sealed override IMember _clone()
         {
             return new Variable(name, _indexOfMembers, ignoreImplicitCast, refblockid, valueType, isConst);
         }

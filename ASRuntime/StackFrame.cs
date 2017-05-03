@@ -11,6 +11,13 @@ namespace ASRuntime
     /// </summary>
     class StackFrame
     {
+        internal int stepCount;
+        public StackFrame(CodeBlock block)
+        {
+            this.block = block;
+            stepCount = block.opSteps.Count;
+        }
+
         public delegate void DelegeExec(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope);
 
         internal enum Try_catch_finally
@@ -89,7 +96,7 @@ namespace ASRuntime
 
         public bool IsEnd()
         {
-            return  codeLinePtr >= block.opSteps.Count ;
+            return  codeLinePtr >= stepCount ;
         }
 
         /// <summary>
@@ -109,24 +116,31 @@ namespace ASRuntime
 
         internal void endStep(OpStep step)
         {
+#if DEBUG
             execing = false;
-            doTryCatchReturn(step);
+#endif
+            if (hasCallJump || hasCallReturn || runtimeError !=null)
+            {
+                doTryCatchReturn(step);
+            }
             if (!isclosed)
             {
                 codeLinePtr++;
             }
         }
-
+#if DEBUG
         private bool execing = false;
-
+#endif
         private void exec(ASBinCode.OpStep step)
         {
+#if DEBUG
             if (execing)
             {
                 throw new InvalidOperationException();
             }
 
             execing = true;
+#endif
 
             switch (step.opCode)
             {
@@ -137,20 +151,20 @@ namespace ASRuntime
                     operators.OpCast.exec_CastPrimitive(this, step, scope);
                     break;
                 case OpCode.assigning:
-                    operators.OpAssigning.execAssigning(player, step,this, scope);
+                    operators.OpAssigning.execAssigning(player, step, this, scope);
                     break;
-                
+
                 case OpCode.add_number:
-                    operators.OpAdd.execAdd_Number(player, step,this, scope);
+                    operators.OpAdd.execAdd_Number(player, step, this, scope);
                     break;
                 case OpCode.add_string:
-                    operators.OpAdd.execAdd_String(player, step,this, scope);
+                    operators.OpAdd.execAdd_String(player, step, this, scope);
                     break;
                 case OpCode.add:
                     operators.OpAdd.execAdd(this, step, scope);
                     break;
                 case OpCode.sub_number:
-                    operators.OpSub.execSub_Number(player, step,this, scope);
+                    operators.OpSub.execSub_Number(player, step, this, scope);
                     break;
                 case OpCode.sub:
                     operators.OpSub.execSub(this, step, scope);
@@ -158,11 +172,20 @@ namespace ASRuntime
                 case OpCode.multi:
                     operators.OpMulti.execMulti(this, step, scope);
                     break;
+                case OpCode.multi_number:
+                    operators.OpMulti.exec_MultiNumber(this, step, scope);
+                    break;
                 case OpCode.div:
                     operators.OpMulti.execDiv(this, step, scope);
                     break;
+                case OpCode.div_number:
+                    operators.OpMulti.exec_DivNumber(this, step, scope);
+                    break;
                 case OpCode.mod:
                     operators.OpMulti.execMod(this, step, scope);
+                    break;
+                case OpCode.mod_number:
+                    operators.OpMulti.exec_ModNumber(this, step, scope);
                     break;
                 case OpCode.neg:
                     operators.OpNeg.execNeg(this, step, scope);
@@ -176,6 +199,9 @@ namespace ASRuntime
                 case OpCode.lt_num:
                     operators.OpLogic.execLT_NUM(this, step, scope);
                     break;
+                //case OpCode.lt_int_int:
+                //    operators.OpLogic.execLT_IntInt(this, step, scope);
+                //    break;
                 case OpCode.lt_void:
                     operators.OpLogic.execLT_VOID(this, step, scope);
                     break;
@@ -477,6 +503,21 @@ namespace ASRuntime
                 case OpCode.foreach_get_enumerator:
                     operators.OpForIn.foreach_get_enumerator(player, this, step, scope);
                     break;
+                case OpCode.logic_is:
+                    operators.OpLogic.exec_IS(this, step, scope);
+                    break;
+                case OpCode.logic_instanceof:
+                    operators.OpLogic.exec_instanceof(this, step, scope);
+                    break;
+                case OpCode.convert_as:
+                    operators.OpLogic.exec_AS(this, step, scope);
+                    break;
+                case OpCode.logic_in:
+                    operators.OpLogic.exec_In(this, step, scope);
+                    break;
+                case OpCode.unary_typeof:
+                    operators.OpTypeOf.exec_TypeOf(this, step, scope);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
@@ -682,98 +723,108 @@ namespace ASRuntime
                 }
                 else if (hasCallJump)
                 {
-                    Stack<int> jumptolinetrys = block.opSteps[jumptoline + 1].trys;
-
-                    if ((jumptolinetrys != null && jumptolinetrys.Peek() != tryCatchState.Peek().tryid)
-                        ||
-                        jumptolinetrys == null
-                        )
+                    if (trystateCount>0)
                     {
-                        if (
-                            tryCatchState.Count > 0
-                                &&
-                            tryCatchState.Peek().state == Try_catch_finally.Try
+
+                        Stack<int> jumptolinetrys = block.opSteps[jumptoline + 1].trys;
+
+                        if ((jumptolinetrys != null && jumptolinetrys.Peek() != tryCatchState.Peek().tryid)
+                            ||
+                            jumptolinetrys == null
                             )
                         {
-                            //先脱掉try;
-                            int tryid = quit_try(tryCatchState.Peek().tryid, step.token);
-                            //前往finally块
-                            hasCallJump = false;
-                            holdhasjumpto = true;
-                            holdjumptoline = jumptoline;
-                            jumptoline = 0;
+                            if (
+                                //tryCatchState.Count > 0
+                                //    &&
+                                tryCatchState.Peek().state == Try_catch_finally.Try
+                                )
                             {
-                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                //先脱掉try;
+                                int tryid = quit_try(tryCatchState.Peek().tryid, step.token);
+                                //前往finally块
+                                hasCallJump = false;
+                                holdhasjumpto = true;
+                                holdjumptoline = jumptoline;
+                                jumptoline = 0;
                                 {
-                                    var op = block.opSteps[j];
-                                    if (op.opCode == OpCode.enter_finally)
+                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
                                     {
-                                        int id = ((ASBinCode.rtData.rtInt)
-                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
-                                        if (id == tryid)
+                                        var op = block.opSteps[j];
+                                        if (op.opCode == OpCode.enter_finally)
                                         {
-                                            codeLinePtr = j - 1;
-                                            break;
+                                            int id = ((ASBinCode.rtData.rtInt)
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                            if (id == tryid)
+                                            {
+                                                codeLinePtr = j - 1;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else if (tryCatchState.Count > 0
-                                &&
-                            tryCatchState.Peek().state == Try_catch_finally.Catch)
-                        {
-                            //脱掉catch
-                            int tryid = quit_catch(tryCatchState.Peek().tryid, step.token);
-                            //前往finally块
-                            hasCallJump = false;
-                            holdhasjumpto = true;
-                            holdjumptoline = jumptoline;
-                            jumptoline = 0;
+                            else if (//tryCatchState.Count > 0
+                                    //&&
+                                tryCatchState.Peek().state == Try_catch_finally.Catch)
+                            {
+                                //脱掉catch
+                                int tryid = quit_catch(tryCatchState.Peek().tryid, step.token);
+                                //前往finally块
+                                hasCallJump = false;
+                                holdhasjumpto = true;
+                                holdjumptoline = jumptoline;
+                                jumptoline = 0;
 
-                            {
-                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
                                 {
-                                    var op = block.opSteps[j];
-                                    if (op.opCode == OpCode.enter_finally)
+                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
                                     {
-                                        int id = ((ASBinCode.rtData.rtInt)
-                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
-                                        if (id == tryid)
+                                        var op = block.opSteps[j];
+                                        if (op.opCode == OpCode.enter_finally)
                                         {
-                                            codeLinePtr = j - 1;
-                                            break;
+                                            int id = ((ASBinCode.rtData.rtInt)
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                            if (id == tryid)
+                                            {
+                                                codeLinePtr = j - 1;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else if (tryCatchState.Count > 0
-                                &&
-                            tryCatchState.Peek().state == Try_catch_finally.Finally)
-                        {
-                            //***在finally中break**
-                            //前往退出finally;
-                            int tryid = tryCatchState.Peek().tryid;
-                            hasCallJump = false;
-                            holdhasjumpto = true;
-                            holdjumptoline = jumptoline;
-                            jumptoline = 0;
+                            else if (//tryCatchState.Count > 0
+                                    //&&
+                                tryCatchState.Peek().state == Try_catch_finally.Finally)
                             {
-                                for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                //***在finally中break**
+                                //前往退出finally;
+                                int tryid = tryCatchState.Peek().tryid;
+                                hasCallJump = false;
+                                holdhasjumpto = true;
+                                holdjumptoline = jumptoline;
+                                jumptoline = 0;
                                 {
-                                    var op = block.opSteps[j];
-                                    if (op.opCode == OpCode.quit_finally)
+                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
                                     {
-                                        int id = ((ASBinCode.rtData.rtInt)
-                                            ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
-                                        if (id == tryid)
+                                        var op = block.opSteps[j];
+                                        if (op.opCode == OpCode.quit_finally)
                                         {
-                                            codeLinePtr = j - 1;
-                                            break;
+                                            int id = ((ASBinCode.rtData.rtInt)
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                            if (id == tryid)
+                                            {
+                                                codeLinePtr = j - 1;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
+                            }
+                            else
+                            {
+                                hasCallJump = false;
+                                codeLinePtr = jumptoline;
+                                jumptoline = 0;
                             }
                         }
                         else
@@ -810,12 +861,13 @@ namespace ASRuntime
         private void enter_try( int tryid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Try, tryid));
+            ++trystateCount;
         }
 
         private int quit_try( int tryid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-
+            --trystateCount;
             if (s.state != Try_catch_finally.Try || s.tryid != tryid)
             {
                 //player.runtimeError = (new error.InternalError(token,
@@ -830,11 +882,12 @@ namespace ASRuntime
         private void enter_catch( int catchid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Catch, catchid));
+            ++trystateCount;
         }
         private int quit_catch( int catchid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-
+            --trystateCount;
             if (s.state != Try_catch_finally.Catch || s.tryid != catchid)
             {
                 //player.runtimeError = (new error.InternalError(token,
@@ -846,14 +899,16 @@ namespace ASRuntime
             return s.tryid;
         }
 
+        private int trystateCount;
         private void enter_finally( int finallyid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Finally, finallyid));
+            ++trystateCount;
         }
         private int quit_finally( int finallyid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-
+            --trystateCount;
             if (s.state != Try_catch_finally.Finally || s.tryid != finallyid)
             {
                 //player.runtimeError = (new error.InternalError(token,

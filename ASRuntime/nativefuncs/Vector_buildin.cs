@@ -670,7 +670,7 @@ namespace ASRuntime.nativefuncs
             sepcb.scope = scope;
             sepcb._intArg = 0;
 
-            object[] sendargs = new object[8];
+            object[] sendargs = new object[9];
             sendargs[0] = cb;
             sendargs[1] = arr;
             sendargs[2] = frame;
@@ -679,6 +679,7 @@ namespace ASRuntime.nativefuncs
             sendargs[5] = argements[0].getValue();
             sendargs[6] = new StringBuilder();
             sendargs[7] = resultSlot;
+            sendargs[8] = new rtInt(0);
 
             sepcb.args = sendargs;
             sepcb.setCallBacker(_SeptoString_CB);
@@ -721,46 +722,83 @@ namespace ASRuntime.nativefuncs
 
         }
 
+        
         private void _ValueToString_CB(BlockCallBackBase sender, object args)
         {
+
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
             List<IRunTimeValue> array = (List<IRunTimeValue>)receiveArgs[1];
+
+            ((rtInt)receiveArgs[8]).value++;
+
+            if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
+            {
+                ((rtInt)receiveArgs[8]).value = 0;
+                BlockCallBackBase valueCB = new BlockCallBackBase();
+                valueCB._intArg = sender._intArg;
+                valueCB.args = sender.args;
+                valueCB.setCallBacker(_ValueToString_CB);
+
+                frame.player.CallBlankBlock(valueCB);
+                return;
+            }
+
 
             StringBuilder sb = (StringBuilder)receiveArgs[6];
             SourceToken token = (SourceToken)receiveArgs[3];
 
             string aSep = (string)receiveArgs[5];
             string toappend = TypeConverter.ConvertToString(frame._tempSlot1.getValue(), frame, token);
-            sb.Append(toappend== null?"null":toappend);
-            if (sender._intArg < array.Count)
+
+            while (true)
             {
-                sb.Append(aSep);
+                sb.Append(toappend == null ? "null" : toappend);
+                if (sender._intArg < array.Count)
+                {
+                    sb.Append(aSep);
 
+                    if (//sender._intArg  < array.Count
+                        //&&
+                        array[sender._intArg ].rtType < RunTimeDataType.unknown
+                        )
+                    {
+                        toappend = TypeConverter.ConvertToString(array[sender._intArg ], frame, token);
+                        sender._intArg++;
+                        continue;
+                    }
+                    else
+                    {
+                        
+                        BlockCallBackBase valueCB = new BlockCallBackBase();
+                        valueCB._intArg = sender._intArg + 1;
+                        valueCB.args = receiveArgs;
+                        valueCB.setCallBacker(_ValueToString_CB);
 
-                BlockCallBackBase valueCB = new BlockCallBackBase();
-                valueCB._intArg = sender._intArg + 1;
-                valueCB.args = receiveArgs;
-                valueCB.setCallBacker(_ValueToString_CB);
+                        operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
+                            frame,
+                            (SourceToken)receiveArgs[3],
+                            (IRunTimeScope)receiveArgs[4],
+                            frame._tempSlot1,
+                            valueCB, false
+                            );
+                        break;
 
-                operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
-                    frame,
-                    (SourceToken)receiveArgs[3],
-                    (IRunTimeScope)receiveArgs[4],
-                    frame._tempSlot1,
-                    valueCB, false
-                    );
+                    }
+                }
+                else
+                {
+                    ISLOT result = (ISLOT)receiveArgs[7];
 
+                    result.directSet(new rtString(sb.ToString()));
+
+                    IBlockCallBack cb = (IBlockCallBack)receiveArgs[0];
+                    cb.call(cb.args);
+                    break;
+                }
             }
-            else
-            {
-                ISLOT result = (ISLOT)receiveArgs[7];
 
-                result.directSet(new rtString(sb.ToString()));
-
-                IBlockCallBack cb = (IBlockCallBack)receiveArgs[0];
-                cb.call(cb.args);
-            }
+            
 
         }
     }

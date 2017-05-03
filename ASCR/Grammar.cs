@@ -109,6 +109,18 @@ namespace ASCompiler
             }
 
             {
+                string _boolean = Properties.Resources.Boolean;
+                var tree = grammar.ParseTree(_boolean, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Boolean.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Boolean.as3"));
+            }
+
+            {
                 string _buildin_ = Properties.Resources.__buildin__;
                 var tree = grammar.ParseTree(_buildin_, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "@__buildin__.as3");

@@ -6,17 +6,17 @@ using ASBinCode.rtti;
 
 namespace ASRuntime
 {
-    class RunTimeScope : IRunTimeScope
+    sealed class RunTimeScope : IRunTimeScope
     {
         HeapSlot[] memberDataList;
 
-        private IList<ISLOT> runtimestack;
+        private ISLOT[] runtimestack;
         private int _offset;
         private int _blockid;
         public RunTimeScope(
             //IList<IMember> members,
             HeapSlot[] memberDataList,
-            IList<ISLOT> rtStack,
+            ISLOT[] rtStack,
             int offset, int blockid,
             IRunTimeScope parent,
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
@@ -65,7 +65,7 @@ namespace ASRuntime
             }
         }
 
-        public IList<ISLOT> stack
+        public ISLOT[] stack
         {
             get
             {
@@ -108,14 +108,7 @@ namespace ASRuntime
         }
 
 
-        //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> _dictMethods;
-        //public Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
-        //{
-        //    get
-        //    {
-        //        return _dictMethods;
-        //    }
-        //}
+        
     }
 
     

@@ -8,10 +8,12 @@ namespace ASRuntime.operators
     {
         public static void execSub_Number(Player player, ASBinCode.OpStep step, StackFrame frame, ASBinCode.IRunTimeScope scope)
         {
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            step.reg.getISlot(scope).setValue(a1.value - a2.value);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+            step.reg.getISlot(scope).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
             frame.endStep(step);
         }
 

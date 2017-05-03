@@ -1,0 +1,22 @@
+﻿package
+{
+	public final class Boolean extends Object
+	{
+		
+		[implicit_to]
+		private static function _to_boolean(thisObj:*):Boolean{ return thisObj._v;}
+
+		[implicit_from]
+		private static function _from_value(value:Boolean):*{ return new Boolean(value); }
+
+		private var _v:Boolean;
+
+		public function Boolean (value:*=false){ _v=value ;}
+
+		[native,_boolean_toString]
+		public function toString () : String;
+
+		
+		public function valueOf () : Boolean{ return _v;}
+	}
+}

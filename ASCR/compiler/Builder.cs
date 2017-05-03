@@ -1545,6 +1545,27 @@ namespace ASCompiler.compiler
                             return;
                         }
                     }
+                    if (env.block.scope is ASBinCode.scopes.FunctionScope)
+                    {
+                        if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
+                            || variable.Access.IsProtected
+                            )
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "Access modifier not allowed on declarations inside a function."));
+
+                        }
+                        else if (variable.Access.IsOverride)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The override attribute can only be used on a method defined in a class."));
+                        }
+                        else if (variable.Access.IsFinal)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The final attribute can only be used on a method defined in a class."));
+                        }
+                    }
                     {
                         VariableBase rtVariable = new Variable(variable.Name, env.block.scope.members.Count, env.block.id, true);
 
@@ -1573,6 +1594,27 @@ namespace ASCompiler.compiler
                     //                "The static attribute may be used only on definitions inside a class." + variable.Name));
                     //            return;
                     //}
+
+                    if (env.block.scope is ASBinCode.scopes.FunctionScope)
+                    {
+                        if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
+                            || variable.Access.IsProtected
+                            )
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "Access modifier not allowed on declarations inside a function."));
+                        }
+                        else if (variable.Access.IsOverride)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The override attribute can only be used on a method defined in a class."));
+                        }
+                        else if (variable.Access.IsFinal)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The final attribute can only be used on a method defined in a class."));
+                        }
+                    }
 
                     for (int i = 0; i < env.block.scope.members.Count; i++) //scope内查找是否有重复
                     {

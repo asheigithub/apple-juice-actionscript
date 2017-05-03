@@ -1,5 +1,6 @@
 ﻿package
 {
+	[_function_]
 	public final dynamic class Function extends Object
 	{
 		

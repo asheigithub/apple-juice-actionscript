@@ -152,7 +152,7 @@ namespace ASRuntime.nativefuncs
             sepcb.scope = scope;
             sepcb._intArg = 0;
 
-            object[] sendargs = new object[8];
+            object[] sendargs = new object[9];
             sendargs[0] = cb;
             sendargs[1] = array;
             sendargs[2] = frame;
@@ -161,6 +161,7 @@ namespace ASRuntime.nativefuncs
             sendargs[5] = " ";
             sendargs[6] = new StringBuilder();
             sendargs[7] = resultSlot;
+            sendargs[8] = new rtInt(0);
             sepcb.args = sendargs;
 
             _SeptoString_CB(sepcb, sendargs);
@@ -193,6 +194,21 @@ namespace ASRuntime.nativefuncs
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
             rtArray array = (rtArray)receiveArgs[1];
+
+            ((rtInt)receiveArgs[8]).value++;
+
+            if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
+            {
+                ((rtInt)receiveArgs[8]).value = 0;
+                BlockCallBackBase valueCB = new BlockCallBackBase();
+                valueCB._intArg = sender._intArg;
+                valueCB.args = receiveArgs;
+                valueCB.setCallBacker(_ValueToString_CB);
+
+                frame.player.CallBlankBlock(valueCB);
+                return;
+            }
+
 
             StringBuilder sb = (StringBuilder)receiveArgs[6];
             SourceToken token = (SourceToken)receiveArgs[3];

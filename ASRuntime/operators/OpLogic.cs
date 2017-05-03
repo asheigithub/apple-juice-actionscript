@@ -1,11 +1,666 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode;
+using ASBinCode.rtti;
 
 namespace ASRuntime.operators
 {
     class OpLogic
     {
+        private static bool _exec_is_instance_v1_isprimivate(ASBinCode.rtti.Class cls,ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeScope scope, ASBinCode.OpStep step)
+        {
+            ASBinCode.RunTimeDataType ot;
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(cls.instanceClass, out ot))
+            {
+                if (v1.rtType == ot)
+                {
+                    return true;
+                    //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                }
+                else
+                {
+                    if (ot == ASBinCode.RunTimeDataType.rt_number)
+                    {
+                        if (v1.rtType == ASBinCode.RunTimeDataType.rt_int ||
+                            v1.rtType == ASBinCode.RunTimeDataType.rt_uint
+                            )
+                        {
+                            return true;
+                            //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        }
+                        else
+                        {
+                            return false;
+                            //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        }
+                    }
+                    else if (ot == ASBinCode.RunTimeDataType.rt_int)
+                    {
+                        if (v1.rtType == ASBinCode.RunTimeDataType.rt_number
+                            )
+                        {
+                            double v = TypeConverter.ConvertToNumber(v1, null, null);
+                            if (Math.Floor(v) == v && Math.Ceiling(v) == v)
+                            {
+                                return true;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            }
+                            else
+                            {
+                                return false;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            }
+                        }
+                        else if (v1.rtType == ASBinCode.RunTimeDataType.rt_uint)
+                        {
+                            return true;
+                            //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        }
+                        else
+                        {
+                            return false;
+                            //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        }
+
+                    }
+                    else if (ot == ASBinCode.RunTimeDataType.rt_uint)
+                    {
+                        if (v1.rtType == ASBinCode.RunTimeDataType.rt_number
+                            )
+                        {
+                            double v = TypeConverter.ConvertToNumber(v1, null, null);
+                            if (Math.Floor(v) == v && Math.Ceiling(v) == v && v >= 0)
+                            {
+                                return true;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            }
+                            else
+                            {
+                                return false;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            }
+                        }
+                        else if (v1.rtType == ASBinCode.RunTimeDataType.rt_int)
+                        {
+                            int v = TypeConverter.ConvertToInt(v1, null, null);
+                            if (v >= 0)
+                            {
+                                return true;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            }
+                            else
+                            {
+                                return false;
+                                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                            //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                        //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    }
+                }
+
+            }
+            else
+            {
+                return false;
+                //step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+            }
+        }
+
+        private static void _as_is(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope,
+            IRunTimeValue iftrue,IRunTimeValue iffalse
+            )
+        {
+            var v2 = step.arg2.getValue(scope);
+            if (v2.rtType < ASBinCode.RunTimeDataType.unknown ||
+                ((ASBinCode.rtData.rtObject)v2).value._class.staticClass != null
+                )
+            {
+                frame.throwError(step.token, 1041, "The right-hand side of operator must be a class.");
+            }
+            else
+            {
+                var cls = ((ASBinCode.rtData.rtObject)v2).value._class;
+
+                var v1 = step.arg1.getValue(scope);
+
+                if (v1.rtType > ASBinCode.RunTimeDataType.unknown
+                    )
+                {
+                    ASBinCode.RunTimeDataType ot;
+                    if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                    {
+                        v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                    }
+                }
+
+                if (v1.rtType < ASBinCode.RunTimeDataType.unknown)
+                {
+                    if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
+                    {
+                        step.reg.getISlot(scope).directSet(iftrue);
+                    }
+                    else
+                    {
+                        step.reg.getISlot(scope).directSet(iffalse);
+                    }
+                }
+                else
+                {
+                    if (ASBinCode.ClassMemberFinder.isInherits
+                        (((ASBinCode.rtData.rtObject)v1).value._class,
+                        cls.instanceClass)
+                        ||
+                        ASBinCode.ClassMemberFinder.isImplements(
+                        ((ASBinCode.rtData.rtObject)v1).value._class,
+                        cls.instanceClass
+                        ))
+                    {
+                        step.reg.getISlot(scope).directSet(iftrue);
+                    }
+                    else
+                    {
+                        step.reg.getISlot(scope).directSet(iffalse);
+                    }
+                }
+
+
+            }
+        }
+
+
+        public static void exec_AS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            _as_is(frame, step, scope, step.arg1.getValue(scope), ASBinCode.rtData.rtNull.nullptr);
+
+            frame.endStep(step);
+        }
+
+
+        public static void exec_IS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            _as_is(frame, step, scope, ASBinCode.rtData.rtBoolean.True, ASBinCode.rtData.rtBoolean.False);
+
+            frame.endStep(step);
+        }
+
+        public static void exec_instanceof(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            var v2 = step.arg2.getValue(scope);
+            if (v2.rtType == ASBinCode.RunTimeDataType.rt_function)
+            {
+                OpCast.Primitive_to_Object(v2, frame, step.token, scope, frame._tempSlot1,
+                    step, _tofunction_callbacker);
+            }
+            else
+            {
+                _tofunction_callbacker(v2, null, frame, step, scope);
+            }
+        }
+
+        private static void _tofunction_callbacker(IRunTimeValue v11, IRunTimeValue v21, 
+            StackFrame frame, OpStep step, IRunTimeScope scope)
+        {
+            var v2 = v11;
+
+            if (v2.rtType < ASBinCode.RunTimeDataType.unknown ||
+                (
+                    ((ASBinCode.rtData.rtObject)v2).value._class.staticClass != null
+                    &&
+                    !ReferenceEquals(((ASBinCode.rtData.rtObject)v2).value._class, frame.player.swc.FunctionClass)
+                )
+                )
+            {
+                frame.throwError(step.token, 1041, "The right-hand side of instanceof must be a class or function.");
+            }
+            else
+            {
+                var cls = ((ASBinCode.rtData.rtObject)v2).value._class;
+                if (cls.isInterface)
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                }
+                else
+                {
+                    var v1 = step.arg1.getValue(scope);
+                    if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+                    {
+                        ASBinCode.RunTimeDataType ot;
+                        if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                        {
+                            v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                        }
+                    }
+
+                    if (v1.rtType < ASBinCode.RunTimeDataType.unknown)
+                    {
+                        if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        }
+                        else
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        }
+                    }
+                    else
+                    {
+                        if (!ReferenceEquals(((ASBinCode.rtData.rtObject)v2).value._class, frame.player.swc.FunctionClass))
+                        {
+                            if (ASBinCode.ClassMemberFinder.isInherits(
+                                ((ASBinCode.rtData.rtObject)v1).value._class,
+                                cls.instanceClass)
+                                )
+                            {
+                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            }
+                            else
+                            {
+                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            }
+
+                        }
+                        else
+                        {
+                            //***检查原型链***
+                            ASBinCode.rtti.Object obj = ((ASBinCode.rtData.rtObject)v1).value;
+
+                            ASBinCode.rtti.DynamicObject _proto = null;
+
+                            if (obj is ASBinCode.rtti.DynamicObject)
+                            {
+                                ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj;
+                                _proto = dobj._prototype_;
+                            }
+                            else
+                            {
+                                _proto = (ASBinCode.rtti.DynamicObject)frame.player.static_instance[obj._class.staticClass.classid].value;
+                            }
+
+                            ASBinCode.rtti.DynamicObject v2obj = (ASBinCode.rtti.DynamicObject)
+                                ((ASBinCode.rtData.rtObject)v2).value;
+
+                            bool found = false;
+                            while (_proto != null)
+                            {
+                                if (ReferenceEquals(_proto, v2obj))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                                //_proto = _proto._prototype_;
+
+                                if (_proto._class.classid == frame.player.swc.FunctionClass.classid) //Function 
+                                {
+                                    var o =
+                                        (ASBinCode.rtti.DynamicObject)
+                                        ((ASBinCode.rtData.rtObject)_proto.memberData[1].getValue()).value;
+                                    _proto = o._prototype_;
+
+                                }
+                                else if (_proto._class.classid == 1)
+                                {
+                                    _proto = null;
+                                }
+                                else
+                                {
+                                    frame.throwError((new error.InternalError(step.token,
+                                         "遭遇了异常的_prototype_"
+                                         )));
+                                    break;
+                                }
+                            }
+
+                            if (found)
+                            {
+                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            }
+                            else
+                            {
+                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+            frame.endStep(step);
+        }
+
+
+
+        public static void exec_In(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            var v1 = step.arg1.getValue(scope);
+
+            var v2 = step.arg2.getValue(scope);
+
+            if (v2.rtType == RunTimeDataType.rt_null)
+            {
+                frame.throwError(
+
+                        step.token, 1009, "Cannot access a property or method of a null object reference."
+
+                        );
+                frame.endStep(step);
+            }
+            else if (v2.rtType == RunTimeDataType.rt_void)
+            {
+                frame.throwError(
+                        step.token, 1010, "A term is undefined and has no properties."
+
+                        );
+                frame.endStep(step);
+            }
+
+            if (v2.rtType < RunTimeDataType.unknown)
+            {
+                OpCast.Primitive_to_Object(v2, frame, step.token, scope, frame._tempSlot1, step, _toObject_callbacker);
+            }
+            else
+            {
+                _toObject_callbacker(v2, null, frame, step, scope);
+            }
+            
+        }
+
+        private static void _check_inrange(IRunTimeValue v1,OpStep step,StackFrame frame,IRunTimeScope scope,
+            IList<IRunTimeValue> list
+            )
+        {
+            if (v1.rtType > RunTimeDataType.unknown)
+            {
+                RunTimeDataType it;
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out it))
+                {
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                }
+            }
+
+            if (v1.rtType == RunTimeDataType.rt_int ||
+            v1.rtType == RunTimeDataType.rt_uint ||
+            v1.rtType == RunTimeDataType.rt_number ||
+            v1.rtType == RunTimeDataType.rt_string
+            )
+            {
+                double idx = TypeConverter.ConvertToNumber(v1, null, null);
+                if (double.IsNaN(idx) || double.IsInfinity(idx))
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    frame.endStep(step);
+                    return;
+                }
+                else
+                {
+                    int idxx = (int)idx;
+                    //ASBinCode.rtData.rtArray arr = 
+                    //    (ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                    if (idxx >= 0 && idxx < list.Count) //arr.innerArray.Count)
+                    {
+                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    }
+                    else
+                    {
+                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    }
+                    frame.endStep(step);
+                    return;
+                }
+            }
+            else if (v1.rtType < RunTimeDataType.unknown)
+            {
+                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                frame.endStep(step);
+                return;
+            }
+            else
+            {
+                BlockCallBackBase cb_tostr_arr = new BlockCallBackBase();
+                cb_tostr_arr.scope = scope;
+                cb_tostr_arr.step = step;
+                object[] args = new object[2];
+                args[0] = frame;
+                args[1] = list; //(ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                cb_tostr_arr.args = args;
+                cb_tostr_arr.setCallBacker(_cb_tostr_arr);
+
+                //***转字符串***
+                OpCast.CastValue(v1, RunTimeDataType.rt_string, frame,
+                    step.token, scope, frame._tempSlot1,
+                    cb_tostr_arr
+                    , false);
+
+                return;
+            }
+        }
+
+
+        private static void _toObject_callbacker(IRunTimeValue v11, IRunTimeValue v21,
+            StackFrame frame, OpStep step, IRunTimeScope scope)
+        {
+            var v2 = v11;
+            if (v2.rtType < RunTimeDataType.unknown)
+            {
+                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                frame.endStep(step);
+                return;
+            }
+
+            var v1 = step.arg1.getValue(scope);
+
+            RunTimeDataType ot;
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+            {
+                if (ot == RunTimeDataType.rt_array)
+                {
+                    ASBinCode.rtData.rtArray arr = 
+                        (ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+
+                    _check_inrange(v1, step, frame, scope, arr.innerArray);
+                    return;
+                }
+            }
+
+            if (frame.player.swc.dict_Vector_type.ContainsKey(((ASBinCode.rtData.rtObject)v2).value._class))
+            {
+                //和数组同样处理
+                var list=((Vector_Data)((HostedObject)((ASBinCode.rtData.rtObject)v2).value).hosted_object).innnerList;
+                _check_inrange(v1, step, frame, scope, list);
+
+                return;
+            }
+            
+
+            if (((ASBinCode.rtData.rtObject)v2).value is ASBinCode.rtti.DictionaryObject)
+            {
+                if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+                {
+                    //***字典对象，允许用Object做Key***
+                    DictionaryObject dict = (DictionaryObject)(((ASBinCode.rtData.rtObject)v2).value);
+                    var key = new DictionaryKey(v1);
+                    if (!dict.isContainsKey(key))
+                    {
+                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        frame.endStep(step);
+                        return;
+                    }
+                    else
+                    {
+                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        frame.endStep(step);
+                        return;
+                    }
+                }
+            }
+
+            //***将key转为字符串***
+            BlockCallBackBase cb_tostr_obj=new BlockCallBackBase();
+            cb_tostr_obj.scope = scope;
+            cb_tostr_obj.step = step;
+            object[] a = new object[2];
+            a[0] = frame;
+            a[1] = v2;
+            cb_tostr_obj.setCallBacker(_cb_tostr_obj);
+            cb_tostr_obj.args = a;
+
+            OpCast.CastValue(v1, RunTimeDataType.rt_string, frame, step.token, scope, frame._tempSlot1, cb_tostr_obj, false);
+
+
+        }
+
+        private static void _cb_tostr_obj(BlockCallBackBase sender, object args)
+        {
+            object[] a = (object[])sender.args;
+            StackFrame frame = (StackFrame)a[0];
+            ASBinCode.rtData.rtObject v2 = (ASBinCode.rtData.rtObject)a[1];
+            IRunTimeValue vidx = frame._tempSlot1.getValue();
+            string name = TypeConverter.ConvertToString(vidx,null,null);
+            var step = sender.step;
+            var scope = sender.scope;
+
+            if (v2.value is Global_Object)
+            {
+                Global_Object gobj = (Global_Object)v2.value;
+                if (!gobj.hasproperty(name))
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    frame.endStep(step);
+                    return;
+                }
+                else
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    frame.endStep(step);
+                    return;
+                }
+            }
+            else
+            {
+                var cls = v2.value._class;
+                
+                var member = ClassMemberFinder.find(cls, name, null);
+                if (member == null)
+                {
+                    if (v2.value._class.dynamic) //如果是动态类型
+                    {
+                        DynamicObject dobj = (DynamicObject)v2.value;
+
+                        bool haserror;
+                        dobj = OpAccess_Dot.findInProtoType(dobj, name, frame, step.token, out haserror);
+                        if (haserror)
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            frame.endStep(step);
+                            return;
+                        }
+
+                        if (dobj != null)
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            frame.endStep(step);
+                            return;
+                        }
+                        else
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            frame.endStep(step);
+                            return;
+                        }
+
+                    }
+                    else
+                    {
+                        var dobj = (DynamicObject)
+                                frame.player.static_instance[v2.value._class.staticClass.classid].value;
+
+                        dobj = (DynamicObject)((ASBinCode.rtData.rtObject)dobj.memberData[0].getValue()).value;
+                        if (!dobj.hasproperty(name))
+                        {
+
+                            dobj = ((DynamicObject)
+                                frame.player.static_instance[v2.value._class.staticClass.classid].value);
+
+                            bool haserror;
+                            dobj = OpAccess_Dot.findInProtoType(dobj, name, frame, step.token, out haserror);
+                            if (haserror)
+                            {
+                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                                frame.endStep(step);
+                                return;
+                            }
+                        }
+
+                        if (dobj != null)
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            frame.endStep(step);
+                            return;
+                        }
+                        else
+                        {
+                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            frame.endStep(step);
+                            return;
+                        }
+
+                    }
+                }
+                else
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    frame.endStep(step);
+                    return;
+                }
+            }
+
+        }
+
+        private static void _cb_tostr_arr(BlockCallBackBase sender, object args)
+        {
+            object[] a = (object[])sender.args;
+            StackFrame frame = (StackFrame)a[0];
+            IList<IRunTimeValue> v2 = (IList<IRunTimeValue>)a[1];
+            IRunTimeValue vidx = frame._tempSlot1.getValue();
+
+            OpStep step = sender.step;
+            var scope = sender.scope;
+
+            double idx = TypeConverter.ConvertToNumber(vidx, null, null);
+            if (double.IsNaN(idx) || double.IsInfinity(idx))
+            {
+                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                frame.endStep(step);
+                return;
+            }
+            else
+            {
+                int idxx = (int)idx;
+                
+                if (idxx >= 0 && idxx < v2.Count)
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                }
+                else
+                {
+                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                }
+                frame.endStep(step);
+                return;
+            }
+
+        }
+
         public static void execNOT(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             var v = TypeConverter.ConvertToBoolean(step.arg1.getValue(scope),frame,step.token);
@@ -26,12 +681,14 @@ namespace ASRuntime.operators
 
         public static void execGT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            
-            
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
 
-            if (a1.value > a2.value)
+
+            //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+
+            if (a1 > a2)
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -48,10 +705,12 @@ namespace ASRuntime.operators
         {
 
 
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            if (a1.value >= a2.value)
+            if (a1 >= a2)
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -261,14 +920,34 @@ namespace ASRuntime.operators
             ((StackFrame)sender.args).endStep(sender.step);
         }
 
+
+        //public static void execLT_IntInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        //{
+        //    ASBinCode.rtData.rtInt a1 = (ASBinCode.rtData.rtInt)step.arg1.getValue(scope);
+        //    ASBinCode.rtData.rtInt a2 = (ASBinCode.rtData.rtInt)step.arg2.getValue(scope);
+        //    if (a1.value < a2.value)
+        //    {
+        //        step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+        //    }
+        //    else
+        //    {
+        //        step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+        //    }
+
+
+        //    frame.endStep(step);
+        //}
+
         public static void execLT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
 
 
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            if (a1.value < a2.value)
+            if (a1 < a2)
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
@@ -285,10 +964,12 @@ namespace ASRuntime.operators
         {
 
 
-            ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
-            ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
+            //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            if (a1.value <= a2.value)
+            if (a1 <= a2)
             {
                 step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }

@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
             int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope), frame, step.token);
 

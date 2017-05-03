@@ -12,24 +12,43 @@ namespace ASRuntime.operators
 
         public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
-            BlockCallBackBase cb = new BlockCallBackBase();
-            cb.setCallBacker(_CastCallBacker);
-            cb.args = frame;
-            cb.scope = scope;
+            var v1 = step.arg1.getValue(scope);
 
-            CastValue(
-                step.arg1.getValue(scope),
-                step.regType,
-                frame,
-                step.token,
-                scope,
-                step.reg.getISlot(scope)
-                ,
-                cb
-                ,
-                false
-                );
+            if (step.regType == RunTimeDataType.rt_void)
+            {
+                step.reg.getISlot(scope).directSet(v1);
+                frame.endStep(step);
+            }
+            else if (step.regType < RunTimeDataType.unknown && v1.rtType < RunTimeDataType.unknown)
+            {
+                if (!CastPrimitive_to_Primitive(step.regType, v1, step.reg.getISlot(scope), frame, step.token))
+                {
+                    frame.throwCastException(step.token, v1.rtType, step.regType);
+                }
+                frame.endStep(step);
+            }
+            else
+            {
 
+                BlockCallBackBase cb = new BlockCallBackBase();
+                cb.setCallBacker(_CastCallBacker);
+                cb.args = frame;
+                cb.scope = scope;
+
+                CastValue(
+                    v1,
+                    step.regType,
+                    frame,
+                    step.token,
+                    scope,
+                    step.reg.getISlot(scope)
+                    ,
+                    cb
+                    ,
+                    false
+                    );
+
+            }
             //if (!CastValue(
             //    step.arg1.getValue(scope), step.regType, step.reg.getISlot(scope), frame, step.token, scope))
             //{
@@ -56,6 +75,135 @@ namespace ASRuntime.operators
         }
 
 
+        private static bool CastPrimitive_to_Primitive(RunTimeDataType targetType,IRunTimeValue srcValue,ISLOT storeto,StackFrame frame,SourceToken token)
+        {
+            switch (targetType)
+            {
+                case ASBinCode.RunTimeDataType.rt_boolean:
+                    {
+                        storeto.setValue(
+                            TypeConverter.ConvertToBoolean(
+                            srcValue, frame, token, true
+                        )
+                            );
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_int:
+                    {
+                        storeto.setValue(
+                         TypeConverter.ConvertToInt(
+                            srcValue, frame, token, true
+                        )
+                        );
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_uint:
+                    {
+                        storeto.setValue(
+                            TypeConverter.ConvertToUInt(
+                            srcValue, frame, token, true
+                        )
+                            );
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_number:
+                    {
+                        storeto.setValue(
+                            TypeConverter.ConvertToNumber(
+                            srcValue, frame, token, true
+                        )
+                            );
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_string:
+                    {
+                        string str = TypeConverter.ConvertToString(
+                            srcValue, frame, token, true
+                        );
+
+                        storeto.setValue(
+                            str
+                            );
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_void:
+                case ASBinCode.RunTimeDataType.rt_null:
+                case ASBinCode.RunTimeDataType.fun_void:
+                    {
+                        storeto.directSet(srcValue);
+                        //callbacker.isSuccess = true;
+                        //callbacker.call(null);
+                        return true;
+                    }
+                case ASBinCode.RunTimeDataType.rt_function:
+                    {
+                        if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
+                            ||
+                            srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
+                            //||
+                            //srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
+                            )
+                        {
+                            {
+                                storeto.directSet(srcValue);
+                                //callbacker.isSuccess = true;
+                                //callbacker.call(null);
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            {
+                                //frame.throwCastException(token, srcValue.rtType, targetType);
+                                //frame.endStep();
+
+                                return false;
+                            }
+                        }
+                    }
+                case RunTimeDataType.rt_array:
+                    {
+                        if (srcValue.rtType == RunTimeDataType.rt_null || srcValue.rtType==RunTimeDataType.rt_array )
+                        {
+                            storeto.directSet(srcValue);
+                            //callbacker.isSuccess = true;
+                            //callbacker.call(null);
+                            return true;
+                        }
+                        else
+                        {
+                            //frame.throwCastException(token, srcValue.rtType, targetType);
+                            //frame.endStep();
+
+                            return false;
+                        }
+                    }
+                case ASBinCode.RunTimeDataType.unknown:
+                    {
+                        //frame.throwCastException(token, srcValue.rtType, targetType);
+                        //frame.endStep();
+                        return false;
+                    }
+                default:
+                    {
+                        //frame.throwCastException(token, srcValue.rtType, targetType);
+                        //frame.endStep();
+                        return false;
+                    }
+            }
+        }
+
+
         public static void CastValue(
             ASBinCode.IRunTimeValue srcValue,
             ASBinCode.RunTimeDataType targetType,
@@ -69,130 +217,140 @@ namespace ASRuntime.operators
         {
             if ((srcValue.rtType < ASBinCode.RunTimeDataType._OBJECT || igrionValueOf) && targetType < ASBinCode.RunTimeDataType._OBJECT)
             {
-                switch (targetType)
+                if (CastPrimitive_to_Primitive(targetType, srcValue, storeto, frame, token))
                 {
-                    case ASBinCode.RunTimeDataType.rt_boolean:
-                        {
-                            storeto.setValue(
-                                TypeConverter.ConvertToBoolean(
-                                srcValue, frame, token, true
-                            )
-                                );
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_int:
-                        {
-                            storeto.setValue(
-                             TypeConverter.ConvertToInt(
-                                srcValue, frame, token, true
-                            )
-                            );
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_uint:
-                        {
-                            storeto.setValue(
-                                TypeConverter.ConvertToUInt(
-                                srcValue, frame, token, true
-                            )
-                                );
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_number:
-                        {
-                            storeto.setValue(
-                                TypeConverter.ConvertToNumber(
-                                srcValue, frame, token, true
-                            )
-                                );
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_string:
-                        {
-                            string str = TypeConverter.ConvertToString(
-                                srcValue, frame, token, true
-                            );
-
-                            storeto.setValue(
-                                str
-                                );
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_void:
-                    case ASBinCode.RunTimeDataType.rt_null:
-                    case ASBinCode.RunTimeDataType.fun_void:
-                        {
-                            storeto.directSet(srcValue);
-                            callbacker.isSuccess = true;
-                            callbacker.call(null);
-                            return;
-                        }
-                    case ASBinCode.RunTimeDataType.rt_function:
-                        {
-                            if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
-                                ||
-                                srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
-                                ||
-                                srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
-                                )
-                            {
-                                {
-                                    storeto.directSet(srcValue);
-                                    callbacker.isSuccess = true;
-                                    callbacker.call(null);
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                {
-                                    frame.throwCastException(token, srcValue.rtType, targetType);
-                                    frame.endStep();
-
-                                    return;
-                                }
-                            }
-                        }
-                    case RunTimeDataType.rt_array:
-                        {
-                            if (srcValue.rtType == RunTimeDataType.rt_null)
-                            {
-                                storeto.directSet(srcValue);
-                                callbacker.isSuccess = true;
-                                callbacker.call(null);
-                                return;
-                            }
-                            else
-                            {
-                                frame.throwCastException(token, srcValue.rtType, targetType);
-                                frame.endStep();
-
-                                return;
-                            }
-                        }
-                    case ASBinCode.RunTimeDataType.unknown:
-                        {
-                            frame.throwCastException(token, srcValue.rtType, targetType);
-                            frame.endStep();
-                            return;
-                        }
-                    default:
-                        {
-                            frame.throwCastException(token, srcValue.rtType, targetType);
-                            frame.endStep();
-                            return;
-                        }
+                    callbacker.isSuccess = true;
+                    callbacker.call(null);
                 }
+                else
+                {
+                    frame.throwCastException(token, srcValue.rtType, targetType);
+                    frame.endStep();
+                }
+                //switch (targetType)
+                //{
+                //    case ASBinCode.RunTimeDataType.rt_boolean:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToBoolean(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_int:
+                //        {
+                //            storeto.setValue(
+                //             TypeConverter.ConvertToInt(
+                //                srcValue, frame, token, true
+                //            )
+                //            );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_uint:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToUInt(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_number:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToNumber(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_string:
+                //        {
+                //            string str = TypeConverter.ConvertToString(
+                //                srcValue, frame, token, true
+                //            );
+
+                //            storeto.setValue(
+                //                str
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_void:
+                //    case ASBinCode.RunTimeDataType.rt_null:
+                //    case ASBinCode.RunTimeDataType.fun_void:
+                //        {
+                //            storeto.directSet(srcValue);
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_function:
+                //        {
+                //            if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
+                //                ||
+                //                srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
+                //                ||
+                //                srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
+                //                )
+                //            {
+                //                {
+                //                    storeto.directSet(srcValue);
+                //                    callbacker.isSuccess = true;
+                //                    callbacker.call(null);
+                //                    return;
+                //                }
+                //            }
+                //            else
+                //            {
+                //                {
+                //                    frame.throwCastException(token, srcValue.rtType, targetType);
+                //                    frame.endStep();
+
+                //                    return;
+                //                }
+                //            }
+                //        }
+                //    case RunTimeDataType.rt_array:
+                //        {
+                //            if (srcValue.rtType == RunTimeDataType.rt_null)
+                //            {
+                //                storeto.directSet(srcValue);
+                //                callbacker.isSuccess = true;
+                //                callbacker.call(null);
+                //                return;
+                //            }
+                //            else
+                //            {
+                //                frame.throwCastException(token, srcValue.rtType, targetType);
+                //                frame.endStep();
+
+                //                return;
+                //            }
+                //        }
+                //    case ASBinCode.RunTimeDataType.unknown:
+                //        {
+                //            frame.throwCastException(token, srcValue.rtType, targetType);
+                //            frame.endStep();
+                //            return;
+                //        }
+                //    default:
+                //        {
+                //            frame.throwCastException(token, srcValue.rtType, targetType);
+                //            frame.endStep();
+                //            return;
+                //        }
+                //}
             }
             else
             {

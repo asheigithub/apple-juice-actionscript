@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -103,6 +104,7 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="aslib\Array.txt" />
+    <Content Include="aslib\Boolean.txt" />
     <Content Include="aslib\Class.txt" />
     <Content Include="aslib\Dictionary.txt" />
     <Content Include="aslib\Error.txt" />

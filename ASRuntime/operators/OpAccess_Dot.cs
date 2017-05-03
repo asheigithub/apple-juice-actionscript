@@ -282,7 +282,7 @@ namespace ASRuntime.operators
                 {
                     var protoObj = dobj._prototype_;
                     //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
-                    if (protoObj._class.classid == 10) //Function 
+                    if (protoObj._class.classid == frame.player.swc.FunctionClass.classid) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
                     }

@@ -164,6 +164,31 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public final class Boolean extends Object
+        ///	{
+        ///		
+        ///		private var _v:Boolean;
+        ///
+        ///		public function Boolean (value:*=false){ _v=value ;}
+        ///
+        ///		
+        ///		public function toString () : String;
+        ///
+        ///		
+        ///		public function valueOf () : Boolean{ return _v;}
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string Boolean {
+            get {
+                return ResourceManager.GetString("Boolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	[no_constructor]
         ///	public dynamic class Class extends Object
         ///	{
@@ -246,6 +271,7 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	[_function_]
         ///	public final dynamic class Function extends Object
         ///	{
         ///		
@@ -270,7 +296,7 @@ namespace ASCompiler.Properties {
         ///		private static function _to_function(thisObj:*):Function{ return thisObj._func;}
         ///
         ///		[implicit_from]
-        ///		private static function _from_value(value:Functi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		private static function _from_val [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Function {
             get {

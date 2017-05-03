@@ -56,8 +56,11 @@ namespace ASBinCode
 
         public IRunTimeValue getValue( IRunTimeScope scope)
         {
-            var v= getISlot(scope).getValue();
-            return v;
+            //var v= getISlot(scope).getValue();
+            //return v;
+
+            return scope.stack[scope.offset + Id].getValue();
+
         }
 
         

@@ -1151,6 +1151,7 @@ Public Class AS3FileGrammarAnalyser
         Else
             If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) And Not (TypeOf MemberScopeStack.Peek() Is AS3Interface) Then
                 func.Access.IsInternal = True
+                func.Access.IsInternal = False
             End If
             If TypeOf MemberScopeStack.Peek() Is AS3Class Or TypeOf MemberScopeStack.Peek() Is AS3Interface Then
                 func.IsMethod = True
@@ -1702,6 +1703,7 @@ Public Class AS3FileGrammarAnalyser
         Else
             If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
                 variable.Access.IsInternal = True
+                variable.Access.IsInternal = False
             End If
         End If
 
@@ -1801,6 +1803,8 @@ Public Class AS3FileGrammarAnalyser
         Else
             If Not (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
                 as3const.Access.IsInternal = True
+                as3const.Access.IsInternal = False
+
             End If
 
         End If

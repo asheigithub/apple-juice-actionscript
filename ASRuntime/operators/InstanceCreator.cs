@@ -77,6 +77,7 @@ namespace ASRuntime.operators
             }
         }
 
+        
 
         public bool init_static_class(Class cls)
         {
@@ -84,6 +85,7 @@ namespace ASRuntime.operators
             {
                 int f = player.getRuntimeStackFlag();
 
+                
                 ASBinCode.IRunTimeScope objScope;
                 ASBinCode.rtti.Object obj = makeObj(cls.staticClass,
                     null, out objScope).value;
@@ -101,7 +103,7 @@ namespace ASRuntime.operators
 
                         bool result= player.step_toStackflag(f);
 
-                        if (cls.classid > 0)
+                        if (cls.classid !=2)
                         {
                             ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
                                 
@@ -198,7 +200,7 @@ namespace ASRuntime.operators
 
         private void set_Class_constructor()
         {
-            if (_class.classid > 0)
+            if (_class.classid > 2)
             {
                 var obj = player.static_instance[_class.staticClass.classid];
 

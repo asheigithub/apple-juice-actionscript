@@ -9,7 +9,7 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    class StackSlot : ISLOT
+    sealed class StackSlot : ISLOT
     {
         public StackSlot(IClassFinder classfinder)
         {
@@ -29,7 +29,16 @@ namespace ASRuntime
                 }
             }
 
+
+            _numberValue = (rtNumber)store[RunTimeDataType.rt_number];
+            _intValue = (rtInt)store[RunTimeDataType.rt_int];
+            _uintValue = (rtUInt)store[RunTimeDataType.rt_uint];
         }
+
+        private rtNumber _numberValue;
+        private rtInt _intValue;
+        private rtUInt _uintValue;
+
 
         internal IEnumerator<IRunTimeValue> cache_enumerator;
 
@@ -89,13 +98,17 @@ namespace ASRuntime
                         store[index] = value;
                         break;
                     case RunTimeDataType.rt_int:
-                        setValue(((rtInt)value).value);
+                        //setValue(((rtInt)value).value);
+                        ((rtInt)store[index]).value = ((rtInt)value).value;
                         break;
                     case RunTimeDataType.rt_uint:
-                        setValue(((rtUInt)value).value);
+                        //setValue(((rtUInt)value).value);
+                        ((rtUInt)store[index]).value = ((rtUInt)value).value;
                         break;
                     case RunTimeDataType.rt_number:
-                        setValue(((rtNumber)value).value);
+                        //setValue(((rtNumber)value).value);
+                        _numberValue.value= ((rtNumber)value).value;
+                        //((rtNumber)store[index]).value = ((rtNumber)value).value;
                         break;
                     case RunTimeDataType.rt_string:
                         setValue(((rtString)value).value);
@@ -212,8 +225,8 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_void;
-                store[(int)RunTimeDataType.rt_void] = value;
+                index = RunTimeDataType.rt_void;
+                store[index] = value;
             }
         }
 
@@ -225,8 +238,8 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_null;
-                store[(int)RunTimeDataType.rt_null] = value;
+                index = RunTimeDataType.rt_null;
+                store[index] = value;
             }
         }
 
@@ -238,8 +251,9 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_uint;
-                ((rtUInt)store[(int)RunTimeDataType.rt_uint]).value = value;
+                index = RunTimeDataType.rt_uint;
+                _uintValue.value = value;
+                //((rtUInt)store[index]).value = value;
             }
         }
 
@@ -251,8 +265,9 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_int;
-                ((rtInt)store[(int)RunTimeDataType.rt_int]).value = value;
+                index = RunTimeDataType.rt_int;
+                _intValue.value = value;
+                //((rtInt)store[index]).value = value;
             }
         }
 
@@ -264,8 +279,9 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_number;
-                ((rtNumber)store[(int)RunTimeDataType.rt_number]).value = value;
+                index = RunTimeDataType.rt_number;
+                _numberValue.value = value;
+                //((rtNumber)store[index]).value = value;
             }
         }
 
@@ -277,8 +293,8 @@ namespace ASRuntime
             }
             else
             {
-                index = (int)RunTimeDataType.rt_boolean;
-                store[(int)RunTimeDataType.rt_boolean] = value;
+                index = RunTimeDataType.rt_boolean;
+                store[index] = value;
             }
         }
 

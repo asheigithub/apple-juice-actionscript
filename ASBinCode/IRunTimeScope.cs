@@ -32,7 +32,7 @@ namespace ASBinCode
         /// <summary>
         /// 程序执行栈
         /// </summary>
-        IList<ISLOT> stack { get; }
+        ISLOT[] stack { get; }
         /// <summary>
         /// 程序执行栈偏移量
         /// </summary>

@@ -150,6 +150,58 @@ namespace ASRuntime
             {
 
             }
+            //人肉内联代码
+            //while (true)
+            //{
+            //    if (runtimeError != null)
+            //    {
+            //        break;
+            //    }
+            //    if (currentRunFrame == null)
+            //    {
+            //        break;
+            //    }
+
+            //    if (receive_error != null)
+            //    {
+            //        var temp = receive_error;
+            //        receive_error = null;
+            //        currentRunFrame.receiveErrorFromStackFrame(temp);
+            //        continue;
+            //    }
+
+            //    if (currentRunFrame.IsEnd()) //执行完成
+            //    {
+            //        runtimeStack.Pop(); //出栈
+
+
+            //        var toclose = currentRunFrame;
+            //        if (currentRunFrame.callbacker != null)
+            //        {
+            //            IBlockCallBack temp = currentRunFrame.callbacker;
+            //            currentRunFrame.callbacker = null;
+            //            temp.call(temp.args);
+
+            //        }
+
+            //        toclose.close();
+
+            //        if (runtimeStack.Count > 0)
+            //        {
+            //            currentRunFrame = runtimeStack.Peek();
+            //        }
+            //        else
+            //        {
+            //            currentRunFrame = null;
+            //        }
+
+            //    }
+            //    else
+            //    {
+            //        currentRunFrame.step();
+            //    }
+            //}
+
 
             if (runtimeError != null)
             {
@@ -204,6 +256,19 @@ namespace ASRuntime
             return memberDataList;
         }
 
+        private static CodeBlock blankBlock;
+        internal void CallBlankBlock(IBlockCallBack callbacker)
+        {
+            if (blankBlock == null)
+            {
+                blankBlock = new CodeBlock(int.MaxValue - 1, "#blank", -65535, false);
+            }
+
+            CallBlock(blankBlock, null, null, null,null, callbacker, null, RunTimeScopeType.function);
+
+        }
+
+
         internal IRunTimeScope CallBlock(ASBinCode.CodeBlock calledblock,
             HeapSlot[] membersHeap,
             ISLOT returnSlot,
@@ -214,8 +279,7 @@ namespace ASRuntime
             RunTimeScopeType type
             )
         {
-            StackFrame frame = new StackFrame();
-            frame.block = calledblock;
+            StackFrame frame = new StackFrame(calledblock);
             frame.codeLinePtr = 0;
             frame.player = this;
             frame.returnSlot = returnSlot;
@@ -326,7 +390,6 @@ namespace ASRuntime
 
                 if (runtimeStack.Count > 0)
                 {
-
                     currentRunFrame = runtimeStack.Peek();
                 }
                 else

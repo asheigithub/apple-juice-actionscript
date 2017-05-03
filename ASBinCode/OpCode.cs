@@ -7,7 +7,7 @@ namespace ASBinCode
     /// <summary>
     /// 操作符
     /// </summary>
-    public enum OpCode
+    public enum OpCode : byte
     {
         /// <summary>
         /// 类型转换
@@ -403,5 +403,44 @@ namespace ASBinCode
         /// 关闭枚举器
         /// </summary>
         enumerator_close = 98,
+
+        /// <summary>
+        /// is运算符
+        /// </summary>
+        logic_is=99,
+        /// <summary>
+        /// instanceof运算符
+        /// </summary>
+        logic_instanceof=100,
+
+        /// <summary>
+        /// as运算符
+        /// </summary>
+        convert_as=101,
+
+        /// <summary>
+        /// in运算符
+        /// </summary>
+        logic_in =102,
+
+        /// <summary>
+        /// typeof运算符
+        /// </summary>
+        unary_typeof=103,
+
+        /// <summary>
+        /// 乘法 2个数字
+        /// </summary>
+        multi_number =104,
+
+        div_number=105,
+
+        mod_number=106,
+
+        /// <summary>
+        /// 两个int小于 &lt;
+        /// </summary>
+        //lt_int_int = 107,
+
     }
 }

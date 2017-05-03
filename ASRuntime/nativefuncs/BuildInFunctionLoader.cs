@@ -71,6 +71,8 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Array_concat());
             bin.regNativeFunction(new Array_toString());
 
+            bin.regNativeFunction(new Boolean_toString());
+
             bin.regNativeFunction(new Vector_constructor());
             bin.regNativeFunction(new Vector_getIsFixed());
             bin.regNativeFunction(new Vector_setIsFixed());

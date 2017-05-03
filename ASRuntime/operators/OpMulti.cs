@@ -6,6 +6,36 @@ namespace ASRuntime.operators
 {
     class OpMulti
     {
+
+        public static void exec_MultiNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+
+            step.reg.getISlot(scope).setValue(a1 * a2);
+            frame.endStep(step);
+
+        }
+
+        public static void exec_DivNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+
+            step.reg.getISlot(scope).setValue(a1 / a2);
+            frame.endStep(step);
+
+        }
+        public static void exec_ModNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        {
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+
+            step.reg.getISlot(scope).setValue(a1 % a2);
+            frame.endStep(step);
+
+        }
+
         public static void execMulti(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
         {
             ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);

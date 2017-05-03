@@ -20,16 +20,20 @@ namespace ASRuntime.operators
             {
                 rtObject rtObj = (rtObject)obj;
 
-                if(ClassMemberFinder.isInherits(rtObj.value._class, 
-                    player.swc.primitive_to_class_table[RunTimeDataType.rt_array] ))
+                if (ClassMemberFinder.isInherits(rtObj.value._class,
+                    player.swc.primitive_to_class_table[RunTimeDataType.rt_array]))
                 {
                     rtArray arr = (rtArray)rtObj.value.memberData[0].getValue();
-                    save.cache_enumerator = getArrayForIn(arr);
+                    save.cache_enumerator = getArrayForIn(arr.innerArray);
+                }
+                else if (player.swc.dict_Vector_type.ContainsKey( rtObj.value._class ))
+                {
+                    save.cache_enumerator = getArrayForIn(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
                 }
                 else
                 {
                     IEnumerator<IRunTimeValue> forinenum = getForinIEnumerator(player, rtObj.value, frame, step, scope);
-                    save.cache_enumerator = forinenum;   
+                    save.cache_enumerator = forinenum;
                 }
             }
 
@@ -50,7 +54,11 @@ namespace ASRuntime.operators
                     player.swc.primitive_to_class_table[RunTimeDataType.rt_array]))
                 {
                     rtArray arr = (rtArray)rtObj.value.memberData[0].getValue();
-                    save.cache_enumerator = getArrayForEach(arr);
+                    save.cache_enumerator = getArrayForEach(arr.innerArray);
+                }
+                else if (player.swc.dict_Vector_type.ContainsKey(rtObj.value._class))
+                {
+                    save.cache_enumerator = getArrayForEach(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
                 }
                 else
                 {
@@ -97,21 +105,21 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static IEnumerator<IRunTimeValue> getArrayForIn(rtArray arr)
+        private static IEnumerator<IRunTimeValue> getArrayForIn(IList<IRunTimeValue> arr)
         {
-            int length = arr.innerArray.Count;
+            int length = arr.Count;
             for (int i = 0; i < length; i++)
             {
                 yield return new rtInt(i);
             }
         }
 
-        private static IEnumerator<IRunTimeValue> getArrayForEach(rtArray arr)
+        private static IEnumerator<IRunTimeValue> getArrayForEach(IList<IRunTimeValue> arr)
         {
-            int length = arr.innerArray.Count;
+            int length = arr.Count;
             for (int i = 0; i < length; i++)
             {
-                yield return arr.innerArray[i];
+                yield return arr[i];
             }
         }
 
@@ -154,8 +162,8 @@ namespace ASRuntime.operators
                 if (dobj._prototype_ != null)
                 {
                     var protoObj = dobj._prototype_;
-                    //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
-                    if (protoObj._class.classid == 10) //Function 
+                    //****_prototype_的类型，只可能是Function对象或Class对象
+                    if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
                         var res = getForinIEnumerator(player, dobj, frame, step, scope);
@@ -257,8 +265,8 @@ namespace ASRuntime.operators
                 if (dobj._prototype_ != null)
                 {
                     var protoObj = dobj._prototype_;
-                    //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
-                    if (protoObj._class.classid == 10) //Function 
+                    //****_prototype_的类型，只可能是Function对象或Class对象
+                    if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
                         var res = getForEach_IEnumerator(player, dobj, frame, step, scope);

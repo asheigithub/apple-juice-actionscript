@@ -306,6 +306,19 @@ namespace ASCompiler.compiler.builds
                             {
                                 builder.bin.DictionaryClass = cls;
                             }
+                            else if (m.Value.Data.Value.ToString()== "_function_")
+                            {
+                                if (builder.bin.FunctionClass == null)
+                                {
+                                    builder.bin.FunctionClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_function_]只能指定一次");
+                                }
+                            }
                         }
                     }
                 }
@@ -1057,6 +1070,17 @@ namespace ASCompiler.compiler.builds
                 ASTool.AS3.AS3Variable variable = (ASTool.AS3.AS3Variable)stmt;
                 if (variable.Access.IsStatic == isstatic)
                 {
+                    if (variable.Access.IsOverride)
+                    {
+                        throw new BuildException(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                "The override attribute can only be used on a method defined in a class."));
+                    }
+                    else if (variable.Access.IsFinal)
+                    {
+                        throw new BuildException(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                "The final attribute can only be used on a method defined in a class."));
+                    }
+
                     for (int j = 0; j < cls.classMembers.Count; j++)
                     {
                         if (cls.classMembers[j].name == variable.Name
@@ -1127,6 +1151,17 @@ namespace ASCompiler.compiler.builds
                 ASTool.AS3.AS3Const constant = (ASTool.AS3.AS3Const)stmt;
                 if (constant.Access.IsStatic == isstatic)
                 {
+                    if (constant.Access.IsOverride)
+                    {
+                        throw new BuildException(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                "The override attribute can only be used on a method defined in a class."));
+                    }
+                    else if (constant.Access.IsFinal)
+                    {
+                        throw new BuildException(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                "The final attribute can only be used on a method defined in a class."));
+                    }
+
                     for (int j = 0; j < cls.classMembers.Count; j++)
                     {
                         if (cls.classMembers[j].name == constant.Name

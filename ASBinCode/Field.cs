@@ -21,7 +21,7 @@ namespace ASBinCode
 
         }
 
-        public override ISLOT getISlot(IRunTimeScope scope)
+        public sealed override ISLOT getISlot(IRunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -42,7 +42,7 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        protected override IMember _clone()
+        protected sealed override IMember _clone()
         {
             Field f = new Field(name, indexOfMembers, refdefinedinblockid, isConst);
             f.valueType = valueType;

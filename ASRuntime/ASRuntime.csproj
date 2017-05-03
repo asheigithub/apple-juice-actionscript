@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,6 +42,7 @@
     <Compile Include="HeapSlot.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="nativefuncs\Array_buildin.cs" />
+    <Compile Include="nativefuncs\Boolean_buildin.cs" />
     <Compile Include="nativefuncs\BuildInFunctionLoader.cs" />
     <Compile Include="nativefuncs\Catch.cs" />
     <Compile Include="nativefuncs\Error_buildin.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="operators\OpNeg.cs" />
     <Compile Include="operators\OpPropGetSet.cs" />
     <Compile Include="operators\OpSub.cs" />
+    <Compile Include="operators\OpTypeOf.cs" />
     <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
