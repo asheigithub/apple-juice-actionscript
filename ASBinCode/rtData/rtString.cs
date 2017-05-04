@@ -7,29 +7,29 @@ namespace ASBinCode.rtData
     /// <summary>
     /// 运行时基本数据类型(String)
     /// </summary>
-    public class rtString : IRunTimeValue
+    public class rtString : RunTimeValueBase
     {
         public string value;
 
-        public rtString(string v)
+        public rtString(string v):base(v==null? RunTimeDataType.rt_null: RunTimeDataType.rt_string)
         {
             value = v;
         }
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                if (value == null)
-                {
-                    return RunTimeDataType.rt_null;
-                }
-                else
-                {
-                    return RunTimeDataType.rt_string;
-                }
-            }
-        }
+        //public RunTimeDataType rtType
+        //{
+        //    get
+        //    {
+        //        if (value == null)
+        //        {
+        //            return RunTimeDataType.rt_null;
+        //        }
+        //        else
+        //        {
+        //            return RunTimeDataType.rt_string;
+        //        }
+        //    }
+        //}
 
         public string valueString()
         {
@@ -44,7 +44,7 @@ namespace ASBinCode.rtData
         }
 
 
-        public override string ToString()
+        public sealed override string ToString()
         {
             if (value == null)
             {
@@ -56,9 +56,10 @@ namespace ASBinCode.rtData
             }
         }
 
-        public object Clone()
+        public sealed override  object Clone()
         {
-            return new rtString(value);
+            return this;
+            //return new rtString(value);
         }
     }
 }

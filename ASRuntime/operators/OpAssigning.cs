@@ -8,10 +8,10 @@ namespace ASRuntime.operators
 {
     class OpAssigning
     {
-        public static void execAssigning(Player player, ASBinCode.OpStep step ,StackFrame frame, ASBinCode.IRunTimeScope scope)
+        public static void execAssigning(Player player, ASBinCode.OpStep step ,StackFrame frame, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v = step.arg1.getValue(scope);
-            ASBinCode.ISLOT slot = step.reg.getISlot(scope);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
+            ASBinCode.SLOT slot = step.reg.getISlot(scope);
 
             if (!slot.isPropGetterSetter)
             {
@@ -111,8 +111,8 @@ namespace ASRuntime.operators
             StackFrame frame = (StackFrame)sender.args;
             OpStep step = sender.step;
 
-            ASBinCode.IRunTimeValue v = frame._tempSlot1.getValue();
-            ASBinCode.ISLOT slot = step.reg.getISlot(sender.scope);
+            ASBinCode.RunTimeValueBase v = frame._tempSlot1.getValue();
+            ASBinCode.SLOT slot = step.reg.getISlot(sender.scope);
 
             if (!slot.directSet(v))
             {
@@ -127,8 +127,8 @@ namespace ASRuntime.operators
 
 
         public static void _doPropAssigning(ClassPropertyGetter prop,StackFrame frame,
-            OpStep step,Player player,IRunTimeScope scope,
-            ASBinCode.rtData.rtObject bindobj,IRunTimeValue v , StackSlot sslot )
+            OpStep step,Player player, RunTimeScope scope,
+            ASBinCode.rtData.rtObject bindobj,RunTimeValueBase v , StackSlot sslot )
         {
             do
             {
@@ -163,7 +163,7 @@ namespace ASRuntime.operators
                 }
 
                 //***读取setter***
-                IRunTimeValue func;
+                RunTimeValueBase func;
 
                 if (sslot.superPropBindClass != null)
                 {

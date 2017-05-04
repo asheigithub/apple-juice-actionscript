@@ -12,7 +12,7 @@ namespace ASRuntime
 
 
         internal Dictionary<int, rtObject> static_instance;
-        internal Dictionary<int, IRunTimeScope> outpackage_runtimescope;
+        internal Dictionary<int, RunTimeScope> outpackage_runtimescope;
 
 
         internal CSWC swc;
@@ -22,7 +22,7 @@ namespace ASRuntime
             this.swc = swc;
 
             static_instance = new Dictionary<int, rtObject>();
-            outpackage_runtimescope = new Dictionary<int, IRunTimeScope>();
+            outpackage_runtimescope = new Dictionary<int, RunTimeScope>();
 
             if (block != null)
             {
@@ -104,7 +104,7 @@ namespace ASRuntime
         StackSlot[] stackSlots;
         private StackFrame displayStackFrame;
         
-        public IRunTimeValue run2(IRightValue result)
+        public RunTimeValueBase run2(IRightValue result)
         {
 
             if (defaultblock == null || swc == null || swc.blocks.Count == 0)
@@ -146,6 +146,7 @@ namespace ASRuntime
                 null, RunTimeScopeType.startup
                 );
             displayStackFrame = runtimeStack.Peek();
+
             while (step())
             {
 
@@ -249,8 +250,10 @@ namespace ASRuntime
             for (int i = 0; i < memberDataList.Length; i++)
             {
                 memberDataList[i] = new HeapSlot();
+                var vt = ((VariableBase)calledblock.scope.members[i]).valueType;
                 memberDataList[i].setDefaultType(
-                    ((VariableBase)calledblock.scope.members[i]).valueType
+                    vt,
+                    TypeConverter.getDefaultValue(vt).getValue(null)
                     );
             }
             return memberDataList;
@@ -269,13 +272,13 @@ namespace ASRuntime
         }
 
 
-        internal IRunTimeScope CallBlock(ASBinCode.CodeBlock calledblock,
+        internal RunTimeScope CallBlock(ASBinCode.CodeBlock calledblock,
             HeapSlot[] membersHeap,
-            ISLOT returnSlot,
-            IRunTimeScope callerScope,
+            SLOT returnSlot,
+            RunTimeScope callerScope,
             SourceToken token,
             IBlockCallBack callbacker,
-            IRunTimeValue this_pointer,
+            RunTimeValueBase this_pointer,
             RunTimeScopeType type
             )
         {

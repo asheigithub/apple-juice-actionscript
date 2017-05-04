@@ -79,7 +79,7 @@ namespace ASBinCode
             }
         }
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             //对方法的包含对象的引用。执行脚本时，this 关键字引用包含该脚本的对象。
             //在方法体的内部，this 关键字引用包含调用方法的类实例。

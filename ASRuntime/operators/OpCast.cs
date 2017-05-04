@@ -10,7 +10,7 @@ namespace ASRuntime.operators
     {
 
 
-        public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v1 = step.arg1.getValue(scope);
 
@@ -75,7 +75,7 @@ namespace ASRuntime.operators
         }
 
 
-        private static bool CastPrimitive_to_Primitive(RunTimeDataType targetType,IRunTimeValue srcValue,ISLOT storeto,StackFrame frame,SourceToken token)
+        private static bool CastPrimitive_to_Primitive(RunTimeDataType targetType,RunTimeValueBase srcValue,SLOT storeto,StackFrame frame,SourceToken token)
         {
             switch (targetType)
             {
@@ -205,12 +205,12 @@ namespace ASRuntime.operators
 
 
         public static void CastValue(
-            ASBinCode.IRunTimeValue srcValue,
+            ASBinCode.RunTimeValueBase srcValue,
             ASBinCode.RunTimeDataType targetType,
             StackFrame frame,
             ASBinCode.SourceToken token,
-            ASBinCode.IRunTimeScope scope,
-            ASBinCode.ISLOT storeto,
+            ASBinCode.RunTimeScope scope,
+            ASBinCode.SLOT storeto,
             BlockCallBackBase callbacker,
             bool igrionValueOf
             )
@@ -637,7 +637,7 @@ namespace ASRuntime.operators
             {
                 BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
 
-                frame.throwCastException((SourceToken)a[1], ((IRunTimeValue)a[6]).rtType, RunTimeDataType.rt_string);
+                frame.throwCastException((SourceToken)a[1], ((RunTimeValueBase)a[6]).rtType, RunTimeDataType.rt_string);
                 //转换异常后立刻结束执行
                 frame.endStep();
             }
@@ -647,8 +647,8 @@ namespace ASRuntime.operators
                     sender._intArg,
                     frame,
                     (SourceToken)a[1],
-                    (IRunTimeScope)a[2],
-                    (ISLOT)a[3],
+                    (RunTimeScope)a[2],
+                    (SLOT)a[3],
                     (BlockCallBackBase)a[4],false
                     );
             }
@@ -659,13 +659,13 @@ namespace ASRuntime.operators
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
             BlockCallBackBase fc = (BlockCallBackBase)a[4];
-            IRunTimeValue rv = ((ISLOT)a[3]).getValue();
+            RunTimeValueBase rv = ((SLOT)a[3]).getValue();
             RunTimeDataType targetType = sender._intArg;
             if (rv.rtType > RunTimeDataType.unknown)
             {
                 if ((bool)a[6] && rv !=a[5])
                 {
-                    frame.throwCastException((SourceToken)a[1], ((IRunTimeValue)a[5]).rtType,
+                    frame.throwCastException((SourceToken)a[1], ((RunTimeValueBase)a[5]).rtType,
                        targetType);
                     //转换异常后立刻结束执行
                     frame.endStep();
@@ -676,8 +676,8 @@ namespace ASRuntime.operators
                         sender._intArg,
                         frame,
                         (SourceToken)a[1],
-                        (IRunTimeScope)a[2],
-                        (ISLOT)a[3],
+                        (RunTimeScope)a[2],
+                        (SLOT)a[3],
                         fc,
                         true
                     );
@@ -689,8 +689,8 @@ namespace ASRuntime.operators
                     sender._intArg,
                     frame,
                     (SourceToken)a[1],
-                    (IRunTimeScope)a[2],
-                    (ISLOT)a[3],
+                    (RunTimeScope)a[2],
+                    (SLOT)a[3],
                     fc,
                     false
                     );
@@ -717,14 +717,14 @@ namespace ASRuntime.operators
 
 
         public static void CastTwoValue(
-            ASBinCode.IRunTimeValue srcValue1,
-            ASBinCode.IRunTimeValue srcValue2,
+            ASBinCode.RunTimeValueBase srcValue1,
+            ASBinCode.RunTimeValueBase srcValue2,
             ASBinCode.RunTimeDataType targetType,
             StackFrame frame,
             ASBinCode.SourceToken token,
-            ASBinCode.IRunTimeScope scope,
-            ASBinCode.ISLOT _tempstoreto1,
-            ASBinCode.ISLOT _tempstoreto2,
+            ASBinCode.RunTimeScope scope,
+            ASBinCode.SLOT _tempstoreto1,
+            ASBinCode.SLOT _tempstoreto2,
             BlockCallBackBase callbacker
 
             )
@@ -754,12 +754,12 @@ namespace ASRuntime.operators
             if (sender.isSuccess)
             {
                 CastValue(
-                    (IRunTimeValue)a[0],
+                    (RunTimeValueBase)a[0],
                     sender._intArg,
                     frame,
                     (SourceToken)a[2],
-                    (IRunTimeScope)a[3],
-                    (ISLOT)a[4],
+                    (RunTimeScope)a[3],
+                    (SLOT)a[4],
                     callbacker,
                     false
                     );
@@ -775,11 +775,11 @@ namespace ASRuntime.operators
 
 
         public static void Primitive_to_Object(
-            ASBinCode.IRunTimeValue srcValue,
+            ASBinCode.RunTimeValueBase srcValue,
             StackFrame frame,
             SourceToken token,
-            IRunTimeScope scope,
-            ISLOT _tempstoreto,
+            RunTimeScope scope,
+            SLOT _tempstoreto,
             ASBinCode.OpStep step,
             StackFrame.DelegeExec exec
             )
@@ -831,7 +831,7 @@ namespace ASRuntime.operators
             object[] a = (object[])cb.args;
 
             StackFrame frame = (StackFrame)a[1];
-            ISLOT result = (ISLOT)a[0];
+            SLOT result = (SLOT)a[0];
             StackFrame.DelegeExec exec = (StackFrame.DelegeExec)a[2];
 
             exec(result.getValue(), null, frame, cb.step, cb.scope);
@@ -847,22 +847,22 @@ namespace ASRuntime.operators
             object[] a = (object[])sender.args;
 
             ((StackFrame.DelegeExec)a[5])(
-                ((ISLOT)a[0]).getValue(),
-                ((ISLOT)a[1]).getValue(),
+                ((SLOT)a[0]).getValue(),
+                ((SLOT)a[1]).getValue(),
                 (StackFrame)a[2],
                 (OpStep)a[3],
-                (IRunTimeScope)a[4]
+                (RunTimeScope)a[4]
                 );
         }
 
         public static void InvokeTwoValueOf(
-            ASBinCode.IRunTimeValue srcValue1,
-            ASBinCode.IRunTimeValue srcValue2,
+            ASBinCode.RunTimeValueBase srcValue1,
+            ASBinCode.RunTimeValueBase srcValue2,
             StackFrame frame,
             SourceToken token,
-            IRunTimeScope scope,
-            ISLOT _tempstoreto1,
-            ISLOT _tempstoreto2,
+            RunTimeScope scope,
+            SLOT _tempstoreto1,
+            SLOT _tempstoreto2,
             ASBinCode.OpStep step,
             StackFrame.DelegeExec exec
             //BlockCallBackBase callbacker
@@ -943,11 +943,11 @@ namespace ASRuntime.operators
         private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
-            IRunTimeValue srcValue2 = (IRunTimeValue)a[0];
+            RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
             StackFrame frame = (StackFrame)a[1]; //tosend[1] = frame;
             SourceToken token = (SourceToken)a[2]; //tosend[2] = token;
-            IRunTimeScope scope = (IRunTimeScope)a[3];  //tosend[3] = scope;
-            ISLOT storeto = (ISLOT)a[4]; //tosend[4] = _tempstoreto2;
+            RunTimeScope scope = (RunTimeScope)a[3];  //tosend[3] = scope;
+            SLOT storeto = (SLOT)a[4]; //tosend[4] = _tempstoreto2;
             BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
 
 
@@ -971,7 +971,7 @@ namespace ASRuntime.operators
         }
 
         private static void InvokeValueOf(
-            rtObject obj, StackFrame frame, SourceToken token, IRunTimeScope scope, ISLOT storeto,
+            rtObject obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
             BlockCallBackBase callbacker
             )
         {
@@ -1113,7 +1113,7 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
 
-            ISLOT returnValue = (ISLOT)a[2];
+            SLOT returnValue = (SLOT)a[2];
             BlockCallBackBase callbacker = (BlockCallBackBase)a[1];
 
             if (returnValue.getValue().rtType > RunTimeDataType.unknown)
@@ -1141,22 +1141,22 @@ namespace ASRuntime.operators
             object[] a = (object[])sender.args;
 
             ((StackFrame.DelegeExec)a[5])(
-                ((ISLOT)a[0]).getValue(),
-                ((ISLOT)a[1]).getValue(),
+                ((SLOT)a[0]).getValue(),
+                ((SLOT)a[1]).getValue(),
                 (StackFrame)a[2],
                 (OpStep)a[3],
-                (IRunTimeScope)a[4]
+                (RunTimeScope)a[4]
                 );
         }
 
         public static void InvokeTwoToString(
-            ASBinCode.IRunTimeValue srcValue1,
-            ASBinCode.IRunTimeValue srcValue2,
+            ASBinCode.RunTimeValueBase srcValue1,
+            ASBinCode.RunTimeValueBase srcValue2,
             StackFrame frame,
             SourceToken token,
-            IRunTimeScope scope,
-            ISLOT _tempstoreto1,
-            ISLOT _tempstoreto2,
+            RunTimeScope scope,
+            SLOT _tempstoreto1,
+            SLOT _tempstoreto2,
             ASBinCode.OpStep step,
             StackFrame.DelegeExec exec
             //BlockCallBackBase callbacker
@@ -1228,11 +1228,11 @@ namespace ASRuntime.operators
         private static void _AfterGetOneToString(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
-            IRunTimeValue srcValue2 = (IRunTimeValue)a[0];
+            RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
             StackFrame frame = (StackFrame)a[1]; //tosend[1] = frame;
             SourceToken token = (SourceToken)a[2]; //tosend[2] = token;
-            IRunTimeScope scope = (IRunTimeScope)a[3];  //tosend[3] = scope;
-            ISLOT storeto = (ISLOT)a[4]; //tosend[4] = _tempstoreto2;
+            RunTimeScope scope = (RunTimeScope)a[3];  //tosend[3] = scope;
+            SLOT storeto = (SLOT)a[4]; //tosend[4] = _tempstoreto2;
             BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
 
 
@@ -1256,7 +1256,7 @@ namespace ASRuntime.operators
         }
 
         private static void InvokeToString(
-            rtObject obj, StackFrame frame, SourceToken token, IRunTimeScope scope, ISLOT storeto,
+            rtObject obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
             BlockCallBackBase callbacker
             )
         {
@@ -1390,7 +1390,7 @@ namespace ASRuntime.operators
         #endregion
 
 
-        public static void exec_CastPrimitive(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_CastPrimitive(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             step.reg.getISlot(scope).directSet
                 ( 

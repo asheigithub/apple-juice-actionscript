@@ -39,7 +39,6 @@
     <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
     <Compile Include="error\InternalError.cs" />
-    <Compile Include="HeapSlot.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="nativefuncs\Array_buildin.cs" />
     <Compile Include="nativefuncs\Boolean_buildin.cs" />
@@ -79,7 +78,6 @@
     <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
-    <Compile Include="RunTimeScope.cs" />
     <Compile Include="StackFrame.cs" />
     <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />

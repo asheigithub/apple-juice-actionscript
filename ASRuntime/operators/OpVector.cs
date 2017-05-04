@@ -8,7 +8,7 @@ namespace ASRuntime.operators
 {
     class OpVector
     {
-        public static void exec_AccessorBind(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_AccessorBind(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
                 (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
@@ -47,7 +47,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_AccessorBind_ConvertIdx(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_AccessorBind_ConvertIdx(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
                 (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
@@ -120,19 +120,19 @@ namespace ASRuntime.operators
 
         }
 
-        public static void exec_push(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_push(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
-            o.innnerList.Add((IRunTimeValue)step.arg2.getValue(scope).Clone());//直接对容器赋值，必须Clone
+            o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope).Clone());//直接对容器赋值，必须Clone
 
             frame.endStep(step);
         }
 
 
-        public static void exec_initfromdata(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_initfromdata(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue initdata = step.arg2.getValue(scope);
+            RunTimeValueBase initdata = step.arg2.getValue(scope);
             int classrttype = ((rtInt)step.arg1.getValue(scope)).value;
             while (true)
             {
@@ -199,9 +199,9 @@ namespace ASRuntime.operators
 
             var step = sender.step;
             StackFrame frame = (StackFrame)sender.args;
-            IRunTimeScope scope = sender.scope;
+            RunTimeScope scope = sender.scope;
 
-            IRunTimeValue initdata = step.arg2.getValue(scope);
+            RunTimeValueBase initdata = step.arg2.getValue(scope);
 
             if (initdata.rtType == RunTimeDataType.rt_array)
             {
@@ -219,14 +219,14 @@ namespace ASRuntime.operators
 
         }
 
-        public static void exec_pushVector(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_pushVector(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
             _pushVector(o, player, frame, step, scope);
         }
 
-        public static void _pushVector(ASBinCode.rtti.Vector_Data o, Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void _pushVector(ASBinCode.rtti.Vector_Data o, Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var arr = step.arg2.getValue(scope);
             if (arr.rtType == RunTimeDataType.rt_null)
@@ -257,13 +257,13 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_pusharray(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_pusharray(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
             _pusharray(o, player, frame, step, scope);
         }
 
-        public static void _pusharray( ASBinCode.rtti.Vector_Data o ,Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void _pusharray( ASBinCode.rtti.Vector_Data o ,Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
             var arr = step.arg2.getValue(scope);
@@ -301,8 +301,8 @@ namespace ASRuntime.operators
 
 
         public static void pushAllElementToVector(ASBinCode.rtti.Vector_Data vd,
-            List<IRunTimeValue> datalist, StackFrame frame, SourceToken token, 
-            IRunTimeScope scope,
+            List<RunTimeValueBase> datalist, StackFrame frame, SourceToken token,
+            RunTimeScope scope,
             IBlockCallBack callbacker
             )
         {
@@ -332,8 +332,8 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtti.Vector_Data vd = (ASBinCode.rtti.Vector_Data)a[0];
                 var v = ((StackFrame)a[5])._tempSlot1.getValue().Clone();//必须Clone
-                var list = (List<IRunTimeValue>)a[1];
-                vd.innnerList.Add((IRunTimeValue)v); 
+                var list = (List<RunTimeValueBase>)a[1];
+                vd.innnerList.Add((RunTimeValueBase)v); 
 
                 sender._intArg = sender._intArg + 1;
 
@@ -346,7 +346,7 @@ namespace ASRuntime.operators
                 {
                     OpCast.CastValue(list[sender._intArg],
                         vd.vector_type, (StackFrame)a[5], (SourceToken)a[2],
-                        (IRunTimeScope)a[3], ((StackFrame)a[5])._tempSlot1,
+                        (RunTimeScope)a[3], ((StackFrame)a[5])._tempSlot1,
                         sender, false);
                 }
             }
@@ -356,7 +356,7 @@ namespace ASRuntime.operators
         }
 
 
-        public class vectorSLot : ISLOT
+        public sealed class vectorSLot : SLOT
         {
             public IClassFinder classfinder;
             public ASBinCode.rtti.Vector_Data vector_data;
@@ -368,7 +368,7 @@ namespace ASRuntime.operators
                 this.classfinder = classfinder;
             }
 
-            public bool isPropGetterSetter
+            public sealed override bool isPropGetterSetter
             {
                 get
                 {
@@ -376,13 +376,13 @@ namespace ASRuntime.operators
                 }
             }
 
-            public void clear()
+            public sealed override void clear()
             {
                 vector_data = null;
                 idx = 0;
             }
 
-            public bool directSet(IRunTimeValue value)
+            public sealed override bool directSet(RunTimeValueBase value)
             {
                 if (vector_data.vector_type != value.rtType
                     &&
@@ -409,48 +409,48 @@ namespace ASRuntime.operators
                     return false;
                 }
 
-                vector_data.innnerList[idx] = (IRunTimeValue)value.Clone(); //对容器的直接赋值，需要Clone
+                vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
                 return true;
                 //throw new NotImplementedException();
             }
 
-            public IRunTimeValue getValue()
+            public sealed override RunTimeValueBase getValue()
             {
                 return vector_data.innnerList[idx];
                 //throw new NotImplementedException();
             }
 
-            public void setValue(rtUndefined value)
+            public sealed override void setValue(rtUndefined value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtNull value)
+            public sealed override void setValue(rtNull value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(int value)
+            public sealed override void setValue(int value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(string value)
+            public sealed override void setValue(string value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(uint value)
+            public sealed override void setValue(uint value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(double value)
+            public sealed override void setValue(double value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtBoolean value)
+            public sealed override void setValue(rtBoolean value)
             {
                 throw new NotImplementedException();
             }

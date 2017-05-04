@@ -7,7 +7,7 @@ namespace ASRuntime.operators
     class OpMulti
     {
 
-        public static void exec_MultiNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_MultiNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
@@ -17,7 +17,7 @@ namespace ASRuntime.operators
 
         }
 
-        public static void exec_DivNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_DivNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
@@ -26,7 +26,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
 
         }
-        public static void exec_ModNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_ModNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
@@ -36,16 +36,16 @@ namespace ASRuntime.operators
 
         }
 
-        public static void execMulti(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execMulti(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
                 frame._tempSlot1, frame._tempSlot2, step, _execMulti_CallBacker);
         }
 
-        private static void _execMulti_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execMulti_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
 
@@ -57,16 +57,16 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execDiv(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDiv(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
                frame._tempSlot1, frame._tempSlot2, step, _execDiv_CallBacker);
 
         }
 
-        private static void _execDiv_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execDiv_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
 
@@ -78,16 +78,16 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execMod(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execMod(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
                frame._tempSlot1, frame._tempSlot2, step, _execMod_CallBacker);
 
         }
 
-        private static void _execMod_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execMod_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
 

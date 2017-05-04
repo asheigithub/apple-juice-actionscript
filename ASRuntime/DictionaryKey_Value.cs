@@ -8,10 +8,10 @@ namespace ASRuntime
 {
     struct DictionaryKey:DictionaryObject.IDictionaryKey,IEquatable<DictionaryKey>
     {
-        public readonly IRunTimeValue key;
-        public DictionaryKey(IRunTimeValue key)
+        public readonly RunTimeValueBase key;
+        public DictionaryKey(RunTimeValueBase key)
         {
-            key = (IRunTimeValue)key.Clone();
+            key = (RunTimeValueBase)key.Clone();
             this.key = key;
         }
 
@@ -106,7 +106,7 @@ namespace ASRuntime
             ;
         }
 
-        public override bool directSet(IRunTimeValue value)
+        public override bool directSet(RunTimeValueBase value)
         {
             base.directSet(value);
             return true;

@@ -18,7 +18,7 @@ namespace ASRuntime
             stepCount = block.opSteps.Count;
         }
 
-        public delegate void DelegeExec(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope);
+        public delegate void DelegeExec(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope);
 
         internal enum Try_catch_finally
         {
@@ -81,12 +81,12 @@ namespace ASRuntime
 
         public Player player;
 
-        public ASBinCode.IRunTimeScope scope;
+        public ASBinCode.RunTimeScope scope;
 
         /// <summary>
         /// 返回值存储槽
         /// </summary>
-        public ASBinCode.ISLOT returnSlot;
+        public ASBinCode.SLOT returnSlot;
         /// <summary>
         /// 如果非null,则退出时会回调。
         /// </summary>
@@ -558,7 +558,7 @@ namespace ASRuntime
 
                         bool foundcatch = false;
 
-                        IRunTimeValue errorValue = err.errorValue;
+                        RunTimeValueBase errorValue = err.errorValue;
                         //***查找匹配catch找到后给捕获异常变量赋值.**
                         for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
                         {

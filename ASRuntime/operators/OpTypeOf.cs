@@ -8,14 +8,14 @@ namespace ASRuntime.operators
 {
     class OpTypeOf
     {
-        private static IRunTimeValue OBJECT = new rtString("object");
-        private static IRunTimeValue BOOLEAN = new rtString("boolean");
-        private static IRunTimeValue NUMBER = new rtString("number");
-        private static IRunTimeValue STRING = new rtString("string");
-        private static IRunTimeValue FUNCTION = new rtString("function");
-        private static IRunTimeValue UNDEFINED = new rtString("undefined");
+        private static RunTimeValueBase OBJECT = new rtString("object");
+        private static RunTimeValueBase BOOLEAN = new rtString("boolean");
+        private static RunTimeValueBase NUMBER = new rtString("number");
+        private static RunTimeValueBase STRING = new rtString("string");
+        private static RunTimeValueBase FUNCTION = new rtString("function");
+        private static RunTimeValueBase UNDEFINED = new rtString("undefined");
 
-        public static void exec_TypeOf(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_TypeOf(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v1 = step.arg1.getValue(scope);
             if (v1.rtType > RunTimeDataType.unknown)

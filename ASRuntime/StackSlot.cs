@@ -9,11 +9,11 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    sealed class StackSlot : ISLOT
+    sealed class StackSlot : SLOT
     {
         public StackSlot(IClassFinder classfinder)
         {
-            store = new IRunTimeValue[(int)RunTimeDataType._OBJECT+1];
+            store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
 
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
@@ -40,7 +40,7 @@ namespace ASRuntime
         private rtUInt _uintValue;
 
 
-        internal IEnumerator<IRunTimeValue> cache_enumerator;
+        internal IEnumerator<RunTimeValueBase> cache_enumerator;
 
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
@@ -49,17 +49,17 @@ namespace ASRuntime
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
 
-        internal ISLOT linktarget;
-        public void linkTo(ISLOT linktarget)
+        internal SLOT linktarget;
+        public void linkTo(SLOT linktarget)
         {
             this.linktarget = linktarget;
         }
 
 
         private int index;
-        private IRunTimeValue[] store;
+        private RunTimeValueBase[] store;
 
-        public bool isPropGetterSetter
+        public sealed override  bool isPropGetterSetter
         {
             get
             {
@@ -74,7 +74,7 @@ namespace ASRuntime
             }
         }
 
-        public bool directSet(IRunTimeValue value)
+        public sealed override bool directSet(RunTimeValueBase value)
         {
             if (linktarget != null)
             {
@@ -177,7 +177,7 @@ namespace ASRuntime
             
         }
 
-        public IRunTimeValue getValue()
+        public sealed override RunTimeValueBase getValue()
         {
             if (linktarget != null)
             {
@@ -190,7 +190,7 @@ namespace ASRuntime
             //throw new NotImplementedException();
         }
 
-        public void setValue(string value)
+        public sealed override void setValue(string value)
         {
             if (linktarget != null)
             {
@@ -217,7 +217,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(rtUndefined value)
+        public sealed override void setValue(rtUndefined value)
         {
             if (linktarget != null)
             {
@@ -230,7 +230,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(rtNull value)
+        public sealed override void setValue(rtNull value)
         {
             if (linktarget != null)
             {
@@ -243,7 +243,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(uint value)
+        public sealed override void setValue(uint value)
         {
             if (linktarget != null)
             {
@@ -257,7 +257,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(int value)
+        public sealed override void setValue(int value)
         {
             if (linktarget != null)
             {
@@ -271,7 +271,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(double value)
+        public sealed override void setValue(double value)
         {
             if (linktarget != null)
             {
@@ -285,7 +285,7 @@ namespace ASRuntime
             }
         }
 
-        public void setValue(rtBoolean value)
+        public sealed override void setValue(rtBoolean value)
         {
             if (linktarget != null)
             {
@@ -298,7 +298,7 @@ namespace ASRuntime
             }
         }
 
-        public void clear()
+        public sealed override void clear()
         {
             linktarget = null;
             propGetSet = null;

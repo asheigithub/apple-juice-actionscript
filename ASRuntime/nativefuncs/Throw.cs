@@ -9,7 +9,7 @@ namespace ASRuntime.nativefuncs
     /// </summary>
     class Throw
     {
-        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (step.arg1 == null)
             {

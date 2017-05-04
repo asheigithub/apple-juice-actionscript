@@ -15,32 +15,32 @@ namespace ASBinCode
     /// <summary>
     /// 定义运行时的内存数据
     /// </summary>
-    public interface IRunTimeScope
-    {
-        IRunTimeScope parent { get; }
+    //public interface IRunTimeScope
+    //{
+    //    IRunTimeScope parent { get; }
 
-        RunTimeScopeType scopeType { get; }
+    //    RunTimeScopeType scopeType { get; }
         
-        //Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtData.rtObject, ISLOT>> dictMethods { get; }
+    //    //Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtData.rtObject, ISLOT>> dictMethods { get; }
 
-        Dictionary<int, rtData.rtObject> static_objects { get; }
+    //    Dictionary<int, rtData.rtObject> static_objects { get; }
 
-        IRunTimeValue this_pointer { get; }
+    //    IRunTimeValue this_pointer { get; }
 
-        ISLOT[] memberData { get; }
+    //    ISLOT[] memberData { get; }
 
-        /// <summary>
-        /// 程序执行栈
-        /// </summary>
-        ISLOT[] stack { get; }
-        /// <summary>
-        /// 程序执行栈偏移量
-        /// </summary>
-        int offset { get; }
+    //    /// <summary>
+    //    /// 程序执行栈
+    //    /// </summary>
+    //    ISLOT[] stack { get; }
+    //    /// <summary>
+    //    /// 程序执行栈偏移量
+    //    /// </summary>
+    //    int offset { get; }
 
-        /// <summary>
-        /// 所属代码块的id
-        /// </summary>
-        int blockId { get; }
-    }
+    //    /// <summary>
+    //    /// 所属代码块的id
+    //    /// </summary>
+    //    int blockId { get; }
+    //}
 }

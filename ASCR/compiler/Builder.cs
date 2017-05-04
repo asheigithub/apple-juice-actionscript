@@ -616,7 +616,7 @@ namespace ASCompiler.compiler
                     
 
                     var expr = _buildingmembers[m];
-                    IRunTimeValue defaultvalue = null;
+                    RunTimeValueBase defaultvalue = null;
                     if (expr is ASTool.AS3.AS3Const)
                     {
                         ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
@@ -738,7 +738,7 @@ namespace ASCompiler.compiler
                     }
 
                     var expr = _buildingmembers[m];
-                    IRunTimeValue defaultvalue = null;
+                    RunTimeValueBase defaultvalue = null;
                     if (expr is ASTool.AS3.AS3Const)
                     {
                         ASTool.AS3.AS3Const as3const = (ASTool.AS3.AS3Const)expr;
@@ -2181,7 +2181,7 @@ namespace ASCompiler.compiler
                 testexpr.Value = expression.Value;
             }
 
-            IRunTimeValue value = ExpressionEval.Eval(testexpr);
+            RunTimeValueBase value = ExpressionEval.Eval(testexpr);
 
             if (value != null && testexpr.Value.IsReg)
             {

@@ -50,7 +50,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             ((rtObject)argements[0].getValue()).value.memberData[0].directSet(argements[1].getValue());
             ((rtFunction)argements[1].getValue()).objHandle.bindFunctionObj = ((rtObject)argements[0].getValue());
@@ -105,7 +105,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -164,7 +164,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -234,15 +234,15 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             throw new NotImplementedException();
         }
 
-        public override void executeAsync(IRunTimeValue thisObj, ISLOT[] argements, ISLOT resultSlot, 
+        public override void executeAsync(RunTimeValueBase thisObj, SLOT[] argements, SLOT resultSlot, 
             object callbacker, 
             object stackframe, 
-            SourceToken token, IRunTimeScope scope)
+            SourceToken token, RunTimeScope scope)
         {
             //base.executeAsync(thisObj, argements, resultSlot, callbacker, stackframe, token, scope);
 
@@ -306,10 +306,10 @@ namespace ASRuntime.nativefuncs
 
         private Stack<FunctionCaller> stackCallers = new Stack<FunctionCaller>();
 
-        private  void _primitive_toObj(ASBinCode.IRunTimeValue v1, 
-            ASBinCode.IRunTimeValue v_temp, 
+        private  void _primitive_toObj(ASBinCode.RunTimeValueBase v1, 
+            ASBinCode.RunTimeValueBase v_temp, 
             StackFrame frame, ASBinCode.OpStep step, 
-            ASBinCode.IRunTimeScope scope)
+            ASBinCode.RunTimeScope scope)
         {
             var c = stackCallers.Pop();
             if (v1.rtType < RunTimeDataType.unknown)
@@ -384,15 +384,15 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             throw new NotImplementedException();
         }
 
-        public override void executeAsync(IRunTimeValue thisObj, ISLOT[] argements, ISLOT resultSlot,
+        public override void executeAsync(RunTimeValueBase thisObj, SLOT[] argements, SLOT resultSlot,
             object callbacker,
             object stackframe,
-            SourceToken token, IRunTimeScope scope)
+            SourceToken token, RunTimeScope scope)
         {
             //base.executeAsync(thisObj, argements, resultSlot, callbacker, stackframe, token, scope);
 
@@ -456,10 +456,10 @@ namespace ASRuntime.nativefuncs
 
         private Stack<FunctionCaller> stackCallers = new Stack<FunctionCaller>();
 
-        private void _primitive_toObj(ASBinCode.IRunTimeValue v1,
-            ASBinCode.IRunTimeValue v_temp,
+        private void _primitive_toObj(ASBinCode.RunTimeValueBase v1,
+            ASBinCode.RunTimeValueBase v_temp,
             StackFrame frame, ASBinCode.OpStep step,
-            ASBinCode.IRunTimeScope scope)
+            ASBinCode.RunTimeScope scope)
         {
             var c = stackCallers.Pop();
             if (v1.rtType < RunTimeDataType.unknown)

@@ -8,7 +8,7 @@ namespace ASRuntime.operators
     {
         internal static readonly ASBinCode.rtData.rtString nullStr = new ASBinCode.rtData.rtString(null);
 
-        public static void execAdd_Number(Player player, ASBinCode.OpStep step,StackFrame frame ,ASBinCode.IRunTimeScope scope)
+        public static void execAdd_Number(Player player, ASBinCode.OpStep step,StackFrame frame ,ASBinCode.RunTimeScope scope)
         {
             double a1 = TypeConverter.ConvertToNumber( step.arg1.getValue(scope),null,null);
             double a2 = TypeConverter.ConvertToNumber( step.arg2.getValue(scope),null,null);
@@ -17,7 +17,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execAdd_String(Player player, ASBinCode.OpStep step,StackFrame frame, ASBinCode.IRunTimeScope scope)
+        public static void execAdd_String(Player player, ASBinCode.OpStep step,StackFrame frame, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.rtData.rtString a1;
             if (step.arg1.getValue(scope).rtType == ASBinCode.RunTimeDataType.rt_null)
@@ -45,10 +45,10 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.IRunTimeScope scope)
+        public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue( scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue( scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue( scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue( scope);
 
             if (
                 (v1.rtType > ASBinCode.RunTimeDataType.unknown && v2.rtType > ASBinCode.RunTimeDataType.unknown)
@@ -78,8 +78,8 @@ namespace ASRuntime.operators
         }
 
         private static void _execAdd_CallBacker( 
-            ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2 ,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+            ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeValueBase v2 ,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.RunTimeDataType v1type = v1.rtType;
             ASBinCode.RunTimeDataType v2type = v2.rtType;
@@ -114,8 +114,8 @@ namespace ASRuntime.operators
             }
         }
         private static void _execAdd_InvokeToString_CallBacker(
-            ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+            ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.RunTimeDataType v1type = v1.rtType;
             ASBinCode.RunTimeDataType v2type = v2.rtType;

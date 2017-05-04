@@ -4,23 +4,17 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public class rtInt : IRunTimeValue
+    public sealed class rtInt : RunTimeValueBase
     {
         public int value;
-        public rtInt(int v)
+        public rtInt(int v):base(RunTimeDataType.rt_int)
         {
             value = v;
         }
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                return RunTimeDataType.rt_int;
-            }
-        }
+        
 
-        public object Clone()
+        public sealed override  object Clone()
         {
             return new rtInt(value);
         }

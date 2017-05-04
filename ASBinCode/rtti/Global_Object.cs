@@ -6,7 +6,7 @@ namespace ASBinCode.rtti
 {
     public class Global_Object:DynamicObject 
     {
-        public static Global_Object formCodeBlock(CodeBlock codeblock,ISLOT[] data,Class _class  )
+        public static Global_Object formCodeBlock(CodeBlock codeblock,SLOT[] data,Class _class  )
         {
             //throw new NotImplementedException();
 

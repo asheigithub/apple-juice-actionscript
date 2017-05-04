@@ -48,7 +48,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -154,7 +154,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             ((rtObject)argements[0].getValue()).value.memberData[0].directSet(argements[1].getValue());
             ((rtArray)argements[1].getValue()).objHandle.bindArrayObject = ((rtObject)argements[0].getValue());
@@ -210,7 +210,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -268,7 +268,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -326,7 +326,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -396,7 +396,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -475,13 +475,13 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             throw new InvalidOperationException();
         }
 
-        public override void executeAsync(IRunTimeValue thisObj, ISLOT[] argements,
-            ISLOT resultSlot, object callbacker, object stackframe, SourceToken token, IRunTimeScope scope)
+        public override void executeAsync(RunTimeValueBase thisObj, SLOT[] argements,
+            SLOT resultSlot, object callbacker, object stackframe, SourceToken token, RunTimeScope scope)
         {
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
@@ -524,7 +524,7 @@ namespace ASRuntime.nativefuncs
         {
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
-            IRunTimeValue aSep = (IRunTimeValue)receiveArgs[5];
+            RunTimeValueBase aSep = (RunTimeValueBase)receiveArgs[5];
             if (aSep.rtType != RunTimeDataType.rt_null)
             {
                 string sep = TypeConverter.ConvertToString( frame._tempSlot1.getValue(),frame,(SourceToken)receiveArgs[3]);
@@ -545,7 +545,7 @@ namespace ASRuntime.nativefuncs
             operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
                 frame,
                 (SourceToken)receiveArgs[3],
-                (IRunTimeScope)receiveArgs[4],
+                (RunTimeScope)receiveArgs[4],
                 frame._tempSlot1,
                 valueCB, false
                 );
@@ -606,7 +606,7 @@ namespace ASRuntime.nativefuncs
                         operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
                             frame,
                             (SourceToken)receiveArgs[3],
-                            (IRunTimeScope)receiveArgs[4],
+                            (RunTimeScope)receiveArgs[4],
                             frame._tempSlot1,
                             valueCB, false
                             );
@@ -615,7 +615,7 @@ namespace ASRuntime.nativefuncs
                 }
                 else
                 {
-                    ISLOT result = (ISLOT)receiveArgs[7];
+                    SLOT result = (SLOT)receiveArgs[7];
 
                     result.directSet(new rtString(sb.ToString()));
 
@@ -672,7 +672,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -736,7 +736,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -798,7 +798,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -864,7 +864,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -918,7 +918,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -983,7 +983,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1074,7 +1074,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1084,7 +1084,7 @@ namespace ASRuntime.nativefuncs
             int startindex = ((rtInt)argements[0].getValue()).value;
             uint deleteCount = ((rtUInt)argements[1].getValue()).value;
 
-            List<IRunTimeValue> insert = null;
+            List<RunTimeValueBase> insert = null;
             if (argements[2].getValue().rtType == RunTimeDataType.rt_array)
             {
                 insert = ((rtArray)argements[2].getValue()).innerArray;
@@ -1173,7 +1173,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1236,7 +1236,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -1303,7 +1303,7 @@ namespace ASRuntime.nativefuncs
 
         
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;

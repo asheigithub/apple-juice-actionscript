@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="ClassMemberFinder.cs" />
     <Compile Include="ClassMethodGetter.cs" />
+    <Compile Include="HeapSlot.cs" />
     <Compile Include="ILinkSlot.cs" />
     <Compile Include="InterfaceMethodGetter.cs" />
     <Compile Include="MethodGetterBase.cs" />
@@ -47,7 +48,7 @@
     <Compile Include="CSWC.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="IClassFinder.cs" />
-    <Compile Include="ISLOT.cs" />
+    <Compile Include="SLOT.cs" />
     <Compile Include="IMember.cs" />
     <Compile Include="IRunTimeScope.cs" />
     <Compile Include="IScope.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="PackagePathGetter.cs" />
     <Compile Include="Register.cs" />
     <Compile Include="ILRValue.cs" />
-    <Compile Include="IRunTimeValue.cs" />
+    <Compile Include="RunTimeValueBase.cs" />
     <Compile Include="OpCode.cs" />
     <Compile Include="OpStep.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="rtti\HostedObject.cs" />
     <Compile Include="rtti\Vector_Data.cs" />
     <Compile Include="RunTimeDataType.cs" />
+    <Compile Include="RunTimeScope.cs" />
     <Compile Include="scopes\FunctionScope.cs" />
     <Compile Include="scopes\ObjectInstanceScope.cs" />
     <Compile Include="scopes\OutPackageMemberScope.cs" />

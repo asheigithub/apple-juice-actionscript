@@ -100,13 +100,13 @@ namespace ASBinCode
         }
 
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             //throw new NotImplementedException();
             return getISlot(scope).getValue();
         }
 
-        public abstract ISLOT getISlot(IRunTimeScope scope);
+        public abstract SLOT getISlot(RunTimeScope scope);
         //{
         //    while( refblockid != scope.blockId )
         //    {

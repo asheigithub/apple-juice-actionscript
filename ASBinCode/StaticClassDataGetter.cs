@@ -20,7 +20,7 @@ namespace ASBinCode
             }
         }
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             return scope.static_objects[_class.classid];
 

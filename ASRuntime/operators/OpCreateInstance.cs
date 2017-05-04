@@ -12,7 +12,7 @@ namespace ASRuntime.operators
     /// </summary>
     class OpCreateInstance
     {
-        private static ASBinCode.rtti.Class getClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static ASBinCode.rtti.Class getClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var rv = step.arg1.getValue(frame.scope);
 
@@ -43,7 +43,7 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void prepareConstructorClassArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void prepareConstructorClassArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var rv = step.arg1.getValue(scope);
 
@@ -113,11 +113,11 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
-        private static void _func_ToObj(ASBinCode.IRunTimeValue v1,
-            ASBinCode.IRunTimeValue v2,
+        private static void _func_ToObj(ASBinCode.RunTimeValueBase v1,
+            ASBinCode.RunTimeValueBase v2,
             StackFrame frame,
             ASBinCode.OpStep step,
-            ASBinCode.IRunTimeScope scope)
+            ASBinCode.RunTimeScope scope)
         {
             var _class = frame.player.swc.classes[0];
             frame.instanceCreator = new InstanceCreator(frame.player, frame, step, step.token, _class);
@@ -128,7 +128,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void push_parameter_class(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void push_parameter_class(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (frame.instanceCreator.constructorCaller == null)
             {
@@ -141,7 +141,7 @@ namespace ASRuntime.operators
             else
             {
                 int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
-                IRunTimeValue arg = step.arg1.getValue(frame.scope);
+                RunTimeValueBase arg = step.arg1.getValue(frame.scope);
 
                 frame.instanceCreator.push_parameter(arg, id);
                 
@@ -149,7 +149,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void prepareConstructorArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void prepareConstructorArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var rv = step.arg1.getValue(frame.scope);
             int classid = ((ASBinCode.rtData.rtInt)rv).value;
@@ -269,7 +269,7 @@ namespace ASRuntime.operators
         //    }
         //}
 
-        public static void init_static(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void init_static(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
             ASBinCode.rtti.Class as3class = player.swc.classes[classid];
@@ -303,7 +303,7 @@ namespace ASRuntime.operators
         //}
 
 
-        public static void exec(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
             //ASBinCode.rtti.Class as3class = player.swc.classes[classid];
@@ -325,7 +325,7 @@ namespace ASRuntime.operators
             frame.instanceCreator.createInstance();
         }
 
-        public static void exec_instanceClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_instanceClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;

@@ -14,9 +14,9 @@ namespace ASRuntime.operators
 
         public int pushedArgs;
 
-        public ISLOT returnSlot;
+        public SLOT returnSlot;
 
-        public ISLOT _tempSlot;
+        public SLOT _tempSlot;
 
         public IBlockCallBack callbacker;
 
@@ -96,7 +96,7 @@ namespace ASRuntime.operators
             
         }
 
-        public void pushParameter(IRunTimeValue argement,int id)
+        public void pushParameter(RunTimeValueBase argement,int id)
         {
             if (toCallFunc.signature.parameters.Count > 0)
             {
@@ -130,7 +130,7 @@ namespace ASRuntime.operators
                     }
 
                     ASBinCode.rtData.rtArray arr = (ASBinCode.rtData.rtArray)slot.getValue();
-                    arr.innerArray.Add((IRunTimeValue)argement.Clone());    //可能从StackSlot中读的数据，因此必须Clone后再传入.
+                    arr.innerArray.Add((RunTimeValueBase)argement.Clone());    //可能从StackSlot中读的数据，因此必须Clone后再传入.
 
                 }
             }
@@ -143,7 +143,7 @@ namespace ASRuntime.operators
         {
             while (check_para_id < pushedArgs)
             {
-                IRunTimeValue argement = CallFuncHeap[check_para_id].getValue();
+                RunTimeValueBase argement = CallFuncHeap[check_para_id].getValue();
                 if (argement.rtType != toCallFunc.signature.parameters[check_para_id].type)
                 {
                     
@@ -179,7 +179,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                invokerFrame.throwCastException(token, ((IRunTimeValue)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
+                invokerFrame.throwCastException(token, ((RunTimeValueBase)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
                 return;
             }
         }

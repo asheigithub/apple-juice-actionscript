@@ -11,11 +11,11 @@ namespace ASBinCode.rtti
     {
         public interface IDictionaryKey { }
         
-        private Dictionary<IDictionaryKey, ISLOT> innerDictionary;
+        private Dictionary<IDictionaryKey, SLOT> innerDictionary;
 
         public DictionaryObject(Class _class):base(_class)
         {
-            innerDictionary = new Dictionary<IDictionaryKey, ISLOT>();
+            innerDictionary = new Dictionary<IDictionaryKey, SLOT>();
         }
 
         public bool isContainsKey(IDictionaryKey value)
@@ -46,7 +46,7 @@ namespace ASBinCode.rtti
         {
             if (!isContainsKey(key))
             {
-                innerDictionary.Add(key, value);
+                innerDictionary.Add(key, (SLOT)value);
                 if (rootSlot == null)
                 {
                     rootSlot = value;
@@ -68,7 +68,7 @@ namespace ASBinCode.rtti
             
             if (innerDictionary.ContainsKey(key))
             {
-                ISLOT slot = innerDictionary[key];
+                SLOT slot = innerDictionary[key];
                 innerDictionary.Remove(key);
 
                 ILinkSlot ls = slot as ILinkSlot;
@@ -98,7 +98,7 @@ namespace ASBinCode.rtti
             }
         }
 
-        public ISLOT getValue(IDictionaryKey key)
+        public SLOT getValue(IDictionaryKey key)
         {
             return innerDictionary[key];
         }

@@ -7,7 +7,7 @@ namespace ASRuntime.operators
 {
     class OpLinkOutPackageScope
     {
-        public static void exec_link(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_link(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot l = (StackSlot)step.reg.getISlot(scope);
 
@@ -17,7 +17,7 @@ namespace ASRuntime.operators
 
             var outscope = player.outpackage_runtimescope[classid];
 
-            ISLOT outpackagescopeslot= ((VariableBase)step.arg1).getISlot(outscope);
+            SLOT outpackagescopeslot= ((VariableBase)step.arg1).getISlot(outscope);
 
             l.linkTo(outpackagescopeslot);
 

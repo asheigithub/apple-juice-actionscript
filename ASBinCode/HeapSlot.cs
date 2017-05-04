@@ -4,12 +4,12 @@ using System.Text;
 using ASBinCode;
 using ASBinCode.rtData;
 
-namespace ASRuntime
+namespace ASBinCode
 {
     /// <summary>
     /// 堆区的存储结构
     /// </summary>
-    class HeapSlot : ASBinCode.ISLOT
+    public class HeapSlot : ASBinCode.SLOT
     {
         
         public HeapSlot()
@@ -18,10 +18,10 @@ namespace ASRuntime
             value = null;
         }
 
-        private IRunTimeValue value;
+        private RunTimeValueBase value;
         private RunTimeDataType rtType;
 
-        public bool isPropGetterSetter
+        public sealed override bool isPropGetterSetter
         {
             get
             {
@@ -29,14 +29,14 @@ namespace ASRuntime
             }
         }
 
-        public void setDefaultType(RunTimeDataType type)
+        public void setDefaultType(RunTimeDataType type,RunTimeValueBase v)
         {
             rtType = type;
-            value = TypeConverter.getDefaultValue(rtType).getValue(null);
+            value = v; //TypeConverter.getDefaultValue(rtType).getValue(null);
         }
 
 
-        public virtual bool directSet(IRunTimeValue value)
+        public override bool directSet(RunTimeValueBase value)
         {
             //value只会在内部new出来，因此，如果value不为null,也肯定是自己new出来的
             rtType = value.rtType;
@@ -44,7 +44,7 @@ namespace ASRuntime
             if (this.value == null || this.value.rtType != rtType)
             {
                 //new 一个
-                this.value = (IRunTimeValue)value.Clone();
+                this.value = (RunTimeValueBase)value.Clone();
             }
             else
             {
@@ -103,48 +103,48 @@ namespace ASRuntime
             return true;
         }
 
-        public IRunTimeValue getValue()
+        public sealed override RunTimeValueBase getValue()
         {
             return value;
         }
 
-        public void setValue(string value)
+        public sealed override void setValue(string value)
         {
             throw new NotImplementedException();
         }
 
-        public void setValue(rtUndefined value)
+        public sealed override void setValue(rtUndefined value)
         {
             throw new NotImplementedException();
         }
 
-        public void setValue(rtNull value)
+        public sealed override void setValue(rtNull value)
         {
             throw new NotImplementedException();
         }
 
-        public void setValue(uint value)
+        public sealed override void setValue(uint value)
         {
             throw new NotImplementedException();
         }
 
-        public void setValue(int value)
+        public sealed override void setValue(int value)
         {
             throw new NotImplementedException();
             
         }
 
-        public void setValue(double value)
+        public sealed override void setValue(double value)
         {
             throw new NotImplementedException();
         }
 
-        public void setValue(rtBoolean value)
+        public sealed override void setValue(rtBoolean value)
         {
             throw new NotImplementedException();
         }
 
-        public void clear()
+        public sealed override void clear()
         {
             throw new NotImplementedException();
         }

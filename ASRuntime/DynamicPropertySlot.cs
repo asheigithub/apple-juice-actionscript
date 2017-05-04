@@ -12,7 +12,7 @@ namespace ASRuntime
     class DynamicPropertySlot : ObjectMemberSlot,ILinkSlot
     {
         internal bool _canDelete;
-        internal ASBinCode.IRunTimeValue backup;
+        internal ASBinCode.RunTimeValueBase backup;
         public DynamicPropertySlot(ASBinCode.rtData.rtObject obj,bool _canDelete):base(obj)
         {
             this._canDelete = _canDelete;
@@ -53,7 +53,7 @@ namespace ASRuntime
             set;
         }
 
-        public override bool directSet(IRunTimeValue value)
+        public override bool directSet(RunTimeValueBase value)
         {
             base.directSet(value);
             if (!_canDelete && backup ==null)

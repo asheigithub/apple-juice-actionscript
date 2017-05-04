@@ -76,7 +76,7 @@ namespace ASBinCode
             }
         }
 
-        public ISLOT getISlot(IRunTimeScope scope)
+        public SLOT getISlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
 
@@ -99,7 +99,7 @@ namespace ASBinCode
 
         //private MethodSlot _tempSlot;
 
-        public abstract IRunTimeValue getValue(IRunTimeScope scope);
+        public abstract RunTimeValueBase getValue(RunTimeScope scope);
 
 
         /// <summary>
@@ -107,20 +107,20 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public abstract IRunTimeValue getConstructor(IRunTimeScope scope);
+        public abstract RunTimeValueBase getConstructor(RunTimeScope scope);
 
 
-        public abstract IRunTimeValue getMethod(IRunTimeScope scope);
+        public abstract RunTimeValueBase getMethod(RunTimeScope scope);
 
 
-        public abstract IRunTimeValue getSuperMethod(IRunTimeScope scope, ASBinCode.rtti.Class superClass);
+        public abstract RunTimeValueBase getSuperMethod(RunTimeScope scope, ASBinCode.rtti.Class superClass);
 
 
 
-        public abstract ISLOT getVirtualSlot(IRunTimeScope scope);
+        public abstract SLOT getVirtualSlot(RunTimeScope scope);
 
 
-        public abstract ISLOT getSuperSlot(IRunTimeScope scope, ASBinCode.rtti.Class superClass);
+        public abstract SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass);
         
 
 
@@ -161,7 +161,7 @@ namespace ASBinCode
 
         //}
 
-        public class MethodSlot : ISLOT
+        public sealed class MethodSlot : SLOT
         {
             private rtFunction method;
 
@@ -171,7 +171,7 @@ namespace ASBinCode
                 this.method = method;
             }
 
-            public bool isPropGetterSetter
+            public sealed override bool isPropGetterSetter
             {
                 get
                 {
@@ -179,52 +179,52 @@ namespace ASBinCode
                 }
             }
 
-            public void clear()
+            public sealed override void clear()
             {
 
             }
 
-            public bool directSet(IRunTimeValue value)
+            public sealed override bool directSet(RunTimeValueBase value)
             {
                 return false;
             }
 
-            public IRunTimeValue getValue()
+            public sealed override RunTimeValueBase getValue()
             {
                 return method;
             }
 
-            public void setValue(rtNull value)
+            public sealed override void setValue(rtNull value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtUndefined value)
+            public sealed override void setValue(rtUndefined value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(string value)
+            public sealed override void setValue(string value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(int value)
+            public sealed override void setValue(int value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(uint value)
+            public sealed override void setValue(uint value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(double value)
+            public sealed override void setValue(double value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtBoolean value)
+            public sealed override void setValue(rtBoolean value)
             {
                 throw new NotImplementedException();
             }

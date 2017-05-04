@@ -66,7 +66,7 @@ namespace ASCompiler.compiler.builds
                     ASTool.AS3.AS3SwitchCase c = as3switch.CaseList[i];
                     if (!c.IsDefault)
                     {
-                        IRunTimeValue v= ExpressionEval.Eval(c.Condition);
+                        RunTimeValueBase v= ExpressionEval.Eval(c.Condition);
                         if (v != null && c.Condition.Value.IsReg)
                         {
                             OpStep op = new OpStep(OpCode.assigning, new SourceToken(c.token.line, c.token.ptr, c.token.sourceFile));

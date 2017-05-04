@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public interface ILinkSlot:ISLOT
+    public interface ILinkSlot
     {
         ILinkSlot preSlot { get; set; }
 

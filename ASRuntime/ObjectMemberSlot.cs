@@ -17,7 +17,7 @@ namespace ASRuntime
         }
 
         private bool flaghasset = false;
-        public override bool directSet(IRunTimeValue value)
+        public override bool directSet(RunTimeValueBase value)
         {
             if (isConstMember)
             {

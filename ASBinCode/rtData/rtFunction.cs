@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public sealed class rtFunction : IRunTimeValue
+    public sealed class rtFunction : RunTimeValueBase
     {
         public class functionObjHandle
         {
@@ -36,16 +36,16 @@ namespace ASBinCode.rtData
         private readonly int _objid;
         private static int _seed;
 
-        private IRunTimeScope _bindScope;
+        private RunTimeScope _bindScope;
 
-        public IRunTimeScope bindScope
+        public RunTimeScope bindScope
         {
             get { return _bindScope; }
         }
 
 
-        private IRunTimeValue _this_pointer;
-        public IRunTimeValue this_pointer
+        private RunTimeValueBase _this_pointer;
+        public RunTimeValueBase this_pointer
         {
             get { return _this_pointer; }
         }
@@ -63,7 +63,7 @@ namespace ASBinCode.rtData
 
 
         private bool _ismethod;
-        public rtFunction(int id,bool ismethod)
+        public rtFunction(int id,bool ismethod):base(RunTimeDataType.rt_function)
         {
             _functionid = id;_bindScope = null;
             this._ismethod = ismethod;
@@ -73,13 +73,7 @@ namespace ASBinCode.rtData
         }
 
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                return RunTimeDataType.rt_function;
-            }
-        }
+       
 
         public bool ismethod
         {
@@ -89,12 +83,12 @@ namespace ASBinCode.rtData
             }
         }
 
-        public void bind(IRunTimeScope scope)
+        public void bind(RunTimeScope scope)
         {
             _bindScope = scope;
         }
 
-        public void setThis(IRunTimeValue obj)
+        public void setThis(RunTimeValueBase obj)
         {
             _this_pointer = obj;
         }
@@ -105,7 +99,7 @@ namespace ASBinCode.rtData
             return "function " + _functionid;
         }
 
-        public object Clone()
+        public sealed override  object Clone()
         {
             rtFunction result= new rtFunction(_functionid,_ismethod);
             result.CopyFrom(this);

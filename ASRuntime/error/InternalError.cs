@@ -16,7 +16,7 @@ namespace ASRuntime.error
         public int errorCode;
 
 
-        public ASBinCode.IRunTimeValue errorValue;
+        public ASBinCode.RunTimeValueBase errorValue;
 
         internal Stack<StackFrame> callStack;
 
@@ -35,14 +35,14 @@ namespace ASRuntime.error
         }
 
 
-        public InternalError(ASBinCode.SourceToken token, string message ,ASBinCode.IRunTimeValue errorValue )
+        public InternalError(ASBinCode.SourceToken token, string message ,ASBinCode.RunTimeValueBase errorValue )
         {
             this.token = token;
             this.message = message;
             this.errorValue = errorValue;
         }
 
-        public InternalError(ASBinCode.SourceToken token, ASBinCode.IRunTimeValue errorValue)
+        public InternalError(ASBinCode.SourceToken token, ASBinCode.RunTimeValueBase errorValue)
         {
             this.token = token;
             this.errorValue = errorValue;

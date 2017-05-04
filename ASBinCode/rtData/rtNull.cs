@@ -4,21 +4,15 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public class rtNull : IRunTimeValue
+    public class rtNull : RunTimeValueBase
     {
         public static rtNull nullptr = new rtNull();
 
-        private rtNull() { }
+        private rtNull():base(RunTimeDataType.rt_null) { }
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                return RunTimeDataType.rt_null;
-            }
-        }
+        
 
-        public object Clone()
+        public sealed override  object Clone()
         {
             return nullptr;
         }

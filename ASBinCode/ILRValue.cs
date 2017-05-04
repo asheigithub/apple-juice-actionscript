@@ -10,7 +10,7 @@ namespace ASBinCode
     /// <typeparam name="T"></typeparam>
     public interface IRightValue
     {
-        IRunTimeValue getValue(IRunTimeScope scope);
+        RunTimeValueBase getValue(RunTimeScope scope);
 
         RunTimeDataType valueType { get; }
 
@@ -27,20 +27,11 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        ISLOT getISlot(IRunTimeScope scope);
+        SLOT getISlot(RunTimeScope scope);
 
     }
 
 
-    public interface IValueSetter
-    {
-        void setValue(rtData.rtBoolean value);
-        void setValue(double value);
-        void setValue(int value);
-        void setValue(uint value);
-        void setValue(string value);
-        void setValue(rtData.rtNull value);
-        void setValue(rtData.rtUndefined value);
-    }
+    
 
 }

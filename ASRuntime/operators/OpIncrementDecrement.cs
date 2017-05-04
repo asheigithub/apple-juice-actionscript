@@ -6,7 +6,7 @@ namespace ASRuntime.operators
 {
     class OpIncrementDecrement
     {
-        public static void execIncrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
 
@@ -17,21 +17,21 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value++;
-                        ((ASBinCode.ILeftValue)step.reg).getISlot(scope).setValue(iv.value);
+                        step.reg.getISlot(scope).setValue(iv.value);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.rt_uint:
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value++;
-                        ((ASBinCode.ILeftValue)step.reg).getISlot(scope).setValue(iv.value);
+                        step.reg.getISlot(scope).setValue(iv.value);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.rt_number:
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value++;
-                        ((ASBinCode.ILeftValue)step.reg).getISlot(scope).setValue(iv.value);
+                        step.reg.getISlot(scope).setValue(iv.value);
                     }
                     break;
                 
@@ -45,7 +45,7 @@ namespace ASRuntime.operators
                         }
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.ILeftValue)step.reg).getISlot(scope).directSet(num);
+                        step.reg.getISlot(scope).directSet(num);
                     }
                     break;
 
@@ -71,8 +71,8 @@ namespace ASRuntime.operators
             frame.endStep(step);
 
         }
-        private static void _execIncrement_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execIncrement_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
@@ -88,8 +88,8 @@ namespace ASRuntime.operators
             }
             
         }
-        private static void _execIncrement_ToString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-           StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execIncrement_ToString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+           StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
            )
         {
             double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
@@ -100,7 +100,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -111,7 +111,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execIncUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -122,7 +122,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -138,7 +138,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execDecrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
 
@@ -204,8 +204,8 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static void _execDecrement_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execDecrement_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
@@ -220,8 +220,8 @@ namespace ASRuntime.operators
                 frame.endStep(step);
             }
         }
-        private static void _execDecrement_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execDecrement_toString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
@@ -232,7 +232,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -243,7 +243,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -254,7 +254,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = step.arg1.getValue(scope);
             {
@@ -268,7 +268,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execSuffixInc(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixInc(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -345,8 +345,8 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static void _execSuffixInc_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execSuffixInc_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
             {
@@ -366,8 +366,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _execSuffixInc_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execSuffixInc_toString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
 
@@ -378,7 +378,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -393,7 +393,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixIncUint(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncUint(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -408,7 +408,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -425,7 +425,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void execSuffixDec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -502,8 +502,8 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static void _execSuffixDec_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execSuffixDec_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
             {
@@ -523,8 +523,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _execSuffixDec_toString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _execSuffixDec_toString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
 
@@ -535,7 +535,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -549,7 +549,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);
@@ -563,7 +563,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSuffixDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSuffixDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             var v = step.arg1.getValue(scope);

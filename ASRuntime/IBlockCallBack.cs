@@ -17,7 +17,7 @@ namespace ASRuntime
         public bool isSuccess;
 
         public int _intArg;
-        public ASBinCode.IRunTimeScope scope;
+        public ASBinCode.RunTimeScope scope;
         public ASBinCode.OpStep step;
         private dgeCallbacker callbacker;
 

@@ -37,7 +37,7 @@ namespace ASRuntime
 
         #region 类型转换
 
-        internal static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.IRunTimeValue src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        internal static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -108,7 +108,7 @@ namespace ASRuntime
         }
 
 
-        internal static int ConvertToInt(ASBinCode.IRunTimeValue src,StackFrame frame, ASBinCode.SourceToken token , bool isthrow=false)
+        internal static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token , bool isthrow=false)
         {
             switch (src.rtType)
             {
@@ -180,7 +180,7 @@ namespace ASRuntime
             }
         }
 
-        internal static uint ConvertToUInt(ASBinCode.IRunTimeValue src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        internal static uint ConvertToUInt(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -252,7 +252,7 @@ namespace ASRuntime
         }
 
 
-        internal static double ConvertToNumber(ASBinCode.IRunTimeValue src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        internal static double ConvertToNumber(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -307,7 +307,7 @@ namespace ASRuntime
         }
 
 
-        internal static string ConvertToString(ASBinCode.IRunTimeValue src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        internal static string ConvertToString(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -376,7 +376,7 @@ namespace ASRuntime
         /// <param name="src"></param>
         /// <param name="dst"></param>
         /// <returns></returns>
-        public static bool testTypeMatch(ASBinCode.IRunTimeValue src,ASBinCode.RunTimeDataType dsttype,ASBinCode.IClassFinder classfinder)
+        public static bool testTypeMatch(ASBinCode.RunTimeValueBase src,ASBinCode.RunTimeDataType dsttype,ASBinCode.IClassFinder classfinder)
         {
             if (src.rtType >rt.unknown && dsttype >rt.unknown)
             {
@@ -703,7 +703,7 @@ namespace ASRuntime
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal static ASBinCode.IRunTimeValue ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
+        internal static ASBinCode.RunTimeValueBase ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
         {
             //return ASBinCode.rtData.rtUndefined.undefined;
 

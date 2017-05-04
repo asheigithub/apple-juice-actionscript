@@ -25,32 +25,32 @@ namespace ASBinCode
             indexofMember = value;
         }
 
-        public sealed override IRunTimeValue getConstructor(IRunTimeScope scope)
+        public sealed override RunTimeValueBase getConstructor(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override IRunTimeValue getMethod(IRunTimeScope scope)
+        public sealed override RunTimeValueBase getMethod(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override IRunTimeValue getSuperMethod(IRunTimeScope scope, Class superClass)
+        public sealed override RunTimeValueBase getSuperMethod(RunTimeScope scope, Class superClass)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override ISLOT getSuperSlot(IRunTimeScope scope, Class superClass)
+        public sealed override SLOT getSuperSlot(RunTimeScope scope, Class superClass)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override IRunTimeValue getValue(IRunTimeScope scope)
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override ISLOT getVirtualSlot(IRunTimeScope scope)
+        public sealed override SLOT getVirtualSlot(RunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {

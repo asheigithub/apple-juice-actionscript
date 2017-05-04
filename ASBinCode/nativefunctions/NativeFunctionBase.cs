@@ -33,11 +33,11 @@ namespace ASBinCode
         /// </summary>
         /// <param name="thisObj"></param>
         /// <returns></returns>
-        public abstract IRunTimeValue execute(IRunTimeValue thisObj,ISLOT[] argements,object stackframe,out string errormessage,out int errorno);
+        public abstract RunTimeValueBase execute(RunTimeValueBase thisObj,SLOT[] argements,object stackframe,out string errormessage,out int errorno);
 
-        public virtual void executeAsync(IRunTimeValue thisObj,ISLOT[] argements,ISLOT resultSlot , 
+        public virtual void executeAsync(RunTimeValueBase thisObj,SLOT[] argements,SLOT resultSlot , 
             object callbacker ,object stackframe,
-            SourceToken token,IRunTimeScope scope)
+            SourceToken token, RunTimeScope scope)
         {
 
         }

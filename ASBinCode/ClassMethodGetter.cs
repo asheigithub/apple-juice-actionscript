@@ -17,7 +17,7 @@ namespace ASBinCode
 
         //private MethodSlot _tempSlot;
 
-        public sealed  override  IRunTimeValue getValue(IRunTimeScope scope)
+        public sealed  override  RunTimeValueBase getValue(RunTimeScope scope)
         {
             return getMethod(scope);
             //throw new NotImplementedException();
@@ -36,7 +36,7 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public sealed override  IRunTimeValue getConstructor(IRunTimeScope scope)
+        public sealed override  RunTimeValueBase getConstructor(RunTimeScope scope)
         {
             rtData.rtFunction method = new rtData.rtFunction(functionid, true);
             method.bind(scope);
@@ -44,7 +44,7 @@ namespace ASBinCode
             return method;
         }
 
-        public sealed override  IRunTimeValue getMethod(IRunTimeScope scope)
+        public sealed override  RunTimeValueBase getMethod(RunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -78,7 +78,7 @@ namespace ASBinCode
             //return method;
         }
 
-        public sealed override IRunTimeValue getSuperMethod(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
+        public sealed override RunTimeValueBase getSuperMethod(RunTimeScope scope, ASBinCode.rtti.Class superClass)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -100,7 +100,7 @@ namespace ASBinCode
         }
 
 
-        public sealed override ISLOT getVirtualSlot(IRunTimeScope scope)
+        public sealed override SLOT getVirtualSlot(RunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -125,7 +125,7 @@ namespace ASBinCode
             }
         }
 
-        public sealed override ISLOT getSuperSlot(IRunTimeScope scope, ASBinCode.rtti.Class superClass)
+        public sealed override SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {

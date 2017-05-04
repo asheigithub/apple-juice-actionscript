@@ -47,7 +47,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;
@@ -112,7 +112,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             throw new NotImplementedException();
         }
@@ -126,7 +126,7 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override void executeAsync(IRunTimeValue thisObj, ISLOT[] argements, ISLOT resultSlot, object callbacker, object stackframe, SourceToken token, IRunTimeScope scope)
+        public override void executeAsync(RunTimeValueBase thisObj, SLOT[] argements, SLOT resultSlot, object callbacker, object stackframe, SourceToken token, RunTimeScope scope)
         {
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
@@ -182,7 +182,7 @@ namespace ASRuntime.nativefuncs
             operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
                 frame,
                 (SourceToken)receiveArgs[3],
-                (IRunTimeScope)receiveArgs[4],
+                (RunTimeScope)receiveArgs[4],
                 frame._tempSlot1,
                 valueCB, false
                 );
@@ -233,7 +233,7 @@ namespace ASRuntime.nativefuncs
                 operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
                     frame,
                     (SourceToken)receiveArgs[3],
-                    (IRunTimeScope)receiveArgs[4],
+                    (RunTimeScope)receiveArgs[4],
                     frame._tempSlot1,
                     valueCB, false
                     );
@@ -296,7 +296,7 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override IRunTimeValue execute(IRunTimeValue thisObj, ISLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             errormessage = null;
             errorno = 0;

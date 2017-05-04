@@ -63,7 +63,7 @@ namespace ASBinCode
             throw new NotImplementedException();
         }
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
@@ -76,7 +76,7 @@ namespace ASBinCode
         //    get { return _tempSlot; }
         //}
 
-        public ISLOT getISlot(IRunTimeScope scope)
+        public SLOT getISlot(RunTimeScope scope)
         {
             //if (_tempSlot == null)
             //{
@@ -102,7 +102,7 @@ namespace ASBinCode
             return name + "{" + (getter!=null?"get;":" ") + (setter !=null?"set;":" ")+ "}";
         }
 
-        public class PropertySlot : ISLOT
+        public sealed class PropertySlot : SLOT
         {
             //public rtObject bindObj;
             //public IRunTimeScope scope;
@@ -114,7 +114,7 @@ namespace ASBinCode
                 //this.property = property;
             }
 
-            public bool isPropGetterSetter
+            public sealed override bool isPropGetterSetter
             {
                 get
                 {
@@ -122,52 +122,52 @@ namespace ASBinCode
                 }
             }
 
-            public void clear()
+            public sealed override void clear()
             {
                 throw new NotImplementedException();
             }
 
-            public bool directSet(IRunTimeValue value)
+            public sealed override bool directSet(RunTimeValueBase value)
             {
                 return false;
             }
 
-            public IRunTimeValue getValue()
+            public sealed override RunTimeValueBase getValue()
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtNull value)
+            public sealed override void setValue(rtNull value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtUndefined value)
+            public sealed override void setValue(rtUndefined value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(string value)
+            public sealed override void setValue(string value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(int value)
+            public sealed override void setValue(int value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(uint value)
+            public sealed override void setValue(uint value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(double value)
+            public sealed override void setValue(double value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtBoolean value)
+            public sealed override void setValue(rtBoolean value)
             {
                 throw new NotImplementedException();
             }

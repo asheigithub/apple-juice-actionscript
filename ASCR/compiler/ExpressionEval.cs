@@ -10,7 +10,7 @@ namespace ASCompiler.compiler
     /// </summary>
     public class ExpressionEval
     {
-        public static ASBinCode.IRunTimeValue Eval(ASTool.AS3.AS3Expression expression,
+        public static ASBinCode.RunTimeValueBase Eval(ASTool.AS3.AS3Expression expression,
             Builder importBuilder=null
             )
         {
@@ -59,7 +59,7 @@ namespace ASCompiler.compiler
 
                     player.loadCode(tempswc,tempEnv.block);
 
-                    IRunTimeValue result=  player.run2(value);
+                    RunTimeValueBase result=  player.run2(value);
 
                     return result;
                     //IRunTimeScope scope = player.run();

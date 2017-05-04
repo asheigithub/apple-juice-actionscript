@@ -79,7 +79,7 @@ namespace ASRuntime.operators
         }
 
         private static void _do_clear_thispointer(Player player, 
-            ASBinCode.rtData.rtFunction function, StackFrame frame,IRunTimeValue outscope)
+            ASBinCode.rtData.rtFunction function, StackFrame frame,RunTimeValueBase outscope)
         {
 
             if (!function.ismethod)
@@ -88,9 +88,9 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step,IRunTimeScope scope)
+        public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue rv;
+            RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
             {
                 rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
@@ -178,7 +178,7 @@ namespace ASRuntime.operators
 
         public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
-            IRunTimeValue rv;
+            RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
             {
                 rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
@@ -229,7 +229,7 @@ namespace ASRuntime.operators
         public static void push_parameter(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
             int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
-            IRunTimeValue arg = step.arg1.getValue(frame.scope);
+            RunTimeValueBase arg = step.arg1.getValue(frame.scope);
 
             if (frame.typeconvertoperator != null)
             {
@@ -251,7 +251,7 @@ namespace ASRuntime.operators
         {
 #if DEBUG
 
-            IRunTimeValue rv;
+            RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
             {
                 rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
@@ -377,7 +377,7 @@ namespace ASRuntime.operators
 
         public static void exec_return(Player player, StackFrame frame, ASBinCode.OpStep step)
         {
-            IRunTimeValue result = step.arg1.getValue(frame.scope);
+            RunTimeValueBase result = step.arg1.getValue(frame.scope);
             if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
@@ -395,7 +395,7 @@ namespace ASRuntime.operators
         public class typeConvertOperator
         {
             public Class targettype;
-            public IRunTimeValue inputvalue;
+            public RunTimeValueBase inputvalue;
         }
 
     }

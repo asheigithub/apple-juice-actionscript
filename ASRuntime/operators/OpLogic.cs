@@ -8,7 +8,7 @@ namespace ASRuntime.operators
 {
     class OpLogic
     {
-        private static bool _exec_is_instance_v1_isprimivate(ASBinCode.rtti.Class cls,ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeScope scope, ASBinCode.OpStep step)
+        private static bool _exec_is_instance_v1_isprimivate(ASBinCode.rtti.Class cls,ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeScope scope, ASBinCode.OpStep step)
         {
             ASBinCode.RunTimeDataType ot;
             if (TypeConverter.Object_CanImplicit_ToPrimitive(cls.instanceClass, out ot))
@@ -116,8 +116,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _as_is(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope,
-            IRunTimeValue iftrue,IRunTimeValue iffalse
+        private static void _as_is(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope,
+            RunTimeValueBase iftrue,RunTimeValueBase iffalse
             )
         {
             var v2 = step.arg2.getValue(scope);
@@ -178,7 +178,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_AS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_AS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             _as_is(frame, step, scope, step.arg1.getValue(scope), ASBinCode.rtData.rtNull.nullptr);
 
@@ -186,14 +186,14 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_IS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_IS(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             _as_is(frame, step, scope, ASBinCode.rtData.rtBoolean.True, ASBinCode.rtData.rtBoolean.False);
 
             frame.endStep(step);
         }
 
-        public static void exec_instanceof(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_instanceof(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v2 = step.arg2.getValue(scope);
             if (v2.rtType == ASBinCode.RunTimeDataType.rt_function)
@@ -207,8 +207,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _tofunction_callbacker(IRunTimeValue v11, IRunTimeValue v21, 
-            StackFrame frame, OpStep step, IRunTimeScope scope)
+        private static void _tofunction_callbacker(RunTimeValueBase v11, RunTimeValueBase v21, 
+            StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var v2 = v11;
 
@@ -340,7 +340,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void exec_In(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec_In(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v1 = step.arg1.getValue(scope);
 
@@ -375,8 +375,8 @@ namespace ASRuntime.operators
             
         }
 
-        private static void _check_inrange(IRunTimeValue v1,OpStep step,StackFrame frame,IRunTimeScope scope,
-            IList<IRunTimeValue> list
+        private static void _check_inrange(RunTimeValueBase v1,OpStep step,StackFrame frame, RunTimeScope scope,
+            IList<RunTimeValueBase> list
             )
         {
             if (v1.rtType > RunTimeDataType.unknown)
@@ -446,8 +446,8 @@ namespace ASRuntime.operators
         }
 
 
-        private static void _toObject_callbacker(IRunTimeValue v11, IRunTimeValue v21,
-            StackFrame frame, OpStep step, IRunTimeScope scope)
+        private static void _toObject_callbacker(RunTimeValueBase v11, RunTimeValueBase v21,
+            StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var v2 = v11;
             if (v2.rtType < RunTimeDataType.unknown)
@@ -524,7 +524,7 @@ namespace ASRuntime.operators
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
             ASBinCode.rtData.rtObject v2 = (ASBinCode.rtData.rtObject)a[1];
-            IRunTimeValue vidx = frame._tempSlot1.getValue();
+            RunTimeValueBase vidx = frame._tempSlot1.getValue();
             string name = TypeConverter.ConvertToString(vidx,null,null);
             var step = sender.step;
             var scope = sender.scope;
@@ -630,8 +630,8 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
-            IList<IRunTimeValue> v2 = (IList<IRunTimeValue>)a[1];
-            IRunTimeValue vidx = frame._tempSlot1.getValue();
+            IList<RunTimeValueBase> v2 = (IList<RunTimeValueBase>)a[1];
+            RunTimeValueBase vidx = frame._tempSlot1.getValue();
 
             OpStep step = sender.step;
             var scope = sender.scope;
@@ -661,7 +661,7 @@ namespace ASRuntime.operators
 
         }
 
-        public static void execNOT(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNOT(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v = TypeConverter.ConvertToBoolean(step.arg1.getValue(scope),frame,step.token);
 
@@ -679,7 +679,7 @@ namespace ASRuntime.operators
         
 
 
-        public static void execGT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
 
@@ -701,7 +701,7 @@ namespace ASRuntime.operators
             
         }
 
-        public static void execGE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
 
@@ -723,13 +723,13 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execGT_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGT_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GTVoid_ValueOf_CallBacker);
         }
-        private static void _GTVoid_ValueOf_CallBacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _GTVoid_ValueOf_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (
                 (
@@ -837,14 +837,14 @@ namespace ASRuntime.operators
 
 
 
-        public static void execGE_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execGE_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GEVoid_ValueOf_Callbacker);
         }
-        private static void _GEVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _GEVoid_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
             if (
@@ -938,7 +938,7 @@ namespace ASRuntime.operators
         //    frame.endStep(step);
         //}
 
-        public static void execLT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLT_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
 
@@ -960,7 +960,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execLE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
 
@@ -980,14 +980,14 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execLT_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLT_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LTVoid_ValueOf_Callbacker);
         }
 
-        private static void _LTVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _LTVoid_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (
                (
@@ -1064,14 +1064,14 @@ namespace ASRuntime.operators
         }
 
 
-        public static void execLE_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execLE_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LEVoid_ValueOf_Callbacker);
         }
-        private static void _LEVoid_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _LEVoid_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (
                 (
@@ -1146,14 +1146,14 @@ namespace ASRuntime.operators
             ((StackFrame)sender.args).endStep(sender.step);
         }
 
-        public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v1 = step.arg1.getValue(scope);
             var v2 = step.arg2.getValue(scope);
 
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _EQ_ValueOf_Callbacker);
         }
-        private static void _EQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _EQ_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //if (TypeConverter.ObjectImplicit_ToNumber(v1))
             //{
@@ -1219,14 +1219,14 @@ namespace ASRuntime.operators
             ((StackFrame)sender.args).endStep(sender.step);
         }
 
-        public static void execNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var v1 = step.arg1.getValue(scope);
             var v2 = step.arg2.getValue(scope);
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _NotEQ_ValueOf_Callbacker);
         }
 
-        private static void _NotEQ_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _NotEQ_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //***能转换基本类型的肯定已经转了
             //if (TypeConverter.ObjectImplicit_ToNumber(v1))
@@ -1292,7 +1292,7 @@ namespace ASRuntime.operators
             ((StackFrame)sender.args).endStep(sender.step);
         }
 
-        public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
             var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
@@ -1308,7 +1308,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
             var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
@@ -1324,7 +1324,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var n1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
             var n2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
@@ -1340,7 +1340,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var n1 = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg1.getValue(scope), frame, step.token);
             var n2 = ((ASBinCode.rtData.rtString)step.arg2.getValue(scope)).value; //TypeConverter.ConvertToString(step.arg2.getValue(scope), frame, step.token);
@@ -1356,7 +1356,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static bool StrictEqual(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2)
+        public static bool StrictEqual(ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeValueBase v2)
         {
             if (ReferenceEquals(v1, v2))
             {
@@ -1460,16 +1460,16 @@ namespace ASRuntime.operators
         }
 
 
-        private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static bool  _execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //strict equality 运算符仅针对数字类型（Number、int 和 uint）执行自动数据转换
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
             return StrictEqual(v1, v2);
         }
 
-        public static void execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execStrictEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (_execStrictEQ(frame, step, scope))
             {
@@ -1481,7 +1481,7 @@ namespace ASRuntime.operators
             }
             frame.endStep(step);
         }
-        public static void execStrictNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execStrictNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (!_execStrictEQ(frame, step, scope))
             {
@@ -1494,7 +1494,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static bool needInvokeToString(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,Player player)
+        private static bool needInvokeToString(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,Player player)
         {
             if ((v1.rtType < ASBinCode.RunTimeDataType.unknown && v2.rtType > ASBinCode.RunTimeDataType.unknown)
                 ||
@@ -1555,7 +1555,7 @@ namespace ASRuntime.operators
         /// <param name="v1"></param>
         /// <param name="v2"></param>
         /// <returns></returns>
-        public static bool testEquals(ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static bool testEquals(ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             
             if (ReferenceEquals(v1, v2))

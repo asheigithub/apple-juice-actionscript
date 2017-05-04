@@ -21,7 +21,7 @@ namespace ASBinCode
 
         }
 
-        public sealed override ISLOT getISlot(IRunTimeScope scope)
+        public sealed override SLOT getISlot(RunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {

@@ -10,7 +10,7 @@ namespace ASRuntime.operators
 {
     class OpForIn
     {
-        public static void forin_get_enumerator(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void forin_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
             StackSlot save = (StackSlot)step.reg.getISlot(scope);
@@ -32,7 +32,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    IEnumerator<IRunTimeValue> forinenum = getForinIEnumerator(player, rtObj.value, frame, step, scope);
+                    IEnumerator<RunTimeValueBase> forinenum = getForinIEnumerator(player, rtObj.value, frame, step, scope);
                     save.cache_enumerator = forinenum;
                 }
             }
@@ -41,7 +41,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void foreach_get_enumerator(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void foreach_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot save = (StackSlot)step.reg.getISlot(scope);
 
@@ -62,7 +62,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    IEnumerator<IRunTimeValue> forinenum = getForEach_IEnumerator(player, rtObj.value, frame, step, scope);
+                    IEnumerator<RunTimeValueBase> forinenum = getForEach_IEnumerator(player, rtObj.value, frame, step, scope);
                     save.cache_enumerator = forinenum;
                 }
             }
@@ -71,7 +71,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void enumerator_movenext(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void enumerator_movenext(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
 
@@ -86,7 +86,7 @@ namespace ASRuntime.operators
 
             frame.endStep(step);
         }
-        public static void enumerator_current(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void enumerator_current(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
 
@@ -95,7 +95,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void enumerator_close(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void enumerator_close(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
 
@@ -105,7 +105,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static IEnumerator<IRunTimeValue> getArrayForIn(IList<IRunTimeValue> arr)
+        private static IEnumerator<RunTimeValueBase> getArrayForIn(IList<RunTimeValueBase> arr)
         {
             int length = arr.Count;
             for (int i = 0; i < length; i++)
@@ -114,7 +114,7 @@ namespace ASRuntime.operators
             }
         }
 
-        private static IEnumerator<IRunTimeValue> getArrayForEach(IList<IRunTimeValue> arr)
+        private static IEnumerator<RunTimeValueBase> getArrayForEach(IList<RunTimeValueBase> arr)
         {
             int length = arr.Count;
             for (int i = 0; i < length; i++)
@@ -123,8 +123,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static IEnumerator<IRunTimeValue> getForinIEnumerator(
-            Player player,ASBinCode.rtti.Object obj ,StackFrame frame, OpStep step, IRunTimeScope scope)
+        private static IEnumerator<RunTimeValueBase> getForinIEnumerator(
+            Player player,ASBinCode.rtti.Object obj ,StackFrame frame, OpStep step, RunTimeScope scope)
         {
             if (obj is ASBinCode.rtti.DynamicObject)
             {
@@ -226,8 +226,8 @@ namespace ASRuntime.operators
         }
 
 
-        private static IEnumerator<IRunTimeValue> getForEach_IEnumerator(
-            Player player, ASBinCode.rtti.Object obj, StackFrame frame, OpStep step, IRunTimeScope scope)
+        private static IEnumerator<RunTimeValueBase> getForEach_IEnumerator(
+            Player player, ASBinCode.rtti.Object obj, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             if (obj is ASBinCode.rtti.DynamicObject)
             {

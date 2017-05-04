@@ -6,9 +6,9 @@ namespace ASRuntime.operators
 {
     class OpNeg
     {
-        public static void execNeg(StackFrame frame, ASBinCode.OpStep step,ASBinCode.IRunTimeScope scope)
+        public static void execNeg(StackFrame frame, ASBinCode.OpStep step,ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
 
             if (v.rtType != ASBinCode.RunTimeDataType.rt_number)
             {
@@ -21,8 +21,8 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _execNeg_ValueOf_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execNeg_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
@@ -38,8 +38,8 @@ namespace ASRuntime.operators
                 frame.endStep(step);
             }
         }
-        private static void _execNeg_ToString_Callbacker(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+        private static void _execNeg_ToString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             step.reg.getISlot(scope).setValue(

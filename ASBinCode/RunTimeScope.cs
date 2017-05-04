@@ -4,23 +4,23 @@ using System.Collections.Generic;
 using System.Text;
 using ASBinCode.rtti;
 
-namespace ASRuntime
+namespace ASBinCode
 {
-    sealed class RunTimeScope : IRunTimeScope
+    public sealed class RunTimeScope //: IRunTimeScope
     {
         HeapSlot[] memberDataList;
 
-        private ISLOT[] runtimestack;
+        private SLOT[] runtimestack;
         private int _offset;
         private int _blockid;
         public RunTimeScope(
             //IList<IMember> members,
             HeapSlot[] memberDataList,
-            ISLOT[] rtStack,
+            SLOT[] rtStack,
             int offset, int blockid,
-            IRunTimeScope parent,
+            RunTimeScope parent,
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
-            IRunTimeValue this_pointer,
+            RunTimeValueBase this_pointer,
             RunTimeScopeType type
             //,
             //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
@@ -40,7 +40,7 @@ namespace ASRuntime
 
 
 
-        public ISLOT[] memberData
+        public SLOT[] memberData
         {
             get
             {
@@ -56,8 +56,8 @@ namespace ASRuntime
             }
         }
 
-        private IRunTimeScope _parent;
-        public IRunTimeScope parent
+        private RunTimeScope _parent;
+        public RunTimeScope parent
         {
             get
             {
@@ -65,7 +65,7 @@ namespace ASRuntime
             }
         }
 
-        public ISLOT[] stack
+        public SLOT[] stack
         {
             get
             {
@@ -89,8 +89,8 @@ namespace ASRuntime
                 return _static_scope;
             }
         }
-        private IRunTimeValue _this_pointer;
-        public IRunTimeValue this_pointer
+        private RunTimeValueBase _this_pointer;
+        public RunTimeValueBase this_pointer
         {
             get
             {

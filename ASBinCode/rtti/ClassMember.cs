@@ -52,7 +52,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 成员字面值,比如1000,"aabc"等确定的字面值
         /// </summary>
-        public IRunTimeValue defaultValue;
+        public RunTimeValueBase defaultValue;
 
         /// <summary>
         /// 所属Class

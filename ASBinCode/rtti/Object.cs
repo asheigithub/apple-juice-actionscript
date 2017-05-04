@@ -26,7 +26,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 类成员
         /// </summary>
-        public ISLOT[] memberData;
+        public SLOT[] memberData;
 
         public override string ToString()
         {

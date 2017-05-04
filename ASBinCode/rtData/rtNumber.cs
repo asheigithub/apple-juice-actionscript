@@ -7,24 +7,17 @@ namespace ASBinCode.rtData
     /// <summary>
     /// 运行时基本数据类型Number (64位浮点数)
     /// </summary>
-    public class rtNumber : IRunTimeValue
+    public sealed class rtNumber : RunTimeValueBase
     {
         
         public double value;
-        public rtNumber(double v)
+        public rtNumber(double v):base(RunTimeDataType.rt_number)
         {
             value = v;
         }
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                return RunTimeDataType.rt_number;
-            }
-        }
-
-        public object Clone()
+        
+        public sealed override object Clone()
         {
             return new rtNumber(value);
         }

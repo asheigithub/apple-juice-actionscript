@@ -9,7 +9,7 @@ namespace ASBinCode.rtti
     {
         public bool isFixed;
 
-        public List<IRunTimeValue> innnerList;
+        public List<RunTimeValueBase> innnerList;
 
         public readonly RunTimeDataType vector_type;
 

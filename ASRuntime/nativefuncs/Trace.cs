@@ -6,7 +6,7 @@ namespace ASRuntime.nativefuncs
 {
     class Trace
     {
-        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (step.arg1==null || step.arg1.valueType == ASBinCode.RunTimeDataType.unknown)
             {

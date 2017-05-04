@@ -65,7 +65,7 @@ namespace ASRuntime.operators
 
         }
 
-        public void push_parameter(IRunTimeValue arg,int id)
+        public void push_parameter(RunTimeValueBase arg,int id)
         {
             if (constructor == null)
             {
@@ -86,7 +86,7 @@ namespace ASRuntime.operators
                 int f = player.getRuntimeStackFlag();
 
                 
-                ASBinCode.IRunTimeScope objScope;
+                ASBinCode.RunTimeScope objScope;
                 ASBinCode.rtti.Object obj = makeObj(cls.staticClass,
                     null, out objScope).value;
 
@@ -167,7 +167,7 @@ namespace ASRuntime.operators
                 afterCreateStaticInstance callbacker = new afterCreateStaticInstance();
                 callbacker.args = this;
 
-                ASBinCode.IRunTimeScope objScope;
+                ASBinCode.RunTimeScope objScope;
                 var obj = makeObj(_class.staticClass, callbacker, out objScope);
 
                 player.static_instance.Add(_class.staticClass.classid,
@@ -278,7 +278,7 @@ namespace ASRuntime.operators
             Global_Object global = Global_Object.formCodeBlock(codeblock, globaldata, player.swc.classes[0]);
             ASBinCode.rtData.rtObject globalObj = new ASBinCode.rtData.rtObject(global, null);
 
-            ASBinCode.IRunTimeScope rtscope = player.CallBlock(
+            ASBinCode.RunTimeScope rtscope = player.CallBlock(
                 codeblock, globaldata, null,
                 null, //player.static_instance[cls.staticClass.classid].objScope,
 
@@ -324,13 +324,13 @@ namespace ASRuntime.operators
             afterCreateInstanceData callbacker = new afterCreateInstanceData();
             callbacker.args = this;
 
-            ASBinCode.IRunTimeScope objScope;
+            ASBinCode.RunTimeScope objScope;
             makeObj(_class, callbacker, out objScope);
         }
 
         private void exec_step2(
-            ASBinCode.rtti.Object obj, 
-            IRunTimeScope objScope, ASBinCode.rtData.rtObject _object)
+            ASBinCode.rtti.Object obj,
+            RunTimeScope objScope, ASBinCode.rtData.rtObject _object)
         {
             //***添加Object的动态对象****
             if (
@@ -430,7 +430,7 @@ namespace ASRuntime.operators
 
         private ASBinCode.rtData.rtObject makeObj(
             ASBinCode.rtti.Class cls,
-            baseinstancecallbacker callbacker, out ASBinCode.IRunTimeScope objScope)
+            baseinstancecallbacker callbacker, out ASBinCode.RunTimeScope objScope)
         {
             
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
@@ -578,7 +578,7 @@ namespace ASRuntime.operators
 
         public ASBinCode.rtti.Object obj { get; set; }
 
-        public ASBinCode.IRunTimeScope objScope { get; set; }
+        public ASBinCode.RunTimeScope objScope { get; set; }
 
         public ASBinCode.rtData.rtObject rtObject { get; set; }
 

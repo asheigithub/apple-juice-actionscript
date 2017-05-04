@@ -6,16 +6,16 @@ namespace ASBinCode.rtti
 {
     public class DynamicObject : Object
     {
-        protected Dictionary<string, ISLOT> propertys;
+        protected Dictionary<string, SLOT> propertys;
 
         public rtti.DynamicObject _prototype_;
 
         public DynamicObject(Class _class):base(_class)
         {
-            propertys = new Dictionary<string, ISLOT>();
+            propertys = new Dictionary<string, SLOT>();
         }
 
-        public ISLOT this[string name]
+        public SLOT this[string name]
         {
             get
             {
@@ -51,7 +51,7 @@ namespace ASBinCode.rtti
         {
             if (!propertys.ContainsKey(name))
             {
-                propertys.Add(name, slot);
+                propertys.Add(name, (SLOT)slot);
 
                 if (rootSlot == null)
                 {
@@ -104,7 +104,7 @@ namespace ASBinCode.rtti
         {
             if (propertys.ContainsKey(name))
             {
-                ISLOT slot = propertys[name];
+                SLOT slot = propertys[name];
                 propertys.Remove(name);
 
                 ILinkSlot ls = slot as ILinkSlot;

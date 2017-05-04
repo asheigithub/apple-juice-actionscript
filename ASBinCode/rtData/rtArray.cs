@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public sealed class rtArray : IRunTimeValue
+    public sealed class rtArray : RunTimeValueBase
     {
         public class arrayObjHandle
         {
@@ -33,15 +33,15 @@ namespace ASBinCode.rtData
 
         }
 
-        private List<IRunTimeValue> array;
-        public List<IRunTimeValue> innerArray {
+        private List<RunTimeValueBase> array;
+        public List<RunTimeValueBase> innerArray {
             get { return array; } }
 
         public arrayObjHandle objHandle;
         
-        public rtArray()
+        public rtArray():base(RunTimeDataType.rt_array)
         {
-            array = new List<IRunTimeValue>();
+            array = new List<RunTimeValueBase>();
             objHandle = new arrayObjHandle();
 
             objHandle.bindArrayObject = null;
@@ -51,13 +51,7 @@ namespace ASBinCode.rtData
 
         
 
-        public RunTimeDataType rtType
-        {
-            get
-            {
-                return RunTimeDataType.rt_array;
-            }
-        }
+        
 
         public override string ToString()
         {
@@ -82,7 +76,7 @@ namespace ASBinCode.rtData
         }
 
 
-        public object Clone()
+        public sealed override  object Clone()
         {
             return this;
             //rtArray result = new rtArray();

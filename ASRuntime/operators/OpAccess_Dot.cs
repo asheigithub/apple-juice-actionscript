@@ -9,9 +9,9 @@ namespace ASRuntime.operators
 {
     class OpAccess_Dot
     {
-        public static void exec_dot(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_dot(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue obj = step.arg1.getValue(scope);
+            RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -30,7 +30,7 @@ namespace ASRuntime.operators
                 if (slot != null)
                 {
                     
-                    ISLOT lintoslot = ((ILeftValue)step.arg2).getISlot(rtObj.objScope);
+                    SLOT lintoslot = ((ILeftValue)step.arg2).getISlot(rtObj.objScope);
                     if (lintoslot == null)
                     {
                         frame.throwError((new error.InternalError(step.token,
@@ -63,9 +63,9 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void exec_method(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_method(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue obj = step.arg1.getValue(scope);
+            RunTimeValueBase obj = step.arg1.getValue(scope);
 
             if (rtNull.nullptr.Equals(obj))
             {
@@ -84,7 +84,7 @@ namespace ASRuntime.operators
                 StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                 if (slot != null)
                 {
-                    ISLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
+                    SLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
                     if (step.arg1 is SuperPointer)
                     {
                         lintoslot = ((MethodGetterBase)step.arg2).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass );
@@ -115,9 +115,9 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void exec_dot_byname(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_dot_byname(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue obj = step.arg1.getValue(scope);
+            RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -158,7 +158,7 @@ namespace ASRuntime.operators
 
         }
 
-        private static void _loadname_dot(rtObject rtObj,OpStep step,StackFrame frame,IRunTimeScope scope,Player player)
+        private static void _loadname_dot(rtObject rtObj,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
         {
             var v2 = step.arg2.getValue(scope);
             
@@ -337,7 +337,7 @@ namespace ASRuntime.operators
         }
 
 
-        private static void _exec_dot_name(rtObject rtObj,string name,OpStep step,StackFrame frame,IRunTimeScope scope,Player player)
+        private static void _exec_dot_name(rtObject rtObj,string name,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
         {
             do
             {
@@ -356,7 +356,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        ISLOT propSlot = gobj[name];
+                        SLOT propSlot = gobj[name];
                         StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                         if (slot != null)
                         {
@@ -378,7 +378,7 @@ namespace ASRuntime.operators
                     {
                         if (ot == RunTimeDataType.rt_array)
                         {
-                            IRunTimeValue obj = TypeConverter.ObjectImplicit_ToPrimitive(rtObj);
+                            RunTimeValueBase obj = TypeConverter.ObjectImplicit_ToPrimitive(rtObj);
                             if (_assess_array(obj, frame, step, scope))
                             {
                                 return;
@@ -525,7 +525,7 @@ namespace ASRuntime.operators
                         StackSlot slot = step.reg.getISlot(scope) as StackSlot;
                         if (slot != null)
                         {
-                            ISLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                            SLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
 
                             if (step.arg1 is SuperPointer)
                             {
@@ -579,7 +579,7 @@ namespace ASRuntime.operators
 
         private static void linkProtoTypeMember(DynamicObject dobj,rtObject rtObj,Player player,StackSlot dslot,string name)
         {
-            ISLOT v = dobj[name];
+            SLOT v = dobj[name];
             if (!ReferenceEquals(dobj, rtObj.value))
             {
                 if (v.getValue().rtType == RunTimeDataType.rt_function)
@@ -625,9 +625,9 @@ namespace ASRuntime.operators
         /// <param name="frame"></param>
         /// <param name="step"></param>
         /// <param name="scope"></param>
-        public static void exec_bracket_access(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_bracket_access(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            IRunTimeValue obj = step.arg1.getValue(scope);
+            RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -694,7 +694,7 @@ namespace ASRuntime.operators
 
         }
 
-        private static void _primitive_toObj(ASBinCode.IRunTimeValue v1, ASBinCode.IRunTimeValue v_temp, StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        private static void _primitive_toObj(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v_temp, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (v1.rtType < RunTimeDataType.unknown)
             {
@@ -728,7 +728,7 @@ namespace ASRuntime.operators
         }
 
 
-        private static bool _assess_array( IRunTimeValue obj, StackFrame frame, OpStep step,IRunTimeScope scope)
+        private static bool _assess_array( RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var idx = step.arg2.getValue(scope);
             var number = TypeConverter.ConvertToNumber(idx, frame, step.token);
@@ -764,7 +764,7 @@ namespace ASRuntime.operators
             return false;
         }
 
-        internal class arraySlot : ISLOT
+        internal sealed class arraySlot : SLOT
         {
             rtArray array;
             int idx;
@@ -774,7 +774,7 @@ namespace ASRuntime.operators
                 this.idx = idx;
             }
 
-            public bool isPropGetterSetter
+            public sealed override bool isPropGetterSetter
             {
                 get
                 {
@@ -782,70 +782,70 @@ namespace ASRuntime.operators
                 }
             }
 
-            public void clear()
+            public sealed override void clear()
             {
                 //throw new NotImplementedException();
             }
 
-            public bool directSet(IRunTimeValue value)
+            public sealed override bool directSet(RunTimeValueBase value)
             {
-                array.innerArray[idx] = (IRunTimeValue)value.Clone(); //对数组的直接赋值，需要Clone
+                array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone
                 return true;
                 //throw new NotImplementedException();
             }
 
-            public IRunTimeValue getValue()
+            public sealed override RunTimeValueBase getValue()
             {
                 return array.innerArray[idx];
                 //throw new NotImplementedException();
             }
 
-            public void setValue(rtUndefined value)
+            public sealed override void setValue(rtUndefined value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtNull value)
+            public sealed override void setValue(rtNull value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(int value)
+            public sealed override void setValue(int value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(string value)
+            public sealed override void setValue(string value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(uint value)
+            public sealed override void setValue(uint value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(double value)
+            public sealed override void setValue(double value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtBoolean value)
+            public sealed override void setValue(rtBoolean value)
             {
                 throw new NotImplementedException();
             }
         }
 
 
-        internal class prototypeSlot : ISLOT
+        internal sealed class prototypeSlot : SLOT
         {
             internal rtObject _protoRootObj;
             internal string _protoname;
 
-            internal ISLOT findSlot;
+            internal SLOT findSlot;
 
             public prototypeSlot(rtObject _protoRootObj, string _protoname,
-                ISLOT findSlot
+                SLOT findSlot
                 )
             {
                 this._protoRootObj = _protoRootObj;
@@ -854,7 +854,7 @@ namespace ASRuntime.operators
             }
 
 
-            public bool isPropGetterSetter
+            public sealed override bool isPropGetterSetter
             {
                 get
                 {
@@ -862,7 +862,7 @@ namespace ASRuntime.operators
                 }
             }
 
-            public void clear()
+            public sealed override void clear()
             {
                 _protoRootObj = null;
                 _protoname = null;
@@ -871,7 +871,7 @@ namespace ASRuntime.operators
                 //throw new NotImplementedException();
             }
 
-            public bool directSet(IRunTimeValue value)
+            public sealed override bool directSet(RunTimeValueBase value)
             {
                 //throw new NotImplementedException();
                 
@@ -891,43 +891,43 @@ namespace ASRuntime.operators
                 
             }
 
-            public IRunTimeValue getValue()
+            public sealed override RunTimeValueBase getValue()
             {
                 return findSlot.getValue();
                 //throw new NotImplementedException();
             }
 
-            public void setValue(rtUndefined value)
+            public sealed override void setValue(rtUndefined value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtNull value)
+            public sealed override void setValue(rtNull value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(int value)
+            public sealed override void setValue(int value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(string value)
+            public sealed override void setValue(string value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(uint value)
+            public sealed override void setValue(uint value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(double value)
+            public sealed override void setValue(double value)
             {
                 throw new NotImplementedException();
             }
 
-            public void setValue(rtBoolean value)
+            public sealed override void setValue(rtBoolean value)
             {
                 throw new NotImplementedException();
             }

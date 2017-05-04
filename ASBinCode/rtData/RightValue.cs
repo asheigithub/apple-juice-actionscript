@@ -6,9 +6,9 @@ namespace ASBinCode.rtData
 {
     public class RightValue : IRightValue
     {
-        private IRunTimeValue value;
+        private RunTimeValueBase value;
 
-        public RightValue(IRunTimeValue value)
+        public RightValue(RunTimeValueBase value)
         {
             this.value = value;
         }
@@ -21,7 +21,7 @@ namespace ASBinCode.rtData
             }
         }
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             return value;
         }

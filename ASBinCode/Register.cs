@@ -54,7 +54,7 @@ namespace ASBinCode
             }
         }
 
-        public IRunTimeValue getValue( IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             //var v= getISlot(scope).getValue();
             //return v;
@@ -69,7 +69,7 @@ namespace ASBinCode
             return "EAX(" + Id + "\t" +type+ ")";
         }
 
-        public ISLOT getISlot(IRunTimeScope scope)
+        public SLOT getISlot(RunTimeScope scope)
         {
             return scope.stack[scope.offset + Id];
         }

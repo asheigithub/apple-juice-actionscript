@@ -8,14 +8,14 @@ namespace ASRuntime.operators
 {
     class OpPropGetSet
     {
-        public static void exec_try_read_prop(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_try_read_prop(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             
-            ASBinCode.ISLOT slot = ((Register)step.arg1).getISlot(scope);
+            ASBinCode.SLOT slot = ((Register)step.arg1).getISlot(scope);
 
             if (!slot.isPropGetterSetter)
             {
-                ISLOT regslot = step.reg.getISlot(scope);
+                SLOT regslot = step.reg.getISlot(scope);
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
@@ -74,7 +74,7 @@ namespace ASRuntime.operators
                     //***读取getter***
 
                     StackSlot sslot = (StackSlot)slot;
-                    IRunTimeValue func;
+                    RunTimeValueBase func;
 
                     if (sslot.superPropBindClass !=null)
                     {
@@ -133,7 +133,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_try_write_prop(Player player, StackFrame frame, OpStep step, IRunTimeScope scope)
+        public static void exec_try_write_prop(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
             if (slot.propGetSet != null)

@@ -21,12 +21,12 @@ namespace ASBinCode
             }
         }
 
-        public ISLOT getISlot(IRunTimeScope scope)
+        public SLOT getISlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public IRunTimeValue getValue(IRunTimeScope scope)
+        public RunTimeValueBase getValue(RunTimeScope scope)
         {
             //***不可能在运行时运行***
             throw new NotImplementedException();

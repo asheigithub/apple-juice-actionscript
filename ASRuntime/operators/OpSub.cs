@@ -6,7 +6,7 @@ namespace ASRuntime.operators
 {
     class OpSub
     {
-        public static void execSub_Number(Player player, ASBinCode.OpStep step, StackFrame frame, ASBinCode.IRunTimeScope scope)
+        public static void execSub_Number(Player player, ASBinCode.OpStep step, StackFrame frame, ASBinCode.RunTimeScope scope)
         {
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
@@ -17,10 +17,10 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void execSub(StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope)
+        public static void execSub(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.IRunTimeValue v1 = step.arg1.getValue(scope);
-            ASBinCode.IRunTimeValue v2 = step.arg2.getValue(scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
                 frame._tempSlot1, frame._tempSlot2, step, _execSub_CallBacker);
@@ -28,8 +28,8 @@ namespace ASRuntime.operators
         }
 
         private static void _execSub_CallBacker(
-            ASBinCode.IRunTimeValue v1,ASBinCode.IRunTimeValue v2,
-            StackFrame frame, ASBinCode.OpStep step, ASBinCode.IRunTimeScope scope
+            ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeValueBase v2,
+            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
             double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
