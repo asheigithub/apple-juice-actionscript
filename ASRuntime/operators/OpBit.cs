@@ -23,7 +23,7 @@ namespace ASRuntime.operators
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
             int r = (int)(n1 & n2);
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
             frame.endStep(step);
         }
 
@@ -42,7 +42,7 @@ namespace ASRuntime.operators
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
             int r = (int)(n1 | n2);
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
             frame.endStep(step);
         }
 
@@ -62,7 +62,7 @@ namespace ASRuntime.operators
             uint n2 = TypeConverter.ConvertToUInt(v2, frame, step.token);
 
             int r = (int)(n1 ^ n2);
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
             frame.endStep(step);
         }
 
@@ -79,7 +79,7 @@ namespace ASRuntime.operators
             int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
 
             int r = ~n1;
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
             frame.endStep(step);
         }
 
@@ -99,7 +99,7 @@ namespace ASRuntime.operators
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 
             int r = n1 << n2;
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
 
             frame.endStep(step);
         }
@@ -120,7 +120,7 @@ namespace ASRuntime.operators
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 
             int r = n1 >> n2;
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
 
             frame.endStep(step);
         }
@@ -141,7 +141,7 @@ namespace ASRuntime.operators
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 
             uint r = n1 >> n2;
-            step.reg.getISlot(scope).setValue(r);
+            step.reg.getSlot(scope).setValue(r);
 
             frame.endStep(step);
         }

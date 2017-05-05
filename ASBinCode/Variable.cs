@@ -33,7 +33,7 @@ namespace ASBinCode
         { }
 
 
-        public sealed override SLOT getISlot(RunTimeScope scope)
+        public sealed override SLOT getSlot(RunTimeScope scope)
         {
             while (refblockid != scope.blockId)
             {

@@ -67,13 +67,14 @@ namespace ASRuntime.operators
 
         public void push_parameter(RunTimeValueBase arg,int id)
         {
+            bool success;
             if (constructor == null)
             {
-                constructorCaller.pushParameter(arg, id);
+                constructorCaller.pushParameter(arg, id,out success);
             }
             else
             {
-                _function_constructor.pushParameter(arg, id);
+                _function_constructor.pushParameter(arg, id,out success);
             }
         }
 
@@ -443,7 +444,14 @@ namespace ASRuntime.operators
             }
             else if (cls.dynamic)
             {
-                obj = new DynamicObject(cls);
+                if (cls.isUnmanaged)
+                {
+                    obj = new HostedDynamicObject(cls);
+                }
+                else
+                {
+                    obj = new DynamicObject(cls);
+                }
             }
             else if (cls.isUnmanaged)
             {

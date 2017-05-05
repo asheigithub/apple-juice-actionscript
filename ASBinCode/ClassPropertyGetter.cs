@@ -76,7 +76,7 @@ namespace ASBinCode
         //    get { return _tempSlot; }
         //}
 
-        public SLOT getISlot(RunTimeScope scope)
+        public SLOT getSlot(RunTimeScope scope)
         {
             //if (_tempSlot == null)
             //{

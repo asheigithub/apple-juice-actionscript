@@ -103,9 +103,11 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="aslib\ArgumentError.txt" />
     <Content Include="aslib\Array.txt" />
     <Content Include="aslib\Boolean.txt" />
     <Content Include="aslib\Class.txt" />
+    <Content Include="aslib\Date.txt" />
     <Content Include="aslib\Dictionary.txt" />
     <Content Include="aslib\Error.txt" />
     <Content Include="aslib\Function.txt" />
@@ -114,6 +116,7 @@
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
     <Content Include="aslib\Sprite.txt" />
+    <Content Include="aslib\String.txt" />
     <Content Include="aslib\TypeError.txt" />
     <Content Include="aslib\uint.txt" />
     <Content Include="aslib\Vector.txt" />

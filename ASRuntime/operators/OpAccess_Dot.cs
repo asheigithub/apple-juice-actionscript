@@ -26,11 +26,11 @@ namespace ASRuntime.operators
                 rtObject rtObj =
                     (rtObject)obj;
                 
-                StackSlot slot = step.reg.getISlot(scope) as StackSlot;
+                StackSlot slot = step.reg.getSlot(scope) as StackSlot;
                 if (slot != null)
                 {
                     
-                    SLOT lintoslot = ((ILeftValue)step.arg2).getISlot(rtObj.objScope);
+                    SLOT lintoslot = ((ILeftValue)step.arg2).getSlot(rtObj.objScope);
                     if (lintoslot == null)
                     {
                         frame.throwError((new error.InternalError(step.token,
@@ -81,7 +81,7 @@ namespace ASRuntime.operators
                 rtObject rtObj =
                     (rtObject)obj;
 
-                StackSlot slot = step.reg.getISlot(scope) as StackSlot;
+                StackSlot slot = step.reg.getSlot(scope) as StackSlot;
                 if (slot != null)
                 {
                     SLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
@@ -208,14 +208,14 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            step.reg.getISlot(scope).directSet(rtUndefined.undefined);
+                            step.reg.getSlot(scope).directSet(rtUndefined.undefined);
                             frame.endStep(step);
                             return;
                         }
                     }
 
                     var slot = dict.getValue(key);
-                    StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
+                    StackSlot dslot = step.reg.getSlot(scope) as StackSlot;
                     if (dslot != null)
                     {
                         dslot.linkTo(slot);
@@ -357,7 +357,7 @@ namespace ASRuntime.operators
                     else
                     {
                         SLOT propSlot = gobj[name];
-                        StackSlot slot = step.reg.getISlot(scope) as StackSlot;
+                        StackSlot slot = step.reg.getSlot(scope) as StackSlot;
                         if (slot != null)
                         {
                             slot.linkTo(propSlot);
@@ -426,7 +426,7 @@ namespace ASRuntime.operators
                                 break;
                             }
 
-                            StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
+                            StackSlot dslot = step.reg.getSlot(scope) as StackSlot;
                             if (dslot != null)
                             {
                                 if (dobj == null || !dobj.hasproperty(name))
@@ -484,7 +484,7 @@ namespace ASRuntime.operators
                             
                             if (dobj != null)
                             {
-                                StackSlot dslot = step.reg.getISlot(scope) as StackSlot;
+                                StackSlot dslot = step.reg.getSlot(scope) as StackSlot;
                                 if (dslot != null)
                                 {
                                     linkProtoTypeMember(dobj, rtObj, player, dslot, name);
@@ -522,7 +522,7 @@ namespace ASRuntime.operators
                     }
 
                     {
-                        StackSlot slot = step.reg.getISlot(scope) as StackSlot;
+                        StackSlot slot = step.reg.getSlot(scope) as StackSlot;
                         if (slot != null)
                         {
                             SLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
@@ -535,7 +535,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                                    linkto = ((ILeftValue)member.bindField).getSlot(rtObj.objScope);
                                 }
                             }
                             else
@@ -546,7 +546,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
+                                    linkto = ((ILeftValue)member.bindField).getSlot(rtObj.objScope);
                                 }
                             }
 
@@ -750,7 +750,7 @@ namespace ASRuntime.operators
 
 
                     //***访问数组的内容***
-                    StackSlot stackSlot= (StackSlot)step.reg.getISlot(scope);
+                    StackSlot stackSlot= (StackSlot)step.reg.getSlot(scope);
                     //stackSlot.fromArray = (rtArray)obj;
                     //stackSlot.fromArrayIndex = (int)number;
 

@@ -16,7 +16,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                step.reg.getISlot(scope).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
+                step.reg.getSlot(scope).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
                 frame.endStep(step);
             }
         }
@@ -32,7 +32,7 @@ namespace ASRuntime.operators
             else
             {
 
-                step.reg.getISlot(scope).setValue(
+                step.reg.getSlot(scope).setValue(
                     -TypeConverter.ConvertToNumber(v1,frame,step.token)  
                     );
                 frame.endStep(step);
@@ -42,7 +42,7 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
-            step.reg.getISlot(scope).setValue(
+            step.reg.getSlot(scope).setValue(
                     -TypeConverter.ConvertToNumber(v1, frame, step.token)
                     //-((ASBinCode.rtData.rtNumber)v1).value
                     );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));

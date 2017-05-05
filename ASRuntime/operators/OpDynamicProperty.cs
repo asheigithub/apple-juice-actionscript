@@ -14,7 +14,7 @@ namespace ASRuntime.operators
         public static void exec_delete(Player player,StackFrame frame,OpStep step, RunTimeScope scope)
         {
             {
-                StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
+                StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
                 if (slot.linktarget is DynamicPropertySlot)
                 {
                     DynamicPropertySlot link = (DynamicPropertySlot)slot.linktarget;

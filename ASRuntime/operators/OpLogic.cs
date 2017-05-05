@@ -147,11 +147,11 @@ namespace ASRuntime.operators
                 {
                     if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
                     {
-                        step.reg.getISlot(scope).directSet(iftrue);
+                        step.reg.getSlot(scope).directSet(iftrue);
                     }
                     else
                     {
-                        step.reg.getISlot(scope).directSet(iffalse);
+                        step.reg.getSlot(scope).directSet(iffalse);
                     }
                 }
                 else
@@ -165,11 +165,11 @@ namespace ASRuntime.operators
                         cls.instanceClass
                         ))
                     {
-                        step.reg.getISlot(scope).directSet(iftrue);
+                        step.reg.getSlot(scope).directSet(iftrue);
                     }
                     else
                     {
-                        step.reg.getISlot(scope).directSet(iffalse);
+                        step.reg.getSlot(scope).directSet(iffalse);
                     }
                 }
 
@@ -227,7 +227,7 @@ namespace ASRuntime.operators
                 var cls = ((ASBinCode.rtData.rtObject)v2).value._class;
                 if (cls.isInterface)
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                 }
                 else
                 {
@@ -245,11 +245,11 @@ namespace ASRuntime.operators
                     {
                         if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                         }
                         else
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                         }
                     }
                     else
@@ -261,11 +261,11 @@ namespace ASRuntime.operators
                                 cls.instanceClass)
                                 )
                             {
-                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                             }
                             else
                             {
-                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                             }
 
                         }
@@ -322,11 +322,11 @@ namespace ASRuntime.operators
 
                             if (found)
                             {
-                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                             }
                             else
                             {
-                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                             }
                         }
                     }
@@ -397,7 +397,7 @@ namespace ASRuntime.operators
                 double idx = TypeConverter.ConvertToNumber(v1, null, null);
                 if (double.IsNaN(idx) || double.IsInfinity(idx))
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                     frame.endStep(step);
                     return;
                 }
@@ -408,11 +408,11 @@ namespace ASRuntime.operators
                     //    (ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
                     if (idxx >= 0 && idxx < list.Count) //arr.innerArray.Count)
                     {
-                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                     }
                     else
                     {
-                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                     }
                     frame.endStep(step);
                     return;
@@ -420,7 +420,7 @@ namespace ASRuntime.operators
             }
             else if (v1.rtType < RunTimeDataType.unknown)
             {
-                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                 frame.endStep(step);
                 return;
             }
@@ -452,7 +452,7 @@ namespace ASRuntime.operators
             var v2 = v11;
             if (v2.rtType < RunTimeDataType.unknown)
             {
-                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                 frame.endStep(step);
                 return;
             }
@@ -491,13 +491,13 @@ namespace ASRuntime.operators
                     var key = new DictionaryKey(v1);
                     if (!dict.isContainsKey(key))
                     {
-                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                         frame.endStep(step);
                         return;
                     }
                     else
                     {
-                        step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                        step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                         frame.endStep(step);
                         return;
                     }
@@ -534,13 +534,13 @@ namespace ASRuntime.operators
                 Global_Object gobj = (Global_Object)v2.value;
                 if (!gobj.hasproperty(name))
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                     frame.endStep(step);
                     return;
                 }
                 else
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                     frame.endStep(step);
                     return;
                 }
@@ -560,20 +560,20 @@ namespace ASRuntime.operators
                         dobj = OpAccess_Dot.findInProtoType(dobj, name, frame, step.token, out haserror);
                         if (haserror)
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                             frame.endStep(step);
                             return;
                         }
 
                         if (dobj != null)
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                             frame.endStep(step);
                             return;
                         }
                         else
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                             frame.endStep(step);
                             return;
                         }
@@ -595,7 +595,7 @@ namespace ASRuntime.operators
                             dobj = OpAccess_Dot.findInProtoType(dobj, name, frame, step.token, out haserror);
                             if (haserror)
                             {
-                                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                                 frame.endStep(step);
                                 return;
                             }
@@ -603,13 +603,13 @@ namespace ASRuntime.operators
 
                         if (dobj != null)
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                             frame.endStep(step);
                             return;
                         }
                         else
                         {
-                            step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                             frame.endStep(step);
                             return;
                         }
@@ -618,7 +618,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                     frame.endStep(step);
                     return;
                 }
@@ -639,7 +639,7 @@ namespace ASRuntime.operators
             double idx = TypeConverter.ConvertToNumber(vidx, null, null);
             if (double.IsNaN(idx) || double.IsInfinity(idx))
             {
-                step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                 frame.endStep(step);
                 return;
             }
@@ -649,11 +649,11 @@ namespace ASRuntime.operators
                 
                 if (idxx >= 0 && idxx < v2.Count)
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
                 }
                 frame.endStep(step);
                 return;
@@ -667,11 +667,11 @@ namespace ASRuntime.operators
 
             if (object.ReferenceEquals(v, ASBinCode.rtData.rtBoolean.True))
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False );
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False );
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             frame.endStep(step);
         }
@@ -690,11 +690,11 @@ namespace ASRuntime.operators
 
             if (a1 > a2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
             frame.endStep(step);
@@ -712,11 +712,11 @@ namespace ASRuntime.operators
 
             if (a1 >= a2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
 
@@ -776,11 +776,11 @@ namespace ASRuntime.operators
 
                 if (n1 > n2)
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
             frame.endStep(step);
@@ -821,15 +821,15 @@ namespace ASRuntime.operators
 
             if (s1 == null || s2 == null)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             else if (string.CompareOrdinal(s1, s2) > 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             ((StackFrame)sender.args).endStep(sender.step);
         }
@@ -890,11 +890,11 @@ namespace ASRuntime.operators
 
                 if (n1 >= n2)
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
             frame.endStep(step);
@@ -906,15 +906,15 @@ namespace ASRuntime.operators
             _readTwoStringFromCallBacker(sender, out s1, out s2);
             if (s1 == null || s2 == null)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else if (string.CompareOrdinal(s1, s2) >= 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
             ((StackFrame)sender.args).endStep(sender.step);
@@ -949,11 +949,11 @@ namespace ASRuntime.operators
 
             if (a1 < a2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
 
@@ -971,11 +971,11 @@ namespace ASRuntime.operators
 
             if (a1 <= a2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1033,11 +1033,11 @@ namespace ASRuntime.operators
 
                 if (n1 < n2)
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
             frame.endStep(step);
@@ -1050,15 +1050,15 @@ namespace ASRuntime.operators
             _readTwoStringFromCallBacker(sender, out s1, out s2);
             if (s1 == null || s2 == null)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             else if (string.CompareOrdinal(s1, s2) < 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             ((StackFrame)sender.args).endStep(sender.step);
         }
@@ -1115,11 +1115,11 @@ namespace ASRuntime.operators
 
                 if (n1 <= n2)
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
             }
             frame.endStep(step);
@@ -1131,15 +1131,15 @@ namespace ASRuntime.operators
 
             if (s1 == null || s2 == null)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else if (string.CompareOrdinal(s1, s2) <= 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
 
@@ -1194,11 +1194,11 @@ namespace ASRuntime.operators
             {
                 if (testEquals(v1, v2, frame, step, scope))
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
                 frame.endStep(step);
             }
@@ -1210,11 +1210,11 @@ namespace ASRuntime.operators
 
             if (string.CompareOrdinal(s1, s2) == 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             ((StackFrame)sender.args).endStep(sender.step);
         }
@@ -1267,11 +1267,11 @@ namespace ASRuntime.operators
             {
                 if (!testEquals(step.arg1.getValue(scope), step.arg2.getValue(scope), frame, step, scope))
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
                 }
                 else
                 {
-                    step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                    step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
                 }
                 frame.endStep(step);
             }
@@ -1283,11 +1283,11 @@ namespace ASRuntime.operators
 
             if (string.CompareOrdinal(s1, s2) != 0)
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                sender.step.reg.getISlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                sender.step.reg.getSlot(sender.scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             ((StackFrame)sender.args).endStep(sender.step);
         }
@@ -1299,11 +1299,11 @@ namespace ASRuntime.operators
 
             if (n1==n2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1315,11 +1315,11 @@ namespace ASRuntime.operators
 
             if (n1 != n2)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1331,11 +1331,11 @@ namespace ASRuntime.operators
 
             if (string.CompareOrdinal(n1,n2)==0)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1347,11 +1347,11 @@ namespace ASRuntime.operators
 
             if (string.CompareOrdinal(n1, n2) != 0)
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1473,11 +1473,11 @@ namespace ASRuntime.operators
         {
             if (_execStrictEQ(frame, step, scope))
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }
@@ -1485,11 +1485,11 @@ namespace ASRuntime.operators
         {
             if (!_execStrictEQ(frame, step, scope))
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
+                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtBoolean.False);
             }
             frame.endStep(step);
         }

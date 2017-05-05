@@ -7,7 +7,7 @@ namespace ASBinCode.rtti
     /// <summary>
     /// 字典类的对象
     /// </summary>
-    public class DictionaryObject:DynamicObject
+    public sealed class DictionaryObject:DynamicObject
     {
         public interface IDictionaryKey { }
         

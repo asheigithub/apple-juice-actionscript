@@ -76,7 +76,7 @@ namespace ASBinCode
             }
         }
 
-        public SLOT getISlot(RunTimeScope scope)
+        public SLOT getSlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
 

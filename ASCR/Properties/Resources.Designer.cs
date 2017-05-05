@@ -135,6 +135,21 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public dynamic class ArgumentError extends Error
+        ///	{
+        ///		public function ArgumentError (message:String=&quot;&quot;, id:int=0);
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string ArgumentError {
+            get {
+                return ResourceManager.GetString("ArgumentError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	public dynamic class Array extends Object
         ///	{
         ///		/**
@@ -167,11 +182,17 @@ namespace ASCompiler.Properties {
         ///	public final class Boolean extends Object
         ///	{
         ///		
+        ///		[implicit_to]
+        ///		private static function _to_boolean(thisObj:*):Boolean{ return thisObj._v;}
+        ///
+        ///		[implicit_from]
+        ///		private static function _from_value(value:Boolean):*{ return new Boolean(value); }
+        ///
         ///		private var _v:Boolean;
         ///
         ///		public function Boolean (value:*=false){ _v=value ;}
         ///
-        ///		
+        ///		[native,_boolean_toString]
         ///		public function toString () : String;
         ///
         ///		
@@ -211,6 +232,15 @@ namespace ASCompiler.Properties {
         internal static string Class {
             get {
                 return ResourceManager.GetString("Class", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似  的本地化字符串。
+        /// </summary>
+        internal static string Date {
+            get {
+                return ResourceManager.GetString("Date", resourceCulture);
             }
         }
         
@@ -418,6 +448,42 @@ namespace ASCompiler.Properties {
         internal static string Sprite {
             get {
                 return ResourceManager.GetString("Sprite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	
+        ///	public final class String extends Object
+        ///	{
+        ///		private var _v:String;
+        ///
+        ///		[implicit_to]
+        ///		private static function _to_string(thisObj:*):String{ return thisObj._v;}
+        ///
+        ///		[explicit_from]
+        ///		private static function _explicit_from_value(value:*):Object
+        ///		{
+        ///			if(value===undefined)
+        ///			{
+        ///				value=&quot;undefined&quot;;
+        ///			}
+        ///			else if(value==null)
+        ///			{
+        ///				value=&quot;null&quot;;
+        ///			}
+        ///
+        ///			return new String(value); 
+        ///		}
+        ///
+        ///		[implicit_from];
+        ///		private static function _from_value(value:String):*
+        ///		{		 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string String {
+            get {
+                return ResourceManager.GetString("String", resourceCulture);
             }
         }
         

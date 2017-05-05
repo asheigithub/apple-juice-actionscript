@@ -12,7 +12,7 @@ namespace ASRuntime.operators
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            step.reg.getISlot(scope).setValue(a1 * a2);
+            step.reg.getSlot(scope).setValue(a1 * a2);
             frame.endStep(step);
 
         }
@@ -22,7 +22,7 @@ namespace ASRuntime.operators
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            step.reg.getISlot(scope).setValue(a1 / a2);
+            step.reg.getSlot(scope).setValue(a1 / a2);
             frame.endStep(step);
 
         }
@@ -31,7 +31,7 @@ namespace ASRuntime.operators
             double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
             double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
 
-            step.reg.getISlot(scope).setValue(a1 % a2);
+            step.reg.getSlot(scope).setValue(a1 % a2);
             frame.endStep(step);
 
         }
@@ -52,7 +52,7 @@ namespace ASRuntime.operators
             double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
             {
-                step.reg.getISlot(scope).setValue(n1 * n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
+                step.reg.getSlot(scope).setValue(n1 * n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
             frame.endStep(step);
         }
@@ -73,7 +73,7 @@ namespace ASRuntime.operators
             double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
             {
-                step.reg.getISlot(scope).setValue(n1 / n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
+                step.reg.getSlot(scope).setValue(n1 / n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
             frame.endStep(step);
         }
@@ -94,7 +94,7 @@ namespace ASRuntime.operators
             double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
 
             {
-                step.reg.getISlot(scope).setValue(n1 % n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
+                step.reg.getSlot(scope).setValue(n1 % n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
             frame.endStep(step);
         }

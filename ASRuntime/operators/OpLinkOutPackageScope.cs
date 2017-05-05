@@ -9,7 +9,7 @@ namespace ASRuntime.operators
     {
         public static void exec_link(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot l = (StackSlot)step.reg.getISlot(scope);
+            StackSlot l = (StackSlot)step.reg.getSlot(scope);
 
             int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope)).value;
 
@@ -17,7 +17,7 @@ namespace ASRuntime.operators
 
             var outscope = player.outpackage_runtimescope[classid];
 
-            SLOT outpackagescopeslot= ((VariableBase)step.arg1).getISlot(outscope);
+            SLOT outpackagescopeslot= ((VariableBase)step.arg1).getSlot(outscope);
 
             l.linkTo(outpackagescopeslot);
 

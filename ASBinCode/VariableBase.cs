@@ -103,10 +103,10 @@ namespace ASBinCode
         public RunTimeValueBase getValue(RunTimeScope scope)
         {
             //throw new NotImplementedException();
-            return getISlot(scope).getValue();
+            return getSlot(scope).getValue();
         }
 
-        public abstract SLOT getISlot(RunTimeScope scope);
+        public abstract SLOT getSlot(RunTimeScope scope);
         //{
         //    while( refblockid != scope.blockId )
         //    {

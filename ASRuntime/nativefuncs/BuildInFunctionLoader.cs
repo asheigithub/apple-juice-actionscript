@@ -73,6 +73,20 @@ namespace ASRuntime.nativefuncs
 
             bin.regNativeFunction(new Boolean_toString());
 
+            bin.regNativeFunction(new String_length());
+            bin.regNativeFunction(new String_charAt());
+            bin.regNativeFunction(new String_charCodeAt());
+            bin.regNativeFunction(new String_fromCharCode());
+            bin.regNativeFunction(new String_indexOf());
+            bin.regNativeFunction(new String_lastindexOf());
+            bin.regNativeFunction(new String_slice());
+            bin.regNativeFunction(new String_split());
+            bin.regNativeFunction(new String_substr());
+            bin.regNativeFunction(new String_substring());
+            bin.regNativeFunction(new String_tolower());
+            bin.regNativeFunction(new String_toupper());
+            bin.regNativeFunction(new String_replace());
+
             bin.regNativeFunction(new Vector_constructor());
             bin.regNativeFunction(new Vector_getIsFixed());
             bin.regNativeFunction(new Vector_setIsFixed());
@@ -89,6 +103,18 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Vector_slice());
             bin.regNativeFunction(new Vector_splice());
             bin.regNativeFunction(new Vector_push());
+
+
+            bin.regNativeFunction(new Date_constructor());
+            bin.regNativeFunction(new Date_getdate());
+            bin.regNativeFunction(new Date_setdate());
+            bin.regNativeFunction(new Date_valueof());
+            bin.regNativeFunction(new Date_tostring());
+            bin.regNativeFunction(new Date_totimestring());
+            bin.regNativeFunction(new Date_toLocalTimeString());
+            bin.regNativeFunction(new Date_toUTCstring());
+            bin.regNativeFunction(new Date_toLocalString());
+            bin.regNativeFunction(new Date_toLocalDateString());
 
             bin.regNativeFunction(new Error_getstack());
 

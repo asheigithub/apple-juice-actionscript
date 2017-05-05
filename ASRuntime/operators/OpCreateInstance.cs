@@ -356,7 +356,7 @@ namespace ASRuntime.operators
         }
         private static void objcreated(BlockCallBackBase sender,object args)
         {
-            sender.step.reg.getISlot(sender.scope).directSet(
+            sender.step.reg.getSlot(sender.scope).directSet(
                 ((StackFrame)sender.args).instanceCreator.objectResult );
 
 

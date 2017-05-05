@@ -266,7 +266,8 @@ namespace ASRuntime.nativefuncs
                 rtArray argArray = (rtArray)argements[1].getValue();
                 for (int i = 0; i < argArray.innerArray.Count; i++)
                 {
-                    caller.pushParameter(argArray.innerArray[i], i);
+                    bool success;
+                    caller.pushParameter(argArray.innerArray[i], i,out success);
                 }
             }
 
@@ -416,7 +417,8 @@ namespace ASRuntime.nativefuncs
                 rtArray argArray = (rtArray)argements[1].getValue();
                 for (int i = 0; i < argArray.innerArray.Count; i++)
                 {
-                    caller.pushParameter(argArray.innerArray[i], i);
+                    bool success;
+                    caller.pushParameter(argArray.innerArray[i], i,out success);
                 }
             }
 

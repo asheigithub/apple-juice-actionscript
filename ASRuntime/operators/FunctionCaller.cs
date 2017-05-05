@@ -96,7 +96,7 @@ namespace ASRuntime.operators
             
         }
 
-        public void pushParameter(RunTimeValueBase argement,int id)
+        public void pushParameter(RunTimeValueBase argement,int id,out bool success)
         {
             if (toCallFunc.signature.parameters.Count > 0)
             {
@@ -114,10 +114,23 @@ namespace ASRuntime.operators
                         CallFuncHeap[id].directSet(argement);
                         pushedArgs++;
                     }
-                    //else
-                    //{
-                    //    //参数数量不匹配
-                    //}
+                    else
+                    {
+                        //参数数量不匹配
+                        invokerFrame.throwArgementException(
+                            token,
+                            string.Format(
+                            "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
+                            player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs+1
+                            )
+
+                            );
+
+                        //***中断本帧本次代码执行进入try catch阶段
+                        success = false;
+                        return;
+
+                    }
 
                 }
                 else
@@ -133,6 +146,20 @@ namespace ASRuntime.operators
                     arr.innerArray.Add((RunTimeValueBase)argement.Clone());    //可能从StackSlot中读的数据，因此必须Clone后再传入.
 
                 }
+
+                success = true;
+            }
+            else
+            {
+                invokerFrame.throwArgementException(
+                            token,
+                            string.Format(
+                            "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
+                            player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs + 1
+                            )
+
+                            );
+                success = false;
             }
         }
 
@@ -179,8 +206,9 @@ namespace ASRuntime.operators
             }
             else
             {
-                invokerFrame.throwCastException(token, ((RunTimeValueBase)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
-                return;
+                throw new InvalidOperationException("解释器内部错误，参数类型检查");
+                //invokerFrame.throwCastException(token, ((RunTimeValueBase)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
+                //return;
             }
         }
 
@@ -193,17 +221,16 @@ namespace ASRuntime.operators
                     if (toCallFunc.signature.parameters[pushedArgs].defaultValue == null
                     &&
                     !toCallFunc.signature.parameters[pushedArgs].isPara
-                    &&
-                    (
-                    toCallFunc.signature.parameters[pushedArgs].type != RunTimeDataType.rt_void
-                        ||
-                    toCallFunc.isMethod
-                    )
+                    //&&
+                    //(
+                    //toCallFunc.signature.parameters[pushedArgs].type != RunTimeDataType.rt_void
+                    //    ||
+                    //toCallFunc.isMethod
+                    //)
                     )
                     {
-                        invokerFrame.throwError(
+                        invokerFrame.throwArgementException(
                             token,
-                           0,
                             string.Format(
                             "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
                             player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs

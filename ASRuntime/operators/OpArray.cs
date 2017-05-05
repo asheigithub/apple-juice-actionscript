@@ -16,7 +16,7 @@ namespace ASRuntime.operators
             //frame.endStep(step);
 
 
-            step.reg.getISlot(scope).directSet(new ASBinCode.rtData.rtArray());
+            step.reg.getSlot(scope).directSet(new ASBinCode.rtData.rtArray());
 
             frame.endStep(step);
 

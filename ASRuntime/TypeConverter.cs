@@ -323,6 +323,7 @@ namespace ASRuntime
                 case rt.rt_string:
                     return ((ASBinCode.rtData.rtString)src).value;//(ASBinCode.rtData.rtString)src;
                 case rt.rt_void:
+                    return null;
                 case rt.fun_void:
                     return ASBinCode.rtData.rtUndefined.undefined.ToString();
                 case rt.rt_null:
@@ -431,10 +432,6 @@ namespace ASRuntime
                 return true;
             }
 
-            if (f > rt.unknown && t == ASBinCode.RunTimeDataType.rt_string)
-            {
-                return false;
-            }
 
             if (f == rt.rt_void && t > rt.unknown)
             {

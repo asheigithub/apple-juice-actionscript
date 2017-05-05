@@ -48,6 +48,7 @@
     <Compile Include="CSWC.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="IClassFinder.cs" />
+    <Compile Include="rtti\HostedDynamicObject.cs" />
     <Compile Include="SLOT.cs" />
     <Compile Include="IMember.cs" />
     <Compile Include="IRunTimeScope.cs" />

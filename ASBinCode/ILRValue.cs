@@ -27,7 +27,7 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        SLOT getISlot(RunTimeScope scope);
+        SLOT getSlot(RunTimeScope scope);
 
     }
 

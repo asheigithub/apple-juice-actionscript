@@ -35,31 +35,31 @@ namespace ASRuntime.operators
                 v1.rtType > RunTimeDataType.unknown
                 )
             {
-                step.reg.getISlot(scope).directSet(OBJECT);
+                step.reg.getSlot(scope).directSet(OBJECT);
             }
             else if (v1.rtType == RunTimeDataType.rt_boolean)
             {
-                step.reg.getISlot(scope).directSet(BOOLEAN);
+                step.reg.getSlot(scope).directSet(BOOLEAN);
             }
             else if (v1.rtType == RunTimeDataType.rt_int ||
                     v1.rtType == RunTimeDataType.rt_uint ||
                     v1.rtType == RunTimeDataType.rt_number
                 )
             {
-                step.reg.getISlot(scope).directSet(NUMBER);
+                step.reg.getSlot(scope).directSet(NUMBER);
             }
             else if (v1.rtType == RunTimeDataType.rt_string
                 )
             {
-                step.reg.getISlot(scope).directSet(STRING);
+                step.reg.getSlot(scope).directSet(STRING);
             }
             else if (v1.rtType == RunTimeDataType.rt_function)
             {
-                step.reg.getISlot(scope).directSet(FUNCTION);
+                step.reg.getSlot(scope).directSet(FUNCTION);
             }
             else if (v1.rtType == RunTimeDataType.rt_void)
             {
-                step.reg.getISlot(scope).directSet(UNDEFINED);
+                step.reg.getSlot(scope).directSet(UNDEFINED);
             }
             else if (v1.rtType == RunTimeDataType.unknown
                 ||

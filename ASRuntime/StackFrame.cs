@@ -117,7 +117,12 @@ namespace ASRuntime
         internal void endStep(OpStep step)
         {
 #if DEBUG
+            if (!execing)
+            {
+                throw new InvalidOperationException();
+            }
             execing = false;
+            
 #endif
             if (hasCallJump || hasCallReturn || runtimeError !=null)
             {
@@ -568,7 +573,7 @@ namespace ASRuntime
                             {
                                 if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope,this))
                                 {
-                                    ((VariableBase)op.reg).getISlot(scope).directSet(errorValue);
+                                    ((VariableBase)op.reg).getSlot(scope).directSet(errorValue);
                                     //引导到catch块
                                     codeLinePtr = j;
                                     foundcatch = true;
@@ -981,6 +986,27 @@ namespace ASRuntime
             else
             {
                 runtimeError = (new error.InternalError(token, "类型转换失败:" + src + "->" + dst));
+            }
+        }
+
+        internal void throwArgementException(ASBinCode.SourceToken token,string errormessage)
+        {
+            if (player.swc.ErrorClass != null)
+            {
+                //***直接开上帝视角从对象里取值赋值***
+                var errorinstance =
+                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[2].getValue());
+
+                errorinstance.value.memberData[0].directSet(new rtString(errormessage));
+                errorinstance.value.memberData[1].directSet(new rtString("ArgumentError"));
+                errorinstance.value.memberData[2].directSet(new rtInt(1063));
+
+                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+
+            }
+            else
+            {
+                runtimeError = (new error.InternalError(token, errormessage));
             }
         }
 

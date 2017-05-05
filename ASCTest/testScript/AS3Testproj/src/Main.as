@@ -23,8 +23,33 @@ package
 		
 		public function Main() 
 		{
+			//var d = new Date("Tue Feb 1 00:00:00 GMT-0800 2005");
+			
+			//var millisecondsPerDay:int = 1000 * 60 * 60 * 24; 
+			// gets a Date one day after the start date of 1/1/1970 
+			//var startTime:Date = new Date(millisecondsPerDay);
+			
+			//var d:Date = new Date("Wed Apr 12 15:30:17 GMT-0700 2006");
+			//
+			//trace(d.toDateString());
+			//trace(d.toLocaleDateString());
+			
+			
+			//var dateParsed:String = "Sat Nov 30 1974";
+//
+			//var milliseconds:Number = Date.parse(dateParsed);
+			//trace(milliseconds); // 154972800000
+
 			
 		}
+		
+		
+		
+		
+		//public function println(str:String):void {
+            //trace(str);
+        //}
+
 	}
 	
 }
@@ -62,15 +87,21 @@ function select( a:Vector.<int> )
 
 
 var a:Vector.<int> = new Vector.<int>();
-//var b:int = 0;
-for(var i:int = 0; i < 5000; ++i )
+var b:int = 0;
+
+
+
+for(var i:int = 0; i < 1000; ++i )
 {
-	//++b;
+	
+	++b;
 	a[i] =Math.random() * 10000;
 }
 
-
+var t = new Date().getTime();
 
 select(a);
+
+trace(new Date().getTime()-t);
 
 //trace(b);

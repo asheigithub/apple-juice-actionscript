@@ -13,7 +13,7 @@ namespace ASRuntime.operators
         public static void forin_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
-            StackSlot save = (StackSlot)step.reg.getISlot(scope);
+            StackSlot save = (StackSlot)step.reg.getSlot(scope);
 
             var obj = step.arg1.getValue(scope);
             if (obj.rtType > RunTimeDataType.unknown)
@@ -43,7 +43,7 @@ namespace ASRuntime.operators
 
         public static void foreach_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot save = (StackSlot)step.reg.getISlot(scope);
+            StackSlot save = (StackSlot)step.reg.getSlot(scope);
 
             var obj = step.arg1.getValue(scope);
             if (obj.rtType > RunTimeDataType.unknown)
@@ -73,31 +73,31 @@ namespace ASRuntime.operators
 
         public static void enumerator_movenext(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
+            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
             if (slot.cache_enumerator.MoveNext())
             {
-                step.reg.getISlot(scope).setValue(rtBoolean.True);
+                step.reg.getSlot(scope).setValue(rtBoolean.True);
             }
             else
             {
-                step.reg.getISlot(scope).setValue(rtBoolean.False);
+                step.reg.getSlot(scope).setValue(rtBoolean.False);
             }
 
             frame.endStep(step);
         }
         public static void enumerator_current(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
+            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            step.reg.getISlot(scope).directSet(slot.cache_enumerator.Current);
+            step.reg.getSlot(scope).directSet(slot.cache_enumerator.Current);
 
             frame.endStep(step);
         }
 
         public static void enumerator_close(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
+            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
             slot.cache_enumerator.Dispose();
             slot.cache_enumerator = null;

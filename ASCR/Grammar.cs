@@ -121,6 +121,18 @@ namespace ASCompiler
             }
 
             {
+                string _string = Properties.Resources.String;
+                var tree = grammar.ParseTree(_string, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "String.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "String.as3"));
+            }
+
+            {
                 string _buildin_ = Properties.Resources.__buildin__;
                 var tree = grammar.ParseTree(_buildin_, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "@__buildin__.as3");
@@ -166,6 +178,29 @@ namespace ASCompiler
                     return null;
                 }
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "TypeError.as3"));
+            }
+            {
+                string _error = Properties.Resources.ArgumentError;
+                var tree = grammar.ParseTree(_error, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "ArgumentError.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "ArgumentError.as3"));
+            }
+
+            {
+                string _date = Properties.Resources.Date;
+                var tree = grammar.ParseTree(_date, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "flash/utils/Date.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "flash/utils/Date.as3"));
             }
 
             {

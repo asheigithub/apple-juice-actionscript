@@ -69,7 +69,7 @@ namespace ASBinCode
             return "EAX(" + Id + "\t" +type+ ")";
         }
 
-        public SLOT getISlot(RunTimeScope scope)
+        public SLOT getSlot(RunTimeScope scope)
         {
             return scope.stack[scope.offset + Id];
         }

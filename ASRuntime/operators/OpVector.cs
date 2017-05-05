@@ -36,7 +36,7 @@ namespace ASRuntime.operators
 
 
 
-            StackSlot slot = (StackSlot)step.reg.getISlot(scope);
+            StackSlot slot = (StackSlot)step.reg.getSlot(scope);
             slot._cache_vectorSlot.idx = idx;
             slot._cache_vectorSlot.vector_data = vector;
 
@@ -108,7 +108,7 @@ namespace ASRuntime.operators
                 }
 
 
-                StackSlot slot = (StackSlot)step.reg.getISlot(scope);
+                StackSlot slot = (StackSlot)step.reg.getSlot(scope);
                 slot._cache_vectorSlot.idx = index;
                 slot._cache_vectorSlot.vector_data = vector;
 
@@ -138,7 +138,7 @@ namespace ASRuntime.operators
             {
                 if (initdata.rtType == classrttype)
                 {
-                    step.reg.getISlot(scope).directSet(initdata);
+                    step.reg.getSlot(scope).directSet(initdata);
                     frame.endStep(step);
                     return;
                 }
@@ -194,7 +194,7 @@ namespace ASRuntime.operators
             var vector = ((StackFrame)sender.args).instanceCreator.objectResult;
 
 
-            sender.step.reg.getISlot(sender.scope).directSet(
+            sender.step.reg.getSlot(sender.scope).directSet(
                 vector);
 
             var step = sender.step;

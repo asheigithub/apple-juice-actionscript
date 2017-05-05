@@ -39,5 +39,3 @@ E:\VS\ASTool\ASCR\bin\Debug\ASTool.pdb
 E:\VS\ASTool\ASCR\bin\Debug\ASTool.xml
 E:\VS\ASTool\ASCR\obj\Debug\ASCompiler.dll
 E:\VS\ASTool\ASCR\obj\Debug\ASCompiler.pdb
-D:\ASTool\ASCR\bin\Debug\ASCompiler.dll.CodeAnalysisLog.xml
-D:\ASTool\ASCR\bin\Debug\ASCompiler.dll.lastcodeanalysissucceeded

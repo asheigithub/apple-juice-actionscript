@@ -1,0 +1,94 @@
+﻿package
+{
+	
+	public final class String extends Object
+	{
+		private var _v:String;
+
+		[implicit_to]
+		private static function _to_string(thisObj:*):String{ return thisObj._v;}
+
+		[explicit_from]
+		private static function _explicit_from_value(value:*):Object
+		{
+			if(value===undefined)
+			{
+				value="undefined";
+			}
+			else if(value==null)
+			{
+				value="null";
+			}
+
+			return new String(value); 
+		}
+
+		[implicit_from];
+		private static function _from_value(value:String):*
+		{		
+			if(value==null)
+			{
+				return null;
+			}
+			return new String(value);
+		}
+
+		[native,_string_length]
+		public function get length () : int;
+
+		public function String (value:*="")
+		{  
+			
+			_v=value;
+		}
+
+
+
+		[native,_string_charat]
+		public function charAt(index:Number = 0):String;
+
+		[native,_string_charcodeat]
+		public function charCodeAt(index:Number = 0):Number;
+
+		[native,_string_fromCharCode]
+		public static function fromCharCode(... charCodes):String;
+
+		[native,_string_indexof]
+		public function indexOf(val:String, startIndex:Number = 0):int;
+
+		[native,_string_lastindexof]
+		public function lastIndexOf(val:String, startIndex:Number = 0x7FFFFFFF):int;
+
+		[native,_string_slice]
+		public function slice(startIndex:Number = 0, endIndex:Number = 0x7fffffff):String;
+
+		[native,_string_split]
+		public function split(delimiter:String, limit:Number = 0x7fffffff):Array;
+
+		[native,_string_substr]
+		public function substr(startIndex:Number = 0, len:Number = 0x7fffffff):String;
+
+		[native,_string_substring]
+		public function substring(startIndex:Number = 0, endIndex:Number = 0x7fffffff):String;
+
+		[native,_string_tolower]
+		public function toLowerCase():String;
+
+		[native,_string_toupper]
+		public function toUpperCase():String;
+
+		[native,_string_replace]
+		public function replace(pattern:String, repl:String):String;
+
+
+		public function concat(... args):String
+		{
+			args.unshift(_v);
+			return args.join("");
+		}
+
+		public function toString () : String{ return _v; }
+
+		public function valueOf () : String{ return _v; }
+	}
+}

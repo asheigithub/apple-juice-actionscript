@@ -111,7 +111,7 @@ namespace ASRuntime.operators
                     var member = (MethodGetterBase)cls.explicit_from.bindField;
                     var func = member.getValue(((rtObject)rv).objScope);
 
-                    step.reg.getISlot(scope).directSet(func);
+                    step.reg.getSlot(scope).directSet(func);
 
                 }
                 else if (cls.implicit_from != null)
@@ -119,14 +119,14 @@ namespace ASRuntime.operators
                     var member = (MethodGetterBase)cls.implicit_from.bindField;
                     var func = member.getValue(((rtObject)rv).objScope);
 
-                    step.reg.getISlot(scope).directSet(func);
+                    step.reg.getSlot(scope).directSet(func);
                 }
                 else
                 {
                     frame.typeconvertoperator = new typeConvertOperator();
                     frame.typeconvertoperator.targettype = cls;
 
-                    step.reg.getISlot(scope).directSet(rv);
+                    step.reg.getSlot(scope).directSet(rv);
                 }
 
                 frame.endStep(step);
@@ -143,7 +143,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
 
-                step.reg.getISlot(scope).directSet(rv);
+                step.reg.getSlot(scope).directSet(rv);
 
                 if (!function.ismethod)
                 {
@@ -240,7 +240,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                frame.funCaller.pushParameter(arg, id);
+                bool success;
+                frame.funCaller.pushParameter(arg, id,out success);
             }
             frame.endStep(step);
         }
@@ -316,7 +317,7 @@ namespace ASRuntime.operators
                 cb.args = args;
 
                 frame.funCaller.callbacker = cb;
-                frame.funCaller.returnSlot = step.reg.getISlot(frame.scope);
+                frame.funCaller.returnSlot = step.reg.getSlot(frame.scope);
                 frame.funCaller.call();
 
                 frame.funCaller = null;
@@ -342,7 +343,7 @@ namespace ASRuntime.operators
 
                     OpCast.CastValue(frame.typeconvertoperator.inputvalue,
                         frame.typeconvertoperator.targettype.instanceClass.getRtType(),
-                        frame, step.token, frame.scope, step.reg.getISlot(frame.scope),
+                        frame, step.token, frame.scope, step.reg.getSlot(frame.scope),
                         cb,
                         false);
                     frame.typeconvertoperator = null;

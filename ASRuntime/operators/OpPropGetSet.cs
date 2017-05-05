@@ -11,11 +11,11 @@ namespace ASRuntime.operators
         public static void exec_try_read_prop(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             
-            ASBinCode.SLOT slot = ((Register)step.arg1).getISlot(scope);
+            ASBinCode.SLOT slot = ((Register)step.arg1).getSlot(scope);
 
             if (!slot.isPropGetterSetter)
             {
-                SLOT regslot = step.reg.getISlot(scope);
+                SLOT regslot = step.reg.getSlot(scope);
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
@@ -102,7 +102,7 @@ namespace ASRuntime.operators
                     funCaller.createParaScope();
                     
                     funCaller._tempSlot = frame._tempSlot1;
-                    funCaller.returnSlot = step.reg.getISlot(scope);
+                    funCaller.returnSlot = step.reg.getSlot(scope);
 
                     ((StackSlot)funCaller.returnSlot).propGetSet = prop;
                     ((StackSlot)funCaller.returnSlot).propBindObj = ((StackSlot)slot).propBindObj;   //propslot.bindObj;
@@ -135,7 +135,7 @@ namespace ASRuntime.operators
 
         public static void exec_try_write_prop(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getISlot(scope);
+            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
             if (slot.propGetSet != null)
             {
 

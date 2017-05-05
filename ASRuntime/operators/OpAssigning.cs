@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         public static void execAssigning(Player player, ASBinCode.OpStep step ,StackFrame frame, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
-            ASBinCode.SLOT slot = step.reg.getISlot(scope);
+            ASBinCode.SLOT slot = step.reg.getSlot(scope);
 
             if (!slot.isPropGetterSetter)
             {
@@ -112,7 +112,7 @@ namespace ASRuntime.operators
             OpStep step = sender.step;
 
             ASBinCode.RunTimeValueBase v = frame._tempSlot1.getValue();
-            ASBinCode.SLOT slot = step.reg.getISlot(sender.scope);
+            ASBinCode.SLOT slot = step.reg.getSlot(sender.scope);
 
             if (!slot.directSet(v))
             {
@@ -184,7 +184,15 @@ namespace ASRuntime.operators
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
                 funCaller.createParaScope();
-                funCaller.pushParameter(v, 0);
+
+                bool success;
+                funCaller.pushParameter(v, 0,out success);
+                if (!success)
+                {
+                    frame.endStep(step);
+                    return;
+                }
+
                 funCaller._tempSlot = frame._tempSlot1;
                 funCaller.returnSlot = frame._tempSlot1;
 
