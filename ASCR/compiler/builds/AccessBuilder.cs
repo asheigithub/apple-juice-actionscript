@@ -345,6 +345,14 @@ namespace ASCompiler.compiler.builds
 
                 if (member == null)
                 {
+                    if (step.Arg3.Data.Value.ToString() == "hasOwnProperty"
+                        ) //***这是Object原型链对象，特殊处理
+                    {
+                        //***此处编译为动态属性***
+                        build_dot_name(env, step, v1);
+                        return;
+                    }
+
                     if (v1 is SuperPointer)
                     {
                         throw new BuildException(

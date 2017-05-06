@@ -323,4 +323,337 @@ namespace ASRuntime.nativefuncs
         }
     }
 
+
+    class __buildin__isfinite : NativeFunctionBase
+    {
+        List<RunTimeDataType> para;
+        public __buildin__isfinite()
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "__buildin__isfinite";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            double num = TypeConverter.ConvertToNumber(argements[0].getValue());
+
+            if (double.IsInfinity(num))
+            {
+                return rtBoolean.True;
+            }
+            else
+            {
+                return rtBoolean.False;
+            }
+
+        }
+    }
+
+    class __buildin__parseint : NativeFunctionBase
+    {
+        List<RunTimeDataType> para;
+        public __buildin__parseint()
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_string);
+            para.Add(RunTimeDataType.rt_uint);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "__buildin__parseint";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_number;
+            }
+        }
+
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            string str= TypeConverter.ConvertToString(argements[0].getValue(),null,null);
+            uint radix = TypeConverter.ConvertToUInt(argements[1].getValue(), null, null);
+
+            if (String.IsNullOrEmpty(str))
+            {
+                return new rtNumber(double.NaN);
+            }
+            //ASCII 48-57 : 0-9 ,65-90 : A-Z;
+
+            str = str.ToUpper();
+            str=str.TrimStart();
+            str=str.TrimStart('0');
+
+            if (radix == 0) { radix = 10; }
+            if (radix < 2 || radix > 36) { return new rtNumber(double.NaN); }
+
+            uint allowidx = 48 + radix;
+
+            if (radix > 10)
+            {
+                allowidx = 65 + radix - 10;
+            }
+
+            double output = double.NaN;
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                if (c < allowidx && ((c < 58 && c >= 48) || c>= 65))
+                {
+                    if (double.IsNaN(output))
+                    {
+                        output = c < 58 ? (c - 48) : (c - 65 + 10);
+                    }
+                    else
+                    {
+                        output = output * radix + (c < 58 ? (c - 48) : (c - 65 + 10));
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+
+            return new rtNumber(output);
+
+        }
+    }
+
+    class __buildin__parsefloat : NativeFunctionBase
+    {
+        List<RunTimeDataType> para;
+        public __buildin__parsefloat()
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_string);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "__buildin__parsefloat";
+            }
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_number;
+            }
+        }
+
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
+
+            string str = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
+            
+            if (String.IsNullOrEmpty(str))
+            {
+                return new rtNumber(double.NaN);
+            }
+
+            str=str.Trim();
+
+            bool hasreaddot=false;
+
+            string newstr = string.Empty;
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+
+                if (c == '.')
+                {
+                    if (hasreaddot)
+                    {
+                        break;
+                    }
+                    hasreaddot = true;
+                }
+                else if (c == '-' || c == '+')
+                {
+                    if (!string.IsNullOrEmpty(newstr))
+                    {
+                        break;
+                    }
+                    if (i + 1 >= str.Length)
+                    {
+                        return new rtNumber(double.NaN);
+                    }
+                    char n = str[i + 1];
+
+                    if (n == '.')
+                    {
+                        if (i + 2 >= str.Length)
+                        {
+                            return new rtNumber(double.NaN);
+                        }
+
+                        n = str[i + 2];
+                        if (n < 48 || n > 57)
+                        {
+                            return new rtNumber(double.NaN);
+                        }
+                    }
+                    else if (n < 48 || n > 57)
+                    {
+                        return new rtNumber(double.NaN);
+                    }
+
+
+                }
+                else if (c == 'e' || c == 'E')
+                {
+                    if (string.IsNullOrEmpty(newstr))
+                    {
+                        return new rtNumber(double.NaN);
+                    }
+                    else
+                    {
+                        if (i + 1 >= str.Length)
+                        {
+                            break;
+                        }
+
+                        string epart = "e";
+                        int st = i + 1;
+                        char ep = str[st];
+                        if (ep == '+' || ep == '-')
+                        {
+                            epart += ep;
+                            st++;
+
+                            if (!(st < str.Length))
+                            {
+                                break;
+                            }
+
+                            ep = str[st];
+                            if (ep < 48 || ep > 57)
+                            {
+                                break;
+                            }
+                            epart += ep;
+                            st++;
+                        }
+
+
+                        for (int j = st; j < str.Length; j++)
+                        {
+                            char n = str[j];
+                            if (n < 48 || n > 57)
+                            {
+                                break;
+                            }
+                            epart += n;
+                        }
+                        newstr += epart;
+
+                        break;
+                    }
+
+                }
+                else if (c < 48 || c > 57)
+                {
+                    if (string.IsNullOrEmpty(newstr))
+                    {
+                        return new rtNumber(double.NaN);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                newstr = newstr + c;
+
+            }
+
+            return new rtNumber(double.Parse(newstr));
+
+        }
+    }
+
+
 }

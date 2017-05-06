@@ -34,11 +34,34 @@ package
 		
 		public function Main() 
 		{
-			var myDate1:Date = new Date();
-            trace(myDate1); // [NOW]
+			var obj:Object = {
+				'a': 0,
+				'b': 1,
+				'c': 2
+			}
 
+			obj.setPropertyIsEnumerable('a', false)
 
-			trace(myDate1.timezoneOffset );
+			trace("object\n")
+			for (var op:* in obj)
+			{
+				trace(op)
+			}
+
+			var dict:Dictionary = new Dictionary()
+			dict['a'] = 0
+			dict['b'] = 1
+			dict['c'] = 2
+
+			dict.setPropertyIsEnumerable('a', false)
+
+			trace("dictionary\n")
+			for (var dp:* in dict)
+			{
+				trace(dp)
+			}
+
+			
 
         }
 

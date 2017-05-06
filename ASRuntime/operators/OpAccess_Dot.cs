@@ -324,7 +324,7 @@ namespace ASRuntime.operators
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
-                            dobj = (DynamicObject)((rtObject)protoObj.memberData[3].getValue()).value;
+                            dobj = (DynamicObject)((rtObject)protoObj.memberData[7].getValue()).value;
                             
                             if (!dobj.hasproperty(name))
                             {

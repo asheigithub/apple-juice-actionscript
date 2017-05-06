@@ -7,8 +7,18 @@
 		
 		private static var valueOf = function():*{ return this };
 
-
+		[native,_Object_hasOwnProperty]
+		private static var hasOwnProperty=function(name:String):Boolean;
 		
+		[native,_Object_isPrototypeOf]
+		private static var isPrototypeOf=function(V:*=null):Boolean;
+		
+		[native,_Object_propertyIsEnumerable]
+		private static var propertyIsEnumerable=function(name:String):Boolean;
+
+		[native,_Object_setPropertyIsEnumerable]
+		private static var setPropertyIsEnumerable=function(name:String,isEnum:Boolean = true):void;
+
 		private static var _prototype:*=
 		{
 			"toString":toString
@@ -19,6 +29,14 @@
 			{
 				return toString();
 			}
+			,
+			"hasOwnProperty":hasOwnProperty
+			,
+			"isPrototypeOf":isPrototypeOf
+			,
+			"propertyIsEnumerable":propertyIsEnumerable
+			,
+			"setPropertyIsEnumerable":setPropertyIsEnumerable
 
 		};
 		

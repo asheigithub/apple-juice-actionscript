@@ -125,7 +125,9 @@ namespace ASRuntime.operators
         }
 
         private static IEnumerator<RunTimeValueBase> getForinIEnumerator(
-            Player player,ASBinCode.rtti.Object obj ,StackFrame frame, OpStep step, RunTimeScope scope)
+            Player player,ASBinCode.rtti.Object obj ,StackFrame frame, OpStep step, RunTimeScope scope,
+            Dictionary<object, object> visited=null
+            )
         {
             if (obj is ASBinCode.rtti.DynamicObject)
             {
@@ -158,7 +160,8 @@ namespace ASRuntime.operators
                     }
 
                 }
-
+                if(visited==null)
+                    visited = new Dictionary<object, object>();
                 //***再到原型链中查找
                 if (dobj._prototype_ != null)
                 {
@@ -167,7 +170,13 @@ namespace ASRuntime.operators
                     if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
-                        var res = getForinIEnumerator(player, dobj, frame, step, scope);
+                        if (visited.ContainsKey(dobj))
+                        {
+                            yield break;
+                        }
+                        visited.Add(dobj, null);
+
+                        var res = getForinIEnumerator(player, dobj, frame, step, scope,visited);
                         while (res.MoveNext())
                         {
                             yield return res.Current;
@@ -228,7 +237,9 @@ namespace ASRuntime.operators
 
 
         private static IEnumerator<RunTimeValueBase> getForEach_IEnumerator(
-            Player player, ASBinCode.rtti.Object obj, StackFrame frame, OpStep step, RunTimeScope scope)
+            Player player, ASBinCode.rtti.Object obj, StackFrame frame, OpStep step, RunTimeScope scope,
+            Dictionary<object,object> visited=null
+            )
         {
             if (obj is ASBinCode.rtti.DynamicObject)
             {
@@ -262,6 +273,8 @@ namespace ASRuntime.operators
 
                 }
 
+                if (visited == null)
+                    visited = new Dictionary<object, object>();
                 //***再到原型链中查找
                 if (dobj._prototype_ != null)
                 {
@@ -270,7 +283,14 @@ namespace ASRuntime.operators
                     if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
                         dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
-                        var res = getForEach_IEnumerator(player, dobj, frame, step, scope);
+
+                        if (visited.ContainsKey(dobj))
+                        {
+                            yield break;
+                        }
+                        visited.Add(dobj, null);
+
+                        var res = getForEach_IEnumerator(player, dobj, frame, step, scope,visited);
                         while (res.MoveNext())
                         {
                             yield return res.Current;

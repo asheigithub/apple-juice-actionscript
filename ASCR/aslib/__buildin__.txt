@@ -15,5 +15,14 @@
 		[native,__buildin__isnan]
 		public static function isNaN(value:Number):Boolean;
 
+		[native,__buildin__isfinite]
+		public static function isFinite(value:Number):Boolean;
+
+		[native,__buildin__parseint]
+		public static function parseInt(str:String="NaN", radix:uint = 0):Number;
+
+		[native,__buildin__parsefloat]
+		public static function parseFloat(str:String="NaN"):Number;
+
 	}
 }

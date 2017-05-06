@@ -28,6 +28,31 @@ namespace ASBinCode.rtti
             return propertys.ContainsKey(name);
         }
 
+        public bool propertyIsEnumerable(string name)
+        {
+            var slot = propertys[name];
+            if (slot is ILinkSlot)
+            {
+                return ((ILinkSlot)slot).propertyIsEnumerable;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public void setPropertyIsEnumerable(string name,bool isEnum)
+        {
+            var slot = propertys[name];
+            if (slot is ILinkSlot)
+            {
+                ((ILinkSlot)slot).propertyIsEnumerable = isEnum;
+            }
+            
+        }
+
+
 
         private ILinkSlot rootSlot;
 
