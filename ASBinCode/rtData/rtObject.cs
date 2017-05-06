@@ -17,6 +17,11 @@ namespace ASBinCode.rtData
             
         }
 
+        public override double toNumber()
+        {
+            return double.NaN;
+        }
+
         //public  RunTimeDataType rtType
         //{
         //    get

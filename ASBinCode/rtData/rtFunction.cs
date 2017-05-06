@@ -93,6 +93,10 @@ namespace ASBinCode.rtData
             _this_pointer = obj;
         }
 
+        public override double toNumber()
+        {
+            return double.NaN;
+        }
 
         public override string ToString()
         {

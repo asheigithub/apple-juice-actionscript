@@ -7,7 +7,7 @@ namespace ASRuntime
     using rt = ASBinCode.RunTimeDataType;
     public class TypeConverter
     {
-        public static ASBinCode.IRightValue getDefaultValue(ASBinCode.RunTimeDataType type)
+        public static ASBinCode.RightValueBase getDefaultValue(ASBinCode.RunTimeDataType type)
         {
             switch (type)
             {
@@ -252,58 +252,59 @@ namespace ASRuntime
         }
 
 
-        internal static double ConvertToNumber(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        internal static double ConvertToNumber(ASBinCode.RunTimeValueBase src)
         {
-            switch (src.rtType)
-            {
-                case rt.rt_boolean:
-                    if (((ASBinCode.rtData.rtBoolean)src).value == true)
-                    {
-                        return 1;// new ASBinCode.rtData.rtNumber(1);
-                    }
-                    else
-                    {
-                        return 0;// ASBinCode.rtData.rtNumber.zero;
-                    }
-                case rt.rt_int:
-                    return ((ASBinCode.rtData.rtInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtInt)src).value);
-                case rt.rt_uint:
-                    return ((ASBinCode.rtData.rtUInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtUInt)src).value);
+            return src.toNumber();
+            //switch (src.rtType)
+            //{
+            //    case rt.rt_boolean:
+            //        if (((ASBinCode.rtData.rtBoolean)src).value == true)
+            //        {
+            //            return 1;// new ASBinCode.rtData.rtNumber(1);
+            //        }
+            //        else
+            //        {
+            //            return 0;// ASBinCode.rtData.rtNumber.zero;
+            //        }
+            //    case rt.rt_int:
+            //        return ((ASBinCode.rtData.rtInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtInt)src).value);
+            //    case rt.rt_uint:
+            //        return ((ASBinCode.rtData.rtUInt)src).value;// new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtUInt)src).value);
 
-                case rt.rt_number:
-                    return ((ASBinCode.rtData.rtNumber)src).value; //(ASBinCode.rtData.rtNumber)src;
+            //    case rt.rt_number:
+            //        return ((ASBinCode.rtData.rtNumber)src).value; //(ASBinCode.rtData.rtNumber)src;
 
-                case rt.rt_string:
-                    {
-                        double r = 0;
-                        if (((ASBinCode.rtData.rtString)src).value == null)
-                        {
-                            return 0;// new ASBinCode.rtData.rtNumber(0);
-                        }
-                        else if (double.TryParse(((ASBinCode.rtData.rtString)src).value, out r))
-                        {
-                            return r;//new ASBinCode.rtData.rtNumber(r);
-                        }
-                        else
-                        {
-                            return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
-                        }
-                    }
-                case rt.rt_void:
-                case rt.fun_void:
-                    return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
+            //    case rt.rt_string:
+            //        {
+            //            double r = 0;
+            //            if (((ASBinCode.rtData.rtString)src).value == null)
+            //            {
+            //                return 0;// new ASBinCode.rtData.rtNumber(0);
+            //            }
+            //            else if (double.TryParse(((ASBinCode.rtData.rtString)src).value, out r))
+            //            {
+            //                return r;//new ASBinCode.rtData.rtNumber(r);
+            //            }
+            //            else
+            //            {
+            //                return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
+            //            }
+            //        }
+            //    case rt.rt_void:
+            //    case rt.fun_void:
+            //        return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
 
-                case rt.rt_null:
-                    return 0;// new ASBinCode.rtData.rtNumber(0);
-                case rt.rt_function:
-                case rt.rt_array:
-                    return double.NaN;
-                case rt.unknown:
-                    return double.NaN;
-                default:
-                    return double.NaN;// null;
+            //    case rt.rt_null:
+            //        return 0;// new ASBinCode.rtData.rtNumber(0);
+            //    case rt.rt_function:
+            //    case rt.rt_array:
+            //        return double.NaN;
+            //    case rt.unknown:
+            //        return double.NaN;
+            //    default:
+            //        return double.NaN;// null;
 
-            }
+            //}
         }
 
 

@@ -10,9 +10,9 @@ namespace ASRuntime.operators
 {
     class OpForIn
     {
-        public static void forin_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void forin_get_enumerator(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-
+            var player = frame.player;
             StackSlot save = (StackSlot)step.reg.getSlot(scope);
 
             var obj = step.arg1.getValue(scope);
@@ -41,8 +41,9 @@ namespace ASRuntime.operators
         }
 
 
-        public static void foreach_get_enumerator(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void foreach_get_enumerator(StackFrame frame, OpStep step, RunTimeScope scope)
         {
+            var player = frame.player;
             StackSlot save = (StackSlot)step.reg.getSlot(scope);
 
             var obj = step.arg1.getValue(scope);
@@ -71,7 +72,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void enumerator_movenext(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void enumerator_movenext(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
@@ -86,7 +87,7 @@ namespace ASRuntime.operators
 
             frame.endStep(step);
         }
-        public static void enumerator_current(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void enumerator_current(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
@@ -95,7 +96,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void enumerator_close(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void enumerator_close(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 

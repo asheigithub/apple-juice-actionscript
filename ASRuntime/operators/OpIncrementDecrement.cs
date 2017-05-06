@@ -38,7 +38,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         if (string.IsNullOrEmpty( ((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -53,9 +53,9 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -81,9 +81,9 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n = TypeConverter.ConvertToNumber(v1);
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
                 frame.endStep(step);
             }
             
@@ -92,9 +92,9 @@ namespace ASRuntime.operators
            StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
            )
         {
-            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            double n = TypeConverter.ConvertToNumber(v1);
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-            ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
             frame.endStep(step);
         }
 
@@ -106,7 +106,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value++;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
             frame.endStep(step);
         }
@@ -117,7 +117,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value++;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
             frame.endStep(step);
         }
@@ -128,7 +128,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value++;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
 
             frame.endStep(step);
@@ -149,35 +149,35 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value--;
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.rt_uint:
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value--;
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.rt_number:
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value--;
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
                     }
                     break;
 
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
                         }
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
                     }
                     break;
 
@@ -185,9 +185,9 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -214,9 +214,9 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n = TypeConverter.ConvertToNumber(v1);
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
                 frame.endStep(step);
             }
         }
@@ -224,9 +224,9 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
-            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            double n = TypeConverter.ConvertToNumber(v1);
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-            ((ASBinCode.ILeftValue)step.reg).getSlot(scope).directSet(num);
+            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).directSet(num);
             frame.endStep(step);
         }
 
@@ -238,7 +238,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value--;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
             frame.endStep(step);
         }
@@ -249,7 +249,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value--;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
             frame.endStep(step);
         }
@@ -260,7 +260,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value--;
-                ((ASBinCode.ILeftValue)step.reg).getSlot(scope).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope).setValue(iv.value);
             }
             frame.endStep(step);
 
@@ -307,7 +307,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -316,7 +316,7 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                     }
                     break;
 
@@ -324,12 +324,12 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
 
                         step.reg.getSlot(scope).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -356,12 +356,12 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n = TypeConverter.ConvertToNumber(v1);
 
                 step.reg.getSlot(scope).setValue(n);
 
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                 frame.endStep(step);
             }
         }
@@ -369,12 +369,12 @@ namespace ASRuntime.operators
         private static void _execSuffixInc_toString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            double n = TypeConverter.ConvertToNumber(v1);
 
             step.reg.getSlot(scope).setValue(n);
 
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-            ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+            ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
             frame.endStep(step);
         }
 
@@ -464,7 +464,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
 
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
                         if (string.IsNullOrEmpty(((ASBinCode.rtData.rtString)v).value))
                         {
                             n = 0;
@@ -473,7 +473,7 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                     }
                     break;
 
@@ -481,12 +481,12 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_void:
                 case ASBinCode.RunTimeDataType.rt_null:
                     {
-                        double n = TypeConverter.ConvertToNumber(v, frame, step.token);
+                        double n = TypeConverter.ConvertToNumber(v);
 
                         step.reg.getSlot(scope).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -513,12 +513,12 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+                double n = TypeConverter.ConvertToNumber(v1);
 
                 step.reg.getSlot(scope).setValue(n);
 
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+                ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
                 frame.endStep(step);
             }
         }
@@ -526,12 +526,12 @@ namespace ASRuntime.operators
         private static void _execSuffixDec_toString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            double n = TypeConverter.ConvertToNumber(v1, frame, step.token);
+            double n = TypeConverter.ConvertToNumber(v1);
 
             step.reg.getSlot(scope).setValue(n);
 
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-            ((ASBinCode.ILeftValue)step.arg1).getSlot(scope).directSet(num);
+            ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope).directSet(num);
             frame.endStep(step);
         }
 

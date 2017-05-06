@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class ClassMethodGetter : MethodGetterBase
+    public sealed class ClassMethodGetter : MethodGetterBase
     {
         public ClassMethodGetter(string name, rtti.Class _class, int indexofMember
             , int refdefinedinblockid

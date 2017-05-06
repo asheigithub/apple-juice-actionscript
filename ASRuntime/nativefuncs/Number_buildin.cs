@@ -434,8 +434,8 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                double v1 = TypeConverter.ConvertToNumber(argements[0].getValue(), null, null, false);
-                double v2 = TypeConverter.ConvertToNumber(argements[1].getValue(), null, null, false);
+                double v1 = TypeConverter.ConvertToNumber(argements[0].getValue());
+                double v2 = TypeConverter.ConvertToNumber(argements[1].getValue());
 
                 errormessage = null;
                 errorno = 0;
@@ -567,7 +567,7 @@ namespace ASRuntime.nativefuncs
         else
         {
             var v = argements[0].getValue();
-            double r = TypeConverter.ConvertToNumber(v, null, null, false);
+            double r = TypeConverter.ConvertToNumber(v);
 
             
             {
@@ -642,7 +642,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -716,7 +716,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -791,7 +791,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -865,7 +865,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -939,7 +939,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1013,7 +1013,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1087,7 +1087,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1161,8 +1161,8 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                double v1 = TypeConverter.ConvertToNumber(argements[0].getValue(), null, null, false);
-                double v2 = TypeConverter.ConvertToNumber(argements[1].getValue(), null, null, false);
+                double v1 = TypeConverter.ConvertToNumber(argements[0].getValue());
+                double v2 = TypeConverter.ConvertToNumber(argements[1].getValue());
 
                 errormessage = null;
                 errorno = 0;
@@ -1228,7 +1228,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1302,7 +1302,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1376,7 +1376,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1450,7 +1450,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {
@@ -1524,7 +1524,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 var v = argements[0].getValue();
-                double r = TypeConverter.ConvertToNumber(v, null, null, false);
+                double r = TypeConverter.ConvertToNumber(v);
 
 
                 {

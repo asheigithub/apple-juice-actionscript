@@ -59,7 +59,7 @@ namespace ASRuntime
         private int index;
         private RunTimeValueBase[] store;
 
-        public sealed override  bool isPropGetterSetter
+        public sealed override bool isPropGetterSetter
         {
             get
             {
@@ -99,11 +99,11 @@ namespace ASRuntime
                         break;
                     case RunTimeDataType.rt_int:
                         //setValue(((rtInt)value).value);
-                        ((rtInt)store[index]).value = ((rtInt)value).value;
+                        _intValue.value = ((rtInt)value).value;
                         break;
                     case RunTimeDataType.rt_uint:
                         //setValue(((rtUInt)value).value);
-                        ((rtUInt)store[index]).value = ((rtUInt)value).value;
+                        _uintValue.value = ((rtUInt)value).value;
                         break;
                     case RunTimeDataType.rt_number:
                         //setValue(((rtNumber)value).value);
@@ -138,14 +138,7 @@ namespace ASRuntime
                     case RunTimeDataType.rt_array:
                         {
                             store[index] = value;
-                            //if (store[index].rtType == RunTimeDataType.rt_null)
-                            //{
-                            //    store[index] = (rtArray)value.Clone();
-                            //}
-                            //else
-                            //{
-                            //    ((rtArray)store[index]).CopyFrom((rtArray)value);
-                            //}
+                            
                         }
                         break;
                     case RunTimeDataType.unknown:
@@ -154,21 +147,7 @@ namespace ASRuntime
                     default:
                         {
                             store[RunTimeDataType._OBJECT] = value;
-                            //store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
-                            //if (store[RunTimeDataType._OBJECT].rtType == RunTimeDataType.rt_null)
-                            //{
-                            //    store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
-                            //}
-                            //else if (((rtObject)store[RunTimeDataType._OBJECT]).value.objectid
-                            //    != ((rtObject)value).value.objectid
-                            //    )
-                            //{
-                            //    store[RunTimeDataType._OBJECT] = (rtObject)value.Clone();
-                            //}
-                            //else
-                            //{
-                            //    ((rtObject)store[RunTimeDataType._OBJECT]).CopyFrom((rtObject)value);
-                            //}
+                            
                         }
                         break;
                 }

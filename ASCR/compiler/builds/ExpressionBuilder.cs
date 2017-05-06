@@ -96,7 +96,7 @@ namespace ASCompiler.compiler.builds
 
         }
 
-        public static IRightValue addCastOpStep(CompileEnv env, IRightValue src, RunTimeDataType dstType, 
+        public static RightValueBase addCastOpStep(CompileEnv env, RightValueBase src, RunTimeDataType dstType, 
             SourceToken token,Builder builder)
         {
             if (dstType < RunTimeDataType.unknown && dstType != RunTimeDataType.rt_void)
@@ -157,6 +157,7 @@ namespace ASCompiler.compiler.builds
                             op.reg = eax;
                             op.regType = dstType;
                             eax.setEAXTypeWhenCompile(dstType);
+                            eax.isFuncResult = true;
 
                             op.arg1 = eax_dot;
                             op.arg1Type = RunTimeDataType.rt_function;
@@ -194,7 +195,7 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        public static IRightValue addCastToPrimitive(CompileEnv env, IRightValue src, SourceToken token,Builder builder)
+        public static RightValueBase addCastToPrimitive(CompileEnv env, RightValueBase src, SourceToken token,Builder builder)
         {
             RunTimeDataType dstType;
             if (ASRuntime.TypeConverter.Object_CanImplicit_ToPrimitive(src.valueType, builder,out dstType))
@@ -219,8 +220,8 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        public static IRightValue addValueOfOpStep(CompileEnv env, 
-            IRightValue src,  
+        public static RightValueBase addValueOfOpStep(CompileEnv env, 
+            RightValueBase src,  
             SourceToken token,Builder builder)
         {
             if (src.valueType > RunTimeDataType.unknown )
@@ -281,7 +282,7 @@ namespace ASCompiler.compiler.builds
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         op.reg = eax;
                         op.regType = RunTimeDataType.rt_void;
-
+                        eax.isFuncResult = true;
                         //***调用valueof***
                         
                         var returnvalueType = signature.returnType;
@@ -309,7 +310,7 @@ namespace ASCompiler.compiler.builds
 
         public void buildIFGoto(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            IRightValue rv = getRightValue(env, step.Arg1, step.token,builder);
+            RightValueBase rv = getRightValue(env, step.Arg1, step.token,builder);
 
             if (rv.valueType != RunTimeDataType.rt_boolean)
             {
@@ -365,7 +366,7 @@ namespace ASCompiler.compiler.builds
 
         private void buildPropSet(ClassPropertyGetter prop,
             ASTool.AS3.Expr.AS3ExprStep step,string name,CompileEnv env,
-            ASBinCode.rtti.Class refClass,IRightValue rv, IRightValue setterbindobj
+            ASBinCode.rtti.Class refClass,RightValueBase rv, RightValueBase setterbindobj
             ,Register eax
             )
         {
@@ -422,7 +423,7 @@ namespace ASCompiler.compiler.builds
             
             //***调用setter访问器**
 
-            IRightValue func;
+            RightValueBase func;
             if (setterbindobj != null)
             {
                 //先从对象中取出setter
@@ -445,7 +446,7 @@ namespace ASCompiler.compiler.builds
             opInvokeSetter.regType = eax.valueType;
             opInvokeSetter.arg1 = func;
             opInvokeSetter.arg1Type = func.valueType;
-
+            eax.isFuncResult = true;
             {
                 OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                 opMakeArgs.arg1 = func;
@@ -476,9 +477,16 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg) //在类似短路操作等编译过程中可能成为赋值目标
                 {
 
-                    IRightValue rv = getRightValue(env, step.Arg2, step.token, builder);
+                    RightValueBase rv = getRightValue(env, step.Arg2, step.token, builder);
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+
+                    if (eax._hasUnaryOrShuffixOrDelete)
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "Target of assignment must be a reference value."));
+                    }
 
                     //当是暂存成员访问中间结果时
                     if (eax._regMember == null)
@@ -501,6 +509,7 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "const成员" + eax._regMember.name + "不能在此赋值"));
                     }
+                    
 
                     eax._isassigntarget = true;
 
@@ -555,7 +564,7 @@ namespace ASCompiler.compiler.builds
                             "const成员" + step.Arg1.Data.Value + "不能在此赋值"));
                     }
 
-                    ILeftValue memberLeftValue = member as ILeftValue;
+                    LeftValueBase memberLeftValue = member as LeftValueBase;
 
                     if (member is FindStaticMember)
                     {
@@ -636,6 +645,7 @@ namespace ASCompiler.compiler.builds
 
 
                         memberLeftValue = ((FindOutPackageScopeMember)member).buildAccessThisMember(step.token, env);
+                        ((Register)memberLeftValue)._isassigntarget = true;
                     }
 
                     if (memberLeftValue is ClassPropertyGetter)
@@ -653,9 +663,9 @@ namespace ASCompiler.compiler.builds
 
                     if (memberLeftValue !=null)//member is ASBinCode.ILeftValue)
                     {
-                        ILeftValue lv = memberLeftValue;//(ILeftValue)member;
+                        LeftValueBase lv = memberLeftValue;//(ILeftValue)member;
 
-                        IRightValue rv = getRightValue(env, step.Arg2, step.token,builder);
+                        RightValueBase rv = getRightValue(env, step.Arg2, step.token,builder);
 
                         //**加入赋值操作***
                         //**隐式类型转换检查
@@ -714,8 +724,8 @@ namespace ASCompiler.compiler.builds
         {
             if (step.OpCode == "+")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
 
                 v1 = addValueOfOpStep(env, v1, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                 v2 = addValueOfOpStep(env, v2, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
@@ -795,8 +805,8 @@ namespace ASCompiler.compiler.builds
             }
             else
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
                 
                 if (step.Arg1.IsReg)
                 {
@@ -879,8 +889,8 @@ namespace ASCompiler.compiler.builds
         /// </summary>
         private void buildMultipy(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-            ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+            ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
 
             if (step.Arg1.IsReg)
             {
@@ -973,8 +983,8 @@ namespace ASCompiler.compiler.builds
         }
 
 
-        private static IRightValue addOpPropGet(ClassPropertyGetter prop, ASTool.Token matchtoken ,string propname ,
-            ASBinCode.rtti.Class refClass , IRightValue rvObj ,CompileEnv env, Builder builder
+        private static RightValueBase addOpPropGet(ClassPropertyGetter prop, ASTool.Token matchtoken ,string propname ,
+            ASBinCode.rtti.Class refClass , RightValueBase rvObj ,CompileEnv env, Builder builder
             )
         {
             
@@ -1018,7 +1028,7 @@ namespace ASCompiler.compiler.builds
 
             int idx = env.block.opSteps.Count;
 
-            IRightValue func;
+            RightValueBase func;
 
             if (rvObj != null)
             {
@@ -1046,7 +1056,7 @@ namespace ASCompiler.compiler.builds
             opInvokeGetter.regType = gv.valueType;
             opInvokeGetter.arg1 = func;
             opInvokeGetter.arg1Type = func.valueType;
-
+            gv.isFuncResult = true;
             {
                 OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                 opMakeArgs.arg1 = func;
@@ -1069,7 +1079,9 @@ namespace ASCompiler.compiler.builds
             return gv;
         }
         
-        public static ASBinCode.IRightValue getRightValue(CompileEnv env, ASTool.AS3.Expr.AS3DataStackElement data, ASTool.Token matchtoken,Builder builder)
+        public static ASBinCode.RightValueBase getRightValue(CompileEnv env, 
+            ASTool.AS3.Expr.AS3DataStackElement data, 
+            ASTool.Token matchtoken,Builder builder,bool addtryreadproperty=false)
         {
             if (data.IsReg)
             {
@@ -1097,7 +1109,7 @@ namespace ASCompiler.compiler.builds
                 }              
                 else
                 {
-                    if (reg.valueType == RunTimeDataType.rt_void)
+                    if (addtryreadproperty && reg.valueType == RunTimeDataType.rt_void)
                     {
                         //***有可能是个访问器，
                         OpStep opgettest = new OpStep(OpCode.try_read_getter, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
@@ -1267,7 +1279,7 @@ namespace ASCompiler.compiler.builds
                                 "成员" + data.Data.Value + "未找到"));
                         }
 
-                        if (member is ASBinCode.IRightValue)
+                        if (member is ASBinCode.RightValueBase)
                         {
                             if (member is ClassPropertyGetter) //需要加上测试读取
                             {
@@ -1279,7 +1291,7 @@ namespace ASCompiler.compiler.builds
                             }
                             else
                             {
-                                return (ASBinCode.IRightValue)member;
+                                return (ASBinCode.RightValueBase)member;
                             }
                         }
                         else
@@ -1406,7 +1418,7 @@ namespace ASCompiler.compiler.builds
                         ASTool.Token key = (ASTool.Token)item;
                         ASTool.AS3.Expr.AS3DataStackElement value = (ASTool.AS3.Expr.AS3DataStackElement)objData[key];
 
-                        IRightValue rv = getRightValue(env, value, matchtoken, builder);
+                        RightValueBase rv = getRightValue(env, value, matchtoken, builder);
 
                         OpStep setprop = new OpStep(OpCode.set_dynamic_prop, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                         setprop.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtString(key.StringValue));
@@ -1442,7 +1454,7 @@ namespace ASCompiler.compiler.builds
                     for (int i = 0; i < list.Count; i++)
                     {
                         ASTool.AS3.Expr.AS3DataStackElement value = list[i];
-                        IRightValue rv = getRightValue(env, value, matchtoken, builder);
+                        RightValueBase rv = getRightValue(env, value, matchtoken, builder);
 
                         OpStep setprop = new OpStep(OpCode.array_push, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
                         setprop.arg1 = rv;
@@ -1676,10 +1688,10 @@ namespace ASCompiler.compiler.builds
         private void buildSuffix(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
             
-            ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
+            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder,true);
             if (step.Arg1.IsReg)
             {
-                if (!(v1 is ILeftValue))
+                if (!(v1 is LeftValueBase))
                 {
                     throw new BuildException(
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -1697,6 +1709,17 @@ namespace ASCompiler.compiler.builds
                     }
                 }
 
+                if (v1 is Register)
+                {
+                    if (((Register)v1).isFuncResult && !(((Register)v1)._regMember !=null && ((Register)v1)._regMember.bindField is ClassPropertyGetter))
+                    {
+                        throw new BuildException(
+                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "Operand of " + step.OpCode + " must be a reference."));
+                    }
+                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
+                }
+
                 if (
                         v1.valueType != RunTimeDataType.rt_number &&
                         v1.valueType != RunTimeDataType.rt_int &&
@@ -1711,7 +1734,7 @@ namespace ASCompiler.compiler.builds
 
                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                 eax.setEAXTypeWhenCompile(v1.valueType);
-
+                eax._hasUnaryOrShuffixOrDelete = true;
 
                 OpCode code;
                 if (step.OpCode == "++")
@@ -1776,7 +1799,25 @@ namespace ASCompiler.compiler.builds
                 //***检查是否是动态属性
                 if (builder._propLines.ContainsKey(v1))
                 {
+                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
                     var addlines = builder._propLines[v1];
+                    foreach (var line in addlines)
+                    {
+                        if (line.reg is Register)
+                        {
+                            ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true;
+                        }
+                        if (line.arg1 is Register)
+                        {
+                            ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true;
+                        }
+                        if (line.arg2 is Register)
+                        {
+                            ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true;
+                        }
+                    }
+
+
                     if (addlines.Count == 1 && addlines[0].opCode == OpCode.try_read_getter)
                     {
                         //***将值赋值回v1***
@@ -1830,7 +1871,7 @@ namespace ASCompiler.compiler.builds
                 #region +
 
                 //正号。检查是否可转换成Number;
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
@@ -1878,7 +1919,7 @@ namespace ASCompiler.compiler.builds
             {
                 #region "-"
 
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
 
                 if (step.Arg1.IsReg)
                 {
@@ -1926,7 +1967,7 @@ namespace ASCompiler.compiler.builds
             {
                 #region ~
 
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
 
                 if (step.Arg1.IsReg)
                 {
@@ -1972,7 +2013,7 @@ namespace ASCompiler.compiler.builds
             {
                 #region "!"
 
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
 
                 if (step.Arg1.IsReg)
                 {
@@ -2013,16 +2054,19 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == "delete" && !env.isEval)
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
 
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
-                    if (!
+                    if (
+                        !
                         (
                             v1.valueType == RunTimeDataType.rt_void ||
-                            v1.valueType > RunTimeDataType.unknown
+                            v1.valueType > RunTimeDataType.unknown  
                         )
+                        &&
+                        !(v1 is Register)
                         )
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -2034,6 +2078,13 @@ namespace ASCompiler.compiler.builds
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "成员[" + ((VariableBase)v1).name + "]不能进行一元操作[delete]");
                     }
+                    if (v1 is ThisPointer || v1 is SuperPointer)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "Cannot assign to a non-reference value.");
+                    }
+
+
 
                     if (v1 is Register)
                     {
@@ -2043,6 +2094,8 @@ namespace ASCompiler.compiler.builds
                             throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "Attempt to delete the fixed property prototype.  Only dynamically defined properties can be deleted.");
                         }
+                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
+
                     }
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
@@ -2130,14 +2183,14 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == "++" || step.OpCode == "--")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder,true);
                 if (step.Arg1.IsReg 
                     || (v1 is Register && ((Register)v1)._regMember != null)
                     ||
                     builder._propLines.ContainsKey(v1)
                     )
                 {
-                    if (!(v1 is ILeftValue))
+                    if (!(v1 is LeftValueBase))
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -2155,8 +2208,17 @@ namespace ASCompiler.compiler.builds
                         }
                     }
 
-
-                    //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
+                    if (v1 is Register)
+                    {
+                        if (((Register)v1).isFuncResult && !(((Register)v1)._regMember != null && ((Register)v1)._regMember.bindField is ClassPropertyGetter))
+                        {
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "Operand of " + step.OpCode + " must be a reference."));
+                        }
+                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
+                    }
+                    
                     if (
                         v1.valueType != RunTimeDataType.rt_number &&
                         v1.valueType != RunTimeDataType.rt_int &&
@@ -2225,6 +2287,7 @@ namespace ASCompiler.compiler.builds
 
                     Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(v1.valueType);
+                    eax._hasUnaryOrShuffixOrDelete = true;
 
                     op.reg = eax;
                     op.regType = eax.valueType;
@@ -2235,6 +2298,23 @@ namespace ASCompiler.compiler.builds
                     if (builder._propLines.ContainsKey(v1))
                     {
                         var addlines = builder._propLines[v1];
+                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
+                        foreach (var line in addlines)
+                        {
+                            if (line.reg is Register)
+                            {
+                                ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true;
+                            }
+                            if (line.arg1 is Register)
+                            {
+                                ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true;
+                            }
+                            if (line.arg2 is Register)
+                            {
+                                ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true;
+                            }
+                        }
+
                         if (addlines.Count == 1 && addlines[0].opCode == OpCode.try_read_getter)
                         {
                             //***将值赋值回v1***
@@ -2291,8 +2371,8 @@ namespace ASCompiler.compiler.builds
         {
             if (step.OpCode == ">" || step.OpCode == "<" || step.OpCode == ">=" || step.OpCode == "<=")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
                     //eax.setEAXTypeWhenCompile(typeTable[(int)v1.valueType, (int)v2.valueType]);
@@ -2435,8 +2515,8 @@ namespace ASCompiler.compiler.builds
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
-                    ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                    ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                    ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                    ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
 
                     if (
                         v2.valueType == RunTimeDataType.rt_void
@@ -2480,8 +2560,8 @@ namespace ASCompiler.compiler.builds
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
-                    ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                    ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                    ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                    ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
 
                     if (
                         v2.valueType == RunTimeDataType.rt_void
@@ -2517,8 +2597,8 @@ namespace ASCompiler.compiler.builds
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
-                    ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                    ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                    ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                    ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
 
                     ASBinCode.OpStep op
                         = new ASBinCode.OpStep(OpCode.logic_in, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -2554,8 +2634,8 @@ namespace ASCompiler.compiler.builds
         {
             if (step.OpCode == "==" || step.OpCode=="!=")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
                 if (step.Arg1.IsReg)
                 {
 
@@ -2609,8 +2689,8 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == "===" || step.OpCode =="!==")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
                 if (step.Arg1.IsReg)
                 {
 
@@ -2650,8 +2730,8 @@ namespace ASCompiler.compiler.builds
 
         private void buildBitAnd(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-            ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token,builder);
+            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+            ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
             if (step.Arg1.IsReg)
             {
                 if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
@@ -2702,8 +2782,8 @@ namespace ASCompiler.compiler.builds
 
         private void buildBitOr(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token,builder);
-            ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
+            ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
             if (step.Arg1.IsReg)
             {
                 if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
@@ -2753,8 +2833,8 @@ namespace ASCompiler.compiler.builds
 
         private void buildBitXor(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-            ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+            ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
             if (step.Arg1.IsReg)
             {
                 if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
@@ -2807,8 +2887,8 @@ namespace ASCompiler.compiler.builds
         {
             if (step.OpCode == "<<")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
                     if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
@@ -2857,8 +2937,8 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == ">>")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
                     if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
@@ -2907,8 +2987,8 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.OpCode == ">>>")
             {
-                ASBinCode.IRightValue v1 = getRightValue(env, step.Arg2, step.token, builder);
-                ASBinCode.IRightValue v2 = getRightValue(env, step.Arg3, step.token, builder);
+                ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
+                ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
                     if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_uint,builder)

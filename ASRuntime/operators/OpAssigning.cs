@@ -8,27 +8,37 @@ namespace ASRuntime.operators
 {
     class OpAssigning
     {
-        public static void execAssigning(Player player, ASBinCode.OpStep step ,StackFrame frame, ASBinCode.RunTimeScope scope)
+        public static void execAssigning(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
             ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
             ASBinCode.SLOT slot = step.reg.getSlot(scope);
 
-            if (!slot.isPropGetterSetter)
+            //if (!slot.isPropGetterSetter)
             {
                 if (!slot.directSet(v))
                 {
-                    if (((StackSlot)slot).linktarget != null)
+                    StackSlot oslot = (StackSlot)slot;
+                    //if (oslot.linktarget != null)
                     {
-                        slot = ((StackSlot)slot).linktarget;
+                        slot = oslot.linktarget;
                     }
 
-                    //if (slot is ILinkSlot)  //需要更新可枚举属性
-                    //{
-                    //    ((ILinkSlot)slot).propertyIsEnumerable = true;
-                    //    frame.endStep(step);
-                    //    return;
-                    //}
-                    //else 
+                    if (slot is ClassPropertyGetter.PropertySlot)
+                    {
+                        ClassPropertyGetter.PropertySlot propslot =
+                        (ASBinCode.ClassPropertyGetter.PropertySlot)slot;
+                        //***调用访问器。***
+                        ASBinCode.ClassPropertyGetter prop = oslot.propGetSet; //propslot.property;
+                        
+                        _doPropAssigning(prop, frame, step, frame.player, scope,
+                            //propslot.bindObj
+                            oslot.propBindObj
+                            , v,
+                            oslot
+                            );
+                        return;
+                    }
+
                     if (slot is OpVector.vectorSLot)    //Vector类型不匹配
                     {
                         BlockCallBackBase cb = new BlockCallBackBase();
@@ -73,36 +83,23 @@ namespace ASRuntime.operators
                         );
                 }
 
-                //if (
-                //    slot is StackSlot 
-                //    &&
-                //    ((StackSlot)slot).linktarget != null
-                //    )
-                //{
-                //    slot = ((StackSlot)slot).linktarget;
-                //    if (slot is ILinkSlot)
-                //    {
-                //        ((ILinkSlot)slot).propertyIsEnumerable = true;
-                //    }
-                //}
-
                 frame.endStep(step);
             }
-            else
-            {
-                ClassPropertyGetter.PropertySlot propslot= 
-                        (ASBinCode.ClassPropertyGetter.PropertySlot)((StackSlot)slot).linktarget;
-                //***调用访问器。***
-                ASBinCode.ClassPropertyGetter prop = ((StackSlot)slot).propGetSet; //propslot.property;
+            //else
+            //{
+            //    ClassPropertyGetter.PropertySlot propslot= 
+            //            (ASBinCode.ClassPropertyGetter.PropertySlot)((StackSlot)slot).linktarget;
+            //    //***调用访问器。***
+            //    ASBinCode.ClassPropertyGetter prop = ((StackSlot)slot).propGetSet; //propslot.property;
 
-                _doPropAssigning(prop, frame, step, player, scope,
-                    //propslot.bindObj
-                    ((StackSlot)slot).propBindObj
-                    , v,
-                    (StackSlot)slot
-                    );
+            //    _doPropAssigning(prop, frame, step, player, scope,
+            //        //propslot.bindObj
+            //        ((StackSlot)slot).propBindObj
+            //        , v,
+            //        (StackSlot)slot
+            //        );
 
-            }
+            //}
 
         }
 
@@ -146,7 +143,18 @@ namespace ASRuntime.operators
                 Class finder;
                 if (block.isoutclass)
                 {
-                    finder = null;
+                    var c = prop._class;
+                    if (c.instanceClass != null) { c = c.instanceClass; }
+                    if (c.mainClass != null) { c = c.mainClass; }
+
+                    if (block.define_class_id == c.classid)
+                    {
+                        finder = player.swc.classes[block.define_class_id];
+                    }
+                    else
+                    {
+                        finder = null;
+                    }
                 }
                 else
                 {

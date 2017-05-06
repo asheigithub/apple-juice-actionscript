@@ -26,16 +26,26 @@ namespace ASBinCode
         /// 所属标签
         /// </summary>
         public Stack<string> labels;
+        ///// <summary>
+        ///// 当前行在哪些try块里
+        ///// </summary>
+        //public Stack<int> trys;
         /// <summary>
-        /// 当前行在哪些try块里
+        /// 当前行在哪个try块里
+        /// -1表示不在任何try块里
         /// </summary>
-        public Stack<int> trys;
+        public int tryid;
+        /// <summary>
+        /// 当前块所属try类型
+        /// 0 try 1 catch 2 finally
+        /// </summary>
+        public int trytype;
 
         public OpCode opCode;
 
-        public ILeftValue reg;
-        public IRightValue arg1;
-        public IRightValue arg2;
+        public LeftValueBase reg;
+        public RightValueBase arg1;
+        public RightValueBase arg2;
 
 
         /// <summary>

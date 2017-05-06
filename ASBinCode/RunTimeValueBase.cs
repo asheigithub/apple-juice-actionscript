@@ -17,6 +17,10 @@ namespace ASBinCode
         }
 
         public abstract object Clone();
-        
+
+
+
+        public abstract double toNumber();
+
     }
 }

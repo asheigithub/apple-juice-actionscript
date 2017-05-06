@@ -9,7 +9,7 @@ namespace ASRuntime.operators
 {
     class OpCallFunction
     {
-        public static void bind(Player player, StackFrame frame, ASBinCode.OpStep step)
+        public static void bind(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             var rv = step.arg1.getValue(frame.scope);
             if (rv.rtType != RunTimeDataType.rt_function)
@@ -54,7 +54,7 @@ namespace ASRuntime.operators
                                     cls = cls.mainClass;
                                 }
 
-                                var ot = player.outpackage_runtimescope[cls.classid];
+                                var ot = frame.player.outpackage_runtimescope[cls.classid];
                                 function.setThis(ot.this_pointer);
                             }
                             //while (!(((ASBinCode.rtData.rtObject)s.this_pointer).value is ASBinCode.rtti.Global_Object))
@@ -65,7 +65,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            if (player.isConsoleOut)
+                            if (frame.player.isConsoleOut)
                             {
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.WriteLine("当前函数没有this指针。也许不是从文档类启动，而是从包外代码启动的");
@@ -88,7 +88,7 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void clear_thispointer(Player player, StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+        public static void clear_thispointer( StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
@@ -100,7 +100,7 @@ namespace ASRuntime.operators
                 rv= step.arg1.getValue(frame.scope);
             }
 
-            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
                 ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
@@ -149,8 +149,8 @@ namespace ASRuntime.operators
                 {
                     int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope)).value;
 
-                    var o = player.outpackage_runtimescope[classid];
-                    _do_clear_thispointer(player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope), frame,o.this_pointer);
+                    var o = frame.player.outpackage_runtimescope[classid];
+                    _do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope), frame,o.this_pointer);
                 }
 
                 
@@ -176,7 +176,7 @@ namespace ASRuntime.operators
         //}
 
 
-        public static void create_paraScope(Player player, StackFrame frame, ASBinCode.OpStep step)
+        public static void create_paraScope(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
@@ -188,7 +188,7 @@ namespace ASRuntime.operators
                 rv = step.arg1.getValue(frame.scope);
             }
 
-            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
                 ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
@@ -217,7 +217,7 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
 
-                frame.funCaller = new FunctionCaller(player, frame, step.token);
+                frame.funCaller = new FunctionCaller(frame.player, frame, step.token);
                 frame.funCaller.function = function;
                 frame.funCaller._tempSlot = frame._tempSlot1;
                 frame.funCaller.loadDefineFromFunction();
@@ -226,7 +226,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void push_parameter(Player player, StackFrame frame, ASBinCode.OpStep step)
+        public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
             RunTimeValueBase arg = step.arg1.getValue(frame.scope);
@@ -248,7 +248,7 @@ namespace ASRuntime.operators
 
 
 
-        public static void exec(Player player, StackFrame frame, ASBinCode.OpStep step)
+        public static void exec(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
 #if DEBUG
 
@@ -262,7 +262,7 @@ namespace ASRuntime.operators
                 rv = step.arg1.getValue(frame.scope);
             }
 
-            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, player.swc))
+            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
                 ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
@@ -296,7 +296,7 @@ namespace ASRuntime.operators
                 }
 
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[function.functionId];
+                ASBinCode.rtti.FunctionDefine funcDefine = frame.player.swc.functions[function.functionId];
 
 
                 if (!frame.funCaller.function.Equals(function))
@@ -376,7 +376,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_return(Player player, StackFrame frame, ASBinCode.OpStep step)
+        public static void exec_return(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             RunTimeValueBase result = step.arg1.getValue(frame.scope);
             if (result.rtType == RunTimeDataType.rt_function)

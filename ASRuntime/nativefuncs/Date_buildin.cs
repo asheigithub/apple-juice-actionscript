@@ -139,7 +139,7 @@ namespace ASRuntime.nativefuncs
                     }
                     else
                     {
-                        double v = TypeConverter.ConvertToNumber(yearOrTimevalue, null, null);
+                        double v = TypeConverter.ConvertToNumber(yearOrTimevalue);
                         if (double.IsNaN(v))
                         {
                             datelink.isvalid = false;

@@ -332,7 +332,7 @@ namespace ASCompiler.compiler.builds
 
 
 
-        private void build_void(CompileEnv env, IRightValue cls, ASTool.AS3.Expr.AS3ExprStep step, Builder builder)
+        private void build_void(CompileEnv env, RightValueBase cls, ASTool.AS3.Expr.AS3ExprStep step, Builder builder)
         {
             OpStep opnewclass = new OpStep(OpCode.new_instance_class,
                                 new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -356,7 +356,7 @@ namespace ASCompiler.compiler.builds
                 for (int i = 0; i < args.Count; i++)
                 {
                     ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                    IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
+                    RightValueBase arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
                     //***参数准备***
                     OpStep opPushArgs = new OpStep(OpCode.push_parameter_class, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     opPushArgs.arg1 = arg;

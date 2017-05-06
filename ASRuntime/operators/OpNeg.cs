@@ -33,7 +33,7 @@ namespace ASRuntime.operators
             {
 
                 step.reg.getSlot(scope).setValue(
-                    -TypeConverter.ConvertToNumber(v1,frame,step.token)  
+                    -TypeConverter.ConvertToNumber(v1)  
                     );
                 frame.endStep(step);
             }
@@ -43,7 +43,7 @@ namespace ASRuntime.operators
             )
         {
             step.reg.getSlot(scope).setValue(
-                    -TypeConverter.ConvertToNumber(v1, frame, step.token)
+                    -TypeConverter.ConvertToNumber(v1)
                     //-((ASBinCode.rtData.rtNumber)v1).value
                     );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
             frame.endStep(step);

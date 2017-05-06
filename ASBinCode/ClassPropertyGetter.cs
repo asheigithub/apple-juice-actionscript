@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class ClassPropertyGetter : IMember ,ILeftValue
+    public sealed class ClassPropertyGetter :LeftValueBase, IMember 
     {
         public readonly ASBinCode.rtti.Class _class;
         private readonly int indexofMember;
@@ -18,6 +18,7 @@ namespace ASBinCode
             this.indexofMember = indexofMember;
             this._name = name;
             this._tempSlot = new PropertySlot();
+            this.valueType = RunTimeDataType.unknown;
         }
 
         
@@ -41,29 +42,29 @@ namespace ASBinCode
             }
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                if (getter == null)
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                    //return getter.valueType;
-                }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        if (getter == null)
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //        else
+        //        {
+        //            throw new NotImplementedException();
+        //            //return getter.valueType;
+        //        }
                 
-            }
-        }
+        //    }
+        //}
 
         public IMember clone()
         {
             throw new NotImplementedException();
         }
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
@@ -76,7 +77,7 @@ namespace ASBinCode
         //    get { return _tempSlot; }
         //}
 
-        public SLOT getSlot(RunTimeScope scope)
+        public sealed override  SLOT getSlot(RunTimeScope scope)
         {
             //if (_tempSlot == null)
             //{

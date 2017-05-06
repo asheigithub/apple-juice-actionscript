@@ -9,7 +9,7 @@ namespace ASRuntime.operators
 {
     class OpAccess_Dot
     {
-        public static void exec_dot(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_dot(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
@@ -30,25 +30,38 @@ namespace ASRuntime.operators
                 if (slot != null)
                 {
                     
-                    SLOT lintoslot = ((ILeftValue)step.arg2).getSlot(rtObj.objScope);
+                    SLOT lintoslot = ((LeftValueBase)step.arg2).getSlot(rtObj.objScope);
                     if (lintoslot == null)
                     {
                         frame.throwError((new error.InternalError(step.token,
                             "没有获取到类成员数据"
                             )));
                     }
+
                     if (lintoslot is ClassPropertyGetter.PropertySlot)
                     {
-                        slot.propGetSet = (ClassPropertyGetter)step.arg2;
-                        slot.propBindObj = rtObj;
-                        if (step.arg1 is SuperPointer)
-                        {
-                            slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
-                        }
+                        //slot.propGetSet = (ClassPropertyGetter)step.arg2;
+                        //slot.propBindObj = rtObj;
+                        //if (step.arg1 is SuperPointer)
+                        //{
+                        //    slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                        //}
+                        frame.endStep(step);
+                        return;
+                    }
+
+                    Register register = (Register)step.reg;
+
+                    if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget)
+                    {
+                        slot.linkTo(lintoslot);
+                    }
+                    else
+                    {
+                        slot.directSet(lintoslot.getValue());
+                        
                     }
                     
-
-                    slot.linkTo(lintoslot);
                     
                 }
                 else
@@ -63,7 +76,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void exec_method(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_method(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase obj = step.arg1.getValue(scope);
 
@@ -101,7 +114,15 @@ namespace ASRuntime.operators
                          )));
                     }
 
-                    slot.linkTo(lintoslot);
+                    Register register = (Register)step.reg;
+                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                    {
+                        slot.linkTo(lintoslot);
+                    }
+                    else
+                    {
+                        slot.directSet(lintoslot.getValue());
+                    }
                 }
                 else
                 {
@@ -115,7 +136,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void exec_dot_byname(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_dot_byname(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
@@ -128,6 +149,7 @@ namespace ASRuntime.operators
             }
             else
             {
+                var player = frame.player;
                 if (!(obj is rtObject))
                 {
                     var objtype = obj.rtType;
@@ -193,12 +215,14 @@ namespace ASRuntime.operators
                         return;
                     }
 
+                    Register register = (Register)step.reg;
+
                     //***访问动态类型
                     DictionaryObject dict = (DictionaryObject)rtObj.value;
                     var key = new DictionaryKey(v2);
                     if (!dict.isContainsKey(key))
                     {
-                        if (((Register)step.reg)._isassigntarget)
+                        if (register._isassigntarget)
                         {
                             DictionarySlot dictslot = new DictionarySlot(rtObj);
                             dictslot._key = key;
@@ -218,7 +242,15 @@ namespace ASRuntime.operators
                     StackSlot dslot = step.reg.getSlot(scope) as StackSlot;
                     if (dslot != null)
                     {
-                        dslot.linkTo(slot);
+                        if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                        {
+                            dslot.linkTo(slot);
+                        }
+                        else
+                        {
+                            dslot.directSet(slot.getValue());
+                        }
+                        
                     }
                     else
                     {
@@ -357,10 +389,19 @@ namespace ASRuntime.operators
                     else
                     {
                         SLOT propSlot = gobj[name];
+                        Register register = (Register)step.reg;
                         StackSlot slot = step.reg.getSlot(scope) as StackSlot;
                         if (slot != null)
                         {
-                            slot.linkTo(propSlot);
+                            if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                            {
+                                slot.linkTo(propSlot);
+                            }
+                            else
+                            {
+                                slot.directSet(propSlot.getValue());
+                            }
+                            
                         }
                         else
                         {
@@ -449,7 +490,7 @@ namespace ASRuntime.operators
                                     }
                                 }
 
-                                linkProtoTypeMember(dobj, rtObj, player, dslot, name);
+                                linkProtoTypeMember(dobj, rtObj, player, dslot, name, (Register)step.reg);
                             }
                             else
                             {
@@ -487,7 +528,7 @@ namespace ASRuntime.operators
                                 StackSlot dslot = step.reg.getSlot(scope) as StackSlot;
                                 if (dslot != null)
                                 {
-                                    linkProtoTypeMember(dobj, rtObj, player, dslot, name);
+                                    linkProtoTypeMember(dobj, rtObj, player, dslot, name, (Register)step.reg);
                                 }
                                 else
                                 {
@@ -535,7 +576,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((ILeftValue)member.bindField).getSlot(rtObj.objScope);
+                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope);
                                 }
                             }
                             else
@@ -546,20 +587,48 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((ILeftValue)member.bindField).getSlot(rtObj.objScope);
+                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope);
                                 }
                             }
 
-                            slot.linkTo(linkto);
-                            if (linkto is ClassPropertyGetter.PropertySlot)
+                            Register register = (Register)step.reg;
+
+                            if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
                             {
-                                slot.propBindObj = rtObj;
-                                slot.propGetSet = (ClassPropertyGetter)member.bindField;
-                                if (step.arg1 is SuperPointer)
+                                slot.linkTo(linkto);
+                                if (linkto is ClassPropertyGetter.PropertySlot)
                                 {
-                                    slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                                    slot.propBindObj = rtObj;
+                                    slot.propGetSet = (ClassPropertyGetter)member.bindField;
+                                    if (step.arg1 is SuperPointer)
+                                    {
+                                        slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                                    }
                                 }
                             }
+                            else
+                            {
+                                if (linkto is ClassPropertyGetter.PropertySlot)
+                                {
+                                    Class supercls = null;
+                                    if (step.arg1 is SuperPointer)
+                                    {
+                                        supercls= ((SuperPointer)step.arg1).superClass;
+                                    }
+                                    OpPropGetSet._do_prop_read(
+                                        (ClassPropertyGetter)member.bindField,
+                                        frame, step, player, scope,
+                                        rtObj,
+                                        supercls
+                                        );
+                                    return;
+                                }
+                                else
+                                {
+                                    slot.directSet(linkto.getValue());
+                                }
+                            }
+                            
                         }
                         else
                         {
@@ -577,7 +646,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static void linkProtoTypeMember(DynamicObject dobj,rtObject rtObj,Player player,StackSlot dslot,string name)
+        private static void linkProtoTypeMember(DynamicObject dobj,rtObject rtObj,Player player,StackSlot dslot,string name,Register register)
         {
             SLOT v = dobj[name];
             if (!ReferenceEquals(dobj, rtObj.value))
@@ -614,7 +683,14 @@ namespace ASRuntime.operators
                 v = pslot;
             }
 
-            dslot.linkTo(v);
+            if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+            {
+                dslot.linkTo(v);
+            }
+            else
+            {
+                dslot.directSet(v.getValue());
+            }
         }
 
 
@@ -625,7 +701,7 @@ namespace ASRuntime.operators
         /// <param name="frame"></param>
         /// <param name="step"></param>
         /// <param name="scope"></param>
-        public static void exec_bracket_access(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_bracket_access(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase obj = step.arg1.getValue(scope);
             if (rtNull.nullptr.Equals(obj))
@@ -639,6 +715,7 @@ namespace ASRuntime.operators
             }
             else
             {
+                var player = frame.player;
                 if (obj is rtArray)
                 {
                     if (_assess_array(obj, frame, step, scope))
@@ -651,7 +728,7 @@ namespace ASRuntime.operators
                     if (player.swc.dict_Vector_type.ContainsKey(((rtObject)obj).value._class))
                     {
                         //说明是Vector数组
-                        OpVector.exec_AccessorBind_ConvertIdx(player, frame, step, scope);
+                        OpVector.exec_AccessorBind_ConvertIdx( frame, step, scope);
                         return;
                     }
                 }
@@ -731,7 +808,7 @@ namespace ASRuntime.operators
         private static bool _assess_array( RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var idx = step.arg2.getValue(scope);
-            var number = TypeConverter.ConvertToNumber(idx, frame, step.token);
+            var number = TypeConverter.ConvertToNumber(idx);
             if (!(double.IsNaN(number) || double.IsInfinity(number)))
             {
                 if ((int)number >= 0)
@@ -750,13 +827,17 @@ namespace ASRuntime.operators
 
 
                     //***访问数组的内容***
-                    StackSlot stackSlot= (StackSlot)step.reg.getSlot(scope);
-                    //stackSlot.fromArray = (rtArray)obj;
-                    //stackSlot.fromArrayIndex = (int)number;
+                    Register register = (Register)step.reg;
+                    StackSlot stackSlot= (StackSlot)register.getSlot(scope);
 
-                    //step.reg.getISlot(scope).directSet(((rtArray)obj).innerArray[(int)number]);
-                    stackSlot.linkTo(new arraySlot((rtArray)obj, (int)number));
-
+                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                    {
+                        stackSlot.linkTo(new arraySlot((rtArray)obj, (int)number));
+                    }
+                    else
+                    {
+                        stackSlot.directSet(((rtArray)obj).innerArray[(int)number]);
+                    }
                     frame.endStep();
                     return true;
                 }
@@ -774,13 +855,13 @@ namespace ASRuntime.operators
                 this.idx = idx;
             }
 
-            public sealed override bool isPropGetterSetter
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            //public sealed override bool isPropGetterSetter
+            //{
+            //    get
+            //    {
+            //        return false;
+            //    }
+            //}
 
             public sealed override void clear()
             {
@@ -854,13 +935,13 @@ namespace ASRuntime.operators
             }
 
 
-            public sealed override bool isPropGetterSetter
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            //public sealed override bool isPropGetterSetter
+            //{
+            //    get
+            //    {
+            //        return false;
+            //    }
+            //}
 
             public sealed override void clear()
             {

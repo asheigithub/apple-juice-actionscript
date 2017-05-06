@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,14 +10,6 @@ namespace ASCompiler.compiler
         public ASBinCode.CodeBlock block;
 
         internal List<ASTool.AS3.AS3Function> tobuildNamedfunction = new List<ASTool.AS3.AS3Function>();
-
-        
-        //public List<ASBinCode.Register> tempEaxList;
-        ///// <summary>
-        ///// 编译期间额外增加的寄存器
-        ///// </summary>
-        //private List<ASBinCode.Register> additionalEaxList;
-
 
         private Dictionary<string, ASBinCode.Register> dictCompileRegisters;
 
@@ -80,12 +73,33 @@ namespace ASCompiler.compiler
 
 
         /// <summary>
-        /// 合并新增寄存器
+        /// 合并需要的StackSlot
         /// </summary>
         /// <returns></returns>
-        public int combieRegisters()
+        public int combieNeedStackSlots()
         {
-            return dictCompileRegisters.Count;
+            //return dictCompileRegisters.Count;
+            int maxindex = -1;
+            foreach (var item in dictCompileRegisters.Values)
+            {
+                if (item._index > maxindex)
+                {
+                    maxindex = item._index;
+                }
+            }
+
+            return maxindex+1;
+        }
+
+        struct trystate
+        {
+            public int type;
+            public int tryid;
+            public trystate(int type,int tryid)
+            {
+                this.type = type;
+                this.tryid = tryid;
+            }
         }
 
         /// <summary>
@@ -132,33 +146,166 @@ namespace ASCompiler.compiler
             }
 
 
-            Stack<int> trys = new Stack<int>();
+            Stack<trystate> trys = new Stack<trystate>();
             for (int i = 0; i < block.opSteps.Count; i++)
             {
                 ASBinCode.OpStep step = block.opSteps[i];
                 if (step.opCode == ASBinCode.OpCode.enter_try)
                 {
+                    block.hasTryStmt = true;
                     int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
-                    trys.Push(tryid);
+                    trys.Push(new trystate(0, tryid));
                 }
                 else if (step.opCode == ASBinCode.OpCode.quit_try)
                 {
                     int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
-                    if (trys.Pop() != tryid)
+                    var s = trys.Pop();
+                    if (s.tryid != tryid || s.type !=0)
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "try块不匹配");
                     }
                 }
-                else if(trys.Count >0)
+                else if (step.opCode == OpCode.enter_catch)
                 {
-                    step.trys = new Stack<int>();
-                    int[] toadd = trys.ToArray();
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    trys.Push(new trystate(1, tryid));
+                }
+                else if (step.opCode == ASBinCode.OpCode.quit_catch)
+                {
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    var s = trys.Pop();
+                    if (s.tryid != tryid || s.type != 1)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "catch块不匹配");
+                    }
+                }
+                else if (step.opCode == OpCode.enter_finally)
+                {
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    trys.Push(new trystate(2, tryid));
+                }
+                else if (step.opCode == ASBinCode.OpCode.quit_finally)
+                {
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    var s = trys.Pop();
+                    if (s.tryid != tryid || s.type != 2)
+                    {
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "finally块不匹配");
+                    }
+                }
+                else if (trys.Count > 0)
+                {
+                    //step.trys = new Stack<int>();
+                    trystate[] toadd = trys.ToArray();
                     for (int j = 0; j < toadd.Length; j++)
                     {
-                        step.trys.Push(toadd[j]);
+                        //step.trys.Push(toadd[j]);
+                        step.tryid = toadd[j].tryid;
+                        step.trytype = toadd[j].type;
+                    }
+                }
+                else
+                {
+                    step.tryid = -1;
+                }
+
+            }
+
+            //***合并寄存器***
+            List<Register> reglist = new List<Register>();
+            var steps = block.opSteps;
+            foreach (var item in dictCompileRegisters.Values)
+            {
+                reglist.Add(item);
+            }
+
+            
+
+            for (int i = 0; i < reglist.Count; i++)
+            {
+                bool found = false;
+
+                var reg = reglist[i];
+                if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
+                {
+                    continue;
+                }
+                int firstline = reglist.Count;
+                int lastline = -1;
+
+                for (int j = 0; j < steps.Count; j++)
+                {
+                    var step = steps[j];
+                    if (ReferenceEquals(step.reg, reg) ||
+                        ReferenceEquals(step.arg1, reg) ||
+                        ReferenceEquals(step.arg2, reg) 
+                        )
+                    {
+                        if (j < firstline)
+                        {
+                            firstline = j;
+                        }
+                        if (j > lastline)
+                        {
+                            lastline = j;
+                        }
+                    }
+                }
+
+                //***查找刚才寄存器最后一次出现后，才出现的新寄存器,公用一个槽****
+                for (int j = 0; j < reglist.Count; j++)
+                {
+                    var r2 = reglist[j];
+                    if (ReferenceEquals(r2, reg)
+                        ||
+                        r2._isassigntarget || r2._hasUnaryOrShuffixOrDelete
+                        ||
+                        r2._index != r2.Id
+                        )
+                    {
+                        continue;
                     }
 
+                    for (int k = 0; k < steps.Count; k++)
+                    {
+                        var step = steps[k];
+                        if (ReferenceEquals(step.reg, r2) ||
+                            ReferenceEquals(step.arg1, r2) ||
+                            ReferenceEquals(step.arg2, r2)
+                            )
+                        {
+                            if (k <= lastline)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                r2._index = reg._index;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (found)
+                    {
+                        break;
+                    }
                 }
+
+                
+
+            }
+
+            Dictionary<int, int> dictnumber = new Dictionary<int, int>();
+            for (int i = 0; i < reglist.Count; i++)
+            {
+                var idx = reglist[i]._index;
+                if (!dictnumber.ContainsKey(idx))
+                {
+                    dictnumber.Add(idx, dictnumber.Count);
+                }
+
+                reglist[i]._index = dictnumber[idx];
 
             }
         }
@@ -173,9 +320,6 @@ namespace ASCompiler.compiler
 
             this.isEval = isEval;
 
-            //tempEaxList = new List<ASBinCode.Register>();
-
-            //additionalEaxList = new List<ASBinCode.Register>();
         }
 
     }

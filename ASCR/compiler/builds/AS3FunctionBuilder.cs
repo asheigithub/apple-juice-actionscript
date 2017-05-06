@@ -44,7 +44,7 @@ namespace ASCompiler.compiler.builds
                         ];
 
                     bool needappendbindscope = false;
-                    IRightValue returnValue = ExpressionBuilder.getRightValue(env, expression.Value, expression.token, builder);
+                    RightValueBase returnValue = ExpressionBuilder.getRightValue(env, expression.Value, expression.token, builder);
                     if (returnValue.valueType == RunTimeDataType.rt_function)
                     {
                         needappendbindscope = true;
@@ -199,7 +199,7 @@ namespace ASCompiler.compiler.builds
         public void buildParameterDefaultValue(ASTool.AS3.AS3Parameter parameter,
             ASBinCode.rtti.FunctionParameter para,List<ASBinCode.rtti.Class> imports,Builder builder)
         {
-            IRightValue defaultv;
+            RightValueBase defaultv;
 
             builder._currentImports.Push(imports);
 
@@ -801,6 +801,7 @@ namespace ASCompiler.compiler.builds
                                             new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
                                     var eax = env.getAdditionalRegister();
                                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                                    eax.isFuncResult = true;
                                     op.reg = eax;
                                     op.regType = RunTimeDataType.rt_void;
 

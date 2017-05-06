@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class PackagePathGetter : ILeftValue
+    public sealed class PackagePathGetter : LeftValueBase
     {
         public readonly string path;
         public PackagePathGetter(string path)
@@ -13,20 +13,20 @@ namespace ASBinCode
         }
 
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return RunTimeDataType.unknown;
-            }
-        }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return RunTimeDataType.unknown;
+        //    }
+        //}
 
-        public SLOT getSlot(RunTimeScope scope)
+        public override sealed SLOT getSlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
         {
             //***不可能在运行时运行***
             throw new NotImplementedException();

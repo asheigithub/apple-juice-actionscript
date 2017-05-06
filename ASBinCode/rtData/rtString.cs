@@ -16,6 +16,23 @@ namespace ASBinCode.rtData
             value = v;
         }
 
+        public override double toNumber()
+        {
+            double r = 0;
+            if (value == null)
+            {
+                return 0;// new ASBinCode.rtData.rtNumber(0);
+            }
+            else if (double.TryParse(value, out r))
+            {
+                return r;//new ASBinCode.rtData.rtNumber(r);
+            }
+            else
+            {
+                return double.NaN; //new ASBinCode.rtData.rtNumber(double.NaN);
+            }
+        }
+
         //public RunTimeDataType rtType
         //{
         //    get

@@ -16,7 +16,11 @@ namespace ASBinCode.rtData
             value = v;
         }
 
-        
+        public override double toNumber()
+        {
+            return value;
+        }
+
         public sealed override object Clone()
         {
             return new rtNumber(value);

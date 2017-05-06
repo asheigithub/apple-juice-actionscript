@@ -5,7 +5,7 @@ using ASBinCode.rtData;
 
 namespace ASBinCode
 {
-    public abstract class MethodGetterBase : ILeftValue,IMember
+    public abstract class MethodGetterBase : LeftValueBase,IMember
     {
         protected readonly ASBinCode.rtti.Class _class;
         protected int indexofMember;
@@ -42,6 +42,9 @@ namespace ASBinCode
             this.indexofMember = indexofMember;
             this._name = name;
             this.refdefinedinblockid = refdefinedinblockid;
+
+            this.valueType = RunTimeDataType.rt_function;
+
         }
 
         public ASBinCode.rtti.ClassMember classmember
@@ -52,13 +55,13 @@ namespace ASBinCode
             }
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return RunTimeDataType.rt_function;
-            }
-        }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return RunTimeDataType.rt_function;
+        //    }
+        //}
 
         public string name
         {
@@ -76,7 +79,7 @@ namespace ASBinCode
             }
         }
 
-        public SLOT getSlot(RunTimeScope scope)
+        public sealed override  SLOT getSlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
 
@@ -99,7 +102,7 @@ namespace ASBinCode
 
         //private MethodSlot _tempSlot;
 
-        public abstract RunTimeValueBase getValue(RunTimeScope scope);
+        //public abstract RunTimeValueBase getValue(RunTimeScope scope);
 
 
         /// <summary>
@@ -171,13 +174,13 @@ namespace ASBinCode
                 this.method = method;
             }
 
-            public sealed override bool isPropGetterSetter
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            //public sealed override bool isPropGetterSetter
+            //{
+            //    get
+            //    {
+            //        return false;
+            //    }
+            //}
 
             public sealed override void clear()
             {

@@ -11,7 +11,7 @@ namespace ASBinCode
     public abstract class  SLOT
     {
         //void setValue(IRunTimeValue value);
-        public abstract bool isPropGetterSetter { get; }
+        public virtual bool isPropGetterSetter { get { return false; } }
 
         public abstract bool directSet(RunTimeValueBase value);
 

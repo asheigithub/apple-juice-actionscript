@@ -67,7 +67,7 @@ namespace ASRuntime.operators
                         }
                         else if (dt == RunTimeDataType.rt_number)
                         {
-                            dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv, invokerFrame, token));
+                            dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
                         }
                         else if (dt == RunTimeDataType.rt_string)
                         {

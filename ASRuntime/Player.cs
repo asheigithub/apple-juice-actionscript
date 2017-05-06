@@ -104,7 +104,7 @@ namespace ASRuntime
         StackSlot[] stackSlots;
         private StackFrame displayStackFrame;
         
-        public RunTimeValueBase run2(IRightValue result)
+        public RunTimeValueBase run2(RightValueBase result)
         {
 
             if (defaultblock == null || swc == null || swc.blocks.Count == 0)

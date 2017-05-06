@@ -4,23 +4,24 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class StaticClassDataGetter : IRightValue
+    public class StaticClassDataGetter : RightValueBase
     {
         public readonly rtti.Class _class;
         public StaticClassDataGetter(ASBinCode.rtti.Class _class)
         {
             this._class = _class;
+            valueType = _class.getRtType();
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return _class.getRtType();
-            }
-        }
+        //public sealed override RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return _class.getRtType();
+        //    }
+        //}
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
         {
             return scope.static_objects[_class.classid];
 

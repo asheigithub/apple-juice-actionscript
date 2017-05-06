@@ -167,6 +167,8 @@ namespace ASRuntime.nativefuncs
             _SeptoString_CB(sepcb, sendargs);
         }
 
+        private static rtString UNDEFINED = new rtString("undefined");
+
         private void _SeptoString_CB(BlockCallBackBase sender, object args)
         {
             object[] receiveArgs = (object[])sender.args;
@@ -179,7 +181,13 @@ namespace ASRuntime.nativefuncs
             valueCB.args = receiveArgs;
             valueCB.setCallBacker(_ValueToString_CB);
 
-            operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
+            var v = array.innerArray[sender._intArg];
+            if (v.rtType == RunTimeDataType.rt_void)
+            {
+                v = UNDEFINED;
+            }
+
+            operators.OpCast.CastValue(v, RunTimeDataType.rt_string,
                 frame,
                 (SourceToken)receiveArgs[3],
                 (RunTimeScope)receiveArgs[4],
@@ -301,7 +309,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            double num = TypeConverter.ConvertToNumber(argements[0].getValue(), null, null);
+            double num = TypeConverter.ConvertToNumber(argements[0].getValue());
 
             if (double.IsNaN(num))
             {

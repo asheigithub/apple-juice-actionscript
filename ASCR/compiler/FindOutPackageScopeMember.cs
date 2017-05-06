@@ -39,6 +39,8 @@ namespace ASCompiler.compiler
 
             env.block.opSteps.Add(op);
 
+            
+
             return eax_member;
         }
 

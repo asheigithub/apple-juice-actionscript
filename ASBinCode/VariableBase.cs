@@ -7,9 +7,9 @@ namespace ASBinCode
     /// <summary>
     /// 表示是变量
     /// </summary>
-    public abstract class VariableBase : ILeftValue,IMember
+    public abstract class VariableBase : LeftValueBase,IMember
     {
-        private RunTimeDataType type;
+        //private RunTimeDataType type;
 
         private  string _name;
 
@@ -65,7 +65,7 @@ namespace ASBinCode
             this._indexOfMembers = index;
             this.ignoreImplicitCast = ignoreImplicitCast;
             this.refblockid = refblockid;
-            this.type = type;
+            this.valueType = type;
             this.isConst = isConst;
         }
 
@@ -78,18 +78,18 @@ namespace ASBinCode
             _name = n;
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return type;
-            }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return type;
+        //    }
 
-            set
-            {
-                type = value;
-            }
-        }
+        //    //set
+        //    //{
+        //    //    type = value;
+        //    //}
+        //}
 
         public string name
         {
@@ -100,26 +100,20 @@ namespace ASBinCode
         }
 
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
         {
             //throw new NotImplementedException();
             return getSlot(scope).getValue();
         }
 
-        public abstract SLOT getSlot(RunTimeScope scope);
-        //{
-        //    while( refblockid != scope.blockId )
-        //    {
-        //        scope = scope.parent;
-        //    }
-        //    return scope.memberData[indexOfMembers];
-        //}
+        //public abstract SLOT getSlot(RunTimeScope scope);
+        
         
 
 
         public override string ToString()
         {
-            return  (isConst?"CST":"VAR")+ "("+name+"\t"+type +")" ;
+            return  (isConst?"CST":"VAR")+ "("+name+"\t"+valueType +")" ;
         }
 
         IMember IMember.clone()

@@ -41,7 +41,7 @@ namespace ASCompiler.compiler
             throw new NotImplementedException();
         }
 
-        public ILeftValue buildAccessThisMember(ASTool.Token matchtoken , CompileEnv env)
+        public LeftValueBase buildAccessThisMember(ASTool.Token matchtoken , CompileEnv env)
         {
             if (
                 !(classMember.bindField is VariableBase)
@@ -52,7 +52,7 @@ namespace ASCompiler.compiler
                 ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class == static_class._class
                 )
             {
-                return (ILeftValue)classMember.bindField;
+                return (LeftValueBase)classMember.bindField;
             }
             else
             {

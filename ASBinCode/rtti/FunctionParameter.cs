@@ -20,7 +20,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 默认值
         /// </summary>
-        public IRightValue defaultValue;
+        public RightValueBase defaultValue;
         /// <summary>
         /// 是否是参数数组
         /// </summary>

@@ -4,24 +4,25 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public class RightValue : IRightValue
+    public sealed class RightValue : RightValueBase
     {
-        private RunTimeValueBase value;
+        private readonly RunTimeValueBase value;
 
         public RightValue(RunTimeValueBase value)
         {
             this.value = value;
+            valueType = value.rtType;
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return value.rtType;
-            }
-        }
+        //public override sealed RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return value.rtType;
+        //    }
+        //}
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
         {
             return value;
         }

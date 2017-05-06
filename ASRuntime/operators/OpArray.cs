@@ -6,7 +6,7 @@ namespace ASRuntime.operators
 {
     class OpArray
     {
-        public static void exec_create(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void exec_create(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //ASBinCode.rtData.rtArray array = (ASBinCode.rtData.rtArray)step.reg.getValue(scope);
 
@@ -23,7 +23,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_Push(Player player,StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void exec_Push(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.rtData.rtArray array = (ASBinCode.rtData.rtArray)step.reg.getValue(scope);
 

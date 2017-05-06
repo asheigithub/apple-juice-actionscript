@@ -21,13 +21,13 @@ namespace ASBinCode
         private RunTimeValueBase value;
         private RunTimeDataType rtType;
 
-        public sealed override bool isPropGetterSetter
-        {
-            get
-            {
-                return false;
-            }
-        }
+        //public sealed override bool isPropGetterSetter
+        //{
+        //    get
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public void setDefaultType(RunTimeDataType type,RunTimeValueBase v)
         {

@@ -39,11 +39,11 @@ namespace ASCompiler.compiler
                 builder.buildExpressNotEval(tempEnv, expression);
 
                 tempEnv.completSteps();
-                tempEnv.block.totalRegisters = tempEnv.combieRegisters();
+                tempEnv.block.totalRegisters = tempEnv.combieNeedStackSlots();
 
                 if (builder.buildErrors.Count == 0)
                 {
-                    IRightValue value = builds.ExpressionBuilder.getRightValue(tempEnv, expression.Value, expression.token, builder);
+                    RightValueBase value = builds.ExpressionBuilder.getRightValue(tempEnv, expression.Value, expression.token, builder);
 
                     ASRuntime.Player player = new ASRuntime.Player();
                     player.isConsoleOut = false;

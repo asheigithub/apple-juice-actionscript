@@ -21,8 +21,22 @@ package
 	public class Main extends Sprite 
 	{
 		
+		public function get a()
+		{
+			return 1;
+		}
+		public function set a(v:int)
+		{
+			trace(v);
+		}
+		
+		private function bb() { trace("bb") };
+		
 		public function Main() 
 		{
+			//trace( --this.a );
+			
+			
 			//var d = new Date("Tue Feb 1 00:00:00 GMT-0800 2005");
 			
 			//var millisecondsPerDay:int = 1000 * 60 * 60 * 24; 
@@ -53,7 +67,7 @@ package
 	}
 	
 }
-
+var opp=0;
 
 function select( a:Vector.<int> )
 {
@@ -65,6 +79,7 @@ function select( a:Vector.<int> )
 	
 	for( i=0; i<len; i++)
 	{
+		
 		var min:int = i;
 		for( j=i+1; j<len; j++ )
 		{
@@ -73,10 +88,11 @@ function select( a:Vector.<int> )
 			
 			count++;
 		}
-
+		
 		tmp = a[min];
 		a[min] = a[i];
 		a[i] = tmp;
+		
 		
 	}
 	
@@ -91,7 +107,7 @@ var b:int = 0;
 
 
 
-for(var i:int = 0; i < 1000; ++i )
+for(var i:int = 0; i < 5000; ++i )
 {
 	
 	++b;
@@ -104,4 +120,4 @@ select(a);
 
 trace(new Date().getTime()-t);
 
-//trace(b);
+trace(b);

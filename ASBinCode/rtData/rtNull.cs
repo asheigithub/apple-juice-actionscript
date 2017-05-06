@@ -10,7 +10,10 @@ namespace ASBinCode.rtData
 
         private rtNull():base(RunTimeDataType.rt_null) { }
 
-        
+        public override double toNumber()
+        {
+            return 0;
+        }
 
         public sealed override  object Clone()
         {

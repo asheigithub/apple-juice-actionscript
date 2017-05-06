@@ -7,7 +7,7 @@ namespace ASBinCode
     /// <summary>
     /// 访问父类的成员
     /// </summary>
-    public class SuperPointer : IRightValue
+    public sealed class SuperPointer : RightValueBase
     {
         public rtti.Class superClass;
 
@@ -17,19 +17,20 @@ namespace ASBinCode
         {
             this.superClass = superClass;
             this.thisClass = thisClass;
+            valueType = superClass.getRtType();
         }
 
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                //throw new NotImplementedException();
-                return superClass.getRtType();
-            }
-        }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        //throw new NotImplementedException();
+        //        return superClass.getRtType();
+        //    }
+        //}
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
         {
             return scope.this_pointer;
         }

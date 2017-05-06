@@ -33,6 +33,12 @@ namespace ASBinCode.rtData
 
         }
 
+        public override double toNumber()
+        {
+            return double.NaN;
+        }
+
+
         private List<RunTimeValueBase> array;
         public List<RunTimeValueBase> innerArray {
             get { return array; } }

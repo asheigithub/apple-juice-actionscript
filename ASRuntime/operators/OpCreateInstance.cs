@@ -43,12 +43,13 @@ namespace ASRuntime.operators
             }
         }
 
-        public static void prepareConstructorClassArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void prepareConstructorClassArgements( StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var rv = step.arg1.getValue(scope);
 
             if (rv.rtType > RunTimeDataType.unknown)
             {
+                var player = frame.player;
                 var _class = getClass(player, frame, step, scope);
                 if (_class != null && !_class.no_constructor)
                 {
@@ -128,7 +129,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void push_parameter_class(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void push_parameter_class(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             if (frame.instanceCreator.constructorCaller == null)
             {
@@ -149,11 +150,11 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        public static void prepareConstructorArgements(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void prepareConstructorArgements(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var rv = step.arg1.getValue(frame.scope);
             int classid = ((ASBinCode.rtData.rtInt)rv).value;
-
+            var player = frame.player;
             var _class = player.swc.classes[classid];
 
             if (_class.isInterface)
@@ -269,8 +270,9 @@ namespace ASRuntime.operators
         //    }
         //}
 
-        public static void init_static(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void init_static(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
+            var player = frame.player;
             int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
             ASBinCode.rtti.Class as3class = player.swc.classes[classid];
             //init_static_class(player, frame, as3class,step.token, scope);
@@ -303,7 +305,7 @@ namespace ASRuntime.operators
         //}
 
 
-        public static void exec(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
             //ASBinCode.rtti.Class as3class = player.swc.classes[classid];
@@ -325,7 +327,7 @@ namespace ASRuntime.operators
             frame.instanceCreator.createInstance();
         }
 
-        public static void exec_instanceClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+        public static void exec_instanceClass(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;

@@ -8,16 +8,16 @@ namespace ASRuntime.operators
     {
         internal static readonly ASBinCode.rtData.rtString nullStr = new ASBinCode.rtData.rtString(null);
 
-        public static void execAdd_Number(Player player, ASBinCode.OpStep step,StackFrame frame ,ASBinCode.RunTimeScope scope)
+        public static void execAdd_Number(StackFrame frame ,ASBinCode.OpStep step,ASBinCode.RunTimeScope scope)
         {
-            double a1 = TypeConverter.ConvertToNumber( step.arg1.getValue(scope),null,null);
-            double a2 = TypeConverter.ConvertToNumber( step.arg2.getValue(scope),null,null);
+            double a1 = step.arg1.getValue(scope).toNumber();
+            double a2 = step.arg2.getValue(scope).toNumber();
 
             step.reg.getSlot(scope).setValue(a1 + a2);//new ASBinCode.rtData.rtNumber(a1.value +a2.value ));
             frame.endStep(step);
         }
 
-        public static void execAdd_String(Player player, ASBinCode.OpStep step,StackFrame frame, ASBinCode.RunTimeScope scope)
+        public static void execAdd_String( StackFrame frame,ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.rtData.rtString a1;
             if (step.arg1.getValue(scope).rtType == ASBinCode.RunTimeDataType.rt_null)
@@ -139,9 +139,9 @@ namespace ASRuntime.operators
             if (finalType == ASBinCode.RunTimeDataType.rt_number)
             {
                 step.reg.getSlot(scope).setValue(
-                    TypeConverter.ConvertToNumber(v1, frame, step.token)
+                    TypeConverter.ConvertToNumber(v1)
                     +
-                    TypeConverter.ConvertToNumber(v2, frame, step.token)
+                    TypeConverter.ConvertToNumber(v2)
 
                     );
             }

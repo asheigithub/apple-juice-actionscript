@@ -13,7 +13,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.IRightValue v1 = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
+                    ASBinCode.RightValueBase v1 = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
                     if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
                     {
                         if (step.Arg3.Data.Value.ToString() == "null")
@@ -185,7 +185,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.IRightValue v1 = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
+                    ASBinCode.RightValueBase v1 = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
                     if (v1 is ASBinCode.StaticClassDataGetter)
                     {
                         build_bracket_access(env, step, v1, builder);
@@ -319,7 +319,7 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        private static void build_class(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, IRightValue v1, ASBinCode.rtti.Class cls, Builder builder)
+        private static void build_class(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1, ASBinCode.rtti.Class cls, Builder builder)
         {
             if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
             {
@@ -378,7 +378,7 @@ namespace ASCompiler.compiler.builds
         }
 
         public static void make_dotStep(CompileEnv env, ASBinCode.rtti.ClassMember member, ASTool.Token token,
-            Register eax, IRightValue rvObj
+            Register eax, RightValueBase rvObj
             )
         {
             OpStep op = new OpStep(
@@ -390,7 +390,7 @@ namespace ASCompiler.compiler.builds
                 , new SourceToken(token.line, token.ptr, token.sourceFile));
 
 
-            IRightValue field = (IRightValue)member.bindField;
+            RightValueBase field = (RightValueBase)member.bindField;
 
 
 
@@ -404,7 +404,7 @@ namespace ASCompiler.compiler.builds
             env.block.opSteps.Add(op);
         }
 
-        private static void build_dot(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, IRightValue v1, ASBinCode.rtti.ClassMember member)
+        private static void build_dot(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1, ASBinCode.rtti.ClassMember member)
         {
             ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
             eax._regMember = member;
@@ -432,7 +432,7 @@ namespace ASCompiler.compiler.builds
         }
 
 
-        private static void build_dot_name(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, IRightValue v1)
+        private static void build_dot_name(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1)
         {
             ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
             eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
@@ -448,7 +448,7 @@ namespace ASCompiler.compiler.builds
             env.block.opSteps.Add(op);
         }
 
-        private static void build_bracket_access(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, IRightValue v1, Builder builder)
+        private static void build_bracket_access(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1, Builder builder)
         {
             ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
             eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);

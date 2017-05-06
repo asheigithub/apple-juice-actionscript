@@ -172,7 +172,7 @@ namespace ASCompiler.compiler.builds
 
                 builder.buildStmt(env, as3forin.ForArg);
 
-                ILeftValue varvalue = null;
+                LeftValueBase varvalue = null;
 
                 if (as3forin.ForArg is ASTool.AS3.AS3StmtExpressions)
                 {
@@ -184,7 +184,7 @@ namespace ASCompiler.compiler.builds
                     }
 
                     ASTool.AS3.AS3Expression expr = exprs.as3exprlist[0];
-                    varvalue =(ILeftValue)ExpressionBuilder.getRightValue(env, expr.Value, expr.token, builder);
+                    varvalue =(LeftValueBase)ExpressionBuilder.getRightValue(env, expr.Value, expr.token, builder);
                 }
                 else if (as3forin.ForArg is ASTool.AS3.AS3Variable)
                 {
@@ -198,7 +198,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 builder.buildExpression(env, as3forin.ForExpr);
-                IRightValue enumerator = ExpressionBuilder.getRightValue(env,as3forin.ForExpr.Value,as3forin.ForExpr.token,builder);
+                RightValueBase enumerator = ExpressionBuilder.getRightValue(env,as3forin.ForExpr.Value,as3forin.ForExpr.token,builder);
 
                 if (enumerator.valueType == RunTimeDataType.rt_void
                     ||
@@ -295,7 +295,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 {
-                    IRightValue loadValue = env.getAdditionalRegister();
+                    RightValueBase loadValue = env.getAdditionalRegister();
                     ((Register)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     //**IEnumerator Current()
@@ -410,7 +410,7 @@ namespace ASCompiler.compiler.builds
 
                 builder.buildStmt(env, as3foreach.ForArg);
 
-                ILeftValue varvalue = null;
+                LeftValueBase varvalue = null;
 
                 if (as3foreach.ForArg is ASTool.AS3.AS3StmtExpressions)
                 {
@@ -422,7 +422,7 @@ namespace ASCompiler.compiler.builds
                     }
 
                     ASTool.AS3.AS3Expression expr = exprs.as3exprlist[0];
-                    varvalue = (ILeftValue)ExpressionBuilder.getRightValue(env, expr.Value, expr.token, builder);
+                    varvalue = (LeftValueBase)ExpressionBuilder.getRightValue(env, expr.Value, expr.token, builder);
                 }
                 else if (as3foreach.ForArg is ASTool.AS3.AS3Variable)
                 {
@@ -436,7 +436,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 builder.buildExpression(env, as3foreach.ForExpr);
-                IRightValue enumerator = ExpressionBuilder.getRightValue(env, as3foreach.ForExpr.Value, as3foreach.ForExpr.token, builder);
+                RightValueBase enumerator = ExpressionBuilder.getRightValue(env, as3foreach.ForExpr.Value, as3foreach.ForExpr.token, builder);
 
                 if (enumerator.valueType == RunTimeDataType.rt_void
                     ||
@@ -533,7 +533,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 {
-                    IRightValue loadValue = env.getAdditionalRegister();
+                    RightValueBase loadValue = env.getAdditionalRegister();
                     ((Register)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     //**IEnumerator Current()

@@ -7,9 +7,9 @@ namespace ASBinCode
     /// <summary>
     /// 表示需对寄存器操作
     /// </summary>
-    public class Register : ILeftValue
+    public sealed class Register : LeftValueBase
     {
-        private  RunTimeDataType type;
+        
 
         /// <summary>
         /// 指示访问成员的中间状态
@@ -18,7 +18,7 @@ namespace ASBinCode
         /// <summary>
         /// 访问成员的所属Object
         /// </summary>
-        public IRightValue _regMemberSrcObj;
+        public RightValueBase _regMemberSrcObj;
 
         
         
@@ -26,52 +26,62 @@ namespace ASBinCode
         /// 指示是否对其有=赋值操作
         /// </summary>
         public bool _isassigntarget;
-
+        /// <summary>
+        /// 指示是否对其有++,--操作
+        /// </summary>
+        public bool _hasUnaryOrShuffixOrDelete;
+        
+        
 
         public PackagePathGetter _pathGetter;
 
-        
+        public bool isFuncResult;
+
 
         public void setEAXTypeWhenCompile(RunTimeDataType t)
         {
-            type = t;
+            //type = t;
+            valueType = t;
         }
 
-        public int Id;
+        public readonly int Id;
+
+        public int _index;
 
         public Register(int id)
         {
             this.Id = id;
-            type = RunTimeDataType.unknown;
-            
+            _index = id;
+            //type = RunTimeDataType.unknown;
+            valueType = RunTimeDataType.unknown;
         }
 
-        public RunTimeDataType valueType
-        {
-            get
-            {
-                return type;
-            }
-        }
+        //public sealed override  RunTimeDataType valueType
+        //{
+        //    get
+        //    {
+        //        return type;
+        //    }
+        //}
 
-        public RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
         {
             //var v= getISlot(scope).getValue();
             //return v;
 
-            return scope.stack[scope.offset + Id].getValue();
+            return scope.stack[scope.offset + _index].getValue();
 
         }
 
         
         public override string ToString()
         {
-            return "EAX(" + Id + "\t" +type+ ")";
+            return "EAX(" + Id + "\t" +valueType+ ")";
         }
 
-        public SLOT getSlot(RunTimeScope scope)
+        public sealed override  SLOT getSlot(RunTimeScope scope)
         {
-            return scope.stack[scope.offset + Id];
+            return scope.stack[scope.offset + _index];
         }
     }
 }

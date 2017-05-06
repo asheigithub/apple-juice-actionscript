@@ -23,6 +23,11 @@ namespace ASBinCode
         public List<OpStep> opSteps;
 
         /// <summary>
+        /// 本段代码是否包含TryCatch
+        /// </summary>
+        public bool hasTryStmt;
+
+        /// <summary>
         /// 本段代码共用了多少个寄存器
         /// </summary>
         public int totalRegisters;

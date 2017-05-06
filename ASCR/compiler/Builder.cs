@@ -47,7 +47,7 @@ namespace ASCompiler.compiler
         internal Dictionary<ASTool.AS3.AS3Parameter,utils.Tuple< ASBinCode.rtti.FunctionParameter,List<ASBinCode.rtti.Class>>>
             _toEvalDefaultParameters = new Dictionary<ASTool.AS3.AS3Parameter, utils.Tuple<ASBinCode.rtti.FunctionParameter, List<ASBinCode.rtti.Class>>>();
 
-        internal Dictionary<IRightValue, List<OpStep>> _propLines = new Dictionary<IRightValue, List<OpStep>>();
+        internal Dictionary<RightValueBase, List<OpStep>> _propLines = new Dictionary<RightValueBase, List<OpStep>>();
 
         internal Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>
             _overridefunctions = new Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>();
@@ -661,8 +661,8 @@ namespace ASCompiler.compiler
 
                 //block必须有收尾工作
                 {
-                    env.combieRegisters();
-                    env.block.totalRegisters = env.combieRegisters();
+                    
+                    env.block.totalRegisters = env.combieNeedStackSlots();
                     env.completSteps();
                 }
 
@@ -1007,9 +1007,9 @@ namespace ASCompiler.compiler
 
                 //block必须有收尾工作
                 {
-                    env.combieRegisters();
-                    env.block.totalRegisters = env.combieRegisters();
                     env.completSteps();
+                    env.block.totalRegisters = env.combieNeedStackSlots();
+                    
                 }
                 _currentImports.Pop();
             }
@@ -1139,7 +1139,7 @@ namespace ASCompiler.compiler
                 buildStmt(env, statements[i]);
             }
             env.completSteps();
-            block.totalRegisters = env.combieRegisters();
+            block.totalRegisters = env.combieNeedStackSlots();
         }
 
         internal void buildNamedFunctionSignature(CompileEnv env, ASTool.AS3.AS3Function as3function)
@@ -1661,7 +1661,7 @@ namespace ASCompiler.compiler
 
                                         CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp", -65535, true), false);
                                         buildExpression(tempEnv, variable.ValueExpr);
-                                        IRightValue tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
+                                        RightValueBase tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
                                             stmt.Token, new Builder(true)
                                             );
                                         newtype = tempRv.valueType;
@@ -1952,7 +1952,7 @@ namespace ASCompiler.compiler
                 {
                     ASTool.AS3.AS3Const variable = (ASTool.AS3.AS3Const)stmt;
                     {
-                        ASBinCode.IRightValue defaultv = null;
+                        ASBinCode.RightValueBase defaultv = null;
                         try
                         {
                             VariableBase rtVariable = (VariableBase)MemberFinder.find(variable.Name, env, variable.Access.IsStatic, this, variable.token);
@@ -2037,7 +2037,7 @@ namespace ASCompiler.compiler
                     ASTool.AS3.AS3Variable variable = (ASTool.AS3.AS3Variable)stmt;
                     {
 
-                        ASBinCode.IRightValue defaultv = null;
+                        ASBinCode.RightValueBase defaultv = null;
 
                         try
                         {
@@ -2185,7 +2185,7 @@ namespace ASCompiler.compiler
 
             if (value != null && testexpr.Value.IsReg)
             {
-                IRightValue rv = new ASBinCode.rtData.RightValue(value);
+                RightValueBase rv = new ASBinCode.rtData.RightValue(value);
 
                 ASBinCode.Register eax = env.createASTRegister(testexpr.Value.Reg.ID);
                 eax.setEAXTypeWhenCompile(rv.valueType);

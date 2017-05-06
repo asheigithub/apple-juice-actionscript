@@ -8,7 +8,7 @@ namespace ASRuntime.operators
 {
     class OpVector
     {
-        public static void exec_AccessorBind(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_AccessorBind(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
                 (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
@@ -20,13 +20,18 @@ namespace ASRuntime.operators
                 frame.throwError(step.token,1125,
                     "The index "+idx+" is out of range "+ vector.innnerList.Count +".");
             }
+
+            Register reg = (Register)step.reg;
+
             if (idx == vector.innnerList.Count)
             {
-                if (vector.isFixed || !((Register)step.reg)._isassigntarget)
+                if (vector.isFixed || !reg._isassigntarget)
                 {
                     frame.throwError(step.token,1125,
                     "The index " + idx + " is out of range " + vector.innnerList.Count + "."
                     );
+                    frame.endStep(step);
+                    return;
                 }
                 else
                 {
@@ -34,20 +39,26 @@ namespace ASRuntime.operators
                 }
             }
 
-
+            
 
             StackSlot slot = (StackSlot)step.reg.getSlot(scope);
-            slot._cache_vectorSlot.idx = idx;
-            slot._cache_vectorSlot.vector_data = vector;
+            if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
+            {
+                slot._cache_vectorSlot.idx = idx;
+                slot._cache_vectorSlot.vector_data = vector;
 
-            slot.linkTo(slot._cache_vectorSlot);
-
+                slot.linkTo(slot._cache_vectorSlot);
+            }
+            else
+            {
+                slot.directSet(vector.innnerList[idx]);
+            }
 
             frame.endStep(step);
         }
 
 
-        public static void exec_AccessorBind_ConvertIdx(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
                 (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
@@ -60,10 +71,10 @@ namespace ASRuntime.operators
             if (idxvalue.rtType > RunTimeDataType.unknown)
             {
                 RunTimeDataType ot;
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(idxvalue.rtType, player.swc, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(idxvalue.rtType, frame.player.swc, out ot))
                 {
                     var v = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)idxvalue);
-                    idx = TypeConverter.ConvertToNumber(v, frame, step.token);
+                    idx = TypeConverter.ConvertToNumber(v);
                 }
             }
             else if(idxvalue.rtType == RunTimeDataType.rt_string 
@@ -72,7 +83,7 @@ namespace ASRuntime.operators
                 || idxvalue.rtType == RunTimeDataType.rt_uint
                 )
             {
-                idx = TypeConverter.ConvertToNumber(idxvalue, frame, step.token);
+                idx = TypeConverter.ConvertToNumber(idxvalue);
             }
 
             if (double.IsNaN(idx))
@@ -93,13 +104,18 @@ namespace ASRuntime.operators
                     frame.throwError(step.token,1125,
                         "The index " + index + " is out of range " + vector.innnerList.Count + ".");
                 }
+
+                Register reg = (Register)step.reg;
+
                 if (idx == vector.innnerList.Count)
                 {
-                    if (vector.isFixed || !((Register)step.reg)._isassigntarget)
+                    if (vector.isFixed || !reg._isassigntarget)
                     {
                         frame.throwError(step.token,
                             1125,
                         "The index " + idx + " is out of range " + vector.innnerList.Count + ".");
+                        frame.endStep(step);
+                        return;
                     }
                     else
                     {
@@ -109,10 +125,18 @@ namespace ASRuntime.operators
 
 
                 StackSlot slot = (StackSlot)step.reg.getSlot(scope);
-                slot._cache_vectorSlot.idx = index;
-                slot._cache_vectorSlot.vector_data = vector;
 
-                slot.linkTo(slot._cache_vectorSlot);
+                if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
+                {
+                    slot._cache_vectorSlot.idx = index;
+                    slot._cache_vectorSlot.vector_data = vector;
+
+                    slot.linkTo(slot._cache_vectorSlot);
+                }
+                else
+                {
+                    slot.directSet(vector.innnerList[index]);
+                }
             }
 
 
@@ -120,7 +144,7 @@ namespace ASRuntime.operators
 
         }
 
-        public static void exec_push(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_push(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
@@ -130,8 +154,9 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_initfromdata(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_initfromdata(StackFrame frame, OpStep step, RunTimeScope scope)
         {
+            var player = frame.player;
             RunTimeValueBase initdata = step.arg2.getValue(scope);
             int classrttype = ((rtInt)step.arg1.getValue(scope)).value;
             while (true)
@@ -207,26 +232,26 @@ namespace ASRuntime.operators
             {
                 _pusharray(
                     (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)vector).value).hosted_object,
-                    frame.player, frame, step, scope
+                     frame, step, scope
                     );
             }
             else
             {
                 _pushVector(   
                     (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)vector).value).hosted_object
-                    , frame.player, frame, step, scope);
+                    , frame, step, scope);
             }
 
         }
 
-        public static void exec_pushVector(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_pushVector(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
 
-            _pushVector(o, player, frame, step, scope);
+            _pushVector(o, frame, step, scope);
         }
 
-        public static void _pushVector(ASBinCode.rtti.Vector_Data o, Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void _pushVector(ASBinCode.rtti.Vector_Data o,  StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var arr = step.arg2.getValue(scope);
             if (arr.rtType == RunTimeDataType.rt_null)
@@ -257,13 +282,13 @@ namespace ASRuntime.operators
         }
 
 
-        public static void exec_pusharray(Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void exec_pusharray(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
-            _pusharray(o, player, frame, step, scope);
+            _pusharray(o, frame, step, scope);
         }
 
-        public static void _pusharray( ASBinCode.rtti.Vector_Data o ,Player player, StackFrame frame, OpStep step, RunTimeScope scope)
+        public static void _pusharray( ASBinCode.rtti.Vector_Data o , StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
             var arr = step.arg2.getValue(scope);
@@ -368,13 +393,13 @@ namespace ASRuntime.operators
                 this.classfinder = classfinder;
             }
 
-            public sealed override bool isPropGetterSetter
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            //public sealed override bool isPropGetterSetter
+            //{
+            //    get
+            //    {
+            //        return false;
+            //    }
+            //}
 
             public sealed override void clear()
             {

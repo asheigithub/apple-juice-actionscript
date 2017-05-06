@@ -11,7 +11,7 @@ namespace ASCompiler.compiler.builds
         {
             if (step.Arg2.IsReg || step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function)
             {
-                IRightValue rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
+                RightValueBase rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
 
 
 
@@ -22,7 +22,7 @@ namespace ASCompiler.compiler.builds
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                 op.reg = eax;
                 op.regType = RunTimeDataType.rt_void;
-
+                eax.isFuncResult = true;
 
                 op.arg1 = rValue;
                 op.arg1Type = RunTimeDataType.rt_function;
@@ -39,7 +39,7 @@ namespace ASCompiler.compiler.builds
                                                 );
                         }
 
-                        build_member_parameterSteps((IRightValue)reg._regMember.bindField,
+                        build_member_parameterSteps((RightValueBase)reg._regMember.bindField,
                             builder, eax, op, step, env, null, rValue, null);
 
                         env.block.opSteps.Add(op);
@@ -63,7 +63,7 @@ namespace ASCompiler.compiler.builds
                 for (int i = 0; i < args.Count; i++)
                 {
                     ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                    IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
+                    RightValueBase arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
                     //***参数准备***
                     OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     opPushArgs.arg1 = arg;
@@ -120,12 +120,12 @@ namespace ASCompiler.compiler.builds
                                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                                 op.reg = eax;
                                 op.regType = RunTimeDataType.rt_void;
-
+                                eax.isFuncResult = true;
 
                                 op.arg1 = eaxfunc;
                                 op.arg1Type = RunTimeDataType.rt_function;
 
-                                build_member_parameterSteps((IRightValue)member.bindField,
+                                build_member_parameterSteps((RightValueBase)member.bindField,
                                     builder, eax, op, step, env, null, eaxfunc, null);
 
                                 env.block.opSteps.Add(op);
@@ -233,8 +233,8 @@ namespace ASCompiler.compiler.builds
                                                                     );
                                     }
 
-                                    IRightValue src = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
-                                    IRightValue ct = ExpressionBuilder.addCastOpStep(env, src,
+                                    RightValueBase src = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
+                                    RightValueBase ct = ExpressionBuilder.addCastOpStep(env, src,
                                         targettype, //cls.instanceClass.getRtType(), 
                                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
 
@@ -263,7 +263,7 @@ namespace ASCompiler.compiler.builds
                         FindStaticMember fm = (FindStaticMember)member;
                         if (ASRuntime.TypeConverter.testImplicitConvert(fm.classMember.valueType, RunTimeDataType.rt_function, builder))
                         {
-                            IRightValue eaxfunc = fm.buildAccessThisMember(step.token, env);
+                            RightValueBase eaxfunc = fm.buildAccessThisMember(step.token, env);
 
                             if (eaxfunc.valueType != RunTimeDataType.rt_function)
                             {
@@ -299,12 +299,12 @@ namespace ASCompiler.compiler.builds
                                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                                 op.reg = eax;
                                 op.regType = RunTimeDataType.rt_void;
-
+                                eax.isFuncResult = true;
 
                                 op.arg1 = eaxfunc;
                                 op.arg1Type = RunTimeDataType.rt_function;
 
-                                build_member_parameterSteps((IRightValue)fm.classMember.bindField,
+                                build_member_parameterSteps((RightValueBase)fm.classMember.bindField,
                                     builder, eax, op, step, env, null, eaxfunc, null);
 
                                 env.block.opSteps.Add(op);
@@ -428,7 +428,7 @@ namespace ASCompiler.compiler.builds
             )
         {
 
-            IRightValue rFunc;
+            RightValueBase rFunc;
 
             IMember originMember = member;
 
@@ -441,7 +441,7 @@ namespace ASCompiler.compiler.builds
             }
             else
             {
-                rFunc = (IRightValue)member;
+                rFunc = (RightValueBase)member;
             }
             if (member is VariableBase || member is FindOutPackageScopeMember)
             {
@@ -480,6 +480,7 @@ namespace ASCompiler.compiler.builds
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                 op.reg = eax;
                 op.regType = RunTimeDataType.rt_void;
+                eax.isFuncResult = true;
 
                 build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null,originMember);
                 
@@ -496,9 +497,9 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        private void build_member_parameterSteps(IRightValue rFunc,Builder builder,Register eax,OpStep op,
+        private void build_member_parameterSteps(RightValueBase rFunc,Builder builder,Register eax,OpStep op,
             ASTool.AS3.Expr.AS3ExprStep step,CompileEnv env,ASBinCode.rtti.Class _cls,
-            IRightValue makeParaArg1 ,IMember funcOriginMember
+            RightValueBase makeParaArg1 ,IMember funcOriginMember
             )
         {
             ASBinCode.rtti.FunctionSignature signature = null;
@@ -558,10 +559,10 @@ namespace ASCompiler.compiler.builds
         public void createParaOp(List<ASTool.AS3.Expr.AS3DataStackElement> args,
             ASBinCode.rtti.FunctionSignature signature, 
             ASTool.Token token, CompileEnv env,
-            IRightValue rFunc,Builder builder,bool isConstructor,ASBinCode.rtti.Class cls
+            RightValueBase rFunc,Builder builder,bool isConstructor,ASBinCode.rtti.Class cls
             ,
 
-            IRightValue makeParaArg1=null
+            RightValueBase makeParaArg1=null
 
             )
         {
@@ -619,7 +620,7 @@ namespace ASCompiler.compiler.builds
             for (int i = 0; i < args.Count; i++)
             {
                 ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                IRightValue arg = builds.ExpressionBuilder.getRightValue(env, argData, token, builder);
+                RightValueBase arg = builds.ExpressionBuilder.getRightValue(env, argData, token, builder);
 
                 if (signature != null) //参数类型检查
                 {

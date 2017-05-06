@@ -40,7 +40,7 @@ namespace ASRuntime.operators
                         if (v1.rtType == ASBinCode.RunTimeDataType.rt_number
                             )
                         {
-                            double v = TypeConverter.ConvertToNumber(v1, null, null);
+                            double v = TypeConverter.ConvertToNumber(v1);
                             if (Math.Floor(v) == v && Math.Ceiling(v) == v)
                             {
                                 return true;
@@ -69,7 +69,7 @@ namespace ASRuntime.operators
                         if (v1.rtType == ASBinCode.RunTimeDataType.rt_number
                             )
                         {
-                            double v = TypeConverter.ConvertToNumber(v1, null, null);
+                            double v = TypeConverter.ConvertToNumber(v1);
                             if (Math.Floor(v) == v && Math.Ceiling(v) == v && v >= 0)
                             {
                                 return true;
@@ -394,7 +394,7 @@ namespace ASRuntime.operators
             v1.rtType == RunTimeDataType.rt_string
             )
             {
-                double idx = TypeConverter.ConvertToNumber(v1, null, null);
+                double idx = TypeConverter.ConvertToNumber(v1);
                 if (double.IsNaN(idx) || double.IsInfinity(idx))
                 {
                     step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
@@ -636,7 +636,7 @@ namespace ASRuntime.operators
             OpStep step = sender.step;
             var scope = sender.scope;
 
-            double idx = TypeConverter.ConvertToNumber(vidx, null, null);
+            double idx = TypeConverter.ConvertToNumber(vidx);
             if (double.IsNaN(idx) || double.IsInfinity(idx))
             {
                 step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
@@ -685,8 +685,8 @@ namespace ASRuntime.operators
 
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
-            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope));
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope));
 
             if (a1 > a2)
             {
@@ -707,8 +707,8 @@ namespace ASRuntime.operators
 
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
-            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope));
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope));
 
             if (a1 >= a2)
             {
@@ -771,8 +771,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1);
+                double n2 = TypeConverter.ConvertToNumber(v2);
 
                 if (n1 > n2)
                 {
@@ -885,8 +885,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1);
+                double n2 = TypeConverter.ConvertToNumber(v2);
 
                 if (n1 >= n2)
                 {
@@ -944,8 +944,8 @@ namespace ASRuntime.operators
 
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
-            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+            double a1 = (step.arg1.getValue(scope)).toNumber();
+            double a2 = (step.arg2.getValue(scope)).toNumber();
 
             if (a1 < a2)
             {
@@ -966,8 +966,8 @@ namespace ASRuntime.operators
 
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), null, null);
-            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), null, null);
+            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope));
+            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope));
 
             if (a1 <= a2)
             {
@@ -1028,8 +1028,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1);
+                double n2 = TypeConverter.ConvertToNumber(v2);
 
                 if (n1 < n2)
                 {
@@ -1110,8 +1110,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, frame, step.token);
-                double n2 = TypeConverter.ConvertToNumber(v2, frame, step.token);
+                double n1 = TypeConverter.ConvertToNumber(v1);
+                double n2 = TypeConverter.ConvertToNumber(v2);
 
                 if (n1 <= n2)
                 {
@@ -1294,8 +1294,8 @@ namespace ASRuntime.operators
 
         public static void execEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
-            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
+            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope));
+            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope));
 
             if (n1==n2)
             {
@@ -1310,8 +1310,8 @@ namespace ASRuntime.operators
 
         public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope), frame, step.token);
-            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope), frame, step.token);
+            var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope));
+            var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope));
 
             if (n1 != n2)
             {
@@ -1392,8 +1392,8 @@ namespace ASRuntime.operators
                 )
                 )
             {
-                double n1 = TypeConverter.ConvertToNumber(v1, null, null);
-                double n2 = TypeConverter.ConvertToNumber(v2, null, null);
+                double n1 = TypeConverter.ConvertToNumber(v1);
+                double n2 = TypeConverter.ConvertToNumber(v2);
 
                 if (n1 == n2)
                 {
@@ -1596,7 +1596,7 @@ namespace ASRuntime.operators
                 )
                 )
             {
-                return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
+                return TypeConverter.ConvertToNumber(v1) == TypeConverter.ConvertToNumber(v2);
             }
             else if (
                 (t1 == ASBinCode.RunTimeDataType.rt_null || t1 == ASBinCode.RunTimeDataType.rt_void)
@@ -1632,7 +1632,7 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_uint:
                         return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
-                        return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
+                        return TypeConverter.ConvertToNumber(v1) == TypeConverter.ConvertToNumber(v2);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
                             ((ASBinCode.rtData.rtString)v1).value
@@ -1667,7 +1667,7 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_uint:
                         return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
-                        return TypeConverter.ConvertToNumber(v1, frame, step.token) == TypeConverter.ConvertToNumber(v2, frame, step.token);
+                        return TypeConverter.ConvertToNumber(v1) == TypeConverter.ConvertToNumber(v2);
                     case ASBinCode.RunTimeDataType.rt_string:
                         return string.CompareOrdinal(
                            ((ASBinCode.rtData.rtString)v1).value
