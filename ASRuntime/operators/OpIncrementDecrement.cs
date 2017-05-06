@@ -382,13 +382,13 @@ namespace ASRuntime.operators
         {
 
             var v = step.arg1.getValue(scope);
-                    {
-                        ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
+                    
+            ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
 
-                        step.reg.getSlot(scope).setValue(iv.value);
+            step.reg.getSlot(scope).setValue(iv.value);
 
-                        iv.value++;
-                    }
+            iv.value++;
+                    
 
             frame.endStep(step);
         }

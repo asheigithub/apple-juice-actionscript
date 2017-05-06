@@ -103,7 +103,7 @@ namespace ASRuntime.operators
 
         }
 
-        private static void _vectorConvertCallBacker(BlockCallBackBase sender,object args)
+        internal static void _vectorConvertCallBacker(BlockCallBackBase sender,object args)
         {
             StackFrame frame = (StackFrame)sender.args;
             OpStep step = sender.step;

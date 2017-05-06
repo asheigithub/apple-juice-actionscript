@@ -5,57 +5,63 @@
 	{
 		[native,_date_getdate]
 		public function get date () : Number;
-		[native,_date_setdate]
-		public function set date (value:Number) : void;
-		/*
+
+		public function set date (value:Number) : void{ setDate(value); }
+		
+		[native,_date_getutcdate]
 		public function get dateUTC () : Number;
-		public function set dateUTC (value:Number) : void;
-
+		public function set dateUTC (value:Number) : void { setUTCDate(value); }
+		
+		[native,_date_getday]
 		public function get day () : Number;
-
+		[native,_date_getutcday]
 		public function get dayUTC () : Number;
-
+		[native,_date_getfullyear]
 		public function get fullYear () : Number;
-		public function set fullYear (value:Number) : void;
 
+		public function set fullYear (value:Number) : void{ setFullYear(value); }
+
+		[native,_date_getutcfullyear]
 		public function get fullYearUTC () : Number;
-		public function set fullYearUTC (value:Number) : void;
 
+		public function set fullYearUTC (value:Number) : void{ setUTCFullYear(value); }
+		[native,_date_gethours]
 		public function get hours () : Number;
-		public function set hours (value:Number) : void;
-
+		public function set hours (value:Number) : void{ setHours(value); }
+		[native,_date_getutchours]
 		public function get hoursUTC () : Number;
-		public function set hoursUTC (value:Number) : void;
+		public function set hoursUTC (value:Number) : void { setUTCHours(value);}
 
+		[native,_date_getmilliseconds]
 		public function get milliseconds () : Number;
-		public function set milliseconds (value:Number) : void;
-
+		public function set milliseconds (value:Number) : void{ setMilliseconds(value); }
+		[native,_date_getutcmilliseconds]
 		public function get millisecondsUTC () : Number;
-		public function set millisecondsUTC (value:Number) : void;
-
+		public function set millisecondsUTC (value:Number) : void{ setUTCMilliseconds(value); }
+		[native,_date_getminutes]
 		public function get minutes () : Number;
-		public function set minutes (value:Number) : void;
-
+		public function set minutes (value:Number) : void{ setMinutes(value); }
+		[native,_date_getutcminutes]
 		public function get minutesUTC () : Number;
-		public function set minutesUTC (value:Number) : void;
-
+		public function set minutesUTC (value:Number) : void{ setUTCMinutes(value); }
+		[native,_date_getmonth]
 		public function get month () : Number;
-		public function set month (value:Number) : void;
-
+		public function set month (value:Number) : void{setMonth(value);}
+		[native,_date_getutcmonth]
 		public function get monthUTC () : Number;
-		public function set monthUTC (value:Number) : void;
-
+		public function set monthUTC (value:Number) : void{setUTCMonth(value);}
+		[native,_date_getseconds]
 		public function get seconds () : Number;
-		public function set seconds (value:Number) : void;
-
+		public function set seconds (value:Number) : void{setSeconds(value);}
+		[native,_date_getutcseconds]
 		public function get secondsUTC () : Number;
-		public function set secondsUTC (value:Number) : void;
-
+		public function set secondsUTC (value:Number) : void{setUTCSeconds(value);}
+		[native,_date_valueof]
 		public function get time () : Number;
-		public function set time (value:Number) : void;
-
+		public function set time (value:Number) : void{setTime(value);}
+		[native,_date_gettimezoneoffset]
 		public function get timezoneOffset () : Number;
-		*/
+		
 
 		[native,_Date_constructor]
 		public function Date(yearOrTimevalue:*=null, 
@@ -75,7 +81,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getDate () : Number;
+		[native,_date_getdate]
+		public function getDate () : Number;
 
 		/**
 		 * 按照本地时间返回该 Date 所指定的星期值（0 代表星期日，1 代表星期一，依此类推）。本地时间由运行 Flash 运行时的操作系统确定。
@@ -85,7 +92,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getDay () : Number;
+		[native,_date_getday]
+		public function getDay () : Number;
 
 		/**
 		 * 按照本地时间返回 Date 对象中的完整年份值（一个 4 位数，如 2000）。本地时间由运行 Flash 运行时的操作系统确定。
@@ -95,7 +103,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getFullYear () : Number;
+		[native,_date_getfullyear]
+		public function getFullYear () : Number;
 
 		/**
 		 * 按照本地时间返回 Date 对象中一天的小时值（0 到 23 之间的一个整数）。本地时间由运行 Flash 运行时的操作系统确定。
@@ -105,7 +114,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getHours () : Number;
+		[native,_date_gethours]
+		public function getHours () : Number;
 
 		/**
 		 * 按照本地时间返回 Date 对象中的毫秒值（0 到 999 之间的一个整数）部分。本地时间由运行 Flash 运行时的操作系统确定。
@@ -115,7 +125,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getMilliseconds () : Number;
+		[native,_date_getmilliseconds]
+		public function getMilliseconds () : Number;
 
 		/**
 		 * 按照本地时间返回 Date 对象中的分钟值（0 到 59 之间的一个整数）部分。本地时间由运行 Flash 运行时的操作系统确定。
@@ -125,7 +136,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getMinutes () : Number;
+		[native,_date_getminutes]
+		public function getMinutes () : Number;
 
 		/**
 		 * 按照本地时间返回该  Date 中的月份值（0 代表一月，1 代表二月，依此类推）部分。本地时间由运行 Flash 运行时的操作系统确定。
@@ -135,7 +147,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getMonth () : Number;
+		[native,_date_getmonth]
+		public function getMonth () : Number;
 
 		/**
 		 * 按照本地时间返回 Date 对象中的秒值（0 到 59 之间的一个整数）部分。本地时间由运行 Flash 运行时的操作系统确定。
@@ -145,7 +158,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getSeconds () : Number;
+		[native,_date_getseconds]
+		public function getSeconds () : Number;
 
 		/**
 		 * 按照通用时间返回 Date 对象中自 1970 年 1 月 1 日午夜以来的毫秒数。在比较两个或更多个 Date 对象时，可使用此方法表示某一特定时刻。
@@ -167,7 +181,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getTimezoneOffset () : Number;
+		[native,_date_gettimezoneoffset]
+		public function getTimezoneOffset () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中表示月中某天的值（1 到 31 之间的一个整数）。
@@ -177,7 +192,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCDate () : Number;
+		[native,_date_getutcdate]
+		public function getUTCDate () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回该 Date  中表示星期的值（0 代表星期日，1 代表星期一，依此类推）。
@@ -187,7 +203,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCDay () : Number;
+		[native,_date_getutcday]
+		public function getUTCDay () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中的四位数年份值。
@@ -197,7 +214,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCFullYear () : Number;
+		[native,_date_getutcfullyear]
+		public function getUTCFullYear () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中一天的小时值（0 到 23 之间的一个整数）。
@@ -207,7 +225,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCHours () : Number;
+		[native,_date_getutchours]
+		public function getUTCHours () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中的毫秒值（0 到 999 之间的一个整数）部分。
@@ -217,7 +236,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCMilliseconds () : Number;
+		[native,_date_getutcmilliseconds]
+		public function getUTCMilliseconds () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中的分钟值（0 到 59 之间的一个整数）部分。
@@ -227,7 +247,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCMinutes () : Number;
+		[native,_date_getutcminutes]
+		public function getUTCMinutes () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中的月份值（0 [一月] 到 11 [十二月]）部分。
@@ -237,7 +258,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCMonth () : Number;
+		[native,_date_getutcmonth]
+		public function getUTCMonth () : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 返回 Date 对象中的秒值（0 到 59 之间的一个整数）部分。
@@ -247,7 +269,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function getUTCSeconds () : Number;
+		[native,_date_getutcseconds]
+		public function getUTCSeconds () : Number;
 
 		/**
 		 * 按照 UTC 将表示日期的字符串转换为一个数字，它等于自 1970 年 1 月 1 日起已经过的毫秒数。
@@ -284,7 +307,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setDate (date:*=null) : Number;
+		[native,_date_setdate]
+		public function setDate (day:Number) : Number;
 
 		/**
 		 * 按照本地时间设置年份值，并以毫秒为单位返回新时间。如果指定了 month 和 day 参数，则将它们设置为本地时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -299,7 +323,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setFullYear (year:*=null, month:*=null, date:*=null) : Number;
+		[native,_date_setfullyear]
+		public function setFullYear (year:Number, month:Number=NaN, date:Number=NaN) : Number;
 
 		/**
 		 * 按照本地时间设置小时值，并以毫秒为单位返回新时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -313,7 +338,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setHours (hour:*=null, min:*=null, sec:*=null, ms:*=null) : Number;
+		[native,_date_sethours]
+		public function setHours (hour:Number, min:Number=NaN, sec:Number=NaN, ms:Number=NaN) : Number;
 
 		/**
 		 * 按照本地时间设置毫秒值，并以毫秒为单位返回新时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -324,7 +350,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setMilliseconds (ms:*=null) : Number;
+		[native,_date_setmilliseconds]
+		public function setMilliseconds (ms:Number) : Number;
 
 		/**
 		 * 按照本地时间设置分钟值，并以毫秒为单位返回新时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -337,7 +364,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setMinutes (min:*=null, sec:*=null, ms:*=null) : Number;
+		[native,_date_setminutes]
+		public function setMinutes (min:Number, sec:Number=NaN, ms:Number=NaN) : Number;
 
 		/**
 		 * 按照本地时间设置月份值以及（可选）日期值，并以毫秒为单位返回新时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -349,7 +377,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setMonth (month:*=null, date:*=null) : Number;
+		[native,_date_setmonth]
+		public function setMonth (month:Number, date:Number=NaN) : Number;
 
 		/**
 		 * 按照本地时间设置秒值，并以毫秒为单位返回新时间。本地时间由运行 Flash 运行时的操作系统确定。
@@ -361,7 +390,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setSeconds (sec:*=null, ms:*=null) : Number;
+		[native,_date_setseconds]
+		public function setSeconds (sec:Number, ms:Number=NaN) : Number;
 
 		/**
 		 * 以毫秒为单位设置自 1970 年 1 月 1 日午夜以来的日期，并以毫秒为单位返回新时间。
@@ -372,7 +402,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setTime (t:*=null) : Number;
+		[native,_date_settime]
+		public function setTime (t:Number) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置日期值，并以毫秒为单位返回新时间。调用此方法不会修改 Date  对象的其他字段，但如果因调用该方法而导致星期值发生变化，则 Date.getUTCDay() 和 Date.getDay() 方法会报告一个新值。
@@ -383,7 +414,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCDate (date:*=null) : Number;
+		[native,_date_setutcdate]
+		public function setUTCDate (date:Number) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置年份值，并以毫秒为单位返回新时间。
@@ -398,7 +430,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCFullYear (year:*=null, month:*=null, date:*=null) : Number;
+		[native,_date_setutcfullyear]
+		public function setUTCFullYear (year:Number, month:Number=NaN, date:Number=NaN) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置小时值，并以毫秒为单位返回新时间。还可指定分钟值、秒值和毫秒值。
@@ -412,7 +445,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCHours (hour:*=null, min:*=null, sec:*=null, ms:*=null) : Number;
+		[native,_date_setutchours]
+		public function setUTCHours (hour:Number, min:Number=NaN, sec:Number=NaN, ms:Number=NaN) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置毫秒值，并以毫秒为单位返回新时间。
@@ -423,7 +457,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCMilliseconds (ms:*=null) : Number;
+		[native,_date_setutcmilliseconds]
+		public function setUTCMilliseconds (ms:Number) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置分钟值，并以毫秒为单位返回新时间。还可以指定秒值和毫秒值。
@@ -436,7 +471,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCMinutes (min:*=null, sec:*=null, ms:*=null) : Number;
+		[native,_date_setutcminutes]
+		public function setUTCMinutes (min:Number, sec:Number=NaN, ms:Number=NaN) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置月份值及（可选）日期值，并以毫秒为单位返回新时间。调用此方法不会修改其他字段，但如果因调用该方法而导致星期值发生变化，则 Date.getUTCDay() 和 Date.getDay() 方法可能会报告一个新值。
@@ -448,7 +484,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCMonth (month:*=null, date:*=null) : Number;
+		[native,_date_setutcmonth]
+		public function setUTCMonth (month:Number, date:Number=NaN) : Number;
 
 		/**
 		 * 按照通用时间 (UTC) 设置秒值以及（可选）毫秒值，并以毫秒为单位返回新时间。
@@ -460,7 +497,8 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public function setUTCSeconds (sec:*=null, ms:*=null) : Number;
+		[native,_date_setutcseconds]
+		public function setUTCSeconds (sec:Number, ms:Number=NaN) : Number;
 
 		/**
 		 * 仅返回星期值和日期值的字符串表示形式，而不返回时间或时区。对比下列方法：
@@ -561,7 +599,14 @@
 		 * @playerversion	AIR 1.0
 		 * @playerversion	Lite 4
 		 */
-		//public static function UTC (year:*, month:*, date:*=1, hours:*=0, minutes:*=0, seconds:*=0, ms:*=0, ...rest) : Number;
+		[native,_date_utc]
+		public static function UTC (year:Number, 
+			month:Number, 
+			date:Number = 1, 
+			hour:Number = 0, 
+			minute:Number = 0, 
+			second:Number = 0, 
+			millisecond:Number = 0) : Number;
 
 		/**
 		 * 按照通用时间返回 Date 对象中自 1970 年 1 月 1 日午夜以来的毫秒数。

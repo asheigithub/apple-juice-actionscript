@@ -107,7 +107,6 @@ namespace ASRuntime.nativefuncs
 
             bin.regNativeFunction(new Date_constructor());
             bin.regNativeFunction(new Date_getdate());
-            bin.regNativeFunction(new Date_setdate());
             bin.regNativeFunction(new Date_valueof());
             bin.regNativeFunction(new Date_tostring());
             bin.regNativeFunction(new Date_totimestring());
@@ -115,6 +114,38 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Date_toUTCstring());
             bin.regNativeFunction(new Date_toLocalString());
             bin.regNativeFunction(new Date_toLocalDateString());
+            bin.regNativeFunction(new Date_getday());
+            bin.regNativeFunction(new Date_getfullyear());
+            bin.regNativeFunction(new Date_gethours());
+            bin.regNativeFunction(new Date_getmilliseconds());
+            bin.regNativeFunction(new Date_getminutes());
+            bin.regNativeFunction(new Date_getmonth());
+            bin.regNativeFunction(new Date_getseconds());
+            bin.regNativeFunction(new Date_timezoneoffset());
+            bin.regNativeFunction(new Date_getutcdate());
+            bin.regNativeFunction(new Date_getutcday());
+            bin.regNativeFunction(new Date_getutcfullyear());
+            bin.regNativeFunction(new Date_getutchours());
+            bin.regNativeFunction(new Date_getutcmilliseconds());
+            bin.regNativeFunction(new Date_getutcminutes());
+            bin.regNativeFunction(new Date_getutcmonth());
+            bin.regNativeFunction(new Date_getutcseconds());
+            bin.regNativeFunction(new Date_setdate());
+            bin.regNativeFunction(new Date_setfullyear());
+            bin.regNativeFunction(new Date_sethours());
+            bin.regNativeFunction(new Date_setmillseconds());
+            bin.regNativeFunction(new Date_setminutes());
+            bin.regNativeFunction(new Date_setmonth());
+            bin.regNativeFunction(new Date_setseconds());
+            bin.regNativeFunction(new Date_settime());
+            bin.regNativeFunction(new Date_setutcdate());
+            bin.regNativeFunction(new Date_setutcfullyear());
+            bin.regNativeFunction(new Date_setutchours());
+            bin.regNativeFunction(new Date_setutcmillseconds());
+            bin.regNativeFunction(new Date_setutcminutes());
+            bin.regNativeFunction(new Date_setutcmonth());
+            bin.regNativeFunction(new Date_setutcseconds());
+            bin.regNativeFunction(new Date_utc());
 
             bin.regNativeFunction(new Error_getstack());
 

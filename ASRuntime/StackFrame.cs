@@ -62,18 +62,18 @@ namespace ASRuntime
         /// <summary>
         /// 执行阶段发生的错误
         /// </summary>
-        private error.InternalError runtimeError;
+        internal error.InternalError runtimeError;
 
         /// <summary>
         /// 暂存是否调用了return
         /// </summary>
-        private bool holdHasCallReturn;
+        internal bool holdHasCallReturn;
 
         /// <summary>
         /// 暂存是否调用了跳转
         /// </summary>
-        private bool holdhasjumpto;
-        private int holdjumptoline;
+        internal bool holdhasjumpto;
+        internal int holdjumptoline;
 
         /// <summary>
         /// 当前指向的指令行
@@ -548,17 +548,17 @@ namespace ASRuntime
             }
         }
 #if DEBUG
-        private bool execing = false;
+        internal bool execing = false;
 #endif
         //private void exec(ASBinCode.OpStep step)
         //{
 
         //}
 
-        private bool hasCallReturn;
+        internal bool hasCallReturn;
 
-        private bool hasCallJump;
-        private int jumptoline;
+        internal bool hasCallJump;
+        internal int jumptoline;
 
         private void doTryCatchReturn(OpStep step)
         {
@@ -889,13 +889,13 @@ namespace ASRuntime
             
         }
 
-        private void enter_try( int tryid)
+        internal void enter_try( int tryid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Try, tryid));
             ++trystateCount;
         }
 
-        private int quit_try( int tryid, SourceToken token)
+        internal int quit_try( int tryid, SourceToken token)
         {
             var s = tryCatchState.Pop();
             --trystateCount;
@@ -910,12 +910,12 @@ namespace ASRuntime
             return s.tryid;
         }
 
-        private void enter_catch( int catchid)
+        internal void enter_catch( int catchid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Catch, catchid));
             ++trystateCount;
         }
-        private int quit_catch( int catchid, SourceToken token)
+        internal int quit_catch( int catchid, SourceToken token)
         {
             var s = tryCatchState.Pop();
             --trystateCount;
@@ -930,13 +930,13 @@ namespace ASRuntime
             return s.tryid;
         }
 
-        private int trystateCount;
-        private void enter_finally( int finallyid)
+        internal int trystateCount;
+        internal void enter_finally( int finallyid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Finally, finallyid));
             ++trystateCount;
         }
-        private int quit_finally( int finallyid, SourceToken token)
+        internal int quit_finally( int finallyid, SourceToken token)
         {
             var s = tryCatchState.Pop();
             --trystateCount;
