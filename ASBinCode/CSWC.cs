@@ -36,6 +36,10 @@ namespace ASBinCode
         /// IEnumerator接口
         /// </summary>
         public Class IEnumeratorInterface;
+        /// <summary>
+        /// IEnumerable接口
+        /// </summary>
+        public Class IEnumerableInterface;
 
         /// <summary>
         /// yielditerator类

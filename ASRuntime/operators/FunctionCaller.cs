@@ -289,7 +289,12 @@ namespace ASRuntime.operators
                 
                 returnSlot.directSet(rtYield);
 
-                invokerFrame.endStep();
+
+                if (callbacker != null)
+                {
+                    callbacker.call(callbacker.args);
+                }
+
                 return;
             }
             else if (!toCallFunc.isNative)

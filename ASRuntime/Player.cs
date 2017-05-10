@@ -1099,6 +1099,7 @@ namespace ASRuntime
                     sb.Append(item.block.opSteps[item.codeLinePtr].token.line+1);
                     sb.Append(" ptr:");
                     sb.Append(  item.block.opSteps[item.codeLinePtr].token.ptr+1);
+                    sb.Append("]");
                     sb.AppendLine();
                 }
                 else

@@ -218,13 +218,25 @@ namespace ASCompiler
             {
                 string _ienumerator = Properties.Resources.IEnumerator;
                 var tree = grammar.ParseTree(_ienumerator, ASTool.AS3LexKeywords.LEXKEYWORDS,
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "IEnumerator.as3");
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "system/collections/IEnumerator.as3");
 
                 if (grammar.hasError)
                 {
                     return null;
                 }
-                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "IEnumerator.as3"));
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "system/collections/IEnumerator.as3"));
+            }
+
+            {
+                string _ienumerable = Properties.Resources.IEnumerable;
+                var tree = grammar.ParseTree(_ienumerable, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "system/collections/IEnumerable.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "system/collections/IEnumerable.as3"));
             }
 
             {

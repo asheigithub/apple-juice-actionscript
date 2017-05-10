@@ -111,6 +111,7 @@
     <Content Include="aslib\Dictionary.txt" />
     <Content Include="aslib\Error.txt" />
     <Content Include="aslib\Function.txt" />
+    <Content Include="aslib\IEnumerable.txt" />
     <Content Include="aslib\IEnumerator.txt" />
     <Content Include="aslib\int.txt" />
     <Content Include="aslib\Math.txt" />

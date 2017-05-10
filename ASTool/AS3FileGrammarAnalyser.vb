@@ -1778,6 +1778,10 @@ Public Class AS3FileGrammarAnalyser
 
         If metapropertystack.Count > 0 Then
             'variable.Meta = metapropertystack.Pop()
+            variable.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                variable.Meta.Add(metapropertystack.Pop())
+            End While
         End If
 
         If memberaccessStack.Count > 0 Then

@@ -1,0 +1,8 @@
+﻿package system.collections
+{
+	[_IEnumerable_]
+	public interface IEnumerable
+    {
+        function getEnumerator():IEnumerator;
+    }
+}

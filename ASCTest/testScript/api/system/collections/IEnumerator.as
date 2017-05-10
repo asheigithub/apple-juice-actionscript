@@ -1,5 +1,10 @@
-﻿package system.collections
+package system.collections 
 {
+	
+	/**
+	 * ...
+	 * @author 
+	 */
 	[_IEnumerator_]
 	public interface IEnumerator
     {
@@ -9,4 +14,5 @@
 
         function reset():void;
     }
+	
 }

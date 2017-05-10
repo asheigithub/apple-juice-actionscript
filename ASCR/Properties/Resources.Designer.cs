@@ -358,7 +358,22 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
-        ///   查找类似 package
+        ///   查找类似 package system.collections
+        ///{
+        ///	public interface IEnumerable
+        ///    {
+        ///        function getEnumerator():IEnumerator;
+        ///    }
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string IEnumerable {
+            get {
+                return ResourceManager.GetString("IEnumerable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package system.collections
         ///{
         ///	[_IEnumerator_]
         ///	public interface IEnumerator
@@ -407,6 +422,7 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	[_object_]
         ///	public dynamic class Object
         ///	{
         ///		[native,_Object_toString]
@@ -421,7 +437,7 @@ namespace ASCompiler.Properties {
         ///		private static var isPrototypeOf=function(V:*=null):Boolean;
         ///		
         ///		[native,_Object_propertyIsEnumerable]
-        ///		private static var propertyIsEnumerable=function(name:String):Boole [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		private static var propertyIsEnumerable=function(name: [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Object {
             get {
@@ -563,14 +579,19 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	import system.collections.IEnumerator
+        ///	[no_constructor]
         ///	[_YieldIterator_]
-        ///	public class YieldIterator implements IEnumerator
+        ///	public final class YieldIterator implements IEnumerator
         ///	{
+        ///		[native,_yield_current]
         ///		public function get current():*;
         ///
+        ///		[native,_yield_movenext]
         ///        public function moveNext():Boolean;
         ///
         ///        public function reset():void;
+        ///		
         ///	}
         ///} 的本地化字符串。
         /// </summary>

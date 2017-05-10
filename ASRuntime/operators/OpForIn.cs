@@ -35,6 +35,38 @@ namespace ASRuntime.operators
                 {
                     saveObj.hosted_object = getArrayForIn(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
                 }
+                else if (ClassMemberFinder.isImplements(rtObj.value._class, player.swc.IEnumerableInterface))
+                {
+                    //***调用getIEnumerator方法****
+                    var movenext = ClassMemberFinder.find(
+                        frame.player.swc.IEnumerableInterface, "getEnumerator", 
+                        frame.player.swc.IEnumerableInterface);
+
+                    var method = ((InterfaceMethodGetter)movenext.bindField).getMethod(
+                        rtObj.objScope);
+
+                    //***调用方法***
+                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    funCaller.function = (rtFunction)method;
+                    funCaller.loadDefineFromFunction();
+                    funCaller.createParaScope();
+
+                    funCaller._tempSlot = frame._tempSlot1;
+                    funCaller.returnSlot = frame._tempSlot1;
+
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_getEnumerator_callbacker);
+                    cb.step = step;
+                    cb.args = frame;
+                    cb.scope = scope;
+
+                    funCaller.callbacker = cb;
+                    funCaller.call();
+
+                    return;
+
+
+                }
                 else if (ClassMemberFinder.isImplements(
                     rtObj.value._class, player.swc.IEnumeratorInterface))
                 {
@@ -50,6 +82,16 @@ namespace ASRuntime.operators
             frame.endStep();
         }
 
+        private static void _getEnumerator_callbacker(BlockCallBackBase sender, object args)
+        {
+            StackFrame frame = (StackFrame)sender.args;
+            rtObject save = (rtObject)sender.step.reg.getValue(sender.scope);
+            HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
+            saveObj.hosted_object = frame._tempSlot1.getValue();
+
+
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
 
         public static void foreach_get_enumerator(StackFrame frame, OpStep step, RunTimeScope scope)
         {
@@ -76,6 +118,38 @@ namespace ASRuntime.operators
                 else if (player.swc.dict_Vector_type.ContainsKey(rtObj.value._class))
                 {
                     saveObj.hosted_object = getArrayForEach(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
+                }
+                else if (ClassMemberFinder.isImplements(rtObj.value._class, player.swc.IEnumerableInterface))
+                {
+                    //***调用getIEnumerator方法****
+                    var movenext = ClassMemberFinder.find(
+                        frame.player.swc.IEnumerableInterface, "getEnumerator",
+                        frame.player.swc.IEnumerableInterface);
+
+                    var method = ((InterfaceMethodGetter)movenext.bindField).getMethod(
+                        rtObj.objScope);
+
+                    //***调用方法***
+                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    funCaller.function = (rtFunction)method;
+                    funCaller.loadDefineFromFunction();
+                    funCaller.createParaScope();
+
+                    funCaller._tempSlot = frame._tempSlot1;
+                    funCaller.returnSlot = frame._tempSlot1;
+
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_getEnumerator_callbacker);
+                    cb.step = step;
+                    cb.args = frame;
+                    cb.scope = scope;
+
+                    funCaller.callbacker = cb;
+                    funCaller.call();
+
+                    return;
+
+
                 }
                 else if (ClassMemberFinder.isImplements(
                     rtObj.value._class, player.swc.IEnumeratorInterface))

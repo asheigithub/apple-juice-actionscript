@@ -20,7 +20,7 @@ package
 	 */
 	public class Main extends Sprite 
 	{
-		
+		[fffmeta]
 		public var fff:int;
 		
 		public function get a()
@@ -42,26 +42,30 @@ package
 			*/
 		
 		
-			var yieldtest=function(a):*
-			{
-				for (var i:int = 0; i < 100; i++ )
-				{
-					if(i>=a)
-					{
-						trace("停止枚举");
-						yield break;
-					}
-					trace("当前输出值：",i);
-					yield return i;
-				}
-			}
-			
-			for (var k in yieldtest(4))
-			{
-				
-				trace("获取到:",k);
-			}
-			
+			//var yieldtest=function(a):*
+			//{
+				//for (var i:int = 0; i < 100; i++ )
+				//{
+					//if(i>=a)
+					//{
+						//trace("停止枚举");
+						//yield break;
+					//}
+					//trace("当前输出值：",i);
+					//yield return i;
+				//}
+			//}
+			//
+			//for (var k in yieldtest(4))
+			//{
+				//
+				//trace("获取到:",k);
+			//}
+			trace(new Error().getStackTrace());
+			//for each(var k in new ia())
+			//{
+				//trace(k);
+			//}
 			
 		}
 		
@@ -73,6 +77,22 @@ package
 	}
 	
 }
+//import system.collections.IEnumerable;
+//import system.collections.IEnumerator;
+//
+//class ia implements IEnumerable
+//{
+	///* INTERFACE system.collections.IEnumerable */
+	//
+	//public function getEnumerator():IEnumerator 
+	//{
+		//for (var i:int = 0; i < 10; i++) 
+		//{
+			//yield return i;
+		//}
+	//}
+//}
+
 
 //var opp=0;
 //

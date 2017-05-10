@@ -69,6 +69,19 @@ namespace ASCompiler.compiler.builds
                                                                    "[_IEnumerator_]只能指定一次");
                                 }
                             }
+                            else if (m.Value.Data.Value.ToString() == "_IEnumerable_")
+                            {
+                                if (builder.bin.IEnumerableInterface == null)
+                                {
+                                    builder.bin.IEnumerableInterface = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3interface.token.line,
+                                               as3interface.token.ptr, as3interface.token.sourceFile,
+                                                                   "[_IEnumerable_]只能指定一次");
+                                }
+                            }
                         }
                     }
                 }
