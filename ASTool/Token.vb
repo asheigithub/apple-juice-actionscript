@@ -69,6 +69,9 @@
         StringValue = String.Empty
     End Sub
 
+    Public preToken As Token
+    Public nextToken As Token
+
 
     Public Type As TokenType
 

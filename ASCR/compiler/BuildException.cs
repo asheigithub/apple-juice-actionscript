@@ -19,6 +19,21 @@ namespace ASCompiler.compiler
         }
     }
 
+    class MemberNotExistsBuildException : BuildException
+    {
+        public MemberNotExistsBuildException(int line, int ptr, string srcFile, string msg)
+            :base(line,ptr,srcFile,msg)
+        {
+
+        }
+        public MemberNotExistsBuildException(BuildError error)
+            : base(error)
+        {
+
+        }
+
+    }
+
     class TooManyBuildErrorException : Exception
     {
 

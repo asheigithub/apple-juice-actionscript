@@ -27,6 +27,20 @@ namespace ASBinCode
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
 
+
+        /// <summary>
+        /// Object类
+        /// </summary>
+        public Class ObjectClass;
+        /// <summary>
+        /// IEnumerator接口
+        /// </summary>
+        public Class IEnumeratorInterface;
+
+        /// <summary>
+        /// yielditerator类
+        /// </summary>
+        public Class YieldIteratorClass;
         /// <summary>
         /// Function类
         /// </summary>

@@ -216,6 +216,30 @@ namespace ASCompiler
             }
 
             {
+                string _ienumerator = Properties.Resources.IEnumerator;
+                var tree = grammar.ParseTree(_ienumerator, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "IEnumerator.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "IEnumerator.as3"));
+            }
+
+            {
+                string _yield = Properties.Resources.YieldIterator;
+                var tree = grammar.ParseTree(_yield, ASTool.AS3LexKeywords.LEXKEYWORDS,
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "@YieldIterator.as3");
+
+                if (grammar.hasError)
+                {
+                    return null;
+                }
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "@YieldIterator.as3"));
+            }
+
+            {
                 string _sprite = Properties.Resources.Sprite;
                 var tree = grammar.ParseTree(_sprite, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Sprite.as3");
@@ -240,9 +264,14 @@ namespace ASCompiler
 
             for (int i = 0; i < lib.SrcFiles.Count; i++)
             {
-                if (lib.SrcFiles[i].Package.MainClass.Name == "__buildin__")
+                if (lib.SrcFiles[i].Package.MainClass !=null && lib.SrcFiles[i].Package.MainClass.Name == "__buildin__")
                 {
                     lib.SrcFiles[i].Package.MainClass.Name = "@__buildin__";
+                }
+
+                if (lib.SrcFiles[i].Package.MainClass != null && lib.SrcFiles[i].Package.MainClass.Name == "YieldIterator")
+                {
+                    lib.SrcFiles[i].Package.MainClass.Name = "@YieldIterator";
                 }
             }
 

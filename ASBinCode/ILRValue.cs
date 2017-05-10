@@ -29,6 +29,7 @@ namespace ASBinCode
         /// <returns></returns>
         public abstract SLOT getSlot(RunTimeScope scope);
 
+        public abstract SLOT getSlotForAssign(RunTimeScope scope);
     }
 
 

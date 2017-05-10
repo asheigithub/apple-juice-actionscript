@@ -98,30 +98,33 @@ namespace ASRuntime.operators
                 if (slot != null)
                 {
                     SLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
-                    if (step.arg1 is SuperPointer)
-                    {
-                        lintoslot = ((MethodGetterBase)step.arg2).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass );
-                    }
-                    else
-                    {
-                        lintoslot = ((MethodGetterBase)step.arg2).getVirtualSlot(rtObj.objScope );
-                    }
-
-                    if (lintoslot == null)
-                    {
-                        frame.throwError((new error.InternalError(step.token,
-                         "没有获取到类成员数据"
-                         )));
-                    }
-
+                    
                     Register register = (Register)step.reg;
                     if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
                     {
+                        if (step.arg1 is SuperPointer)
+                        {
+                            lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope);
+                        }
+                        else
+                        {
+                            lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope);
+                        }
+
                         slot.linkTo(lintoslot);
                     }
                     else
                     {
-                        slot.directSet(lintoslot.getValue());
+                        if (step.arg1 is SuperPointer)
+                        {
+                            slot.directSet( ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass));
+                        }
+                        else
+                        {
+                            slot.directSet(((MethodGetterBase)step.arg2).getMethod(rtObj.objScope));
+                        }
+
+                        //slot.directSet(lintoslot.getValue());
                     }
                 }
                 else
@@ -568,11 +571,23 @@ namespace ASRuntime.operators
                         {
                             SLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
 
+                            Register register = (Register)step.reg;
+
                             if (step.arg1 is SuperPointer)
                             {
                                 if (member.bindField is MethodGetterBase)
                                 {
-                                    linkto = ((MethodGetterBase)member.bindField).getSuperSlot(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+                                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                                    {
+                                        //method赋值必失败
+                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope);
+                                    }
+                                    else
+                                    {
+                                        slot.directSet(((MethodGetterBase)member.bindField).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass));
+
+                                        break;
+                                    }
                                 }
                                 else
                                 {
@@ -583,7 +598,17 @@ namespace ASRuntime.operators
                             {
                                 if (member.bindField is MethodGetterBase)
                                 {
-                                    linkto = ((MethodGetterBase)member.bindField).getVirtualSlot(rtObj.objScope);
+                                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+                                    {
+                                        //method赋值必失败
+                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope);
+                                    }
+                                    else
+                                    {
+                                        slot.directSet(((MethodGetterBase)member.bindField).getMethod(rtObj.objScope));
+                                        break;
+                                    }
+                                    //linkto = ((MethodGetterBase)member.bindField).getVirtualSlot(rtObj.objScope);
                                 }
                                 else
                                 {
@@ -591,8 +616,7 @@ namespace ASRuntime.operators
                                 }
                             }
 
-                            Register register = (Register)step.reg;
-
+                            
                             if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
                             {
                                 slot.linkTo(linkto);

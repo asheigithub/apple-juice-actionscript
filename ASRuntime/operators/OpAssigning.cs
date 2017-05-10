@@ -11,52 +11,59 @@ namespace ASRuntime.operators
         public static void execAssigning(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
             ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
-            ASBinCode.SLOT slot = step.reg.getSlot(scope);
+            ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope);
 
             //if (!slot.isPropGetterSetter)
             {
                 if (!slot.directSet(v))
                 {
-                    StackSlot oslot = (StackSlot)slot;
-                    //if (oslot.linktarget != null)
+                    
+                    if (!(slot is StackSlot)) //直接赋值时
                     {
-                        slot = oslot.linktarget;
+                        //ext = "Illegal assignment to function " + ((MethodGetterBase)step.reg).name + ".";
                     }
-
-                    if (slot is ClassPropertyGetter.PropertySlot)
+                    else
                     {
-                        ClassPropertyGetter.PropertySlot propslot =
-                        (ASBinCode.ClassPropertyGetter.PropertySlot)slot;
-                        //***调用访问器。***
-                        ASBinCode.ClassPropertyGetter prop = oslot.propGetSet; //propslot.property;
-                        
-                        _doPropAssigning(prop, frame, step, frame.player, scope,
-                            //propslot.bindObj
-                            oslot.propBindObj
-                            , v,
-                            oslot
-                            );
-                        return;
+                        StackSlot oslot = (StackSlot)slot;
+                        //if (oslot.linktarget != null)
+                        {
+                            slot = oslot.linktarget;
+                        }
+
+                        if (slot is ClassPropertyGetter.PropertySlot)
+                        {
+                            ClassPropertyGetter.PropertySlot propslot =
+                            (ASBinCode.ClassPropertyGetter.PropertySlot)slot;
+                            //***调用访问器。***
+                            ASBinCode.ClassPropertyGetter prop = oslot.propGetSet; //propslot.property;
+
+                            _doPropAssigning(prop, frame, step, frame.player, scope,
+                                //propslot.bindObj
+                                oslot.propBindObj
+                                , v,
+                                oslot
+                                );
+                            return;
+                        }
+
+                        if (slot is OpVector.vectorSLot)    //Vector类型不匹配
+                        {
+                            BlockCallBackBase cb = new BlockCallBackBase();
+                            cb.scope = scope;
+                            cb.step = step;
+                            cb.args = frame;
+                            cb.setCallBacker(_vectorConvertCallBacker);
+
+                            //***调用强制类型转换***
+                            OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
+                                frame, step.token, scope, frame._tempSlot1, cb, false);
+
+                            return;
+                        }
+
                     }
-
-                    if (slot is OpVector.vectorSLot)    //Vector类型不匹配
-                    {
-                        BlockCallBackBase cb = new BlockCallBackBase();
-                        cb.scope = scope;
-                        cb.step = step;
-                        cb.args = frame;
-                        cb.setCallBacker(_vectorConvertCallBacker);
-
-                        //***调用强制类型转换***
-                        OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
-                            frame, step.token, scope, frame._tempSlot1, cb, false);
-
-                        return;
-                    }
-
-
-
                     string ext = String.Empty;
+
                     if (slot is MethodGetterBase.MethodSlot)
                     {
                         ext = "Cannot assign to a method ";// + ((ASBinCode.ClassMethodGetter.MethodSlot)slot).method;

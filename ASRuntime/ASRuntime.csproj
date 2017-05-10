@@ -55,6 +55,7 @@
     <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="nativefuncs\Uint_buildin.cs" />
     <Compile Include="nativefuncs\Vector_buildin.cs" />
+    <Compile Include="nativefuncs\Yield_buildin.cs" />
     <Compile Include="nativefuncs\__buildin__.cs" />
     <Compile Include="ObjectMemberSlot.cs" />
     <Compile Include="operators\FunctionCaller.cs" />

@@ -35,6 +35,16 @@ package
 			return true;
 		}
 		
+		public function getfunc()
+		{
+			return function() { 
+				
+				trace(this);
+				return this;
+			};
+			
+		}
+		
 		
 		public  function get i()
 		{
@@ -53,3 +63,5 @@ package
 	}
 
 }
+
+var TT = "TEST";

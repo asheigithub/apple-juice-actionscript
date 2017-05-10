@@ -513,6 +513,35 @@ namespace ASRuntime
                 case OpCode.unary_typeof:
                     operators.OpTypeOf.exec_TypeOf(this, step, scope);
                     break;
+                case OpCode.function_create:
+                    {
+                        rtArray arr = (rtArray)step.arg1.getValue(scope);
+                        int funcid = ((rtInt)arr.innerArray[0]).value;
+                        bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
+
+                        rtFunction function = new rtFunction(funcid, ismethod);
+                        step.reg.getSlot(scope).directSet(function);
+                        
+                        endStep(step);
+                    }
+                    break;
+                case OpCode.yield_return:
+                    
+                    operators.OpCallFunction.exec_yieldreturn(this, step, scope);
+
+                    break;
+                case OpCode.yield_continuetoline:
+                    {
+                        //跳转继续下一次yield
+                        codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
+                        endStep(step);
+                    }
+                    break;
+                case OpCode.yield_break:
+                    hasCallReturn = true;
+                    returnSlot.directSet(rtUndefined.undefined);
+                    endStep(step);
+                    break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
@@ -884,7 +913,6 @@ namespace ASRuntime
         internal void receiveErrorFromStackFrame(error.InternalError error)
         {
             runtimeError = error;
-
             endStep(block.opSteps[codeLinePtr]);
             
         }
@@ -1026,7 +1054,7 @@ namespace ASRuntime
                 errorinstance.value.memberData[0].directSet(new rtString(errormessage));
                 errorinstance.value.memberData[1].directSet(new rtString("ArgumentError"));
                 errorinstance.value.memberData[2].directSet(new rtInt(1063));
-
+                errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
                 runtimeError = (new error.InternalError(token, errormessage, errorinstance));
 
             }
@@ -1047,6 +1075,7 @@ namespace ASRuntime
                 errorinstance.value.memberData[0].directSet(new rtString("无法执行操作" + opcode));
                 errorinstance.value.memberData[1].directSet(new rtString("Error"));
                 errorinstance.value.memberData[2].directSet(new rtInt(0));
+                errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
 
                 runtimeError = (new error.InternalError(token, "无法执行操作" + opcode, errorinstance));
 
@@ -1073,6 +1102,7 @@ namespace ASRuntime
                 errorinstance.value.memberData[0].directSet(new rtString(errormessage));
                 errorinstance.value.memberData[1].directSet(new rtString("Error"));
                 errorinstance.value.memberData[2].directSet(new rtInt(code));
+                errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
 
                 runtimeError = (new error.InternalError(token, errormessage, errorinstance));
 

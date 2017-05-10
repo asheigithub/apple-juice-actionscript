@@ -11,7 +11,7 @@ namespace ASBinCode
             , int refdefinedinblockid
             ):base(name,_class,indexofMember,refdefinedinblockid)
         {
-            
+            cache = new WeakReference(null);
         }
 
 
@@ -44,13 +44,45 @@ namespace ASBinCode
             return method;
         }
 
+        /// <summary>
+        /// 转换函数，无所谓this和scope,并且有可能在包外使用
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        public rtFunction getImplicitConvertFunction(RunTimeScope scope)
+        {
+            rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return method;
+        }
+
+        public rtFunction getMethodForClearThis(RunTimeScope scope)
+        {
+            //clearthis 即获取这个函数之后将删除this指针，所以这里直接把函数找出来返回即可
+            
+            rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+            return method;
+        }
+
+        WeakReference cache;
+
         public sealed override  RunTimeValueBase getMethod(RunTimeScope scope)
         {
+            if (cache.IsAlive)
+            {
+                if (((rtFunction)cache.Target).bindScope == scope)
+                {
+                    return (rtFunction)cache.Target;
+                }
+            }
+
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
                 scope = scope.parent;
             }
-
 
             if (!isNotReadVirtual)
             {
@@ -60,15 +92,20 @@ namespace ASBinCode
                 rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
                 method.bind(scope);
                 method.setThis(scope.this_pointer);
+
+                cache.Target = method;
+
                 return method;
 
             }
             else
             {
-
                 rtData.rtFunction method = new rtData.rtFunction(functionid, true);
                 method.bind(scope);
                 method.setThis(scope.this_pointer);
+
+                cache.Target = method;
+
                 return method;
             }
 
@@ -100,49 +137,49 @@ namespace ASBinCode
         }
 
 
-        public sealed override SLOT getVirtualSlot(RunTimeScope scope)
-        {
-            while (scope.scopeType != RunTimeScopeType.objectinstance)
-            {
-                scope = scope.parent;
-            }
+        //public sealed override SLOT getVirtualSlot(RunTimeScope scope)
+        //{
+        //    while (scope.scopeType != RunTimeScopeType.objectinstance)
+        //    {
+        //        scope = scope.parent;
+        //    }
 
-            if (!isNotReadVirtual)
-            {
-                var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
+        //    if (!isNotReadVirtual)
+        //    {
+        //        var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
 
-                rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
-                method.bind(scope);
-                method.setThis(scope.this_pointer);
-                return new MethodSlot(method);
-            }
-            else
-            {
-                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
-                method.bind(scope);
-                method.setThis(scope.this_pointer);
-                return new MethodSlot(method);
-            }
-        }
+        //        rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
+        //        method.bind(scope);
+        //        method.setThis(scope.this_pointer);
+        //        return new MethodSlot(method);
+        //    }
+        //    else
+        //    {
+        //        rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+        //        method.bind(scope);
+        //        method.setThis(scope.this_pointer);
+        //        return new MethodSlot(method);
+        //    }
+        //}
 
-        public sealed override SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass)
-        {
-            while (scope.scopeType != RunTimeScopeType.objectinstance)
-            {
-                scope = scope.parent;
-            }
+        //public sealed override SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass)
+        //{
+        //    while (scope.scopeType != RunTimeScopeType.objectinstance)
+        //    {
+        //        scope = scope.parent;
+        //    }
 
-            var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
-            while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
-            {
-                m = m.virtualLink;
-            }
+        //    var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
+        //    while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
+        //    {
+        //        m = m.virtualLink;
+        //    }
 
 
-            rtData.rtFunction method = new rtData.rtFunction(((ClassMethodGetter)m.bindField).functionid, true);
-            method.bind(scope);
-            method.setThis(scope.this_pointer);
-            return new MethodSlot(method);
-        }
+        //    rtData.rtFunction method = new rtData.rtFunction(((ClassMethodGetter)m.bindField).functionid, true);
+        //    method.bind(scope);
+        //    method.setThis(scope.this_pointer);
+        //    return new MethodSlot(method);
+        //}
     }
 }

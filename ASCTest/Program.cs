@@ -8,9 +8,9 @@ namespace ASCTest
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            
             ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";

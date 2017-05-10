@@ -25,7 +25,10 @@ namespace ASBinCode
         {
             throw new NotImplementedException();
         }
-
+        public override SLOT getSlotForAssign(RunTimeScope scope)
+        {
+            throw new NotImplementedException();
+        }
         public override sealed RunTimeValueBase getValue(RunTimeScope scope)
         {
             //***不可能在运行时运行***

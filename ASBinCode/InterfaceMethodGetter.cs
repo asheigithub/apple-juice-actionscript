@@ -12,7 +12,7 @@ namespace ASBinCode
             , int refdefinedinblockid
             ):base(name,_class,0,refdefinedinblockid)
         {
-            
+            cache = new WeakReference(null);
         }
 
         public void setIndexMember(int value,Class setter)
@@ -29,45 +29,73 @@ namespace ASBinCode
         {
             throw new NotImplementedException();
         }
-
+        WeakReference cache;
         public sealed override RunTimeValueBase getMethod(RunTimeScope scope)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+
+            if (cache.IsAlive)
+            {
+                if (((rtFunction)cache.Target).bindScope == scope)
+                {
+                    return (rtFunction)cache.Target;
+                }
+            }
+
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
+
+            var instance_class = ((rtObject)scope.this_pointer).value._class;
+            var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
+
+            rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
+
+            cache.Target = method;
+
+            return method;
         }
+
+        
 
         public sealed override RunTimeValueBase getSuperMethod(RunTimeScope scope, Class superClass)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override SLOT getSuperSlot(RunTimeScope scope, Class superClass)
-        {
-            throw new NotImplementedException();
-        }
+        //public sealed override SLOT getSuperSlot(RunTimeScope scope, Class superClass)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public sealed override RunTimeValueBase getValue(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
-        public sealed override SLOT getVirtualSlot(RunTimeScope scope)
-        {
-            while (scope.scopeType != RunTimeScopeType.objectinstance)
-            {
-                scope = scope.parent;
-            }
+        //public sealed override SLOT getVirtualSlot(RunTimeScope scope)
+        //{
+        //    while (scope.scopeType != RunTimeScopeType.objectinstance)
+        //    {
+        //        scope = scope.parent;
+        //    }
 
-            var instance_class = ((rtObject)scope.this_pointer).value._class;
-            var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
+        //    var instance_class = ((rtObject)scope.this_pointer).value._class;
+        //    var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
 
 
 
-            rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
-            method.bind(scope);
-            method.setThis(scope.this_pointer);
-            return new MethodSlot(method);
+        //    rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+        //    method.bind(scope);
+        //    method.setThis(scope.this_pointer);
+        //    return new MethodSlot(method);
+        //}
 
-            
-        }
+
+
     }
 }

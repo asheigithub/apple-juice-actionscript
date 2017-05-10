@@ -54,7 +54,7 @@ namespace ASRuntime.operators
                 if (_class != null && !_class.no_constructor)
                 {
 
-                    frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
+                    frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
                     if (_class.constructor != null)
                     {
                         frame.instanceCreator.prepareConstructorArgements();
@@ -95,7 +95,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-
+                        
                         //***创建一个Object对象，创建完毕之后，使用此函数执行初始化。将此对象作为此函数的this指针执行一次。
                         OpCast.Primitive_to_Object((ASBinCode.rtData.rtFunction)rv,
                             frame, step.token, scope, frame._tempSlot1, step,_func_ToObj
@@ -121,7 +121,7 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeScope scope)
         {
             var _class = frame.player.swc.classes[0];
-            frame.instanceCreator = new InstanceCreator(frame.player, frame, step, step.token, _class);
+            frame.instanceCreator = new InstanceCreator(frame.player, frame, step.token, _class);
             frame.instanceCreator.constructor = (ASBinCode.rtData.rtObject)v1;
             frame.instanceCreator.prepareConstructorArgements();
 
@@ -168,7 +168,7 @@ namespace ASRuntime.operators
             else
             {
 
-                frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
+                frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
                 frame.instanceCreator.prepareConstructorArgements();
             }
             //ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
@@ -277,7 +277,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.Class as3class = player.swc.classes[classid];
             //init_static_class(player, frame, as3class,step.token, scope);
 
-            InstanceCreator ic = new InstanceCreator(player, frame, step, step.token, as3class);
+            InstanceCreator ic = new InstanceCreator(player, frame, step.token, as3class);
             ic.init_static_class(as3class);
 
             frame.endStep(step);

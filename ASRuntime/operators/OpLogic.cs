@@ -232,7 +232,7 @@ namespace ASRuntime.operators
                 else
                 {
                     var v1 = step.arg1.getValue(scope);
-                    if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
+                    if (v1.rtType > RunTimeDataType.unknown)
                     {
                         ASBinCode.RunTimeDataType ot;
                         if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
@@ -243,7 +243,12 @@ namespace ASRuntime.operators
 
                     if (v1.rtType < ASBinCode.RunTimeDataType.unknown)
                     {
-                        if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
+                        if (cls.staticClass != null)
+                        {
+                            //V1 instanceof V2   v2不是一个Class,而v1又是一个基本类型，则一定不是。。
+                            step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.False);
+                        }
+                        else if (_exec_is_instance_v1_isprimivate(cls, v1, scope, step))
                         {
                             step.reg.getSlot(scope).directSet(ASBinCode.rtData.rtBoolean.True);
                         }
@@ -1427,7 +1432,7 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
                 ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
 
-                return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
+                return ASBinCode.rtData.rtFunction.isFunctionEqual(obj1, obj2);
 
             }
             else if (v1.rtType == ASBinCode.RunTimeDataType.rt_array
@@ -1692,7 +1697,7 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtFunction obj1 = (ASBinCode.rtData.rtFunction)v1;
                 ASBinCode.rtData.rtFunction obj2 = (ASBinCode.rtData.rtFunction)v2;
 
-                return ASBinCode.rtData.rtFunction.isTypeEqual(obj1, obj2);
+                return ASBinCode.rtData.rtFunction.isFunctionEqual(obj1, obj2);
 
             }
             else if (v1.rtType == ASBinCode.RunTimeDataType.rt_array 

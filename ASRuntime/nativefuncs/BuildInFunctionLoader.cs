@@ -153,6 +153,9 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Date_setutcseconds());
             bin.regNativeFunction(new Date_utc());
 
+            bin.regNativeFunction(new Yield_movenext());
+            bin.regNativeFunction(new Yield_current());
+
             bin.regNativeFunction(new Error_getstack());
 
         }

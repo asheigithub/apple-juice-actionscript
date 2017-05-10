@@ -12,8 +12,13 @@ namespace ASRuntime.operators
     {
         public static void forin_get_enumerator(StackFrame frame, OpStep step, RunTimeScope scope)
         {
+
             var player = frame.player;
-            StackSlot save = (StackSlot)step.reg.getSlot(scope);
+
+            SLOT slot = step.reg.getSlot(scope);
+            ASBinCode.rtti.HostedDynamicObject saveObj = new ASBinCode.rtti.HostedDynamicObject(player.swc.ObjectClass);
+            rtObject save = new rtObject(saveObj, null);
+            slot.directSet(save);
 
             var obj = step.arg1.getValue(scope);
             if (obj.rtType > RunTimeDataType.unknown)
@@ -24,16 +29,21 @@ namespace ASRuntime.operators
                     player.swc.primitive_to_class_table[RunTimeDataType.rt_array]))
                 {
                     rtArray arr = (rtArray)rtObj.value.memberData[0].getValue();
-                    save.cache_enumerator = getArrayForIn(arr.innerArray);
+                    saveObj.hosted_object = getArrayForIn(arr.innerArray);
                 }
-                else if (player.swc.dict_Vector_type.ContainsKey( rtObj.value._class ))
+                else if (player.swc.dict_Vector_type.ContainsKey(rtObj.value._class))
                 {
-                    save.cache_enumerator = getArrayForIn(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
+                    saveObj.hosted_object = getArrayForIn(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
+                }
+                else if (ClassMemberFinder.isImplements(
+                    rtObj.value._class, player.swc.IEnumeratorInterface))
+                {
+                    saveObj.hosted_object = rtObj;
                 }
                 else
                 {
                     IEnumerator<RunTimeValueBase> forinenum = getForinIEnumerator(player, rtObj.value, frame, step, scope);
-                    save.cache_enumerator = forinenum;
+                    saveObj.hosted_object = forinenum;
                 }
             }
 
@@ -44,7 +54,12 @@ namespace ASRuntime.operators
         public static void foreach_get_enumerator(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var player = frame.player;
-            StackSlot save = (StackSlot)step.reg.getSlot(scope);
+
+            SLOT slot= step.reg.getSlot(scope);
+            ASBinCode.rtti.HostedDynamicObject saveObj = new ASBinCode.rtti.HostedDynamicObject(player.swc.ObjectClass);
+            rtObject save = new rtObject(saveObj, null);
+            slot.directSet(save);
+
 
             var obj = step.arg1.getValue(scope);
             if (obj.rtType > RunTimeDataType.unknown)
@@ -55,16 +70,22 @@ namespace ASRuntime.operators
                     player.swc.primitive_to_class_table[RunTimeDataType.rt_array]))
                 {
                     rtArray arr = (rtArray)rtObj.value.memberData[0].getValue();
-                    save.cache_enumerator = getArrayForEach(arr.innerArray);
+                    saveObj.hosted_object = getArrayForEach(arr.innerArray);
+                    
                 }
                 else if (player.swc.dict_Vector_type.ContainsKey(rtObj.value._class))
                 {
-                    save.cache_enumerator = getArrayForEach(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
+                    saveObj.hosted_object = getArrayForEach(((Vector_Data)((HostedObject)rtObj.value).hosted_object).innnerList);
+                }
+                else if (ClassMemberFinder.isImplements(
+                    rtObj.value._class, player.swc.IEnumeratorInterface))
+                {
+                    saveObj.hosted_object = rtObj;
                 }
                 else
                 {
                     IEnumerator<RunTimeValueBase> forinenum = getForEach_IEnumerator(player, rtObj.value, frame, step, scope);
-                    save.cache_enumerator = forinenum;
+                    saveObj.hosted_object = forinenum;
                 }
             }
 
@@ -74,35 +95,126 @@ namespace ASRuntime.operators
 
         public static void enumerator_movenext(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
+            //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            if (slot.cache_enumerator.MoveNext())
+            
+            rtObject save = (rtObject)((Variable)step.arg1).getValue(scope);
+            HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
+
+            IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
+
+
+            if ( enumerator !=null && enumerator.MoveNext() )//slot.cache_enumerator !=null && slot.cache_enumerator.MoveNext())
             {
                 step.reg.getSlot(scope).setValue(rtBoolean.True);
             }
             else
             {
-                step.reg.getSlot(scope).setValue(rtBoolean.False);
+                if (saveObj.hosted_object is rtObject)  //是否是接口
+                {
+                    var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "moveNext", frame.player.swc.IEnumeratorInterface);
+                    var method=((InterfaceMethodGetter)movenext.bindField).getMethod(
+                        (((rtObject)saveObj.hosted_object)).objScope );
+
+                    //***调用方法***
+                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
+                    funCaller.loadDefineFromFunction();
+                    funCaller.createParaScope();
+
+                    funCaller._tempSlot = step.reg.getSlot(scope);
+                    funCaller.returnSlot = step.reg.getSlot(scope);
+
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_enumerator_operator_callbacker);
+                    cb.step = step;
+                    cb.args = frame;
+
+                    funCaller.callbacker = cb;
+                    funCaller.call();
+
+                    return;
+
+                }
+                else
+                {
+                    step.reg.getSlot(scope).setValue(rtBoolean.False);
+                }
             }
 
             frame.endStep(step);
         }
+
+        private static void _enumerator_operator_callbacker(BlockCallBackBase sender, object args)
+        {
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
+
         public static void enumerator_current(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
+            //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            step.reg.getSlot(scope).directSet(slot.cache_enumerator.Current);
+            rtObject save = (rtObject)((Variable)step.arg1).getValue(scope);
+            HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
+
+            IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
+
+
+            //IEnumerator<RunTimeValueBase> enumerator = scope.cache_enumerator as  IEnumerator<RunTimeValueBase>;
+            if (enumerator != null)
+            {
+                step.reg.getSlot(scope).directSet(enumerator.Current);
+            }
+            else
+            {
+                if (saveObj.hosted_object is rtObject)  //是否是接口
+                {
+                    var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "current", frame.player.swc.IEnumeratorInterface);
+                    var method = 
+                        ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object).objScope);
+
+                    //***调用方法***
+                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
+                    funCaller.loadDefineFromFunction();
+                    funCaller.createParaScope();
+
+                    funCaller._tempSlot = step.reg.getSlot(scope);
+                    funCaller.returnSlot = step.reg.getSlot(scope);
+
+                    BlockCallBackBase cb = new BlockCallBackBase();
+                    cb.setCallBacker(_enumerator_operator_callbacker);
+                    cb.step = step;
+                    cb.args = frame;
+
+                    funCaller.callbacker = cb;
+                    funCaller.call();
+
+                    return;
+
+                }
+            }
 
             frame.endStep(step);
         }
 
         public static void enumerator_close(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
+            //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            slot.cache_enumerator.Dispose();
-            slot.cache_enumerator = null;
+            rtObject save = (rtObject)((Variable)step.arg1).getValue(scope);
+            HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
+            //if (scope.cache_enumerator != null)
+            {
+                IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
+                if (enumerator != null)
+                {
+                    enumerator.Dispose();
+                }
+
+                saveObj.hosted_object = null;
+            }
             frame.endStep(step);
         }
 

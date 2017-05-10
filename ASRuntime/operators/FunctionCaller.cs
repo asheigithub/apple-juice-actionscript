@@ -98,16 +98,25 @@ namespace ASRuntime.operators
 
         public void pushParameter(RunTimeValueBase argement,int id,out bool success)
         {
-            if (toCallFunc.signature.parameters.Count > 0)
+            if (toCallFunc.signature.parameters.Count > 0 || toCallFunc.IsAnonymous)
             {
                 bool lastIsPara = false;
 
-                if (toCallFunc.signature.parameters[toCallFunc.signature.parameters.Count - 1].isPara)
+                if (toCallFunc.signature.parameters.Count > 0 && toCallFunc.signature.parameters[toCallFunc.signature.parameters.Count - 1].isPara)
                 {
                     lastIsPara = true;
                 }
-
-                if (!lastIsPara || id < toCallFunc.signature.parameters.Count - 1)
+                
+                if (!lastIsPara 
+                    || id < toCallFunc.signature.parameters.Count - 1 
+                    || 
+                    (
+                    toCallFunc.IsAnonymous  
+                    &&
+                    !(lastIsPara && id >= toCallFunc.signature.parameters.Count-1 )
+                    )
+                    
+                    )
                 {
                     if (id < toCallFunc.signature.parameters.Count)
                     {
@@ -116,19 +125,22 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        //参数数量不匹配
-                        invokerFrame.throwArgementException(
-                            token,
-                            string.Format(
-                            "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
-                            player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs+1
-                            )
+                        if (!toCallFunc.IsAnonymous)
+                        {
+                            //参数数量不匹配
+                            invokerFrame.throwArgementException(
+                                token,
+                                string.Format(
+                                "Argument count mismatch on Function/{0}. Expected {1}, got {2}.",
+                                player.swc.blocks[toCallFunc.blockid].name, toCallFunc.signature.parameters.Count, pushedArgs + 1
+                                )
 
-                            );
+                                );
 
-                        //***中断本帧本次代码执行进入try catch阶段
-                        success = false;
-                        return;
+                            //***中断本帧本次代码执行进入try catch阶段
+                            success = false;
+                            return;
+                        }
 
                     }
 
@@ -171,7 +183,10 @@ namespace ASRuntime.operators
             while (check_para_id < pushedArgs)
             {
                 RunTimeValueBase argement = CallFuncHeap[check_para_id].getValue();
-                if (argement.rtType != toCallFunc.signature.parameters[check_para_id].type)
+                if (argement.rtType != toCallFunc.signature.parameters[check_para_id].type
+                    &&
+                    toCallFunc.signature.parameters[check_para_id].type != RunTimeDataType.rt_void
+                    )
                 {
                     
                     cb.args = argement;
@@ -214,19 +229,13 @@ namespace ASRuntime.operators
 
         private void _doCall()
         {
-            if (pushedArgs < toCallFunc.signature.parameters.Count)
+            if (pushedArgs < toCallFunc.signature.parameters.Count && !toCallFunc.IsAnonymous) //匿名函数能跳过参数检查
             {
                 for (int i = pushedArgs; i < toCallFunc.signature.parameters.Count; i++)
                 {
                     if (toCallFunc.signature.parameters[pushedArgs].defaultValue == null
                     &&
                     !toCallFunc.signature.parameters[pushedArgs].isPara
-                    //&&
-                    //(
-                    //toCallFunc.signature.parameters[pushedArgs].type != RunTimeDataType.rt_void
-                    //    ||
-                    //toCallFunc.isMethod
-                    //)
                     )
                     {
                         invokerFrame.throwArgementException(
@@ -244,9 +253,46 @@ namespace ASRuntime.operators
                     }
                 }
             }
+            if (toCallFunc.isYield)
+            {
+                if (!player.static_instance.ContainsKey(player.swc.YieldIteratorClass.staticClass.classid))
+                {
+                    operators.InstanceCreator ic = new InstanceCreator(player, invokerFrame, token, player.swc.YieldIteratorClass);
+                    if (!ic.init_static_class(player.swc.YieldIteratorClass))
+                    {
+                        invokerFrame.endStep();
+                        return;
+                    }
 
-            
-            if (!toCallFunc.isNative)
+                }
+
+                ASBinCode.rtti.YieldObject yobj = new ASBinCode.rtti.YieldObject(
+                    player.swc.YieldIteratorClass);
+
+
+                CallFuncHeap[CallFuncHeap.Length - 2].directSet(new ASBinCode.rtData.rtInt(1));
+
+                yobj.argements = CallFuncHeap;
+                yobj.function_bindscope = function.bindScope;
+                yobj.block = player.swc.blocks[toCallFunc.blockid];
+                yobj.yield_function = toCallFunc;
+
+                
+                ASBinCode.rtData.rtObject rtYield = new ASBinCode.rtData.rtObject(yobj, null);
+                yobj.thispointer =
+                    (function.this_pointer != null ?
+                    function.this_pointer : invokerFrame.scope.this_pointer);
+
+                RunTimeScope scope = new RunTimeScope(player.swc,null, null, 
+                    0, player.swc.YieldIteratorClass.blockid, null, null, rtYield, RunTimeScopeType.objectinstance);
+                rtYield.objScope = scope;
+                
+                returnSlot.directSet(rtYield);
+
+                invokerFrame.endStep();
+                return;
+            }
+            else if (!toCallFunc.isNative)
             {
                 returnSlot.directSet(
                     TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null));

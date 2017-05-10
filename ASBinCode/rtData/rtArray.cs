@@ -9,27 +9,27 @@ namespace ASBinCode.rtData
         public class arrayObjHandle
         {
             public rtObject bindArrayObject;
-            public override int GetHashCode()
-            {
-                if (bindArrayObject == null)
-                {
-                    return 0.GetHashCode();
-                }
-                else
-                {
-                    return bindArrayObject.GetHashCode();
-                }
-            }
+            //public override int GetHashCode()
+            //{
+            //    if (bindArrayObject == null)
+            //    {
+            //        return 0.GetHashCode();
+            //    }
+            //    else
+            //    {
+            //        return bindArrayObject.GetHashCode();
+            //    }
+            //}
 
-            public override bool Equals(object obj)
-            {
-                arrayObjHandle right = obj as arrayObjHandle;
-                if (right == null)
-                {
-                    return false;
-                }
-                return ReferenceEquals(bindArrayObject, right.bindArrayObject);
-            }
+            //public override bool Equals(object obj)
+            //{
+            //    arrayObjHandle right = obj as arrayObjHandle;
+            //    if (right == null)
+            //    {
+            //        return false;
+            //    }
+            //    return ReferenceEquals(bindArrayObject, right.bindArrayObject);
+            //}
 
         }
 
@@ -97,21 +97,21 @@ namespace ASBinCode.rtData
         //    objHandle = right.objHandle;
         //}
 
-        public override int GetHashCode()
-        {
-            return array.GetHashCode() ^ objHandle.GetHashCode();
-        }
+        //public override int GetHashCode()
+        //{
+        //    return array.GetHashCode() ^ objHandle.GetHashCode();
+        //}
 
-        public override bool Equals(object obj)
-        {
-            rtArray right = obj as rtArray;
-            if (right == null)
-            {
-                return false;
-            }
+        //public override bool Equals(object obj)
+        //{
+        //    rtArray right = obj as rtArray;
+        //    if (right == null)
+        //    {
+        //        return false;
+        //    }
 
-            return array.Equals(right.array) && objHandle.Equals(right.objHandle);
-        }
+        //    return array.Equals(right.array) && objHandle.Equals(right.objHandle);
+        //}
 
 
     }

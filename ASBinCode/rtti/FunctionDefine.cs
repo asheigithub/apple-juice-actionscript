@@ -40,6 +40,10 @@ namespace ASBinCode.rtti
         public string native_name;
         public int native_index;
 
+        /// <summary>
+        /// 是否为yield返回
+        /// </summary>
+        public bool isYield;
 
         public FunctionDefine(int id)
         {

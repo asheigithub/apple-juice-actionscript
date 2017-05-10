@@ -100,18 +100,20 @@ namespace ASBinCode
         }
 
 
-        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
-        {
+        //public override sealed RunTimeValueBase getValue(RunTimeScope scope)
+        //{
             //throw new NotImplementedException();
+
+            
             //return getSlot(scope).getValue();
 
-            while (refblockid != scope.blockId)
-            {
-                scope = scope.parent;
-            }
-            return scope.memberData[indexOfMembers].getValue();
+            //while (refblockid != scope.blockId)
+            //{
+            //    scope = scope.parent;
+            //}
+            //return scope.memberData[indexOfMembers].getValue();
 
-        }
+        //}
 
         //public abstract SLOT getSlot(RunTimeScope scope);
         

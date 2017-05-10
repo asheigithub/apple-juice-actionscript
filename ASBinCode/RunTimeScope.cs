@@ -8,11 +8,12 @@ namespace ASBinCode
 {
     public sealed class RunTimeScope //: IRunTimeScope
     {
-        
+        public readonly CSWC swc;
        
         public readonly int offset;
         public readonly int blockId;
         public RunTimeScope(
+            CSWC swc,
             //IList<IMember> members,
             SLOT[] memberDataList,
             SLOT[] rtStack,
@@ -25,6 +26,8 @@ namespace ASBinCode
             //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
             )
         {
+            this.swc = swc;
+
             this.stack = rtStack;
             this.offset = offset;
             this.blockId = blockid;
@@ -61,10 +64,11 @@ namespace ASBinCode
 
 
         public readonly RunTimeScopeType scopeType;
-        
 
 
         
+
+
     }
 
     

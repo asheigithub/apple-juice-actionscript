@@ -77,6 +77,11 @@ namespace ASBinCode
         //    get { return _tempSlot; }
         //}
 
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        {
+            return _tempSlot;
+        }
+
         public sealed override  SLOT getSlot(RunTimeScope scope)
         {
             //if (_tempSlot == null)

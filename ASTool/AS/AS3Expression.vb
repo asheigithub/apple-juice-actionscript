@@ -16,11 +16,13 @@
 
 
         Public Overridable Sub Write(tabs As Integer, srcout As ISrcOut)
-
-            For Each k In exprStepList
-                srcout.WriteLn(k.ToString(), tabs)
-            Next
-
+            If exprStepList.Count > 0 Then
+                For Each k In exprStepList
+                    srcout.WriteLn(k.ToString(), tabs)
+                Next
+            Else
+                'srcout.WriteLn(ToString(), tabs)
+            End If
         End Sub
 
         Public Overrides Function ToString() As String

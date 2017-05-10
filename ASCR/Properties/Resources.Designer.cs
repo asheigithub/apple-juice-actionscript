@@ -78,8 +78,13 @@ namespace ASCompiler.Properties {
         ///		[native,__buildin__isnan]
         ///		public static function isNaN(value:Number):Boolean;
         ///
-        ///	}
-        ///} 的本地化字符串。
+        ///		[native,__buildin__isfinite]
+        ///		public static function isFinite(value:Number):Boolean;
+        ///
+        ///		[native,__buildin__parseint]
+        ///		public static function parseInt(str:String=&quot;NaN&quot;, radix:uint = 0):Number;
+        ///
+        ///		[n [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string @__buildin__ {
             get {
@@ -236,7 +241,25 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
-        ///   查找类似  的本地化字符串。
+        ///   查找类似 package
+        ///{
+        ///	[hosted]
+        ///	public final dynamic class Date extends Object
+        ///	{
+        ///		[native,_date_getdate]
+        ///		public function get date () : Number;
+        ///
+        ///		public function set date (value:Number) : void{ setDate(value); }
+        ///		
+        ///		[native,_date_getutcdate]
+        ///		public function get dateUTC () : Number;
+        ///		public function set dateUTC (value:Number) : void { setUTCDate(value); }
+        ///		
+        ///		[native,_date_getday]
+        ///		public function get day () : Number;
+        ///		[native,_date_getutcday]
+        ///		public function get dayUTC () : Number;
+        ///		[na [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Date {
             get {
@@ -337,6 +360,27 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	[_IEnumerator_]
+        ///	public interface IEnumerator
+        ///    {
+        ///        function get current():*;
+        ///
+        ///        function moveNext():Boolean;
+        ///
+        ///        function reset():void;
+        ///    }
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string IEnumerator {
+            get {
+                return ResourceManager.GetString("IEnumerator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	/**
         ///	 * Math 类包含表示常用数学函数和值的方法和常数。 
         ///	 * &lt;p class=&quot;- topic/p &quot;&gt;使用此类的方法和属性可以访问和处理数学常数和函数。Math 类的所有属性和方法都是静态的，而且必须使用 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;Math.method(&lt;/codeph&gt;&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;&lt;i class=&quot;+ topic/ph hi-d/i &quot;&gt;parameter&lt;/i&gt;&lt;/codeph&gt;&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;)&lt;/codeph&gt; 或 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;Math.constant&lt;/codeph&gt; 语法才能调用。在 ActionScript 中，使用双精度 IEEE-754 浮点数的最高精度定义常数。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;若干 Math 类方法使用以弧度为单位的角度测量值作为参数。在调用此方法之 [字符串的其余部分被截断]&quot;; 的本地化字符串。
@@ -370,31 +414,14 @@ namespace ASCompiler.Properties {
         ///		
         ///		private static var valueOf = function():*{ return this };
         ///
-        ///
+        ///		[native,_Object_hasOwnProperty]
+        ///		private static var hasOwnProperty=function(name:String):Boolean;
         ///		
-        ///		private static var _prototype:*=
-        ///		{
-        ///			&quot;toString&quot;:toString
-        ///			,
-        ///			&quot;valueOf&quot;:valueOf
-        ///			,
-        ///			&quot;toLocaleString&quot;:function toLocaleString()
-        ///			{
-        ///				return toString();
-        ///			}
-        ///
-        ///		};
+        ///		[native,_Object_isPrototypeOf]
+        ///		private static var isPrototypeOf=function(V:*=null):Boolean;
         ///		
-        ///		/*
-        ///		public static function get prototype():*
-        ///		{
-        ///			return _prototype;
-        ///		}
-        ///		*/
-        ///		
-        ///
-        ///		[explicit_from];
-        ///		private static function _explicit_ [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		[native,_Object_propertyIsEnumerable]
+        ///		private static var propertyIsEnumerable=function(name:String):Boole [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Object {
             get {
@@ -530,6 +557,26 @@ namespace ASCompiler.Properties {
         internal static string Vector {
             get {
                 return ResourceManager.GetString("Vector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	[_YieldIterator_]
+        ///	public class YieldIterator implements IEnumerator
+        ///	{
+        ///		public function get current():*;
+        ///
+        ///        public function moveNext():Boolean;
+        ///
+        ///        public function reset():void;
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string YieldIterator {
+            get {
+                return ResourceManager.GetString("YieldIterator", resourceCulture);
             }
         }
     }

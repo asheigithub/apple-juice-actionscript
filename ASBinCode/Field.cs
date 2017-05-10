@@ -21,6 +21,27 @@ namespace ASBinCode
 
         }
 
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        {
+            while (scope.scopeType != RunTimeScopeType.objectinstance)
+            {
+                scope = scope.parent;
+            }
+
+#if DEBUG
+            //***检查类的继承关系***
+            rtData.rtObject obj = (rtData.rtObject)scope.this_pointer;
+            var cls = obj.value._class;
+
+            while (cls.blockid != refblockid)
+            {
+                cls = cls.super;
+            }
+#endif
+
+            return scope.memberData[indexOfMembers];
+        }
+
         public sealed override SLOT getSlot(RunTimeScope scope)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
@@ -40,6 +61,11 @@ namespace ASBinCode
 #endif
 
             return scope.memberData[indexOfMembers];
+        }
+
+        public override RunTimeValueBase getValue(RunTimeScope scope)
+        {
+            return getSlot(scope).getValue();
         }
 
         protected sealed override IMember _clone()

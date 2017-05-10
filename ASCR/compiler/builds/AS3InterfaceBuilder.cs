@@ -48,6 +48,34 @@ namespace ASCompiler.compiler.builds
                 cls.ispackageout = true;
             }
 
+            if (as3interface.Meta != null)
+            {
+                foreach (var m in as3interface.Meta)
+                {
+                    if (!m.Value.IsReg)
+                    {
+                        if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
+                        { 
+                            if (m.Value.Data.Value.ToString() == "_IEnumerator_")
+                            {
+                                if (builder.bin.IEnumeratorInterface == null)
+                                {
+                                    builder.bin.IEnumeratorInterface = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3interface.token.line,
+                                               as3interface.token.ptr, as3interface.token.sourceFile,
+                                                                   "[_IEnumerator_]只能指定一次");
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+
 
             //****编译metaclass***
             int metaclassid = builder.getClassId();

@@ -79,6 +79,13 @@ namespace ASBinCode
             }
         }
 
+        private static MethodSlot _temp= MethodSlot.instance;
+
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        {
+            return _temp;
+        }
+
         public sealed override  SLOT getSlot(RunTimeScope scope)
         {
             throw new NotImplementedException();
@@ -120,10 +127,10 @@ namespace ASBinCode
 
 
 
-        public abstract SLOT getVirtualSlot(RunTimeScope scope);
+        //public abstract SLOT getVirtualSlot(RunTimeScope scope);
 
 
-        public abstract SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass);
+        //public abstract SLOT getSuperSlot(RunTimeScope scope, ASBinCode.rtti.Class superClass);
         
 
 
@@ -166,22 +173,15 @@ namespace ASBinCode
 
         public sealed class MethodSlot : SLOT
         {
-            private rtFunction method;
-
-            public MethodSlot(rtFunction method)
+            //private rtFunction method;
+            public static MethodSlot instance = new MethodSlot();
+            
+            private MethodSlot()
             {
                 
-                this.method = method;
+                //this.method = method;
             }
-
-            //public sealed override bool isPropGetterSetter
-            //{
-            //    get
-            //    {
-            //        return false;
-            //    }
-            //}
-
+            
             public sealed override void clear()
             {
 
@@ -194,7 +194,7 @@ namespace ASBinCode
 
             public sealed override RunTimeValueBase getValue()
             {
-                return method;
+                throw new NotImplementedException();
             }
 
             public sealed override void setValue(rtNull value)

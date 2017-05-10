@@ -7,6 +7,27 @@ namespace ASCompiler.compiler.builds
 {
     class AS3BreakBuilder
     {
+        public void buildAS3YieldBreak(CompileEnv env, ASTool.AS3.AS3YieldBreak as3yieldbreak,Builder builder)
+        {
+            if (builder.buildingfunctons.Count > 0)
+            {
+                ASTool.AS3.AS3Function as3function = builder.buildingfunctons.Peek();
+                if (as3function.IsConstructor)
+                {
+                    throw new BuildException(as3yieldbreak.Token.line, as3yieldbreak.Token.ptr, as3yieldbreak.Token.sourceFile,
+                            "构造函数不能用yield");
+                }
+
+                OpStep opyieldbreak = new OpStep(OpCode.yield_break, new SourceToken(as3yieldbreak.Token.line, as3yieldbreak.Token.ptr, as3yieldbreak.Token.sourceFile));
+                env.block.opSteps.Add(opyieldbreak);
+            }
+            else
+            {
+                throw new BuildException(as3yieldbreak.Token.line, as3yieldbreak.Token.ptr, as3yieldbreak.Token.sourceFile,
+                            "yield break 只能在函数中");
+            }
+        }
+
         public void buildAS3Break(CompileEnv env, ASTool.AS3.AS3Break as3break)
         {
             if (string.IsNullOrEmpty(as3break.breakFlag))

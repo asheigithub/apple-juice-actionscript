@@ -192,7 +192,7 @@ namespace ASRuntime.operators
 
 
             var _class = player.swc.getClassByRunTimeDataType(classrttype);
-            frame.instanceCreator = new InstanceCreator(player, frame, step, step.token, _class);
+            frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
 

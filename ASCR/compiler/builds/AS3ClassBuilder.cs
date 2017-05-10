@@ -300,13 +300,44 @@ namespace ASCompiler.compiler.builds
                             }
                             else if (m.Value.Data.Value.ToString() == "_error_class_")
                             {
-                                builder.bin.ErrorClass = cls;
+                                if (builder.bin.ErrorClass == null)
+                                {
+                                    builder.bin.ErrorClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_error_class_]只能指定一次");
+                                }
                             }
                             else if (m.Value.Data.Value.ToString() == "_dictionary_")
                             {
-                                builder.bin.DictionaryClass = cls;
+                                if (builder.bin.DictionaryClass == null)
+                                {
+                                    builder.bin.DictionaryClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_dictionary_]只能指定一次");
+                                }
                             }
-                            else if (m.Value.Data.Value.ToString()== "_function_")
+                            else if (m.Value.Data.Value.ToString() == "_YieldIterator_")
+                            {
+                                if (builder.bin.YieldIteratorClass == null)
+                                {
+                                    builder.bin.YieldIteratorClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_YieldIterator_]只能指定一次");
+                                }
+                            }
+                            else if (m.Value.Data.Value.ToString() == "_function_")
                             {
                                 if (builder.bin.FunctionClass == null)
                                 {
@@ -319,6 +350,20 @@ namespace ASCompiler.compiler.builds
                                                                    "[_function_]只能指定一次");
                                 }
                             }
+                            else if (m.Value.Data.Value.ToString() == "_object_")
+                            {
+                                if (builder.bin.ObjectClass == null)
+                                {
+                                    builder.bin.ObjectClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_object_]只能指定一次");
+                                }
+                            }
+                            
                         }
                     }
                 }
@@ -397,6 +442,12 @@ namespace ASCompiler.compiler.builds
                         "Forward reference to base class ." + extendName + "."
                         );
                         //
+                    }
+
+                    if (find[0].isInterface)
+                    {
+                        throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "A class can only extend another class, not an interface.");
                     }
 
                     cls.super = find[0];

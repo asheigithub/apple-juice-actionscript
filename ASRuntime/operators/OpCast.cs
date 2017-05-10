@@ -535,7 +535,7 @@ namespace ASRuntime.operators
                                 ,
                                 targetType, frame.player.swc))
                             {
-                                var funConv = (rtFunction)((MethodGetterBase)cls.implicit_from.bindField).getMethod(scope);
+                                var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getImplicitConvertFunction(scope);
 
                                 FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                                 fc.function = funConv;
@@ -790,7 +790,7 @@ namespace ASRuntime.operators
                 var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
                 if (cls != null)
                 {
-                    var funConv = (rtFunction)((MethodGetterBase)cls.implicit_from.bindField).getMethod(scope);
+                    var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getImplicitConvertFunction(scope);
 
                     FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                     fc.function = funConv;

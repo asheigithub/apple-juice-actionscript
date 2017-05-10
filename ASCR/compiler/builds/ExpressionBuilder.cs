@@ -18,81 +18,92 @@ namespace ASCompiler.compiler.builds
 
         public void buildAS3Expression(CompileEnv env, ASTool.AS3.AS3Expression expression)
         {
-            for (int i = 0; i < expression.exprStepList.Count; i++)
+            if (expression.exprStepList.Count==0
+                &&
+                expression.Value !=null
+                &&
+                expression.Value.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.identifier
+                )
             {
-                ASTool.AS3.Expr.AS3ExprStep step = expression.exprStepList[i];
-
-                switch (step.Type)
+                var rv = getRightValue(env, expression.Value, expression.token, builder);
+            }
+            else
+            {
+                for (int i = 0; i < expression.exprStepList.Count; i++)
                 {
-                    case ASTool.AS3.Expr.OpType.Plus:
-                        buildPlus(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Assigning:
-                        buildAssigning(env, step);
-                        break;      
-                    case ASTool.AS3.Expr.OpType.LogicEQ:
-                        buildLogicEQ(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Logic:
-                        buildLogic(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.BitShift:
-                        buildBitShift(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.BitAnd:
-                        buildBitAnd(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Unary:
-                        buildUnary(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.BitOr:
-                        buildBitOr(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.BitXor:
-                        buildBitXor(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Multiply:
-                        buildMultipy(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Suffix:
-                        buildSuffix(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.IF_GotoFlag:
-                        buildIFGoto(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.GotoFlag:
-                        buildGoto(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Flag:
-                        buildFlag(env, step);
-                        break;
-                    case ASTool.AS3.Expr.OpType.CallFunc:
-                        FuncCallBuilder fcb = new FuncCallBuilder();
-                        fcb.buildFuncCall(env, step,builder);
-                        break;
-                    
-                    case ASTool.AS3.Expr.OpType.Access:
-                        AccessBuilder acb = new AccessBuilder();
-                        acb.buildAccess(env, step, builder);
-                        break;
-                    case ASTool.AS3.Expr.OpType.Constructor:
-                        ConstructorBuilder cb = new ConstructorBuilder();
-                        cb.buildConstructor(env, step, builder);
-                        break;
-                    case ASTool.AS3.Expr.OpType.E4XAccess:
+                    ASTool.AS3.Expr.AS3ExprStep step = expression.exprStepList[i];
 
-                    case ASTool.AS3.Expr.OpType.E4XFilter:
+                    switch (step.Type)
+                    {
+                        case ASTool.AS3.Expr.OpType.Plus:
+                            buildPlus(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Assigning:
+                            buildAssigning(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.LogicEQ:
+                            buildLogicEQ(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Logic:
+                            buildLogic(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.BitShift:
+                            buildBitShift(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.BitAnd:
+                            buildBitAnd(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Unary:
+                            buildUnary(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.BitOr:
+                            buildBitOr(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.BitXor:
+                            buildBitXor(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Multiply:
+                            buildMultipy(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Suffix:
+                            buildSuffix(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.IF_GotoFlag:
+                            buildIFGoto(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.GotoFlag:
+                            buildGoto(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Flag:
+                            buildFlag(env, step);
+                            break;
+                        case ASTool.AS3.Expr.OpType.CallFunc:
+                            FuncCallBuilder fcb = new FuncCallBuilder();
+                            fcb.buildFuncCall(env, step, builder);
+                            break;
 
-                    case ASTool.AS3.Expr.OpType.NameSpaceAccess:
+                        case ASTool.AS3.Expr.OpType.Access:
+                            AccessBuilder acb = new AccessBuilder();
+                            acb.buildAccess(env, step, builder);
+                            break;
+                        case ASTool.AS3.Expr.OpType.Constructor:
+                            ConstructorBuilder cb = new ConstructorBuilder();
+                            cb.buildConstructor(env, step, builder);
+                            break;
+                        case ASTool.AS3.Expr.OpType.E4XAccess:
 
-                    default:
-                        throw new BuildException(
-                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "不支持的操作类型 " + step.Type + " " + step.OpCode));
+                        case ASTool.AS3.Expr.OpType.E4XFilter:
 
+                        case ASTool.AS3.Expr.OpType.NameSpaceAccess:
+
+                        default:
+                            throw new BuildException(
+                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "不支持的操作类型 " + step.Type + " " + step.OpCode));
+
+                    }
                 }
             }
-
 
         }
 
@@ -173,7 +184,7 @@ namespace ASCompiler.compiler.builds
             }
 
 
-            if (src.valueType != dstType)
+            if (src.valueType != dstType && dstType != RunTimeDataType.rt_void)
             {
                 OpStep op =
                     new OpStep(OpCode.cast, token);
@@ -1235,8 +1246,8 @@ namespace ASCompiler.compiler.builds
                                     ((FindStaticMember)member).classMember.bindField;
                                 //***调用属性访问器***
                                 return addOpPropGet(prop, matchtoken, prop.name,
-                                    ((FindStaticMember)member).classMember.refClass, 
-                                    ((FindStaticMember)member).static_class , env, builder);
+                                    ((FindStaticMember)member).classMember.refClass,
+                                    ((FindStaticMember)member).static_class, env, builder);
                             }
                             else
                             {
@@ -1274,7 +1285,7 @@ namespace ASCompiler.compiler.builds
 
                         if (member == null)
                         {
-                            throw new BuildException(
+                            throw new MemberNotExistsBuildException(
                                 new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
                                 "成员" + data.Data.Value + "未找到"));
                         }
@@ -1381,13 +1392,36 @@ namespace ASCompiler.compiler.builds
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,
                             "表达式求值时不考虑function " + data.Data.FF1Type));
                     }
-                    ASTool.AS3.AS3Function as3func = (ASTool.AS3.AS3Function)data.Data.Value;
 
+                    ASTool.AS3.AS3Function as3func = (ASTool.AS3.AS3Function)data.Data.Value;
+                    if (env.block.define_class_id == -65535)//测试类型
+                    {
+                        return new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtFunction(0,as3func.IsMethod ));
+                    }
 
                     builds.AS3FunctionBuilder fb = new AS3FunctionBuilder();
                     var fc = fb.buildAS3Function(env, as3func, builder, null);
 
-                    return new ASBinCode.rtData.RightValue(fc);
+                    ASBinCode.rtData.rtArray arr = new ASBinCode.rtData.rtArray();
+                    arr.innerArray.Add(new ASBinCode.rtData.rtInt(fc.functionId));
+                    arr.innerArray.Add(fc.ismethod ? ASBinCode.rtData.rtBoolean.True : ASBinCode.rtData.rtBoolean.False);
+
+                    OpStep opcreatefunc = new OpStep(OpCode.function_create, 
+                        new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile)
+                        );
+                    Register eax = env.getAdditionalRegister();
+                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                    opcreatefunc.reg = eax;
+                    opcreatefunc.regType = eax.valueType;
+                    opcreatefunc.arg1 = new ASBinCode.rtData.RightValue(arr);
+                    opcreatefunc.arg1Type = RunTimeDataType.rt_array;
+                    opcreatefunc.arg2 = null;
+                    opcreatefunc.arg2Type = RunTimeDataType.unknown;
+
+                    env.block.opSteps.Add(opcreatefunc);
+
+                    return eax;
+                    //return new ASBinCode.rtData.RightValue(fc);
                 }
                 else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.dynamicobj && !env.isEval)
                 {
@@ -2126,24 +2160,36 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    var v1= getRightValue(env, step.Arg2, step.token, builder);
+                    RightValueBase v1=null;
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_string);
+                    try
+                    {
+                        v1 = getRightValue(env, step.Arg2, step.token, builder);
+                    }
+                    catch (MemberNotExistsBuildException)
+                    {
+                        v1 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
+                    }
+                    finally
+                    {
+                        
 
-                    ASBinCode.OpStep op
-                        = new ASBinCode.OpStep(ASBinCode.OpCode.unary_typeof, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        eax.setEAXTypeWhenCompile(RunTimeDataType.rt_string);
 
-                    op.arg1 = v1;
-                    op.arg1Type = v1.valueType;
-                    op.arg2 = null;
-                    op.arg2Type = RunTimeDataType.unknown;
+                        ASBinCode.OpStep op
+                            = new ASBinCode.OpStep(ASBinCode.OpCode.unary_typeof, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                    op.reg = eax;
-                    op.regType = eax.valueType;
+                        op.arg1 = v1;
+                        op.arg1Type = v1.valueType;
+                        op.arg2 = null;
+                        op.arg2Type = RunTimeDataType.unknown;
 
-                    env.block.opSteps.Add(op);
+                        op.reg = eax;
+                        op.regType = eax.valueType;
 
+                        env.block.opSteps.Add(op);
+                    }
                 }
                 else
                 {

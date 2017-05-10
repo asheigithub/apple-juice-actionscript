@@ -112,7 +112,7 @@
 
 <ACCESS_DEF>   ::=<ACCESS_KEYWORD><ACCESS_DEF>| <DefClass> | <DefInterface>|<Function>| <NameSpace> | <Const>|<Variable>;
 
-<ACCESS_KEYWORD> ::="public" |"private"   | "internal" |"final" |"dynamic" |<ClassMetaProperty> ;
+<ACCESS_KEYWORD> ::="public" |"private"   | "internal" |"final" |"dynamic" | "static" |"override"|<ClassMetaProperty> ;
 
 
 
@@ -136,7 +136,8 @@
 			<SWITCH>		|
 		<Return><EatAnSemicolon>		|
 		<Break><EatAnSemicolon>			|
-		<Continue><EatAnSemicolon>		
+		<Continue><EatAnSemicolon>		|
+		<YIELD><EatAnSemicolon>
 		;
 
 <EatAnSemicolon> ::=";"|null;
@@ -208,11 +209,15 @@
 
 <FunctionBody>::=<Stmts>|null;
 
+<YIELD>	  ::="yield"<YIELD_RB>;
+<YIELD_RB>::="return" <ReturnValue>|
+			 "break";	
 
 <Return>  ::="return"<ReturnValue>;
+
 <ReturnValue> ::=<ExpressionList>|null;
 
-<Break>   ::="break" <LabelFlag>;
+<Break>   ::="break" <LabelFlag> ;
 <Continue> ::="continue" <LabelFlag>;
 
 

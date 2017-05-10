@@ -128,6 +128,8 @@
     <Compile Include="AS\AS3Vector.vb" />
     <Compile Include="AS\AS3While.vb" />
     <Compile Include="AS\AS3With.vb" />
+    <Compile Include="AS\AS3YieldBreak.vb" />
+    <Compile Include="AS\AS3YieldReturn.vb" />
     <Compile Include="AS\Expr\AS3DataStackElement.vb" />
     <Compile Include="AS\Expr\AS3DataValue.vb" />
     <Compile Include="AS\Expr\AS3ExprStep.vb" />

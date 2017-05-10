@@ -896,7 +896,7 @@ namespace ASRuntime
 
             RunTimeScope scope;
             
-            scope = new RunTimeScope(
+            scope = new RunTimeScope(swc,
                 membersHeap, stackSlots, startOffset, calledblock.id, callerScope
                 ,
                 static_instance

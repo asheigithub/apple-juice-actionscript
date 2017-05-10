@@ -213,8 +213,10 @@ namespace ASCompiler.compiler.builds
                         builder);
                 }
 
-                Register regSaveEnumerator = env.getAdditionalRegister();
-                regSaveEnumerator.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                //Register regSaveEnumerator = env.getAdditionalRegister();
+                Variable varSaveEnumerator = new Variable("@saveEnumeraor_" + env.block.scope.members.Count, env.block.scope.members.Count, env.block.id);
+                env.block.scope.members.Add(varSaveEnumerator);
+                varSaveEnumerator.valueType=(RunTimeDataType.rt_void);
                 {
                     //**IEnumerator Get And Reset();
                     OpStep opGetEnumerator = new OpStep(OpCode.forin_get_enumerator,
@@ -223,7 +225,7 @@ namespace ASCompiler.compiler.builds
                           as3forin.Token.sourceFile)
                         );
 
-                    opGetEnumerator.reg = regSaveEnumerator;
+                    opGetEnumerator.reg = varSaveEnumerator;
                     opGetEnumerator.regType = RunTimeDataType.rt_void;
                     opGetEnumerator.arg1 = enumerator;
                     opGetEnumerator.arg1Type = enumerator.valueType;
@@ -254,8 +256,8 @@ namespace ASCompiler.compiler.builds
 
                     opMoveNext.reg = eaxismovenext;
                     opMoveNext.regType = RunTimeDataType.rt_boolean;
-                    opMoveNext.arg1 = regSaveEnumerator;
-                    opMoveNext.arg1Type = regSaveEnumerator.valueType;
+                    opMoveNext.arg1 = varSaveEnumerator;
+                    opMoveNext.arg1Type = varSaveEnumerator.valueType;
 
                     env.block.opSteps.Add(opMoveNext);
                 }
@@ -307,8 +309,8 @@ namespace ASCompiler.compiler.builds
 
                     opCurrent.reg = (Register)loadValue;
                     opCurrent.regType = RunTimeDataType.rt_void;
-                    opCurrent.arg1 = regSaveEnumerator;
-                    opCurrent.arg1Type = regSaveEnumerator.valueType;
+                    opCurrent.arg1 = varSaveEnumerator;
+                    opCurrent.arg1Type = varSaveEnumerator.valueType;
 
                     env.block.opSteps.Add(opCurrent);
 
@@ -369,7 +371,7 @@ namespace ASCompiler.compiler.builds
                     OpStep opClose = new OpStep(OpCode.enumerator_close, new SourceToken(as3forin.Token.line, as3forin.Token.ptr, as3forin.Token.sourceFile));
                     opClose.reg = null;
                     opClose.regType = RunTimeDataType.unknown;
-                    opClose.arg1 = regSaveEnumerator;
+                    opClose.arg1 = varSaveEnumerator;
                     opClose.arg1Type = RunTimeDataType.rt_void;
                     opClose.arg2 = null;
                     opClose.arg2Type = RunTimeDataType.rt_void;
@@ -451,8 +453,10 @@ namespace ASCompiler.compiler.builds
                         builder);
                 }
 
-                Register regSaveEnumerator = env.getAdditionalRegister();
-                regSaveEnumerator.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                //Register regSaveEnumerator = env.getAdditionalRegister();
+                Variable varSaveEnumerator = new Variable("@saveEnumeraor_" + env.block.scope.members.Count, env.block.scope.members.Count, env.block.id);
+                env.block.scope.members.Add(varSaveEnumerator);
+                varSaveEnumerator.valueType=(RunTimeDataType.rt_void);
                 {
                     //**IEnumerator Get And Reset();
                     OpStep opGetEnumerator = new OpStep(OpCode.foreach_get_enumerator,
@@ -461,7 +465,7 @@ namespace ASCompiler.compiler.builds
                           as3foreach.Token.sourceFile)
                         );
 
-                    opGetEnumerator.reg = regSaveEnumerator;
+                    opGetEnumerator.reg = varSaveEnumerator;
                     opGetEnumerator.regType = RunTimeDataType.rt_void;
                     opGetEnumerator.arg1 = enumerator;
                     opGetEnumerator.arg1Type = enumerator.valueType;
@@ -492,8 +496,8 @@ namespace ASCompiler.compiler.builds
 
                     opMoveNext.reg = eaxismovenext;
                     opMoveNext.regType = RunTimeDataType.rt_boolean;
-                    opMoveNext.arg1 = regSaveEnumerator;
-                    opMoveNext.arg1Type = regSaveEnumerator.valueType;
+                    opMoveNext.arg1 = varSaveEnumerator;
+                    opMoveNext.arg1Type = varSaveEnumerator.valueType;
 
                     env.block.opSteps.Add(opMoveNext);
                 }
@@ -545,8 +549,8 @@ namespace ASCompiler.compiler.builds
 
                     opCurrent.reg = (Register)loadValue;
                     opCurrent.regType = RunTimeDataType.rt_void;
-                    opCurrent.arg1 = regSaveEnumerator;
-                    opCurrent.arg1Type = regSaveEnumerator.valueType;
+                    opCurrent.arg1 = varSaveEnumerator;
+                    opCurrent.arg1Type = varSaveEnumerator.valueType;
 
                     env.block.opSteps.Add(opCurrent);
 
@@ -607,7 +611,7 @@ namespace ASCompiler.compiler.builds
                     OpStep opClose = new OpStep(OpCode.enumerator_close, new SourceToken(as3foreach.Token.line, as3foreach.Token.ptr, as3foreach.Token.sourceFile));
                     opClose.reg = null;
                     opClose.regType = RunTimeDataType.unknown;
-                    opClose.arg1 = regSaveEnumerator;
+                    opClose.arg1 = varSaveEnumerator;
                     opClose.arg1Type = RunTimeDataType.rt_void;
                     opClose.arg2 = null;
                     opClose.arg2Type = RunTimeDataType.rt_void;

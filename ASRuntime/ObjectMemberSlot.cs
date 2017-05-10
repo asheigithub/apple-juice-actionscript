@@ -41,6 +41,16 @@ namespace ASRuntime
                     function.setThis(obj);
                 }
             }
+            else if (obj.objScope !=null && value.rtType == obj.objScope.swc.FunctionClass.getRtType())
+            {
+                ASBinCode.rtData.rtFunction function =(ASBinCode.rtData.rtFunction)
+                    TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)value);
+
+                if (function.this_pointer == null || !function.ismethod)
+                {
+                    function.setThis(obj);
+                }
+            }
 
             return true;
         }

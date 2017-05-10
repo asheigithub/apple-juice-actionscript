@@ -7,19 +7,93 @@ namespace ASCompiler.compiler.builds
 {
     class AS3FunctionBuilder
     {
-        //public class NamedFunctionSignature
-        //{
-        //    public NamedFunctionSignature(ASBinCode.rtti.FunctionSignature signature,
-        //        Variable member
-        //        )
-        //    {
-        //        this.signature = signature;
-        //        this.member = member;
-        //    }
+        public void buildAS3YieldReturn(CompileEnv env, ASTool.AS3.AS3YieldReturn  as3yieldreturn, Builder builder)
+        {
+            if (builder.buildingfunctons.Count > 0)
+            {
+                ASTool.AS3.AS3Function as3function = builder.buildingfunctons.Peek();
 
-        //    public readonly ASBinCode.rtti.FunctionSignature signature;
-        //    public readonly Variable member;
-        //}
+                if (as3function.IsConstructor)
+                {
+                    throw new BuildException(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile,
+                            "构造函数不能用yield");
+                }
+
+                var retType = getFunReturnType(as3function, builder);
+
+                if (retType != builder.bin.IEnumeratorInterface.getRtType())
+                {
+                    if (  !ASRuntime.TypeConverter.testImplicitConvert(retType, builder.bin.IEnumeratorInterface.getRtType(), builder))
+                    {
+                        throw new BuildException(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile,
+                            "yield 函数必须返回IEnumerator");
+                    }
+
+                }
+
+
+                if (as3yieldreturn.ReturnValue != null)
+                {
+                    builder.buildStmt(env, as3yieldreturn.ReturnValue);
+
+                    ASTool.AS3.AS3Expression expression = as3yieldreturn.ReturnValue.as3exprlist[
+                        as3yieldreturn.ReturnValue.as3exprlist.Count - 1
+                        ];
+
+                    bool needappendbindscope = false;
+                    RightValueBase returnValue = ExpressionBuilder.getRightValue(env, expression.Value, expression.token, builder);
+                    if (returnValue.valueType == RunTimeDataType.rt_function)
+                    {
+                        needappendbindscope = true;
+                    }
+
+
+                    if (needappendbindscope)
+                    {
+                        //**绑定环境**
+                        OpStep stepbind = new OpStep(OpCode.bind_scope, new SourceToken(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile));
+                        stepbind.reg = null;
+                        stepbind.regType = RunTimeDataType.unknown;
+                        stepbind.arg1 = returnValue;
+                        stepbind.arg1Type = returnValue.valueType;
+                        stepbind.arg2 = null;
+                        stepbind.arg2Type = RunTimeDataType.unknown;
+
+                        env.block.opSteps.Add(stepbind);
+                    }
+
+                    OpStep opreturn = new OpStep(OpCode.yield_return,
+                        new SourceToken(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile));
+                    opreturn.arg1 = returnValue;
+                    opreturn.arg1Type = returnValue.valueType;
+
+                    env.block.opSteps.Add(opreturn);
+
+                }
+                else
+                {
+                    OpStep opreturn = new OpStep(OpCode.yield_return,
+                        new SourceToken(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile));
+                    opreturn.arg1 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
+                    opreturn.arg1Type = RunTimeDataType.rt_void;
+
+                    env.block.opSteps.Add(opreturn);
+                }
+
+                int yield_id = env.getLabelId();
+                OpStep yield_flag = new OpStep(OpCode.flag,
+                    new SourceToken(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile));
+
+                yield_flag.flag = "YIELD_FLAG_" + yield_id;
+                env.block.opSteps.Add(yield_flag);
+
+            }
+            else
+            {
+                throw new BuildException(as3yieldreturn.Token.line, as3yieldreturn.Token.ptr, as3yieldreturn.Token.sourceFile,
+                            "yield return 只能在函数中");
+            }
+        }
 
 
         public void buildAS3Return(CompileEnv env, ASTool.AS3.AS3Return as3return, Builder builder)
@@ -748,7 +822,48 @@ namespace ASCompiler.compiler.builds
             if (!function.isNative && !isinterface)
             {
                 builder.buildCodeBlock(as3function.StamentsStack.Peek(), block);
-                if (function.signature.returnType != RunTimeDataType.fun_void &&
+
+                if (
+                    existsOperator(block, OpCode.yield_break)
+                    ||
+                    existsOperator(block, OpCode.yield_return)
+                    )
+                {
+                    //***如果是yield类函数***
+                    if (existsOperator(block, OpCode.function_return))
+                    {
+                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                   "yield返回和return不能在一起使用");
+                    }
+                    function.isYield = true;
+
+                    var yieldlineflag = new Variable("@yieldflag", block.scope.members.Count, block.id);
+                    yieldlineflag.valueType = RunTimeDataType.rt_int;
+                    block.scope.members.Add(yieldlineflag);
+
+                    var yieldismovenext = new Variable("@yieldismovenext", block.scope.members.Count, block.id);
+                    yieldismovenext.valueType = RunTimeDataType.rt_boolean;
+                    block.scope.members.Add(yieldismovenext);
+
+
+                    for (int i = 0; i < block.opSteps.Count; i++)
+                    {
+                        var step = block.opSteps[i];
+                        if (step.opCode == OpCode.yield_return)
+                        {
+                            if (step.tryid != -1)
+                            {
+                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                   "yield无法在try中生成值");
+                            }
+
+                            step.arg2 = yieldlineflag;
+                            step.arg2Type = RunTimeDataType.rt_int;
+                        }
+                    }
+                    
+                }
+                else if (function.signature.returnType != RunTimeDataType.fun_void &&
                     function.signature.returnType != RunTimeDataType.rt_void &&
                     !function.IsAnonymous
                     )

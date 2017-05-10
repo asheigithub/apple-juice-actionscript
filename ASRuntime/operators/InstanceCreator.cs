@@ -21,7 +21,7 @@ namespace ASRuntime.operators
 
         public FunctionCaller constructorCaller;
 
-        public ASBinCode.rtData.rtObject objectResult;
+        public RunTimeValueBase objectResult;
 
         /// <summary>
         /// 是否是通过Function对象创建
@@ -29,7 +29,7 @@ namespace ASRuntime.operators
         public ASBinCode.rtData.rtObject constructor;
         private FunctionCaller _function_constructor;
 
-        public InstanceCreator(Player player, StackFrame invokerFrame,OpStep step , SourceToken token,ASBinCode.rtti.Class _class)
+        public InstanceCreator(Player player, StackFrame invokerFrame, SourceToken token, Class _class)
         {
             this.player = player;
             this.invokerFrame = invokerFrame;
@@ -419,6 +419,25 @@ namespace ASRuntime.operators
         private void _finalStep(BlockCallBackBase sender,object args)
         {
             objectResult = (ASBinCode.rtData.rtObject)sender.args;
+
+            //***如果有返回值****
+            var returnvalue = _function_constructor.returnSlot.getValue();
+            if (returnvalue.rtType != RunTimeDataType.rt_void
+                &&
+                returnvalue.rtType != RunTimeDataType.rt_string
+                &&
+                returnvalue.rtType != RunTimeDataType.rt_number
+                &&
+                returnvalue.rtType != RunTimeDataType.rt_int
+                &&
+                returnvalue.rtType != RunTimeDataType.rt_boolean
+                &&
+                returnvalue.rtType != RunTimeDataType.rt_uint
+                )
+            {
+                objectResult = returnvalue;
+            }
+
             //objectResult.directSet((ASBinCode.rtData.rtObject)sender.args);
             if (callbacker != null)
             {

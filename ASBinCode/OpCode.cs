@@ -437,6 +437,15 @@ namespace ASBinCode
 
         mod_number=106,
 
+
+        function_create=107,
+
+        yield_return=108,
+
+        yield_break=109,
+
+        yield_continuetoline=110,
+
         /// <summary>
         /// 两个int小于 &lt;
         /// </summary>

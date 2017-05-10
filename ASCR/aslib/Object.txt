@@ -1,5 +1,6 @@
 ﻿package
 {
+	[_object_]
 	public dynamic class Object
 	{
 		[native,_Object_toString]

@@ -8,6 +8,15 @@ Public Class TokenList
     ''' <remarks></remarks>
     Public Sub Reset()
         currentindx = -1
+
+        For index = 1 To Count - 1
+            Dim token = Me(index)
+
+            token.preToken = Me(index - 1)
+            token.preToken.nextToken = token
+
+        Next
+
     End Sub
 
     

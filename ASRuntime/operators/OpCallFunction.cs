@@ -34,9 +34,9 @@ namespace ASRuntime.operators
                     if (function.this_pointer == null)
                     {
                         var s = frame.scope;
-                        if (s.this_pointer != null && s.this_pointer is ASBinCode.rtData.rtObject)
+                        if (s.this_pointer != null && s.this_pointer is rtObject)
                         {
-                            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)s.this_pointer;
+                            rtObject obj = (rtObject)s.this_pointer;
 
                             if (obj.value is Global_Object)
                             {
@@ -57,11 +57,7 @@ namespace ASRuntime.operators
                                 var ot = frame.player.outpackage_runtimescope[cls.classid];
                                 function.setThis(ot.this_pointer);
                             }
-                            //while (!(((ASBinCode.rtData.rtObject)s.this_pointer).value is ASBinCode.rtti.Global_Object))
-                            //{
-                            //    s = s.parent;
-                            //}
-                            //function.setThis(s.this_pointer);
+                            
                         }
                         else
                         {
@@ -93,7 +89,7 @@ namespace ASRuntime.operators
             RunTimeValueBase rv;
             if (step.arg1 is MethodGetterBase)
             {
-                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
+                rv = ((ClassMethodGetter)step.arg1).getMethodForClearThis(frame.scope);
             }
             else
             {
@@ -208,6 +204,10 @@ namespace ASRuntime.operators
                 }
             }
 
+            if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
+            {
+                rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);
+            }
 
             if (rv.rtType != RunTimeDataType.rt_function)
             {
@@ -228,8 +228,38 @@ namespace ASRuntime.operators
 
         public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
+            int id = ((rtInt)step.arg2.getValue(frame.scope)).value;
             RunTimeValueBase arg = step.arg1.getValue(frame.scope);
+
+            //**当function作为参数被传入时，重新绑定scope
+            {
+                if (arg.rtType == frame.player.swc.FunctionClass.getRtType())
+                {
+                    var function = (rtFunction)TypeConverter.ObjectImplicit_ToPrimitive((rtObject)arg);
+                    if (!function.ismethod && (function.bindScope == null
+                        ||
+                        function.bindScope.blockId == frame.scope.blockId
+                        )
+                        )
+                    {
+                        function.bind(frame.scope);
+                    }
+                }
+                else if (arg.rtType == RunTimeDataType.rt_function)
+                {
+                    var function = (rtFunction)arg;
+                    if (!function.ismethod && (function.bindScope == null
+                        ||
+                        function.bindScope.blockId == frame.scope.blockId
+                        )
+                        )
+                    {
+                        function.bind(frame.scope);
+                    }
+                }
+
+                
+            }
 
             if (frame.typeconvertoperator != null)
             {
@@ -261,7 +291,10 @@ namespace ASRuntime.operators
             {
                 rv = step.arg1.getValue(frame.scope);
             }
-
+            if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
+            {
+                rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);
+            }
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
@@ -390,6 +423,28 @@ namespace ASRuntime.operators
 
             frame.returnSlot.directSet(result);
             frame.endStep(step);
+        }
+
+        public static void exec_yieldreturn(StackFrame frame,OpStep step,RunTimeScope scope)
+        {
+            RunTimeValueBase result = step.arg1.getValue(scope);
+            if (result.rtType == RunTimeDataType.rt_function)
+            {
+                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
+                if (!function.ismethod)//闭包
+                {
+                    function.setThis(null);
+                }
+            }
+
+            scope.memberData[scope.memberData.Length - 2].directSet( new rtInt( frame.codeLinePtr + 1));
+            scope.memberData[scope.memberData.Length - 1].directSet(rtBoolean.True);
+
+            frame.returnSlot.directSet(result);
+            frame.endStep(step);
+
+            //退出当前调用 *** yield语句不可能包含在try中，所以直接移动到最后一行退出即可
+            frame.codeLinePtr = frame.block.opSteps.Count;
         }
 
 

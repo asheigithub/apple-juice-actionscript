@@ -107,6 +107,20 @@ namespace ASCompiler.compiler
         /// </summary>
         public void completSteps()
         {
+            //****先查找yield return,如果有，则在开头插入跳转步骤**
+            for (int i = 0; i < block.opSteps.Count; i++)
+            {
+                OpStep step = block.opSteps[i];
+                if (step.opCode == OpCode.yield_return)
+                {
+                    OpStep yieldline = new OpStep(OpCode.yield_continuetoline, new SourceToken(0,0,string.Empty));
+                    block.opSteps.Insert(0, yieldline);
+
+                    break;
+                }
+            }
+            
+
             for (int i = 0; i < block.opSteps.Count; i++)
             {
                 ASBinCode.OpStep step = block.opSteps[i];

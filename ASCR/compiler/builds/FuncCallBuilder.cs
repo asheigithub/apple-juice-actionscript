@@ -9,7 +9,29 @@ namespace ASCompiler.compiler.builds
     {
         public void buildFuncCall(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
         {
-            if (step.Arg2.IsReg || step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function)
+            if (env.isEval)
+            {
+                return;
+            }
+
+            if (!step.Arg2.IsReg && step.Arg2.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.as3_expressionlist )
+            {     
+                //var f = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
+                var olddata = step.Arg2;
+
+                step.Arg2= ((List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg2.Data.Value)[((List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg2.Data.Value).Count -1];
+                
+
+                buildFuncCall(env, step, builder);
+
+                step.Arg2 = olddata;
+                return;
+            }
+
+
+            if (step.Arg2.IsReg || step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_function
+                
+                )
             {
                 RightValueBase rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
 
@@ -222,7 +244,42 @@ namespace ASCompiler.compiler.builds
                                 {
                                     _cls = cls;
                                     member = cls.explicit_from.bindField;
-                                    goto memberfinded;
+
+                                    OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+                                        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                                    stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                                        new ASBinCode.rtData.rtInt(cls.instanceClass.classid));
+                                    stepInitClass.arg1Type = cls.getRtType();
+                                    env.block.opSteps.Add(stepInitClass);
+
+                                    var _buildin_ = new StaticClassDataGetter(cls);
+                                    var eaxfunc = env.getAdditionalRegister();
+                                    {
+
+                                        eaxfunc.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                                        AccessBuilder.make_dotStep(env, cls.explicit_from, step.token, eaxfunc, _buildin_);
+
+                                    }
+                                    {
+                                        OpStep op = new OpStep(OpCode.call_function,
+                                            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+                                        var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                        eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                                        op.reg = eax;
+                                        op.regType = RunTimeDataType.rt_void;
+                                        eax.isFuncResult = true;
+
+                                        op.arg1 = eaxfunc;
+                                        op.arg1Type = RunTimeDataType.rt_function;
+
+                                        build_member_parameterSteps((RightValueBase)cls.explicit_from.bindField,
+                                            builder, eax, op, step, env, null, eaxfunc, null);
+
+                                        env.block.opSteps.Add(op);
+
+                                    }
+                                    return;
                                 }
 
                                 {
@@ -271,8 +328,10 @@ namespace ASCompiler.compiler.builds
                                     new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
                                     , builder);
                             }
-
+                            
                             {
+
+
                                 var oc = getOutPackageClass(env);
 
                                 OpStep clear = new OpStep(OpCode.clear_thispointer,
@@ -287,7 +346,6 @@ namespace ASCompiler.compiler.builds
                                 ((Register)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
                                 clear.reg = (Register)eaxfunc;
                                 clear.regType = eaxfunc.valueType;
-
 
                                 env.block.opSteps.Add(clear);
 

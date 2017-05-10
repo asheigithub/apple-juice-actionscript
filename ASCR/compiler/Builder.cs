@@ -1545,6 +1545,35 @@ namespace ASCompiler.compiler
                             return;
                         }
                     }
+                    if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                        &&
+                        variable.Access.IsStatic
+                        )
+                    {
+                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The static attribute may be used only on definitions inside a class." + variable.Name));
+                        return;
+                    }
+                    if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope)
+                    {
+                        if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
+                            || variable.Access.IsProtected
+                            )
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "Access modifier may be used only on class property definitions."));
+                        }
+                        else if (variable.Access.IsOverride)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The override attribute can only be used on a method defined in a class."));
+                        }
+                        else if (variable.Access.IsFinal)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The final attribute can only be used on a method defined in a class."));
+                        }
+                    }
                     if (env.block.scope is ASBinCode.scopes.FunctionScope)
                     {
                         if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
@@ -1585,16 +1614,35 @@ namespace ASCompiler.compiler
                 {
                     ASTool.AS3.AS3Variable variable = (ASTool.AS3.AS3Variable)stmt;
 
-                    //if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
-                    //    &&
-                    //    variable.Access.IsStatic 
-                    //    )
-                    //{                        
-                    //    pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                    //                "The static attribute may be used only on definitions inside a class." + variable.Name));
-                    //            return;
-                    //}
-
+                    if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope
+                        &&
+                        variable.Access.IsStatic
+                        )
+                    {
+                        pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The static attribute may be used only on definitions inside a class." + variable.Name));
+                        return;
+                    }
+                    if (env.block.scope is ASBinCode.scopes.OutPackageMemberScope)
+                    {
+                        if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
+                            || variable.Access.IsProtected
+                            )
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "Access modifier may be used only on class property definitions."));
+                        }
+                        else if (variable.Access.IsOverride)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The override attribute can only be used on a method defined in a class."));
+                        }
+                        else if (variable.Access.IsFinal)
+                        {
+                            pushBuildError(new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                    "The final attribute can only be used on a method defined in a class."));
+                        }
+                    }
                     if (env.block.scope is ASBinCode.scopes.FunctionScope)
                     {
                         if (variable.Access.IsInternal || variable.Access.IsPublic || variable.Access.IsPrivate
@@ -1661,7 +1709,7 @@ namespace ASCompiler.compiler
 
                                         CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp", -65535, true), false);
                                         buildExpression(tempEnv, variable.ValueExpr);
-                                        RightValueBase tempRv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
+                                        RightValueBase tempRv = builds.ExpressionBuilder.getRightValue(tempEnv, variable.ValueExpr.Value,
                                             stmt.Token, new Builder(true)
                                             );
                                         newtype = tempRv.valueType;
@@ -1878,13 +1926,24 @@ namespace ASCompiler.compiler
                     ASTool.AS3.AS3Break as3Break = (ASTool.AS3.AS3Break)stmt;
                     builds.AS3BreakBuilder builder = new builds.AS3BreakBuilder();
                     builder.buildAS3Break(env, as3Break);
-
+                }
+                else if (stmt is ASTool.AS3.AS3YieldBreak)
+                {
+                    ASTool.AS3.AS3YieldBreak  as3yieldBreak = (ASTool.AS3.AS3YieldBreak)stmt;
+                    builds.AS3BreakBuilder builder = new builds.AS3BreakBuilder();
+                    builder.buildAS3YieldBreak(env, as3yieldBreak,this);
                 }
                 else if (stmt is ASTool.AS3.AS3Return)
                 {
                     ASTool.AS3.AS3Return as3return = (ASTool.AS3.AS3Return)stmt;
                     builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
                     builder.buildAS3Return(env, as3return, this);
+                }
+                else if (stmt is ASTool.AS3.AS3YieldReturn)
+                {
+                    ASTool.AS3.AS3YieldReturn as3yieldreturn = (ASTool.AS3.AS3YieldReturn)stmt;
+                    builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+                    builder.buildAS3YieldReturn(env, as3yieldreturn, this);
                 }
                 else if (stmt is ASTool.AS3.AS3Continue)
                 {

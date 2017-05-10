@@ -79,6 +79,25 @@ Public Class AS3FileGrammarAnalyser
     Private current_new_operator As Stack(Of GrammerExpr)
     Private current_visiting_expression As Stack(Of GrammerExpr)
 
+    'Private current_function_anonymous_scope As Stack(Of GrammerExpr)
+    Private func_anonymous_scope As Dictionary(Of IAS3MemberList, Stack(Of GrammerExpr))
+    Private Sub push_func_anonymous(node As GrammerExpr)
+        If Not func_anonymous_scope.ContainsKey(MemberScopeStack.Peek()) Then
+            func_anonymous_scope.Add(MemberScopeStack.Peek(), New Stack(Of GrammerExpr))
+        End If
+        func_anonymous_scope(MemberScopeStack.Peek()).Push(node)
+    End Sub
+    Private Sub pop_func_anonymous()
+        func_anonymous_scope(MemberScopeStack.Peek()).Pop()
+    End Sub
+    Private Function func_anonymous() As Boolean
+        If Not func_anonymous_scope.ContainsKey(MemberScopeStack.Peek()) Then
+            Return False
+        End If
+        Return func_anonymous_scope(MemberScopeStack.Peek()).Count > 0
+    End Function
+
+
     Private as3file As New AS3SrcFile()
 
     Public err As GrammarException
@@ -122,6 +141,9 @@ Public Class AS3FileGrammarAnalyser
 
         current_new_operator = New Stack(Of GrammerExpr)()
         current_visiting_expression = New Stack(Of GrammerExpr)()
+
+        func_anonymous_scope = New Dictionary(Of IAS3MemberList, Stack(Of GrammerExpr))
+
 
         currentMain = Nothing
         currentImpllist = Nothing
@@ -527,6 +549,10 @@ Public Class AS3FileGrammarAnalyser
                 _ThisSuper(node)
             Case "A_FC"
                 _A_FC(node)
+            Case "YIELD"
+                _YIELD(node)
+            Case "YIELD_RB"
+                _YIELD_RB(node)
         End Select
 
         visitednodes.Add(node)
@@ -1237,6 +1263,13 @@ Public Class AS3FileGrammarAnalyser
 
         MemberScopeStack.Pop()
 
+        If func_anonymous() Then
+            func.Name = String.Empty
+            func.IsAnonymous = True
+
+        End If
+
+
         '***Unit部分
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
@@ -1319,7 +1352,11 @@ Public Class AS3FileGrammarAnalyser
 
         Dim condition As New AS3StmtExpressions(node.MatchedToken)
 
+        push_func_anonymous(node)
+
         VisitNodes(node.Nodes(3))
+
+        pop_func_anonymous()
 
         condition.as3exprlist = currentparseExprListStack.Pop()
 
@@ -1405,8 +1442,11 @@ Public Class AS3FileGrammarAnalyser
         as3while.label = lbl
 
         Dim conditon As New AS3StmtExpressions(node.MatchedToken)
+        push_func_anonymous(node)
 
         VisitNodes(node.Nodes(3))
+
+        pop_func_anonymous()
 
         conditon.as3exprlist = currentparseExprListStack.Pop()
 
@@ -1447,9 +1487,9 @@ Public Class AS3FileGrammarAnalyser
 
 
         Dim conditon As New AS3StmtExpressions(node.MatchedToken)
-
+        push_func_anonymous(node)
         VisitNodes(node.Nodes(3).Nodes(2))
-
+        pop_func_anonymous()
         conditon.as3exprlist = currentparseExprListStack.Pop()
 
         as3do.Condition = conditon
@@ -1593,9 +1633,53 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
 
+    Sub _YIELD(node As GrammerExpr)
+        '<YIELD>	    ::="yield"<YIELD_RB>;
+        '<YIELD_RB>     ::="return" <ReturnValue>|
+        '                   "break";
+    End Sub
+    Sub _YIELD_RB(node As GrammerExpr)
+
+        If node.Nodes.Count = 2 Then
+
+            '***yield return***
+            Dim as3yieldreturn As New AS3YieldReturn(node.MatchedToken)
+
+            If node.Nodes(1).Nodes.Count > 0 Then
+                Dim as3stmt = New AS3StmtExpressions(node.MatchedToken)
+
+                VisitNodes(node.Nodes(1).Nodes(0))
+
+                as3stmt.as3exprlist = currentparseExprListStack.Pop()
+
+                as3yieldreturn.ReturnValue = as3stmt
+
+            End If
+
+            MemberScopeStack.Peek().StamentsStack.Peek().Add(as3yieldreturn)
+        Else
+            Dim as3yieldbreak As New AS3YieldBreak(node.MatchedToken)
+            MemberScopeStack.Peek().StamentsStack.Peek().Add(as3yieldbreak)
+        End If
+
+
+    End Sub
+
+
     Sub _Return(node As GrammerExpr)
         '<Return>  ::="return"<ReturnValue>;
         '<ReturnValue> ::=<ExpressionList>|null;
+
+
+        Dim testpertoken = node.MatchedToken.preToken
+        While Not testpertoken Is Nothing AndAlso (testpertoken.Type = Token.TokenType.comments Or testpertoken.Type = Token.TokenType.whitespace)
+            testpertoken = testpertoken.preToken
+        End While
+
+        If testpertoken.Type = Token.TokenType.identifier And testpertoken.line = node.MatchedToken.line Then
+            Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+        End If
+
 
         Dim as3return As New AS3Return(node.MatchedToken)
 
@@ -1611,6 +1695,8 @@ Public Class AS3FileGrammarAnalyser
         End If
 
         MemberScopeStack.Peek().StamentsStack.Peek().Add(as3return)
+
+
     End Sub
     Sub _Break(node As GrammerExpr)
 
@@ -1714,7 +1800,16 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes(2).Nodes.Count > 0 Then
             Dim expr As New AS3Expression(node.Nodes(2).Nodes(1).MatchedToken)
 
+            If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
+                push_func_anonymous(node.Nodes(2))
+            End If
+
             VisitNodes(node.Nodes(2).Nodes(1))
+
+            If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
+                pop_func_anonymous()
+            End If
+
             expr.exprStepList = node.Nodes(2).Nodes(1).exprsteplist
 
             expr.Value = MemberScopeStack.Peek().ExprDataStack.Pop()
@@ -2228,7 +2323,7 @@ Public Class AS3FileGrammarAnalyser
 
         Dim tempscope As New AS3MemberListBase(node.MatchedToken)
         Dim currentno = MemberScopeStack.Peek().LastRegId()
-        While tempscope.LastRegId() <currentno
+        While tempscope.LastRegId() < currentno
             tempscope.NextRegId()
         End While
 
@@ -2409,7 +2504,10 @@ Public Class AS3FileGrammarAnalyser
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
         If node.Nodes.Count = 2 Then
+
+            push_func_anonymous(node)
             VisitNodes(node.Nodes(1))
+            pop_func_anonymous()
 
 
             Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()

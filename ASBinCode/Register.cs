@@ -83,5 +83,11 @@ namespace ASBinCode
         {
             return scope.stack[scope.offset + _index];
         }
+
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        {
+            return scope.stack[scope.offset + _index];
+        }
+
     }
 }

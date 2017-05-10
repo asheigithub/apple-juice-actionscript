@@ -32,8 +32,25 @@ namespace ASBinCode
             :base(name,index,ignoreImplicitCast,refblockid,type,isConst)
         { }
 
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
+        {
+            while (refblockid != scope.blockId)
+            {
+                scope = scope.parent;
+            }
+            return scope.memberData[indexOfMembers].getValue();
+        }
 
         public sealed override SLOT getSlot(RunTimeScope scope)
+        {
+            while (refblockid != scope.blockId)
+            {
+                scope = scope.parent;
+            }
+            return scope.memberData[indexOfMembers];
+        }
+
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
         {
             while (refblockid != scope.blockId)
             {

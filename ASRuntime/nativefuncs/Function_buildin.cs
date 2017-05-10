@@ -294,7 +294,16 @@ namespace ASRuntime.nativefuncs
                     }
                     else
                     {
-                        caller.function.setThis(null);
+                        var fd = player.swc.functions[caller.function.functionId];
+                        var block = player.swc.blocks[fd.blockid];
+                        //if (block.isoutclass )将this复位
+                        {
+
+                            var oc = player.outpackage_runtimescope[block.define_class_id];
+                            caller.function.setThis(oc.this_pointer);
+                        }
+
+                        //caller.function.setThis(caller.function.bindScope.this_pointer);
                     }
                 }
                 else
@@ -445,7 +454,20 @@ namespace ASRuntime.nativefuncs
                     }
                     else
                     {
-                        caller.function.setThis(null);
+                        var fd = player.swc.functions[caller.function.functionId];
+                        var block = player.swc.blocks[fd.blockid];
+                        //if (block.isoutclass )将this复位
+                        {
+                            
+                            var oc= player.outpackage_runtimescope[block.define_class_id];
+                            caller.function.setThis(oc.this_pointer);
+                        }
+                        //else
+                        //{
+                        //    caller.function.setThis(null);
+                        //}
+
+                        
                     }
                 }
                 else
