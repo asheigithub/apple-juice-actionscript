@@ -8,6 +8,7 @@ namespace ASCTest
 {
     class Program
     {
+        
 
         static void Main(string[] args)
         {
@@ -17,7 +18,7 @@ namespace ASCTest
             string teststring = "package{}";//System.IO.File.ReadAllText("../../testScript/AS3Testproj/src/Main.as");
 
             string[] files =null;
-
+            
 
             if (args.Length > 0)
             {
@@ -113,23 +114,23 @@ namespace ASCTest
             {
                 p.Write(0, srcout);
             }
-
+            
 #endif
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 
             
-            builder.Build(proj);
+            builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
 
             if (builder.buildErrors.Count == 0)
             {
-                ASBinCode.CSWC swc = builder.bin;
+                ASBinCode.CSWC swc = builder.getBuildOutSWC();
                 if (swc != null)
                 {
 #if DEBUG
-
+                    
                     for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];

@@ -194,7 +194,7 @@ namespace ASRuntime.operators
                 {
                     func = ((MethodGetterBase)getter.bindField).getMethod(
                     //propslot.bindObj.objScope
-                    propBindObj.objScope
+                    propBindObj
                     );
 
                 }

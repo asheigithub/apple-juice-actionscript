@@ -395,7 +395,7 @@ namespace ASRuntime.operators
 
                         )
                     {
-                        function = (rtFunction)((MethodGetterBase)toStr.bindField).getMethod(obj.objScope);
+                        function = (rtFunction)((MethodGetterBase)toStr.bindField).getMethod(obj);
                     }
                     else
                     {
@@ -990,7 +990,7 @@ namespace ASRuntime.operators
                 && !valueOf.isSetter
                 )
             {
-                function = (rtFunction)((MethodGetterBase)valueOf.bindField).getMethod(obj.objScope);
+                function = (rtFunction)((MethodGetterBase)valueOf.bindField).getMethod(obj);
             }
             else
             {
@@ -1275,7 +1275,7 @@ namespace ASRuntime.operators
                 && !toString.isSetter
                 )
             {
-                function = (rtFunction)((MethodGetterBase)toString.bindField).getMethod(obj.objScope);
+                function = (rtFunction)((MethodGetterBase)toString.bindField).getMethod(obj);
             }
             else
             {

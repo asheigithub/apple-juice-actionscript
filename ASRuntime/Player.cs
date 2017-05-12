@@ -129,7 +129,7 @@ namespace ASRuntime
                 //***先执行必要代码初始化****
                 var block = swc.blocks[swc.ErrorClass.outscopeblockid];
                 HeapSlot[] initdata = genHeapFromCodeBlock(block);
-                CallBlock(block, initdata, new StackSlot(swc), null,
+                callBlock(block, initdata, new StackSlot(swc), null,
                     new SourceToken(0, 0, ""), null,
                     null, RunTimeScopeType.startup
                     );
@@ -141,7 +141,7 @@ namespace ASRuntime
 
 
             HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
-            var topscope = CallBlock(defaultblock,data ,new StackSlot(swc), null, 
+            var topscope = callBlock(defaultblock,data ,new StackSlot(swc), null, 
                 new SourceToken(0, 0, ""),null,
                 null, RunTimeScopeType.startup
                 );
@@ -828,8 +828,14 @@ namespace ASRuntime
 
         }
 
+        private static readonly HeapSlot[] emptyMembers = new HeapSlot[0];
         internal HeapSlot[] genHeapFromCodeBlock(ASBinCode.CodeBlock calledblock)
         {
+            if (calledblock.scope.members.Count == 0)
+            {
+                return emptyMembers;
+            }
+
             var memberDataList = new HeapSlot[calledblock.scope.members.Count];
             for (int i = 0; i < memberDataList.Length; i++)
             {
@@ -851,12 +857,16 @@ namespace ASRuntime
                 blankBlock = new CodeBlock(int.MaxValue - 1, "#blank", -65535, false);
             }
 
-            CallBlock(blankBlock, null, null, null,null, callbacker, null, RunTimeScopeType.function);
+            callBlock(blankBlock, null, null, null,null, callbacker, null, RunTimeScopeType.function);
 
         }
 
-
-        internal RunTimeScope CallBlock(ASBinCode.CodeBlock calledblock,
+        public rtObject alloc_pureHostedOrLinkedObject(ASBinCode.rtti.Class cls)
+        {
+            return operators.InstanceCreator.createPureHostdOrLinkObject(this, cls);
+        }
+        
+        internal RunTimeScope callBlock(ASBinCode.CodeBlock calledblock,
             HeapSlot[] membersHeap,
             SLOT returnSlot,
             RunTimeScope callerScope,
@@ -903,8 +913,6 @@ namespace ASRuntime
                 ,
                 this_pointer,
                 type
-                //,
-                //frame._dictMethods
             );
             
             frame.scope = scope;
@@ -935,8 +943,6 @@ namespace ASRuntime
             return false;
 
         }
-
-
 
 
         private StackFrame currentRunFrame;

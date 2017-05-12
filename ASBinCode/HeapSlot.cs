@@ -86,9 +86,17 @@ namespace ASBinCode
                         this.value = null;
                         break;
                     default:
-
-                        this.value = value;
-
+                        if (!ReferenceEquals(this.value, value))
+                        {
+                            if (this.value.rtType == value.rtType)
+                            {
+                                ((rtObject)value).ReplaceValue((rtObject)this.value);
+                            }
+                            else
+                            {
+                                this.value = (RunTimeValueBase)value.Clone(); //考虑处理结构类型struct
+                            }
+                        }
                         //this.value = (rtObject)value.Clone();
                         //if (((rtObject)this.value).value.objectid != ((rtObject)value).value.objectid)
                         //{

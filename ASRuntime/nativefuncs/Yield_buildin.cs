@@ -84,7 +84,7 @@ namespace ASRuntime.nativefuncs
             cb.setCallBacker(_movenext_callbacker);
 
 
-            frame.player.CallBlock(
+            frame.player.callBlock(
                 frame.player.swc.blocks[toCallFunc.blockid],
                 CallFuncHeap,
                 yieldObj.returnSlot,

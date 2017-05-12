@@ -12,6 +12,8 @@ package
 	import ppp.IPPP;
 	import ppp.it;
 	import ppp.pp2.CP;
+	import system.DateTimeKind;
+	import system.Int64;
 	
 	[Doc]
 	/**
@@ -36,12 +38,34 @@ package
 		
 		public function Main() 
 		{
+			//var dk = DateTimeKind.Local;
+			//trace( int(DateTimeKind.Local));
+			
+			var i:Int64 = new Int64(4);
+			
+			var k:Int64 = i;
+			
+			i = Int64(4);
+
+			trace(i == k);
+			
+			k = Int64(i + i)  ;
+			
+			trace(i, k);
+			
+			trace(Int64.MaxValue);
+			trace(Int64.MaxValue);
+			
+			var b = Int64(3);
+			var c = 5;
+			
+			trace(b - c);
+			
+			
 			/*
 			yield 是从.net2.0语法中移植过来，可自动生成一个可枚举对象的语法。每次yield return都可以返回一个值
 			yield break可停止枚举。
 			*/
-		
-		
 			//var yieldtest=function(a):*
 			//{
 				//for (var i:int = 0; i < 100; i++ )
@@ -58,10 +82,13 @@ package
 			//
 			//for (var k in yieldtest(4))
 			//{
-				//
 				//trace("获取到:",k);
 			//}
-			trace(new Error().getStackTrace());
+			
+			//var m:Object = 1;
+			
+			
+			
 			//for each(var k in new ia())
 			//{
 				//trace(k);

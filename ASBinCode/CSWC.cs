@@ -27,7 +27,10 @@ namespace ASBinCode
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
 
-
+        /// <summary>
+        /// Class类型
+        /// </summary>
+        public Class TypeClass;
         /// <summary>
         /// Object类
         /// </summary>

@@ -1776,14 +1776,6 @@ Public Class AS3FileGrammarAnalyser
 
         Dim variable As New AS3Variable(node.MatchedToken)
 
-        If metapropertystack.Count > 0 Then
-            'variable.Meta = metapropertystack.Pop()
-            variable.Meta = New List(Of AS3Meta)
-            While metapropertystack.Count > 0
-                variable.Meta.Add(metapropertystack.Pop())
-            End While
-        End If
-
         If memberaccessStack.Count > 0 Then
             Dim temp = memberaccessStack.ToArray()
             variable.Access.SetValue(memberaccessStack)
@@ -1823,6 +1815,14 @@ Public Class AS3FileGrammarAnalyser
             End If
 
             variable.ValueExpr = expr
+        End If
+
+        If metapropertystack.Count > 0 Then
+            'variable.Meta = metapropertystack.Pop()
+            variable.Meta = New List(Of AS3Meta)
+            While metapropertystack.Count > 0
+                variable.Meta.Add(metapropertystack.Pop())
+            End While
         End If
 
         MemberScopeStack.Peek().Add(variable)

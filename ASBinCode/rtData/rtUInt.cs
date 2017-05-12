@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public class rtUInt : RunTimeValueBase
+    public sealed  class rtUInt : RunTimeValueBase
     {
         
         public uint value;

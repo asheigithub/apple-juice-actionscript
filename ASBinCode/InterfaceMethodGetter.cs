@@ -29,6 +29,32 @@ namespace ASBinCode
         {
             throw new NotImplementedException();
         }
+
+        public override RunTimeValueBase getMethod(rtObject rtObj)
+        {
+            if (cache.IsAlive)
+            {
+                if (ReferenceEquals(((rtFunction)cache.Target).this_pointer, rtObj))
+                {
+                    if (((rtFunction)cache.Target).this_pointer == rtObj)
+                    {
+                        return (rtFunction)cache.Target;
+                    }
+                }
+            }
+            var instance_class = rtObj.value._class;
+            var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
+
+            rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+            method.bind(rtObj.objScope);
+            method.setThis(rtObj);
+
+            cache.Target = method;
+
+            return method;
+        }
+
+
         WeakReference cache;
         public sealed override RunTimeValueBase getMethod(RunTimeScope scope)
         {

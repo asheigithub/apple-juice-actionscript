@@ -278,9 +278,11 @@ namespace ASRuntime.operators
             //init_static_class(player, frame, as3class,step.token, scope);
 
             InstanceCreator ic = new InstanceCreator(player, frame, step.token, as3class);
-            ic.init_static_class(as3class);
-
-            frame.endStep(step);
+            if (ic.init_static_class(as3class))
+            {
+                frame.endStep(step);
+            }
+            
         }
 
         //private static bool init_static_class(Player player, StackFrame frame, Class as3class,SourceToken token, 

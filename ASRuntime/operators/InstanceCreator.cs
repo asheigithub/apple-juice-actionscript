@@ -279,7 +279,7 @@ namespace ASRuntime.operators
             Global_Object global = Global_Object.formCodeBlock(codeblock, globaldata, player.swc.classes[0]);
             ASBinCode.rtData.rtObject globalObj = new ASBinCode.rtData.rtObject(global, null);
 
-            ASBinCode.RunTimeScope rtscope = player.CallBlock(
+            ASBinCode.RunTimeScope rtscope = player.callBlock(
                 codeblock, globaldata, null,
                 null, //player.static_instance[cls.staticClass.classid].objScope,
 
@@ -445,19 +445,81 @@ namespace ASRuntime.operators
             }
         }
 
-
-
-
-        private ASBinCode.rtData.rtObject makeObj(
-            ASBinCode.rtti.Class cls,
-            baseinstancecallbacker callbacker, out ASBinCode.RunTimeScope objScope)
+        internal static ASBinCode.rtData.rtObject createPureHostdOrLinkObject(Player player, Class cls)
         {
-            
+            if (cls.isLink_System)
+            {
+                ASBinCode.rtti.Object obj = createObject(player.swc, cls);
+                ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
+                //RunTimeScope scope = new RunTimeScope(player.swc,
+                //    player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid]), null, 0,
+                //    cls.blockid, null, player.static_instance, rtObj, RunTimeScopeType.objectinstance);
+                //rtObj.objScope = scope;
+
+                return rtObj;
+            }
+            else if (cls.isUnmanaged)
+            {
+                ASBinCode.rtti.Object obj;
+                if (cls.dynamic)
+                {
+                    obj = new HostedDynamicObject(cls);
+                }
+                else
+                {
+                    obj = new HostedObject(cls);
+                }
+
+                ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
+                RunTimeScope scope = new RunTimeScope(player.swc,
+                    player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid]), null, 0, 
+                    cls.blockid, null, player.static_instance, rtObj, RunTimeScopeType.objectinstance);
+                rtObj.objScope = scope;
+                
+                
+                return rtObj;
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        private static HeapSlot[] _classSlot = new HeapSlot[] { new HeapSlot() };
+        private static ASBinCode.rtData.rtInt _classid= new ASBinCode.rtData.rtInt(0);
+        private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls)
+        {
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
-            if (
-                player.swc.DictionaryClass !=null
+
+            if (cls.isLink_System)
+            {
+                var creator= swc.functions[((ClassMethodGetter)cls.staticClass.linkObjCreator.bindField).functionId];
+                if (creator.native_index == -1)
+                {
+                    creator.native_index = swc.nativefunctionNameIndex[creator.native_name];
+                }
+                var func = swc.nativefunctions[creator.native_index];
+
+                _classid.value = cls.classid;
+                _classSlot[0].directSet(_classid);
+
+                string err;int no;
+                ASBinCode.rtData.rtObject rtObj= 
+                    func.execute(null, _classSlot, cls, out err,out no) as ASBinCode.rtData.rtObject ;
+                if (rtObj == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return rtObj.value;
+                }
+                //obj = new LinkSystemObject(cls);
+            }
+            else if (
+                swc.DictionaryClass != null
                 &&
-                ClassMemberFinder.isInherits(cls, player.swc.DictionaryClass))
+                ClassMemberFinder.isInherits(cls, swc.DictionaryClass))
             {
                 obj = new DictionaryObject(cls);
             }
@@ -480,28 +542,45 @@ namespace ASRuntime.operators
             {
                 obj = new ASBinCode.rtti.Object(cls);
             }
-           
 
-            obj.memberData = new ObjectMemberSlot[cls.fields.Count];
+            return obj;
+        }
+
+
+
+        private static readonly ObjectMemberSlot[] blankFields = new ObjectMemberSlot[0];
+        private ASBinCode.rtData.rtObject makeObj(
+            ASBinCode.rtti.Class cls,
+            baseinstancecallbacker callbacker, out ASBinCode.RunTimeScope objScope)
+        {
+
+            ASBinCode.rtti.Object obj = createObject(player.swc, cls);
 
             var result = new ASBinCode.rtData.rtObject(obj, null);
-
-            for (int i = 0; i < obj.memberData.Length; i++)
+            if (cls.fields.Count > 0)
             {
-                obj.memberData[i] = new ObjectMemberSlot(result);
-
-                if (cls.fields[i].defaultValue == null)
+                obj.memberData = new ObjectMemberSlot[cls.fields.Count];
+                for (int i = 0; i < obj.memberData.Length; i++)
                 {
-                    obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null));
+                    obj.memberData[i] = new ObjectMemberSlot(result);
+
+                    if (cls.fields[i].defaultValue == null)
+                    {
+                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null));
+                    }
+
+                    ((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;
                 }
-
-                ((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;
-
             }
+            else
+            {
+                obj.memberData = blankFields;
+            }
+
 
             ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.blockid];
 
-            objScope = player.CallBlock(codeblock,
+            objScope = player.callBlock(codeblock,
                 (ObjectMemberSlot[])obj.memberData, null,  
                 null
                 , token, callbacker
@@ -515,7 +594,7 @@ namespace ASRuntime.operators
             var ss = cls.super;
             while (ss != null)
             {
-                player.CallBlock(player.swc.blocks[ss.blockid],
+                player.callBlock(player.swc.blocks[ss.blockid],
                     (ObjectMemberSlot[])obj.memberData,
                     null, null, token, null, result, RunTimeScopeType.objectinstance
                     );

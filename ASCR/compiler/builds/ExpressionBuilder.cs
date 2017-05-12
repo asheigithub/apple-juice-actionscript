@@ -415,7 +415,10 @@ namespace ASCompiler.compiler.builds
             }
 
             //**提取function**
-
+            if (builder.buildErrors.Count > 0)
+            {
+                return;
+            }
             var signature =
                          builder.dictSignatures[prop.setter.refdefinedinblockid][prop.setter];
 

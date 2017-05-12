@@ -37,7 +37,7 @@ namespace ASRuntime
 
         #region 类型转换
 
-        internal static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -108,7 +108,7 @@ namespace ASRuntime
         }
 
 
-        internal static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token , bool isthrow=false)
+        public static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token , bool isthrow=false)
         {
             switch (src.rtType)
             {
@@ -180,7 +180,7 @@ namespace ASRuntime
             }
         }
 
-        internal static uint ConvertToUInt(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static uint ConvertToUInt(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {
@@ -252,7 +252,7 @@ namespace ASRuntime
         }
 
 
-        internal static double ConvertToNumber(ASBinCode.RunTimeValueBase src)
+        public static double ConvertToNumber(ASBinCode.RunTimeValueBase src)
         {
             return src.toNumber();
             //switch (src.rtType)
@@ -308,7 +308,7 @@ namespace ASRuntime
         }
 
 
-        internal static string ConvertToString(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static string ConvertToString(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
         {
             switch (src.rtType)
             {

@@ -13,7 +13,7 @@ namespace ASBinCode.rtData
     /// 您只能为无类型变量赋予 undefined 这一值。
     /// 无类型变量是指缺乏类型注释或者使用星号 (*) 作为类型注释的变量。您可以将 void 只用作返回类型注释。
     /// </summary>
-    public class rtUndefined : RunTimeValueBase
+    public sealed class rtUndefined : RunTimeValueBase
     {
         private rtUndefined():base(RunTimeDataType.rt_void) { }
 

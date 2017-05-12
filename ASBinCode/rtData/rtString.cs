@@ -7,7 +7,7 @@ namespace ASBinCode.rtData
     /// <summary>
     /// 运行时基本数据类型(String)
     /// </summary>
-    public class rtString : RunTimeValueBase
+    public sealed class rtString : RunTimeValueBase
     {
         public string value;
 

@@ -41,6 +41,7 @@
     <Compile Include="ClassMethodGetter.cs" />
     <Compile Include="HeapSlot.cs" />
     <Compile Include="ILinkSlot.cs" />
+    <Compile Include="INativeFunctionRegister.cs" />
     <Compile Include="InterfaceMethodGetter.cs" />
     <Compile Include="MethodGetterBase.cs" />
     <Compile Include="ClassPropertyGetter.cs" />
@@ -49,6 +50,8 @@
     <Compile Include="Field.cs" />
     <Compile Include="IClassFinder.cs" />
     <Compile Include="rtti\HostedDynamicObject.cs" />
+    <Compile Include="rtti\IHostedObject.cs" />
+    <Compile Include="rtti\LinkSystemObject.cs" />
     <Compile Include="rtti\YieldObject.cs" />
     <Compile Include="SLOT.cs" />
     <Compile Include="IMember.cs" />

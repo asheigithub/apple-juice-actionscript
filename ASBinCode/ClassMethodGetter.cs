@@ -69,6 +69,42 @@ namespace ASBinCode
 
         WeakReference cache;
 
+        public override RunTimeValueBase getMethod(rtObject rtObj)
+        {
+            if (cache.IsAlive)
+            {
+                if ( ReferenceEquals( ((rtFunction)cache.Target).this_pointer , rtObj))
+                {
+                    return (rtFunction)cache.Target;
+                }
+            }
+
+            if (!isNotReadVirtual)
+            {
+
+                var vmember = (ClassMethodGetter)(rtObj).value._class.classMembers[indexofMember].bindField;
+
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
+
+                cache.Target = method;
+
+                return method;
+
+            }
+            else
+            {
+                rtData.rtFunction method = new rtData.rtFunction(functionid, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
+
+                cache.Target = method;
+
+                return method;
+            }
+        }
+
         public sealed override  RunTimeValueBase getMethod(RunTimeScope scope)
         {
             if (cache.IsAlive)

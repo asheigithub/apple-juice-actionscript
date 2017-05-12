@@ -16,7 +16,7 @@ namespace ASRuntime.operators
             var player = frame.player;
 
             SLOT slot = step.reg.getSlot(scope);
-            ASBinCode.rtti.HostedDynamicObject saveObj = new ASBinCode.rtti.HostedDynamicObject(player.swc.ObjectClass);
+            ASBinCode.rtti.HostedDynamicObject saveObj = new HostedDynamicObject(player.swc.ObjectClass);
             rtObject save = new rtObject(saveObj, null);
             slot.directSet(save);
 
@@ -43,7 +43,7 @@ namespace ASRuntime.operators
                         frame.player.swc.IEnumerableInterface);
 
                     var method = ((InterfaceMethodGetter)movenext.bindField).getMethod(
-                        rtObj.objScope);
+                        rtObj);
 
                     //***调用方法***
                     var funCaller = new FunctionCaller(frame.player, frame, step.token);
@@ -127,7 +127,7 @@ namespace ASRuntime.operators
                         frame.player.swc.IEnumerableInterface);
 
                     var method = ((InterfaceMethodGetter)movenext.bindField).getMethod(
-                        rtObj.objScope);
+                        rtObj);
 
                     //***调用方法***
                     var funCaller = new FunctionCaller(frame.player, frame, step.token);
@@ -188,7 +188,7 @@ namespace ASRuntime.operators
                 {
                     var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "moveNext", frame.player.swc.IEnumeratorInterface);
                     var method=((InterfaceMethodGetter)movenext.bindField).getMethod(
-                        (((rtObject)saveObj.hosted_object)).objScope );
+                        (((rtObject)saveObj.hosted_object)) );
 
                     //***调用方法***
                     var funCaller = new FunctionCaller(frame.player, frame, step.token);
@@ -245,7 +245,7 @@ namespace ASRuntime.operators
                 {
                     var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "current", frame.player.swc.IEnumeratorInterface);
                     var method = 
-                        ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object).objScope);
+                        ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object));
 
                     //***调用方法***
                     var funCaller = new FunctionCaller(frame.player, frame, step.token);

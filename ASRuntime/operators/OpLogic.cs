@@ -1448,7 +1448,9 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
                 ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
 
-                return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
+                return System.Object.Equals(obj1, obj2);
+
+                //return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
 
             }
             else
@@ -1713,7 +1715,9 @@ namespace ASRuntime.operators
                 ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
                 ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
 
-                return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
+                return System.Object.Equals(obj1, obj2);
+
+                //return ReferenceEquals(obj1.value, obj2.value) && ReferenceEquals(obj1.objScope, obj2.objScope);
 
             }
             return false;

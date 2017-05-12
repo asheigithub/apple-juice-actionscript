@@ -118,9 +118,21 @@ namespace ASCompiler.compiler
         }
 
 
-        public ASBinCode.CSWC bin;
+        internal ASBinCode.CSWC bin;
 
-        public void Build(ASTool.AS3.AS3Proj proj)
+        public CSWC getBuildOutSWC()
+        {
+            if (buildErrors.Count == 0)
+            {
+                return bin;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void Build(ASTool.AS3.AS3Proj proj,IList<ASBinCode.INativeFunctionRegister> extfunctions)
         {
             buildErrors.Clear();
 
@@ -137,7 +149,13 @@ namespace ASCompiler.compiler
 
             bin = new CSWC();
             ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
-
+            if (extfunctions != null)
+            {
+                for (int i = 0; i < extfunctions.Count; i++)
+                {
+                    extfunctions[i].registrationFunction(bin);
+                }
+            }
 
             try
             {
@@ -1003,7 +1021,12 @@ namespace ASCompiler.compiler
                     }
                 }
 
-
+                if (cls.isLink_System && cls.staticClass.linkObjCreator == null)
+                {
+                    throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                    "[link_system]的类必须有[creator]函数");
+                                    
+                }
 
                 //block必须有收尾工作
                 {

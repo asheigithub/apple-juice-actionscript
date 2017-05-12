@@ -54,7 +54,7 @@ namespace ASRuntime.operators
                     var dt = signature.parameters[i].type;
                     var dv = signature.parameters[i].defaultValue.getValue(null);
 
-
+                    
                     if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
                     {
                         if (dt == RunTimeDataType.rt_int)
@@ -301,7 +301,7 @@ namespace ASRuntime.operators
             {
                 returnSlot.directSet(
                     TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null));
-                player.CallBlock(
+                player.callBlock(
                     player.swc.blocks[toCallFunc.blockid],
                     CallFuncHeap,
                     returnSlot,

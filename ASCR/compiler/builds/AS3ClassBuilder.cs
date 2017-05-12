@@ -163,7 +163,7 @@ namespace ASCompiler.compiler.builds
                     CheckProp( cls.classMembers[i],  builder);
                 }
             }
-
+            
             builder._buildingClass.Pop();
         }
 
@@ -298,6 +298,20 @@ namespace ASCompiler.compiler.builds
                                     cls.no_constructor = true;
                                 }
                             }
+                            else if (m.Value.Data.Value.ToString() == "struct")
+                            {
+                                if (!cls.ispackageout && cls.isPublic)
+                                {
+                                    cls.isStruct = true;
+                                }
+                            }
+                            else if (m.Value.Data.Value.ToString() == "link_system")
+                            {
+                                if (!cls.ispackageout && cls.isPublic)
+                                {
+                                    cls.isLink_System = true;
+                                }
+                            }
                             else if (m.Value.Data.Value.ToString() == "_error_class_")
                             {
                                 if (builder.bin.ErrorClass == null)
@@ -363,6 +377,19 @@ namespace ASCompiler.compiler.builds
                                                                    "[_object_]只能指定一次");
                                 }
                             }
+                            else if (m.Value.Data.Value.ToString() == "_class_")
+                            {
+                                if (builder.bin.TypeClass == null)
+                                {
+                                    builder.bin.TypeClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_class_]只能指定一次");
+                                }
+                            }
                             
                         }
                     }
@@ -370,7 +397,32 @@ namespace ASCompiler.compiler.builds
                 
             }
 
+            if (cls.isUnmanaged && cls.isLink_System)
+            {
+                throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[hosted]与[link_system]互斥");
+            }
+            if (cls.isStruct && !cls.isLink_System)
+            {
+                throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[struct]必须和[link_system]同时设置");
+            }
+            if (cls.isStruct && !cls.final)
+            {
+                throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[struct]的类必须是final");
+            }
 
+
+            if (cls.isUnmanaged && !cls.final)
+            {
+                throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[hosted]的类必须是final");
+            }
 
             //List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
 
@@ -475,6 +527,20 @@ namespace ASCompiler.compiler.builds
                     cls.super = OBJECT;
                 }
             }
+
+            if (cls.isLink_System)
+            {
+                if (!cls.super.isLink_System
+                    &&
+                    cls.super != builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT)
+                    )
+                {
+                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                        "[link_system]的类只能继承自同样[link_system]的类"
+                        );
+                }
+            }
+
         }
 
         public void checkCircularReference(ASTool.AS3.AS3Class as3class, Builder builder)
@@ -673,6 +739,18 @@ namespace ASCompiler.compiler.builds
 
                     buildClassMember(env, fc, cls, builder, false);
                 }
+
+                if (cls.isLink_System)
+                {
+                    if (cls.fields.Count > 0)
+                    {
+                        throw new BuildException(
+                                            new BuildError(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                                                                    "[link_system]的类只能包含[native]的成员")
+                                            );
+                    }
+                }
+
             }
             else
             {
@@ -690,6 +768,21 @@ namespace ASCompiler.compiler.builds
                 {
                     buildClassMember(envMeta, classstmts[i], metaclass, builder, true);
                 }
+
+                if (cls.isLink_System)
+                {
+                    for (int i = 0; i < metaclass.fields.Count; i++)
+                    {
+                        if (metaclass.fields[i].inheritFrom == null)
+                        {
+                            throw new BuildException(
+                                            new BuildError(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                                                                    "[link_system]的类只能包含[native]的成员")
+                                            );
+                        }
+                    }
+                }
+
             }
         }
 
@@ -1151,6 +1244,227 @@ namespace ASCompiler.compiler.builds
                         }
                     }
 
+                    if (variable.Meta != null)
+                    {
+                        var metalist = variable.Meta;
+                        for (int i = 0; i < metalist.Count; i++)
+                        {
+                            var m = metalist[i];
+                            if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_array)
+                            {
+                                List<ASTool.AS3.Expr.AS3DataStackElement> data =
+                                    (List<ASTool.AS3.Expr.AS3DataStackElement>)m.Value.Data.Value;
+
+                                if (data.Count == 0)
+                                {
+                                    throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                                   "Meta 格式错误,至少有1个设置");
+                                }
+                                else
+                                {
+                                    string meta = data[0].Data.Value.ToString();
+                                    if (meta == "native")
+                                    {
+                                        if (data.Count == 3)
+                                        {
+                                            string native_get = data[1].Data.Value.ToString();
+
+                                            if (builder.bin.nativefunctionNameIndex.ContainsKey(native_get))
+                                            {
+                                                var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
+                                                if (nf.isMethod)
+                                                {
+                                                    if (nf.parameters.Count != 0)
+                                                    {
+                                                        throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                            "本地函数 " + native_get + "不接受参数");
+                                                    }
+                                                    if (nf.returnType != RunTimeDataType.rt_void)
+                                                    {
+                                                        throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                            "本地函数 " + native_get + "必须返回*");
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                        "本地函数 " + native_get + " isMethod属性不符");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                    "本地函数 " + native_get + " 未注册");
+                                            }
+
+                                            string native_set = data[2].Data.Value.ToString();
+
+                                            if (builder.bin.nativefunctionNameIndex.ContainsKey(native_set))
+                                            {
+                                                var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_set]];
+                                                if (nf.isMethod)
+                                                {
+                                                    if (nf.parameters.Count != 1)
+                                                    {
+                                                        throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                            "本地函数 " + native_set + "必须只有1个参数");
+                                                    }
+                                                    if (nf.parameters[0] != RunTimeDataType.rt_void)
+                                                    {
+                                                        throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                            "本地函数 " + native_set + "参数类型必须是*");
+                                                    }
+                                                    if (nf.returnType != RunTimeDataType.fun_void)
+                                                    {
+                                                        throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                            "本地函数 " + native_set + "必须是void");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                        "本地函数 " + native_get + " isMethod属性不符");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                    "本地函数 " + native_set + " 未注册");
+                                            }
+
+                                            //***检查通过，创建两个函数作为getter和setter放进去***
+
+                                            {
+                                                ASTool.AS3.AS3Function fc = 
+                                                    new ASTool.AS3.AS3Function(new ASTool.Token());
+                                                fc.Access = variable.Access;
+                                                fc.IsConstructor = false;
+                                                fc.Name = variable.Name;
+                                                fc.TypeStr = variable.TypeStr;
+                                                fc.IsMethod = true;
+                                                fc.IsGet = true;
+
+                                                fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
+                                                //fc.ParentScope = builder.
+                                                    
+                                                fc.StamentsStack.Push(new List<ASTool.AS3.IAS3Stmt>());
+                                                fc.Meta = new List<ASTool.AS3.AS3Meta>();
+                                                ASTool.AS3.AS3Meta me = new ASTool.AS3.AS3Meta(new ASTool.Token());
+
+                                                List<ASTool.AS3.Expr.AS3DataStackElement> medata
+                                                    = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+
+                                                me.Value = new ASTool.AS3.Expr.AS3DataStackElement();
+                                                me.Value.Data = new ASTool.AS3.Expr.AS3DataValue();
+                                                me.Value.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.as3_array;
+                                                me.Value.Data.Value = medata;
+
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                        Data=new ASTool.AS3.Expr.AS3DataValue()
+                                                        {
+                                                             FF1Type= ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                             Value= "native"
+                                                        }
+                                                }
+                                                );
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                    Data = new ASTool.AS3.Expr.AS3DataValue()
+                                                    {
+                                                        FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                        Value = native_get
+                                                    }
+                                                }
+                                                );
+                                                fc.Meta.Add(me);
+
+                                                buildClassMember(env, fc, cls, builder, isstatic);
+
+                                            }
+
+                                            {
+                                                ASTool.AS3.AS3Function fc =
+                                                    new ASTool.AS3.AS3Function(new ASTool.Token());
+                                                fc.Access = variable.Access;
+                                                fc.IsConstructor = false;
+                                                fc.Name = variable.Name;
+                                                fc.TypeStr = "void";
+                                                fc.IsMethod = true;
+                                                fc.IsSet = true;
+
+                                                fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
+                                                fc.Parameters.Add(
+                                                    new ASTool.AS3.AS3Parameter(new ASTool.Token())
+                                                    {
+                                                         Name="value",
+                                                         TypeStr=variable.TypeStr
+                                                    }
+                                                    
+                                                    
+                                                    );
+                                                
+                                                //fc.ParentScope = builder.
+
+                                                fc.StamentsStack.Push(new List<ASTool.AS3.IAS3Stmt>());
+                                                fc.Meta = new List<ASTool.AS3.AS3Meta>();
+                                                ASTool.AS3.AS3Meta me = new ASTool.AS3.AS3Meta(new ASTool.Token());
+
+                                                List<ASTool.AS3.Expr.AS3DataStackElement> medata
+                                                    = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+
+                                                me.Value = new ASTool.AS3.Expr.AS3DataStackElement();
+                                                me.Value.Data = new ASTool.AS3.Expr.AS3DataValue();
+                                                me.Value.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.as3_array;
+                                                me.Value.Data.Value = medata;
+
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                    Data = new ASTool.AS3.Expr.AS3DataValue()
+                                                    {
+                                                        FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                        Value = "native"
+                                                    }
+                                                }
+                                                );
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                    Data = new ASTool.AS3.Expr.AS3DataValue()
+                                                    {
+                                                        FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                        Value = native_set
+                                                    }
+                                                }
+                                                );
+                                                fc.Meta.Add(me);
+
+                                                buildClassMember(env, fc, cls, builder, isstatic);
+
+                                            }
+
+                                            return;
+
+                                        }
+                                        else
+                                        {
+                                            throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                                "[native] Field需要指定2个访问函数");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+                                    "Meta 格式错误");
+                            }
+                        }
+
+                    }
+
+
+
                     Field field = new Field(variable.Name, env.block.scope.members.Count, env.block.id, false);
                     env.block.scope.members.Add(field);
                     field.isInternal = variable.Access.IsInternal;
@@ -1230,6 +1544,133 @@ namespace ASCompiler.compiler.builds
                                 );
                         }
                     }
+
+                    if (constant.Meta != null)
+                    {
+                        var metalist = constant.Meta;
+                        for (int i = 0; i < metalist.Count; i++)
+                        {
+                            var m = metalist[i];
+                            if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_array)
+                            {
+                                List<ASTool.AS3.Expr.AS3DataStackElement> data =
+                                    (List<ASTool.AS3.Expr.AS3DataStackElement>)m.Value.Data.Value;
+
+                                if (data.Count == 0)
+                                {
+                                    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                                   "Meta 格式错误,至少有1个设置");
+                                }
+                                else
+                                {
+                                    string meta = data[0].Data.Value.ToString();
+                                    if (meta == "native")
+                                    {
+                                        if (data.Count == 2)
+                                        {
+                                            string native_get = data[1].Data.Value.ToString();
+
+                                            if (builder.bin.nativefunctionNameIndex.ContainsKey(native_get))
+                                            {
+                                                var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
+                                                if (nf.isMethod)
+                                                {
+                                                    if (nf.parameters.Count != 0)
+                                                    {
+                                                        throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                            "本地函数 " + native_get + "不接受参数");
+                                                    }
+                                                    if (nf.returnType != RunTimeDataType.rt_void)
+                                                    {
+                                                        throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                            "本地函数 " + native_get + "必须返回*");
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                        "本地函数 " + native_get + " isMethod属性不符");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                    "本地函数 " + native_get + " 未注册");
+                                            }
+                                            //***检查通过，创建两个函数作为getter和setter放进去***
+
+                                            {
+                                                ASTool.AS3.AS3Function fc =
+                                                    new ASTool.AS3.AS3Function(new ASTool.Token());
+                                                fc.Access = constant.Access;
+                                                fc.IsConstructor = false;
+                                                fc.Name = constant.Name;
+                                                fc.TypeStr = constant.TypeStr;
+                                                fc.IsMethod = true;
+                                                fc.IsGet = true;
+
+                                                fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
+                                                //fc.ParentScope = builder.
+
+                                                fc.StamentsStack.Push(new List<ASTool.AS3.IAS3Stmt>());
+                                                fc.Meta = new List<ASTool.AS3.AS3Meta>();
+                                                ASTool.AS3.AS3Meta me = new ASTool.AS3.AS3Meta(new ASTool.Token());
+
+                                                List<ASTool.AS3.Expr.AS3DataStackElement> medata
+                                                    = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+
+                                                me.Value = new ASTool.AS3.Expr.AS3DataStackElement();
+                                                me.Value.Data = new ASTool.AS3.Expr.AS3DataValue();
+                                                me.Value.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.as3_array;
+                                                me.Value.Data.Value = medata;
+
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                    Data = new ASTool.AS3.Expr.AS3DataValue()
+                                                    {
+                                                        FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                        Value = "native"
+                                                    }
+                                                }
+                                                );
+                                                medata.Add(new ASTool.AS3.Expr.AS3DataStackElement()
+                                                {
+                                                    Data = new ASTool.AS3.Expr.AS3DataValue()
+                                                    {
+                                                        FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string,
+                                                        Value = native_get
+                                                    }
+                                                }
+                                                );
+                                                fc.Meta.Add(me);
+
+                                                buildClassMember(env, fc, cls, builder, isstatic);
+
+                                            }
+
+
+
+                                            return;
+
+                                        }
+                                        else
+                                        {
+                                            throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                "[native] const Field需要指定1个访问函数");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                    "Meta 格式错误");
+                            }
+                        }
+
+                    }
+
 
                     Field constfield = new Field(constant.Name, env.block.scope.members.Count, env.block.id, true);
                     env.block.scope.members.Add(constfield);

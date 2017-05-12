@@ -190,7 +190,7 @@ namespace ASRuntime.operators
                 else
                 {
                     func = ((MethodGetterBase)setter.bindField).getMethod(
-                        bindobj.objScope
+                        bindobj
                         );
                 }
                 //***调用设置器***

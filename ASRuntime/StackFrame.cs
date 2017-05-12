@@ -9,7 +9,7 @@ namespace ASRuntime
     /// <summary>
     /// 调用堆栈栈帧
     /// </summary>
-    class StackFrame
+    public class StackFrame
     {
         internal int stepCount;
         public StackFrame(CodeBlock block)

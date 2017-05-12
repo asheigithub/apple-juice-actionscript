@@ -121,7 +121,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            slot.directSet(((MethodGetterBase)step.arg2).getMethod(rtObj.objScope));
+                            slot.directSet(((MethodGetterBase)step.arg2).getMethod(rtObj));
                         }
 
                         //slot.directSet(lintoslot.getValue());
@@ -605,7 +605,7 @@ namespace ASRuntime.operators
                                     }
                                     else
                                     {
-                                        slot.directSet(((MethodGetterBase)member.bindField).getMethod(rtObj.objScope));
+                                        slot.directSet(((MethodGetterBase)member.bindField).getMethod(rtObj));
                                         break;
                                     }
                                     //linkto = ((MethodGetterBase)member.bindField).getVirtualSlot(rtObj.objScope);

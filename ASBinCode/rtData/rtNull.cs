@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public class rtNull : RunTimeValueBase
+    public sealed class rtNull : RunTimeValueBase
     {
         public static rtNull nullptr = new rtNull();
 

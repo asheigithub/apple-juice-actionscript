@@ -26,6 +26,20 @@ namespace ASBinCode.rtti
         public bool isUnmanaged;
 
         /// <summary>
+        /// 链接到的系统对象是否是一个结构体
+        /// </summary>
+        public bool isStruct;
+        /// <summary>
+        /// 是否链接到系统对象
+        /// </summary>
+        public bool isLink_System;
+        /// <summary>
+        /// 系统对象创建器
+        /// </summary>
+        public ClassMember linkObjCreator;
+
+
+        /// <summary>
         /// 是否不可实例化
         /// </summary>
         public bool no_constructor;

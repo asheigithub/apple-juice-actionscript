@@ -654,7 +654,7 @@ namespace ASCompiler.compiler.builds
                                     if (function.signature.returnType != RunTimeDataType._OBJECT)
                                     {
                                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                        "explicit_from特性函数返回类型必须是Object"); 
+                                        "explicit_from特性函数返回类型必须是Object");
                                     }
 
                                     for (int j = 0; j < iclass.classMembers.Count; j++)
@@ -677,6 +677,59 @@ namespace ASCompiler.compiler.builds
 
                                 }
                                 #endregion
+                            }
+                            else if (meta == "creator")
+                            {
+                                if (isoutclass)
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "creator特性不能在包外定义");
+                                }
+                                else
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.instanceClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "creator特性只能定义在静态方法上");
+                                    }
+                                    if (!as3function.Access.IsPrivate)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "creator特性必须为private");
+                                    }
+                                    if (function.signature.parameters.Count != 1
+                                        ||
+                                        function.signature.parameters[0].type != builder.bin.TypeClass.getRtType()
+                                        )
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "creator特性函数的参数必须是要创建的Class");
+                                    }
+
+                                    if (function.signature.returnType != RunTimeDataType._OBJECT)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "creator特性函数返回类型必须是Object");
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            ((MethodGetterBase)member.bindField).setNotReadVirtual();
+                                            iclass.linkObjCreator = member;
+                                            function.signature.returnType = iclass.instanceClass.getRtType();
+
+                                            break;
+                                        }
+                                    }
+
+                                }
                             }
                             else if (meta == "novisual")
                             {
@@ -740,6 +793,12 @@ namespace ASCompiler.compiler.builds
                                                     &&
                                                     signature.returnType == vc
                                                 )
+                                                &&
+                                                !(
+                                                    signature.returnType > RunTimeDataType.unknown
+                                                    &&
+                                                    nf.returnType== RunTimeDataType.rt_void
+                                                )
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
@@ -761,6 +820,8 @@ namespace ASCompiler.compiler.builds
                                                     !(!signature.parameters[j].isPara && isvectorScope && nf.parameters[j] == RunTimeDataType.rt_void)
                                                     &&
                                                     !(signature.parameters[j].isPara && nf.parameters[j] == RunTimeDataType.rt_array)
+                                                    &&
+                                                    !(signature.parameters[j].type>RunTimeDataType._OBJECT && nf.parameters[j] == RunTimeDataType.rt_void)
                                                     )
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
@@ -798,6 +859,27 @@ namespace ASCompiler.compiler.builds
                     }
                 }
             }
+
+            if (refClass != null)
+            {
+                if (refClass.isLink_System)
+                {
+                    if (!function.isNative)
+                    {
+                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                   "[link_system]只能包含[native]成员");
+                    }
+                }
+                else if (refClass.instanceClass != null && refClass.instanceClass.isLink_System)
+                {
+                    if (!function.isNative)
+                    {
+                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                   "[link_system]只能包含[native]成员");
+                    }
+                }
+            }
+
 
 
             ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope(function);
