@@ -14,6 +14,7 @@ package
 	import ppp.pp2.CP;
 	import system.DateTimeKind;
 	import system.Int64;
+	import system.TimeSpan;
 	
 	[Doc]
 	/**
@@ -36,30 +37,110 @@ package
 		
 		private function bb() { trace("bb") };
 		
+		
 		public function Main() 
 		{
 			//var dk = DateTimeKind.Local;
 			//trace( int(DateTimeKind.Local));
 			
-			var i:Int64 = new Int64(4);
+			//var i:Int64 = new Int64(4);
+			//
+			//var k:Int64 = i;
+			//
+			//i = Int64(4);
+			//
+			//trace(i == k);
+			//
+			//k = Int64(i + i)  ;
+			//
+			//trace(i, k);
+			//
+			//k = 99;
+			//
+			//trace(i, k);
+			//
+			trace(Int64.MaxValue);
+			trace(Int64.MinValue);
+			//
+			//trace(k.equals(Int64.MaxValue));
+			//
+			//
+			//var j = Int64.parse("998");
 			
-			var k:Int64 = i;
+			//trace( system.Object.referenceEquals( Int64( k+1), Int64(i+1)) );
 			
-			i = Int64(4);
+			//a b;
+			
+			var ts:TimeSpan = new TimeSpan(-1, 2, 3);
+			trace(ts);
+			
+			trace(ts.equals( new TimeSpan(0, -60 + 2, 3) ));
+			
+			
+			var a = ts.add( new TimeSpan(3,5,0) );
+			trace(a.minutes);
+			
+			trace( ts.compareTo_TimeSpan( ts) );
+			
+			trace(ts.duration().negate().seconds,TimeSpan(a).subtract(a).milliseconds, TimeSpan.compare(ts.duration().negate(), TimeSpan(a).subtract(a)) );
+			
+			trace(  ts.totalSeconds);
+			
+			var tp:TimeSpan = TimeSpan.constructor__(1, 2, 3, 4,6);
+			trace(tp.totalDays);
+			
+			var tt:TimeSpan = TimeSpan.constructor___(Int64(999));
+			trace(tt);
+			trace( tt.ticks.valueOf()===uint( 999 ) );
+			
+			try 
+			{
+				tt = TimeSpan.fromDays(3.3).add( TimeSpan.fromMinutes( -3000000) );
+			}
+			catch (e:ArgumentError)
+			{
+				
+			}
+			catch (e:AneError)
+			{
+				trace(e.message,'\n',e.getStackTrace());
+			}
+			finally
+			{
+				trace(tt);
+			}
+			
+			var v:Vector.<Vector.<TimeSpan>> = Vector.<Vector.<TimeSpan>>( [Vector.<TimeSpan>([tt,tt,tt])]);
+			trace(v);
+			
+			v[0][0]=v[0][0].add(TimeSpan.fromDays(1));
+			v[0][1]=v[0][1].add(TimeSpan.fromDays(2));
+			v[0][2]=v[0][2].add(TimeSpan.fromSeconds(1));
+			
+			
+			trace( v[0][0] == v[0][1] );
+			trace( v[0][0] == tt.add(TimeSpan.fromTicks(Int64(60*60*24))) );
+			trace( v[0][0] == v[0][2] );
+			trace(v);
+			
+			
+			var values = [ "000000006", "12.12:12:12.12345678" ];
+			for each (var s:String in values)
+			{
+			   try {
+				  var interval = TimeSpan.parse(s);
+				  trace("{0} --> {1}", s, interval);
+			   }   
+			   catch (e:Error) {
+				  trace("{0}: Bad Format", s);
+			   }   
+			   
+			}
 
-			trace(i == k);
 			
-			k = Int64(i + i)  ;
+			trace(TimeSpan.Zero);
 			
-			trace(i, k);
-			
-			trace(Int64.MaxValue);
-			trace(Int64.MaxValue);
-			
-			var b = Int64(3);
-			var c = 5;
-			
-			trace(b - c);
+			trace(TimeSpan.greaterThan( TimeSpan.Zero,tt ));
 			
 			
 			/*

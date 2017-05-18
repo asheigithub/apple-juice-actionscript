@@ -88,14 +88,33 @@ namespace ASBinCode
                     default:
                         if (!ReferenceEquals(this.value, value))
                         {
-                            if (this.value.rtType == value.rtType)
+                            rtObject ro = (rtObject)value;
+                            var _class = ro.value._class;
+
+                            //if (this.value.rtType == value.rtType)//前面已有判断这里肯定相同
                             {
-                                ((rtObject)value).ReplaceValue((rtObject)this.value);
+                                
+                                if (_class.isLink_System)
+                                {
+                                    if (_class.isStruct)
+                                    {
+                                        ((rtti.LinkSystemObject)((rtObject)this.value).value)
+                                            .CopyStructData((rtti.LinkSystemObject)ro.value);
+                                    }
+                                    else
+                                    {
+                                        ro.value = ((rtObject)value).value;
+                                    }
+                                }
+                                else
+                                {
+                                    this.value = value;
+                                }
                             }
-                            else
-                            {
-                                this.value = (RunTimeValueBase)value.Clone(); //考虑处理结构类型struct
-                            }
+                            //else
+                            //{
+                            //    this.value = (RunTimeValueBase)value.Clone(); //考虑处理结构类型struct
+                            //}
                         }
                         //this.value = (rtObject)value.Clone();
                         //if (((rtObject)this.value).value.objectid != ((rtObject)value).value.objectid)

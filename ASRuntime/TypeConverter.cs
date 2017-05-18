@@ -465,6 +465,15 @@ namespace ASRuntime
                 }
 
                 var tc = classfinder.getClassByRunTimeDataType(t);
+                if (tc.staticClass != null)
+                {
+                    tc = tc.staticClass;
+                }
+                else
+                {
+                    return false;
+                }
+
                 if (tc.implicit_from != null)
                 {
                     return testImplicitConvert(f, tc.implicit_from_type,classfinder);
@@ -505,11 +514,7 @@ namespace ASRuntime
 
 
                 return false;
-#if DEBUG
-                throw new NotImplementedException();
-#else
-                return false;
-#endif
+
 
             }
 

@@ -42,7 +42,7 @@
 		}
 
 		[explicit_from];
-		private static function _explicit_from_value(v:Function):Object
+		private static function _explicit_from_value(v:Function):*
 		{
 			throw "The form function('function body') is not supported."
 		}

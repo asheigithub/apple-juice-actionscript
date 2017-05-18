@@ -78,17 +78,17 @@ namespace ASRuntime.operators
             }
         }
 
-        
-
-        public bool init_static_class(Class cls)
+        public static bool init_static_class(Class cls,Player player,SourceToken token)
         {
             if (!player.static_instance.ContainsKey(cls.staticClass.classid))
             {
                 int f = player.getRuntimeStackFlag();
 
-                
+
                 ASBinCode.RunTimeScope objScope;
-                ASBinCode.rtti.Object obj = makeObj(cls.staticClass,
+                ASBinCode.rtti.Object obj = makeObj(
+                    player,token,
+                    cls.staticClass,
                     null, out objScope).value;
 
                 player.static_instance.Add(cls.staticClass.classid,
@@ -96,18 +96,18 @@ namespace ASRuntime.operators
 
                 if (cls.super != null)
                 {
-                    bool s = init_static_class(cls.super);
+                    bool s = init_static_class(cls.super,player,token);
 
                     if (s)
                     {
                         ((DynamicObject)obj)._prototype_ = (DynamicObject)(player.static_instance[cls.super.staticClass.classid]).value;
 
-                        bool result= player.step_toStackflag(f);
+                        bool result = player.step_toStackflag(f);
 
-                        if (cls.classid !=2)
+                        if (cls.classid != 2)
                         {
                             ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
-                                
+
                         }
 
                         return result;
@@ -119,16 +119,69 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    bool result= player.step_toStackflag(f);
+                    bool result = player.step_toStackflag(f);
 
                     return result;
                 }
-                
+
             }
             else
             {
                 return true;
             }
+        }
+
+        public bool init_static_class(Class cls)
+        {
+            return init_static_class(cls, player, token);
+
+            //if (!player.static_instance.ContainsKey(cls.staticClass.classid))
+            //{
+            //    int f = player.getRuntimeStackFlag();
+
+                
+            //    ASBinCode.RunTimeScope objScope;
+            //    ASBinCode.rtti.Object obj = makeObj(player,token, cls.staticClass,
+            //        null, out objScope).value;
+
+            //    player.static_instance.Add(cls.staticClass.classid,
+            //        new ASBinCode.rtData.rtObject(obj, objScope));
+
+            //    if (cls.super != null)
+            //    {
+            //        bool s = init_static_class(cls.super);
+
+            //        if (s)
+            //        {
+            //            ((DynamicObject)obj)._prototype_ = (DynamicObject)(player.static_instance[cls.super.staticClass.classid]).value;
+
+            //            bool result= player.step_toStackflag(f);
+
+            //            if (cls.classid !=2)
+            //            {
+            //                ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
+                                
+            //            }
+
+            //            return result;
+            //        }
+            //        else
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        bool result= player.step_toStackflag(f);
+
+            //        return result;
+            //    }
+                
+            //}
+            //else
+            //{
+            //    return true;
+            //}
         }
 
 
@@ -169,7 +222,7 @@ namespace ASRuntime.operators
                 callbacker.args = this;
 
                 ASBinCode.RunTimeScope objScope;
-                var obj = makeObj(_class.staticClass, callbacker, out objScope);
+                var obj = makeObj(player,token, _class.staticClass, callbacker, out objScope);
 
                 player.static_instance.Add(_class.staticClass.classid,
                     obj);
@@ -326,7 +379,7 @@ namespace ASRuntime.operators
             callbacker.args = this;
 
             ASBinCode.RunTimeScope objScope;
-            makeObj(_class, callbacker, out objScope);
+            makeObj(player,token, _class, callbacker, out objScope);
         }
 
         private void exec_step2(
@@ -445,6 +498,21 @@ namespace ASRuntime.operators
             }
         }
 
+
+        internal static LinkSystemObject createLinkObjectValue(Player player, Class cls)
+        {
+            if (cls.isLink_System)
+            {
+                ASBinCode.rtti.Object obj = createObject(player.swc, cls);
+                return (LinkSystemObject)obj;
+            }
+            else
+            {
+                throw new ASRunTimeException();
+            }
+        }
+
+
         internal static ASBinCode.rtData.rtObject createPureHostdOrLinkObject(Player player, Class cls)
         {
             if (cls.isLink_System)
@@ -481,12 +549,11 @@ namespace ASRuntime.operators
             }
             else
             {
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
         }
 
-        private static HeapSlot[] _classSlot = new HeapSlot[] { new HeapSlot() };
-        private static ASBinCode.rtData.rtInt _classid= new ASBinCode.rtData.rtInt(0);
+        
         private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls)
         {
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
@@ -500,12 +567,11 @@ namespace ASRuntime.operators
                 }
                 var func = swc.nativefunctions[creator.native_index];
 
-                _classid.value = cls.classid;
-                _classSlot[0].directSet(_classid);
+                
 
                 string err;int no;
                 ASBinCode.rtData.rtObject rtObj= 
-                    func.execute(null, _classSlot, cls, out err,out no) as ASBinCode.rtData.rtObject ;
+                    func.execute(null, null, cls, out err,out no) as ASBinCode.rtData.rtObject ;
                 if (rtObj == null)
                 {
                     return null;
@@ -549,7 +615,9 @@ namespace ASRuntime.operators
 
 
         private static readonly ObjectMemberSlot[] blankFields = new ObjectMemberSlot[0];
-        private ASBinCode.rtData.rtObject makeObj(
+        private static ASBinCode.rtData.rtObject makeObj(
+            Player player,
+            SourceToken token,
             ASBinCode.rtti.Class cls,
             baseinstancecallbacker callbacker, out ASBinCode.RunTimeScope objScope)
         {

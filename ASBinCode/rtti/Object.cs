@@ -9,12 +9,9 @@ namespace ASBinCode.rtti
     /// </summary>
     public class Object
     {
-        private static int seed;
-        public readonly int objectid;
-
+        
         public Object(rtti.Class _class)
         {
-            objectid = seed++;
             this._class = _class;
             memberData = null;
         }

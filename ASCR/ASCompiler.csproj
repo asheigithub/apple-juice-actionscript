@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="aslib\AneError.txt" />
     <Content Include="aslib\ArgumentError.txt" />
     <Content Include="aslib\Array.txt" />
     <Content Include="aslib\Boolean.txt" />

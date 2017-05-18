@@ -66,7 +66,7 @@ namespace ASCompiler.compiler.builds
                                 env.block.opSteps.Add(stepInitClass);
 
                                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-                                eax.setEAXTypeWhenCompile(item.getRtType());
+                                eax.setEAXTypeWhenCompile(item.staticClass.getRtType());
 
                                 OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                                 op.reg = eax;

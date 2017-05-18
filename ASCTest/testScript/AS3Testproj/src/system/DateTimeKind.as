@@ -13,7 +13,7 @@ package system
 		public static const Local:DateTimeKind = create(2,"Local",DateTimeKind);
 		
 		[explicit_from]
-		private static function _explicit_from_value(value:int):Object
+		private static function _explicit_from_value(value:int):*
 		{
 			if (value == 1)
 			{

@@ -2165,15 +2165,15 @@ namespace ASCompiler.compiler.builds
                 {
                     RightValueBase v1=null;
 
-                    try
+                    //try
                     {
                         v1 = getRightValue(env, step.Arg2, step.token, builder);
                     }
-                    catch (MemberNotExistsBuildException)
-                    {
-                        v1 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
-                    }
-                    finally
+                    //catch (MemberNotExistsBuildException)
+                    //{
+                    //    v1 = new ASBinCode.rtData.RightValue(ASBinCode.rtData.rtUndefined.undefined);
+                    //}
+                    //finally
                     {
                         
 

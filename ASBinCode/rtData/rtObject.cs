@@ -8,8 +8,24 @@ namespace ASBinCode.rtData
     {
 
         public RunTimeScope objScope;
-        public readonly rtti.Object value;
-        
+        public rtti.Object value;
+
+        /// <summary>
+        /// 仅用于创建用于StackSlot的缓存对象。
+        /// </summary>
+        /// <returns></returns>
+        public static rtObject create_cache_linkObject()
+        {
+            return new rtObject();
+        }
+
+        private rtObject() : base(RunTimeDataType.unknown)
+        {
+            
+            value = null;
+            objScope = null;
+        }
+
         public rtObject(rtti.Object v, RunTimeScope scope):base(v._class.classid + RunTimeDataType._OBJECT)
         {
             value = v;
@@ -22,39 +38,89 @@ namespace ASBinCode.rtData
             return double.NaN;
         }
 
-        //public  RunTimeDataType rtType
-        //{
-        //    get
-        //    {
-        //        return value._class.classid+RunTimeDataType._OBJECT;
-        //    }
-        //}
-
-        public void ReplaceValue(rtObject other)
+        /// <summary>
+        /// 仅用于作为cache时，清空缓存
+        /// </summary>
+        public void cache_clear()
         {
-            other.objScope = objScope;
-            ((rtti.LinkSystemObject)other.value).CopyData((rtti.LinkSystemObject)value);
+            value = null;
+            rtType = RunTimeDataType.unknown;
         }
 
-        public sealed override  object Clone()
+        /// <summary>
+        /// 仅用于更新链接的类对象
+        /// </summary>
+        /// <param name="clsType"></param>
+        /// <param name="linkObject"></param>
+        public void cache_setTypeAndLinkObject(rtti.Class clsType,object linkObject)
         {
-            if (value._class.isStruct)
+#if DEBUG
+            if (clsType.isStruct)
             {
-                rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
-                if (lobj.__iscreateout)
+                throw new ASRunTimeException();
+            }
+#endif
+            ((rtti.LinkSystemObject)value).SetLinkData(linkObject);
+            rtType = clsType.classid + RunTimeDataType._OBJECT;
+        }
+
+        public void cache_setValue(ASBinCode.rtti.LinkSystemObject otherValue)
+        {
+            if (otherValue._class.isStruct)
+            {
+                if (rtType == otherValue._class.classid + RunTimeDataType._OBJECT)
                 {
-                    lobj.__iscreateout = false;
-                    return this;
+                    ((rtti.LinkSystemObject)value).CopyStructData(otherValue);
                 }
                 else
                 {
-                    rtObject clone=new rtObject(((rtti.LinkSystemObject)value).Clone(),
-                        //objScope
+                    if (otherValue.__iscreateout)
+                    {
+                        value = otherValue;
+                    }
+                    else
+                    {
+                        value = otherValue.Clone();
+                    }  
+                }
+            }
+            else
+            {
+                value = otherValue;
+            }
+
+            rtType = otherValue._class.classid + RunTimeDataType._OBJECT;
+        }
+
+
+
+
+        //public void ReplaceStructValue(rtObject other)
+        //{
+        //    other.objScope = objScope;
+            
+        //    ((rtti.LinkSystemObject)other.value).CopyStructData((rtti.LinkSystemObject)value);
+        //}
+
+        public sealed override  object Clone()
+        {
+            if (value._class.isLink_System)
+            {
+                rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
+                //if (lobj.__iscreateout)
+                //{
+                    lobj.__iscreateout = false;
+
+                //    return this;
+                //}
+                //else
+                //{
+                    rtObject clone = new rtObject(((rtti.LinkSystemObject)value).Clone(),
                         null
                         );
                     return clone;
 
-                }
+                //}
             }
             else
             {
@@ -74,7 +140,6 @@ namespace ASBinCode.rtData
             }
 
             return value.Equals(o.value);
-            //return base.Equals(obj);
         }
 
 
@@ -83,16 +148,13 @@ namespace ASBinCode.rtData
             return value.GetHashCode();
         }
 
-
-        //public void CopyFrom(rtObject right)
-        //{
-        //    value = right.value;
-        //    objScope = right.objScope;
-
-        //}
-
+        
         public override string ToString()
         {
+            if (value == null)
+            {
+                return string.Empty;
+            }
             return value.ToString();
         }
 

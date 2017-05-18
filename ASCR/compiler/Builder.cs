@@ -104,7 +104,7 @@ namespace ASCompiler.compiler
                 Console.ForegroundColor = ConsoleColor.Red;
 
                 Console.WriteLine("file :" + err.srcFile);
-                Console.WriteLine("line :" + err.line + " ptr :" + err.ptr);
+                Console.WriteLine("line :" + (err.line+1) + " ptr :" + (err.ptr+1));
                 Console.WriteLine(err.errorMsg);
 
                 Console.ResetColor();
@@ -2384,8 +2384,10 @@ namespace ASCompiler.compiler
             
             
             string template= Properties.Resources.Vector;
-            template= template.Replace("Vector.<T>", TC);
-            template = template.Replace("T", ot);
+            template= template.Replace("Vector.<&T>", TC);
+
+            
+            template = template.Replace("&T", ot);
 
             string imports = string.Empty;
 

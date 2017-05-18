@@ -6,6 +6,15 @@ namespace ASBinCode
 {
     public abstract class NativeFunctionBase
     {
+        public enum NativeFunctionMode
+        {
+            normal_0=0,
+            async_0=1,
+
+            normal_1=2,
+
+        }
+
         public abstract string name { get; }
         /// <summary>
         /// 参数定义
@@ -20,14 +29,20 @@ namespace ASBinCode
         
         public IClassFinder bin { get; set; }
 
+
         /// <summary>
         /// 指示是否同步完成
         /// </summary>
-        public virtual bool isAsync
+        //public virtual bool isAsync
+        //{
+        //    get { return false; }
+        //}
+        public virtual NativeFunctionMode mode
         {
-            get { return false; }
+            get { return NativeFunctionMode.normal_0; }
         }
-        
+
+
         /// <summary>
         /// 调用函数
         /// </summary>
@@ -41,5 +56,17 @@ namespace ASBinCode
         {
 
         }
+
+        public virtual void execute2(RunTimeValueBase thisObj, 
+            rtti.FunctionDefine functionDefine,
+            SLOT[] argements, 
+            SLOT   returnSlot,
+            SourceToken token,
+            object stackframe, 
+            out bool success)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

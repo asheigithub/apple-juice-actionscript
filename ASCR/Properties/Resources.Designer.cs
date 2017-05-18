@@ -140,6 +140,21 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public dynamic class AneError extends Error
+        ///	{
+        ///		public function AneError (message:String=&quot;&quot;, id:int=0);
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string AneError {
+            get {
+                return ResourceManager.GetString("AneError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
         ///	public dynamic class ArgumentError extends Error
         ///	{
         ///		public function ArgumentError (message:String=&quot;&quot;, id:int=0);
@@ -215,6 +230,7 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	[_class_]
         ///	[no_constructor]
         ///	public dynamic class Class extends Object
         ///	{
@@ -360,6 +376,7 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package system.collections
         ///{
+        ///	[_IEnumerable_]
         ///	public interface IEnumerable
         ///    {
         ///        function getEnumerator():IEnumerator;
@@ -506,7 +523,7 @@ namespace ASCompiler.Properties {
         ///		private static function _to_string(thisObj:*):String{ return thisObj._v;}
         ///
         ///		[explicit_from]
-        ///		private static function _explicit_from_value(value:*):Object
+        ///		private static function _explicit_from_value(value:*):*
         ///		{
         ///			if(value===undefined)
         ///			{
@@ -522,7 +539,8 @@ namespace ASCompiler.Properties {
         ///
         ///		[implicit_from];
         ///		private static function _from_value(value:String):*
-        ///		{		 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		{		
+        ///			 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string String {
             get {

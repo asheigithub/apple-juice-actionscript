@@ -26,10 +26,8 @@
 			,
 			"valueOf":valueOf
 			,
-			"toLocaleString":function toLocaleString()
-			{
-				return toString();
-			}
+			"toLocaleString":toString
+			
 			,
 			"hasOwnProperty":hasOwnProperty
 			,
@@ -50,7 +48,7 @@
 		
 
 		[explicit_from];
-		private static function _explicit_from_value(value:Object):Object
+		private static function _explicit_from_value(value:Object):*
 		{
 			if(value==null || value==undefined)
 			{

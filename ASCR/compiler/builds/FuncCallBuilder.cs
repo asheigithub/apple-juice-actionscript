@@ -34,7 +34,15 @@ namespace ASCompiler.compiler.builds
                 )
             {
                 RightValueBase rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
+                if (rValue is PackagePathGetter)
+                {
 
+                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                                "类型" + ((PackagePathGetter)rValue).path + "没有找到."
+                            );
+                    
+
+                }
 
 
                 OpStep op = new OpStep(OpCode.call_function,

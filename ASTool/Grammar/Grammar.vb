@@ -469,6 +469,39 @@ Public Class Grammar
 
         '#End Region
 
+        'continue、break、return和throw后跟换行符会添加一个分号
+        For index = 0 To words.Count - 1
+            Dim token = words(index)
+            If token.Type = Token.TokenType.identifier Then
+                If token.StringValue = "continue" Or
+                    token.StringValue = "break" Or
+                    token.StringValue = "return" Or
+                    token.StringValue = "throw" Then
+
+                    '***查询后面到换行直接是否全是空白，如果是则插入一个分号
+
+                    For k = index + 1 To words.Count - 1
+                        Dim nt = words(k)
+                        If nt.Type = Token.TokenType.other And nt.StringValue = ";" Then
+                            Exit For
+                        ElseIf nt.Type = token.TokenType.whitespace And nt.StringValue = vbLf Then
+
+                            nt.Type = Token.TokenType.other
+                            nt.StringValue = ";"
+                            Exit For
+
+                        ElseIf nt.Type = Token.TokenType.comments Then
+
+                        Else
+                            Exit For
+                        End If
+
+                    Next
+
+                End If
+            End If
+        Next
+
 
         '#Region "检测语句label"
 

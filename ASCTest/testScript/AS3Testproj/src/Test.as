@@ -37,7 +37,7 @@ package
 		
 		public function getfunc()
 		{
-			return function() { 
+			return function () { 
 				
 				trace(this);
 				return this;

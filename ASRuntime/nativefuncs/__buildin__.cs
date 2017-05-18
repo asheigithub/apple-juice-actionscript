@@ -114,14 +114,14 @@ namespace ASRuntime.nativefuncs
 
         public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
-            throw new NotImplementedException();
+            throw new ASRunTimeException();
         }
 
-        public override bool isAsync
+        public override NativeFunctionMode mode
         {
             get
             {
-                return true;
+                return  NativeFunctionMode.async_0;
             }
         }
 

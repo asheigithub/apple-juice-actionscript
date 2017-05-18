@@ -115,7 +115,7 @@ namespace ASRuntime
 #if DEBUG
             if (execing)
             {
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
 
             execing = true;
@@ -562,7 +562,7 @@ namespace ASRuntime
 #if DEBUG
             if (!execing)
             {
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
             execing = false;
             
@@ -933,7 +933,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 try块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
             return s.tryid;
         }
@@ -953,7 +953,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 catch块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
             return s.tryid;
         }
@@ -974,7 +974,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 finally块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new InvalidOperationException();
+                throw new ASRunTimeException();
             }
 
 
@@ -1007,7 +1007,7 @@ namespace ASRuntime
         }
 
 
-        internal void throwCastException(ASBinCode.SourceToken token, RunTimeDataType srctype, RunTimeDataType dsttype)
+        public void throwCastException(ASBinCode.SourceToken token, RunTimeDataType srctype, RunTimeDataType dsttype)
         {
             string src = srctype.ToString();
             string dst = dsttype.ToString();
@@ -1043,7 +1043,7 @@ namespace ASRuntime
             }
         }
 
-        internal void throwArgementException(ASBinCode.SourceToken token,string errormessage)
+        public void throwArgementException(ASBinCode.SourceToken token,string errormessage)
         {
             if (player.swc.ErrorClass != null)
             {
@@ -1064,7 +1064,7 @@ namespace ASRuntime
             }
         }
 
-        internal void throwOpException(ASBinCode.SourceToken token, OpCode opcode)
+        public void throwOpException(ASBinCode.SourceToken token, OpCode opcode)
         {
             if (player.swc.ErrorClass != null)
             {
@@ -1091,7 +1091,7 @@ namespace ASRuntime
             runtimeError = err;
         }
 
-        internal void throwError(SourceToken token,int code,string errormessage)
+        public void throwError(SourceToken token,int code,string errormessage)
         {
             if (player.swc.ErrorClass != null)
             {
@@ -1115,6 +1115,26 @@ namespace ASRuntime
             
         }
 
+        public void throwAneException(ASBinCode.SourceToken token, string errormessage)
+        {
+            if (player.swc.ErrorClass != null)
+            {
+                //***直接开上帝视角从对象里取值赋值***
+                var errorinstance =
+                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[3].getValue());
+
+                errorinstance.value.memberData[0].directSet(new rtString(errormessage));
+                errorinstance.value.memberData[1].directSet(new rtString("AneError"));
+                errorinstance.value.memberData[2].directSet(new rtInt(10001));
+                errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
+                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+
+            }
+            else
+            {
+                runtimeError = (new error.InternalError(token, errormessage));
+            }
+        }
 
         private bool isclosed;
         /// <summary>

@@ -16,28 +16,57 @@ namespace ASBinCode.rtti
             value = v;
         }
 
+        public override string ToString()
+        {
+            return value.ToString();
+        }
+
         public override LinkSystemObject Clone()
         {
             return new LinkObj<T>(_class, value);
         }
 
-        public override void CopyData(LinkSystemObject other)
+        public override void CopyStructData(LinkSystemObject other)
         {
             value = ((LinkObj<T>)other).value;
         }
 
+        public override void SetLinkData( object linkvalue)
+        {
+            value = (T)linkvalue;
+        }
+
+
+        
+        public override object GetLinkData()
+        {
+            return value;
+        }
 
         public sealed override bool Equals(object obj)
         {
-            LinkObj<T> r = obj as LinkObj<T>;
-            if (r == null)
+            
+            LinkObj<T> other = obj as LinkObj<T>;
+            if (other != null)
             {
-                return false;
+                return Equals(other.value, value);
+            }
+            else
+            {
+                LinkObj<object> o2 = obj as LinkObj<object>;
+                if (o2 != null)
+                {
+                    return Equals(value,o2.value);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
-            return Equals(value, r.value);
-
         }
+
+        
 
 
 
@@ -52,9 +81,9 @@ namespace ASBinCode.rtti
     public abstract class LinkSystemObject : Object
     {
         /// <summary>
-        /// 是否是刚new出来的。刚new出来的第一次赋值是不需要Clone的
+        /// 是否是刚new出来的。刚new出来的第一次被heapslot调用clone后，就会设置这个值为false
         /// </summary>
-        public bool __iscreateout;
+        internal bool __iscreateout;
 
         public LinkSystemObject(Class _class):base(_class)
         {
@@ -64,18 +93,13 @@ namespace ASBinCode.rtti
         public abstract LinkSystemObject Clone();
 
         
-        public abstract void CopyData(LinkSystemObject other);
+        public abstract void CopyStructData(LinkSystemObject other);
 
-        public T getLinkedObject<T>()
-        {
-            LinkObj<T> t = this as LinkObj<T>;
-            if (t == null)
-            {
-                return default(T);
-            }
-            return t.value;
-        }
-
-
+        public abstract void SetLinkData( object linkvalue);
+        /// <summary>
+        /// 获取链接的对象
+        /// </summary>
+        /// <returns></returns>
+        public abstract object GetLinkData();
     }
 }

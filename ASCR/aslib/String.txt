@@ -9,7 +9,7 @@
 		private static function _to_string(thisObj:*):String{ return thisObj._v;}
 
 		[explicit_from]
-		private static function _explicit_from_value(value:*):Object
+		private static function _explicit_from_value(value:*):*
 		{
 			if(value===undefined)
 			{

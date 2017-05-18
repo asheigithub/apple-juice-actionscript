@@ -55,3 +55,5 @@
 var err:Error=new Error();
 var typeerr:TypeError=new TypeError();
 var argementerr:ArgumentError=new ArgumentError();
+var aneerr:AneError=new AneError();
+

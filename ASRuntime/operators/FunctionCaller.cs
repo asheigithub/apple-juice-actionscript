@@ -221,7 +221,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                throw new InvalidOperationException("解释器内部错误，参数类型检查");
+                throw new ASRunTimeException("解释器内部错误，参数类型检查");
                 //invokerFrame.throwCastException(token, ((RunTimeValueBase)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
                 //return;
             }
@@ -315,17 +315,18 @@ namespace ASRuntime.operators
                     toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
                 }
 
-                string errormsg;
-                int errorno;
+                
 
                 var nf = player.swc.nativefunctions[toCallFunc.native_index];
                 nf.bin = player.swc;
 
-                if (!nf.isAsync)
+                if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_0)
                 {
+                    string errormsg;
+                    int errorno;
                     var result = nf.execute(
                         function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
-                        CallFuncHeap,invokerFrame,
+                        CallFuncHeap, invokerFrame,
                         out errormsg,
                         out errorno
                         );
@@ -342,12 +343,38 @@ namespace ASRuntime.operators
                     else
                     {
                         invokerFrame.throwError(
-                            token,0, errormsg
+                            token, 0, errormsg
                             );
 
                         invokerFrame.endStep();
                     }
 
+                }
+                else if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_1)
+                {
+                    bool success;
+
+                    nf.execute2(
+                        function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+                        toCallFunc,
+                        CallFuncHeap, 
+                        returnSlot,
+                        token,
+                        invokerFrame,
+                        out success
+                        );
+
+                    if (success)
+                    {
+                        if (callbacker != null)
+                        {
+                            callbacker.call(callbacker.args);
+                        }
+                    }
+                    else
+                    {
+                        invokerFrame.endStep();
+                    }
                 }
                 else
                 {

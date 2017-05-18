@@ -605,8 +605,19 @@ namespace ASCompiler.compiler.builds
                                             }
                                             else
                                             {
-                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                    function.signature.parameters[0].type.ToString() + "的类型转换不明确"); //将来做了继承后可能会改为Object
+                                                if (iclass.instanceClass.isLink_System
+                                                    &&
+                                                    iclass.instanceClass.classid > builder.bin.primitive_to_class_table[function.signature.parameters[0].type].classid
+                                                    &&
+                                                    iclass.final
+                                                    )
+                                                {
+                                                }
+                                                else
+                                                {
+                                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                        function.signature.parameters[0].type.ToString() + "的类型转换不明确"); //将来做了继承后可能会改为Object
+                                                }
                                             }
                                             //as3function.TypeStr = iclass.instanceClass.name;
                                             break;
@@ -651,10 +662,10 @@ namespace ASCompiler.compiler.builds
                                     //    "explicit_from特性函数必须有1个参数,且确定为原始数据类型");
                                     //}
 
-                                    if (function.signature.returnType != RunTimeDataType._OBJECT)
+                                    if (function.signature.returnType != RunTimeDataType.rt_void)
                                     {
                                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                        "explicit_from特性函数返回类型必须是Object");
+                                        "explicit_from特性函数返回类型必须是*");
                                     }
 
                                     for (int j = 0; j < iclass.classMembers.Count; j++)
@@ -707,10 +718,10 @@ namespace ASCompiler.compiler.builds
                                         "creator特性函数的参数必须是要创建的Class");
                                     }
 
-                                    if (function.signature.returnType != RunTimeDataType._OBJECT)
+                                    if (function.signature.returnType != RunTimeDataType.rt_void)
                                     {
                                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                        "creator特性函数返回类型必须是Object");
+                                        "creator特性函数返回类型必须是*");
                                     }
 
                                     for (int j = 0; j < iclass.classMembers.Count; j++)

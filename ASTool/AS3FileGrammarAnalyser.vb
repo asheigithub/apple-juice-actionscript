@@ -1199,11 +1199,11 @@ Public Class AS3FileGrammarAnalyser
             If funcprop.Nodes(1).Nodes.Count = 0 Then
                 func.Name = funcprop.Nodes(0).MatchedToken.StringValue
 
-                If (funcprop.Nodes(0).Nodes.Count = 0) Then
-                    func.IsAnonymous = True
-                    func.IsMethod = False
-                    func.Access.IsStatic = False
-                End If
+                'If (funcprop.Nodes(0).Nodes.Count = 0) Then
+                '    func.IsAnonymous = True
+                '    func.IsMethod = False
+                '    func.Access.IsStatic = False
+                'End If
 
             Else
                 If funcprop.Nodes(0).MatchedToken.StringValue = "get" Then
@@ -1263,11 +1263,21 @@ Public Class AS3FileGrammarAnalyser
 
         MemberScopeStack.Pop()
 
+
         If func_anonymous() Then
             func.Name = String.Empty
             func.IsAnonymous = True
 
+        Else
+            If func.IsAnonymous Then
+                If Not current_expression_canfunctioninvoke.Peek() And current_expression_canfunctioninvoke.Count < 3 Then
+                    Throw New GrammarException(node.MatchedToken, "'function' is not allowed here")
+                End If
+            End If
+
         End If
+
+
 
 
         '***Unit部分
@@ -1331,7 +1341,60 @@ Public Class AS3FileGrammarAnalyser
 
 
     Sub _EatAnSemicolon(node As GrammerExpr)
+        Dim mt = node.MatchedToken
 
+        If Not mt.preToken Is Nothing AndAlso mt.preToken.StringValue = vbLf Then
+
+        ElseIf node.Parent.Parent.SelectGrammerLine.Derivation(0).Name = "Stmt" Then
+            If mt.StringValue <> ";" Then
+                If mt.StringValue <> vbLf Then
+
+                    If mt.Type = Token.TokenType.other Then
+
+                        Dim nt = mt.nextToken
+
+                        While Not nt Is Nothing
+
+                            If nt.StringValue = ";" Then
+                                Exit While
+                            ElseIf nt.sourceFile = vbLf Then
+                                Exit While
+                            ElseIf nt.Type = Token.TokenType.comments Then
+                            ElseIf nt.Type = Token.TokenType.whitespace Then
+                            Else
+                                Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+                            End If
+
+
+                            nt = nt.nextToken
+                        End While
+                    Else
+                        Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+
+                    End If
+
+
+                End If
+                End If
+        End If
+
+
+
+
+        'If node.MatchedToken.StringValue <> ";" Then
+        '    '***查找后面是否有;
+
+        '    Dim pretoken = node.MatchedToken.preToken
+        '    While (Not pretoken Is Nothing) AndAlso (Not pretoken.StringValue = ";") AndAlso (pretoken.Type = Token.TokenType.whitespace Or pretoken.Type = Token.TokenType.comments)
+        '        pretoken = pretoken.preToken
+        '    End While
+        '    If Not Equals(pretoken, node.MatchedToken.preToken) Then
+        '        If pretoken.line = node.MatchedToken.line And (node.MatchedToken.Type = Token.TokenType.identifier Or node.MatchedToken.Type = Token.TokenType.const_number Or node.MatchedToken.Type = Token.TokenType.const_string) Then
+        '            Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+        '        End If
+
+        '    End If
+        'End If
 
         memberaccessStack.Clear()
 
@@ -1684,6 +1747,9 @@ Public Class AS3FileGrammarAnalyser
         Dim as3return As New AS3Return(node.MatchedToken)
 
         If node.Nodes(1).Nodes.Count > 0 Then
+
+            push_func_anonymous(node.Nodes(1))
+
             Dim as3stmt = New AS3StmtExpressions(node.MatchedToken)
 
             VisitNodes(node.Nodes(1).Nodes(0))
@@ -1691,6 +1757,8 @@ Public Class AS3FileGrammarAnalyser
             as3stmt.as3exprlist = currentparseExprListStack.Pop()
 
             as3return.ReturnValue = as3stmt
+
+            pop_func_anonymous()
 
         End If
 
@@ -1796,15 +1864,15 @@ Public Class AS3FileGrammarAnalyser
         If node.Nodes(2).Nodes.Count > 0 Then
             Dim expr As New AS3Expression(node.Nodes(2).Nodes(1).MatchedToken)
 
-            If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
-                push_func_anonymous(node.Nodes(2))
-            End If
+            'If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
+            push_func_anonymous(node.Nodes(2))
+            'End If
 
             VisitNodes(node.Nodes(2).Nodes(1))
 
-            If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
-                pop_func_anonymous()
-            End If
+            'If (TypeOf MemberScopeStack.Peek() Is AS3Function) Then
+            pop_func_anonymous()
+            'End If
 
             expr.exprStepList = node.Nodes(2).Nodes(1).exprsteplist
 

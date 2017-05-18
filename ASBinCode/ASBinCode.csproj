@@ -37,6 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASRunTimeException.cs" />
     <Compile Include="ClassMemberFinder.cs" />
     <Compile Include="ClassMethodGetter.cs" />
     <Compile Include="HeapSlot.cs" />

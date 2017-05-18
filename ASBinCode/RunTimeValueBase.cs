@@ -9,7 +9,7 @@ namespace ASBinCode
     /// </summary>
     public abstract class RunTimeValueBase:ICloneable
     {
-        public readonly RunTimeDataType  rtType;
+        public RunTimeDataType  rtType;
 
         public RunTimeValueBase(RunTimeDataType rtType)
         {

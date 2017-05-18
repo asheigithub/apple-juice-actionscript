@@ -528,7 +528,23 @@ namespace ASRuntime.operators
                     //***从基本类型转换为引用类型***
                     if (srcValue.rtType != RunTimeDataType.rt_void)
                     {
+                        
                         var cls = frame.player.swc.primitive_to_class_table[srcValue.rtType].staticClass;
+
+                        if (cls == null || !((ClassMemberFinder.check_isinherits(cls.instanceClass.getRtType()
+                                ,
+                                targetType, frame.player.swc))))
+                        {
+                            var targetCls = frame.player.swc.getClassByRunTimeDataType(targetType);
+                            if (targetCls.staticClass != null &&
+
+                                TypeConverter.testImplicitConvert(srcValue.rtType,
+                                targetCls.staticClass.implicit_from_type, null))
+                            {
+                                cls = targetCls.staticClass;
+                            }
+                        }
+
                         if (cls != null)
                         {
                             if (ClassMemberFinder.check_isinherits(cls.instanceClass.getRtType()
@@ -536,13 +552,22 @@ namespace ASRuntime.operators
                                 targetType, frame.player.swc))
                             {
                                 var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getImplicitConvertFunction(scope);
+                                
+                                if (!operators.InstanceCreator.init_static_class(cls.instanceClass,frame.player,token))
+                                {
+                                    return;
+                                }
+                                
+
+
+                                funConv.setThis(frame.player.static_instance[cls.classid]);
 
                                 FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                                 fc.function = funConv;
                                 fc.loadDefineFromFunction();
                                 fc.createParaScope();
                                 bool success;
-                                fc.pushParameter(srcValue, 0,out success);
+                                fc.pushParameter(srcValue, 0, out success);
                                 fc._tempSlot = frame._tempSlot1;
                                 fc.returnSlot = storeto;
 
@@ -570,7 +595,7 @@ namespace ASRuntime.operators
                                 frame.throwCastException(token, srcValue.rtType, targetType);
                                 frame.endStep();
                             }
-                        }
+                        }     
                         else
                         {
                             frame.throwCastException(token, srcValue.rtType, targetType);
@@ -791,6 +816,12 @@ namespace ASRuntime.operators
                 if (cls != null)
                 {
                     var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getImplicitConvertFunction(scope);
+                    if (!operators.InstanceCreator.init_static_class(cls.instanceClass, frame.player, token))
+                    {
+                        return;
+                    }
+
+                    funConv.setThis(frame.player.static_instance[cls.classid]);
 
                     FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
                     fc.function = funConv;

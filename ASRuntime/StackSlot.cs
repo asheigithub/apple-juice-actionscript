@@ -9,7 +9,7 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    sealed class StackSlot : SLOT
+    public sealed class StackSlot : SLOT
     {
         public StackSlot(IClassFinder classfinder)
         {
@@ -18,6 +18,8 @@ namespace ASRuntime
 
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
             _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
+
+            _cache_linksystemObject = rtObject.create_cache_linkObject();
 
             //存储器设置初始值
             for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
@@ -39,15 +41,16 @@ namespace ASRuntime
         private rtInt _intValue;
         private rtUInt _uintValue;
 
-
-        //internal object cache_enumerator;
-
+        
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
 
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
+
+        internal rtObject _cache_linksystemObject;
+
 
         internal SLOT linktarget;
         public void linkTo(SLOT linktarget)
@@ -87,9 +90,7 @@ namespace ASRuntime
                 if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
                 {
                     index = RunTimeDataType._OBJECT;
-                }
-                //store[index] = value;
-
+                }               
                 //值类型必须拷贝!!否则值可能被其他引用而导致错误
                 //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
                 switch (value.rtType)
@@ -146,8 +147,18 @@ namespace ASRuntime
                         break;
                     default:
                         {
-                            store[RunTimeDataType._OBJECT] = value;
-                            
+                            rtObject obj = (rtObject)value;
+                            if (obj.value._class.isLink_System) 
+                            {
+                                //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
+                                //要重新创建rtObject,而是直接更新缓存的rtObject.
+                                _cache_linksystemObject.cache_setValue((ASBinCode.rtti.LinkSystemObject)obj.value);
+                                store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+                            }
+                            else
+                            {
+                                store[RunTimeDataType._OBJECT] = value;
+                            }
                         }
                         break;
                 }
@@ -155,6 +166,50 @@ namespace ASRuntime
             }
             
         }
+
+        //仅用于链接对象的赋值更新
+        public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player ,T value)
+        {
+            index = RunTimeDataType._OBJECT;
+
+            if (_cache_linksystemObject.rtType == clsType.getRtType())
+            {
+                ((ASBinCode.rtti.LinkObj<T>)_cache_linksystemObject.value).value = value;
+            }
+            else
+            {
+                if (clsType.isStruct 
+                    )
+                {
+                    var lk = player.alloc_LinkObjValue(clsType);
+                    ((ASBinCode.rtti.LinkObj<T>)lk).value = value;
+                    _cache_linksystemObject.cache_setValue(lk);
+                }
+                else
+                {
+                    if (
+                        _cache_linksystemObject.rtType == RunTimeDataType.unknown
+                        || 
+                        _cache_linksystemObject.value._class.isStruct)
+                    {
+                        var lk = player.alloc_LinkObjValue(clsType);
+                        ((ASBinCode.rtti.LinkObj<object>)lk).value = value;
+                        _cache_linksystemObject.cache_setValue(lk);
+                    }
+                    else
+                    {
+                        _cache_linksystemObject.cache_setTypeAndLinkObject(clsType, value);
+                    }
+
+                    
+                }
+                
+            }
+
+
+            store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+        }
+
 
         public sealed override RunTimeValueBase getValue()
         {
@@ -283,11 +338,11 @@ namespace ASRuntime
             propGetSet = null;
             propBindObj = null;
             superPropBindClass = null;
-            //cache_enumerator = null;
-            //fromArray = null;
-            //fromArrayIndex = -1;
+            
             _cache_vectorSlot.clear();
             _cache_prototypeSlot.clear();
+            _cache_linksystemObject.cache_clear();
+
 
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;
