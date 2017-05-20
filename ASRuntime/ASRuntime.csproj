@@ -49,6 +49,7 @@
     <Compile Include="nativefuncs\Function_buildin.cs" />
     <Compile Include="nativefuncs\Int_buildin.cs" />
     <Compile Include="nativefuncs\LinkSystem_buildin.cs" />
+    <Compile Include="nativefuncs\NativeConstParameterFunction.cs" />
     <Compile Include="nativefuncs\Number_buildin.cs" />
     <Compile Include="nativefuncs\Object_buildin.cs" />
     <Compile Include="nativefuncs\String_buildin.cs" />

@@ -1132,6 +1132,27 @@ namespace ASCompiler.compiler
                 }
                 _toEvalDefaultParameters.Clear();
             }
+            ASBinCode.rtti.FunctionDefine outf;
+            if (!bin.operatorOverrides.Check(out outf))
+            {
+                foreach (var item in buildoutfunctions)
+                {
+                    if (item.Value == outf)
+                    {
+                        pushBuildError(
+                            new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile, 
+                            ">,<,==,!=,>=,<=必须同时重载")
+                            );
+
+
+                        break;
+                    }
+                }
+
+
+
+
+            }
         }
 
 

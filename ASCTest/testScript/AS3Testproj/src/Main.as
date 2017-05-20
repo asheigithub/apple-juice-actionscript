@@ -61,6 +61,7 @@ package
 			//
 			trace(Int64.MaxValue);
 			trace(Int64.MinValue);
+			
 			//
 			//trace(k.equals(Int64.MaxValue));
 			//
@@ -124,24 +125,23 @@ package
 			trace(v);
 			
 			
-			var values = [ "000000006", "12.12:12:12.12345678" ];
-			for each (var s:String in values)
-			{
-			   try {
-				  var interval = TimeSpan.parse(s);
-				  trace("{0} --> {1}", s, interval);
-			   }   
-			   catch (e:Error) {
-				  trace("{0}: Bad Format", s);
-			   }   
-			   
-			}
+			//var values = [ "000000006", "12.12:12:12.12345678" ];
+			//for each (var s:String in values)
+			//{
+			   //try {
+				  //var interval = TimeSpan.parse(s);
+				  //trace("{0} --> {1}", s, interval);
+			   //}   
+			   //catch (e:Error) {
+				  //trace("{0}: Bad Format", s);
+			   //}   
+			   //
+			//}
 
 			
 			trace(TimeSpan.Zero);
 			
-			trace(TimeSpan.greaterThan( TimeSpan.Zero,tt ));
-			
+			trace(TimeSpan.Zero>tt);
 			
 			/*
 			yield 是从.net2.0语法中移植过来，可自动生成一个可枚举对象的语法。每次yield return都可以返回一个值

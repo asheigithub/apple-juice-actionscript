@@ -62,6 +62,9 @@ namespace ASBinCode
         /// </summary>
         public Class DictionaryClass;
 
+
+        public OperatorFunctions operatorOverrides;
+
         public CSWC()
         {
             for (int i = 0; i < RunTimeDataType.unknown; i++)
@@ -70,7 +73,8 @@ namespace ASBinCode
             }
 
             loadBuildinNativeFunctions();
-            
+
+            operatorOverrides = new OperatorFunctions();
         }
 
         public void regNativeFunction(NativeFunctionBase nativefunction)

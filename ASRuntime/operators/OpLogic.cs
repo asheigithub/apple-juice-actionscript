@@ -732,6 +732,26 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
+
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.GreatherThan, v1.rtType, v2.rtType);
+            if(f !=null)
+            {
+                
+                FunctionCaller fc = new FunctionCaller(frame.player, frame, step.token);
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+                
+                return;
+            }
+
+
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GTVoid_ValueOf_CallBacker);
         }
         private static void _GTVoid_ValueOf_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)

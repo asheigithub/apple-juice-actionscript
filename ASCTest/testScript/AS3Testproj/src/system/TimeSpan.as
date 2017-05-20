@@ -24,10 +24,10 @@ package system
 		
 		
 		
-		
-		[native, _system_TimeSpan_operator_greaterThan]
-		public static function greaterThan(t1:TimeSpan,t2:TimeSpan):Boolean;
-		
+		//[operator,">"];
+		//[native, _system_TimeSpan_operator_greaterThan];
+		//private static function greaterThan(t1:TimeSpan,t2:TimeSpan):Boolean;
+		//
 		
 		
 		

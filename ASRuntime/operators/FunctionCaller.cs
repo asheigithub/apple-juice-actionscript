@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASRuntime.operators
 {
-    class FunctionCaller
+    class FunctionCaller : IBlockCallBack
     {
         private HeapSlot[] CallFuncHeap;
 
@@ -40,10 +40,24 @@ namespace ASRuntime.operators
 
         public void createParaScope()
         {
-            
-            ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature;
+            if (toCallFunc.isNative)
+            {
+                if (toCallFunc.native_index < 0)
+                {
+                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+                }
+                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+                nf.bin = player.swc;
+                if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+                {
+                    ((nativefuncs.NativeConstParameterFunction)nf).prepareParameter(toCallFunc);
 
-            
+                    return;
+                }
+            }
+
+            ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature; 
+
             CallFuncHeap =
                 player.genHeapFromCodeBlock(player.swc.blocks[toCallFunc.blockid]);
 
@@ -98,6 +112,27 @@ namespace ASRuntime.operators
 
         public void pushParameter(RunTimeValueBase argement,int id,out bool success)
         {
+            if (toCallFunc.isNative)
+            {
+                if (toCallFunc.native_index < 0)
+                {
+                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+                }
+                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+                nf.bin = player.swc;
+                if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+                {
+                    ((nativefuncs.NativeConstParameterFunction)nf).pushParameter(toCallFunc, id, argement, 
+                        token,invokerFrame, out success);
+                    if (success)
+                    {
+                        pushedArgs++;
+                    }
+                    return;
+                }
+            }
+
+
             if (toCallFunc.signature.parameters.Count > 0 || toCallFunc.IsAnonymous)
             {
                 bool lastIsPara = false;
@@ -175,14 +210,41 @@ namespace ASRuntime.operators
             }
         }
 
-        private int check_para_id = 0;
+        private RunTimeValueBase getToCheckParameter(int para_id)
+        {
+            if (toCallFunc.isNative)
+            {
+                if (toCallFunc.native_index < 0)
+                {
+                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+                }
+                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+                nf.bin = player.swc;
+                if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+                {
+                    return ((nativefuncs.NativeConstParameterFunction)nf).getToCheckParameter(para_id);
+                }
+            }
 
-        BlockCallBackBase cb;
+            return CallFuncHeap[para_id].getValue();
+
+        }
+        private void setCheckedParameter(int para_id,RunTimeValueBase value)
+        {
+            CallFuncHeap[para_id].directSet(value);
+        }
+
+
+        private int check_para_id = 0;
+        BlockCallBackBase cb=new BlockCallBackBase();
+
+        
         private void check_para()
         {
             while (check_para_id < pushedArgs)
             {
-                RunTimeValueBase argement = CallFuncHeap[check_para_id].getValue();
+                //RunTimeValueBase argement = CallFuncHeap[check_para_id].getValue();
+                RunTimeValueBase argement = getToCheckParameter(check_para_id);
                 if (argement.rtType != toCallFunc.signature.parameters[check_para_id].type
                     &&
                     toCallFunc.signature.parameters[check_para_id].type != RunTimeDataType.rt_void
@@ -216,7 +278,8 @@ namespace ASRuntime.operators
         {
             if (sender.isSuccess)
             {
-                CallFuncHeap[sender._intArg].directSet(_tempSlot.getValue());
+                //CallFuncHeap[sender._intArg].directSet(_tempSlot.getValue());
+                setCheckedParameter(sender._intArg, _tempSlot.getValue());
                 check_para();
             }
             else
@@ -357,7 +420,7 @@ namespace ASRuntime.operators
                     nf.execute2(
                         function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
                         toCallFunc,
-                        CallFuncHeap, 
+                        CallFuncHeap,
                         returnSlot,
                         token,
                         invokerFrame,
@@ -376,7 +439,7 @@ namespace ASRuntime.operators
                         invokerFrame.endStep();
                     }
                 }
-                else
+                else if (nf.mode == NativeFunctionBase.NativeFunctionMode.async_0)
                 {
                     nf.executeAsync(function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
                         CallFuncHeap,
@@ -387,6 +450,33 @@ namespace ASRuntime.operators
                         function.bindScope
                         );
                 }
+                else if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+                {
+                    bool success;
+
+                    ((nativefuncs.NativeConstParameterFunction)nf).execute3(
+                        function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+                        toCallFunc,
+                        returnSlot,
+                        token,
+                        invokerFrame,
+                        out success
+                        );
+
+                    ((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
+
+                    if (success)
+                    {
+                        if (callbacker != null)
+                        {
+                            callbacker.call(callbacker.args);
+                        }
+                    }
+                    else
+                    {
+                        invokerFrame.endStep();
+                    }
+                }
             }
         }
 
@@ -396,7 +486,22 @@ namespace ASRuntime.operators
             check_para();
         }
 
-        
+        object IBlockCallBack.args
+        {
+            get
+            {
+                return null;
+            }
 
+            set
+            {
+                ;
+            }
+        }
+
+        void IBlockCallBack.call(object args)
+        {
+            invokerFrame.endStep();
+        }
     }
 }

@@ -150,7 +150,7 @@ namespace ASRuntime
 
             while (true)
             {
-                try
+                //try
                 {
                     while (step())
                     {
@@ -158,44 +158,44 @@ namespace ASRuntime
                     }
                     break;
                 }
-                catch (ASRunTimeException)   //引擎抛出的异常直接抛出
-                {
-                    throw;
-                }
-                catch (StackOverflowException)
-                {
-                    throw;
-                }
-                catch (OutOfMemoryException)
-                {
-                    throw;
-                }
-                catch (Exception le)    //捕获外部函数异常
-                {
-                    if (currentRunFrame != null)
-                    {
-                        SourceToken token;
+                //catch (ASRunTimeException)   //引擎抛出的异常直接抛出
+                //{
+                //    throw;
+                //}
+                //catch (StackOverflowException)
+                //{
+                //    throw;
+                //}
+                //catch (OutOfMemoryException)
+                //{
+                //    throw;
+                //}
+                //catch (Exception le)    //捕获外部函数异常
+                //{
+                //    if (currentRunFrame != null)
+                //    {
+                //        SourceToken token;
 
-                        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
-                        {
-                            token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
-                        }
-                        else
-                        {
-                            token = new SourceToken(0, 0, string.Empty);
-                        }
+                //        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
+                //        {
+                //            token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
+                //        }
+                //        else
+                //        {
+                //            token = new SourceToken(0, 0, string.Empty);
+                //        }
 
-                        currentRunFrame.throwAneException(token
-                            , le.Message);
-                        currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
+                //        currentRunFrame.throwAneException(token
+                //            , le.Message);
+                //        currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
 
-                        continue;
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                //        continue;
+                //    }
+                //    else
+                //    {
+                //        throw;
+                //    }
+                //}
             }
             
 

@@ -11,9 +11,9 @@ namespace ASCTest
     {
         public void registrationFunction(CSWC bin)
         {
-            bin.regNativeFunction(new enumitem_create());
-            bin.regNativeFunction(new enumitem_tostring());
-            bin.regNativeFunction(new enumitem_valueof());
+            //bin.regNativeFunction(new enumitem_create());
+            //bin.regNativeFunction(new enumitem_tostring());
+            //bin.regNativeFunction(new enumitem_valueof());
 
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Object_creator__", default(object)));
             bin.regNativeFunction(new system_object_ctor());
@@ -22,6 +22,33 @@ namespace ASCTest
             bin.regNativeFunction(LinkSystem_Buildin.getEquals("_system_Object_equals"));
             bin.regNativeFunction(new object_static_equals());
             bin.regNativeFunction(new object_static_referenceEquals());
+
+            bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DateTimeKind_creator__", default(DateTimeKind)));
+            bin.regNativeFunction(new system_DateTimeKind_ctor());
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DateTimeKind_Local_getter"
+                ,
+                () => { return DateTimeKind.Local; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DateTimeKind_Unspecified_getter"
+                ,
+                () => { return DateTimeKind.Unspecified; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DateTimeKind_Utc_getter"
+                ,
+                () => { return DateTimeKind.Utc; }
+                )
+                );
+
+
+
+
+
+
 
 
 

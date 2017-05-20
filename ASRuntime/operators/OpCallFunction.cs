@@ -216,12 +216,12 @@ namespace ASRuntime.operators
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-
-                frame.funCaller = new FunctionCaller(frame.player, frame, step.token);
-                frame.funCaller.function = function;
-                frame.funCaller._tempSlot = frame._tempSlot1;
-                frame.funCaller.loadDefineFromFunction();
-                frame.funCaller.createParaScope();
+                var funcCaller = new FunctionCaller(frame.player, frame, step.token);
+                funcCaller.function = function;
+                funcCaller._tempSlot = frame._tempSlot1;
+                funcCaller.loadDefineFromFunction();
+                funcCaller.createParaScope();
+                frame.funCaller = funcCaller;
             }
             frame.endStep(step);
         }
@@ -343,13 +343,13 @@ namespace ASRuntime.operators
 
             if (frame.typeconvertoperator == null)
             {
-                funbacker cb = new funbacker();
-                object[] args = new object[2];
-                args[0] = frame;
-                args[1] = step;
-                cb.args = args;
+                //funbacker cb = new funbacker();
+                //object[] args = new object[2];
+                //args[0] = frame;
+                //args[1] = step;
+                //cb.args = args;
 
-                frame.funCaller.callbacker = cb;
+                frame.funCaller.callbacker = frame.funCaller;
                 frame.funCaller.returnSlot = step.reg.getSlot(frame.scope);
                 frame.funCaller.call();
 
@@ -390,23 +390,23 @@ namespace ASRuntime.operators
         }
 
 
-        class funbacker : IBlockCallBack
-        {
-            public object args
-            {
-                get
-                ;
+        //class funbacker : IBlockCallBack
+        //{
+        //    public object args
+        //    {
+        //        get
+        //        ;
 
-                set
-                ;
-            }
+        //        set
+        //        ;
+        //    }
 
-            public void call(object args)
-            {
-                object[] a = (object[])args;
-                ((StackFrame)a[0]).endStep((OpStep)a[1]);
-            }
-        }
+        //    public void call(object args)
+        //    {
+        //        object[] a = (object[])args;
+        //        ((StackFrame)a[0]).endStep((OpStep)a[1]);
+        //    }
+        //}
 
 
         public static void exec_return(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)

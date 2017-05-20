@@ -436,7 +436,24 @@ namespace ASRuntime.nativefuncs
             else
             {
                 string search = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
-                int st = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+                double  sst = TypeConverter.ConvertToNumber(argements[1].getValue());
+
+                int st;
+                if (double.IsNaN(sst))
+                {
+                    st = 0x7FFFFFFF;
+                }
+                else
+                {
+                    st = (int)sst;
+                }
+
+                //****坑****
+                //var text = 'Mississippi';
+                //var p = text.lastIndexOf('ss', 5);
+                //p=5  !!!
+
+                st = st + search.Length;
 
                 if (st < 0) st = 0;
                 if (st > b.Length) { st = b.Length; }

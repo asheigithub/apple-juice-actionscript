@@ -808,7 +808,7 @@ namespace ASCompiler.compiler.builds
                                                 !(
                                                     signature.returnType > RunTimeDataType.unknown
                                                     &&
-                                                    nf.returnType== RunTimeDataType.rt_void
+                                                    nf.returnType == RunTimeDataType.rt_void
                                                 )
                                                 )
                                             {
@@ -832,7 +832,7 @@ namespace ASCompiler.compiler.builds
                                                     &&
                                                     !(signature.parameters[j].isPara && nf.parameters[j] == RunTimeDataType.rt_array)
                                                     &&
-                                                    !(signature.parameters[j].type>RunTimeDataType._OBJECT && nf.parameters[j] == RunTimeDataType.rt_void)
+                                                    !(signature.parameters[j].type > RunTimeDataType._OBJECT && nf.parameters[j] == RunTimeDataType.rt_void)
                                                     )
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
@@ -859,6 +859,122 @@ namespace ASCompiler.compiler.builds
                                 {
                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                         "native特性需要说明对应的本地函数。用[native,XXXX]格式指定");
+                                }
+                            }
+                            else if (meta == "operator")
+                            {
+                                if (data.Count == 2)
+                                {
+                                    string operatorCode = data[1].Data.Value.ToString();
+                                    if (isoutclass)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                            "operator特性不能在包外定义");
+                                    }
+                                    else
+                                    {
+                                        ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                        if (iclass.instanceClass == null)
+                                        {
+                                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                            "operator特性只能定义在静态方法上");
+                                        }
+                                        if (!as3function.Access.IsPrivate)
+                                        {
+                                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                            "operator特性必须为private");
+                                        }
+                                        if (operatorCode == ">")
+                                        {
+                                            #region >
+
+                                            if (function.signature.returnType != RunTimeDataType.rt_boolean)
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                     "操作符>必须返回Boolean值");
+                                            }
+                                            if (function.signature.parameters.Count != 2)
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                     "操作符>参数必须是2个");
+                                            }
+                                            if (function.signature.parameters[0].defaultValue != null
+                                                ||
+                                                function.signature.parameters[1].defaultValue != null
+                                                ||
+                                                function.signature.parameters[1].isPara
+                                                )
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                     "操作符>参数不能有默认值，也不能是不固定数量");
+                                            }
+                                            if (function.signature.parameters[0].type == RunTimeDataType.rt_void
+                                                ||
+                                                function.signature.parameters[1].type == RunTimeDataType.rt_void
+                                                )
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                     "操作符>参数类型必须确定");
+                                            }
+                                            if (function.signature.parameters[0].type < RunTimeDataType.unknown
+                                                ||
+                                                function.signature.parameters[1].type < RunTimeDataType.unknown
+                                                )
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                     "操作符>参数不能都是基本类型");
+                                            }
+                                            if (function.signature.parameters[0].type > RunTimeDataType.unknown
+                                                )
+                                            {
+                                                var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
+                                                if (cls.staticClass == null || !cls.final)
+                                                {
+                                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                         "操作符>参数类型必须是final的并且不是Class");
+                                                }
+                                            }
+                                            if (function.signature.parameters[1].type > RunTimeDataType.unknown
+                                                )
+                                            {
+                                                var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
+                                                if (cls.staticClass == null || !cls.final)
+                                                {
+                                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                         "操作符>参数类型必须是final的并且不是Class");
+                                                }
+                                            }
+
+                                            if (builder.bin.operatorOverrides.getOperatorFunction(OverrideableOperator.GreatherThan,
+                                                function.signature.parameters[0].type,
+                                                function.signature.parameters[1].type
+                                                ) == null
+                                                )
+                                            {
+                                                builder.bin.operatorOverrides.AddOperatorFunction(OverrideableOperator.GreatherThan, function);
+                                            }
+                                            else
+                                            {
+                                                throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                         "重复的重载操作符>函数.");
+                                            }
+                                            #endregion
+
+                                        }
+                                        else
+                                        {
+                                            throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                                "操作符"+operatorCode+"不能重载");
+                                        }
+                                        
+
+                                    }
+
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "operator需要指定要重载的操作符。用[operator,\"*\"]格式指定");
                                 }
                             }
                         }

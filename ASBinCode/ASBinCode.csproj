@@ -50,6 +50,7 @@
     <Compile Include="CSWC.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="IClassFinder.cs" />
+    <Compile Include="OperatorOverride.cs" />
     <Compile Include="rtti\HostedDynamicObject.cs" />
     <Compile Include="rtti\IHostedObject.cs" />
     <Compile Include="rtti\LinkSystemObject.cs" />

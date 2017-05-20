@@ -11,7 +11,7 @@ namespace ASRuntime
         void call(object args);
     }
 
-    struct BlockCallBackBase : IBlockCallBack
+    class BlockCallBackBase : IBlockCallBack
     {
         public delegate void dgeCallbacker(BlockCallBackBase sender, object args);
         public bool isSuccess;

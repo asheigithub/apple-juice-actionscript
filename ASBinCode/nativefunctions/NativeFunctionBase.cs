@@ -12,7 +12,7 @@ namespace ASBinCode
             async_0=1,
 
             normal_1=2,
-
+            const_parameter_0=3,
         }
 
         public abstract string name { get; }

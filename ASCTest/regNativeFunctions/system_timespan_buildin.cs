@@ -1887,9 +1887,9 @@ namespace ASCTest.regNativeFunctions
     }
 
 
-    class system_timespan_operator_greaterThan : NativeFunctionBase
+    class system_timespan_operator_greaterThan : ASRuntime.nativefuncs.NativeConstParameterFunction
     {
-        public system_timespan_operator_greaterThan()
+        public system_timespan_operator_greaterThan():base(2)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_void);
@@ -1928,50 +1928,30 @@ namespace ASCTest.regNativeFunctions
                 return RunTimeDataType.rt_boolean;
             }
         }
-
-        public override NativeFunctionMode mode
+        
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
-
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void execute2(RunTimeValueBase thisObj,
-            FunctionDefine functionDefine,
-            SLOT[] argements,
-            SLOT returnSlot,
-            SourceToken token,
-            object stackframe, out bool success)
-        {
-            StackFrame frame = (StackFrame)stackframe;
-
             TimeSpan ts1;
-            var arg1 = argements[0].getValue();
-            if (arg1.rtType == RunTimeDataType.rt_null)
+            
+            if (argements[0].rtType == RunTimeDataType.rt_null)
             {
                 ts1 = default(TimeSpan);
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg1).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
                 ts1 = argObj.value;
             }
 
             TimeSpan ts2;
-            var arg2 = argements[1].getValue();
-            if (arg2.rtType == RunTimeDataType.rt_null)
+            
+            if (argements[1].rtType == RunTimeDataType.rt_null)
             {
                 ts2 = default(TimeSpan);
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg2).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 > ts2)
@@ -1984,11 +1964,7 @@ namespace ASCTest.regNativeFunctions
             }
             success = true;
         }
-
     }
-
-
-
 
 
 }
