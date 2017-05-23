@@ -24,14 +24,46 @@ package system
 		
 		
 		
-		//[operator,">"];
-		//[native, _system_TimeSpan_operator_greaterThan];
-		//private static function greaterThan(t1:TimeSpan,t2:TimeSpan):Boolean;
-		//
+		[operator,">"];
+		[native, _system_TimeSpan_operator_greaterThan];
+		private static function greaterThan(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"<"];
+		[native, _system_TimeSpan_operator_lessThan];
+		private static function lessThan(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"=="];
+		[native, _system_TimeSpan_operator_equality];
+		private static function equality(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"!="];
+		[native, _system_TimeSpan_operator_inequality];
+		private static function inequality(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,">="];
+		[native, _system_TimeSpan_operator_greaterThanOrEqual];
+		private static function greaterThanOrEqual(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"<="];
+		[native, _system_TimeSpan_operator_lessThanOrEqual];
+		private static function lessThanOrEqual(t1:TimeSpan,t2:TimeSpan):Boolean;
 		
 		
+		[operator,"+"];
+		[native, _system_TimeSpan_operator_unaryPlus];
+		private static function unaryPlus(t1:TimeSpan):TimeSpan;
 		
+		[operator,"-"];
+		[native, _system_TimeSpan_operator_unaryNegation];
+		private static function unaryNegation(t1:TimeSpan):TimeSpan;
 		
+		[operator,"+"];
+		[native, _system_TimeSpan_operator_addition];
+		private static function addition(t1:TimeSpan,t2:TimeSpan):TimeSpan;
+		
+		[operator,"-"];
+		[native, _system_TimeSpan_operator_subtraction];
+		private static function subtraction(t1:TimeSpan,t2:TimeSpan):TimeSpan;
 		
 		[creator];
 		[native, _system_TimeSpan_creator__];

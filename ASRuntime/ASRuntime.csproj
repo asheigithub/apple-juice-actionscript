@@ -80,6 +80,7 @@
     <Compile Include="operators\OpPropGetSet.cs" />
     <Compile Include="operators\OpSub.cs" />
     <Compile Include="operators\OpTypeOf.cs" />
+    <Compile Include="operators\OpUnaryPlus.cs" />
     <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />

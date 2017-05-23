@@ -12,15 +12,7 @@ namespace ASBinCode
             this._class = _class;
             valueType = _class.getRtType();
         }
-
-        //public sealed override RunTimeDataType valueType
-        //{
-        //    get
-        //    {
-        //        return _class.getRtType();
-        //    }
-        //}
-
+        
         public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
         {
             return scope.static_objects[_class.classid];

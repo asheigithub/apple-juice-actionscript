@@ -216,11 +216,13 @@ namespace ASRuntime.operators
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                var funcCaller = new FunctionCaller(frame.player, frame, step.token);
+                var funcCaller =  FunctionCaller.create(frame.player, frame, step.token);
                 funcCaller.function = function;
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();
                 funcCaller.createParaScope();
+                //funcCaller.releaseAfterCall = true;
+
                 frame.funCaller = funcCaller;
             }
             frame.endStep(step);

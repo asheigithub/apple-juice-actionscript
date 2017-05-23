@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -50,7 +51,24 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue( scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue( scope);
 
-            if (
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.addition,
+                v1.rtType, v2.rtType);
+            if (f != null)
+            {
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                //fc.releaseAfterCall = true;
+
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+                
+            }
+            else if (
                 (v1.rtType > ASBinCode.RunTimeDataType.unknown && v2.rtType > ASBinCode.RunTimeDataType.unknown)
                 ||
                 v1.rtType == ASBinCode.RunTimeDataType.rt_int

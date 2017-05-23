@@ -201,7 +201,8 @@ namespace ASRuntime.operators
 
                 //***调用设置器***
 
-                var funCaller = new FunctionCaller(player, frame, step.token);
+                var funCaller =  FunctionCaller.create(player, frame, step.token);
+                //funCaller.releaseAfterCall = true;
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
                 funCaller.createParaScope();

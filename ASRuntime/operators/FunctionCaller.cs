@@ -7,6 +7,36 @@ namespace ASRuntime.operators
 {
     class FunctionCaller : IBlockCallBack
     {
+        private static Stack<FunctionCaller> pool;
+        static FunctionCaller()
+        {
+            pool = new Stack<FunctionCaller>();
+            for (int i = 0; i < 128; i++)
+            {
+                pool.Push(new FunctionCaller(null, null, null));
+            }
+        }
+
+        public static FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
+        {
+            FunctionCaller fc = pool.Pop();
+            fc.player = player;
+            fc.invokerFrame = invokerFrame;
+            fc.token = token;
+
+            fc.check_para_id = 0;
+            fc.pushedArgs = 0;
+            fc.hasReleased = false;
+            
+            return fc;
+        }
+
+        private static void ret(FunctionCaller c)
+        {
+            pool.Push(c);
+        }
+
+
         private HeapSlot[] CallFuncHeap;
 
         public ASBinCode.rtData.rtFunction function;
@@ -24,12 +54,43 @@ namespace ASRuntime.operators
         public Player player;
         private StackFrame invokerFrame;
         private SourceToken token;
+        private int check_para_id;
 
-        public FunctionCaller(Player player,StackFrame invokerFrame, SourceToken token)
+        private FunctionCaller(Player player,StackFrame invokerFrame, SourceToken token)
         {
             this.player = player;
             this.invokerFrame = invokerFrame;
             this.token = token;
+
+            check_para_id = 0;
+            pushedArgs = 0;
+            hasReleased = false;
+            
+        }
+
+        
+        bool hasReleased;
+        private void release()
+        {
+            if (!hasReleased)
+            {
+                hasReleased = true;
+                CallFuncHeap = null;
+                function = null;
+                toCallFunc = null;
+                pushedArgs = 0;
+                returnSlot = null;
+                _tempSlot = null;
+                callbacker = null;
+                
+                player = null;
+                invokerFrame = null;
+                token = null;
+                check_para_id = 0;
+
+                ret(this);
+            }
+            
         }
 
         public void loadDefineFromFunction()
@@ -174,6 +235,12 @@ namespace ASRuntime.operators
 
                             //***中断本帧本次代码执行进入try catch阶段
                             success = false;
+
+                            
+                            {
+                                release();
+                            }
+
                             return;
                         }
 
@@ -207,6 +274,11 @@ namespace ASRuntime.operators
 
                             );
                 success = false;
+
+                
+                {
+                    release();
+                }
             }
         }
 
@@ -234,11 +306,6 @@ namespace ASRuntime.operators
             CallFuncHeap[para_id].directSet(value);
         }
 
-
-        private int check_para_id = 0;
-        BlockCallBackBase cb=new BlockCallBackBase();
-
-        
         private void check_para()
         {
             while (check_para_id < pushedArgs)
@@ -250,7 +317,7 @@ namespace ASRuntime.operators
                     toCallFunc.signature.parameters[check_para_id].type != RunTimeDataType.rt_void
                     )
                 {
-                    
+                    BlockCallBackBase cb = new BlockCallBackBase();
                     cb.args = argement;
                     cb._intArg = check_para_id;
                     cb.setCallBacker(check_para_callbacker);
@@ -312,6 +379,10 @@ namespace ASRuntime.operators
 
                         //***中断本帧本次代码执行进入try catch阶段
                         invokerFrame.endStep();
+                        
+                        {
+                            release();
+                        }
                         return;
                     }
                 }
@@ -324,6 +395,10 @@ namespace ASRuntime.operators
                     if (!ic.init_static_class(player.swc.YieldIteratorClass))
                     {
                         invokerFrame.endStep();
+                        
+                        {
+                            release();
+                        }
                         return;
                     }
 
@@ -352,12 +427,15 @@ namespace ASRuntime.operators
                 
                 returnSlot.directSet(rtYield);
 
-
+                
                 if (callbacker != null)
                 {
                     callbacker.call(callbacker.args);
                 }
-
+                
+                {
+                    release();
+                }
                 return;
             }
             else if (!toCallFunc.isNative)
@@ -370,6 +448,11 @@ namespace ASRuntime.operators
                     returnSlot,
                     function.bindScope,
                     token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
+
+                if ( !ReferenceEquals(callbacker,this))
+                {
+                    release();
+                }
             }
             else
             {
@@ -397,10 +480,15 @@ namespace ASRuntime.operators
                     if (errormsg == null)
                     {
                         returnSlot.directSet(result);
-
+                        
                         if (callbacker != null)
                         {
                             callbacker.call(callbacker.args);
+                        }
+
+                        
+                        {
+                            release();
                         }
                     }
                     else
@@ -410,6 +498,10 @@ namespace ASRuntime.operators
                             );
 
                         invokerFrame.endStep();
+                        
+                        {
+                            release();
+                        }
                     }
 
                 }
@@ -438,6 +530,11 @@ namespace ASRuntime.operators
                     {
                         invokerFrame.endStep();
                     }
+
+                    
+                    {
+                        release();
+                    }
                 }
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.async_0)
                 {
@@ -449,6 +546,11 @@ namespace ASRuntime.operators
                         token,
                         function.bindScope
                         );
+
+                    if ( !ReferenceEquals(callbacker, this))
+                    {
+                        release();
+                    }
                 }
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
@@ -476,6 +578,11 @@ namespace ASRuntime.operators
                     {
                         invokerFrame.endStep();
                     }
+
+                    
+                    {
+                        release();
+                    }
                 }
             }
         }
@@ -502,6 +609,10 @@ namespace ASRuntime.operators
         void IBlockCallBack.call(object args)
         {
             invokerFrame.endStep();
+            
+            {
+                release();
+            }
         }
     }
 }

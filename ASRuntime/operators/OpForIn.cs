@@ -46,7 +46,8 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    var funCaller =  FunctionCaller.create(frame.player, frame, step.token);
+                    //funCaller.releaseAfterCall = true;
                     funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     funCaller.createParaScope();
@@ -130,7 +131,8 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    var funCaller =FunctionCaller.create(frame.player, frame, step.token);
+                    //funCaller.releaseAfterCall = true;
                     funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     funCaller.createParaScope();
@@ -191,7 +193,8 @@ namespace ASRuntime.operators
                         (((rtObject)saveObj.hosted_object)) );
 
                     //***调用方法***
-                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+                    //funCaller.releaseAfterCall = true;
                     funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     funCaller.createParaScope();
@@ -248,7 +251,8 @@ namespace ASRuntime.operators
                         ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object));
 
                     //***调用方法***
-                    var funCaller = new FunctionCaller(frame.player, frame, step.token);
+                    var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+                    //funCaller.releaseAfterCall = true;
                     funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     funCaller.createParaScope();

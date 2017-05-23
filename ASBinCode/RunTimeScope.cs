@@ -22,8 +22,6 @@ namespace ASBinCode
             Dictionary<int, ASBinCode.rtData.rtObject> _static_scope,
             RunTimeValueBase this_pointer,
             RunTimeScopeType type
-            //,
-            //Dictionary<ClassMethodGetter, Dictionary<ASBinCode.rtData.rtObject, ISLOT>> dictMethods
             )
         {
             this.swc = swc;

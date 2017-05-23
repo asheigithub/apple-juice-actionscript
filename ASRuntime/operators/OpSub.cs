@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -22,9 +23,27 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
 
-            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
-                frame._tempSlot1, frame._tempSlot2, step, _execSub_CallBacker);
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.subtraction,
+                v1.rtType, v2.rtType);
+            if (f != null)
+            {
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
 
+            }
+            else
+            {
+
+                OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope,
+                    frame._tempSlot1, frame._tempSlot2, step, _execSub_CallBacker);
+            }
         }
 
         private static void _execSub_CallBacker(

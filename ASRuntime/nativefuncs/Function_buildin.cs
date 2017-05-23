@@ -253,13 +253,15 @@ namespace ASRuntime.nativefuncs
             rtFunction toApply= (rtFunction)func.Clone();
 
             //toApply.setThis(thisArg);
-            operators.FunctionCaller caller = new operators.FunctionCaller(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+            FunctionCaller caller =  FunctionCaller.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
             caller.createParaScope();
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
+
+            //caller.releaseAfterCall = true;
 
             if (argements[1].getValue().rtType != rtNull.nullptr.rtType)
             {
@@ -312,6 +314,7 @@ namespace ASRuntime.nativefuncs
                 }
             }
             caller.call();
+            
         }
 
         private Stack<FunctionCaller> stackCallers = new Stack<FunctionCaller>();
@@ -327,6 +330,7 @@ namespace ASRuntime.nativefuncs
                 
                 c.function.setThis(null);
                 c.call();
+                
                 return;
             }
             else
@@ -334,6 +338,7 @@ namespace ASRuntime.nativefuncs
                 rtObject rtObj = (rtObject)v1;
                 c.function.setThis(rtObj);
                 c.call();
+                
                 return;
             }
             
@@ -413,13 +418,15 @@ namespace ASRuntime.nativefuncs
             rtFunction toApply = (rtFunction)func.Clone();
 
             //toApply.setThis(thisArg);
-            operators.FunctionCaller caller = new operators.FunctionCaller(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+            FunctionCaller caller =  FunctionCaller.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
             caller.createParaScope();
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
+
+            //caller.releaseAfterCall = true;
 
             if (argements[1].getValue().rtType == RunTimeDataType.rt_array)
             {

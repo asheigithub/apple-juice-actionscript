@@ -737,7 +737,8 @@ namespace ASRuntime.operators
             if(f !=null)
             {
                 
-                FunctionCaller fc = new FunctionCaller(frame.player, frame, step.token);
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -866,7 +867,24 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.GreatherThanOrEqual, v1.rtType, v2.rtType);
+            if (f != null)
+            {
 
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+
+                return;
+            }
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _GEVoid_ValueOf_Callbacker);
         }
         private static void _GEVoid_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1009,6 +1027,25 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
+
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.LessThan, v1.rtType, v2.rtType);
+            if (f != null)
+            {
+
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+
+                return;
+            }
+
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LTVoid_ValueOf_Callbacker);
         }
 
@@ -1093,7 +1130,23 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope);
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.LessThanOrEqual, v1.rtType, v2.rtType);
+            if (f != null)
+            {
 
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+
+                return;
+            }
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _LEVoid_ValueOf_Callbacker);
         }
         private static void _LEVoid_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1176,6 +1229,25 @@ namespace ASRuntime.operators
             var v1 = step.arg1.getValue(scope);
             var v2 = step.arg2.getValue(scope);
 
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Equality, v1.rtType, v2.rtType);
+            if (f != null)
+            {
+
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+
+                return;
+            }
+
+
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _EQ_ValueOf_Callbacker);
         }
         private static void _EQ_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1248,6 +1320,23 @@ namespace ASRuntime.operators
         {
             var v1 = step.arg1.getValue(scope);
             var v2 = step.arg2.getValue(scope);
+            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Inequality, v1.rtType, v2.rtType);
+            if (f != null)
+            {
+
+                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope);
+                fc.callbacker = fc;
+                fc.call();
+
+
+                return;
+            }
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _NotEQ_ValueOf_Callbacker);
         }
 

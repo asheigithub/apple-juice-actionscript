@@ -479,14 +479,15 @@ namespace ASRuntime.operators
 
 
 
-                        operators.FunctionCaller fc = new operators.FunctionCaller(frame.player, frame, token);
+                        operators.FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                        //fc.releaseAfterCall = true;
                         object[] sendargs = new object[7];
                         sendargs[0] = frame;
                         sendargs[1] = token;
                         sendargs[2] = scope;
                         sendargs[3] = storeto;
                         sendargs[4] = callbacker;
-                        sendargs[5] = fc;
+                        sendargs[5] = function;
                         sendargs[6] = srcValue;
                         toStringCB.args = sendargs;
 
@@ -562,7 +563,8 @@ namespace ASRuntime.operators
 
                                 funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                                FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
+                                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                                //fc.releaseAfterCall = true;
                                 fc.function = funConv;
                                 fc.loadDefineFromFunction();
                                 fc.createParaScope();
@@ -574,15 +576,15 @@ namespace ASRuntime.operators
                                 BlockCallBackBase cb = new BlockCallBackBase();
                                 cb.setCallBacker(_primivite_Obj);
 
-                                object[] sendargs = new object[7];
-                                sendargs[0] = frame;
-                                sendargs[1] = token;
-                                sendargs[2] = scope;
-                                sendargs[3] = storeto;
-                                sendargs[4] = callbacker;
-                                sendargs[5] = fc;
-                                sendargs[6] = srcValue;
-                                cb.args = sendargs;
+                                //object[] sendargs = new object[5];
+                                //sendargs[0] = frame;
+                                //sendargs[1] = token;
+                                //sendargs[2] = scope;
+                                //sendargs[3] = storeto;
+                                //sendargs[4] = callbacker;
+                                //sendargs[5] = fc;
+                                //sendargs[6] = srcValue;
+                                cb.args = callbacker; //sendargs;
 
                                 fc.callbacker = cb;
                                 fc.call();
@@ -655,11 +657,12 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
-            FunctionCaller fc = (FunctionCaller)a[5];
+            rtFunction fc = (rtFunction)a[5];
 
-            var rv = fc.returnSlot.getValue();
+            var rv =  ((SLOT)a[3]).getValue();
+
             if (rv.rtType > RunTimeDataType.unknown ||
-                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[fc.function.functionId].signature.returnType == RunTimeDataType.rt_void)
+                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[fc.functionId].signature.returnType == RunTimeDataType.rt_void)
             {
                 BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
 
@@ -669,7 +672,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                CastValue(fc.returnSlot.getValue(),
+                CastValue(rv,
                     sender._intArg,
                     frame,
                     (SourceToken)a[1],
@@ -726,9 +729,9 @@ namespace ASRuntime.operators
 
         private static void _primivite_Obj(BlockCallBackBase sender, object args)
         {
-            object[] a = (object[])sender.args;
+            //object[] a = (object[])sender.args;
 
-            BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
+            BlockCallBackBase callbacker = (BlockCallBackBase)sender.args; //(BlockCallBackBase)a[4];
             callbacker.isSuccess = true;
             callbacker.call(null);
 
@@ -823,7 +826,8 @@ namespace ASRuntime.operators
 
                     funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                    FunctionCaller fc = new FunctionCaller(frame.player, frame, token);
+                    FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                    //fc.releaseAfterCall = true;
                     fc.function = funConv;
                     fc.loadDefineFromFunction();
                     fc.createParaScope();
@@ -1111,7 +1115,8 @@ namespace ASRuntime.operators
                 BlockCallBackBase valueofCB = new BlockCallBackBase();
                 valueofCB.setCallBacker(_InvokeValueOf_Backer);
 
-                operators.FunctionCaller fc = new operators.FunctionCaller(frame.player, frame, token);
+                FunctionCaller fc = FunctionCaller.create(frame.player, frame, token);
+                //fc.releaseAfterCall = true;
                 object[] sendargs = new object[5];
                 sendargs[0] = obj;
                 sendargs[1] = callbacker;
@@ -1387,7 +1392,8 @@ namespace ASRuntime.operators
                 BlockCallBackBase toStringCB = new BlockCallBackBase();
                 toStringCB.setCallBacker(_InvokeToString_Backer);
 
-                operators.FunctionCaller fc = new operators.FunctionCaller(frame.player, frame, token);
+                operators.FunctionCaller fc = FunctionCaller.create(frame.player, frame, token);
+                //fc.releaseAfterCall = true;
                 object[] sendargs = new object[5];
                 sendargs[0] = obj;
                 sendargs[1] = callbacker;

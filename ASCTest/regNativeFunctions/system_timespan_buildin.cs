@@ -1966,5 +1966,675 @@ namespace ASCTest.regNativeFunctions
         }
     }
 
+    class system_timespan_operator_lessThan : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_lessThan() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_lessThan";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+            if (ts1 < ts2)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_equality : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_equality() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_equality";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+            if (ts1 == ts2)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_inequality : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_inequality() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_inequality";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+            if (ts1 != ts2)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_greatherOrEqual : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_greatherOrEqual() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_greaterThanOrEqual";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+            if (ts1 >= ts2)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_lessThanOrEqual : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_lessThanOrEqual() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_lessThanOrEqual";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_boolean;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+            if (ts1 <= ts2)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+            }
+            else
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+            }
+            success = true;
+        }
+    }
+
+
+    class system_timespan_operator_unaryPlus : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_unaryPlus() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_unaryPlus";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                bin.getClassByRunTimeDataType( functionDefine.signature.returnType), stackframe.player, +ts1);
+
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_unaryNegation : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_unaryNegation() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_unaryNegation";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                bin.getClassByRunTimeDataType(functionDefine.signature.returnType), stackframe.player, -ts1);
+
+            success = true;
+        }
+    }
+
+
+    class system_timespan_operator_addition : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_addition() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_addition";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                bin.getClassByRunTimeDataType(functionDefine.signature.returnType), stackframe.player, ts1+ts2);
+
+            success = true;
+        }
+    }
+
+    class system_timespan_operator_subtraction : ASRuntime.nativefuncs.NativeConstParameterFunction
+    {
+        public system_timespan_operator_subtraction() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_TimeSpan_operator_subtraction";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            TimeSpan ts1;
+
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                ts1 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = argObj.value;
+            }
+
+            TimeSpan ts2;
+
+            if (argements[1].rtType == RunTimeDataType.rt_null)
+            {
+                ts2 = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = argObj.value;
+            }
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                bin.getClassByRunTimeDataType(functionDefine.signature.returnType), stackframe.player, ts1 - ts2);
+
+            success = true;
+        }
+    }
 
 }

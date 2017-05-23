@@ -30,6 +30,23 @@ namespace ASBinCode
         /// !=
         /// </summary>
         Inequality=5,
+
+        /// <summary>
+        /// +前缀
+        /// </summary>
+        Unary_plus=6,
+        /// <summary>
+        /// -前缀
+        /// </summary>
+        Unary_negation=7,
+        /// <summary>
+        /// +
+        /// </summary>
+        addition,
+        /// <summary>
+        /// -
+        /// </summary>
+        subtraction,
     }
 
     public struct OperatorFunctionKey : IEquatable<OperatorFunctionKey>
@@ -72,7 +89,7 @@ namespace ASBinCode
         /// </summary>
         public bool Check(out rtti.FunctionDefine function)
         {
-            for (int i = 0; i <= (int) OverrideableOperator.Inequality; i++)
+            for (int i = 0; i <= (int)OverrideableOperator.Inequality; i++)
             {
                 foreach (var key in operFunctions[i].Keys)
                 {
@@ -94,7 +111,7 @@ namespace ASBinCode
 
         public OperatorFunctions()
         {
-            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.Inequality+1];
+            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.subtraction+1];
             for (int i = 0; i < operFunctions.Length; i++)
             {
                 operFunctions[i] = new Dictionary<OperatorFunctionKey, DefineAndFunc>();
@@ -136,6 +153,20 @@ namespace ASBinCode
                 }
 
                 return function.func;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public rtti.FunctionDefine getOperatorDefine(OverrideableOperator operCode, RunTimeDataType v1, RunTimeDataType v2)
+        {
+            var dict = operFunctions[(int)operCode];
+            DefineAndFunc function;
+            if (dict.TryGetValue(new OperatorFunctionKey(v1, v2), out function))
+            {
+                return function.define;
             }
             else
             {

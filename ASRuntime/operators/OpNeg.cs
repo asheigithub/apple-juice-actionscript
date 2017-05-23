@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +13,25 @@ namespace ASRuntime.operators
 
             if (v.rtType != ASBinCode.RunTimeDataType.rt_number)
             {
-                OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execNeg_ValueOf_Callbacker);
+                var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Unary_negation,
+                v.rtType, RunTimeDataType.unknown);
+                if (f != null)
+                {
+                    FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                    fc.function = f;
+                    fc.loadDefineFromFunction();
+                    bool success;
+                    fc.pushParameter(v, 0, out success);
+                    fc.returnSlot = step.reg.getSlot(scope);
+                    fc.callbacker = fc;
+                    fc.call();
+
+                    return;
+                }
+                else
+                {
+                    OpCast.InvokeTwoValueOf(v, ASBinCode.rtData.rtNull.nullptr, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _execNeg_ValueOf_Callbacker);
+                }
             }
             else
             {

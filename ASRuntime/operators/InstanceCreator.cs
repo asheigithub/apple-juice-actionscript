@@ -19,7 +19,7 @@ namespace ASRuntime.operators
         private ASBinCode.rtti.Class _class;
         public IBlockCallBack callbacker;
 
-        public FunctionCaller constructorCaller;
+        internal FunctionCaller constructorCaller;
 
         public RunTimeValueBase objectResult;
 
@@ -47,20 +47,24 @@ namespace ASRuntime.operators
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
 
-            constructorCaller = new FunctionCaller(player, invokerFrame, token);
+            constructorCaller = FunctionCaller.create(player, invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
             constructorCaller.createParaScope();
 
+            //constructorCaller.releaseAfterCall = true;
+
             if (constructor != null)
             {
-                _function_constructor = new FunctionCaller(player, invokerFrame, token);
+                _function_constructor = FunctionCaller.create(player, invokerFrame, token);
                 _function_constructor._tempSlot = invokerFrame._tempSlot1;
                 _function_constructor.toCallFunc = 
                     player.swc.functions[ ((ASBinCode.rtData.rtFunction)
                     TypeConverter.ObjectImplicit_ToPrimitive( constructor)).functionId];
 
                 _function_constructor.createParaScope();
+
+                //_function_constructor.releaseAfterCall = true;
             }
 
         }
@@ -461,20 +465,25 @@ namespace ASRuntime.operators
                 _function_constructor.function.setThis(rtobject);
 
                 BlockCallBackBase cb = new BlockCallBackBase();
-                cb.args = rtobject;
+                cb.args = new object[] { rtobject , _temp };
+                
+
                 cb.setCallBacker(_finalStep);
 
                 _function_constructor.callbacker = cb;
                 _function_constructor.call();
+                _function_constructor = null;
             }
         }
 
         private void _finalStep(BlockCallBackBase sender,object args)
         {
-            objectResult = (ASBinCode.rtData.rtObject)sender.args;
+            object[] a = (object[])sender.args;
+
+            objectResult = (ASBinCode.rtData.rtObject)a[0];
 
             //***如果有返回值****
-            var returnvalue = _function_constructor.returnSlot.getValue();
+            var returnvalue = ((SLOT)a[1]).getValue();
             if (returnvalue.rtType != RunTimeDataType.rt_void
                 &&
                 returnvalue.rtType != RunTimeDataType.rt_string

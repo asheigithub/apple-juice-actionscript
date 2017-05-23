@@ -157,8 +157,15 @@ namespace ASCTest
                 )
                 );
             bin.regNativeFunction(new system_timespan_operator_greaterThan());
-
-
+            bin.regNativeFunction(new system_timespan_operator_lessThan());
+            bin.regNativeFunction(new system_timespan_operator_equality());
+            bin.regNativeFunction(new system_timespan_operator_inequality());
+            bin.regNativeFunction(new system_timespan_operator_greatherOrEqual());
+            bin.regNativeFunction(new system_timespan_operator_lessThanOrEqual());
+            bin.regNativeFunction(new system_timespan_operator_unaryPlus());
+            bin.regNativeFunction(new system_timespan_operator_unaryNegation());
+            bin.regNativeFunction(new system_timespan_operator_addition());
+            bin.regNativeFunction(new system_timespan_operator_subtraction());
         }
     }
 }

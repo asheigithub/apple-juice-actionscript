@@ -166,6 +166,9 @@ namespace ASRuntime
                 case OpCode.mod_number:
                     operators.OpMulti.exec_ModNumber(this, step, scope);
                     break;
+                case OpCode.unary_plus:
+                    operators.OpUnaryPlus.execUnaryPlus(this, step, scope);
+                    break;
                 case OpCode.neg:
                     operators.OpNeg.execNeg(this, step, scope);
                     break;

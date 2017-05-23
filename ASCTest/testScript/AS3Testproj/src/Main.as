@@ -124,6 +124,14 @@ package
 			trace( v[0][0] == v[0][2] );
 			trace(v);
 			
+			var k = 1;
+			k.toString();
+			
+			var m = this;
+			
+			trace(m -2 +m );
+			
+			
 			
 			//var values = [ "000000006", "12.12:12:12.12345678" ];
 			//for each (var s:String in values)
@@ -137,11 +145,17 @@ package
 			   //}   
 			   //
 			//}
-
+			
 			
 			trace(TimeSpan.Zero);
 			
-			trace(TimeSpan.Zero>tt);
+			trace(TimeSpan.Zero<=tt);
+			
+			trace( -tt+tt);
+			
+			var b = a;
+			
+			
 			
 			/*
 			yield 是从.net2.0语法中移植过来，可自动生成一个可枚举对象的语法。每次yield return都可以返回一个值
@@ -178,7 +192,10 @@ package
 		}
 		
 		
-		
+		private function valueOf()
+		{
+			return 5;
+		}
 		
 		
 
