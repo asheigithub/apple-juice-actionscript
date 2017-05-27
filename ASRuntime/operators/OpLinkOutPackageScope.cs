@@ -9,13 +9,13 @@ namespace ASRuntime.operators
     {
         public static void exec_link(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot l = (StackSlot)step.reg.getSlot(scope);
+            StackSlot l = (StackSlot)step.reg.getSlot(scope, frame);
 
-            int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope)).value;
+            int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope, frame)).value;
 
             var outscope = frame.player.outpackage_runtimescope[classid];
 
-            SLOT outpackagescopeslot= ((VariableBase)step.arg1).getSlot(outscope);
+            SLOT outpackagescopeslot= ((VariableBase)step.arg1).getSlot(outscope,null);
 
             Register register = (Register)step.reg;
             if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)

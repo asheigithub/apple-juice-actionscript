@@ -39,7 +39,7 @@ namespace ASRuntime.operators
             
         }
 
-        public void prepareConstructorArgements()
+        public bool prepareConstructorArgements()
         {
             int classid = _class.classid;
 
@@ -50,7 +50,7 @@ namespace ASRuntime.operators
             constructorCaller = FunctionCaller.create(player, invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
-            constructorCaller.createParaScope();
+            if (!constructorCaller.createParaScope()) { return false; }
 
             //constructorCaller.releaseAfterCall = true;
 
@@ -62,11 +62,11 @@ namespace ASRuntime.operators
                     player.swc.functions[ ((ASBinCode.rtData.rtFunction)
                     TypeConverter.ObjectImplicit_ToPrimitive( constructor)).functionId];
 
-                _function_constructor.createParaScope();
+                if (!_function_constructor.createParaScope()) { return false; }
 
                 //_function_constructor.releaseAfterCall = true;
             }
-
+            return true;
         }
 
         public void push_parameter(RunTimeValueBase arg,int id)
@@ -349,7 +349,7 @@ namespace ASRuntime.operators
             globalObj.objScope = rtscope;
             player.outpackage_runtimescope.Add(cls.classid, rtscope);
             {
-                var slot = new DynamicPropertySlot(globalObj,true);
+                var slot = new DynamicPropertySlot(globalObj,true,player.swc.FunctionClass.getRtType());
                 slot.directSet(player.static_instance[cls.staticClass.classid]);
                 global.createproperty(cls.name, slot);
             }
@@ -359,7 +359,7 @@ namespace ASRuntime.operators
                 {
                     if (init_static_class(player.swc.classes[i]))
                     {
-                        var slot = new DynamicPropertySlot(globalObj,true);
+                        var slot = new DynamicPropertySlot(globalObj,true,player.swc.FunctionClass.getRtType());
                         slot.directSet(player.static_instance[player.swc.classes[i].staticClass.classid]);
                         global.createproperty(player.swc.classes[i].name, slot);
                     }
@@ -400,7 +400,7 @@ namespace ASRuntime.operators
                
                 if (constructor == null)
                 {
-                    dobj.createproperty("constructor", new DynamicPropertySlot(_object, false));
+                    dobj.createproperty("constructor", new DynamicPropertySlot(_object, false,player.swc.FunctionClass.getRtType()));
                     dobj["constructor"].directSet(player.static_instance[obj._class.staticClass.classid]);
                     dobj._prototype_ = (DynamicObject)player.static_instance[_class.staticClass.classid].value;
                 }
@@ -455,6 +455,7 @@ namespace ASRuntime.operators
                 if (callbacker != null)
                 {
                     callbacker.call(this);
+                    callbacker = null;
                 }
             }
             else
@@ -464,9 +465,10 @@ namespace ASRuntime.operators
                 _function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
                 _function_constructor.function.setThis(rtobject);
 
-                BlockCallBackBase cb = new BlockCallBackBase();
-                cb.args = new object[] { rtobject , _temp };
-                
+                BlockCallBackBase cb = BlockCallBackBase.create();
+                cb.args = cb.cacheObjects; //new object[] { rtobject , _temp };
+                cb.cacheObjects[0] = rtobject;
+                cb.cacheObjects[1] = _temp;
 
                 cb.setCallBacker(_finalStep);
 
@@ -504,6 +506,7 @@ namespace ASRuntime.operators
             if (callbacker != null)
             {
                 callbacker.call(this);
+                callbacker = null;
             }
         }
 
@@ -548,9 +551,9 @@ namespace ASRuntime.operators
                 }
 
                 ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
-                RunTimeScope scope = new RunTimeScope(player.swc,
-                    player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid]), null, 0, 
-                    cls.blockid, null, player.static_instance, rtObj, RunTimeScopeType.objectinstance);
+                RunTimeScope scope = new RunTimeScope(
+                    player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid]), 
+                    cls.blockid, null, rtObj, RunTimeScopeType.objectinstance);
                 rtObj.objScope = scope;
                 
                 
@@ -639,11 +642,11 @@ namespace ASRuntime.operators
                 obj.memberData = new ObjectMemberSlot[cls.fields.Count];
                 for (int i = 0; i < obj.memberData.Length; i++)
                 {
-                    obj.memberData[i] = new ObjectMemberSlot(result);
+                    obj.memberData[i] = new ObjectMemberSlot(result,player.swc.FunctionClass.getRtType());
 
                     if (cls.fields[i].defaultValue == null)
                     {
-                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null));
+                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null,null));
                     }
 
                     ((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;
@@ -767,6 +770,21 @@ namespace ASRuntime.operators
 
         public abstract void call(object args);
 
+        public void noticeRunFailed()
+        {
+            //throw new NotImplementedException();
+            InstanceCreator ic = (InstanceCreator)args;
+            if (ic.constructorCaller != null)
+            {
+                ic.constructorCaller.noticeRunFailed();
+                ic.constructorCaller = null;
+            }
+            if (ic.callbacker != null)
+            {
+                ic.callbacker.noticeRunFailed();
+                ic.callbacker = null;
+            }
+        }
     }
 
 }

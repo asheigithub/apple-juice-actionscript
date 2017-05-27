@@ -10,10 +10,14 @@ namespace ASRuntime
         internal readonly ASBinCode.rtData.rtObject obj;
 
         internal bool isConstMember;
-        public ObjectMemberSlot(ASBinCode.rtData.rtObject obj)
+
+        private RunTimeDataType FunctionClassRtType;
+
+        public ObjectMemberSlot(ASBinCode.rtData.rtObject obj ,RunTimeDataType FunctionClassRtType)
         {
             this.obj = obj;
             this.isConstMember = false;
+            this.FunctionClassRtType = FunctionClassRtType;
         }
 
         private bool flaghasset = false;
@@ -41,7 +45,7 @@ namespace ASRuntime
                     function.setThis(obj);
                 }
             }
-            else if (obj.objScope !=null && value.rtType == obj.objScope.swc.FunctionClass.getRtType())
+            else if (obj.objScope !=null && value.rtType == FunctionClassRtType)
             {
                 ASBinCode.rtData.rtFunction function =(ASBinCode.rtData.rtFunction)
                     TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)value);

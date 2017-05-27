@@ -13,7 +13,7 @@ namespace ASRuntime
     {
         internal bool _canDelete;
         internal ASBinCode.RunTimeValueBase backup;
-        public DynamicPropertySlot(ASBinCode.rtData.rtObject obj,bool _canDelete):base(obj)
+        public DynamicPropertySlot(ASBinCode.rtData.rtObject obj,bool _canDelete, RunTimeDataType functionClassRtType) :base(obj,functionClassRtType)
         {
             this._canDelete = _canDelete;
             propertyIsEnumerable = false;

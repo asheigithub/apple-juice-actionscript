@@ -22,7 +22,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 frame.throwError(new error.InternalError(step.token,
-                                step.arg1.getValue(scope)
+                                step.arg1.getValue(scope,frame)
                                 ));
             }
 

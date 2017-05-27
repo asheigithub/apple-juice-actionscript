@@ -32,7 +32,16 @@ namespace ASBinCode
             :base(name,index,ignoreImplicitCast,refblockid,type,isConst)
         { }
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
+        /// <summary>
+        /// 仅在编译优化阶段重设置成员索引。
+        /// </summary>
+        public void setIndexMemberWhenCompile(int newindex)
+        {
+            _indexOfMembers = newindex;
+        }
+
+
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope,RunTimeDataHolder holder)
         {
             while (refblockid != scope.blockId)
             {
@@ -41,7 +50,7 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers].getValue();
         }
 
-        public sealed override SLOT getSlot(RunTimeScope scope)
+        public sealed override SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
             while (refblockid != scope.blockId)
             {
@@ -50,7 +59,7 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
             while (refblockid != scope.blockId)
             {

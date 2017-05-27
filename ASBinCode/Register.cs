@@ -64,12 +64,12 @@ namespace ASBinCode
         //    }
         //}
 
-        public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             //var v= getISlot(scope).getValue();
             //return v;
 
-            return scope.stack[scope.offset + _index].getValue();
+            return holder.stack[holder.offset + _index].getValue();
 
         }
 
@@ -79,14 +79,14 @@ namespace ASBinCode
             return "EAX(" + Id + "\t" +valueType+ ")";
         }
 
-        public sealed override  SLOT getSlot(RunTimeScope scope)
+        public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return scope.stack[scope.offset + _index];
+            return holder.stack[holder.offset + _index];
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return scope.stack[scope.offset + _index];
+            return holder.stack[holder.offset + _index];
         }
 
     }

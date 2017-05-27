@@ -11,11 +11,11 @@ namespace ASRuntime.operators
         public static void exec_try_read_prop( StackFrame frame, OpStep step, RunTimeScope scope)
         {
             
-            ASBinCode.SLOT slot = ((Register)step.arg1).getSlot(scope);
+            ASBinCode.SLOT slot = ((Register)step.arg1).getSlot(scope,frame);
 
             if (!slot.isPropGetterSetter)
             {
-                SLOT regslot = step.reg.getSlot(scope);
+                SLOT regslot = step.reg.getSlot(scope, frame);
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
@@ -205,16 +205,16 @@ namespace ASRuntime.operators
                 //funCaller.releaseAfterCall = true;
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
-                funCaller.createParaScope();
+                if (!funCaller.createParaScope()) { return; }
 
                 funCaller._tempSlot = frame._tempSlot1;
-                funCaller.returnSlot = step.reg.getSlot(scope);
+                funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                 ((StackSlot)funCaller.returnSlot).propGetSet = prop;
                 ((StackSlot)funCaller.returnSlot).propBindObj = propBindObj;   //propslot.bindObj;
 
 
-                BlockCallBackBase cb = new BlockCallBackBase();
+                BlockCallBackBase cb = BlockCallBackBase.create();
                 cb.setCallBacker(_getter_callbacker);
                 cb.step = step;
                 cb.args = frame;
@@ -239,7 +239,7 @@ namespace ASRuntime.operators
 
         public static void exec_try_write_prop(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
+            StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope,frame);
             if (slot.propGetSet != null)
             {
 

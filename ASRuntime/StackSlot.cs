@@ -11,7 +11,7 @@ namespace ASRuntime
     /// </summary>
     public sealed class StackSlot : SLOT
     {
-        public StackSlot(IClassFinder classfinder)
+        public StackSlot(CSWC classfinder)
         {
             store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
@@ -27,7 +27,7 @@ namespace ASRuntime
                 RunTimeDataType t = (RunTimeDataType)i;
                 if(t != RunTimeDataType.unknown)
                 {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null);
+                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null);
                 }
             }
 

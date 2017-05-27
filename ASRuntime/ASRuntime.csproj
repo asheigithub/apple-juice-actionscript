@@ -39,6 +39,7 @@
     <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
     <Compile Include="error\InternalError.cs" />
+    <Compile Include="FrameInfo.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="nativefuncs\Array_buildin.cs" />
     <Compile Include="nativefuncs\Boolean_buildin.cs" />

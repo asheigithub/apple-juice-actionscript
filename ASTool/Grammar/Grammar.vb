@@ -430,7 +430,14 @@ Public Class Grammar
 
     End Sub
 
-
+    Private Function findinkeywords(definekeywords As IEnumerable(Of String), key As String) As Boolean
+        For Each k In definekeywords
+            If k = key Then
+                Return True
+            End If
+        Next
+        Return False
+    End Function
 
     Public Function ParseTree(input As String, definekeywords As IEnumerable(Of String), defineSkipBlankWords As IEnumerable(Of String), Optional srcfile As String = "") As GrammerTree
 
@@ -643,7 +650,9 @@ Public Class Grammar
 
                         If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
                             Continue While
-                        ElseIf test.Type = Token.TokenType.other And test.StringValue = "." Then
+                        ElseIf test.Type = Token.TokenType.other And (test.StringValue = "." Or test.StringValue = "?" Or test.StringValue = ":" Or findinkeywords(definekeywords, test.StringValue)) Then
+
+
                             Continue For
                         ElseIf test.Type = Token.TokenType.identifier And (
                             test.StringValue = "case") Then

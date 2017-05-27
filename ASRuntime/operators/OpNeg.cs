@@ -9,11 +9,11 @@ namespace ASRuntime.operators
     {
         public static void execNeg(StackFrame frame, ASBinCode.OpStep step,ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
 
             if (v.rtType != ASBinCode.RunTimeDataType.rt_number)
             {
-                var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Unary_negation,
+                var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Unary_negation,
                 v.rtType, RunTimeDataType.unknown);
                 if (f != null)
                 {
@@ -22,7 +22,7 @@ namespace ASRuntime.operators
                     fc.loadDefineFromFunction();
                     bool success;
                     fc.pushParameter(v, 0, out success);
-                    fc.returnSlot = step.reg.getSlot(scope);
+                    fc.returnSlot = step.reg.getSlot(scope, frame);
                     fc.callbacker = fc;
                     fc.call();
 
@@ -35,7 +35,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                step.reg.getSlot(scope).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
+                step.reg.getSlot(scope, frame).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
                 frame.endStep(step);
             }
         }
@@ -51,7 +51,7 @@ namespace ASRuntime.operators
             else
             {
 
-                step.reg.getSlot(scope).setValue(
+                step.reg.getSlot(scope, frame).setValue(
                     -TypeConverter.ConvertToNumber(v1)  
                     );
                 frame.endStep(step);
@@ -61,7 +61,7 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
-            step.reg.getSlot(scope).setValue(
+            step.reg.getSlot(scope, frame).setValue(
                     -TypeConverter.ConvertToNumber(v1)
                     //-((ASBinCode.rtData.rtNumber)v1).value
                     );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));

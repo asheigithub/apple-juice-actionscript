@@ -99,7 +99,7 @@ namespace ASRuntime.nativefuncs
 
             while (data.innnerList.Count < length)
             {
-                data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null));
+                data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null,null));
             }
 
             rtObj.hosted_object = data;
@@ -358,7 +358,7 @@ namespace ASRuntime.nativefuncs
 
                 while (list.Count < newlen)
                 {
-                    list.Add( TypeConverter.getDefaultValue( t ).getValue(null) );
+                    list.Add( TypeConverter.getDefaultValue( t ).getValue(null,null) );
                 }
             }
             else if (newlen < list.Count)
@@ -666,11 +666,11 @@ namespace ASRuntime.nativefuncs
             }
 
 
-            BlockCallBackBase sepcb = new BlockCallBackBase();
+            BlockCallBackBase sepcb =  BlockCallBackBase.create();
             sepcb.scope = scope;
             sepcb._intArg = 0;
 
-            object[] sendargs = new object[9];
+            object[] sendargs = sepcb.cacheObjects;
             sendargs[0] = cb;
             sendargs[1] = arr;
             sendargs[2] = frame;
@@ -707,9 +707,9 @@ namespace ASRuntime.nativefuncs
 
             List<RunTimeValueBase> array = (List<RunTimeValueBase>)receiveArgs[1];
 
-            BlockCallBackBase valueCB = new BlockCallBackBase();
+            BlockCallBackBase valueCB = BlockCallBackBase.create();
             valueCB._intArg = sender._intArg + 1;
-            valueCB.args = receiveArgs;
+            valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
             valueCB.setCallBacker(_ValueToString_CB);
 
             operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
@@ -735,9 +735,9 @@ namespace ASRuntime.nativefuncs
             if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
             {
                 ((rtInt)receiveArgs[8]).value = 0;
-                BlockCallBackBase valueCB = new BlockCallBackBase();
+                BlockCallBackBase valueCB =  BlockCallBackBase.create();
                 valueCB._intArg = sender._intArg;
-                valueCB.args = sender.args;
+                valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
 
                 frame.player.CallBlankBlock(valueCB);
@@ -770,9 +770,9 @@ namespace ASRuntime.nativefuncs
                     else
                     {
                         
-                        BlockCallBackBase valueCB = new BlockCallBackBase();
+                        BlockCallBackBase valueCB = BlockCallBackBase.create();
                         valueCB._intArg = sender._intArg + 1;
-                        valueCB.args = receiveArgs;
+                        valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                         valueCB.setCallBacker(_ValueToString_CB);
 
                         operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,

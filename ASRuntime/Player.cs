@@ -94,6 +94,14 @@ namespace ASRuntime
             
         }
 
+
+        /// <summary>
+        /// 当调用本地函数时，会自动设置这个字段，如果本地函数抛出异常并被try catch到后，会根据这个字段继续后续操作
+        /// </summary>
+        internal operators.FunctionCaller _nativefuncCaller;
+        
+
+
         private error.InternalError runtimeError;
 
        
@@ -102,7 +110,7 @@ namespace ASRuntime
         /// </summary>
         private Stack<StackFrame> runtimeStack;
         StackSlot[] stackSlots;
-        private StackFrame displayStackFrame;
+        private FrameInfo displayStackFrame;
         
         public RunTimeValueBase run2(RightValueBase result)
         {
@@ -145,7 +153,7 @@ namespace ASRuntime
                 new SourceToken(0, 0, ""),null,
                 null, RunTimeScopeType.startup
                 );
-            displayStackFrame = runtimeStack.Peek();
+            displayStackFrame = runtimeStack.Peek().getInfo();
 
 
             while (true)
@@ -174,6 +182,16 @@ namespace ASRuntime
                 //{
                 //    if (currentRunFrame != null)
                 //    {
+                //        if (_nativefuncCaller != null)
+                //        {
+                //            if (_nativefuncCaller.callbacker != null)
+                //            {
+                //                _nativefuncCaller.callbacker.noticeRunFailed();
+                //            }
+                //            _nativefuncCaller.release();
+                //            _nativefuncCaller = null;
+                //        }
+
                 //        SourceToken token;
 
                 //        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
@@ -207,9 +225,14 @@ namespace ASRuntime
                 outPutErrorMessage(runtimeError);
             }
 
+            operators.FunctionCaller.checkpool();
+            BlockCallBackBase.checkpool();
+            StackFrame.checkpool();
+
 #if DEBUG
             if (isConsoleOut)
             {
+               
                 Console.WriteLine();
                 Console.WriteLine("====程序状态====");
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -233,7 +256,7 @@ namespace ASRuntime
 #endif
             if (result != null && runtimeError==null)
             {
-                return result.getValue(topscope);
+                return result.getValue(topscope,displayStackFrame);
             }
             else
             {
@@ -257,7 +280,7 @@ namespace ASRuntime
                 var vt = ((VariableBase)calledblock.scope.members[i]).valueType;
                 memberDataList[i].setDefaultType(
                     vt,
-                    TypeConverter.getDefaultValue(vt).getValue(null)
+                    TypeConverter.getDefaultValue(vt).getValue(null,null)
                     );
             }
             return memberDataList;
@@ -295,17 +318,24 @@ namespace ASRuntime
             RunTimeScopeType type
             )
         {
-            StackFrame frame = new StackFrame(calledblock);
+            StackFrame frame =  StackFrame.create(calledblock);
             frame.codeLinePtr = 0;
             frame.player = this;
             frame.returnSlot = returnSlot;
             frame.callbacker = callbacker;
+            frame.static_objects = static_instance;
 
             int startOffset = 0;
             if (runtimeStack.Count > 0)
             {
-                startOffset = runtimeStack.Peek().scope.offset + runtimeStack.Peek().block.totalRegisters+1+1;
+                var rs = runtimeStack.Peek();
+
+                startOffset = rs.offset + rs.block.totalRegisters+1+1 + rs.call_parameter_slotCount;
+                
             }
+            
+            frame.offset = startOffset;
+            frame.stack = stackSlots;
 
             if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length)
             {
@@ -321,21 +351,31 @@ namespace ASRuntime
             }
 
 
+            if (
+                ReferenceEquals(membersHeap, emptyMembers)
+                && type == RunTimeScopeType.function
+                &&
+                this_pointer is rtObject
+                &&
+                (callerScope==null ||
+                callerScope.scopeType != RunTimeScopeType.function)
+                )
+            {
+                frame.scope = ((rtObject)this_pointer).objScope; //callerScope;
+            }
+            else
+            {
+                RunTimeScope scope;
 
+                scope = new RunTimeScope(
+                    membersHeap, calledblock.id, callerScope
+                    ,
+                    this_pointer,
+                    type
+                );
 
-            RunTimeScope scope;
-            
-            scope = new RunTimeScope(swc,
-                membersHeap, stackSlots, startOffset, calledblock.id, callerScope
-                ,
-                static_instance
-                ,
-                this_pointer,
-                type
-            );
-            
-            frame.scope = scope;
-
+                frame.scope = scope;
+            }
             return frame.scope;
         }
 
@@ -423,9 +463,9 @@ namespace ASRuntime
         {
             if (error.callStack == null) //收集调用栈
             {
-                error.callStack = new Stack<StackFrame>();
+                error.callStack = new Stack<FrameInfo>();
             }
-            error.callStack.Push(currentRunFrame); 
+            error.callStack.Push(currentRunFrame.getInfo()); 
 
             runtimeStack.Pop();
 
@@ -434,7 +474,6 @@ namespace ASRuntime
             {
                 currentRunFrame = runtimeStack.Peek();
                 receive_error = error;
-                //currentRunFrame.receiveErrorFromStackFrame(error);
             }
             else
             {
@@ -474,7 +513,7 @@ namespace ASRuntime
                     Console.WriteLine(err.message);
                 }
 
-                Stack<StackFrame> _temp = new Stack<StackFrame>();
+                Stack<FrameInfo> _temp = new Stack<FrameInfo>();
 
                 while (err.callStack !=null && err.callStack.Count>0)
                 {

@@ -11,5 +11,8 @@ namespace ASBinCode.rtti
     {
         public List<FunctionParameter> parameters;
         public RunTimeDataType returnType;
+
+        public int onStackParameters;
+
     }
 }

@@ -1634,12 +1634,12 @@ namespace ASCompiler.compiler.builds
             funcscope.parentScope = env.block.scope;
             block.scope = funcscope;
 
-            
 
             for (int i = 0; i < as3function.Parameters.Count; i++)
             {
                 buildParameter(block, as3function.Parameters[i],builder, env);
             }
+
 
             bool isinterface = false;
             if (refClass != null && refClass.isInterface)

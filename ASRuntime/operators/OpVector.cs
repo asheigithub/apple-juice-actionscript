@@ -11,9 +11,9 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
 
-            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope), frame, step.token);
+            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame), frame, step.token);
 
             if (idx < 0 || idx > vector.innnerList.Count )
             {
@@ -35,13 +35,13 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null));
+                    vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null));
                 }
             }
 
             
 
-            StackSlot slot = (StackSlot)step.reg.getSlot(scope);
+            StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame);
             if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
             {
                 slot._cache_vectorSlot.idx = idx;
@@ -61,10 +61,10 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
 
 
-            var idxvalue = step.arg2.getValue(scope);
+            var idxvalue = step.arg2.getValue(scope, frame);
 
             double idx = double.NaN;
 
@@ -119,12 +119,12 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null));
+                        vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null));
                     }
                 }
 
 
-                StackSlot slot = (StackSlot)step.reg.getSlot(scope);
+                StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame);
 
                 if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
                 {
@@ -146,9 +146,9 @@ namespace ASRuntime.operators
 
         public static void exec_push(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
 
-            o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope).Clone());//直接对容器赋值，必须Clone
+            o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope, frame).Clone());//直接对容器赋值，必须Clone
 
             frame.endStep(step);
         }
@@ -157,13 +157,13 @@ namespace ASRuntime.operators
         public static void exec_initfromdata(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var player = frame.player;
-            RunTimeValueBase initdata = step.arg2.getValue(scope);
-            int classrttype = ((rtInt)step.arg1.getValue(scope)).value;
+            RunTimeValueBase initdata = step.arg2.getValue(scope, frame);
+            int classrttype = ((rtInt)step.arg1.getValue(scope, frame)).value;
             while (true)
             {
                 if (initdata.rtType == classrttype)
                 {
-                    step.reg.getSlot(scope).directSet(initdata);
+                    step.reg.getSlot(scope, frame).directSet(initdata);
                     frame.endStep(step);
                     return;
                 }
@@ -198,10 +198,13 @@ namespace ASRuntime.operators
 
             if (_class.constructor != null)
             {
-                frame.instanceCreator.prepareConstructorArgements();
+                if (!frame.instanceCreator.prepareConstructorArgements())
+                {
+                    return;
+                }
             }
 
-            BlockCallBackBase cb = new BlockCallBackBase();
+            BlockCallBackBase cb = BlockCallBackBase.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -218,15 +221,15 @@ namespace ASRuntime.operators
         {
             var vector = ((StackFrame)sender.args).instanceCreator.objectResult;
 
-
-            sender.step.reg.getSlot(sender.scope).directSet(
+            StackFrame frame = (StackFrame)sender.args;
+            sender.step.reg.getSlot(sender.scope, frame).directSet(
                 vector);
 
             var step = sender.step;
-            StackFrame frame = (StackFrame)sender.args;
+            
             RunTimeScope scope = sender.scope;
 
-            RunTimeValueBase initdata = step.arg2.getValue(scope);
+            RunTimeValueBase initdata = step.arg2.getValue(scope, frame);
 
             if (initdata.rtType == RunTimeDataType.rt_array)
             {
@@ -246,24 +249,24 @@ namespace ASRuntime.operators
 
         public static void exec_pushVector(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
 
             _pushVector(o, frame, step, scope);
         }
 
         public static void _pushVector(ASBinCode.rtti.Vector_Data o,  StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var arr = step.arg2.getValue(scope);
+            var arr = step.arg2.getValue(scope, frame);
             if (arr.rtType == RunTimeDataType.rt_null)
             {
                 frame.throwCastException(step.token, RunTimeDataType.rt_null,
-                    step.arg1.getValue(scope).rtType
+                    step.arg1.getValue(scope, frame).rtType
                     );
                 frame.endStep(step);
             }
             else
             {
-                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg2.getValue(scope)).value).hosted_object;
+                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg2.getValue(scope, frame)).value).hosted_object;
                 if (array.innnerList.Count == 0)
                 {
                     frame.endStep(step);
@@ -271,7 +274,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = new BlockCallBackBase();
+                    BlockCallBackBase cb = BlockCallBackBase.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_allpushed);
@@ -284,18 +287,18 @@ namespace ASRuntime.operators
 
         public static void exec_pusharray(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
             _pusharray(o, frame, step, scope);
         }
 
         public static void _pusharray( ASBinCode.rtti.Vector_Data o , StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
-            var arr = step.arg2.getValue(scope);
+            var arr = step.arg2.getValue(scope, frame);
             if (arr.rtType == RunTimeDataType.rt_null)
             {
                 frame.throwCastException(step.token, RunTimeDataType.rt_null,
-                    step.arg1.getValue(scope).rtType
+                    step.arg1.getValue(scope, frame).rtType
                     );
                 frame.endStep(step);
             }
@@ -309,7 +312,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = new BlockCallBackBase();
+                    BlockCallBackBase cb = BlockCallBackBase.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_allpushed);
@@ -331,11 +334,11 @@ namespace ASRuntime.operators
             IBlockCallBack callbacker
             )
         {
-            BlockCallBackBase convertCb = new BlockCallBackBase();
+            BlockCallBackBase convertCb = BlockCallBackBase.create();
             convertCb._intArg = 0;
             convertCb.setCallBacker(_convertCB);
 
-            object[] args = new object[6];
+            object[] args = convertCb.cacheObjects; //new object[6];
             args[0] = vd;
             args[1] = datalist;
             args[2] = token;

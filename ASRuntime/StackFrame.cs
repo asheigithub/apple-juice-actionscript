@@ -9,20 +9,60 @@ namespace ASRuntime
     /// <summary>
     /// 调用堆栈栈帧
     /// </summary>
-    public class StackFrame
+    public sealed class StackFrame :RunTimeDataHolder
     {
-        internal int stepCount;
-        public StackFrame(CodeBlock block)
+        private static Stack<StackFrame> pool;
+        static StackFrame()
         {
-            this.block = block;
-            stepCount = block.opSteps.Count;
-
-            if (block.hasTryStmt)
+            pool = new Stack<StackFrame>();
+            for (int i = 0; i < 128; i++)
             {
-                tryCatchState = new Stack<TryState>();
+                pool.Push(new StackFrame(null));
             }
+        }
+
+        public static StackFrame create(CodeBlock block)
+        {
+            StackFrame frame = pool.Pop();
+            frame.block = block;
+            frame.stepCount = block.opSteps.Count;
+
+            frame.isclosed = false;
+            return frame;
+        }
+
+        public static void checkpool()
+        {
+            if (pool.Count != 128)
+            {
+                throw new ASRunTimeException("缓存池异常");
+            }
+        }
+
+        private static void ret(StackFrame c)
+        {
+            pool.Push(c);
+        }
+
+
+
+        internal int stepCount;
+        private StackFrame(CodeBlock block)
+        {
+            //this.block = block;
+            //stepCount = block.opSteps.Count;
+
+            
+            tryCatchState = new Stack<TryState>();
+            
 
         }
+
+        internal FrameInfo getInfo()
+        {
+            return new FrameInfo(block, codeLinePtr,scope,static_objects,offset,stack);
+        }
+
 
         public delegate void DelegeExec(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope);
 
@@ -50,6 +90,8 @@ namespace ASRuntime
         internal operators.OpCallFunction.typeConvertOperator typeconvertoperator;
         internal StackSlot _tempSlot1;
         internal StackSlot _tempSlot2;
+
+        internal int call_parameter_slotCount;
 
         //internal Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtObject, ISLOT>> _dictMethods
         //    =new Dictionary<ClassMethodGetter, Dictionary<rtObject, ISLOT>>();
@@ -303,7 +345,7 @@ namespace ASRuntime
                     break;
                 case OpCode.if_jmp:
                     {
-                        if (((rtBoolean)step.arg1.getValue(scope)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+                        if (((rtBoolean)step.arg1.getValue(scope, this)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
                         {
                             if (trystateCount != 0)
                             {
@@ -344,7 +386,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_try:
                     {
-                        int tryid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int tryid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         enter_try(tryid);
 
                         endStep(step);
@@ -352,7 +394,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_try:
                     {
-                        int tryid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int tryid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         quit_try(tryid, step.token);
 
                         endStep(step);
@@ -360,7 +402,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_catch:
                     {
-                        int catchid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int catchid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         enter_catch(catchid);
 
                         endStep(step);
@@ -368,7 +410,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_catch:
                     {
-                        int catchid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int catchid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         quit_catch(catchid, step.token);
 
                         endStep(step);
@@ -376,7 +418,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_finally:
                     {
-                        int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int finallyid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         enter_finally(finallyid);
 
                         endStep(step);
@@ -384,7 +426,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_finally:
                     {
-                        int finallyid = ((rtInt)step.arg1.getValue(scope)).value;
+                        int finallyid = ((rtInt)step.arg1.getValue(scope,this)).value;
                         quit_finally(finallyid, step.token);
 
                         endStep(step);
@@ -518,12 +560,12 @@ namespace ASRuntime
                     break;
                 case OpCode.function_create:
                     {
-                        rtArray arr = (rtArray)step.arg1.getValue(scope);
+                        rtArray arr = (rtArray)step.arg1.getValue(scope,this);
                         int funcid = ((rtInt)arr.innerArray[0]).value;
                         bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
                         rtFunction function = new rtFunction(funcid, ismethod);
-                        step.reg.getSlot(scope).directSet(function);
+                        step.reg.getSlot(scope,this).directSet(function);
                         
                         endStep(step);
                     }
@@ -574,10 +616,11 @@ namespace ASRuntime
             {
                 doTryCatchReturn(step);
             }
-            if (!isclosed)
+            if (!isclosed)//在doTryCatchReturn步骤里可能修改了isclosed.
             {
                 codeLinePtr++;
             }
+            
         }
 #if DEBUG
         internal bool execing = false;
@@ -625,7 +668,7 @@ namespace ASRuntime
                             {
                                 if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope,this))
                                 {
-                                    ((VariableBase)op.reg).getSlot(scope).directSet(errorValue);
+                                    op.reg.getSlot(scope,this).directSet(errorValue);
                                     //引导到catch块
                                     codeLinePtr = j;
                                     foundcatch = true;
@@ -643,7 +686,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -674,7 +717,7 @@ namespace ASRuntime
                             if (op.opCode == OpCode.enter_finally)
                             {
                                 int id = ((ASBinCode.rtData.rtInt)
-                                    ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                    ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                 if (id == tryid)
                                 {
                                     codeLinePtr = j - 1;
@@ -685,8 +728,19 @@ namespace ASRuntime
                     }
                     else
                     {
-                        //var err = runtimeError;
-                        //player.runtimeError = err;
+                        if (callbacker != null)
+                        {
+                            callbacker.noticeRunFailed();
+                            callbacker = null;
+                        }
+                        if (instanceCreator != null)
+                        {
+                            if (instanceCreator.callbacker != null)
+                            {
+                                instanceCreator.callbacker.noticeRunFailed();
+                            }
+                        }
+                        
                         player.exitStackFrameWithError(runtimeError);
                     }
                 }
@@ -710,7 +764,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -736,7 +790,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -762,7 +816,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.quit_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -816,7 +870,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -845,7 +899,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -873,7 +927,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.quit_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -1145,20 +1199,52 @@ namespace ASRuntime
         /// </summary>
         public void close()
         {
+            
             typeconvertoperator = null;
             funCaller = null;
             instanceCreator = null;
 
             isclosed = true;
-            int offset = scope.offset;
+
             //清除执行栈
-            for (int i = offset; i < offset + block.totalRegisters; i++)
+            for (int i = offset; i < offset + block.totalRegisters + 1+1 + call_parameter_slotCount; i++)
             {
-                scope.stack[i].clear();
+                stack[i].clear();
             }
-            _tempSlot1.clear();
-            _tempSlot2.clear();
+            //_tempSlot1.clear();
+            //_tempSlot2.clear();
             //_dictMethods.Clear();
+
+
+            tryCatchState.Clear();
+            block = null;
+            scope = null;
+            static_objects = null;
+            offset = 0;
+            call_parameter_slotCount = 0;
+            stack = null;
+            player = null;
+            returnSlot = null;
+            callbacker = null;
+            codeLinePtr = 0;
+            holdedError = null;
+            hasCallJump = false;
+            hasCallReturn = false;
+            holdHasCallReturn = false;
+            holdhasjumpto = false;
+            holdjumptoline = 0;
+            jumptoline = 0;
+            trystateCount = 0;
+            
+            typeconvertoperator = null;
+#if DEBUG
+            execing = false;
+#endif   
+
+
+            ret(this);
+            
+            
         }
 
     }

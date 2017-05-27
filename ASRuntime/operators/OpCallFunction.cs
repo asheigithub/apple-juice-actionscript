@@ -11,7 +11,7 @@ namespace ASRuntime.operators
     {
         public static void bind(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            var rv = step.arg1.getValue(frame.scope);
+            var rv = step.arg1.getValue(frame.scope, frame);
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(
@@ -93,7 +93,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                rv= step.arg1.getValue(frame.scope);
+                rv= step.arg1.getValue(frame.scope, frame);
             }
 
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
@@ -105,24 +105,24 @@ namespace ASRuntime.operators
                 {
 
                     var member = (MethodGetterBase)cls.explicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope);
+                    var func = member.getValue(((rtObject)rv).objScope,null);
 
-                    step.reg.getSlot(scope).directSet(func);
+                    step.reg.getSlot(scope, frame).directSet(func);
 
                 }
                 else if (cls.implicit_from != null)
                 {
                     var member = (MethodGetterBase)cls.implicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope);
+                    var func = member.getValue(((rtObject)rv).objScope,null);
 
-                    step.reg.getSlot(scope).directSet(func);
+                    step.reg.getSlot(scope, frame).directSet(func);
                 }
                 else
                 {
                     frame.typeconvertoperator = new typeConvertOperator();
                     frame.typeconvertoperator.targettype = cls;
 
-                    step.reg.getSlot(scope).directSet(rv);
+                    step.reg.getSlot(scope, frame).directSet(rv);
                 }
 
                 frame.endStep(step);
@@ -139,14 +139,14 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
 
-                step.reg.getSlot(scope).directSet(rv);
+                step.reg.getSlot(scope, frame).directSet(rv);
 
                 if (!function.ismethod)
                 {
-                    int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope)).value;
+                    int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope, frame)).value;
 
                     var o = frame.player.outpackage_runtimescope[classid];
-                    _do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope), frame,o.this_pointer);
+                    _do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope, frame), frame,o.this_pointer);
                 }
 
                 
@@ -181,7 +181,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                rv = step.arg1.getValue(frame.scope);
+                rv = step.arg1.getValue(frame.scope, frame);
             }
 
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
@@ -220,7 +220,7 @@ namespace ASRuntime.operators
                 funcCaller.function = function;
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();
-                funcCaller.createParaScope();
+                if (!funcCaller.createParaScope()) { return; }
                 //funcCaller.releaseAfterCall = true;
 
                 frame.funCaller = funcCaller;
@@ -230,8 +230,8 @@ namespace ASRuntime.operators
 
         public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            int id = ((rtInt)step.arg2.getValue(frame.scope)).value;
-            RunTimeValueBase arg = step.arg1.getValue(frame.scope);
+            int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
+            RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
 
             //**当function作为参数被传入时，重新绑定scope
             {
@@ -291,7 +291,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                rv = step.arg1.getValue(frame.scope);
+                rv = step.arg1.getValue(frame.scope, frame);
             }
             if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
             {
@@ -352,7 +352,7 @@ namespace ASRuntime.operators
                 //cb.args = args;
 
                 frame.funCaller.callbacker = frame.funCaller;
-                frame.funCaller.returnSlot = step.reg.getSlot(frame.scope);
+                frame.funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
                 frame.funCaller.call();
 
                 frame.funCaller = null;
@@ -369,7 +369,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = new BlockCallBackBase();
+                    BlockCallBackBase cb = BlockCallBackBase.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_convert_cb);
@@ -378,7 +378,7 @@ namespace ASRuntime.operators
 
                     OpCast.CastValue(frame.typeconvertoperator.inputvalue,
                         frame.typeconvertoperator.targettype.instanceClass.getRtType(),
-                        frame, step.token, frame.scope, step.reg.getSlot(frame.scope),
+                        frame, step.token, frame.scope, step.reg.getSlot(frame.scope, frame),
                         cb,
                         false);
                     frame.typeconvertoperator = null;
@@ -413,7 +413,7 @@ namespace ASRuntime.operators
 
         public static void exec_return(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            RunTimeValueBase result = step.arg1.getValue(frame.scope);
+            RunTimeValueBase result = step.arg1.getValue(frame.scope, frame);
             if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
@@ -429,7 +429,7 @@ namespace ASRuntime.operators
 
         public static void exec_yieldreturn(StackFrame frame,OpStep step,RunTimeScope scope)
         {
-            RunTimeValueBase result = step.arg1.getValue(scope);
+            RunTimeValueBase result = step.arg1.getValue(scope, frame);
             if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;

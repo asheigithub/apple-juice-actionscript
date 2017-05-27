@@ -9,9 +9,9 @@ namespace ASRuntime.operators
     {
         public static void execUnaryPlus(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
 
-            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Unary_plus, 
+            var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.Unary_plus, 
                 v.rtType,RunTimeDataType.unknown);
             if (f != null)
             {
@@ -21,7 +21,7 @@ namespace ASRuntime.operators
                 fc.loadDefineFromFunction();
                 bool success;
                 fc.pushParameter(v, 0, out success);
-                fc.returnSlot = step.reg.getSlot(scope);
+                fc.returnSlot = step.reg.getSlot(scope, frame);
                 fc.callbacker = fc;
                 fc.call();
 
@@ -29,7 +29,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                BlockCallBackBase cb = new BlockCallBackBase();
+                BlockCallBackBase cb = BlockCallBackBase.create();
                 cb.scope = scope;
                 cb.step = step;
                 cb.args = frame;
@@ -46,7 +46,7 @@ namespace ASRuntime.operators
             StackFrame frame = (StackFrame)sender.args;
             OpStep step = sender.step;
 
-            step.reg.getSlot(sender.scope).setValue( frame._tempSlot1.getValue().toNumber() );
+            step.reg.getSlot(sender.scope, frame).setValue( frame._tempSlot1.getValue().toNumber() );
             frame.endStep(step);
         }
     }

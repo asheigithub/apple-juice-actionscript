@@ -14,7 +14,7 @@ namespace ASRuntime.operators
     {
         private static ASBinCode.rtti.Class getClass(Player player, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var rv = step.arg1.getValue(frame.scope);
+            var rv = step.arg1.getValue(frame.scope, frame);
 
             if (rv.rtType > RunTimeDataType.unknown)
             {
@@ -45,7 +45,7 @@ namespace ASRuntime.operators
 
         public static void prepareConstructorClassArgements( StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var rv = step.arg1.getValue(scope);
+            var rv = step.arg1.getValue(scope, frame);
 
             if (rv.rtType > RunTimeDataType.unknown)
             {
@@ -57,7 +57,10 @@ namespace ASRuntime.operators
                     frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
                     if (_class.constructor != null)
                     {
-                        frame.instanceCreator.prepareConstructorArgements();
+                        if (!frame.instanceCreator.prepareConstructorArgements())
+                        {
+                            return;
+                        }
                     }
                     //if (_class.constructor != null)
                     //{
@@ -123,7 +126,10 @@ namespace ASRuntime.operators
             var _class = frame.player.swc.classes[0];
             frame.instanceCreator = new InstanceCreator(frame.player, frame, step.token, _class);
             frame.instanceCreator.constructor = (ASBinCode.rtData.rtObject)v1;
-            frame.instanceCreator.prepareConstructorArgements();
+            if (!frame.instanceCreator.prepareConstructorArgements())
+            {
+                return;
+            }
 
             frame.endStep(step);
         }
@@ -141,8 +147,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope)).value;
-                RunTimeValueBase arg = step.arg1.getValue(frame.scope);
+                int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope, frame)).value;
+                RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
 
                 frame.instanceCreator.push_parameter(arg, id);
                 
@@ -152,7 +158,7 @@ namespace ASRuntime.operators
 
         public static void prepareConstructorArgements(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var rv = step.arg1.getValue(frame.scope);
+            var rv = step.arg1.getValue(frame.scope, frame);
             int classid = ((ASBinCode.rtData.rtInt)rv).value;
             var player = frame.player;
             var _class = player.swc.classes[classid];
@@ -169,7 +175,10 @@ namespace ASRuntime.operators
             {
 
                 frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
-                frame.instanceCreator.prepareConstructorArgements();
+                if (!frame.instanceCreator.prepareConstructorArgements())
+                {
+                    return;
+                }
             }
             //ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             //ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
@@ -273,7 +282,7 @@ namespace ASRuntime.operators
         public static void init_static(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             var player = frame.player;
-            int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
+            int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope, frame)).value;
             ASBinCode.rtti.Class as3class = player.swc.classes[classid];
             //init_static_class(player, frame, as3class,step.token, scope);
 
@@ -319,7 +328,7 @@ namespace ASRuntime.operators
 
             
 
-            BlockCallBackBase cb = new BlockCallBackBase();
+            BlockCallBackBase cb = BlockCallBackBase.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -335,7 +344,7 @@ namespace ASRuntime.operators
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
 
-            BlockCallBackBase cb = new BlockCallBackBase();
+            BlockCallBackBase cb = BlockCallBackBase.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -360,7 +369,7 @@ namespace ASRuntime.operators
         }
         private static void objcreated(BlockCallBackBase sender,object args)
         {
-            sender.step.reg.getSlot(sender.scope).directSet(
+            sender.step.reg.getSlot(sender.scope, (StackFrame)sender.args).directSet(
                 ((StackFrame)sender.args).instanceCreator.objectResult );
 
 

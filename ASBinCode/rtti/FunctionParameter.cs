@@ -26,5 +26,13 @@ namespace ASBinCode.rtti
         /// </summary>
         public bool isPara;
 
+
+
+        /// <summary>
+        /// 是否通过栈来传递
+        /// </summary>
+        public bool isOnStack;
+        public LeftValueBase varorreg;
+
     }
 }

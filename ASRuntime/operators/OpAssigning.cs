@@ -10,8 +10,8 @@ namespace ASRuntime.operators
     {
         public static void execAssigning(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope);
-            ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
+            ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope, frame);
 
             //if (!slot.isPropGetterSetter)
             {
@@ -48,7 +48,7 @@ namespace ASRuntime.operators
 
                         if (slot is OpVector.vectorSLot)    //Vector类型不匹配
                         {
-                            BlockCallBackBase cb = new BlockCallBackBase();
+                            BlockCallBackBase cb =  BlockCallBackBase.create();
                             cb.scope = scope;
                             cb.step = step;
                             cb.args = frame;
@@ -116,12 +116,12 @@ namespace ASRuntime.operators
             OpStep step = sender.step;
 
             ASBinCode.RunTimeValueBase v = frame._tempSlot1.getValue();
-            ASBinCode.SLOT slot = step.reg.getSlot(sender.scope);
+            ASBinCode.SLOT slot = step.reg.getSlot(sender.scope, frame);
 
             if (!slot.directSet(v))
             {
                 frame.throwCastException(step.token,
-                       step.arg1.getValue(sender.scope).rtType,
+                       step.arg1.getValue(sender.scope, frame).rtType,
                        ((OpVector.vectorSLot)((StackSlot)slot).linktarget).vector_data.vector_type
                         );
             }
@@ -198,7 +198,7 @@ namespace ASRuntime.operators
                 var funCaller =  FunctionCaller.create(player, frame, step.token);
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
-                funCaller.createParaScope();
+                if (!funCaller.createParaScope()) { return; }
 
                 //funCaller.releaseAfterCall = true;
 
@@ -213,7 +213,7 @@ namespace ASRuntime.operators
                 funCaller._tempSlot = frame._tempSlot1;
                 funCaller.returnSlot = frame._tempSlot1;
 
-                BlockCallBackBase cb = new BlockCallBackBase();
+                BlockCallBackBase cb =  BlockCallBackBase.create();
                 cb.setCallBacker(_assign_callbacker);
                 cb.step = step;
                 cb.args = frame;

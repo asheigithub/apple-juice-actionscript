@@ -21,7 +21,7 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class Main extends Sprite 
+	public class FuncTest extends Sprite 
 	{
 		[fffmeta]
 		public var fff:int;
@@ -38,7 +38,7 @@ package
 		private function bb() { trace("bb") };
 		
 		
-		public function Main() 
+		public function FuncTest() 
 		{
 			//var dk = DateTimeKind.Local;
 			//trace( int(DateTimeKind.Local));
@@ -97,6 +97,7 @@ package
 			try 
 			{
 				tt = TimeSpan.fromDays(3.3).add( TimeSpan.fromMinutes( -3000000) );
+				
 			}
 			catch (e:ArgumentError)
 			{
@@ -108,7 +109,8 @@ package
 			}
 			finally
 			{
-				trace(tt);
+				
+				trace("tt",tt);
 			}
 			
 			var v:Vector.<Vector.<TimeSpan>> = Vector.<Vector.<TimeSpan>>( [Vector.<TimeSpan>([tt,tt,tt])]);
@@ -129,9 +131,7 @@ package
 			
 			var m = this;
 			
-			trace(m -2 +m );
-			
-			
+			trace(this.a);
 			
 			//var values = [ "000000006", "12.12:12:12.12345678" ];
 			//for each (var s:String in values)
@@ -150,12 +150,6 @@ package
 			trace(TimeSpan.Zero);
 			
 			trace(TimeSpan.Zero<=tt);
-			
-			trace( -tt+tt);
-			
-			var b = a;
-			
-			
 			
 			/*
 			yield 是从.net2.0语法中移植过来，可自动生成一个可枚举对象的语法。每次yield return都可以返回一个值
@@ -192,16 +186,15 @@ package
 		}
 		
 		
-		private function valueOf()
-		{
-			return 5;
-		}
+		
 		
 		
 
 	}
 	
 }
+
+
 //import system.collections.IEnumerable;
 //import system.collections.IEnumerator;
 //
@@ -276,66 +269,3 @@ package
 //trace(new Date().getTime()-t);
 //
 //trace(b);
-
-//function Emitter() {
-    //this._listener = {}; //_listener[自定义的事件名] = [所用执行的匿名函数1, 所用执行的匿名函数2]
-//}
-//
-////注册事件
-//Emitter.prototype.bind = function(eventName, funCallback) {
-        //var listenersArr = this._listener[eventName] || []; ////this._listener[eventName]没有值则将listener定义为[](数组)。
-        //listenersArr.push(funCallback);
-        //this._listener[eventName] = listenersArr;
-    //}
-    ////触发事件
-//Emitter.prototype.trigger = function(eventName,...args) {
-        //
-	//
-	////未绑定事件    
-        //if (!this._listener.hasOwnProperty(eventName)) {
-            //trace('you do not bind this event');
-            //return;
-        //}
-        ////var args = Array.prototype.slice.call(arguments, 1); ////args为获得除了eventName后面的参数(最后被用作注册事件的参数)
-        //var listenersArr = this._listener[eventName];
-        //var _this = this;
-        //if (!(listenersArr is Array)) return; ////自定义事件名不存在
-//
-        //listenersArr.forEach(Object(function(callback) {
-            //try {
-				//trace(this);
-				//
-                //callback.call(_this, args);
-            //} catch (e) {
-                //trace(e);
-            //}
-        //}));
-    //}
-    ////解绑
-//Emitter.prototype.unbind = function(eventName, callback) {
-    //this._listener.hasOwnProperty(eventName) && delete this._listener[eventName];
-    //callback && callback();
-//}
-//
-//var emitter = new Emitter();
-//emitter.bind("selfEvent", function(...args) {
-    //trace("第一个绑定");
-	//
-    //args.forEach(function(item) {
-		//trace(this.Emitter);
-        //trace(item);
-    //});
-//});
-//emitter.bind("selfEvent", function(...args) {
-    //trace("第二个绑定");
-    //args.forEach(function(item) {
-        //trace(item);
-    //});
-//});
-//emitter.trigger('selfEvent', 'a', 'b', 'c');
-//emitter.unbind('selfEvent', function() {
-    //trace("解除绑定");
-//});
-//emitter.trigger('selfEvent', 'a', 'b', 'c');
-
-

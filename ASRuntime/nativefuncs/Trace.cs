@@ -15,9 +15,9 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                var totrace = step.arg1.getValue(scope);
+                var totrace = step.arg1.getValue(scope,frame);
 
-                BlockCallBackBase cb=new BlockCallBackBase();
+                BlockCallBackBase cb= BlockCallBackBase.create();
                 cb.args = frame;
                 cb.setCallBacker(cast_back);
 

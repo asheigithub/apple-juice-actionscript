@@ -64,7 +64,7 @@ namespace ASBinCode
             throw new NotImplementedException();
         }
 
-        public sealed override  RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             throw new NotImplementedException();
         }
@@ -77,12 +77,12 @@ namespace ASBinCode
         //    get { return _tempSlot; }
         //}
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return _tempSlot;
         }
 
-        public sealed override  SLOT getSlot(RunTimeScope scope)
+        public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
             //if (_tempSlot == null)
             //{

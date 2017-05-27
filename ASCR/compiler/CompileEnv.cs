@@ -102,6 +102,154 @@ namespace ASCompiler.compiler
             }
         }
 
+        public void convertVarToReg(Builder builder,ASBinCode.rtti.FunctionDefine f)
+        {
+            
+            List<CodeBlock> blocks = new List<CodeBlock>();
+            foreach (var b in builder.bin.blocks)
+            {
+                if (b != null && b.define_class_id == block.define_class_id && b != block)
+                {
+                    blocks.Add(b);
+                }
+            }
+
+            Dictionary<Variable, Register> toReplace = new Dictionary<Variable, Register>();
+
+            for (int i = 0/* f.signature.parameters.Count*/; i < block.scope.members.Count; i++)
+            {
+                var m = block.scope.members[i];
+                
+                {
+                    Variable vm = (Variable)m;
+                    if (i < f.signature.parameters.Count)
+                    {
+                        f.signature.parameters[i].varorreg = vm;
+                    }
+
+                    bool found = false;
+                    //***查找是否被其他块引用***
+                    foreach (var tofindblock in blocks)
+                    {
+                        var steps = tofindblock.opSteps;
+                        foreach (var op in steps)
+                        {
+                            Variable v = op.reg as Variable;
+                            if (v !=null && v.name==vm.name && v.indexOfMembers==vm.indexOfMembers && v.refdefinedinblockid==vm.refdefinedinblockid)
+                            {
+                                found = true;
+                                break;
+                            }
+                            v = op.arg1 as Variable;
+                            if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
+                            {
+                                found = true;
+                                break;
+                            }
+                            v = op.arg2 as Variable;
+                            if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!found)
+                    {
+                        
+                        Register varReg = getAdditionalRegister();
+                        //***将Variable替换为Reg***
+                        toReplace.Add(vm, varReg);
+
+                        if (i >= f.signature.parameters.Count)
+                        {
+                            varReg._index = block.totalRegisters;
+                            block.totalRegisters++;
+                        }
+                        else
+                        {
+                            //是参数修改
+
+                            f.signature.onStackParameters++;
+                            varReg._index = -f.signature.onStackParameters;
+                            f.signature.parameters[i].varorreg = varReg;
+                            f.signature.parameters[i].isOnStack = true;
+                        }
+
+                    }
+                }
+            }
+
+            if (toReplace.Count > 0)
+            {
+                foreach (var item in toReplace)
+                {
+                    block.scope.members.Remove(item.Key);
+                    foreach (var op in block.opSteps)
+                    {
+                        //***将所有引用到的Variable替换***
+                        if (Object.Equals(op.reg, item.Key))
+                        {
+                            op.reg = item.Value;
+                        }
+
+                        if (Object.Equals(op.arg1, item.Key))
+                        {
+                            op.arg1 = item.Value;
+                        }
+
+                        if (Object.Equals(op.arg2, item.Key))
+                        {
+                            op.arg2 = item.Value;
+                        }
+                    }
+                }
+
+                for (int i = 0; i < block.scope.members.Count; i++)
+                {
+                    Variable var = (Variable)block.scope.members[i];
+                    if (var.indexOfMembers != i)
+                    {
+                        var tosearchblocks = new List<CodeBlock>();
+                        tosearchblocks.Add(block);
+                        tosearchblocks.AddRange(blocks);
+                        //***更新所有引用的新索引
+                        foreach (var tofindblock in tosearchblocks)
+                        {
+                            var steps = tofindblock.opSteps;
+                            foreach (var op in steps)
+                            {
+                                
+                                if ( Equals(op.reg,var) )
+                                {
+                                    ((Variable)op.reg).setIndexMemberWhenCompile(i);
+                                }
+
+                                if (Equals(op.arg1, var))
+                                {
+                                    ((Variable)op.arg1).setIndexMemberWhenCompile(i);
+                                }
+
+                                if (Equals(op.arg2, var))
+                                {
+                                    ((Variable)op.arg2).setIndexMemberWhenCompile(i);
+                                }
+                            }
+                        }
+                        var.setIndexMemberWhenCompile(i);
+
+                    }
+                }
+                
+            }
+            
+
+
+        }
+
+
+
         /// <summary>
         /// 刷新条件跳转语句等的目标行
         /// </summary>
@@ -130,11 +278,11 @@ namespace ASCompiler.compiler
                 if (step.opCode == ASBinCode.OpCode.if_jmp
                     )
                 {
-                    findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null)).value;
+                    findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null,null)).value;
                 }
                 else if (step.opCode == ASBinCode.OpCode.jmp)
                 {
-                    findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null)).value;
+                    findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null,null)).value;
                 }
                
                 if (findflag != null)
@@ -167,12 +315,12 @@ namespace ASCompiler.compiler
                 if (step.opCode == ASBinCode.OpCode.enter_try)
                 {
                     block.hasTryStmt = true;
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     trys.Push(new trystate(0, tryid));
                 }
                 else if (step.opCode == ASBinCode.OpCode.quit_try)
                 {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     var s = trys.Pop();
                     if (s.tryid != tryid || s.type !=0)
                     {
@@ -181,12 +329,12 @@ namespace ASCompiler.compiler
                 }
                 else if (step.opCode == OpCode.enter_catch)
                 {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     trys.Push(new trystate(1, tryid));
                 }
                 else if (step.opCode == ASBinCode.OpCode.quit_catch)
                 {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     var s = trys.Pop();
                     if (s.tryid != tryid || s.type != 1)
                     {
@@ -195,12 +343,12 @@ namespace ASCompiler.compiler
                 }
                 else if (step.opCode == OpCode.enter_finally)
                 {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     trys.Push(new trystate(2, tryid));
                 }
                 else if (step.opCode == ASBinCode.OpCode.quit_finally)
                 {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null)).value;
+                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
                     var s = trys.Pop();
                     if (s.tryid != tryid || s.type != 2)
                     {

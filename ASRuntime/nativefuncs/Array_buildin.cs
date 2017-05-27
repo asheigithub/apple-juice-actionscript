@@ -496,11 +496,11 @@ namespace ASRuntime.nativefuncs
             }
 
 
-            BlockCallBackBase sepcb = new BlockCallBackBase();
+            BlockCallBackBase sepcb = BlockCallBackBase.create();
             sepcb.scope = scope;
             sepcb._intArg = 0;
 
-            object[] sendargs = new object[9];
+            object[] sendargs = sepcb.cacheObjects;
             sendargs[0] = cb;
             sendargs[1] = array;
             sendargs[2] = frame;
@@ -537,9 +537,9 @@ namespace ASRuntime.nativefuncs
 
             rtArray array = (rtArray)receiveArgs[1];
 
-            BlockCallBackBase valueCB = new BlockCallBackBase();
+            BlockCallBackBase valueCB = BlockCallBackBase.create();
             valueCB._intArg = sender._intArg + 1;
-            valueCB.args = receiveArgs;
+            valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
             valueCB.setCallBacker(_ValueToString_CB);
 
             operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
@@ -563,9 +563,9 @@ namespace ASRuntime.nativefuncs
             if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
             {
                 ((rtInt)receiveArgs[8]).value = 0;
-                BlockCallBackBase valueCB = new BlockCallBackBase();
+                BlockCallBackBase valueCB = BlockCallBackBase.create();
                 valueCB._intArg = sender._intArg;
-                valueCB.args = sender.args;
+                valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
 
                 frame.player.CallBlankBlock(valueCB);
@@ -598,9 +598,9 @@ namespace ASRuntime.nativefuncs
                     else
                     {
 
-                        BlockCallBackBase valueCB = new BlockCallBackBase();
+                        BlockCallBackBase valueCB =  BlockCallBackBase.create();
                         valueCB._intArg = sender._intArg + 1;
-                        valueCB.args = receiveArgs;
+                        valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                         valueCB.setCallBacker(_ValueToString_CB);
 
                         operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,

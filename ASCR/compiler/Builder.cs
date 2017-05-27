@@ -52,6 +52,7 @@ namespace ASCompiler.compiler
         internal Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>
             _overridefunctions = new Dictionary<ASBinCode.rtti.Class, Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>>();
 
+        internal Dictionary<CodeBlock, CompileEnv> blockEnv = new Dictionary<CodeBlock, CompileEnv>();
 
 
         internal readonly bool isEval;
@@ -679,9 +680,8 @@ namespace ASCompiler.compiler
 
                 //block必须有收尾工作
                 {
-                    
-                    env.block.totalRegisters = env.combieNeedStackSlots();
                     env.completSteps();
+                    env.block.totalRegisters = env.combieNeedStackSlots();
                 }
 
                 _currentImports.Pop();
@@ -1148,17 +1148,35 @@ namespace ASCompiler.compiler
                         break;
                     }
                 }
-
-
-
-
             }
+
+            //先查找函数私有变量，不考虑参数。如果这个私有变量只在函数体内使用，则转化为1个Register.
+            #region 变量查找
+
+            
+            foreach (var f in bin.functions)
+            {
+                if (f == null || f.isYield || f.isNative)
+                {
+                    continue;
+                }
+                var fb = bin.blocks[f.blockid];
+                if (blockEnv.ContainsKey(fb))
+                {
+                    blockEnv[fb].convertVarToReg(this, f);
+                }
+            }
+
+            #endregion
+
         }
 
 
         internal void buildCodeBlock(List<ASTool.AS3.IAS3Stmt> statements, CodeBlock block)
         {
             CompileEnv env = new CompileEnv(block, false);
+            blockEnv.Add(block, env);
+
             //先提取变量定义
             for (int i = 0; i < statements.Count; i++)
             {

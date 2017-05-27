@@ -17,7 +17,7 @@ namespace ASBinCode
 
         //private MethodSlot _tempSlot;
 
-        public sealed  override  RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed  override  RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return getMethod(scope);
             //throw new NotImplementedException();

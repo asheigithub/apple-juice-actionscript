@@ -18,7 +18,7 @@ namespace ASRuntime.error
 
         public ASBinCode.RunTimeValueBase errorValue;
 
-        internal Stack<StackFrame> callStack;
+        internal Stack<FrameInfo> callStack;
 
         public InternalError(ASBinCode.SourceToken token,string message)
         {

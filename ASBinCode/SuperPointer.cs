@@ -30,7 +30,7 @@ namespace ASBinCode
         //    }
         //}
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return scope.this_pointer;
         }

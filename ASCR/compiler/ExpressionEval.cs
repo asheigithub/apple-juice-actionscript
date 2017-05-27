@@ -56,7 +56,7 @@ namespace ASCompiler.compiler
                         tempswc.functions.AddRange(importBuilder.bin.functions);
                     }
                     tempswc.blocks.Add(tempEnv.block);
-
+                    
                     player.loadCode(tempswc,tempEnv.block);
 
                     RunTimeValueBase result=  player.run2(value);

@@ -31,6 +31,14 @@ namespace ASRuntime.operators
             return fc;
         }
 
+        public static void checkpool()
+        {
+            if (pool.Count != 128)
+            {
+                throw new ASRunTimeException("缓存池异常");
+            }
+        }
+
         private static void ret(FunctionCaller c)
         {
             pool.Push(c);
@@ -70,7 +78,7 @@ namespace ASRuntime.operators
 
         
         bool hasReleased;
-        private void release()
+        public void release()
         {
             if (!hasReleased)
             {
@@ -99,7 +107,7 @@ namespace ASRuntime.operators
            
         }
 
-        public void createParaScope()
+        public bool createParaScope()
         {
             if (toCallFunc.isNative)
             {
@@ -113,11 +121,29 @@ namespace ASRuntime.operators
                 {
                     ((nativefuncs.NativeConstParameterFunction)nf).prepareParameter(toCallFunc);
 
-                    return;
+                    return true;
                 }
             }
 
-            ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature; 
+            ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature;
+
+            invokerFrame.call_parameter_slotCount = signature.onStackParameters;
+            if (invokerFrame.offset + 
+                invokerFrame.block.totalRegisters + 1 + 1 + 
+                invokerFrame.call_parameter_slotCount >= invokerFrame.stack.Length)
+            {
+
+                invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
+                invokerFrame.endStep();
+                if (callbacker != null)
+                {
+                    callbacker.noticeRunFailed();
+                }
+                release();
+
+                return false;
+            }
+
 
             CallFuncHeap =
                 player.genHeapFromCodeBlock(player.swc.blocks[toCallFunc.blockid]);
@@ -127,7 +153,7 @@ namespace ASRuntime.operators
                 if (signature.parameters[i].defaultValue != null)
                 {
                     var dt = signature.parameters[i].type;
-                    var dv = signature.parameters[i].defaultValue.getValue(null);
+                    var dv = signature.parameters[i].defaultValue.getValue(null,null);
 
                     
                     if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
@@ -154,22 +180,124 @@ namespace ASRuntime.operators
                         }
                     }
 
+                    //if (signature.onStackParameters > 0)
+                    //{
+                    //    ASBinCode.rtti.FunctionParameter fp = signature.parameters[i];
 
-                    CallFuncHeap[i].directSet(
-                        dv
+                    //    if (fp.isOnStack)
+                    //    {
+                    //        Register r = (Register)fp.varorreg;
+                    //        int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1+1 
+                    //                    + invokerFrame.call_parameter_slotCount + r._index ;
+                    //        invokerFrame.stack[index].directSet(dv);
+                    //    }
+                    //    else
+                    //    {
+                    //        CallFuncHeap[ ((Variable) fp.varorreg).indexOfMembers ].directSet(
+                    //            dv
 
-                        );
+                    //        );
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    CallFuncHeap[i].directSet(
+                    //        dv
+
+                    //        );
+                    //}
+                    _storeArgementToSlot(i, dv);
                 }
                 else if (signature.parameters[i].isPara)
                 {
-                    CallFuncHeap[i].directSet(
-                       new ASBinCode.rtData.rtArray()
-                       );
+                    //if (signature.onStackParameters > 0)
+                    //{
+                    //    ASBinCode.rtti.FunctionParameter fp = signature.parameters[i];
+                    //    if (fp.isOnStack)
+                    //    {
+                    //        Register r = (Register)fp.varorreg;
+                    //        int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1
+                    //                    + invokerFrame.call_parameter_slotCount + r._index;
+                    //        invokerFrame.stack[index].directSet(new ASBinCode.rtData.rtArray());
+                    //    }
+                    //    else
+                    //    {
+                    //        CallFuncHeap[((Variable)fp.varorreg).indexOfMembers].directSet(
+                    //            new ASBinCode.rtData.rtArray()
+
+                    //        );
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    CallFuncHeap[i].directSet(
+                    //            new ASBinCode.rtData.rtArray()
+                    //        );
+                    //}
+                    _storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
                 }
 
             }
+
+            return true;
             
         }
+
+        private SLOT _getArgementSlot(int id)
+        {
+            var signature = toCallFunc.signature;
+
+            if (signature.onStackParameters > 0)
+            {
+                ASBinCode.rtti.FunctionParameter fp = signature.parameters[id];
+
+                if (fp.isOnStack)
+                {
+                    Register r = (Register)fp.varorreg;
+                    int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1
+                                + invokerFrame.call_parameter_slotCount + r._index;
+                    return invokerFrame.stack[index];
+                }
+                else
+                {
+                    return CallFuncHeap[((Variable)fp.varorreg).indexOfMembers];
+                }
+            }
+            else
+            {
+                return CallFuncHeap[id];
+            }
+        }
+
+        private void _storeArgementToSlot(int id,RunTimeValueBase v)
+        {
+            var signature = toCallFunc.signature;
+
+            if (signature.onStackParameters > 0)
+            {
+                ASBinCode.rtti.FunctionParameter fp = signature.parameters[id];
+
+                if (fp.isOnStack)
+                {
+                    Register r = (Register)fp.varorreg;
+                    int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1
+                                + invokerFrame.call_parameter_slotCount + r._index;
+                    invokerFrame.stack[index].directSet(v);
+                }
+                else
+                {
+                    CallFuncHeap[((Variable)fp.varorreg).indexOfMembers].directSet(
+                        v
+
+                    );
+                }
+            }
+            else
+            {
+                CallFuncHeap[id].directSet(v);
+            }
+        }
+
 
         public void pushParameter(RunTimeValueBase argement,int id,out bool success)
         {
@@ -188,6 +316,13 @@ namespace ASRuntime.operators
                     if (success)
                     {
                         pushedArgs++;
+                    }
+                    else
+                    {
+                        if (callbacker != null)
+                        {
+                            callbacker.noticeRunFailed();
+                        }
                     }
                     return;
                 }
@@ -216,7 +351,10 @@ namespace ASRuntime.operators
                 {
                     if (id < toCallFunc.signature.parameters.Count)
                     {
-                        CallFuncHeap[id].directSet(argement);
+                        //CallFuncHeap[id].directSet(argement);
+
+                        _storeArgementToSlot(id, argement);
+
                         pushedArgs++;
                     }
                     else
@@ -236,11 +374,14 @@ namespace ASRuntime.operators
                             //***中断本帧本次代码执行进入try catch阶段
                             success = false;
 
-                            
-                            {
-                                release();
-                            }
 
+                            if (callbacker != null)
+                            {
+                                callbacker.noticeRunFailed();
+                            }
+                            release();
+                            
+                            
                             return;
                         }
 
@@ -250,7 +391,7 @@ namespace ASRuntime.operators
                 else
                 {
                     //***最后一个是参数数组，并且id大于等于最后一个
-                    HeapSlot slot = CallFuncHeap[toCallFunc.signature.parameters.Count - 1];
+                    SLOT slot = _getArgementSlot(toCallFunc.signature.parameters.Count - 1); //CallFuncHeap[toCallFunc.signature.parameters.Count - 1];
                     if (slot.getValue().rtType == RunTimeDataType.rt_null)
                     {
                         slot.directSet(new ASBinCode.rtData.rtArray());
@@ -275,10 +416,14 @@ namespace ASRuntime.operators
                             );
                 success = false;
 
-                
+
+                if (callbacker != null)
                 {
-                    release();
+                    callbacker.noticeRunFailed();
                 }
+                release();
+                
+                
             }
         }
 
@@ -298,12 +443,13 @@ namespace ASRuntime.operators
                 }
             }
 
-            return CallFuncHeap[para_id].getValue();
+            return _getArgementSlot(para_id).getValue();  //CallFuncHeap[para_id].getValue();
 
         }
         private void setCheckedParameter(int para_id,RunTimeValueBase value)
         {
-            CallFuncHeap[para_id].directSet(value);
+            //CallFuncHeap[para_id].directSet(value);
+            _getArgementSlot(para_id).directSet(value);
         }
 
         private void check_para()
@@ -317,7 +463,7 @@ namespace ASRuntime.operators
                     toCallFunc.signature.parameters[check_para_id].type != RunTimeDataType.rt_void
                     )
                 {
-                    BlockCallBackBase cb = new BlockCallBackBase();
+                    BlockCallBackBase cb = BlockCallBackBase.create();
                     cb.args = argement;
                     cb._intArg = check_para_id;
                     cb.setCallBacker(check_para_callbacker);
@@ -379,10 +525,14 @@ namespace ASRuntime.operators
 
                         //***中断本帧本次代码执行进入try catch阶段
                         invokerFrame.endStep();
-                        
+
+                        if (callbacker != null)
                         {
-                            release();
+                            callbacker.noticeRunFailed();
                         }
+                        release();
+                        
+                        
                         return;
                     }
                 }
@@ -395,10 +545,14 @@ namespace ASRuntime.operators
                     if (!ic.init_static_class(player.swc.YieldIteratorClass))
                     {
                         invokerFrame.endStep();
-                        
+
+                        if (callbacker != null)
                         {
-                            release();
+                            callbacker.noticeRunFailed();
                         }
+                        release();
+                        
+                        
                         return;
                     }
 
@@ -421,8 +575,8 @@ namespace ASRuntime.operators
                     (function.this_pointer != null ?
                     function.this_pointer : invokerFrame.scope.this_pointer);
 
-                RunTimeScope scope = new RunTimeScope(player.swc,null, null, 
-                    0, player.swc.YieldIteratorClass.blockid, null, null, rtYield, RunTimeScopeType.objectinstance);
+                RunTimeScope scope = new RunTimeScope(null,  
+                     player.swc.YieldIteratorClass.blockid, null, rtYield, RunTimeScopeType.objectinstance);
                 rtYield.objScope = scope;
                 
                 returnSlot.directSet(rtYield);
@@ -432,27 +586,45 @@ namespace ASRuntime.operators
                 {
                     callbacker.call(callbacker.args);
                 }
+                release();
                 
-                {
-                    release();
-                }
                 return;
             }
             else if (!toCallFunc.isNative)
             {
                 returnSlot.directSet(
-                    TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null));
-                player.callBlock(
-                    player.swc.blocks[toCallFunc.blockid],
-                    CallFuncHeap,
-                    returnSlot,
-                    function.bindScope,
-                    token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
+                    TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null,null));
 
-                if ( !ReferenceEquals(callbacker,this))
+                if (!ReferenceEquals(callbacker, this))
                 {
+                    //***执行完成后，先清理参数***
+                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    cb.args = cb.cacheObjects;
+                    cb.cacheObjects[0] = callbacker;
+                    cb.cacheObjects[1] = invokerFrame;
+
+                    cb.setCallBacker(callfun_cb);
+                    cb.setWhenFailed(callfun_failed);
+
+                    player.callBlock(
+                        player.swc.blocks[toCallFunc.blockid],
+                        CallFuncHeap,
+                        returnSlot,
+                        function.bindScope,
+                        token, cb, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
+
                     release();
                 }
+                else
+                {
+                    player.callBlock(
+                        player.swc.blocks[toCallFunc.blockid],
+                        CallFuncHeap,
+                        returnSlot,
+                        function.bindScope,
+                        token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
+                }
+                
             }
             else
             {
@@ -468,6 +640,8 @@ namespace ASRuntime.operators
 
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_0)
                 {
+                    player._nativefuncCaller = this;
+
                     string errormsg;
                     int errorno;
                     var result = nf.execute(
@@ -476,7 +650,7 @@ namespace ASRuntime.operators
                         out errormsg,
                         out errorno
                         );
-
+                    player._nativefuncCaller = null;
                     if (errormsg == null)
                     {
                         returnSlot.directSet(result);
@@ -485,11 +659,9 @@ namespace ASRuntime.operators
                         {
                             callbacker.call(callbacker.args);
                         }
-
                         
-                        {
-                            release();
-                        }
+                        release();
+                        
                     }
                     else
                     {
@@ -498,15 +670,20 @@ namespace ASRuntime.operators
                             );
 
                         invokerFrame.endStep();
-                        
+
+                        if (callbacker != null)
                         {
-                            release();
+                            callbacker.noticeRunFailed();
                         }
+                        release();
+                        
+                        
                     }
 
                 }
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_1)
                 {
+                    player._nativefuncCaller = this;
                     bool success;
 
                     nf.execute2(
@@ -518,7 +695,7 @@ namespace ASRuntime.operators
                         invokerFrame,
                         out success
                         );
-
+                    player._nativefuncCaller = null;
                     if (success)
                     {
                         if (callbacker != null)
@@ -528,13 +705,16 @@ namespace ASRuntime.operators
                     }
                     else
                     {
+                        if (callbacker != null)
+                        {
+                            callbacker.noticeRunFailed();
+                        }
                         invokerFrame.endStep();
                     }
 
+                    release();
                     
-                    {
-                        release();
-                    }
+                   
                 }
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.async_0)
                 {
@@ -555,7 +735,7 @@ namespace ASRuntime.operators
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
                     bool success;
-
+                    player._nativefuncCaller = this;
                     ((nativefuncs.NativeConstParameterFunction)nf).execute3(
                         function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
                         toCallFunc,
@@ -564,7 +744,7 @@ namespace ASRuntime.operators
                         invokerFrame,
                         out success
                         );
-
+                    player._nativefuncCaller = null;
                     ((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
 
                     if (success)
@@ -576,14 +756,52 @@ namespace ASRuntime.operators
                     }
                     else
                     {
+                        if (callbacker != null)
+                        {
+                            callbacker.noticeRunFailed();
+                        }
                         invokerFrame.endStep();
                     }
 
                     
-                    {
-                        release();
-                    }
+                    release();
+                    
+                    
                 }
+            }
+        }
+
+        private void callfun_failed(BlockCallBackBase sender, object args)
+        {
+            StackFrame frame = (StackFrame)sender.cacheObjects[1];
+            clear_para_slot(frame);
+        }
+
+        private static void callfun_cb(BlockCallBackBase sender, object args)
+        {
+            IBlockCallBack callbacker = sender.cacheObjects[0] as IBlockCallBack;
+            StackFrame frame = (StackFrame)sender.cacheObjects[1];
+            clear_para_slot(frame);
+            if (callbacker != null)
+            {
+                callbacker.call(callbacker.args);
+            }
+            
+        }
+
+        private static void clear_para_slot(StackFrame invokerFrame)
+        {
+            if (invokerFrame.call_parameter_slotCount > 0)
+            {
+                //**清理**
+                for (int i = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1;
+                    i < invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount
+                    ; i++)
+                {
+                    invokerFrame.stack[i].clear();
+                }
+
+                invokerFrame.call_parameter_slotCount = 0;
             }
         }
 
@@ -608,11 +826,16 @@ namespace ASRuntime.operators
 
         void IBlockCallBack.call(object args)
         {
+            clear_para_slot(invokerFrame);
             invokerFrame.endStep();
+            release();
             
-            {
-                release();
-            }
+        }
+
+        public void noticeRunFailed()
+        {
+            clear_para_slot(invokerFrame);
+            release();
         }
     }
 }

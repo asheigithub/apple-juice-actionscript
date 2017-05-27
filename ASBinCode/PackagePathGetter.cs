@@ -21,15 +21,15 @@ namespace ASBinCode
         //    }
         //}
 
-        public override sealed SLOT getSlot(RunTimeScope scope)
+        public override sealed SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
             throw new NotImplementedException();
         }
-        public override SLOT getSlotForAssign(RunTimeScope scope)
+        public override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
             throw new NotImplementedException();
         }
-        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             //***不可能在运行时运行***
             throw new NotImplementedException();

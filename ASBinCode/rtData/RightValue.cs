@@ -22,7 +22,7 @@ namespace ASBinCode.rtData
         //    }
         //}
 
-        public override sealed RunTimeValueBase getValue(RunTimeScope scope)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return value;
         }
@@ -33,36 +33,5 @@ namespace ASBinCode.rtData
         }
     }
 
-
-    //public class RightValue<T> :IRightValue
-    //    where T :IRunTimeValue 
-    //{
-    //    private T value;
-    //    public RightValue(T value)
-    //    {
-    //        this.value = value;
-    //    }
-
-    //    public RunTimeDataType valueType
-    //    {
-    //        get
-    //        {
-    //            return value.rtType;
-    //        }
-    //    }
-
-    //    public IRunTimeValue getValue(IRunTimeScope scope)
-    //    {
-    //        return value;
-    //    }
-
-
-    //    public override string ToString()
-    //    {
-    //        return value.ToString();
-    //    }
-
-        
-
-    //}
+    
 }

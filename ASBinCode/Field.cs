@@ -21,7 +21,7 @@ namespace ASBinCode
 
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -42,7 +42,7 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public sealed override SLOT getSlot(RunTimeScope scope)
+        public sealed override SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -63,9 +63,9 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public override RunTimeValueBase getValue(RunTimeScope scope)
+        public override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return getSlot(scope).getValue();
+            return getSlot(scope,holder).getValue();
         }
 
         protected sealed override IMember _clone()

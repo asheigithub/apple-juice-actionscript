@@ -16,7 +16,7 @@ namespace ASRuntime.operators
             //frame.endStep(step);
 
 
-            step.reg.getSlot(scope).directSet(new ASBinCode.rtData.rtArray());
+            step.reg.getSlot(scope, frame).directSet(new ASBinCode.rtData.rtArray());
 
             frame.endStep(step);
 
@@ -25,10 +25,10 @@ namespace ASRuntime.operators
 
         public static void exec_Push(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.rtData.rtArray array = (ASBinCode.rtData.rtArray)step.reg.getValue(scope);
+            ASBinCode.rtData.rtArray array = (ASBinCode.rtData.rtArray)step.reg.getValue(scope, frame);
 
             //防止引用了StackSlot中的值类型，因此这里需要Clone()
-            array.innerArray.Add((ASBinCode.RunTimeValueBase)step.arg1.getValue(scope).Clone());
+            array.innerArray.Add((ASBinCode.RunTimeValueBase)step.arg1.getValue(scope, frame).Clone());
 
             frame.endStep(step);
         }

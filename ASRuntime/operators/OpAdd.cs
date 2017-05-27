@@ -11,47 +11,47 @@ namespace ASRuntime.operators
 
         public static void execAdd_Number(StackFrame frame ,ASBinCode.OpStep step,ASBinCode.RunTimeScope scope)
         {
-            double a1 = step.arg1.getValue(scope).toNumber();
-            double a2 = step.arg2.getValue(scope).toNumber();
+            double a1 = step.arg1.getValue(scope, frame).toNumber();
+            double a2 = step.arg2.getValue(scope, frame).toNumber();
 
-            step.reg.getSlot(scope).setValue(a1 + a2);//new ASBinCode.rtData.rtNumber(a1.value +a2.value ));
+            step.reg.getSlot(scope, frame).setValue(a1 + a2);//new ASBinCode.rtData.rtNumber(a1.value +a2.value ));
             frame.endStep(step);
         }
 
         public static void execAdd_String( StackFrame frame,ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             ASBinCode.rtData.rtString a1;
-            if (step.arg1.getValue(scope).rtType == ASBinCode.RunTimeDataType.rt_null)
+            if (step.arg1.getValue(scope, frame).rtType == ASBinCode.RunTimeDataType.rt_null)
             {
                 a1 = nullStr;
             }
             else
             {
-                a1 = (ASBinCode.rtData.rtString)step.arg1.getValue(scope);
+                a1 = (ASBinCode.rtData.rtString)step.arg1.getValue(scope, frame);
             }
 
 
             ASBinCode.rtData.rtString a2;
-                if (step.arg2.getValue(scope).rtType == ASBinCode.RunTimeDataType.rt_null)
+                if (step.arg2.getValue(scope, frame).rtType == ASBinCode.RunTimeDataType.rt_null)
             {
                 a2 = nullStr;
             }
             else
             {
-                a2= (ASBinCode.rtData.rtString)step.arg2.getValue(scope);
+                a2= (ASBinCode.rtData.rtString)step.arg2.getValue(scope, frame);
             }
 
 
-            step.reg.getSlot(scope).setValue(a1.valueString() + a2.valueString());// new ASBinCode.rtData.rtString(a1.valueString() + a2.valueString()));
+            step.reg.getSlot(scope, frame).setValue(a1.valueString() + a2.valueString());// new ASBinCode.rtData.rtString(a1.valueString() + a2.valueString()));
             frame.endStep(step);
         }
 
         public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue( scope);
-            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue( scope);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue( scope, frame);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue( scope, frame);
 
-            var f = scope.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.addition,
+            var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.addition,
                 v1.rtType, v2.rtType);
             if (f != null)
             {
@@ -63,7 +63,7 @@ namespace ASRuntime.operators
                 bool success;
                 fc.pushParameter(v1, 0, out success);
                 fc.pushParameter(v2, 1, out success);
-                fc.returnSlot = step.reg.getSlot(scope);
+                fc.returnSlot = step.reg.getSlot(scope, frame);
                 fc.callbacker = fc;
                 fc.call();
                 
@@ -156,7 +156,7 @@ namespace ASRuntime.operators
 
             if (finalType == ASBinCode.RunTimeDataType.rt_number)
             {
-                step.reg.getSlot(scope).setValue(
+                step.reg.getSlot(scope, frame).setValue(
                     TypeConverter.ConvertToNumber(v1)
                     +
                     TypeConverter.ConvertToNumber(v2)
@@ -166,7 +166,7 @@ namespace ASRuntime.operators
             else if (finalType == ASBinCode.RunTimeDataType.rt_string)
             {
 
-                BlockCallBackBase cb = new BlockCallBackBase();
+                BlockCallBackBase cb = BlockCallBackBase.create();
                 cb.setCallBacker(_Cast_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;
@@ -181,7 +181,7 @@ namespace ASRuntime.operators
             }
             else if (finalType == ASBinCode.RunTimeDataType.rt_void)
             {
-                step.reg.getSlot(scope).setValue(ASBinCode.rtData.rtUndefined.undefined);
+                step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtUndefined.undefined);
             }
             else
             {
@@ -220,7 +220,7 @@ namespace ASRuntime.operators
                 }
             }
 
-            sender.step.reg.getSlot(sender.scope).setValue(v1 + v2);
+            sender.step.reg.getSlot(sender.scope,(StackFrame)sender.args).setValue(v1 + v2);
             ((StackFrame)sender.args).endStep(sender.step);
 
         }

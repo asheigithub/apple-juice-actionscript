@@ -10,7 +10,7 @@ namespace ASBinCode
     /// <typeparam name="T"></typeparam>
     public abstract class RightValueBase
     {
-        public abstract RunTimeValueBase getValue(RunTimeScope scope);
+        public abstract RunTimeValueBase getValue(RunTimeScope scope , RunTimeDataHolder dataHolder );
 
         //public abstract RunTimeDataType valueType { get; }
         public RunTimeDataType valueType;
@@ -27,9 +27,9 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public abstract SLOT getSlot(RunTimeScope scope);
+        public abstract SLOT getSlot(RunTimeScope scope, RunTimeDataHolder dataHolder);
 
-        public abstract SLOT getSlotForAssign(RunTimeScope scope);
+        public abstract SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder dataHolder);
     }
 
 

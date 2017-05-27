@@ -98,7 +98,7 @@ namespace ASBinCode
         //    throw new NotImplementedException();
         //}
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope)
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             throw new NotImplementedException();
         }

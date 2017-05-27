@@ -257,7 +257,7 @@ namespace ASRuntime.nativefuncs
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
-            caller.createParaScope();
+            if (!caller.createParaScope()) {  return; }
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
 
@@ -422,7 +422,7 @@ namespace ASRuntime.nativefuncs
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
-            caller.createParaScope();
+            if (!caller.createParaScope()) {  return; }
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
 

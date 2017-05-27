@@ -129,12 +129,28 @@ namespace ASCompiler.compiler.builds
                     env.block.opSteps.Add(enter_catch);
                 }
 
-
+                int bstidx = env.block.opSteps.Count;
                 for (int j = 0; j < c.CatchBlock.Count; j++)
                 {
                     builder.buildStmt(env,c.CatchBlock[j]);
                 }
 
+                for (int k = bstidx; k < env.block.opSteps.Count; k++)
+                {
+                    var oop = env.block.opSteps[k];
+                    if (Equals(oop.reg, rtVariable))
+                    {
+                        ((Variable)oop.reg).resetName("0" + rtVariable.name + "_" + i + "_" + tryid);
+                    }
+                    if (Equals(oop.arg1, rtVariable))
+                    {
+                        ((Variable)oop.arg1).resetName("0" + rtVariable.name + "_" + i + "_" + tryid);
+                    }
+                    if (Equals(oop.arg2, rtVariable))
+                    {
+                        ((Variable)oop.arg2).resetName("0" + rtVariable.name + "_" + i + "_" + tryid);
+                    }
+                }
                 
                 rtVariable.resetName( "0"+ rtVariable.name  + "_" +i+"_" + tryid );
 
