@@ -5,7 +5,11 @@ ASBinCode/bin/
 ASBinCode/obj/
 ASCR/bin/
 ASCR/obj/
-ASCTest/bin/
+ASCTest/bin/Debug/
+ASCTest/bin/Release/*.dll
+ASCTest/bin/Release/*.exe
+ASCTest/bin/Release/*.config
+ASCTest/bin/Release/*.xml
 ASCTest/obj/
 ASRuntime/bin/
 ASRuntime/obj/
