@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASBinCode;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -33,8 +34,29 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope, frame);
             ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope, frame);
 
-            OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitOR_ValueOf_CallBacker);
+            var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.bitOr,
+                v1.rtType, v2.rtType);
+            if (f != null)
+            {
+                FunctionCaller fc = FunctionCaller.create(frame.player, frame, step.token);
+                fc.function = f;
+                fc.loadDefineFromFunction();
+                //fc.releaseAfterCall = true;
+
+                bool success;
+                fc.pushParameter(v1, 0, out success);
+                fc.pushParameter(v2, 1, out success);
+                fc.returnSlot = step.reg.getSlot(scope, frame);
+                fc.callbacker = fc;
+                fc.call();
+
+            }
+            else
+            {
+                OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _BitOR_ValueOf_CallBacker);
+            }
         }
+
         private static void _BitOR_ValueOf_CallBacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {

@@ -2962,6 +2962,28 @@ namespace ASCompiler.compiler.builds
             ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
             if (step.Arg1.IsReg)
             {
+                if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
+                   (OverrideableOperator.bitOr, v1.valueType, v2.valueType) != null)
+                {
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    eax.setEAXTypeWhenCompile(
+                        builder.bin.operatorOverrides.getOperatorDefine
+                                (OverrideableOperator.bitOr, v1.valueType, v2.valueType).signature.returnType);
+                    ASBinCode.OpStep op;
+                    op = new ASBinCode.OpStep(ASBinCode.OpCode.bitOr, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    op.arg1 = v1;
+                    op.arg1Type = v1.valueType;
+                    op.arg2 = v2;
+                    op.arg2Type = v2.valueType;
+
+                    op.reg = eax;
+                    op.regType = eax.valueType;
+
+                    env.block.opSteps.Add(op);
+                    return;
+                }
+
+
                 if (!ASRuntime.TypeConverter.testImplicitConvert(v1.valueType, RunTimeDataType.rt_int,builder)
                     ||
                     v1.valueType == RunTimeDataType.rt_boolean
@@ -2981,23 +3003,23 @@ namespace ASCompiler.compiler.builds
                         v2.valueType + "不能执行位或操作"));
                 }
 
+                {
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
-                eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
+                    ASBinCode.OpStep op
+                        = new ASBinCode.OpStep(OpCode.bitOr, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                ASBinCode.OpStep op
-                    = new ASBinCode.OpStep(OpCode.bitOr, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    op.arg1 = v1;
+                    op.arg1Type = v1.valueType;
+                    op.arg2 = v2;
+                    op.arg2Type = v2.valueType;
 
-                op.arg1 = v1;
-                op.arg1Type = v1.valueType;
-                op.arg2 = v2;
-                op.arg2Type = v2.valueType;
+                    op.reg = eax;
+                    op.regType = eax.valueType;
 
-                op.reg = eax;
-                op.regType = eax.valueType;
-
-                env.block.opSteps.Add(op);
-
+                    env.block.opSteps.Add(op);
+                }
             }
             else
             {

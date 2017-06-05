@@ -23,6 +23,11 @@ package system
 		[native,_system_DateTimeKind_ctor]
 		public function DateTimeKind();
 		
+		
+		[operator,"|"];
+		[native, _system_DateTimeKind_operator_bitOr];
+		private static function bitOr(t1:DateTimeKind,t2:DateTimeKind):DateTimeKind;
+		
 	}
 
 }

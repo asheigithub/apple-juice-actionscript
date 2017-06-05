@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
@@ -50,6 +51,68 @@ namespace ASRuntime.nativefuncs
 
         }
     }
+
+
+    class Object_valueOf :NativeConstParameterFunction
+    {
+        public override bool isMethod
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_Object_valueOf";
+            }
+        }
+
+        private List<RunTimeDataType> para = new List<RunTimeDataType>();
+
+        public Object_valueOf() : base(0)
+        {
+        }
+
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj,
+            FunctionDefine functionDefine, 
+            SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            success = true;
+            returnSlot.directSet(thisObj);
+        }
+
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
+
+        //    return new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(thisObj, null, null));
+
+
+        //}
+    }
+
+
 
     class Object_hasOwnProperty : NativeFunctionBase
     {

@@ -44,7 +44,7 @@ namespace ASCTest
                 )
                 );
 
-
+            bin.regNativeFunction(new system_DateTimeKind_operator_bitOr());
 
 
 

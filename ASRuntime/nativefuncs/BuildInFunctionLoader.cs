@@ -16,6 +16,7 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new __buildin__parsefloat());
 
             bin.regNativeFunction(new Object_toString());
+            bin.regNativeFunction(new Object_valueOf());
             bin.regNativeFunction(new Object_hasOwnProperty());
             bin.regNativeFunction(new Object_isPrototypeOf());
             bin.regNativeFunction(new Object_propertyIsEnumerable());

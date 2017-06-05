@@ -5,8 +5,8 @@
 	{
 		[native,_Object_toString]
 		private static var toString= function():String;
-		
-		private static var valueOf = function():*{ return this };
+		[native,_Object_valueOf]
+		private static var valueOf = function():*;
 
 		[native,_Object_hasOwnProperty]
 		private static var hasOwnProperty=function(name:String):Boolean;

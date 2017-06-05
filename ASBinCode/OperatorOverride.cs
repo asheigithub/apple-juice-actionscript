@@ -42,11 +42,17 @@ namespace ASBinCode
         /// <summary>
         /// +
         /// </summary>
-        addition,
+        addition=9,
         /// <summary>
         /// -
         /// </summary>
-        subtraction,
+        subtraction=10,
+
+        /// <summary>
+        /// |
+        /// </summary>
+        bitOr=11,
+
     }
 
     public struct OperatorFunctionKey : IEquatable<OperatorFunctionKey>
@@ -111,7 +117,7 @@ namespace ASBinCode
 
         public OperatorFunctions()
         {
-            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.subtraction+1];
+            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.bitOr+1];
             for (int i = 0; i < operFunctions.Length; i++)
             {
                 operFunctions[i] = new Dictionary<OperatorFunctionKey, DefineAndFunc>();

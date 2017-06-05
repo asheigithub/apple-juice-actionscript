@@ -8,11 +8,10 @@
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="21" />
+    <movie version="23" />
     <movie minorVersion="0" />
     <movie platform="AIR" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="AIR 23.0.0;23.0.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -74,7 +73,7 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\FuncTest.as" />
+    <compile path="src\TimeSpan_Test.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

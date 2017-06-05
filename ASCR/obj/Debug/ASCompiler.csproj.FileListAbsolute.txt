@@ -39,3 +39,4 @@ E:\VS\ASTool\ASCR\bin\Debug\ASTool.xml
 E:\VS\ASTool\ASCR\obj\Debug\ASCompiler.dll
 E:\VS\ASTool\ASCR\obj\Debug\ASCompiler.pdb
 D:\ASTool\ASCR\bin\Debug\ASTool.dll
+D:\ASTool\ASCR\bin\Debug\ASTool.dll.config
