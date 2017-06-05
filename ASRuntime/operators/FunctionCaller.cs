@@ -705,11 +705,12 @@ namespace ASRuntime.operators
                     }
                     else
                     {
+                        invokerFrame.endStep();
                         if (callbacker != null)
                         {
                             callbacker.noticeRunFailed();
                         }
-                        invokerFrame.endStep();
+                        
                     }
 
                     release();
@@ -756,11 +757,12 @@ namespace ASRuntime.operators
                     }
                     else
                     {
+                        invokerFrame.endStep();
                         if (callbacker != null)
                         {
                             callbacker.noticeRunFailed();
                         }
-                        invokerFrame.endStep();
+                        
                     }
 
                     

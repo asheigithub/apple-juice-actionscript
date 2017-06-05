@@ -1,5 +1,6 @@
 package 
 {
+	import system.DateTime;
 	import system.DateTimeKind;
 	[Doc]
 	/**
@@ -11,9 +12,12 @@ package
 		
 		public function FuncTest() 
 		{
-			var dt:DateTimeKind = DateTimeKind.Local;
+			var d:DateTime = new DateTime();
 			
-			trace( dt  | DateTimeKind.Utc );
+			trace(d);
+			
+			d = DateTime.constructor_(2017, 6, 65);
+			trace(d);
 			
 		}
 		

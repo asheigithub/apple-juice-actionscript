@@ -19,7 +19,7 @@ namespace ASCTest
 
             string[] files =null;
             
-
+            
             if (args.Length > 0)
             {
                 string path = args[0];

@@ -166,6 +166,12 @@ namespace ASCTest
             bin.regNativeFunction(new system_timespan_operator_unaryNegation());
             bin.regNativeFunction(new system_timespan_operator_addition());
             bin.regNativeFunction(new system_timespan_operator_subtraction());
+
+
+
+            bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DateTime_creator__", default(DateTime)));// new system_int64_creator());
+            bin.regNativeFunction(new system_datetime_ctor());
+            bin.regNativeFunction(new system_datetime_static_constructor_());
         }
     }
 }
