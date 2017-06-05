@@ -159,6 +159,8 @@ namespace ASRuntime.nativefuncs
 
             bin.regNativeFunction(new Error_getstack());
 
+
+            bin.regNativeFunction(new system_enum_valueOf());
         }
 
     }

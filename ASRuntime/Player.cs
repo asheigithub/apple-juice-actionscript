@@ -307,7 +307,13 @@ namespace ASRuntime
         {
             return operators.InstanceCreator.createLinkObjectValue(this, cls);
         }
-        
+
+        public bool init_static_class(ASBinCode.rtti.Class cls,SourceToken token)
+        {
+            return operators.InstanceCreator.init_static_class(cls, this, token);
+        }
+
+
         internal RunTimeScope callBlock(ASBinCode.CodeBlock calledblock,
             HeapSlot[] membersHeap,
             SLOT returnSlot,

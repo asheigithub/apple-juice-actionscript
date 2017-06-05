@@ -628,6 +628,40 @@ namespace ASRuntime.nativefuncs
 
     #endregion
 
-    
+    class system_enum_valueOf : NativeConstParameterFunction
+    {
+        public system_enum_valueOf() : base(0)
+        {
+            para = new List<RunTimeDataType>();
+        }
+
+        public override string name
+        {
+            get { return "_system_Enum_valueOf"; }
+        }
+
+        public override bool isMethod { get { return true; } }
+
+        public override RunTimeDataType returnType { get { return RunTimeDataType.rt_int; } }
+
+        private List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get { return para; }
+        }
+
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            success = true;
+
+            LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value;
+
+            ((StackSlot)returnSlot).setValue((int)lo.GetLinkData());
+
+
+
+        }
+    }
 
 }

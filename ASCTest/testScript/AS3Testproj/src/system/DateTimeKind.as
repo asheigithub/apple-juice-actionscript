@@ -28,6 +28,9 @@ package system
 		[native, _system_DateTimeKind_operator_bitOr];
 		private static function bitOr(t1:DateTimeKind,t2:DateTimeKind):DateTimeKind;
 		
+		[native, _system_Enum_valueOf];
+		public function valueOf():int;
+		
 	}
 
 }

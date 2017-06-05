@@ -806,10 +806,15 @@ namespace ASCTest.regNativeFunctions
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
             StackFrame frame = (StackFrame)stackframe;
 
-            ((StackSlot)returnSlot).setLinkObjectValue(cls, frame.player, lobj.value.Ticks);
-
-
-            success = true;
+            if (frame.player.init_static_class(cls, token))
+            {
+                ((StackSlot)returnSlot).setLinkObjectValue(cls, frame.player, lobj.value.Ticks);
+                success = true;
+            }
+            else
+            {
+                success = false;
+            }
         }
 
     }

@@ -48,8 +48,51 @@ namespace ASCTest
 
 
 
-
-
+            bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DayOfWeek_creator__", default(DayOfWeek)));
+            bin.regNativeFunction(new system_dayOfWeek_ctor());
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Friday_getter"
+                ,
+                () => { return DayOfWeek.Friday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Monday_getter"
+                ,
+                () => { return DayOfWeek.Monday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Saturday_getter"
+                ,
+                () => { return DayOfWeek.Saturday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Sunday_getter"
+                ,
+                () => { return DayOfWeek.Sunday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Thursday_getter"
+                ,
+                () => { return DayOfWeek.Thursday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Tuesday_getter"
+                ,
+                () => { return DayOfWeek.Tuesday; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DayOfWeek_Wednesday_getter"
+                ,
+                () => { return DayOfWeek.Wednesday; }
+                )
+                );
+            bin.regNativeFunction(new system_dayOfWeek_operator_bitOr());
 
 
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Int64_creator__",default(long)) );// new system_int64_creator());
@@ -172,6 +215,43 @@ namespace ASCTest
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DateTime_creator__", default(DateTime)));// new system_int64_creator());
             bin.regNativeFunction(new system_datetime_ctor());
             bin.regNativeFunction(new system_datetime_static_constructor_());
+            bin.regNativeFunction(new system_datetime_static_constructor__());
+            bin.regNativeFunction(new system_datetime_static_constructor___());
+            bin.regNativeFunction(new system_datetime_static_constructor____());
+            bin.regNativeFunction(new system_datetime_static_constructor_____());
+            bin.regNativeFunction(new system_datetime_static_constructor______());
+            bin.regNativeFunction(new system_datetime_static_constructor_______());
+            bin.regNativeFunction(new system_datetime_kind());
+            bin.regNativeFunction(new system_datetime_date());
+            bin.regNativeFunction(new system_datetime_day());
+            bin.regNativeFunction(new system_datetime_dayOfWeek());
+            bin.regNativeFunction(new system_datetime_dayOfYear());
+            bin.regNativeFunction(new system_datetime_hour());
+            bin.regNativeFunction(new system_datetime_millsecond());
+            bin.regNativeFunction(new system_datetime_minute());
+            bin.regNativeFunction(new system_datetime_month());
+            bin.regNativeFunction(new system_datetime_now());
+            bin.regNativeFunction(new system_datetime_second());
+            bin.regNativeFunction(new system_datetime_ticks());
+            bin.regNativeFunction(new system_datetime_timeOfDay());
+            bin.regNativeFunction(new system_datetime_year());
+            bin.regNativeFunction(new system_datetime_toDay());
+            bin.regNativeFunction(new system_datetime_utcNow());
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DateTime_static_MaxValue_getter"
+                ,
+                () => { return DateTime.MaxValue; }
+                )
+                );
+            bin.regNativeFunction(
+                LinkSystem_Buildin.getStruct_static_field_getter("_system_DateTime_static_MinValue_getter"
+                ,
+                () => { return DateTime.MinValue; }
+                )
+                );
+            bin.regNativeFunction(new system_datetime_add());
+            bin.regNativeFunction(new system_datetime_addDays());
+
         }
     }
 }
