@@ -9,5 +9,8 @@ namespace ASBinCode
         public Dictionary<int, ASBinCode.rtData.rtObject> static_objects;
         public int offset;
         public SLOT[] stack;
+
+        //public RunTimeValueBase scope_thispointer;
+        public abstract void throwError(SourceToken token, int code, string errormessage);
     }
 }

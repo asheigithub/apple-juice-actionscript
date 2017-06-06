@@ -16,7 +16,7 @@ namespace ASRuntime.operators
                 pool.Push(new FunctionCaller(null, null, null));
             }
         }
-
+        
         public static FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
         {
             FunctionCaller fc = pool.Pop();
@@ -153,9 +153,9 @@ namespace ASRuntime.operators
                 if (signature.parameters[i].defaultValue != null)
                 {
                     var dt = signature.parameters[i].type;
-                    var dv = signature.parameters[i].defaultValue.getValue(null,null);
+                    var dv = signature.parameters[i].defaultValue.getValue(null, null);
 
-                    
+
                     if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
                     {
                         if (dt == RunTimeDataType.rt_int)
@@ -236,7 +236,10 @@ namespace ASRuntime.operators
                     //}
                     _storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
                 }
-
+                else
+                {
+                    _storeArgementToSlot(i, ASBinCode.rtData.rtUndefined.undefined);
+                }
             }
 
             return true;
@@ -449,6 +452,23 @@ namespace ASRuntime.operators
         private void setCheckedParameter(int para_id,RunTimeValueBase value)
         {
             //CallFuncHeap[para_id].directSet(value);
+            if (toCallFunc.isNative)
+            {
+                if (toCallFunc.native_index < 0)
+                {
+                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+                }
+                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+                nf.bin = player.swc;
+                if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+                {
+                    ((nativefuncs.NativeConstParameterFunction)nf)
+                        .setCheckedParameter(para_id,value);
+                    return;
+                }
+            }
+
+
             _getArgementSlot(para_id).directSet(value);
         }
 

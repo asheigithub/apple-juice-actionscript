@@ -251,6 +251,17 @@ namespace ASCTest
                 );
             bin.regNativeFunction(new system_datetime_add());
             bin.regNativeFunction(new system_datetime_addDays());
+            bin.regNativeFunction(new system_datetime_addHours());
+            bin.regNativeFunction(new system_datetime_addMilliseconds());
+            bin.regNativeFunction(new system_datetime_addMinutes());
+            bin.regNativeFunction(new system_datetime_addMonths());
+            bin.regNativeFunction(new system_datetime_addSeconds());
+            bin.regNativeFunction(new system_datetime_addTicks());
+            bin.regNativeFunction(new system_datetime_addYears());
+            bin.regNativeFunction(new system_datetime_static_compare());
+            bin.regNativeFunction(LinkSystem_Buildin.getCompareTo<DateTime>("_system_DateTime_compareTo"));
+            bin.regNativeFunction(LinkSystem_Buildin.getCompareTo_Generic<DateTime>("_system_DateTime_compareTo_DateTime"));
+            bin.regNativeFunction(new system_datetime_static_daysinmonth());
 
         }
     }

@@ -9,7 +9,7 @@ namespace ASBinCode
     public sealed class RunTimeScope //: IRunTimeScope
     {
         
-        public readonly int blockId;
+        public int blockId;
         public RunTimeScope(
             
             SLOT[] memberDataList,

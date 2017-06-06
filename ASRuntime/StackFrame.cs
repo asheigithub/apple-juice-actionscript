@@ -60,7 +60,9 @@ namespace ASRuntime
 
         internal FrameInfo getInfo()
         {
-            return new FrameInfo(block, codeLinePtr,scope,static_objects,offset,stack);
+            return new FrameInfo(block, codeLinePtr,scope,
+                //scope_thispointer,
+                static_objects,offset,stack);
         }
 
 
@@ -131,6 +133,7 @@ namespace ASRuntime
 
         public ASBinCode.RunTimeScope scope;
 
+        
         /// <summary>
         /// 返回值存储槽
         /// </summary>
@@ -740,7 +743,14 @@ namespace ASRuntime
                                 instanceCreator.callbacker.noticeRunFailed();
                             }
                         }
-                        
+                        if (funCaller != null)
+                        {
+                            if (funCaller.callbacker != null)
+                            {
+                                funCaller.callbacker.noticeRunFailed();
+                            }
+                            funCaller.noticeRunFailed();
+                        }
                         player.exitStackFrameWithError(runtimeError);
                     }
                 }
@@ -1148,7 +1158,7 @@ namespace ASRuntime
             runtimeError = err;
         }
 
-        public void throwError(SourceToken token,int code,string errormessage)
+        public override  void throwError(SourceToken token,int code,string errormessage)
         {
             if (player.swc.ErrorClass != null)
             {
@@ -1218,7 +1228,7 @@ namespace ASRuntime
 
             tryCatchState.Clear();
             block = null;
-            scope = null;
+            scope = null;//scope_thispointer = null;
             static_objects = null;
             offset = 0;
             call_parameter_slotCount = 0;

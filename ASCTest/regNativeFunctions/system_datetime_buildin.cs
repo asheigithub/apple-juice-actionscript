@@ -1644,5 +1644,548 @@ namespace ASCTest.regNativeFunctions
         }
 
     }
+    class system_datetime_addHours : NativeConstParameterFunction
+    {
+        public system_datetime_addHours() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addHours";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            double arg = argements[0].toNumber();
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddHours(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addMilliseconds : NativeConstParameterFunction
+    {
+        public system_datetime_addMilliseconds() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addMilliseconds";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            double arg = argements[0].toNumber();
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddMilliseconds(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addMinutes : NativeConstParameterFunction
+    {
+        public system_datetime_addMinutes() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addMinutes";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            double arg = argements[0].toNumber();
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddMinutes(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addMonths : NativeConstParameterFunction
+    {
+        public system_datetime_addMonths() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addMonths";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            int arg = TypeConverter.ConvertToInt( argements[0],stackframe,token);
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddMonths(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addSeconds : NativeConstParameterFunction
+    {
+        public system_datetime_addSeconds() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_number);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addSeconds";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            double arg = argements[0].toNumber();
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddSeconds(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addTicks : NativeConstParameterFunction
+    {
+        public system_datetime_addTicks() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addTicks";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            //double arg = argements[0].toNumber();
+            long arg;
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                arg = default(long);
+            }
+            else
+            {
+                arg = ((LinkObj<long>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+            }
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddTicks(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_addYears : NativeConstParameterFunction
+    {
+        public system_datetime_addYears() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_addYears";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            int arg = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.AddYears(arg));
+
+            success = true;
+
+        }
+
+    }
+    class system_datetime_static_compare : NativeConstParameterFunction
+    {
+        public system_datetime_static_compare():base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_static_compare";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            StackFrame frame = stackframe;
+
+            var arg1 = argements[0];
+            if (arg1.rtType == RunTimeDataType.rt_null)
+            {
+                frame.throwArgementException(token, "参数" + functionDefine.signature.parameters[0].name + "不能为null");
+                success = false;
+                return;
+            }
+            var arg2 = argements[1];
+            if (arg2.rtType == RunTimeDataType.rt_null)
+            {
+                frame.throwArgementException(token, "参数" + functionDefine.signature.parameters[1].name + "不能为null");
+                success = false;
+                return;
+            }
+
+            LinkObj<DateTime> a1 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)arg1).value;
+            LinkObj<DateTime> a2 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)arg2).value;
+
+            int v = DateTime.Compare(a1.value, a2.value);
+
+            returnSlot.setValue(v);
+
+            success = true;
+
+        }
+
+
+
+    }
+    class system_datetime_static_daysinmonth : NativeConstParameterFunction
+    {
+        public system_datetime_static_daysinmonth() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_static_daysInMonth";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            StackFrame frame = stackframe;
+
+            int a1 = TypeConverter.ConvertToInt(argements[0], frame, token);
+            int a2 = TypeConverter.ConvertToInt(argements[1], frame, token);
+
+            int v = DateTime.DaysInMonth(a1, a2);
+
+            returnSlot.setValue(v);
+
+            success = true;
+
+        }
+
+
+
+    }
 
 }

@@ -182,6 +182,7 @@ namespace ASRuntime
                     )
                 {
                     var lk = player.alloc_LinkObjValue(clsType);
+                    
                     ((ASBinCode.rtti.LinkObj<T>)lk).value = value;
                     _cache_linksystemObject.cache_setValue(lk);
                 }

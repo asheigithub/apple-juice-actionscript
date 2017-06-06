@@ -34,7 +34,28 @@ package
 			var d3 = DateTime.constructor_______(Int64(123456789),j);
 			trace(d3);
 			
-			trace(DateTime.MinValue.add(TimeSpan.fromDays(10)).addDays(15));
+			trace(DateTime.MinValue.add(TimeSpan.fromDays(10)).addDays(15).addHours(120).addYears(1000));
+			
+			DateTime.prototype.kk = function(d:DateTime){
+				
+				
+					trace(this.year);
+				
+				
+			};
+			
+			d3.kk.apply(d3);
+			
+			trace(DateTime.compare(d3, d2));
+			
+			trace(d2.compareTo_DateTime(d3));
+			
+			var July = 7;
+			var Feb = 2;
+
+			var daysInJuly = DateTime.daysInMonth(2001, July);
+			trace(daysInJuly);
+			
 			
 		}
 		

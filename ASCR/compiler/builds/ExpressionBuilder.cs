@@ -668,7 +668,9 @@ namespace ASCompiler.compiler.builds
                         buildPropSet(prop, step, prop.name, env, prop._class,
                             getRightValue(env, step.Arg2, step.token, builder),
                             
-                            new ThisPointer(env.block.scope)
+                            new ThisPointer(env.block.scope,
+                            new SourceToken(step.token.line,step.token.ptr,step.token.sourceFile)
+                            )
                             ,
                             
                             env.getAdditionalRegister());
@@ -1416,7 +1418,9 @@ namespace ASCompiler.compiler.builds
                         }
 
 
-                        return new ThisPointer(env.block.scope);
+                        return new ThisPointer(env.block.scope,
+                            new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile)
+                            );
                     }
                     else
                     {

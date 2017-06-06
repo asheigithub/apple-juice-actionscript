@@ -13,9 +13,10 @@ namespace ASBinCode
         //RunTimeDataType _vt;
 
         //int refblockid;
-
-        public ThisPointer(IScope scope)
+        private SourceToken token;
+        public ThisPointer(IScope scope,SourceToken token)
         {
+            this.token = token;
             scopes.FunctionScope funcscope = scope as scopes.FunctionScope;
 
             if (funcscope != null)
@@ -83,8 +84,16 @@ namespace ASBinCode
         {
             //对方法的包含对象的引用。执行脚本时，this 关键字引用包含该脚本的对象。
             //在方法体的内部，this 关键字引用包含调用方法的类实例。
-
-            return scope.this_pointer;
+            //if (scope == null)
+            //{
+            //    holder.throwError(token, 0, "不能使用this（可能是[link_system]对象或[hosted]）");
+            //    return rtData.rtUndefined.undefined;
+            //    //return holder.scope_thispointer;
+            //}
+            //else
+            {
+                return scope.this_pointer;
+            }
 
             //var tempscope = scope;
 

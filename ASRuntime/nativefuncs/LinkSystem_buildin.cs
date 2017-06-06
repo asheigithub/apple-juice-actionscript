@@ -456,11 +456,11 @@ namespace ASRuntime.nativefuncs
 
     #region compareTo
 
-    class compareto<T> : NativeFunctionBase
+    class compareto<T> : NativeConstParameterFunction
         where T :IComparable
     {
         private string funname;
-        public compareto(string name)
+        public compareto(string name):base(1)
         {
             this.funname = name;
             para = new List<RunTimeDataType>();
@@ -500,31 +500,51 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+        //public override NativeFunctionMode mode
+        //{
+        //    get
+        //    {
+        //        return NativeFunctionMode.normal_1;
+        //    }
+        //}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public override void execute2(RunTimeValueBase thisObj,
-            FunctionDefine functionDefine,
-            SLOT[] argements,
-            SLOT returnSlot,
-            SourceToken token,
-            object stackframe, out bool success)
+        //public override void execute2(RunTimeValueBase thisObj,
+        //    FunctionDefine functionDefine,
+        //    SLOT[] argements,
+        //    SLOT returnSlot,
+        //    SourceToken token,
+        //    object stackframe, out bool success)
+        //{
+        //    LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
+
+        //    StackFrame frame = (StackFrame)stackframe;
+
+        //    var arg = argements[0].getValue();
+        //    if (arg.rtType == RunTimeDataType.rt_null)
+        //    {
+        //        ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(null));
+        //    }
+        //    else
+        //    {
+        //        LinkSystemObject argObj = (LinkSystemObject)((ASBinCode.rtData.rtObject)arg).value;
+        //        ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(argObj.GetLinkData()));
+
+        //    }
+        //    success = true;
+        //}
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
 
-            StackFrame frame = (StackFrame)stackframe;
+            StackFrame frame = stackframe;
 
-            var arg = argements[0].getValue();
+            var arg = argements[0];
             if (arg.rtType == RunTimeDataType.rt_null)
             {
                 ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(null));
@@ -541,11 +561,11 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    class compareto_generic<T> : NativeFunctionBase
+    class compareto_generic<T> : NativeConstParameterFunction
         where T : IComparable<T>
     {
         private string funname;
-        public compareto_generic(string name)
+        public compareto_generic(string name):base(1)
         {
             this.funname = name;
             para = new List<RunTimeDataType>();
@@ -585,31 +605,50 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+        //public override NativeFunctionMode mode
+        //{
+        //    get
+        //    {
+        //        return NativeFunctionMode.normal_1;
+        //    }
+        //}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public override void execute2(RunTimeValueBase thisObj,
-            FunctionDefine functionDefine,
-            SLOT[] argements,
-            SLOT returnSlot,
-            SourceToken token,
-            object stackframe, out bool success)
+        //public override void execute2(RunTimeValueBase thisObj,
+        //    FunctionDefine functionDefine,
+        //    SLOT[] argements,
+        //    SLOT returnSlot,
+        //    SourceToken token,
+        //    object stackframe, out bool success)
+        //{
+        //    LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
+
+        //    StackFrame frame = (StackFrame)stackframe;
+
+        //    var arg = argements[0].getValue();
+        //    if (arg.rtType == RunTimeDataType.rt_null)
+        //    {
+        //        ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(default(T)));
+        //    }
+        //    else
+        //    {
+        //        LinkObj<T> argObj = (LinkObj<T>)((ASBinCode.rtData.rtObject)arg).value;
+        //        ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(argObj.value));
+
+        //    }
+        //    success = true;
+        //}
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
 
-            StackFrame frame = (StackFrame)stackframe;
+            StackFrame frame = stackframe;
 
-            var arg = argements[0].getValue();
+            var arg = argements[0];
             if (arg.rtType == RunTimeDataType.rt_null)
             {
                 ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(default(T)));
@@ -622,7 +661,6 @@ namespace ASRuntime.nativefuncs
             }
             success = true;
         }
-
     }
 
 

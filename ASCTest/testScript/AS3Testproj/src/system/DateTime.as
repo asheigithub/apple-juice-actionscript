@@ -46,6 +46,12 @@ package system
 		[native,_system_DateTime_utcNow]
 		public static function get utcNow():DateTime;
 		
+		[native,_system_DateTime_static_compare]
+		public static function compare(t1:DateTime,t2:DateTime):int;
+		
+		[native,_system_DateTime_static_daysInMonth]
+		public static function daysInMonth(year:int,month:int):int;
+		
 		
 		[native,_system_DateTime_ctor]
 		public function DateTime();
@@ -101,6 +107,36 @@ package system
 		
 		[native,_system_DateTime_addDays]
 		public function addDays(value:Number):DateTime;
+		
+		[native,_system_DateTime_addHours]
+		public function addHours(value:Number):DateTime;
+		
+		[native,_system_DateTime_addMilliseconds]
+		public function addMilliseconds(value:Number):DateTime;
+		
+		[native,_system_DateTime_addMinutes]
+		public function addMinutes(value:Number):DateTime;
+		
+		[native,_system_DateTime_addMonths]
+		public function addMonths(value:int):DateTime;
+		
+		[native,_system_DateTime_addSeconds]
+		public function addSeconds(value:Number):DateTime;
+		
+		[native,_system_DateTime_addTicks]
+		public function addTicks(value:Int64):DateTime;
+		
+		[native,_system_DateTime_addYears]
+		public function addYears(value:int):DateTime;
+		
+		
+		
+		
+		[native,_system_DateTime_compareTo]
+		public function compareTo(value:_Object_):int;
+		
+		[native,_system_DateTime_compareTo_DateTime]
+		public function compareTo_DateTime(value:DateTime):int;
 		
 	}
 

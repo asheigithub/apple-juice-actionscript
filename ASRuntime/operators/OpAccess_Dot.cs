@@ -145,8 +145,8 @@ namespace ASRuntime.operators
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
-                    
-                        step.token,1009, "Cannot access a property or method of a null object reference."
+
+                        step.token, 1009, "Cannot access a property or method of a null object reference."
                         );
                 frame.endStep(step);
             }

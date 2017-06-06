@@ -18,12 +18,11 @@ namespace ASBinCode.rtData
         {
             return new rtObject();
         }
-
+        
         private rtObject() : base(RunTimeDataType.unknown)
         {
-            
             value = null;
-            objScope = null;
+            objScope = new RunTimeScope(null,-2,null,this, RunTimeScopeType.objectinstance );
         }
 
         public rtObject(rtti.Object v, RunTimeScope scope):base(v._class.classid + RunTimeDataType._OBJECT)
@@ -45,6 +44,9 @@ namespace ASBinCode.rtData
         {
             value = null;
             rtType = RunTimeDataType.unknown;
+
+            objScope.blockId = -2;
+
         }
 
         /// <summary>
@@ -62,6 +64,9 @@ namespace ASBinCode.rtData
 #endif
             ((rtti.LinkSystemObject)value).SetLinkData(linkObject);
             rtType = clsType.classid + RunTimeDataType._OBJECT;
+
+            objScope.blockId = clsType.blockid;
+
         }
 
         public void cache_setValue(ASBinCode.rtti.LinkSystemObject otherValue)
@@ -89,6 +94,7 @@ namespace ASBinCode.rtData
                 value = otherValue;
             }
 
+            objScope.blockId = value._class.blockid;
             rtType = otherValue._class.classid + RunTimeDataType._OBJECT;
         }
 
@@ -118,7 +124,13 @@ namespace ASBinCode.rtData
                     rtObject clone = new rtObject(((rtti.LinkSystemObject)value).Clone(),
                         null
                         );
-                    return clone;
+
+                RunTimeScope scope =
+                    new RunTimeScope(null, objScope.blockId, null, 
+                    clone, RunTimeScopeType.objectinstance);
+                clone.objScope = scope;
+
+                return clone;
 
                 //}
             }

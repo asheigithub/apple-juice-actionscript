@@ -363,7 +363,7 @@ namespace ASRuntime
                 &&
                 this_pointer is rtObject
                 &&
-                (callerScope==null ||
+                (callerScope == null ||
                 callerScope.scopeType != RunTimeScopeType.function)
                 )
             {
@@ -381,7 +381,10 @@ namespace ASRuntime
                 );
 
                 frame.scope = scope;
+                
             }
+            //frame.scope_thispointer = this_pointer;
+            
             return frame.scope;
         }
 

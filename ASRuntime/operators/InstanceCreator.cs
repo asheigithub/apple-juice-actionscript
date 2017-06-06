@@ -531,10 +531,13 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtti.Object obj = createObject(player.swc, cls);
                 ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
-                //RunTimeScope scope = new RunTimeScope(
-                //    player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid]), cls.blockid,null, rtObj,
-                //     RunTimeScopeType.objectinstance);
-                //rtObj.objScope = scope;
+
+                RunTimeScope scope = new RunTimeScope(
+                    null
+                    //player.genHeapFromCodeBlock(player.swc.blocks[cls.blockid])
+                        , cls.blockid, null, rtObj,
+                     RunTimeScopeType.objectinstance);
+                rtObj.objScope = scope;
 
                 return rtObj;
             }
