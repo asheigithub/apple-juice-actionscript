@@ -38,16 +38,16 @@ var yieldtest=function(a):*
 ### 与.net类库方便集成。
 as3本身是完整的面向对象支持语言，因此可以将.net类库大部分保持原风格的集成进来。同时又可以使用原型链进行扩展。(虽然并不推荐使用原型链)
 见如下，集成了.net的System.DateTime,同时又使用原型链扩展
-
-    var d3 = DateTime.constructor_______(Int64(123456789),j);
+```actionscript3
+    var d3 = DateTime.constructor_______(Int64(123456789),j);
     trace(d3);
     trace(DateTime.MinValue.add(TimeSpan.fromDays(10)).addDays(15).addHours(120).addYears(1000));
     DateTime.prototype.kk = function()
     {
         trace(this.year);
     };
-    d3.kk.apply(d3);
-
+    d3.kk.apply(d3);
+```
 ### 当前进度
 链接.net类库到脚本系统中。由于系统本身使用.net2.0 开发的，所以链接系统类库比创建代理类的性能要高。
 考虑到为了避免使用反射（IOS系统你懂的）因此需要制作代码生成工具，来自动生成链接的代码。
