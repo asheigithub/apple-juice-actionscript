@@ -59,6 +59,7 @@
     <Compile Include="extFunctions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="regNativeFunctions\system_arrays_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetimekind_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetime_buildin.cs" />
     <Compile Include="regNativeFunctions\system_dayofweek_buildin.cs" />

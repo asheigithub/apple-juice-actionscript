@@ -1,5 +1,6 @@
 package system 
 {
+	import system.arrays.Array_Of_String;
 	[struct]
 	[link_system]
 	public final class DateTime extends _Object_ 
@@ -129,9 +130,16 @@ package system
 		[native,_system_DateTime_addYears]
 		public function addYears(value:int):DateTime;
 		
+		[native,_system_DateTime_getDateTimeFormats]
+		public function getDateTimeFormats():Array_Of_String;
 		
+		[native,_system_DateTime_subtract]
+		public function subtract(value:DateTime):TimeSpan;
 		
+		[native,_system_DateTime_subtract_TimeSpan]
+		public function subtract_TimeSpan(value:TimeSpan):DateTime;
 		
+
 		[native,_system_DateTime_compareTo]
 		public function compareTo(value:_Object_):int;
 		

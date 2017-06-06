@@ -2187,5 +2187,207 @@ namespace ASCTest.regNativeFunctions
 
 
     }
+    class system_datetime_getdatetimeformats : NativeConstParameterFunction
+    {
+        public system_datetime_getdatetimeformats() : base(0)
+        {
+            para = new List<RunTimeDataType>();
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_getDateTimeFormats";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+
+            var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            if (stackframe.player.init_static_class(cls, token))    // 如果返回对象类型不是自身类型，需要先初始化类型防止出错。
+            {
+                success = true;
+
+                ((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player,
+                    dt.value.GetDateTimeFormats());
+            }
+            else
+            {
+                success = false;
+            }
+
+        }
+    }
+    class system_datetime_subtract : NativeConstParameterFunction
+    {
+        public system_datetime_subtract() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_subtract";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+
+            DateTime value;
+            if (argements[0].rtType == RunTimeDataType.rt_null)
+            {
+                value = default(DateTime);
+            }
+            else
+            {
+                value = ((LinkObj<DateTime>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+            }
+
+            var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            if (stackframe.player.init_static_class(cls, token))    // 如果返回对象类型不是自身类型，需要先初始化类型防止出错。
+            {
+                success = true;
+
+                ((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player,
+                    dt.value.Subtract(value));
+            }
+            else
+            {
+                success = false;
+            }
+
+        }
+    }
+    class system_datetime_subtract_timespan : NativeConstParameterFunction
+    {
+        public system_datetime_subtract_timespan() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_DateTime_subtract_TimeSpan";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            LinkObj<DateTime> lobj =
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            var arg = argements[0];
+            TimeSpan ts;
+            if (arg.rtType == RunTimeDataType.rt_null)
+            {
+                ts = default(TimeSpan);
+            }
+            else
+            {
+                LinkObj<TimeSpan> argObj =
+                    (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg).value;
+                ts = argObj.value;
+            }
+
+
+            var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(
+                typeClass, stackframe.player, lobj.value.Subtract(ts));
+
+            success = true;
+
+        }
+
+    }
 
 }

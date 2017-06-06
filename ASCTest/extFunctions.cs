@@ -23,6 +23,9 @@ namespace ASCTest
             bin.regNativeFunction(new object_static_equals());
             bin.regNativeFunction(new object_static_referenceEquals());
 
+            bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Array_creator_", default(Array)));
+            system_arrays_buildin.regNativeFunctions(bin);
+
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DateTimeKind_creator__", default(DateTimeKind)));
             bin.regNativeFunction(new system_DateTimeKind_ctor());
             bin.regNativeFunction(
@@ -262,7 +265,9 @@ namespace ASCTest
             bin.regNativeFunction(LinkSystem_Buildin.getCompareTo<DateTime>("_system_DateTime_compareTo"));
             bin.regNativeFunction(LinkSystem_Buildin.getCompareTo_Generic<DateTime>("_system_DateTime_compareTo_DateTime"));
             bin.regNativeFunction(new system_datetime_static_daysinmonth());
-
+            bin.regNativeFunction(new system_datetime_getdatetimeformats());
+            bin.regNativeFunction(new system_datetime_subtract());
+            bin.regNativeFunction(new system_datetime_subtract_timespan());
         }
     }
 }

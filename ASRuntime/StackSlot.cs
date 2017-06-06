@@ -191,7 +191,9 @@ namespace ASRuntime
                     if (
                         _cache_linksystemObject.rtType == RunTimeDataType.unknown
                         || 
-                        _cache_linksystemObject.value._class.isStruct)
+                        _cache_linksystemObject.value._class.isStruct
+                        
+                        )                   
                     {
                         var lk = player.alloc_LinkObjValue(clsType);
                         ((ASBinCode.rtti.LinkObj<object>)lk).value = value;

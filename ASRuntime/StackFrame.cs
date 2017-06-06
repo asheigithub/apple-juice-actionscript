@@ -749,7 +749,7 @@ namespace ASRuntime
                             {
                                 funCaller.callbacker.noticeRunFailed();
                             }
-                            funCaller.noticeRunFailed();
+                            
                         }
                         player.exitStackFrameWithError(runtimeError);
                     }
