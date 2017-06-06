@@ -9,9 +9,9 @@
 
 ### 扩展语法
 新增语言特性 yield。和C#的yield语法完全一致，可以自动生成一个枚举器对象.
-
-      var yieldtest=function(a):*
-      {
+```actionscript3
+var yieldtest=function(a):*
+{
         for (var i:int = 0; i < 100; i++ )
         {
           if(i>=a)
@@ -33,8 +33,8 @@
         trace("receive:",k);
         //**输出调用堆栈。
         trace(new Error().getStackTrace());
-      }
-
+      }
+```
 ### 与.net类库方便集成。
 as3本身是完整的面向对象支持语言，因此可以将.net类库大部分保持原风格的集成进来。同时又可以使用原型链进行扩展。(虽然并不推荐使用原型链)
 见如下，集成了.net的System.DateTime,同时又使用原型链扩展
