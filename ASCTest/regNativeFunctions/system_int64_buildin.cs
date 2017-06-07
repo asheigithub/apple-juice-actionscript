@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ASBinCode.rtti;
+using ASRuntime.nativefuncs;
+using ASRuntime;
 
 namespace ASCTest.regNativeFunctions
 {
@@ -491,4 +493,59 @@ namespace ASCTest.regNativeFunctions
         }
 
     }
+
+    class system_int64_toString_ : NativeConstParameterFunction
+    {
+        public system_int64_toString_() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_string);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_Int64_toString_";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_string;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            string format = TypeConverter.ConvertToString(argements[0], stackframe, token);
+
+
+            LinkObj<Int64> obj = ((LinkObj<Int64>)((ASBinCode.rtData.rtObject)thisObj).value);
+
+            returnSlot.setValue(obj.value.ToString(format));
+            success = true;
+        }
+
+    }
+
 }

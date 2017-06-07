@@ -79,11 +79,11 @@ namespace ASBinCode.rtData
                 }
                 else
                 {
-                    if (otherValue.__iscreateout)
-                    {
-                        value = otherValue;
-                    }
-                    else
+                    //if (otherValue.__iscreateout)
+                    //{
+                    //    value = otherValue;
+                    //}
+                    //else
                     {
                         value = otherValue.Clone();
                     }  
@@ -115,7 +115,7 @@ namespace ASBinCode.rtData
                 rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
                 //if (lobj.__iscreateout)
                 //{
-                    lobj.__iscreateout = false;
+                    //lobj.__iscreateout = false;
 
                 //    return this;
                 //}

@@ -21,6 +21,15 @@ package system.arrays
 		[native, _system_Array_rank_]
 		public function get rank():int;
 		
+		[native, _system_Array_getLength_]
+		public function getLength(dimension:int):int;
+		
+		[native, _system_Array_getLowerBound_]
+		public function getLowerBound(dimension:int):int; 
+		
+		[native, _system_Array_getUpperBound_]
+		public function getUpperBound(dimension:int):int; 
+		
 	}
 
 }

@@ -13,8 +13,20 @@ namespace ASCompiler.compiler.builds
         public ExpressionBuilder(Builder builder)
         {
             this.builder = builder;
-            
         }
+
+        public string getTypeName(RunTimeDataType rttype)
+        {
+            if (rttype <= RunTimeDataType.unknown)
+            {
+                return rttype.ToString();
+            }
+            else
+            {
+                return builder.getClassByRunTimeDataType(rttype).name;
+            }
+        }
+
 
         public void buildAS3Expression(CompileEnv env, ASTool.AS3.AS3Expression expression)
         {
@@ -777,7 +789,7 @@ namespace ASCompiler.compiler.builds
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "类型" + v1.valueType + "与" + v2.valueType + "的[+]操作未定义."));
+                            "类型" + getTypeName( v1.valueType) + "与" + getTypeName( v2.valueType) + "的[+]操作未定义."));
                     }
 
                     if (rt == RunTimeDataType.rt_number
@@ -895,7 +907,7 @@ namespace ASCompiler.compiler.builds
                         {
                             throw new BuildException(
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "类型" + v1.valueType + "与" + v2.valueType + "的[-]操作未定义."));
+                                "类型" + getTypeName( v1.valueType) + "与" + getTypeName( v2.valueType) + "的[-]操作未定义."));
                         }
                     }
                     else
@@ -905,7 +917,7 @@ namespace ASCompiler.compiler.builds
                         {
                             throw new BuildException(
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "类型" + v1.valueType + "与" + v2.valueType + "的[-]操作未定义."));
+                                "类型" + getTypeName( v1.valueType) + "与" + getTypeName( v2.valueType) + "的[-]操作未定义."));
                         }
 
                         if (rt == RunTimeDataType.rt_number
@@ -1009,7 +1021,7 @@ namespace ASCompiler.compiler.builds
                 {
                     throw new BuildException(
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                        "类型" + v1.valueType + "与" + v2.valueType + "的[" + step.OpCode + "]操作未定义."));
+                        "类型" + getTypeName( v1.valueType) + "与" + getTypeName( v2.valueType) + "的[" + step.OpCode + "]操作未定义."));
                 }
 
                 if (rt == RunTimeDataType.rt_number

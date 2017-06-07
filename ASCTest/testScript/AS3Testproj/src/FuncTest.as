@@ -1,10 +1,15 @@
 package 
 {
+	import system.Byte;
+	import system.Char;
 	import system.DateTime;
 	import system.DateTimeKind;
 	import system.DayOfWeek;
 	import system.Int64;
+	import system.SByte;
 	import system.TimeSpan;
+	import system.UInt64;
+	import system.arrays.Array_Of_Array;
 	import system.arrays.Array_Of_Int;
 	import system.arrays.Array_Of_String;
 	import system.arrays._Array_;
@@ -18,6 +23,36 @@ package
 		
 		public function FuncTest() 
 		{
+			
+			var u:UInt64 = new UInt64( 6);
+			
+			var bb:UInt64 = u;
+			
+			bb = 9999;
+			
+			trace(bb,u);
+			trace(UInt64(100));
+			trace(UInt64.parse("5678").valueOf() - UInt64.parse("5000").valueOf());
+			
+			
+			var values = [ SByte(-124), SByte(0), SByte(118) ];
+
+			var specifiers = [ "G", "C", "D3", "E2", "e3", "F", 
+                              "N", "P", "X", "00.0", "#.0", 
+                              "000;(0);**Zero**"];
+			
+			for each (var value in values) 
+			{
+				for each (var s in specifiers) 
+				{
+					var ss = [s, value.toString_(s)].join(":");
+					trace( ss);
+				}
+			}	
+			
+			
+			return;
+			
 			var d:DateTime = new DateTime();
 			
 			trace(d);
@@ -89,8 +124,13 @@ package
 			
 			
 			trace( sr.setValue("sss",0) ,sr.getValue(0) );
-			
 			trace( sr.equals(ar) );
+			trace(sr.getLength(0),sr.getLowerBound(0),sr.getUpperBound(0));
+			
+			
+			
+			
+			
 		}
 		
 		private function readformats(d:DateTime)

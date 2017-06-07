@@ -14,8 +14,14 @@ namespace ASCTest.regNativeFunctions
         {
             bin.regNativeFunction(new system_array_length());
             bin.regNativeFunction(new system_array_rank());
+            bin.regNativeFunction(new system_array_getlength());
+            bin.regNativeFunction(new system_array_getlowerbound());
+            bin.regNativeFunction(new system_array_getupperbound());
 
             bin.regNativeFunction(new system_array_ctor<object>("_system_ArrayOfObject_ctor_"));
+
+            //bin.regNativeFunction(new system_array_ctor<Array>("_system_ArrayOfArray_ctor_"));
+            
 
             bin.regNativeFunction(new system_array_ctor<int>("_system_ArrayOfInt_ctor_"));
             bin.regNativeFunction(new system_arrayOfInt_getValue());
@@ -158,6 +164,167 @@ namespace ASCTest.regNativeFunctions
 
 
     }
+    class system_array_getlength : NativeConstParameterFunction
+    {
+        public system_array_getlength() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_Array_getLength_";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            success = true;
+            int dimension = TypeConverter.ConvertToInt( argements[0],stackframe,token);
+
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+            returnSlot.setValue(array.GetLength(dimension));
+
+        }
+
+    }
+    class system_array_getlowerbound : NativeConstParameterFunction
+    {
+        public system_array_getlowerbound() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_Array_getLowerBound_";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            success = true;
+            int dimension = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+            returnSlot.setValue(array.GetLowerBound(dimension));
+
+        }
+
+    }
+    class system_array_getupperbound : NativeConstParameterFunction
+    {
+        public system_array_getupperbound() : base(1)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "_system_Array_getUpperBound_";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            success = true;
+            int dimension = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+            returnSlot.setValue(array.GetUpperBound(dimension));
+
+        }
+
+    }
+
+
 
     class system_array_ctor<T> : NativeConstParameterFunction
     {

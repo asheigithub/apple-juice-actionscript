@@ -1,6 +1,5 @@
 package system.arrays 
 {
-	import system._Object_;
 	
 	[link_system]
 	public final class Array_Of_Int extends _Array_ 

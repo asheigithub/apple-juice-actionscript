@@ -39,6 +39,9 @@ package system
 		[native,_system_Int64_valueOf]
 		public function valueOf():Number;
 		
+		[native,_system_Int64_toString_]
+		public function toString_(format:String):String;
+		
 		
 	}
 

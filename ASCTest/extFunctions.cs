@@ -26,6 +26,11 @@ namespace ASCTest
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Array_creator_", default(Array)));
             system_arrays_buildin.regNativeFunctions(bin);
 
+            system_byte_buildin.regNativeFunctions(bin);
+            system_char_buildin.regNativeFunctions(bin);
+            system_sbyte_buildin.regNativeFunctions(bin);
+            system_uint64_buildin.regNativeFunctions(bin);
+
             bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_DateTimeKind_creator__", default(DateTimeKind)));
             bin.regNativeFunction(new system_DateTimeKind_ctor());
             bin.regNativeFunction(
@@ -121,7 +126,7 @@ namespace ASCTest
                 );
 
             bin.regNativeFunction(new system_int64_static_Parse());
-
+            bin.regNativeFunction(new system_int64_toString_());
 
 
 
