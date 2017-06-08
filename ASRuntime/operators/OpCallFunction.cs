@@ -351,6 +351,7 @@ namespace ASRuntime.operators
                 //args[1] = step;
                 //cb.args = args;
 
+                
                 frame.funCaller.callbacker = frame.funCaller;
                 frame.funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
                 frame.funCaller.call();

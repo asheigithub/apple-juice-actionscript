@@ -127,6 +127,19 @@ namespace ASCompiler.compiler
                         f.signature.parameters[i].varorreg = vm;
                     }
 
+                    //if (vm.valueType == RunTimeDataType.rt_void)
+                    //{
+                    //    continue;
+                    //}
+                    //if (vm.valueType > RunTimeDataType.unknown)
+                    //{
+                    //    var c = builder.bin.getClassByRunTimeDataType(vm.valueType);
+                    //    if(c==null || c.isLink_System)
+                    //    {
+                    //        continue;
+                    //    }
+                    //}
+
                     bool found = false;
                     //***查找是否被其他块引用***
                     foreach (var tofindblock in blocks)
@@ -253,7 +266,7 @@ namespace ASCompiler.compiler
         /// <summary>
         /// 刷新条件跳转语句等的目标行
         /// </summary>
-        public void completSteps()
+        public void completSteps(Builder builder)
         {
             //****先查找yield return,如果有，则在开头插入跳转步骤**
             for (int i = 0; i < block.opSteps.Count; i++)
@@ -372,7 +385,7 @@ namespace ASCompiler.compiler
                 }
 
             }
-
+            
             //***合并寄存器***
             List<Register> reglist = new List<Register>();
             var steps = block.opSteps;
@@ -392,6 +405,36 @@ namespace ASCompiler.compiler
                 {
                     continue;
                 }
+
+                //任意类型的寄存器，可能是链接对象，所以不能重用。
+                if (reg.valueType == RunTimeDataType.rt_void)
+                {
+                    continue;
+                }
+                if (reg.valueType > RunTimeDataType.unknown)
+                {
+                    bool f2 = false;
+                    //var c=builder._classbuildingEnv;
+                    foreach (var item in builder._classbuildingEnv)
+                    {
+                        if (item.Key.getRtType() == reg.valueType)
+                        {
+                            f2 = true;
+                            if (item.Key.isLink_System)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    if (!f2)
+                    {
+                        continue;
+                    }
+                }
+
+
+
+
                 int firstline = reglist.Count;
                 int lastline = -1;
 

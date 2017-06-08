@@ -148,7 +148,7 @@ namespace ASRuntime
                     default:
                         {
                             rtObject obj = (rtObject)value;
-                            if (obj.value._class.isLink_System) 
+                            if (obj.value._class.isLink_System)
                             {
                                 //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
                                 //要重新创建rtObject,而是直接更新缓存的rtObject.
@@ -174,7 +174,14 @@ namespace ASRuntime
 
             if (_cache_linksystemObject.rtType == clsType.getRtType())
             {
-                ((ASBinCode.rtti.LinkObj<T>)_cache_linksystemObject.value).value = value;
+                if (clsType.isStruct)
+                {
+                    ((ASBinCode.rtti.LinkObj<T>)_cache_linksystemObject.value).value = value;
+                }
+                else
+                {
+                    ((ASBinCode.rtti.LinkSystemObject)_cache_linksystemObject.value).SetLinkData(value);
+                }
             }
             else
             {
@@ -190,10 +197,10 @@ namespace ASRuntime
                 {
                     if (
                         _cache_linksystemObject.rtType == RunTimeDataType.unknown
-                        || 
+                        ||
                         _cache_linksystemObject.value._class.isStruct
-                        
-                        )                   
+
+                        )
                     {
                         var lk = player.alloc_LinkObjValue(clsType);
                         ((ASBinCode.rtti.LinkObj<object>)lk).value = value;
@@ -204,7 +211,7 @@ namespace ASRuntime
                         _cache_linksystemObject.cache_setTypeAndLinkObject(clsType, value);
                     }
 
-                    
+
                 }
                 
             }

@@ -38,7 +38,7 @@ namespace ASCompiler.compiler
                 tempEnv.block.scope = new ASBinCode.scopes.StartUpBlockScope();
                 builder.buildExpressNotEval(tempEnv, expression);
 
-                tempEnv.completSteps();
+                tempEnv.completSteps(builder);
                 tempEnv.block.totalRegisters = tempEnv.combieNeedStackSlots();
 
                 if (builder.buildErrors.Count == 0)

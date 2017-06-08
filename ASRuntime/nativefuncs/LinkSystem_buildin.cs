@@ -49,13 +49,14 @@ namespace ASRuntime.nativefuncs
 
     #region creator
 
-    class creator<T> : NativeFunctionBase
+    class creator<T> : NativeFunctionBase,ILinkSystemObjCreator
     {
         private T defaultvalue;
         private string funname;
 
         public creator(string funname, T v)
         {
+            _type = typeof(T);
             this.defaultvalue = v;
             this.funname = funname;
             para = new List<RunTimeDataType>();
@@ -114,6 +115,17 @@ namespace ASRuntime.nativefuncs
 
                 return new ASBinCode.rtData.rtObject(obj, null);
             }
+        }
+
+        private Type _type;
+        public Type getLinkSystemObjType()
+        {
+            return _type;
+        }
+
+        public void setLinkObjectValueToSlot(SLOT slot,object player,  object value, Class clsType)
+        {
+            ((StackSlot)slot).setLinkObjectValue(clsType, (Player)player, (T)value);
         }
     }
 

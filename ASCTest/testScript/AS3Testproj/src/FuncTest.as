@@ -9,10 +9,11 @@ package
 	import system.SByte;
 	import system.TimeSpan;
 	import system.UInt64;
+	import system._Object_;
 	import system.arrays.Array_Of_Array;
 	import system.arrays.Array_Of_Int;
 	import system.arrays.Array_Of_String;
-	import system.arrays._Array_;
+	import system._Array_;
 	[Doc]
 	/**
 	 * ...
@@ -20,6 +21,18 @@ package
 	 */
 	public final class FuncTest 
 	{
+		private function getArray()
+		{
+			var ar:_Array_ = _Array_.createInstance(_Array_, 100);
+		
+			ar.setValue( _Array_.createInstance(TimeSpan,5),0 );
+			
+			//_Array_( ar.getValue(0)).setValue(TimeSpan.fromDays(66), 0);
+			
+			
+			return ar;
+		}
+		
 		
 		public function FuncTest() 
 		{
@@ -50,8 +63,15 @@ package
 				}
 			}	
 			
+			var ar = getArray() //as _Array_;
 			
-			return;
+			trace(ar , _Array_( ar.getValue(0)).getValue(0));
+			
+			ar.setValue(null, 0);
+			
+			trace(ar,_Array_( ar.getValue(0)));
+			
+			
 			
 			var d:DateTime = new DateTime();
 			
@@ -103,29 +123,6 @@ package
 				trace(formats.getValue(i));
 			}
 			trace(d.getHashCode());
-			
-			var ar:Array_Of_Int = new Array_Of_Int(10);
-			trace(ar, ar.length);
-			
-			var b = ar;
-			//ar = null;
-			trace(b.length);
-			trace(b.rank);
-			trace(ar == b);
-			
-			ar.setValue(5, 3);
-			
-			trace( b.getValue(3)  );
-			
-			trace( ar.getValue(3)  );
-			
-			var sr:Array_Of_String = new Array_Of_String(3);
-			
-			
-			
-			trace( sr.setValue("sss",0) ,sr.getValue(0) );
-			trace( sr.equals(ar) );
-			trace(sr.getLength(0),sr.getLowerBound(0),sr.getUpperBound(0));
 			
 			
 			

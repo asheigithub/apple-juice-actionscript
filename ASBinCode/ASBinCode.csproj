@@ -44,6 +44,7 @@
     <Compile Include="ILinkSlot.cs" />
     <Compile Include="INativeFunctionRegister.cs" />
     <Compile Include="InterfaceMethodGetter.cs" />
+    <Compile Include="LinkTypeMapper.cs" />
     <Compile Include="MethodGetterBase.cs" />
     <Compile Include="ClassPropertyGetter.cs" />
     <Compile Include="CodeBlock.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="OperatorOverride.cs" />
     <Compile Include="rtti\HostedDynamicObject.cs" />
     <Compile Include="rtti\IHostedObject.cs" />
+    <Compile Include="rtti\ILinkSystemObjCreator.cs" />
     <Compile Include="rtti\LinkSystemObject.cs" />
     <Compile Include="rtti\YieldObject.cs" />
     <Compile Include="RunTimeDataHolder.cs" />

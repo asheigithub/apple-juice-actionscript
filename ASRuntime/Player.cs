@@ -14,7 +14,8 @@ namespace ASRuntime
         internal Dictionary<int, rtObject> static_instance;
         internal Dictionary<int, RunTimeScope> outpackage_runtimescope;
 
-
+        public LinkTypeMapper linktypemapper;
+        
         internal CSWC swc;
         private CodeBlock defaultblock;
         public void loadCode(CSWC swc,CodeBlock block=null)
@@ -23,6 +24,14 @@ namespace ASRuntime
 
             static_instance = new Dictionary<int, rtObject>();
             outpackage_runtimescope = new Dictionary<int, RunTimeScope>();
+
+
+            //***初始化类型映射****
+
+            linktypemapper = new RuntimeLinkTypeMapper();
+            linktypemapper.init(swc);
+
+            //****************
 
             if (block != null)
             {

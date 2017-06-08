@@ -85,6 +85,7 @@
     <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="RTInternalException.cs" />
+    <Compile Include="RuntimeLinkTypeMapper.cs" />
     <Compile Include="StackFrame.cs" />
     <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />

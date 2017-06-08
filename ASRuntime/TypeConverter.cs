@@ -706,7 +706,7 @@ namespace ASRuntime
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal static ASBinCode.RunTimeValueBase ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
+        public static ASBinCode.RunTimeValueBase ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
         {
             //return ASBinCode.rtData.rtUndefined.undefined;
 

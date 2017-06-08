@@ -8,7 +8,7 @@ namespace ASBinCode
     /// <summary>
     /// 输出的类库
     /// </summary>
-    public class CSWC:IClassFinder
+    public class CSWC : IClassFinder
     {
         public List<CodeBlock> blocks = new List<CodeBlock>();
         public List<ASBinCode.rtti.FunctionDefine> functions = new List<ASBinCode.rtti.FunctionDefine>();
@@ -21,11 +21,16 @@ namespace ASBinCode
         public List<rtti.Class> primitive_to_class_table = new List<Class>();
 
 
-        public readonly List<NativeFunctionBase> nativefunctions=new List<NativeFunctionBase>();
+        public readonly List<NativeFunctionBase> nativefunctions = new List<NativeFunctionBase>();
         public readonly Dictionary<string, int> nativefunctionNameIndex = new Dictionary<string, int>();
 
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
+
+        public readonly Dictionary<ILinkSystemObjCreator, Class> creator_Class
+            = new Dictionary<ILinkSystemObjCreator, Class>();
+
+
 
         /// <summary>
         /// Class类型
@@ -71,9 +76,7 @@ namespace ASBinCode
             {
                 primitive_to_class_table.Add(null);
             }
-
-            loadBuildinNativeFunctions();
-
+            
             operatorOverrides = new OperatorFunctions();
         }
 
@@ -90,9 +93,14 @@ namespace ASBinCode
             }
         }
 
-        private void loadBuildinNativeFunctions()
+        public NativeFunctionBase getNativeFunction(int funcitonid)
         {
-               //regNativeFunction(new nativefunctions.Int_toPrecision());
+            var define = functions[funcitonid];
+            if (define.native_index == -1)
+            {
+                define.native_index = nativefunctionNameIndex[define.native_name];
+            }
+            return nativefunctions[define.native_index];
         }
 
 

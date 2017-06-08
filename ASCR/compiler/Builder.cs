@@ -680,7 +680,7 @@ namespace ASCompiler.compiler
 
                 //block必须有收尾工作
                 {
-                    env.completSteps();
+                    env.completSteps(this);
                     env.block.totalRegisters = env.combieNeedStackSlots();
                 }
 
@@ -1027,10 +1027,26 @@ namespace ASCompiler.compiler
                                     "[link_system]的类必须有[creator]函数");
                                     
                 }
+                if (cls.isLink_System)
+                {
+                    var creator =
+                        buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[cls.staticClass.linkObjCreator]];
 
+                    int idx = bin.nativefunctionNameIndex[creator.native_name];
+                    var func = bin.nativefunctions[idx];
+                    ASBinCode.rtti.ILinkSystemObjCreator ic = func as ASBinCode.rtti.ILinkSystemObjCreator;
+                    if (ic == null)
+                    {
+                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                    "[creator]函数必须实现[ILinkSystemObjCreator]接口");
+                    }
+
+                    bin.creator_Class.Add(ic, cls);
+
+                }
                 //block必须有收尾工作
                 {
-                    env.completSteps();
+                    env.completSteps(this);
                     env.block.totalRegisters = env.combieNeedStackSlots();
                     
                 }
@@ -1200,7 +1216,7 @@ namespace ASCompiler.compiler
             {
                 buildStmt(env, statements[i]);
             }
-            env.completSteps();
+            env.completSteps(this);
             block.totalRegisters = env.combieNeedStackSlots();
         }
 

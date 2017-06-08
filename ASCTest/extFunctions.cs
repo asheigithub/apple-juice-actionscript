@@ -23,7 +23,6 @@ namespace ASCTest
             bin.regNativeFunction(new object_static_equals());
             bin.regNativeFunction(new object_static_referenceEquals());
 
-            bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Array_creator_", default(Array)));
             system_arrays_buildin.regNativeFunctions(bin);
 
             system_byte_buildin.regNativeFunctions(bin);

@@ -131,7 +131,7 @@ package system
 		public function addYears(value:int):DateTime;
 		
 		[native,_system_DateTime_getDateTimeFormats]
-		public function getDateTimeFormats():Array_Of_String;
+		public function getDateTimeFormats():_Array_;
 		
 		[native,_system_DateTime_subtract]
 		public function subtract(value:DateTime):TimeSpan;

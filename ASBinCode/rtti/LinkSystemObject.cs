@@ -10,7 +10,7 @@ namespace ASBinCode.rtti
 
         public LinkObj(Class cls) : this(cls, default(T))
         { }
-
+        
         public LinkObj(Class cls, T v) : base(cls)
         {
             value = v;
