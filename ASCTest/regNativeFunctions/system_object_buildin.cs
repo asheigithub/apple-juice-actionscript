@@ -225,7 +225,17 @@ namespace ASCTest.regNativeFunctions
             //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
             success = true;
 
-            ASBinCode.rtData.rtObject obj = argements[0].getValue() as ASBinCode.rtData.rtObject;
+            var a1 = argements[0].getValue();
+            var a2 = argements[1].getValue();
+
+            if (a1.rtType == a2.rtType && a1.rtType == RunTimeDataType.rt_null)
+            {
+                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+                return;
+            }
+
+
+            ASBinCode.rtData.rtObject obj = a1 as ASBinCode.rtData.rtObject;
             if (obj == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
@@ -240,21 +250,21 @@ namespace ASCTest.regNativeFunctions
             }
 
 
-            ASBinCode.rtData.rtObject obj2 = argements[1].getValue() as ASBinCode.rtData.rtObject;
+            ASBinCode.rtData.rtObject obj2 = a2 as ASBinCode.rtData.rtObject;
             if (obj2 == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
                 return;
             }
 
-            LinkSystemObject o2 = obj.value as LinkSystemObject;
+            LinkSystemObject o2 = obj2.value as LinkSystemObject;
             if (o2 == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
                 return;
             }
 
-            if (object.ReferenceEquals(o1, o2))
+            if (object.ReferenceEquals(o1.GetLinkData(), o2.GetLinkData()))
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
                 return;

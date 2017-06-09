@@ -1191,7 +1191,7 @@ namespace ASCompiler.compiler.builds
 
                 Register reg = env.loadRegisterByAST(data.Reg.ID);
                 
-                if (reg == null)
+                if (reg == null || builder.isEval)
                 {
                     throw new BuildException(
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,

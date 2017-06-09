@@ -37,6 +37,8 @@ exit
 @echo show src code  %1
 @echo=
 
+@if not exist .\tests\%1\FuncTest.as (goto subend)
+
 @type .\tests\%1\FuncTest.as
 
 

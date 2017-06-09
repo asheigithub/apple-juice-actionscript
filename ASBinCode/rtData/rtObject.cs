@@ -92,7 +92,7 @@ namespace ASBinCode.rtData
                 //}
                 //else
                 //{
-                //    value = otherValue;
+                //    value = otherValue.Clone();
                 //}
                 value = otherValue;
             }

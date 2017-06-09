@@ -12,6 +12,8 @@ namespace ASRuntime
         Dictionary<Type, RunTimeDataType> link_type;
         Dictionary<RunTimeDataType, Type> type_link;
 
+        RunTimeDataType _objectType_;
+
         public sealed override void init(CSWC swc)
         {
             arrayType = typeof(Array);
@@ -26,6 +28,10 @@ namespace ASRuntime
             foreach (var item in swc.creator_Class)
             {
                 link_type.Add(item.Key.getLinkSystemObjType(), item.Value.getRtType());
+                if (item.Key.getLinkSystemObjType().Equals(typeof(object)))
+                {
+                    _objectType_ = item.Value.getRtType();
+                }
             }
 
             type_link = new Dictionary<RunTimeDataType, Type>();
@@ -52,7 +58,7 @@ namespace ASRuntime
             {
                 return link_type[arrayType];
             }
-
+            
             return link_type[linkType];
         }
 
@@ -171,8 +177,41 @@ namespace ASRuntime
                     if (c.isLink_System)
                     {
                         LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObject)value).value;
-                        linkobject=lo.GetLinkData();
+                        linkobject = lo.GetLinkData();
 
+                    }
+                    else
+                    {
+                        linkobject = null;
+                        return false;
+                    }
+                }
+                else if (at == _objectType_) //托管object
+                {
+                    if (vt == RunTimeDataType.rt_int)
+                    {
+                        linkobject = (TypeConverter.ConvertToInt(value, null, null));
+                    }
+                    else if (vt == RunTimeDataType.rt_uint)
+                    {
+                        linkobject = (TypeConverter.ConvertToUInt(value, null, null));
+                    }
+                    else if (vt == RunTimeDataType.rt_string)
+                    {
+                        linkobject = (TypeConverter.ConvertToString(value, null, null));
+                    }
+                    else if (at == RunTimeDataType.rt_number)
+                    {
+                        linkobject = (TypeConverter.ConvertToNumber(value));
+                    }
+                    else if (vt == RunTimeDataType.rt_boolean)
+                    {
+                        var b = TypeConverter.ConvertToBoolean(value, null, null);
+                        linkobject = b.value;
+                    }
+                    else if (vt == RunTimeDataType.rt_void)
+                    {
+                        linkobject = null;
                     }
                     else
                     {
