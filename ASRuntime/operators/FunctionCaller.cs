@@ -525,6 +525,22 @@ namespace ASRuntime.operators
 
         private void _doCall()
         {
+            if (toCallFunc.signature.returnType > RunTimeDataType.unknown)
+            {
+                if (!InstanceCreator.init_static_class(player.swc.getClassByRunTimeDataType(toCallFunc.signature.returnType), player, token))
+                {
+                    //***中断本帧本次代码执行进入try catch阶段
+                    invokerFrame.endStep();
+
+                    if (callbacker != null)
+                    {
+                        callbacker.noticeRunFailed();
+                    }
+                    release();
+                    return;
+                }
+            }
+
             if (pushedArgs < toCallFunc.signature.parameters.Count && !toCallFunc.IsAnonymous) //匿名函数能跳过参数检查
             {
                 for (int i = pushedArgs; i < toCallFunc.signature.parameters.Count; i++)

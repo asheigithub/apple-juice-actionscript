@@ -172,7 +172,19 @@ namespace ASCompiler.compiler.builds
         public void buildInterfaceExtends(ASTool.AS3.AS3Interface as3interface, Builder builder)
         {
             var cls = builder.buildingclasses[as3interface];
+            
             cls.staticClass.super = builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT + 2);
+
+            if (cls.isLink_System)
+            {
+                if (builder.bin.LinkObjectClass == null)
+                {
+                    throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+                            "未设置链接对象基类");
+                }
+                cls.super = builder.bin.LinkObjectClass;
+            }
+
             if (as3interface.ExtendsNames.Count > 0)
             {
                 for (int i = 0; i < as3interface.ExtendsNames.Count; i++)

@@ -43,15 +43,31 @@ namespace ASBinCode
                 }
             }
             var instance_class = rtObj.value._class;
-            var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
 
-            rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
-            method.bind(rtObj.objScope);
-            method.setThis(rtObj);
+            if (instance_class.isInterface && instance_class.isLink_System)
+            {//***可能是链接到系统的接口****
+                var vmember = (InterfaceMethodGetter)instance_class.classMembers[indexofMember].bindField;
 
-            cache.Target = method;
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
 
-            return method;
+                cache.Target = method;
+
+                return method;
+            }
+            else
+            {
+                var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
+
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
+
+                cache.Target = method;
+
+                return method;
+            }
         }
 
 

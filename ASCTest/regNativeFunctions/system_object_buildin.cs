@@ -141,7 +141,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkSystemObject o2 = obj.value as LinkSystemObject;
+            LinkSystemObject o2 = obj2.value as LinkSystemObject;
             if (o2 == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);

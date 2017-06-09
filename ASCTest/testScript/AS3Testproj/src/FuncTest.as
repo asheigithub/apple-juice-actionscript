@@ -30,7 +30,18 @@ package
 			
 			_Array_(arr).setValue( _Array_.createInstance(int,4)  , 0);
 			
-			trace(_Array_(arr).getValue(0).getValue(0));
+			
+			
+			//trace(_Array_(arr).getValue(0).getValue(0));
+			
+			var b:_IEnumerator_ = _Array_(arr).getValue(0).getEnumerator();
+			b.reset();
+			while (b.moveNext()) 
+			{
+				trace(b.current);
+			}
+			
+			trace( _Object_.equals( b, arr.getEnumerator() )  ); 
 			
 		}
 		

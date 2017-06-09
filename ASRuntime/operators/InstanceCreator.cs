@@ -575,13 +575,13 @@ namespace ASRuntime.operators
 
             if (cls.isLink_System)
             {
-                var creator= swc.functions[((ClassMethodGetter)cls.staticClass.linkObjCreator.bindField).functionId];
-                if (creator.native_index == -1)
-                {
-                    creator.native_index = swc.nativefunctionNameIndex[creator.native_name];
-                }
-                var func = swc.nativefunctions[creator.native_index];
-
+                //var creator= swc.functions[((ClassMethodGetter)cls.staticClass.linkObjCreator.bindField).functionId];
+                //if (creator.native_index == -1)
+                //{
+                //    creator.native_index = swc.nativefunctionNameIndex[creator.native_name];
+                //}
+                //var func = swc.nativefunctions[creator.native_index];
+                var func = (NativeFunctionBase)swc.class_Creator[cls];
                 
 
                 string err;int no;

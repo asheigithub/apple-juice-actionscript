@@ -88,7 +88,7 @@ namespace ASBinCode
 
         public static bool isInherits(Class extendsClass,Class super)
         {
-
+            
 
             var t = extendsClass;
 

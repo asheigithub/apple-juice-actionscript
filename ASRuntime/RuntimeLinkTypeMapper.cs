@@ -63,7 +63,7 @@ namespace ASRuntime
         }
 
 
-        public sealed override void storeLinkObject_ToSlot(object obj, SLOT returnSlot, IClassFinder bin, object player)
+        public sealed override void storeLinkObject_ToSlot(object obj,FunctionDefine funcDefine ,SLOT returnSlot, IClassFinder bin, object player)
         {
             if (obj == null)
             {
@@ -71,9 +71,13 @@ namespace ASRuntime
             }
             else
             {
-
-                RunTimeDataType rt =
-                    getRuntimeDataType(obj.GetType());
+                RunTimeDataType rt = funcDefine.signature.returnType; //getLinkType(funcDefine.signature.returnType);
+                //RunTimeDataType rt =
+                //    getRuntimeDataType(obj.GetType());
+                if (rt == RunTimeDataType.rt_void)
+                {
+                    rt = getRuntimeDataType(obj.GetType());
+                }
 
                 if (rt == RunTimeDataType.rt_int)
                 {
@@ -107,8 +111,10 @@ namespace ASRuntime
                 {
                     Class rtCls = bin.getClassByRunTimeDataType(rt);
 
-                    var funCreator = (ClassMethodGetter)rtCls.staticClass.linkObjCreator.bindField;
-                    var f = (ILinkSystemObjCreator)((CSWC)bin).getNativeFunction(funCreator.functionId);
+                    //var funCreator = (ClassMethodGetter)rtCls.staticClass.linkObjCreator.bindField;
+                    //var f = (ILinkSystemObjCreator)((CSWC)bin).getNativeFunction(funCreator.functionId);
+
+                    var f = ((CSWC)bin).class_Creator[rtCls];
 
                     f.setLinkObjectValueToSlot(returnSlot, player,  obj, rtCls);
 

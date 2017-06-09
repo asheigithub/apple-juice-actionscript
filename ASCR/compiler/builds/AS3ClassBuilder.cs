@@ -377,6 +377,19 @@ namespace ASCompiler.compiler.builds
                                                                    "[_object_]只能指定一次");
                                 }
                             }
+                            else if (m.Value.Data.Value.ToString() == "_link_Object_")
+                            {
+                                if (builder.bin.LinkObjectClass == null)
+                                {
+                                    builder.bin.LinkObjectClass = cls;
+                                }
+                                else
+                                {
+                                    throw new BuildException(as3class.token.line,
+                                               as3class.token.ptr, as3class.token.sourceFile,
+                                                                   "[_link_Object_]只能指定一次");
+                                }
+                            }
                             else if (m.Value.Data.Value.ToString() == "_class_")
                             {
                                 if (builder.bin.TypeClass == null)

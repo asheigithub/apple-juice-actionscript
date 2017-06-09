@@ -1057,10 +1057,12 @@ namespace ASCompiler.compiler
                         }
 
                         bin.creator_Class.Add(ic, cls);
+                        bin.class_Creator.Add(cls, ic);
                     }
                     else
                     {
                         bin.creator_Class.Add((ASBinCode.rtti.ILinkSystemObjCreator)linkinterfaceCreators[cls], cls);
+                        bin.class_Creator.Add(cls, (ASBinCode.rtti.ILinkSystemObjCreator)linkinterfaceCreators[cls]);
                     }
                 }
                 //block必须有收尾工作

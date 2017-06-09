@@ -3,6 +3,7 @@ package system
 	import system._Object_;
 	import system.collections.ICollection;
 	import system.collections.IList;
+	import system.collections._IEnumerator_;
 	
 	[no_constructor]
 	[link_system]
@@ -62,6 +63,11 @@ package system
 		
 		[native, _system_Array_setValue___]
 		public function setValue__(value:*,indices:_Array_):void;
+		
+
+		[native, system_collections_ienumerable_getenumerator_]
+		public function getEnumerator():_IEnumerator_ 
+		
 	}
 
 }
