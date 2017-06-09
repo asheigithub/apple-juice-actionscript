@@ -26,4 +26,13 @@ namespace ASBinCode
         public abstract void setValue(rtNull value);
         public abstract void setValue(rtUndefined value);
     }
+
+    public abstract class StackSlotBase : SLOT
+    {
+        /// <summary>
+        /// 是否是存在栈上的变量
+        /// </summary>
+        public bool isConvertFromVariable;
+    }
+
 }

@@ -441,11 +441,10 @@ namespace ASRuntime
                 currentRunFrame.receiveErrorFromStackFrame(temp);
                 return true;
             }
-
+            
             if (currentRunFrame.IsEnd()) //执行完成
             {
                 runtimeStack.Pop(); //出栈
-
 
                 var toclose = currentRunFrame;
                 if (currentRunFrame.callbacker != null)
@@ -453,10 +452,21 @@ namespace ASRuntime
                     IBlockCallBack temp = currentRunFrame.callbacker;
                     currentRunFrame.callbacker = null;
                     temp.call(temp.args);
-                   
+
+                    if (receive_error != null)
+                    {
+                        var t = receive_error;
+                        receive_error = null;
+                        currentRunFrame.receiveErrorFromStackFrame(t);
+                        return true;
+                    }
+                    
                 }
                 
                 toclose.close();
+
+                
+
 
                 if (runtimeStack.Count > 0)
                 {
@@ -466,6 +476,7 @@ namespace ASRuntime
                 {
                     currentRunFrame = null;
                 }
+                
                 
             }
             else
@@ -477,17 +488,25 @@ namespace ASRuntime
         }
 
         private error.InternalError receive_error;
-        internal void exitStackFrameWithError(error.InternalError error)
+        internal void exitStackFrameWithError(error.InternalError error,StackFrame raiseframe)
         {
             if (error.callStack == null) //收集调用栈
             {
                 error.callStack = new Stack<FrameInfo>();
             }
-            error.callStack.Push(currentRunFrame.getInfo()); 
+            error.callStack.Push(raiseframe.getInfo()); 
 
             runtimeStack.Pop();
 
-            currentRunFrame.close();
+            raiseframe.close();
+
+            if (!ReferenceEquals(currentRunFrame, raiseframe))
+            {
+                
+                currentRunFrame.close();
+            }
+
+            //currentRunFrame.close();
             if (runtimeStack.Count > 0)
             {
                 currentRunFrame = runtimeStack.Peek();

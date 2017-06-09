@@ -82,6 +82,15 @@ namespace ASCompiler.compiler.builds
                 List<ASTool.AS3.Expr.AS3DataStackElement> args
                     = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
 
+                List<RightValueBase> argsValue = new List<RightValueBase>();
+
+                for (int i = 0; i < args.Count; i++)
+                {
+                    ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
+                    RightValueBase arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
+                    argsValue.Add(arg);
+                }
+                //***
                 {
                     OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     opMakeArgs.arg1 = rValue;
@@ -89,19 +98,15 @@ namespace ASCompiler.compiler.builds
                     env.block.opSteps.Add(opMakeArgs);
                 }
 
-
                 for (int i = 0; i < args.Count; i++)
                 {
-                    ASTool.AS3.Expr.AS3DataStackElement argData = args[i];
-                    RightValueBase arg = builds.ExpressionBuilder.getRightValue(env, argData, step.token, builder);
                     //***参数准备***
                     OpStep opPushArgs = new OpStep(OpCode.push_parameter, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-                    opPushArgs.arg1 = arg;
-                    opPushArgs.arg1Type = arg.valueType;
+                    opPushArgs.arg1 = argsValue[i];
+                    opPushArgs.arg1Type = argsValue[i].valueType;
                     opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));
                     opPushArgs.arg2Type = RunTimeDataType.rt_int;
                     env.block.opSteps.Add(opPushArgs);
-
                 }
 
                 env.block.opSteps.Add(op);

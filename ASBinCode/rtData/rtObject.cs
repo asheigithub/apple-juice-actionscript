@@ -79,11 +79,6 @@ namespace ASBinCode.rtData
                 }
                 else
                 {
-                    //if (otherValue.__iscreateout)
-                    //{
-                    //    value = otherValue;
-                    //}
-                    //else
                     {
                         value = otherValue.Clone();
                     }  
@@ -91,6 +86,14 @@ namespace ASBinCode.rtData
             }
             else
             {
+                //if (rtType == otherValue._class.classid + RunTimeDataType._OBJECT)
+                //{
+                //    ((rtti.LinkSystemObject)value).SetLinkData(otherValue.GetLinkData());
+                //}
+                //else
+                //{
+                //    value = otherValue;
+                //}
                 value = otherValue;
             }
 

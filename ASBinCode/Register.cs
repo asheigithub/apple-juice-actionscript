@@ -37,6 +37,7 @@ namespace ASBinCode
 
         public bool isFuncResult;
 
+        public bool isConvertFromVariable;
 
         public void setEAXTypeWhenCompile(RunTimeDataType t)
         {
@@ -81,12 +82,16 @@ namespace ASBinCode
 
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return holder.stack[holder.offset + _index];
+            StackSlotBase slot = (StackSlotBase)holder.stack[holder.offset + _index];
+            slot.isConvertFromVariable = isConvertFromVariable;
+            return slot;
         }
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return holder.stack[holder.offset + _index];
+            StackSlotBase slot= (StackSlotBase)holder.stack[holder.offset + _index];
+            slot.isConvertFromVariable = isConvertFromVariable;
+            return slot;
         }
 
     }

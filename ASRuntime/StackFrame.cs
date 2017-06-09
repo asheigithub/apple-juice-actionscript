@@ -20,7 +20,7 @@ namespace ASRuntime
                 pool.Push(new StackFrame(null));
             }
         }
-
+        private static List<StackFrame> used = new List<StackFrame>();
         public static StackFrame create(CodeBlock block)
         {
             StackFrame frame = pool.Pop();
@@ -28,6 +28,9 @@ namespace ASRuntime
             frame.stepCount = block.opSteps.Count;
 
             frame.isclosed = false;
+
+            used.Add(frame);
+
             return frame;
         }
 
@@ -41,6 +44,7 @@ namespace ASRuntime
 
         private static void ret(StackFrame c)
         {
+            used.Remove(c);
             pool.Push(c);
         }
 
@@ -568,6 +572,7 @@ namespace ASRuntime
                         bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
                         rtFunction function = new rtFunction(funcid, ismethod);
+                        function.bind(scope);
                         step.reg.getSlot(scope,this).directSet(function);
                         
                         endStep(step);
@@ -751,7 +756,7 @@ namespace ASRuntime
                             }
                             
                         }
-                        player.exitStackFrameWithError(runtimeError);
+                        player.exitStackFrameWithError(runtimeError,this);
                     }
                 }
                 else if (hasCallReturn) //已经调用了Return
@@ -1209,7 +1214,6 @@ namespace ASRuntime
         /// </summary>
         public void close()
         {
-            
             typeconvertoperator = null;
             funCaller = null;
             instanceCreator = null;

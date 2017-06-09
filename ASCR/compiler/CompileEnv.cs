@@ -172,6 +172,7 @@ namespace ASCompiler.compiler
                     {
                         
                         Register varReg = getAdditionalRegister();
+                        varReg.isConvertFromVariable = true;
                         //***将Variable替换为Reg***
                         toReplace.Add(vm, varReg);
 
@@ -401,36 +402,36 @@ namespace ASCompiler.compiler
                 bool found = false;
 
                 var reg = reglist[i];
-                if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
+                if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
                 {
                     continue;
                 }
-
-                //任意类型的寄存器，可能是链接对象，所以不能重用。
-                if (reg.valueType == RunTimeDataType.rt_void)
-                {
-                    continue;
-                }
-                if (reg.valueType > RunTimeDataType.unknown)
-                {
-                    bool f2 = false;
-                    //var c=builder._classbuildingEnv;
-                    foreach (var item in builder._classbuildingEnv)
-                    {
-                        if (item.Key.getRtType() == reg.valueType)
-                        {
-                            f2 = true;
-                            if (item.Key.isLink_System)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                    if (!f2)
-                    {
-                        continue;
-                    }
-                }
+                
+                ////任意类型的寄存器，可能是链接对象，所以不能重用。
+                //if (reg.valueType == RunTimeDataType.rt_void)
+                //{
+                //    continue;
+                //}
+                //if (reg.valueType > RunTimeDataType.unknown)
+                //{
+                //    bool f2 = false;
+                //    //var c=builder._classbuildingEnv;
+                //    foreach (var item in builder._classbuildingEnv)
+                //    {
+                //        if (item.Key.getRtType() == reg.valueType)
+                //        {
+                //            f2 = true;
+                //            if (item.Key.isLink_System)
+                //            {
+                //                continue;
+                //            }
+                //        }
+                //    }
+                //    if (!f2)
+                //    {
+                //        continue;
+                //    }
+                //}
 
 
 

@@ -9,12 +9,14 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    public sealed class StackSlot : SLOT
+    public sealed class StackSlot : StackSlotBase
     {
         public StackSlot(CSWC classfinder)
         {
             store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
+
+            isConvertFromVariable = false;
 
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
             _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
@@ -150,10 +152,17 @@ namespace ASRuntime
                             rtObject obj = (rtObject)value;
                             if (obj.value._class.isLink_System)
                             {
-                                //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
-                                //要重新创建rtObject,而是直接更新缓存的rtObject.
-                                _cache_linksystemObject.cache_setValue((ASBinCode.rtti.LinkSystemObject)obj.value);
-                                store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+                                if (isConvertFromVariable)
+                                {
+                                    store[RunTimeDataType._OBJECT] = (RunTimeValueBase)value.Clone();
+                                }
+                                else
+                                {
+                                    //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
+                                    //要重新创建rtObject,而是直接更新缓存的rtObject.
+                                    _cache_linksystemObject.cache_setValue((ASBinCode.rtti.LinkSystemObject)obj.value);
+                                    store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+                                }
                             }
                             else
                             {
@@ -353,6 +362,7 @@ namespace ASRuntime
             _cache_prototypeSlot.clear();
             _cache_linksystemObject.cache_clear();
 
+            isConvertFromVariable = false;
 
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;
