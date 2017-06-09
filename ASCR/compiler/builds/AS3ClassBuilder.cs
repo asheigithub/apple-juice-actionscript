@@ -583,7 +583,12 @@ namespace ASCompiler.compiler.builds
                             if (cls.implements.ContainsKey(find[0]))
                             {
                                 throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
-                                "class "+cls.name+" implements interface "+ find[0].name +" multiple times.");
+                                "class " + cls.name + " implements interface " + find[0].name + " multiple times.");
+                            }
+                            else if ((!cls.isLink_System) && find[0].isLink_System)
+                            {
+                                throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+                                "非链接到系统的类" + cls.name + " 不能实现链接到系统的接口 " + find[0].name);
                             }
                             else
                             {

@@ -11,20 +11,26 @@ package
 	import system.UInt64;
 	import system._Object_;
 	import system._Array_;
+	import system.collections.ICollection;
+	import system.collections.IList;
+	import system.collections._IEnumerable_;
+	import system.collections._IEnumerator_;
 	[Doc]
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public final class FuncTest 
+	public final class FuncTest
 	{
 		
 		
 		public function FuncTest() 
 		{
-			var arr:_Array_ = _Array_.createInstance(_Object_, 10);
+			var arr:IList = _Array_.createInstance(_IEnumerable_, 10);
 			
-			arr.setValue(Int64(4), 0);
+			_Array_(arr).setValue( _Array_.createInstance(int,4)  , 0);
+			
+			trace(_Array_(arr).getValue(0).getValue(0));
 			
 		}
 		

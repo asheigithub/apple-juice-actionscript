@@ -54,6 +54,9 @@ namespace ASCompiler.compiler
 
         internal Dictionary<CodeBlock, CompileEnv> blockEnv = new Dictionary<CodeBlock, CompileEnv>();
 
+        internal Dictionary<ASBinCode.rtti.Class, NativeFunctionBase>
+            linkinterfaceCreators = new Dictionary<ASBinCode.rtti.Class, NativeFunctionBase>();
+
 
         internal readonly bool isEval;
         public Builder(bool isEval)
@@ -1023,26 +1026,42 @@ namespace ASCompiler.compiler
 
                 if (cls.isLink_System && cls.staticClass.linkObjCreator == null)
                 {
-                    throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                    "[link_system]的类必须有[creator]函数");
-                                    
+                    if (!cls.isInterface)
+                    {
+                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                        "[link_system]的类必须有[creator]函数");
+                    }
+                    else
+                    {
+                        if (!linkinterfaceCreators.ContainsKey(cls))
+                        {
+                            throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                        "[link_system_interface]的接口必须定义creator创建器");
+                        }
+                    }
                 }
                 if (cls.isLink_System)
                 {
-                    var creator =
-                        buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[cls.staticClass.linkObjCreator]];
-
-                    int idx = bin.nativefunctionNameIndex[creator.native_name];
-                    var func = bin.nativefunctions[idx];
-                    ASBinCode.rtti.ILinkSystemObjCreator ic = func as ASBinCode.rtti.ILinkSystemObjCreator;
-                    if (ic == null)
+                    if (!cls.isInterface)
                     {
-                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                    "[creator]函数必须实现[ILinkSystemObjCreator]接口");
+                        var creator =
+                            buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[cls.staticClass.linkObjCreator]];
+
+                        int idx = bin.nativefunctionNameIndex[creator.native_name];
+                        var func = bin.nativefunctions[idx];
+                        ASBinCode.rtti.ILinkSystemObjCreator ic = func as ASBinCode.rtti.ILinkSystemObjCreator;
+                        if (ic == null)
+                        {
+                            throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+                                        "[creator]函数必须实现[ILinkSystemObjCreator]接口");
+                        }
+
+                        bin.creator_Class.Add(ic, cls);
                     }
-
-                    bin.creator_Class.Add(ic, cls);
-
+                    else
+                    {
+                        bin.creator_Class.Add((ASBinCode.rtti.ILinkSystemObjCreator)linkinterfaceCreators[cls], cls);
+                    }
                 }
                 //block必须有收尾工作
                 {

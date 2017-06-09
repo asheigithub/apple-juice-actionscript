@@ -48,6 +48,8 @@ namespace ASCompiler.compiler.builds
                 cls.ispackageout = true;
             }
 
+            NativeFunctionBase creatorfunction = null;
+
             if (as3interface.Meta != null)
             {
                 foreach (var m in as3interface.Meta)
@@ -55,7 +57,7 @@ namespace ASCompiler.compiler.builds
                     if (!m.Value.IsReg)
                     {
                         if (m.Value.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
-                        { 
+                        {
                             if (m.Value.Data.Value.ToString() == "_IEnumerator_")
                             {
                                 if (builder.bin.IEnumeratorInterface == null)
@@ -84,6 +86,59 @@ namespace ASCompiler.compiler.builds
                             }
                         }
                     }
+                    else
+                    {
+                        if (m.exprStepList != null && m.exprStepList.Count == 1)
+                        {
+                            var step = m.exprStepList[0];
+                            if (step.Type == ASTool.AS3.Expr.OpType.CallFunc)
+                            {
+                                if (!step.Arg2.IsReg)
+                                {
+                                    if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
+                                    {
+                                        if (step.Arg2.Data.Value.ToString() == "link_system_interface")
+                                        {
+                                            cls.isLink_System = true;
+
+                                            if (step.Arg3.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_callargements)
+                                            {
+                                                List<ASTool.AS3.Expr.AS3DataStackElement>
+                                                    cargs = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
+                                                if (cargs.Count == 1)
+                                                {
+                                                    if (cargs[0].Data.FF1Type 
+                                                        == ASTool.AS3.Expr.FF1DataValueType.identifier)
+                                                    {
+                                                        string creator = cargs[0].Data.Value.ToString();
+
+                                                        if (builder.bin.nativefunctionNameIndex.ContainsKey(creator))
+                                                        {
+                                                            
+                                                            var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[creator]];
+                                                            if (!(nf is ASBinCode.rtti.ILinkSystemObjCreator))
+                                                            {
+                                                                throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+                                                                "链接接口必须有一个INativeFunctionRegister类型的创建器");
+                                                            }
+
+                                                            creatorfunction = nf;
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+                                                                "本地函数 " + creator + " 未注册");
+                                                        }
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -105,7 +160,10 @@ namespace ASCompiler.compiler.builds
             cls.staticClass = metaclass;
             metaclass.instanceClass = cls;
 
-
+            if (cls.isLink_System)
+            {
+                builder.linkinterfaceCreators.Add(cls, creatorfunction);
+            }
 
             return cls;
         }
@@ -128,6 +186,11 @@ namespace ASCompiler.compiler.builds
                         {
                             throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
                                 "An interface can only extend other interfaces, but " + extendName + " is a class.");
+                        }
+                        else if ((!cls.isLink_System) && find[0].isLink_System)
+                        {
+                            throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+                            "非链接到系统的接口" + cls.name + " 不能继承链接到系统的接口 " + find[0].name);
                         }
                         else
                         {
