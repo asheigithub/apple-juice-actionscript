@@ -40,12 +40,6 @@ namespace ASRuntime.operators
 
                     if (lintoslot is ClassPropertyGetter.PropertySlot)
                     {
-                        //slot.propGetSet = (ClassPropertyGetter)step.arg2;
-                        //slot.propBindObj = rtObj;
-                        //if (step.arg1 is SuperPointer)
-                        //{
-                        //    slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
-                        //}
                         frame.endStep(step);
                         return;
                     }
@@ -198,6 +192,82 @@ namespace ASRuntime.operators
                 }
             }
 
+            //***考虑索引器****
+            if(step.opCode== OpCode.bracket_access || step.opCode== OpCode.bracket_byname)
+            {
+                Register register = (Register)step.reg;
+
+                if (!(register._isassigntarget || register._hasUnaryOrShuffixOrDelete))
+                {
+                    if (rtObj.value._class.get_this_item != null)
+                    {
+
+                        //***调用索引器get***
+                        RunTimeValueBase func;
+
+                        func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
+                            rtObj
+                            );
+
+                        var funCaller = FunctionCaller.create(player, frame, step.token);
+                        funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                        funCaller.loadDefineFromFunction();
+                        if (!funCaller.createParaScope()) { return; }
+
+                        //funCaller.releaseAfterCall = true;
+
+                        bool success;
+                        funCaller.pushParameter(v2, 0, out success);
+                        if (!success)
+                        {
+                            frame.endStep(step);
+                            return;
+                        }
+
+                        funCaller._tempSlot = frame._tempSlot1;
+                        funCaller.returnSlot = register.getSlot(scope, frame);
+
+                        BlockCallBackBase cb = BlockCallBackBase.create();
+                        cb.setCallBacker(_get_this_item_callbacker);
+                        cb.step = step;
+                        cb.args = frame;
+
+                        funCaller.callbacker = cb;
+                        funCaller.call();
+
+                        return;
+
+                    }
+                }
+                else
+                {
+                    if (rtObj.value._class.set_this_item != null)
+                    {
+                        if (rtObj.value._class.get_this_item == null)
+                        {
+                            frame.throwError((new error.InternalError(step.token,
+                             "有set_this_item则必须有get_this_item"
+                             )));
+                            frame.endStep(step);
+                            return;
+                        }
+
+                        //***使用设置器***
+                        StackSlot dslot = (StackSlot)register.getSlot(scope, frame);
+                        dslot.linkTo(dslot._cache_setthisslot);
+
+                        dslot._cache_setthisslot.bindObj = rtObj;
+                        dslot._cache_setthisslot.setindex = v2;
+
+                        frame.endStep(step);
+
+                        return;
+
+                    }
+                }
+            }
+
+
             if (v2.rtType == RunTimeDataType.rt_string)
             {
                 _exec_dot_name(rtObj, ((rtString)v2).value, step, frame, scope, player);
@@ -288,6 +358,12 @@ namespace ASRuntime.operators
             }
         }
 
+        
+
+        private static void _get_this_item_callbacker(BlockCallBackBase sender, object args)
+        {
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
 
         private static void _convert_callbacker(BlockCallBackBase sender,object args)
         {

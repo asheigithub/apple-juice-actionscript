@@ -155,7 +155,6 @@ namespace ASRuntime.operators
                     var dt = signature.parameters[i].type;
                     var dv = signature.parameters[i].defaultValue.getValue(null, null);
 
-
                     if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
                     {
                         if (dt == RunTimeDataType.rt_int)
@@ -180,60 +179,12 @@ namespace ASRuntime.operators
                         }
                     }
 
-                    //if (signature.onStackParameters > 0)
-                    //{
-                    //    ASBinCode.rtti.FunctionParameter fp = signature.parameters[i];
-
-                    //    if (fp.isOnStack)
-                    //    {
-                    //        Register r = (Register)fp.varorreg;
-                    //        int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1+1 
-                    //                    + invokerFrame.call_parameter_slotCount + r._index ;
-                    //        invokerFrame.stack[index].directSet(dv);
-                    //    }
-                    //    else
-                    //    {
-                    //        CallFuncHeap[ ((Variable) fp.varorreg).indexOfMembers ].directSet(
-                    //            dv
-
-                    //        );
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    CallFuncHeap[i].directSet(
-                    //        dv
-
-                    //        );
-                    //}
+                    
                     _storeArgementToSlot(i, dv);
                 }
                 else if (signature.parameters[i].isPara)
                 {
-                    //if (signature.onStackParameters > 0)
-                    //{
-                    //    ASBinCode.rtti.FunctionParameter fp = signature.parameters[i];
-                    //    if (fp.isOnStack)
-                    //    {
-                    //        Register r = (Register)fp.varorreg;
-                    //        int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1
-                    //                    + invokerFrame.call_parameter_slotCount + r._index;
-                    //        invokerFrame.stack[index].directSet(new ASBinCode.rtData.rtArray());
-                    //    }
-                    //    else
-                    //    {
-                    //        CallFuncHeap[((Variable)fp.varorreg).indexOfMembers].directSet(
-                    //            new ASBinCode.rtData.rtArray()
-
-                    //        );
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    CallFuncHeap[i].directSet(
-                    //            new ASBinCode.rtData.rtArray()
-                    //        );
-                    //}
+                    
                     _storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
                 }
                 else
@@ -628,9 +579,18 @@ namespace ASRuntime.operators
             }
             else if (!toCallFunc.isNative)
             {
-                returnSlot.directSet(
-                    TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null,null));
+                if (returnSlot is StackSlot)
+                {
+                    TypeConverter.setDefaultValueToStackSlot(
+                        toCallFunc.signature.returnType,
+                        (StackSlot)returnSlot);
+                }
+                else
+                {
+                    returnSlot.directSet(
+                        TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null, null));
 
+                }
                 if (!ReferenceEquals(callbacker, this))
                 {
                     //***执行完成后，先清理参数***

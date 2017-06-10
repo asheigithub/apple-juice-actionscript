@@ -32,6 +32,8 @@ namespace ASBinCode
         /// </summary>
         public int totalRegisters;
 
+        public List<Register> regConvFromVar;
+
         public CodeBlock(int id,string name,int define_class_id,bool isoutclass)
         {
             this.id = id;
@@ -40,6 +42,7 @@ namespace ASBinCode
             this.isoutclass = isoutclass;
 
             opSteps = new List<OpStep>();
+            regConvFromVar = new List<Register>();
         }
 
         public override string ToString()

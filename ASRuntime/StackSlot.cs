@@ -19,7 +19,7 @@ namespace ASRuntime
             
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
             _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
-
+            _cache_setthisslot = new SetThisItemSlot();
             
             //存储器设置初始值
             for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
@@ -45,9 +45,13 @@ namespace ASRuntime
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
+        
 
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
+        internal SetThisItemSlot _cache_setthisslot;
+
+        internal SetThisItemSlot _temp_try_write_setthisitem;
 
         internal StackLinkObjectCache _linkObjCache;
 
@@ -68,6 +72,21 @@ namespace ASRuntime
                 if (linktarget != null)
                 {
                     return linktarget.isPropGetterSetter;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public sealed override bool isSetThisItem
+        {
+            get
+            {
+                if (linktarget != null)
+                {
+                    return linktarget.isSetThisItem;
                 }
                 else
                 {
@@ -336,9 +355,12 @@ namespace ASRuntime
             propGetSet = null;
             propBindObj = null;
             superPropBindClass = null;
-            
+
+            _temp_try_write_setthisitem = null;
+
             _cache_vectorSlot.clear();
             _cache_prototypeSlot.clear();
+            _cache_setthisslot.clear();
             _linkObjCache.clearRefObj();
             
             store[RunTimeDataType.rt_string] = rtNull.nullptr;

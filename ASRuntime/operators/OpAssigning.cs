@@ -30,6 +30,13 @@ namespace ASRuntime.operators
                             slot = oslot.linktarget;
                         }
 
+                        if (slot is SetThisItemSlot)
+                        {
+                            _doSetThisItem(((SetThisItemSlot)slot).bindObj, v, ((SetThisItemSlot)slot).setindex , oslot, frame,step);
+
+                            return;
+                        }
+
                         if (slot is ClassPropertyGetter.PropertySlot)
                         {
                             ClassPropertyGetter.PropertySlot propslot =
@@ -234,6 +241,61 @@ namespace ASRuntime.operators
         {
             ((StackFrame)sender.args).endStep(sender.step);
         }
-        
+
+
+        public static void _doSetThisItem(ASBinCode.rtData.rtObject thisObj,
+            RunTimeValueBase v,RunTimeValueBase index,StackSlot slot,StackFrame frame,OpStep step
+            )
+        {
+            //***读取setter***
+            RunTimeValueBase func;
+
+            func = ((MethodGetterBase)thisObj.value._class.set_this_item.bindField).getMethod(
+                thisObj
+                );
+            
+            //***调用设置器***
+
+            var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+            funCaller.function = (ASBinCode.rtData.rtFunction)func;
+            funCaller.loadDefineFromFunction();
+            if (!funCaller.createParaScope()) { return; }
+
+            //funCaller.releaseAfterCall = true;
+
+            bool success;
+            funCaller.pushParameter(v, 0, out success);
+            
+            if (!success)
+            {
+                frame.endStep(step);
+                return;
+            }
+
+            funCaller.pushParameter(index, 1, out success);
+            if (!success)
+            {
+                frame.endStep(step);
+                return;
+            }
+
+            funCaller._tempSlot = frame._tempSlot1;
+            funCaller.returnSlot = frame._tempSlot1;
+
+            BlockCallBackBase cb = BlockCallBackBase.create();
+            cb.setCallBacker(_setthisitem_callbacker);
+            cb.step = step;
+            cb.args = frame;
+
+            funCaller.callbacker = cb;
+            funCaller.call();
+
+            return;
+        }
+
+        private static void _setthisitem_callbacker(BlockCallBackBase sender, object args)
+        {
+            ((StackFrame)sender.args).endStep(sender.step);
+        }
     }
 }

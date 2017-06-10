@@ -139,6 +139,14 @@ namespace ASBinCode.rtti
         public int explicit_from_functionid;
         public RunTimeDataType explicit_from_type;
 
+        /// <summary>
+        /// 索引器 取值
+        /// </summary>
+        public ClassMember get_this_item;
+        /// <summary>
+        /// 索引器 赋值
+        /// </summary>
+        public ClassMember set_this_item;
 
         /// <summary>
         /// 类成员定义

@@ -180,6 +180,9 @@ namespace ASCompiler.compiler
                         {
                             varReg._index = block.totalRegisters;
                             block.totalRegisters++;
+                            varReg.valueType = vm.valueType;
+                            block.regConvFromVar.Add(varReg);
+
                         }
                         else
                         {

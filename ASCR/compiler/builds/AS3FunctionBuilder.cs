@@ -5,6 +5,8 @@ using System.Text;
 
 namespace ASCompiler.compiler.builds
 {
+    
+
     class AS3FunctionBuilder
     {
         public void buildAS3YieldReturn(CompileEnv env, ASTool.AS3.AS3YieldReturn  as3yieldreturn, Builder builder)
@@ -750,6 +752,84 @@ namespace ASCompiler.compiler.builds
                                             break;
                                         }
                                     }
+                                }
+                            }
+                            else if (meta == "get_this_item")
+                            {
+                                //索引器get
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.staticClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "get_this_item特性只能是实例方法");
+                                    }
+                                    if (function.signature.parameters.Count != 1
+                                        )
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "get_this_item特性函数的参数必须是1个");
+                                    }
+
+                                    if (function.signature.returnType == RunTimeDataType.fun_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "get_this_item特性函数必须有返回值");
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            iclass.get_this_item = member;
+                                            break;
+                                        }
+                                    }
+
+                                }
+
+
+                            }
+                            else if (meta == "set_this_item")
+                            {
+                                //索引器set
+                                {
+                                    ASBinCode.rtti.Class iclass = ((ASBinCode.scopes.ObjectInstanceScope)scope)._class;
+                                    if (iclass.staticClass == null)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "set_this_item特性只能是实例方法");
+                                    }
+                                    if (function.signature.parameters.Count != 2
+                                        )
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "set_this_item特性函数的参数必须是2个");
+                                    }
+
+                                    if (function.signature.returnType != RunTimeDataType.fun_void)
+                                    {
+                                        throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+                                        "set_this_item特性函数不能有返回值");
+                                    }
+
+                                    for (int j = 0; j < iclass.classMembers.Count; j++)
+                                    {
+                                        ASBinCode.rtti.ClassMember member = iclass.classMembers[j];
+                                        if (member.valueType == RunTimeDataType.rt_function
+                                            &&
+                                            member.name == function.name
+                                            )
+                                        {
+                                            iclass.set_this_item = member;
+                                            break;
+                                        }
+                                    }
+
                                 }
                             }
                             else if (meta == "native")
@@ -1658,8 +1738,8 @@ namespace ASCompiler.compiler.builds
                                             throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                                 "操作符" + operatorCode + "不能重载");
                                         }
-                                        
-                                        
+
+
                                     }
 
                                 }

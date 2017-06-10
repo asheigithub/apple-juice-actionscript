@@ -2615,6 +2615,44 @@ Public Class AS3FileGrammarAnalyser
                 node.exprsteplist.Add(lv_true_flag)
 
                 MemberScopeStack.Peek().ExprDataStack.Push(arg2)
+            ElseIf code = "&&=" Then
+                '***短路拆分***
+                Dim lv_true_flag As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+                lv_true_flag.Type = Expr.OpType.Flag
+                lv_true_flag.OpCode = "logicAnd_leftvalue_true_" & AS3.Expr.AS3ExprStep.GetFlagId().ToString()
+
+                Dim lv_false_flag As New Expr.AS3ExprStep(node.MatchedToken)
+                lv_false_flag.Type = Expr.OpType.Flag
+                lv_false_flag.OpCode = "logicAnd_leftvalue_false_" & AS3.Expr.AS3ExprStep.GetFlagId().ToString()
+
+                Dim opifgoto_lvtrue As New AS3.Expr.AS3ExprStep(node.MatchedToken)    '短路操作
+                opifgoto_lvtrue.Arg1 = arg1
+                opifgoto_lvtrue.OpCode = lv_true_flag.OpCode
+                opifgoto_lvtrue.Type = Expr.OpType.IF_GotoFlag
+
+                node.exprsteplist.Add(opifgoto_lvtrue)
+
+                Dim opgoto_lvfalse As New Expr.AS3ExprStep(node.MatchedToken)
+                opgoto_lvfalse.OpCode = lv_false_flag.OpCode
+                opgoto_lvfalse.Type = Expr.OpType.GotoFlag
+
+                node.exprsteplist.Add(opgoto_lvfalse)
+                node.exprsteplist.Add(lv_true_flag)
+
+                node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+
+                Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+                op.Type = Expr.OpType.Assigning
+                op.OpCode = "="
+                op.Arg1 = arg1
+                op.Arg2 = arg2
+
+                node.exprsteplist.Add(op)
+
+                node.exprsteplist.Add(lv_false_flag)
+
+                MemberScopeStack.Peek().ExprDataStack.Push(arg2)
+
 
             ElseIf code <> "=" Then
                 '操作拆分  v<temp> = arg1+arg2

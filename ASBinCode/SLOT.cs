@@ -13,6 +13,9 @@ namespace ASBinCode
         //void setValue(IRunTimeValue value);
         public virtual bool isPropGetterSetter { get { return false; } }
 
+        public virtual bool isSetThisItem { get { return false; } }
+
+
         public abstract bool directSet(RunTimeValueBase value);
 
         public abstract RunTimeValueBase getValue();
@@ -27,12 +30,6 @@ namespace ASBinCode
         public abstract void setValue(rtUndefined value);
     }
 
-    public abstract class StackSlotBase : SLOT
-    {
-        /// <summary>
-        /// 是否是存在栈上的变量
-        /// </summary>
-        public bool isConvertFromVariable;
-    }
+    
 
 }

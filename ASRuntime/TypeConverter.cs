@@ -35,6 +35,45 @@ namespace ASRuntime
             }
         }
 
+        public static void setDefaultValueToStackSlot(
+            rt type,StackSlot slot
+            )
+        {
+            switch (type)
+            {
+                case rt.rt_boolean:
+                    slot.setValue(ASBinCode.rtData.rtBoolean.False);
+                    break;
+                case rt.rt_int:
+                    slot.setValue((int)0);
+                    break;
+                case rt.rt_uint:
+                    slot.setValue((uint)0);
+                    break;
+                case rt.rt_number:
+                    slot.setValue(double.NaN);
+                    break;
+                case rt.rt_string:
+                    slot.setValue(ASBinCode.rtData.rtNull.nullptr);
+                    break;
+                case rt.rt_void:
+                case rt.fun_void:
+                    slot.setValue(ASBinCode.rtData.rtUndefined.undefined);
+                    break;
+                case rt.rt_null:
+                case rt.rt_function:
+                case rt.rt_array:
+                    slot.setValue(ASBinCode.rtData.rtNull.nullptr);
+                    break;
+                case rt.unknown:
+                    slot.clear();
+                    break;
+                default:
+                    slot.setValue(ASBinCode.rtData.rtNull.nullptr);
+                    break;
+            }
+        }
+
         #region 类型转换
 
         public static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)

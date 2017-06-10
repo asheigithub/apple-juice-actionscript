@@ -12,6 +12,7 @@ package
 	import system._Object_;
 	import system._Array_;
 	import system.collections.ICollection;
+	import system.collections.IEnumerable;
 	import system.collections.IList;
 	import system.collections._IEnumerable_;
 	import system.collections._IEnumerator_;
@@ -24,28 +25,26 @@ package
 	{
 		
 		
+		
 		public function FuncTest() 
 		{
-			var arr:IList = _Array_.createInstance(_IEnumerable_, 10);
+			var k:IEnumerable;
+			var o:Object;
 			
-			_Array_(arr).setValue( _Array_.createInstance(int,4)  , 0);
+			o = k;
+			trace(o);
 			
-			_Array_(arr).getValue(0).setValue(9, 3);
 			
-			//trace(_Array_(arr).getValue(0).getValue(0));
 			
-			var b:_IEnumerator_ = _Array_(arr).getValue(0).getEnumerator();
-			b.reset();
-			while (b.moveNext()) 
-			{
-				trace(b.current);
-			}
 			
-			trace( _Object_.equals( b, arr.getEnumerator() )  ); 
 			
+			var arr = _Array_.createInstance(_Array_, 5);
+			arr[3] = _Array_.createInstance(UInt64, 3);
+			arr[3][0] =  int(9999);
+			//trace(arr[3]--);
+			
+			trace(arr[3][0],arr[0],arr[1]);
 		}
-		
-		
 		
 		
 	}

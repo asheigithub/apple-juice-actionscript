@@ -550,7 +550,7 @@ namespace ASCompiler.compiler.builds
             else
             {
 
-                OpStep op = new OpStep(OpCode.access_dot_byname, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                OpStep op = new OpStep(OpCode.bracket_byname, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                 op.reg = eax;
                 op.regType = eax.valueType;
                 op.arg1 = v1;

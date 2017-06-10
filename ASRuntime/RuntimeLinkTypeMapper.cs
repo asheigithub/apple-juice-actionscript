@@ -206,7 +206,7 @@ namespace ASRuntime
                     {
                         linkobject = (TypeConverter.ConvertToString(value, null, null));
                     }
-                    else if (at == RunTimeDataType.rt_number)
+                    else if (vt == RunTimeDataType.rt_number)
                     {
                         linkobject = (TypeConverter.ConvertToNumber(value));
                     }
@@ -233,6 +233,7 @@ namespace ASRuntime
             }
             else
             {
+                
                 linkobject = null;
                 return false;
             }

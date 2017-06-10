@@ -295,46 +295,51 @@ namespace ASBinCode
         bracket_access =76,
 
         /// <summary>
+        /// []按名字访问
+        /// </summary>
+        bracket_byname =77,
+
+        /// <summary>
         /// 访问方法
         /// </summary>
-        access_method =77,
+        access_method =78,
 
         /// <summary>
         /// 如果不是method,则清空this指针
         /// </summary>
-        clear_thispointer=78,
+        clear_thispointer=79,
 
         /// <summary>
         /// 如果是一个属性，则尝试从属性中读取值。
         /// </summary>
-        try_read_getter=79,
+        try_read_getter=80,
 
         /// <summary>
         /// 试图往属性中写回值
         /// </summary>
-        try_write_setter=80,
+        try_write_setter=81,
 
         /// <summary>
         /// 删除属性
         /// </summary>
-        delete_prop=81,
+        delete_prop=82,
 
         /// <summary>
         /// 设置动态属性
         /// </summary>
-        set_dynamic_prop=82,
+        set_dynamic_prop=83,
 
         /// <summary>
         /// 从对象转换到基本类型
         /// </summary>
-        cast_primitive=83,
+        cast_primitive=84,
 
 
-        array_create=84,
+        array_create=85,
         /// <summary>
         /// 往原始数组对象中追加元素
         /// </summary>
-        array_push=85,
+        array_push=86,
 
         ///// <summary>
         ///// 初始化Vector
@@ -345,107 +350,107 @@ namespace ASBinCode
         /// <summary>
         /// 绑定Vector访问器
         /// </summary>
-        vectorAccessor_bind=86,
+        vectorAccessor_bind=87,
         /// <summary>
         /// 先转换索引，再绑定Vector访问器
         /// </summary>
-        vectorAccessor_convertidx=87,
+        vectorAccessor_convertidx=88,
 
         /// <summary>
         /// 往vector里追加元素
         /// </summary>
-        vector_push=88,
+        vector_push=89,
         /// <summary>
         /// 把数组的内容拷贝到Vector
         /// </summary>
-        vector_pusharray=89,
+        vector_pusharray=90,
         /// <summary>
         /// 把Vector的内容拷贝到Vector
         /// </summary>
-        vector_pushvector = 90,
+        vector_pushvector = 91,
 
         /// <summary>
         /// 从初始数据中构造Vector
         /// 要么是数组，要么是完全匹配的Vector,要么是T要创建的Vector的T的子类的Vector
         /// </summary>
-        vector_initfrmdata=91,
+        vector_initfrmdata=92,
 
         /// <summary>
         /// 链接到包外成员
         /// </summary>
-        link_outpackagevairable=92,
+        link_outpackagevairable=93,
 
         /// <summary>
         /// 标记准备调父类的构造函数
         /// </summary>
-        flag_call_super_constructor =93,
+        flag_call_super_constructor =94,
 
 
         /// <summary>
         /// 获取forin的enumerator
         /// </summary>
-        forin_get_enumerator=94,
+        forin_get_enumerator=95,
         /// <summary>
         /// 获取foreach的enumerator
         /// </summary>
-        foreach_get_enumerator=95,
+        foreach_get_enumerator=96,
         /// <summary>
         /// 调movenext
         /// </summary>
-        enumerator_movenext=96,
+        enumerator_movenext=97,
 
         /// <summary>
         /// 调用读取当前值
         /// </summary>
-        enumerator_current=97,
+        enumerator_current=98,
 
         /// <summary>
         /// 关闭枚举器
         /// </summary>
-        enumerator_close = 98,
+        enumerator_close = 99,
 
         /// <summary>
         /// is运算符
         /// </summary>
-        logic_is=99,
+        logic_is=100,
         /// <summary>
         /// instanceof运算符
         /// </summary>
-        logic_instanceof=100,
+        logic_instanceof=101,
 
         /// <summary>
         /// as运算符
         /// </summary>
-        convert_as=101,
+        convert_as=102,
 
         /// <summary>
         /// in运算符
         /// </summary>
-        logic_in =102,
+        logic_in =103,
 
         /// <summary>
         /// typeof运算符
         /// </summary>
-        unary_typeof=103,
+        unary_typeof=104,
 
         /// <summary>
         /// 乘法 2个数字
         /// </summary>
-        multi_number =104,
+        multi_number =105,
 
-        div_number=105,
+        div_number=106,
 
-        mod_number=106,
+        mod_number=107,
 
-        unary_plus=107,
+        unary_plus=108,
 
-        function_create=108,
+        function_create=109,
 
-        yield_return=109,
+        yield_return=110,
 
-        yield_break=110,
+        yield_break=111,
 
-        yield_continuetoline=111,
+        yield_continuetoline=112,
 
     }
 }

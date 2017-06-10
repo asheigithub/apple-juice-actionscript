@@ -184,6 +184,10 @@ namespace ASCompiler.compiler.builds
                 }
                 cls.super = builder.bin.LinkObjectClass;
             }
+            else
+            {
+                cls.super = builder.bin.ObjectClass;
+            }
 
             if (as3interface.ExtendsNames.Count > 0)
             {

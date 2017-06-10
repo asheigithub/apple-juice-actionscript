@@ -369,6 +369,21 @@ namespace ASRuntime
                 frame._tempSlot2 = stackSlots[startOffset + frame.block.totalRegisters+1];
                 runtimeStack.Push(frame);
                 currentRunFrame = frame;
+
+                var block = calledblock;
+                for (int i = 0; i < block.regConvFromVar.Count; i++)
+                {
+                    Register regvar = block.regConvFromVar[i];
+                    var slot = (StackSlot)regvar.getSlot(null, frame);
+                    TypeConverter.setDefaultValueToStackSlot(
+                        regvar.valueType,slot
+                        );
+
+                    //block.regConvFromVar[i].getSlot(null, frame).directSet(
+                    //    TypeConverter.getDefaultValue(block.regConvFromVar[i].valueType).getValue(null, null)
+                    //    );
+                }
+
             }
 
 
@@ -427,6 +442,7 @@ namespace ASRuntime
 
         }
 
+        private IBlockCallBack _tempcallbacker;
 
         private StackFrame currentRunFrame;
         public bool step()
@@ -447,30 +463,50 @@ namespace ASRuntime
                 currentRunFrame.receiveErrorFromStackFrame(temp);
                 return true;
             }
-            
+
+            if (_tempcallbacker != null)
+            {
+                var temp = _tempcallbacker;
+                _tempcallbacker = null;
+                temp.call(temp.args);
+                
+                return true;
+            }
+
             if (currentRunFrame.IsEnd()) //执行完成
             {
-                runtimeStack.Pop(); //出栈
-
-                var toclose = currentRunFrame;
                 if (currentRunFrame.callbacker != null)
                 {
-                    IBlockCallBack temp = currentRunFrame.callbacker;
+                    _tempcallbacker = currentRunFrame.callbacker;
                     currentRunFrame.callbacker = null;
-                    temp.call(temp.args);
-
-                    if (receive_error != null)
-                    {
-                        var t = receive_error;
-                        receive_error = null;
-                        currentRunFrame.receiveErrorFromStackFrame(t);
-                        return true;
-                    }
                     
                 }
-                
-                toclose.close();
 
+                currentRunFrame.close();
+                runtimeStack.Pop();
+
+                //runtimeStack.Pop(); //出栈
+                //var toclose = currentRunFrame;
+                
+
+                //if (currentRunFrame.callbacker != null)
+                //{
+                //    IBlockCallBack temp = currentRunFrame.callbacker;
+                //    currentRunFrame.callbacker = null;
+                //    temp.call(temp.args);
+
+                //    if (receive_error != null)
+                //    {
+                //        var t = receive_error;
+                //        receive_error = null;
+                //        currentRunFrame.receiveErrorFromStackFrame(t);
+                //        return true;
+                //    }
+                    
+                //}
+
+                //toclose.close();
+                
                 
 
 
@@ -506,11 +542,14 @@ namespace ASRuntime
 
             raiseframe.close();
 
+#if DEBUG
+
             if (!ReferenceEquals(currentRunFrame, raiseframe))
             {
-                
-                currentRunFrame.close();
+                //currentRunFrame.close();
+                throw new ASRunTimeException("");
             }
+#endif
 
             //currentRunFrame.close();
             if (runtimeStack.Count > 0)

@@ -38,7 +38,7 @@ namespace ASRuntime.operators
 
             
         }
-
+        
         public bool prepareConstructorArgements()
         {
             int classid = _class.classid;
@@ -46,7 +46,7 @@ namespace ASRuntime.operators
             
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
-
+            
             constructorCaller = FunctionCaller.create(player, invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
@@ -434,6 +434,7 @@ namespace ASRuntime.operators
                 constructorCaller.call();
 
                 constructorCaller = null;
+                
             }
             else
             {

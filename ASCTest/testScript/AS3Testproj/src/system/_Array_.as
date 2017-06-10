@@ -44,11 +44,12 @@ package system
 		[native, _system_Array_getUpperBound_]
 		public function getUpperBound(dimension:int):int; 
 		
-		
-		[native, _system_Array_getValue_]
+		[get_this_item];
+		[native, _system_Array_getValue_];
 		public function getValue(index:int):*;
 		
-		[native, _system_Array_setValue_]
+		[set_this_item];
+		[native, _system_Array_setValue_];
 		public function setValue(value:*, index:int):void;
 		
 		

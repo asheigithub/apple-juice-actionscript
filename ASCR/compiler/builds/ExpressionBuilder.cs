@@ -1211,6 +1211,24 @@ namespace ASCompiler.compiler.builds
                 }              
                 else
                 {
+                    if (matchtoken.StringValue == "+=" ||
+                        matchtoken.StringValue == "-=" ||
+                        matchtoken.StringValue == "*=" ||
+                        matchtoken.StringValue == "/=" ||
+                        matchtoken.StringValue == "%=" ||
+                        matchtoken.StringValue == "<<=" ||
+                        matchtoken.StringValue == ">>=" ||
+                        matchtoken.StringValue == ">>>=" ||
+                        matchtoken.StringValue == "&=" ||
+                        matchtoken.StringValue == "^=" ||
+                        matchtoken.StringValue == "|=" ||
+                        matchtoken.StringValue == "&&=" ||
+                        matchtoken.StringValue == "||="
+                        )
+                    {
+                        addtryreadproperty = true;
+                    }
+
                     if (addtryreadproperty && reg.valueType == RunTimeDataType.rt_void)
                     {
                         //***有可能是个访问器，

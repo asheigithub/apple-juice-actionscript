@@ -13,14 +13,70 @@ namespace ASRuntime.operators
             
             ASBinCode.SLOT slot = ((Register)step.arg1).getSlot(scope,frame);
 
-            if (!slot.isPropGetterSetter)
+            if (slot.isPropGetterSetter)
+            {
+                _do_prop_read(
+
+                    ((StackSlot)slot).propGetSet,
+                    frame, step, frame.player, scope, ((StackSlot)slot).propBindObj, ((StackSlot)slot).superPropBindClass
+                    );
+            }
+            else if (slot.isSetThisItem)
+            {
+                SetThisItemSlot sslot = (SetThisItemSlot)((StackSlot)slot).linktarget;
+                //***调用索引器get***
+                RunTimeValueBase func;
+                var rtObj = sslot.bindObj;
+                var player = frame.player;
+                var v2 = sslot.setindex;
+                func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
+                    rtObj
+                    );
+
+                var funCaller = FunctionCaller.create(player, frame, step.token);
+                funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                funCaller.loadDefineFromFunction();
+                if (!funCaller.createParaScope()) { return; }
+
+                //funCaller.releaseAfterCall = true;
+
+                bool success;
+                funCaller.pushParameter(v2, 0, out success);
+                if (!success)
+                {
+                    frame.endStep(step);
+                    return;
+                }
+
+                funCaller._tempSlot = frame._tempSlot1;
+                funCaller.returnSlot = step.reg.getSlot(scope, frame);
+
+                StackSlot ret = (StackSlot)funCaller.returnSlot;
+                ret._temp_try_write_setthisitem = ret._cache_setthisslot;
+                ret._cache_setthisslot.bindObj = rtObj;
+                ret._cache_setthisslot.setindex = v2;
+
+
+                BlockCallBackBase cb = BlockCallBackBase.create();
+                cb.setCallBacker(_get_this_item_callbacker);
+                cb.step = step;
+                cb.args = frame;
+
+                funCaller.callbacker = cb;
+                funCaller.call();
+
+                return;
+
+
+            }
+            else
             {
                 SLOT regslot = step.reg.getSlot(scope, frame);
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
-                
-                if ( d !=null && s!=null && s.linktarget != null)
+
+                if (d != null && s != null && s.linktarget != null)
                 {
                     d.linkTo(s.linktarget);
                 }
@@ -30,102 +86,13 @@ namespace ASRuntime.operators
                 }
                 frame.endStep(step);
             }
-            else
-            {
-                _do_prop_read(
-                    
-                    ((StackSlot)slot).propGetSet,
-                    frame,step,frame.player,scope, ((StackSlot)slot).propBindObj, ((StackSlot)slot).superPropBindClass
-                    );
 
-                //do
-                //{
-                //    ClassPropertyGetter.PropertySlot propslot =
-                //        (ASBinCode.ClassPropertyGetter.PropertySlot)((StackSlot)slot).linktarget;
-                //    //***调用访问器。***
-                //    ASBinCode.ClassPropertyGetter prop = ((StackSlot)slot).propGetSet; //propslot.property;
-                //    if (prop.getter == null)
-                //    {
-                //        frame.throwError(
-                //            step.token,0, "Illegal read of write-only property"
-                //            );
-                //        break;
-                //    }
-                //    //检查访问权限
-                //    CodeBlock block = player.swc.blocks[scope.blockId];
-                //    Class finder;
-                //    if (block.isoutclass)
-                //    {
-                //        finder = null;
-                //    }
-                //    else
-                //    {
-                //        finder = player.swc.classes[block.define_class_id];
-                //    }
+           
+        }
 
-                //    var getter = ClassMemberFinder.find(prop._class, prop.getter.name, finder);
-                //    if (getter == null || getter.bindField != prop.getter)
-                //    {
-                //        frame.throwError(
-                //            step.token,0, "Illegal read of write-only property"
-                //            );
-                //        break;
-                //    }
-
-                //    //***读取getter***
-
-                //    StackSlot sslot = (StackSlot)slot;
-                //    RunTimeValueBase func;
-
-                //    if (sslot.superPropBindClass !=null)
-                //    {
-                //        func = ((MethodGetterBase)getter.bindField).getSuperMethod(
-                //        //propslot.bindObj.objScope
-                //        ((StackSlot)slot).propBindObj.objScope,
-                //        sslot.superPropBindClass
-
-                //        );
-                //    }
-                //    else
-                //    {
-                //        func = ((MethodGetterBase)getter.bindField).getMethod(
-                //        //propslot.bindObj.objScope
-                //        ((StackSlot)slot).propBindObj.objScope
-                //        );
-
-                //    }
-
-                //    //***调用设置器***
-
-                //    var funCaller = new FunctionCaller(player, frame, step.token);
-                //    funCaller.function = (ASBinCode.rtData.rtFunction)func;
-                //    funCaller.loadDefineFromFunction();
-                //    funCaller.createParaScope();
-                    
-                //    funCaller._tempSlot = frame._tempSlot1;
-                //    funCaller.returnSlot = step.reg.getSlot(scope);
-
-                //    ((StackSlot)funCaller.returnSlot).propGetSet = prop;
-                //    ((StackSlot)funCaller.returnSlot).propBindObj = ((StackSlot)slot).propBindObj;   //propslot.bindObj;
-
-
-                //    BlockCallBackBase cb = new BlockCallBackBase();
-                //    cb.setCallBacker(_getter_callbacker);
-                //    cb.step = step;
-                //    cb.args = frame;
-
-                //    funCaller.callbacker = cb;
-                //    funCaller.call();
-
-                //    return;
-
-                //} while (false);
-
-
-                //frame.endStep(step);
-
-
-            }
+        private static void _get_this_item_callbacker(BlockCallBackBase sender, object args)
+        {
+            ((StackFrame)sender.args).endStep(sender.step);
         }
 
         public static void _do_prop_read( 
@@ -250,6 +217,19 @@ namespace ASRuntime.operators
                     ,
                     slot
                     );
+            }
+            else if (slot._temp_try_write_setthisitem !=null)
+            {
+                SetThisItemSlot sslot = (SetThisItemSlot)slot._temp_try_write_setthisitem;
+                slot._temp_try_write_setthisitem = null;
+
+                OpAssigning._doSetThisItem(
+                    sslot.bindObj,
+                    slot.getValue(),
+                    sslot.setindex,
+                    slot, frame, step
+                    );
+
             }
             else
             {

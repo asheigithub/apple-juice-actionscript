@@ -169,7 +169,7 @@ namespace ASRuntime
 
             execing = true;
 #endif
-
+            
             switch (step.opCode)
             {
                 case OpCode.cast:
@@ -490,6 +490,9 @@ namespace ASRuntime
                 case OpCode.bracket_access:
                     operators.OpAccess_Dot.exec_bracket_access(this, step, scope);
                     break;
+                case OpCode.bracket_byname:
+                    operators.OpAccess_Dot.exec_dot_byname(this, step, scope);
+                    break;
                 case OpCode.access_method:
                     operators.OpAccess_Dot.exec_method(this, step, scope);
                     break;
@@ -613,7 +616,7 @@ namespace ASRuntime
         internal void endStep(OpStep step)
         {
 #if DEBUG
-            if (!execing)
+            if (!execing || isclosed)
             {
                 throw new ASRunTimeException();
             }
@@ -1208,23 +1211,35 @@ namespace ASRuntime
             }
         }
 
+        
+
         private bool isclosed;
         /// <summary>
         /// 退出程序栈时
         /// </summary>
         public void close()
         {
+#if DEBUG
+            if (isclosed)
+            {
+                throw new ASRunTimeException();
+            }
+#endif
+            isclosed = true;
+
             typeconvertoperator = null;
             funCaller = null;
             instanceCreator = null;
 
-            isclosed = true;
+            
 
             //清除执行栈
             for (int i = offset; i < offset + block.totalRegisters + 1+1 + call_parameter_slotCount; i++)
             {
                 stack[i].clear();
             }
+
+            
             //_tempSlot1.clear();
             //_tempSlot2.clear();
             //_dictMethods.Clear();
