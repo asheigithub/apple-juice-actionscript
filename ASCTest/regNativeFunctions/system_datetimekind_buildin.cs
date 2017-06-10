@@ -107,8 +107,8 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<DateTimeKind> argObj = (LinkObj<DateTimeKind>)((ASBinCode.rtData.rtObject)argements[0]).value;
-                ts1 = argObj.value;
+                LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = (DateTimeKind)argObj.value;
             }
 
             DateTimeKind ts2;
@@ -119,8 +119,8 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<DateTimeKind> argObj = (LinkObj<DateTimeKind>)((ASBinCode.rtData.rtObject)argements[1]).value;
-                ts2 = argObj.value;
+                LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = (DateTimeKind)argObj.value;
             }
 
             ((StackSlot)returnSlot).setLinkObjectValue(

@@ -1,5 +1,6 @@
 package system 
 {
+	[_link_Object_]
 	[link_system]
 	/**
 	 * .net对象的基类。因为直接用Object会导致IDE不正常，所以改名为_Object_

@@ -87,6 +87,7 @@
     <Compile Include="RTInternalException.cs" />
     <Compile Include="RuntimeLinkTypeMapper.cs" />
     <Compile Include="StackFrame.cs" />
+    <Compile Include="StackLinkObjectCache.cs" />
     <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

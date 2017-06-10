@@ -5,7 +5,6 @@ package system
 	 * @author ...
 	 */
 	[no_constructor]
-	[struct]
 	[link_system]
 	public final class DayOfWeek 
 	{

@@ -82,16 +82,14 @@ namespace ASBinCode
 
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            StackSlotBase slot = (StackSlotBase)holder.stack[holder.offset + _index];
-            slot.isConvertFromVariable = isConvertFromVariable;
-            return slot;
+            return holder.stack[holder.offset + _index];
+            
         }
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            StackSlotBase slot= (StackSlotBase)holder.stack[holder.offset + _index];
-            slot.isConvertFromVariable = isConvertFromVariable;
-            return slot;
+            return holder.stack[holder.offset + _index];
+            
         }
 
     }

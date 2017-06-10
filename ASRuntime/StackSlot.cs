@@ -9,20 +9,18 @@ namespace ASRuntime
     /// <summary>
     /// 程序执行栈的存储结构
     /// </summary>
-    public sealed class StackSlot : StackSlotBase
+    public sealed class StackSlot : SLOT
     {
         public StackSlot(CSWC classfinder)
         {
             store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
 
-            isConvertFromVariable = false;
-
+            
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
             _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
 
-            _cache_linksystemObject = rtObject.create_cache_linkObject();
-
+            
             //存储器设置初始值
             for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
             {
@@ -51,8 +49,7 @@ namespace ASRuntime
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
 
-        internal rtObject _cache_linksystemObject;
-
+        internal StackLinkObjectCache _linkObjCache;
 
         internal SLOT linktarget;
         public void linkTo(SLOT linktarget)
@@ -152,17 +149,27 @@ namespace ASRuntime
                             rtObject obj = (rtObject)value;
                             if (obj.value._class.isLink_System)
                             {
-                                if (isConvertFromVariable)
+
+                                //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
+                                //要重新创建rtObject,而是直接更新缓存的rtObject.
+                                var cacheobj = _linkObjCache.getCacheObj(obj.value._class);
+                                ASBinCode.rtti.LinkSystemObject link = (ASBinCode.rtti.LinkSystemObject)cacheobj.value;
+
+                                if (obj.value._class.isStruct)
                                 {
-                                    store[RunTimeDataType._OBJECT] = (RunTimeValueBase)value.Clone();
+                                    link.CopyStructData((ASBinCode.rtti.LinkSystemObject)obj.value);
                                 }
                                 else
                                 {
-                                    //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
-                                    //要重新创建rtObject,而是直接更新缓存的rtObject.
-                                    _cache_linksystemObject.cache_setValue((ASBinCode.rtti.LinkSystemObject)obj.value);
-                                    store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+                                    link._class = obj.value._class;
+                                    link.SetLinkData(((ASBinCode.rtti.LinkSystemObject)obj.value).GetLinkData());
+                                    cacheobj.rtType = obj.rtType;
+                                    cacheobj.objScope.blockId = obj.value._class.blockid;
+                                    
                                 }
+
+                                store[RunTimeDataType._OBJECT] = cacheobj;
+                                
                             }
                             else
                             {
@@ -181,52 +188,24 @@ namespace ASRuntime
         {
             index = RunTimeDataType._OBJECT;
 
-            if (_cache_linksystemObject.rtType == clsType.getRtType())
+            var cacheobj = _linkObjCache.getCacheObj(clsType);
+            
+            if (clsType.isStruct)
             {
-                if (clsType.isStruct)
-                {
-                    ((ASBinCode.rtti.LinkObj<T>)_cache_linksystemObject.value).value = value;
-                }
-                else
-                {
-                    ((ASBinCode.rtti.LinkSystemObject)_cache_linksystemObject.value).SetLinkData(value);
-                }
+                var link = (ASBinCode.rtti.LinkObj<T>)cacheobj.value;
+                link.value = value;
             }
             else
             {
-                if (clsType.isStruct 
-                    )
-                {
-                    var lk = player.alloc_LinkObjValue(clsType);
-                    
-                    ((ASBinCode.rtti.LinkObj<T>)lk).value = value;
-                    _cache_linksystemObject.cache_setValue(lk);
-                }
-                else
-                {
-                    if (
-                        _cache_linksystemObject.rtType == RunTimeDataType.unknown
-                        ||
-                        _cache_linksystemObject.value._class.isStruct
+                var link = (ASBinCode.rtti.LinkSystemObject)cacheobj.value;
+                link._class = clsType;
+                link.SetLinkData(value);
+                cacheobj.rtType = clsType.getRtType();
+                cacheobj.objScope.blockId = clsType.blockid;
 
-                        )
-                    {
-                        var lk = player.alloc_LinkObjValue(clsType);
-                        ((ASBinCode.rtti.LinkObj<object>)lk).value = value;
-                        _cache_linksystemObject.cache_setValue(lk);
-                    }
-                    else
-                    {
-                        _cache_linksystemObject.cache_setTypeAndLinkObject(clsType, value);
-                    }
-
-
-                }
-                
             }
 
-
-            store[RunTimeDataType._OBJECT] = _cache_linksystemObject;
+            store[RunTimeDataType._OBJECT] = cacheobj;
         }
 
 
@@ -360,10 +339,8 @@ namespace ASRuntime
             
             _cache_vectorSlot.clear();
             _cache_prototypeSlot.clear();
-            _cache_linksystemObject.cache_clear();
-
-            isConvertFromVariable = false;
-
+            _linkObjCache.clearRefObj();
+            
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;
             store[RunTimeDataType.rt_array] = rtNull.nullptr;

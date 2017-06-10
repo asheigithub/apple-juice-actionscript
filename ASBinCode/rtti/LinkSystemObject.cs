@@ -80,11 +80,7 @@ namespace ASBinCode.rtti
 
     public abstract class LinkSystemObject : Object
     {
-        /// <summary>
-        /// 是否是刚new出来的。刚new出来的第一次被heapslot调用clone后，就会设置这个值为false
-        /// </summary>
-        //internal bool __iscreateout;
-
+        
         public LinkSystemObject(Class _class):base(_class)
         {
             //__iscreateout = true;

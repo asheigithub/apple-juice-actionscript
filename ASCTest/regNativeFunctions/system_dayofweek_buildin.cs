@@ -107,8 +107,8 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<DayOfWeek> argObj = (LinkObj<DayOfWeek>)((ASBinCode.rtData.rtObject)argements[0]).value;
-                ts1 = argObj.value;
+                LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                ts1 = (DayOfWeek)argObj.value;
             }
 
             DayOfWeek ts2;
@@ -119,8 +119,8 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<DayOfWeek> argObj = (LinkObj<DayOfWeek>)((ASBinCode.rtData.rtObject)argements[1]).value;
-                ts2 = argObj.value;
+                LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                ts2 = (DayOfWeek)argObj.value;
             }
 
             ((StackSlot)returnSlot).setLinkObjectValue(

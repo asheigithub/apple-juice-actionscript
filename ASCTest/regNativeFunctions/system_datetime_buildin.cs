@@ -275,7 +275,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[6].rtType > RunTimeDataType.unknown)
             {
-                kind = ((LinkObj<DateTimeKind>)((ASBinCode.rtData.rtObject)argements[6]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[6]).value).value;
             }
             else
             {
@@ -435,7 +435,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[7].rtType > RunTimeDataType.unknown)
             {
-                kind = ((LinkObj<DateTimeKind>)((ASBinCode.rtData.rtObject)argements[7]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[7]).value).value;
             }
             else
             {
@@ -588,7 +588,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[1].rtType > RunTimeDataType.unknown)
             {
-                kind = ((LinkObj<DateTimeKind>)((ASBinCode.rtData.rtObject)argements[1]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value).value;
             }
             else
             {

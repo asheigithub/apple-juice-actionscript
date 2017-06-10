@@ -30,6 +30,11 @@ namespace ASBinCode.rtti
         /// </summary>
         public bool isStruct;
         /// <summary>
+        /// 结构体排序序号(从1开始排起)
+        /// </summary>
+        public int structIndex;
+
+        /// <summary>
         /// 是否链接到系统对象
         /// </summary>
         public bool isLink_System;

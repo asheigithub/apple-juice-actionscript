@@ -19,7 +19,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 指向的类
         /// </summary>
-        public readonly rtti.Class _class;
+        public rtti.Class _class;
         /// <summary>
         /// 类成员
         /// </summary>

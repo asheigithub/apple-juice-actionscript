@@ -100,7 +100,6 @@ namespace ASRuntime
             }
             runtimeStack = new Stack<StackFrame>();
             stackSlots = new StackSlot[1024];
-            
         }
 
 
@@ -140,8 +139,15 @@ namespace ASRuntime
             {
                 stackSlots[i] = new StackSlot(swc);
             }
+            StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, this);
+            stackSlots[0]._linkObjCache = lobjcache;
+            for (int i = 1; i < stackSlots.Length; i++)
+            {
+                stackSlots[i]._linkObjCache = lobjcache.Clone();
+            }
 
-            if(swc.ErrorClass !=null)
+
+            if (swc.ErrorClass !=null)
             {
                 //***先执行必要代码初始化****
                 var block = swc.blocks[swc.ErrorClass.outscopeblockid];

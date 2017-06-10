@@ -9,6 +9,8 @@ namespace ASCompiler.compiler
     {
         public bool isConsoleOut = true;
 
+        private int _structCount = 1;
+
         private int blockseed = 0;
         internal int getBlockId() { return blockseed++; }
         private int functionseed = 0;
@@ -1058,6 +1060,12 @@ namespace ASCompiler.compiler
 
                         bin.creator_Class.Add(ic, cls);
                         bin.class_Creator.Add(cls, ic);
+
+                        if (cls.isStruct)
+                        {
+                            cls.structIndex = _structCount++;
+                        }
+
                     }
                     else
                     {

@@ -30,7 +30,7 @@ package
 			
 			_Array_(arr).setValue( _Array_.createInstance(int,4)  , 0);
 			
-			
+			_Array_(arr).getValue(0).setValue(9, 3);
 			
 			//trace(_Array_(arr).getValue(0).getValue(0));
 			
