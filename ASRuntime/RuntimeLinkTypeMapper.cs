@@ -24,6 +24,8 @@ namespace ASRuntime
             link_type.Add(typeof(double), RunTimeDataType.rt_number);
             link_type.Add(typeof(bool), RunTimeDataType.rt_boolean);
             link_type.Add(typeof(uint), RunTimeDataType.rt_uint);
+            link_type.Add(typeof(ASBinCode.rtData.rtArray), RunTimeDataType.rt_array);
+            link_type.Add(typeof(ASBinCode.rtData.rtFunction), RunTimeDataType.rt_function);
 
             foreach (var item in swc.creator_Class)
             {
@@ -40,6 +42,8 @@ namespace ASRuntime
             type_link.Add(RunTimeDataType.rt_number, typeof(double));
             type_link.Add(RunTimeDataType.rt_boolean, typeof(bool));
             type_link.Add(RunTimeDataType.rt_uint, typeof(uint));
+            type_link.Add(RunTimeDataType.rt_array, typeof(ASBinCode.rtData.rtArray));
+            type_link.Add(RunTimeDataType.rt_function, typeof(ASBinCode.rtData.rtFunction));
 
             foreach (var item in swc.creator_Class)
             {
@@ -107,6 +111,14 @@ namespace ASRuntime
                     }
 
                 }
+                else if (rt == RunTimeDataType.rt_array)
+                {
+                    returnSlot.directSet((ASBinCode.rtData.rtArray)obj);
+                }
+                else if (rt == RunTimeDataType.rt_function)
+                {
+                    returnSlot.directSet((ASBinCode.rtData.rtFunction)obj);
+                }
                 else if (rt > RunTimeDataType.unknown)
                 {
                     Class rtCls = bin.getClassByRunTimeDataType(rt);
@@ -116,7 +128,7 @@ namespace ASRuntime
 
                     var f = ((CSWC)bin).class_Creator[rtCls];
 
-                    f.setLinkObjectValueToSlot(returnSlot, player,  obj, rtCls);
+                    f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
 
                 }
                 else
@@ -129,7 +141,7 @@ namespace ASRuntime
 
 
         public sealed override bool rtValueToLinkObject
-            (RunTimeValueBase value, Type linkType,IClassFinder bin, out object linkobject)
+            (RunTimeValueBase value, Type linkType,IClassFinder bin,bool needclone, out object linkobject)
         {
             RunTimeDataType vt = value.rtType;
 
@@ -156,24 +168,41 @@ namespace ASRuntime
 
             if (at == RunTimeDataType.rt_int)
             {
-                linkobject=(TypeConverter.ConvertToInt(value, null, null));
+                linkobject = (TypeConverter.ConvertToInt(value, null, null));
             }
             else if (at == RunTimeDataType.rt_uint)
             {
-                linkobject=(TypeConverter.ConvertToUInt(value, null, null));
+                linkobject = (TypeConverter.ConvertToUInt(value, null, null));
             }
             else if (at == RunTimeDataType.rt_string)
             {
-                linkobject=(TypeConverter.ConvertToString(value, null, null));
+                linkobject = (TypeConverter.ConvertToString(value, null, null));
             }
             else if (at == RunTimeDataType.rt_number)
             {
-                linkobject=(TypeConverter.ConvertToNumber(value));
+                linkobject = (TypeConverter.ConvertToNumber(value));
             }
             else if (at == RunTimeDataType.rt_boolean)
             {
-                var b = TypeConverter.ConvertToBoolean(value,null,null);
+                var b = TypeConverter.ConvertToBoolean(value, null, null);
                 linkobject = b.value;
+            }
+            else if (at == RunTimeDataType.rt_array)
+            {
+
+                linkobject = (ASBinCode.rtData.rtArray)value;
+            }
+            else if (at == RunTimeDataType.rt_function)
+            {
+                if (needclone)
+                {
+                    linkobject = (ASBinCode.rtData.rtFunction)value;
+                }
+                else
+                {
+                    linkobject = ((ASBinCode.rtData.rtFunction)value).Clone();
+                }
+
             }
             else if (at > RunTimeDataType.unknown)
             {
@@ -215,6 +244,21 @@ namespace ASRuntime
                         var b = TypeConverter.ConvertToBoolean(value, null, null);
                         linkobject = b.value;
                     }
+                    else if (vt == RunTimeDataType.rt_array)
+                    {
+                        linkobject = (ASBinCode.rtData.rtArray)value;
+                    }
+                    else if (vt == RunTimeDataType.rt_function)
+                    {
+                        if (needclone)
+                        {
+                            linkobject = (ASBinCode.rtData.rtFunction)value;
+                        }
+                        else
+                        {
+                            linkobject = ((ASBinCode.rtData.rtFunction)value).Clone();
+                        }
+                    }
                     else if (vt == RunTimeDataType.rt_void)
                     {
                         linkobject = null;
@@ -233,7 +277,7 @@ namespace ASRuntime
             }
             else
             {
-                
+
                 linkobject = null;
                 return false;
             }

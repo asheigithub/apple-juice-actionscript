@@ -242,7 +242,13 @@ namespace ASRuntime.nativefuncs
                 valueCB.args = valueCB.copyFromReceiveArgs(receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
 
-                operators.OpCast.CastValue(array.innerArray[sender._intArg], RunTimeDataType.rt_string,
+                var v = array.innerArray[sender._intArg];
+                if (v.rtType == RunTimeDataType.rt_void)
+                {
+                    v = UNDEFINED;
+                }
+
+                operators.OpCast.CastValue(v, RunTimeDataType.rt_string,
                     frame,
                     (SourceToken)receiveArgs[3],
                     (RunTimeScope)receiveArgs[4],

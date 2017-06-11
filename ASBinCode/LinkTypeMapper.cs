@@ -21,7 +21,7 @@ namespace ASBinCode
         public abstract void storeLinkObject_ToSlot(object obj, FunctionDefine funcDefine, SLOT returnSlot, IClassFinder bin, object player);
         
 
-        public abstract bool rtValueToLinkObject(RunTimeValueBase value, Type linkType, IClassFinder bin , out object linkobject);
+        public abstract bool rtValueToLinkObject(RunTimeValueBase value, Type linkType, IClassFinder bin , bool needclone ,out object linkobject);
 
         
     }

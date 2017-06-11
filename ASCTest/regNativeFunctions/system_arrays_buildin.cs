@@ -786,7 +786,7 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], array.GetType().GetElementType(), bin, out lo
+                    argements[0], array.GetType().GetElementType(), bin,true, out lo
                     ))
                 {
                     array.SetValue(lo, index);
@@ -957,7 +957,7 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], array.GetType().GetElementType(), bin, out lo
+                    argements[0], array.GetType().GetElementType(), bin,true, out lo
                     ))
                 {
                     array.SetValue(lo, index1,index2);
@@ -1186,7 +1186,7 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], array.GetType().GetElementType(), bin, out lo
+                    argements[0], array.GetType().GetElementType(), bin,true, out lo
                     ))
                 {
                     array.SetValue(lo, indices);

@@ -28,22 +28,26 @@ package
 		
 		public function FuncTest() 
 		{
-			var k:IEnumerable;
-			var o:Object;
-			
-			o = k;
-			trace(o);
-			
-			
+			//var k:IEnumerable;
+			//var o:Object;
+			//
+			//o = k;
+			//trace(o);
 			
 			
 			
-			var arr = _Array_.createInstance(_Array_, 5);
-			arr[3] = _Array_.createInstance(UInt64, 3);
-			arr[3][0] =  int(9999);
+			
+			
+			var arr = _Array_.createInstance(_Object_, 5);
+			
+			arr[3] = function(j){ trace(j, j)};
+			
+			//arr[3] =[1,2,3];
+			//arr[3][0] =  int(9999);
 			//trace(arr[3]--);
 			
-			trace(arr[3][0],arr[0],arr[1]);
+			trace(arr[3](66));
+			
 		}
 		
 		
