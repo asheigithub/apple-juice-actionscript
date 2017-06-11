@@ -12,6 +12,19 @@ namespace ASRuntime.operators
         {
             ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
             ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope, frame);
+            if (slot == null)
+            {
+                if (step.reg is Field)
+                {
+                    frame.throwError(step.token, 0, ((Field)step.reg).name + "没有找到");
+                }
+                else
+                {
+                    frame.throwError(step.token, 0, "没有找到赋值目标");
+                }
+                frame.endStep(step);
+                return;
+            }
 
             //if (!slot.isPropGetterSetter)
             {

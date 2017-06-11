@@ -84,7 +84,7 @@ namespace ASCTest.regNativeFunctions
             {
                 object obj = array.GetEnumerator();
 
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine, returnSlot, bin, stackframe.player);
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
@@ -326,7 +326,7 @@ namespace ASCTest.regNativeFunctions
             {
                 object obj = enumerator.Current;
 
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine, returnSlot, bin, stackframe.player);
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }

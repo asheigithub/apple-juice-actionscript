@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         static FunctionCaller()
         {
             pool = new Stack<FunctionCaller>();
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 1024; i++)
             {
                 pool.Push(new FunctionCaller(null, null, null));
             }
@@ -33,7 +33,7 @@ namespace ASRuntime.operators
 
         public static void checkpool()
         {
-            if (pool.Count != 128)
+            if (pool.Count != 1024)
             {
                 throw new ASRunTimeException("缓存池异常");
             }

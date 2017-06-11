@@ -525,7 +525,6 @@ namespace ASRuntime.operators
             }
         }
 
-
         internal static ASBinCode.rtData.rtObject createPureHostdOrLinkObject(Player player, Class cls)
         {
             if (cls.isLink_System)

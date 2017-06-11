@@ -18,7 +18,7 @@ namespace ASBinCode
         /// <summary>
         /// 将一个系统对象保存到StackSlot中
         /// </summary>
-        public abstract void storeLinkObject_ToSlot(object obj, FunctionDefine funcDefine, SLOT returnSlot, IClassFinder bin, object player);
+        public abstract void storeLinkObject_ToSlot(object obj, RunTimeDataType defineReturnType, SLOT returnSlot, IClassFinder bin, object player);
         
 
         public abstract bool rtValueToLinkObject(RunTimeValueBase value, Type linkType, IClassFinder bin , bool needclone ,out object linkobject);

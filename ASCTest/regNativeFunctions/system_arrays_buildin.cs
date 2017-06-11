@@ -707,7 +707,7 @@ namespace ASCTest.regNativeFunctions
             try
             {
                 object obj = array.GetValue(index);
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine, returnSlot, bin, stackframe.player);
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
@@ -877,7 +877,7 @@ namespace ASCTest.regNativeFunctions
             try
             {
                 object obj = array.GetValue(index1,index2);
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine, returnSlot, bin, stackframe.player);
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
@@ -1076,7 +1076,7 @@ namespace ASCTest.regNativeFunctions
             try
             {
                 object obj = array.GetValue(indices);
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine, returnSlot, bin, stackframe.player);
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }

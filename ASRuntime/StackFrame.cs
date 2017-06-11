@@ -15,12 +15,12 @@ namespace ASRuntime
         static StackFrame()
         {
             pool = new Stack<StackFrame>();
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 1024; i++)
             {
                 pool.Push(new StackFrame(null));
             }
         }
-        private static List<StackFrame> used = new List<StackFrame>();
+        
         public static StackFrame create(CodeBlock block)
         {
             StackFrame frame = pool.Pop();
@@ -29,14 +29,13 @@ namespace ASRuntime
 
             frame.isclosed = false;
 
-            used.Add(frame);
-
+            
             return frame;
         }
 
         public static void checkpool()
         {
-            if (pool.Count != 128)
+            if (pool.Count != 1024)
             {
                 throw new ASRunTimeException("缓存池异常");
             }
@@ -44,7 +43,7 @@ namespace ASRuntime
 
         private static void ret(StackFrame c)
         {
-            used.Remove(c);
+            
             pool.Push(c);
         }
 

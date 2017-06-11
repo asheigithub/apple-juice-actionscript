@@ -339,12 +339,7 @@ namespace ASRuntime
             RunTimeScopeType type
             )
         {
-            StackFrame frame =  StackFrame.create(calledblock);
-            frame.codeLinePtr = 0;
-            frame.player = this;
-            frame.returnSlot = returnSlot;
-            frame.callbacker = callbacker;
-            frame.static_objects = static_instance;
+            
 
             int startOffset = 0;
             if (runtimeStack.Count > 0)
@@ -354,17 +349,36 @@ namespace ASRuntime
                 startOffset = rs.offset + rs.block.totalRegisters+1+1 + rs.call_parameter_slotCount;
                 
             }
-            
-            frame.offset = startOffset;
-            frame.stack = stackSlots;
+
+            StackFrame frame = null;
 
             if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length)
             {
-                runtimeError = new error.InternalError(token, "stack overflow");
-                
+                //runtimeError = new error.InternalError(token, "stack overflow");
+                if (callbacker != null)
+                {
+                    callbacker.noticeRunFailed();
+                }
+                //frame.close();
+                //currentRunFrame.receiveErrorFromStackFrame(runtimeError);
+                //runtimeError = null;
+
+                currentRunFrame.receiveErrorFromStackFrame(new error.InternalError(token, "stack overflow"));
+
+                return null;
             }
             else
             {
+                frame = StackFrame.create(calledblock);
+                frame.codeLinePtr = 0;
+                frame.player = this;
+                frame.returnSlot = returnSlot;
+                frame.callbacker = callbacker;
+                frame.static_objects = static_instance;
+
+                frame.offset = startOffset;
+                frame.stack = stackSlots;
+
                 frame._tempSlot1 = stackSlots[startOffset + frame.block.totalRegisters];
                 frame._tempSlot2 = stackSlots[startOffset + frame.block.totalRegisters+1];
                 runtimeStack.Push(frame);

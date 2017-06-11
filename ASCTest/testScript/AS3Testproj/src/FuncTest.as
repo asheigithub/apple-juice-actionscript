@@ -24,7 +24,7 @@ package
 	public final class FuncTest
 	{
 		
-		
+		var temp;
 		
 		public function FuncTest() 
 		{
@@ -34,23 +34,36 @@ package
 			//o = k;
 			//trace(o);
 			
+			var arr = _Array_.createInstance(Object,3);
+			arr[0] = this;
+			arr[1] = undefined;
+			arr[2] = 1;
 			
+			temp = arr;
+
+			var enum:_IEnumerator_ = _Array_(arr).getEnumerator();
 			
+			enum.reset();
+			while (enum.moveNext()) 
+			{
+				trace(enum.current);
+			}
 			
-			
-			var arr = _Array_.createInstance(_Object_, 5);
-			
-			arr[3] = function(j){ trace(j, j)};
-			
-			//arr[3] =[1,2,3];
-			//arr[3][0] =  int(9999);
-			//trace(arr[3]--);
-			
-			trace(arr[3](66));
 			
 		}
 		
-		
+		public function makfunc()
+		{
+			var temp = this.temp;
+			function ff(f)
+			{
+				
+				temp[1] = f;
+				trace(temp[0], temp[1],temp[2] );
+			}
+			
+			return ff;
+		}
 	}
 
 }

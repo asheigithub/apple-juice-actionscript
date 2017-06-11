@@ -33,9 +33,20 @@ namespace ASRuntime.operators
                     SLOT lintoslot = ((LeftValueBase)step.arg2).getSlot(rtObj.objScope,null);
                     if (lintoslot == null)
                     {
-                        frame.throwError((new error.InternalError(step.token,
-                            "没有获取到类成员数据"
-                            )));
+                        if (step.arg2 is VariableBase)
+                        {
+                            frame.throwError((new error.InternalError(step.token,
+                                "成员" + ((VariableBase)step.arg2).name +"没有找到" 
+                                )));
+                        }
+                        else
+                        {
+                            frame.throwError((new error.InternalError(step.token,
+                                "没有获取到成员数据"
+                                )));
+                        }
+                        frame.endStep(step);
+                        return;
                     }
 
                     if (lintoslot is ClassPropertyGetter.PropertySlot)

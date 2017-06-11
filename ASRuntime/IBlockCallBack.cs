@@ -24,7 +24,7 @@ namespace ASRuntime
         static BlockCallBackBase()
         {
             pool = new Stack<BlockCallBackBase>();
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < 1024; i++)
             {
                 pool.Push(new BlockCallBackBase());
             }
@@ -51,7 +51,7 @@ namespace ASRuntime
 
         public static void checkpool()
         {
-            if (pool.Count != 128)
+            if (pool.Count != 1024)
             {
                 throw new ASBinCode.ASRunTimeException("缓存池异常");
             }

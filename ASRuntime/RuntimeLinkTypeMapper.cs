@@ -14,6 +14,8 @@ namespace ASRuntime
 
         RunTimeDataType _objectType_;
 
+        RunTimeDataType _OBJECT_LINK = -999;
+
         public sealed override void init(CSWC swc)
         {
             arrayType = typeof(Array);
@@ -26,6 +28,7 @@ namespace ASRuntime
             link_type.Add(typeof(uint), RunTimeDataType.rt_uint);
             link_type.Add(typeof(ASBinCode.rtData.rtArray), RunTimeDataType.rt_array);
             link_type.Add(typeof(ASBinCode.rtData.rtFunction), RunTimeDataType.rt_function);
+            link_type.Add(typeof(RunTimeValueBase), _OBJECT_LINK);
 
             foreach (var item in swc.creator_Class)
             {
@@ -44,6 +47,7 @@ namespace ASRuntime
             type_link.Add(RunTimeDataType.rt_uint, typeof(uint));
             type_link.Add(RunTimeDataType.rt_array, typeof(ASBinCode.rtData.rtArray));
             type_link.Add(RunTimeDataType.rt_function, typeof(ASBinCode.rtData.rtFunction));
+            type_link.Add(_OBJECT_LINK, typeof(RunTimeValueBase));
 
             foreach (var item in swc.creator_Class)
             {
@@ -53,7 +57,14 @@ namespace ASRuntime
 
         public sealed override Type getLinkType(RunTimeDataType rtType)
         {
-            return type_link[rtType];
+            if (rtType == RunTimeDataType._OBJECT)
+            {
+                return type_link[_OBJECT_LINK];
+            }
+            else
+            {
+                return type_link[rtType];
+            }
         }
 
         public sealed override RunTimeDataType getRuntimeDataType(Type linkType)
@@ -62,12 +73,30 @@ namespace ASRuntime
             {
                 return link_type[arrayType];
             }
+
+            RunTimeDataType ot;
+            if (link_type.TryGetValue(linkType, out ot))
+            {
+                return ot;
+            }
+            else
+            {
+                if (linkType.IsSubclassOf(type_link[_OBJECT_LINK]))
+                {
+                    return _OBJECT_LINK;
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+            }
+
             
-            return link_type[linkType];
+            
         }
 
 
-        public sealed override void storeLinkObject_ToSlot(object obj,FunctionDefine funcDefine ,SLOT returnSlot, IClassFinder bin, object player)
+        public sealed override void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, object player)
         {
             if (obj == null)
             {
@@ -75,13 +104,27 @@ namespace ASRuntime
             }
             else
             {
-                RunTimeDataType rt = funcDefine.signature.returnType; //getLinkType(funcDefine.signature.returnType);
+                RunTimeDataType rt =  defineReturnType; //getLinkType(funcDefine.signature.returnType);
                 //RunTimeDataType rt =
                 //    getRuntimeDataType(obj.GetType());
                 if (rt == RunTimeDataType.rt_void)
                 {
                     rt = getRuntimeDataType(obj.GetType());
                 }
+                if (rt == RunTimeDataType._OBJECT)
+                {
+                    rt = _OBJECT_LINK;
+                }
+                if (rt == _OBJECT_LINK)
+                {
+                    rt = ((RunTimeValueBase)obj).rtType;
+                    if (rt < RunTimeDataType.unknown)//否则走下面的Object路径
+                    {
+                        returnSlot.directSet((RunTimeValueBase)obj);
+                        return;
+                    }
+                }
+
 
                 if (rt == RunTimeDataType.rt_int)
                 {
@@ -121,14 +164,31 @@ namespace ASRuntime
                 }
                 else if (rt > RunTimeDataType.unknown)
                 {
-                    Class rtCls = bin.getClassByRunTimeDataType(rt);
+                    Class rtCls;// = ((ASBinCode.rtData.rtObject)obj).value._class; //bin.getClassByRunTimeDataType(rt);
+                    ASBinCode.rtData.rtObject testObj = obj as ASBinCode.rtData.rtObject;
+                    if (testObj != null)
+                    {
+                        rtCls = ((ASBinCode.rtData.rtObject)obj).value._class;
 
-                    //var funCreator = (ClassMethodGetter)rtCls.staticClass.linkObjCreator.bindField;
-                    //var f = (ILinkSystemObjCreator)((CSWC)bin).getNativeFunction(funCreator.functionId);
+                        if (rtCls.isLink_System)
+                        {
+                            var f = ((CSWC)bin).class_Creator[rtCls];
+                            f.setLinkObjectValueToSlot(returnSlot, player,
+                                ((LinkSystemObject)testObj.value).GetLinkData(), rtCls);
+                        }
+                        else
+                        {
+                            returnSlot.directSet((ASBinCode.rtData.rtObject)obj);
+                        }
 
-                    var f = ((CSWC)bin).class_Creator[rtCls];
+                    }
+                    else
+                    {
+                        rtCls = bin.getClassByRunTimeDataType(rt);
+                        var f = ((CSWC)bin).class_Creator[rtCls];
+                        f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
+                    }
 
-                    f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
 
                 }
                 else
@@ -202,7 +262,25 @@ namespace ASRuntime
                 {
                     linkobject = ((ASBinCode.rtData.rtFunction)value).Clone();
                 }
-
+            }
+            else if (at == _OBJECT_LINK)
+            {
+                if (vt > RunTimeDataType.unknown)
+                {
+                    linkobject = ((ASBinCode.rtData.rtObject)value).Clone();
+                }
+                else
+                {
+                    if (needclone)
+                    {
+                        linkobject = value.Clone();
+                    }
+                    else
+                    {
+                        linkobject = value;
+                    }
+                }
+                
             }
             else if (at > RunTimeDataType.unknown)
             {
@@ -243,21 +321,6 @@ namespace ASRuntime
                     {
                         var b = TypeConverter.ConvertToBoolean(value, null, null);
                         linkobject = b.value;
-                    }
-                    else if (vt == RunTimeDataType.rt_array)
-                    {
-                        linkobject = (ASBinCode.rtData.rtArray)value;
-                    }
-                    else if (vt == RunTimeDataType.rt_function)
-                    {
-                        if (needclone)
-                        {
-                            linkobject = (ASBinCode.rtData.rtFunction)value;
-                        }
-                        else
-                        {
-                            linkobject = ((ASBinCode.rtData.rtFunction)value).Clone();
-                        }
                     }
                     else if (vt == RunTimeDataType.rt_void)
                     {

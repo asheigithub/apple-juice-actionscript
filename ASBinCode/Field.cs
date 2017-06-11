@@ -26,6 +26,10 @@ namespace ASBinCode
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
                 scope = scope.parent;
+                if (scope == null)
+                {
+                    return null;
+                }
             }
 
 #if DEBUG
@@ -47,6 +51,10 @@ namespace ASBinCode
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
                 scope = scope.parent;
+                if (scope == null)
+                {
+                    return null;
+                }
             }
 
 #if DEBUG
@@ -65,7 +73,15 @@ namespace ASBinCode
 
         public override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return getSlot(scope,holder).getValue();
+            var slot = getSlot(scope, holder);
+            if (slot == null)   //**匿名函数引用了类的成员，但是又在闭包环境下在别的地方被调用，就有可能出现找不到的情况
+            {
+                return ASBinCode.rtData.rtUndefined.undefined;
+            }
+            else
+            { 
+                return slot.getValue();
+            }
         }
 
         protected sealed override IMember _clone()

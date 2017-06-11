@@ -57,3 +57,10 @@ var typeerr:TypeError=new TypeError();
 var argementerr:ArgumentError=new ArgumentError();
 var aneerr:AneError=new AneError();
 
+var i:int=new int();
+var ui:uint=new uint();
+var ub:Boolean=new Boolean();
+var n:Number=new Number();
+var s:String = new String();
+var a:Array = new Array();
+var f:Object=Object(function(){});

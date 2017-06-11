@@ -125,7 +125,9 @@ namespace ASRuntime.nativefuncs
 
         public void setLinkObjectValueToSlot(SLOT slot,object player,  object value, Class clsType)
         {
+            
             ((StackSlot)slot).setLinkObjectValue(clsType, (Player)player, (T)value);
+            
         }
     }
 
