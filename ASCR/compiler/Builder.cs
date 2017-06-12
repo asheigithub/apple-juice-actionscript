@@ -930,7 +930,10 @@ namespace ASCompiler.compiler
                             for (int j = 0; j < cls.classMembers.Count; j++)
                             {
                                 var clsmember = cls.classMembers[j];
-                                if (clsmember.name == implmember.name)
+                                if (clsmember.name == implmember.name
+                                    ||
+                                    check_expl_impl(clsmember,implmember)
+                                    )
                                 {
                                     found = true;
                                     if (!clsmember.isPublic)
@@ -1215,7 +1218,84 @@ namespace ASCompiler.compiler
             #endregion
 
         }
+        
+        private bool check_expl_impl(ASBinCode.rtti.ClassMember clsmember,
+            ASBinCode.rtti.ClassMember interfacemember)
+        {
+            if (!clsmember.refClass.isLink_System) return false;
+            if (!interfacemember.refClass.isLink_System) return false;
 
+
+            if (clsmember.bindField is ClassPropertyGetter && interfacemember.bindField is ClassPropertyGetter)
+            {
+                ClassPropertyGetter cc = (ClassPropertyGetter)clsmember.bindField;
+                ClassPropertyGetter ic = (ClassPropertyGetter)interfacemember.bindField;
+
+                bool ok = true;
+
+                if (ic.getter != null)
+                {
+                    if (cc.getter == null)
+                    {
+                        ok = false;
+                    }
+                    else
+                    {
+                        ok =ok && check_expl_impl(cc.getter.classmember, ic.getter.classmember);
+                    }
+                }
+                if (ic.setter != null)
+                {
+                    if (cc.getter == null)
+                    {
+                        ok = false;
+                    }
+                    else
+                    {
+                        ok = ok && check_expl_impl(cc.setter.classmember, ic.setter.classmember);
+                    }
+                }
+
+                return ok;
+            }
+
+
+            if (!_buildingmembers.ContainsKey(clsmember)) return false;
+            if (interfacemember.inheritFrom == null)
+            {
+                if (!_buildingmembers.ContainsKey(interfacemember)) return false;
+            }
+            else
+            {
+                if (!_buildingmembers.ContainsKey(interfacemember.inheritSrcMember)) return false;
+            }
+           
+
+            ASBinCode.rtti.FunctionDefine clssig =
+                  buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]];
+            ASBinCode.rtti.FunctionDefine interfacesig;
+            if (interfacemember.inheritFrom == null)
+            {
+                interfacesig = 
+                    buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[interfacemember]];
+            }
+            else
+            {
+                interfacesig = 
+                    buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[interfacemember.inheritSrcMember]];
+            }
+
+            if (clssig.isNative && interfacesig.isNative)
+            {
+                if (clssig.native_name == interfacesig.native_name)
+                {
+                    return true;
+                }
+            }
+
+
+            return false;
+        }
 
         internal void buildCodeBlock(List<ASTool.AS3.IAS3Stmt> statements, CodeBlock block)
         {

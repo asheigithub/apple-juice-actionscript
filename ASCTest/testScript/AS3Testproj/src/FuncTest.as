@@ -35,9 +35,18 @@ package
 			//trace(o);
 			
 			var arr = _Array_.createInstance(Object,3);
-			arr[0] = this;
+			arr[0] = [7,6,5,4];
 			arr[1] = undefined;
 			arr[2] = 1;
+			
+			var arr2 = _Array_.createInstance(Object,3);;
+			
+			trace( IList(arr).count );
+			
+			IList(arr).copyTo(arr2, 0);
+			
+			trace(  IList(arr2)[0]);
+			trace(  arr[0]===arr2[0] );
 			
 			temp = arr;
 

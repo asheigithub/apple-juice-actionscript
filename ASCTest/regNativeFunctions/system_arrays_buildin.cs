@@ -14,7 +14,7 @@ namespace ASCTest.regNativeFunctions
         {
             bin.regNativeFunction(LinkSystem_Buildin.getCreator(
                 "_system_Array_creator_", default(Array)));
-            bin.regNativeFunction(new system_array_length());
+            
             bin.regNativeFunction(new system_array_rank());
             bin.regNativeFunction(new system_array_getlength());
             bin.regNativeFunction(new system_array_getlowerbound());
@@ -358,77 +358,12 @@ namespace ASCTest.regNativeFunctions
                 throw new ASRunTimeException();
             }
 
-
+            
         }
 
     }
 
 
-    class system_array_length : NativeConstParameterFunction
-    {
-        public system_array_length() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_system_Array_length_";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_int;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-            success = true;
-
-
-            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
-
-            returnSlot.setValue(array.Length);
-
-        }
-
-
-        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        //{
-        //    errormessage = null; errorno = 0;
-
-        //    ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value =
-        //         new int[1];
-
-        //    return ASBinCode.rtData.rtUndefined.undefined;
-
-        //}
-
-
-    }
     class system_array_rank : NativeConstParameterFunction
     {
         public system_array_rank() : base(0)

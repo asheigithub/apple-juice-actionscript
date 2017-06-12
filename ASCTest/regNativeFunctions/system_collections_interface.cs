@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ASCTest.regNativeFunctions
 {
-    class system_linkinterface
+    class system_collections_interface
     {
         public static void regNativeFunctions(CSWC bin)
         {
@@ -27,7 +27,8 @@ namespace ASCTest.regNativeFunctions
             bin.regNativeFunction(new system_collectoins_ienumerator_reset());
             bin.regNativeFunction(new system_collectoins_ienumerator_movenext());
             bin.regNativeFunction(new system_collectoins_ienumerator_current());
-
+            bin.regNativeFunction(new system_collectoins_icollection_count());
+            bin.regNativeFunction(new system_collectoins_icollection_copyto());
         }
     }
 
@@ -350,6 +351,175 @@ namespace ASCTest.regNativeFunctions
         }
 
 
+    }
+
+    class system_collectoins_icollection_count : NativeConstParameterFunction
+    {
+        public system_collectoins_icollection_count() : base(0)
+        {
+            para = new List<RunTimeDataType>();
+
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "system_collections_icollection_count";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.rt_int;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+
+
+
+            System.Collections.ICollection enumerator =
+                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+            try
+            {
+                object obj = enumerator.Count;
+
+                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+                //returnSlot.setValue((int)array.GetValue(index));
+                success = true;
+            }
+            catch (KeyNotFoundException)
+            {
+                success = false;
+                stackframe.throwAneException(token, enumerator.ToString() + "没有链接到脚本");
+            }
+            catch (ArgumentException a)
+            {
+                success = false;
+                stackframe.throwAneException(token, a.Message);
+            }
+            catch (IndexOutOfRangeException i)
+            {
+                success = false;
+                stackframe.throwAneException(token, i.Message);
+            }
+
+
+        }
+
+
+    }
+
+    class system_collectoins_icollection_copyto : NativeConstParameterFunction
+    {
+        public system_collectoins_icollection_copyto() : base(2)
+        {
+            para = new List<RunTimeDataType>();
+            para.Add(RunTimeDataType.rt_void);
+            para.Add(RunTimeDataType.rt_int);
+        }
+
+        public override bool isMethod
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string name
+        {
+            get
+            {
+                return "system_collections_icollection_copyto";
+            }
+        }
+
+        List<RunTimeDataType> para;
+        public override List<RunTimeDataType> parameters
+        {
+            get
+            {
+                return para;
+            }
+        }
+
+        public override RunTimeDataType returnType
+        {
+            get
+            {
+                return RunTimeDataType.fun_void;
+            }
+        }
+
+        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+        {
+            int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+
+            System.Collections.ICollection collection =
+                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+            try
+            {
+
+                object lo;
+                if (stackframe.player.linktypemapper.rtValueToLinkObject(
+                    argements[0], stackframe.player.linktypemapper.getLinkType(functionDefine.signature.parameters[0].type), bin, true, out lo
+                    ))
+                {
+                    collection.CopyTo((Array)lo, index);
+                    returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
+                    success = true;
+                }
+                else
+                {
+                    stackframe.throwCastException(token, argements[0].rtType,
+                        stackframe.player.linktypemapper.getRuntimeDataType(collection.GetType().GetElementType())
+                        );
+                    success = false;
+                }
+
+            }
+            catch (InvalidCastException ic)
+            {
+                success = false;
+                stackframe.throwAneException(token, ic.Message);
+            }
+            catch (ArgumentException a)
+            {
+                success = false;
+                stackframe.throwAneException(token, a.Message);
+            }
+            catch (IndexOutOfRangeException i)
+            {
+                success = false;
+                stackframe.throwAneException(token, i.Message);
+            }
+
+
+        }
     }
 
 }
