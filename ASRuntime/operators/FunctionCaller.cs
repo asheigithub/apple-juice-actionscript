@@ -73,7 +73,7 @@ namespace ASRuntime.operators
             check_para_id = 0;
             pushedArgs = 0;
             hasReleased = false;
-            
+            ischeckfailed = false;
         }
 
         
@@ -96,6 +96,7 @@ namespace ASRuntime.operators
                 token = null;
                 check_para_id = 0;
 
+                
                 ret(this);
             }
             
@@ -423,6 +424,7 @@ namespace ASRuntime.operators
             _getArgementSlot(para_id).directSet(value);
         }
 
+        private bool ischeckfailed;
         private void check_para()
         {
             while (check_para_id < pushedArgs)
@@ -438,6 +440,7 @@ namespace ASRuntime.operators
                     cb.args = argement;
                     cb._intArg = check_para_id;
                     cb.setCallBacker(check_para_callbacker);
+                    cb.setWhenFailed(check_para_failed);
 
                     check_para_id++;
 
@@ -446,7 +449,6 @@ namespace ASRuntime.operators
 
                         invokerFrame, token, invokerFrame.scope, _tempSlot,cb,false);
 
-                    
                     return;
                 }
                 else
@@ -456,6 +458,15 @@ namespace ASRuntime.operators
             }
             //***全部参数检查通过***
             _doCall();
+        }
+
+        private void check_para_failed(BlockCallBackBase sender, object args)
+        {
+            if (callbacker != null)
+            {
+                callbacker.noticeRunFailed();
+            }
+            release();
         }
 
         private void check_para_callbacker(BlockCallBackBase sender,object args)
@@ -476,6 +487,7 @@ namespace ASRuntime.operators
 
         private void _doCall()
         {
+            
             if (toCallFunc.signature.returnType > RunTimeDataType.unknown)
             {
                 if (!InstanceCreator.init_static_class(player.swc.getClassByRunTimeDataType(toCallFunc.signature.returnType), player, token))
@@ -824,6 +836,7 @@ namespace ASRuntime.operators
 
         void IBlockCallBack.call(object args)
         {
+            
             clear_para_slot(invokerFrame);
             invokerFrame.endStep();
             release();
@@ -832,6 +845,7 @@ namespace ASRuntime.operators
 
         public void noticeRunFailed()
         {
+            
             clear_para_slot(invokerFrame);
             release();
         }

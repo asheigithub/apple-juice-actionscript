@@ -29,7 +29,7 @@ package system
 		[native, _system_Array_ctor_]
 		public function _Array_(length:int);
 		
-		[native, _system_Array_length_]
+		[native, system_collections_icollection_count]
 		public function get length():int;
 		
 		[native, _system_Array_rank_]
@@ -44,11 +44,12 @@ package system
 		[native, _system_Array_getUpperBound_]
 		public function getUpperBound(dimension:int):int; 
 		
-		
-		[native, _system_Array_getValue_]
+		[get_this_item];
+		[native, _system_collections_ilist_getThisItem_];
 		public function getValue(index:int):*;
 		
-		[native, _system_Array_setValue_]
+		[set_this_item];
+		[native, _system_collections_ilist_setThisItem_];
 		public function setValue(value:*, index:int):void;
 		
 		
@@ -66,8 +67,38 @@ package system
 		
 
 		[native, system_collections_ienumerable_getenumerator_]
-		public function getEnumerator():_IEnumerator_ 
+		public function getEnumerator():_IEnumerator_;
 		
+		
+		[native,system_collections_icollection_copyto]
+		public function copyTo(array:_Array_, index:int):void;
+		
+		[native,_system_collections_ilist_isFixedSize_]
+		public function get isFixedSize():Boolean;
+		
+		[native,_system_collections_ilist_isReadOnly_]
+		public function get isReadOnly():Boolean;
+		
+		[native,_system_collections_ilist_add_]
+		private function add(value:*):int;
+		
+		[native,_system_collections_ilist_clear_]
+		private function clear():void;
+		
+		[native,_system_collections_ilist_contains_]
+		private function contains(value:*):Boolean;
+		
+		[native,_system_collections_ilist_indexOf_]
+		private function indexOf(value:*):int;
+		
+		[native,_system_collections_ilist_insert_]
+		private function insert(index:int, value:*):void;
+		
+		[native,_system_collections_ilist_remove_]
+		private function remove(value:*):void;
+		
+		[native,_system_collections_ilist_removeAt_]
+		private function removeAt(index:int):void
 	}
 
 }

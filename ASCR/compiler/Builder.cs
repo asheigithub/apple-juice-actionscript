@@ -507,6 +507,14 @@ namespace ASCompiler.compiler
                 }
                 else if (c1.Value.isInterface && c2.Value.isInterface)
                 {
+                    if (c1.Value.isLink_System && !c2.Value.isLink_System)
+                    {
+                        return -1;
+                    }
+                    else if (!c1.Value.isLink_System && c2.Value.isLink_System)
+                    {
+                        return 1;
+                    }
                     if (c1.Value.implements.ContainsKey(c2.Value))
                     {
                         return 1;
@@ -514,6 +522,17 @@ namespace ASCompiler.compiler
                     else if (c2.Value.implements.ContainsKey(c1.Value))
                     {
                         return -1;
+                    }
+                    else
+                    {
+                        //***查找实现深度**
+                        int id1 = get_impl_depth(c1.Value);
+                        int id2 = get_impl_depth(c2.Value);
+
+                        if (id1 != id2)
+                        {
+                            return id1 - id2;
+                        }
                     }
                 }
 
@@ -936,7 +955,10 @@ namespace ASCompiler.compiler
                                     )
                                 {
                                     found = true;
-                                    if (!clsmember.isPublic)
+                                    if (!clsmember.isPublic
+                                        &&
+                                        !check_expl_impl(clsmember, implmember)//显式接口实现可以是私有。。。
+                                        )
                                     {
                                         throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
                                             "interface method "
@@ -1296,6 +1318,30 @@ namespace ASCompiler.compiler
 
             return false;
         }
+
+        private int get_impl_depth(ASBinCode.rtti.Class itface)
+        {
+            if (itface.implements.Count == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                int d = 0;
+                foreach (var item in itface.implements.Keys)
+                {
+                    int getd = get_impl_depth(item) + 1;
+
+                    if (getd > d)
+                    {
+                        d = getd;
+                    }
+
+                }
+                return d;
+            }
+        }
+
 
         internal void buildCodeBlock(List<ASTool.AS3.IAS3Stmt> statements, CodeBlock block)
         {

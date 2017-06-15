@@ -13,7 +13,10 @@ namespace ASBinCode
         {
             cache = new WeakReference(null);
         }
-
+        public sealed override  int functionId
+        {
+            get { return functionid; }
+        }
 
         //private MethodSlot _tempSlot;
 

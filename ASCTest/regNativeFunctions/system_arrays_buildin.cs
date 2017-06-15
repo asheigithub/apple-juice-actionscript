@@ -23,8 +23,8 @@ namespace ASCTest.regNativeFunctions
             bin.regNativeFunction(new system_array_static_createinstance());
             bin.regNativeFunction(new system_array_static_createinstance_());
             bin.regNativeFunction(new system_array_static_createinstance__());
-            bin.regNativeFunction(new system_array_getValue());
-            bin.regNativeFunction(new system_array_setValue());
+            //bin.regNativeFunction(new system_array_getValue());
+            //bin.regNativeFunction(new system_array_setValue());
             bin.regNativeFunction(new system_array_getValue_());
             bin.regNativeFunction(new system_array_setValue_());
             bin.regNativeFunction(new system_array_getValue__());
@@ -589,173 +589,174 @@ namespace ASCTest.regNativeFunctions
 
     }
 
-    class system_array_getValue : NativeConstParameterFunction
-    {
-        public system_array_getValue() : base(1)
-        {
-            para = new List<RunTimeDataType>();
-            para.Add(RunTimeDataType.rt_int);
-        }
+    //class system_array_getValue : NativeConstParameterFunction
+    //{
+    //    public system_array_getValue() : base(1)
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //        para.Add(RunTimeDataType.rt_int);
+    //    }
 
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
 
-        public override string name
-        {
-            get
-            {
-                return "_system_Array_getValue_";
-            }
-        }
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Array_getValue_";
+    //        }
+    //    }
 
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
 
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.rt_void;
+    //        }
+    //    }
 
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-            int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
-
-            Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
-
-            try
-            {
-                object obj = array.GetValue(index);
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
-                //returnSlot.setValue((int)array.GetValue(index));
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, array.ToString() + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
+    //    public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+    //    {
 
 
-        }
+    //        int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+
+    //        Array array =
+    //            (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+    //        try
+    //        {
+    //            object obj = array.GetValue(index);
+    //            stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+    //            //returnSlot.setValue((int)array.GetValue(index));
+    //            success = true;
+    //        }
+    //        catch (KeyNotFoundException)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, array.ToString() + "没有链接到脚本");
+    //        }
+    //        catch (ArgumentException a)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, a.Message);
+    //        }
+    //        catch (IndexOutOfRangeException i)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, i.Message);
+    //        }
 
 
-    }
-    class system_array_setValue : NativeConstParameterFunction
-    {
-        public system_array_setValue() : base(2)
-        {
-            para = new List<RunTimeDataType>();
-            para.Add(RunTimeDataType.rt_void);
-            para.Add(RunTimeDataType.rt_int);
-        }
+    //    }
 
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
 
-        public override string name
-        {
-            get
-            {
-                return "_system_Array_setValue_";
-            }
-        }
+    //}
 
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
+    //class system_array_setValue : NativeConstParameterFunction
+    //{
+    //    public system_array_setValue() : base(2)
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //        para.Add(RunTimeDataType.rt_void);
+    //        para.Add(RunTimeDataType.rt_int);
+    //    }
 
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.fun_void;
-            }
-        }
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
 
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-            int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Array_setValue_";
+    //        }
+    //    }
 
-            Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
 
-            try
-            {
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.fun_void;
+    //        }
+    //    }
 
-                object lo;
-                if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], array.GetType().GetElementType(), bin,true, out lo
-                    ))
-                {
-                    array.SetValue(lo, index);
-                    returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
-                    success = true;
-                }
-                else
-                {
-                    stackframe.throwCastException(token, argements[0].rtType,
-                        stackframe.player.linktypemapper.getRuntimeDataType(array.GetType().GetElementType())
-                        );
-                    success = false;
-                }
+    //    public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+    //    {
+    //        int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+
+    //        Array array =
+    //            (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+
+    //        try
+    //        {
+
+    //            object lo;
+    //            if (stackframe.player.linktypemapper.rtValueToLinkObject(
+    //                argements[0], array.GetType().GetElementType(), bin,true, out lo
+    //                ))
+    //            {
+    //                array.SetValue(lo, index);
+    //                returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
+    //                success = true;
+    //            }
+    //            else
+    //            {
+    //                stackframe.throwCastException(token, argements[0].rtType,
+    //                    stackframe.player.linktypemapper.getRuntimeDataType(array.GetType().GetElementType())
+    //                    );
+    //                success = false;
+    //            }
                 
-            }
-            catch (InvalidCastException ic)
-            {
-                success = false;
-                stackframe.throwAneException(token, ic.Message);
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
+    //        }
+    //        catch (InvalidCastException ic)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, ic.Message);
+    //        }
+    //        catch (ArgumentException a)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, a.Message);
+    //        }
+    //        catch (IndexOutOfRangeException i)
+    //        {
+    //            success = false;
+    //            stackframe.throwAneException(token, i.Message);
+    //        }
 
 
-        }
-    }
+    //    }
+    //}
 
     class system_array_getValue_ : NativeConstParameterFunction
     {

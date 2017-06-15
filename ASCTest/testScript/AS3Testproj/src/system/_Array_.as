@@ -45,11 +45,11 @@ package system
 		public function getUpperBound(dimension:int):int; 
 		
 		[get_this_item];
-		[native, _system_Array_getValue_];
+		[native, _system_collections_ilist_getThisItem_];
 		public function getValue(index:int):*;
 		
 		[set_this_item];
-		[native, _system_Array_setValue_];
+		[native, _system_collections_ilist_setThisItem_];
 		public function setValue(value:*, index:int):void;
 		
 		
@@ -73,6 +73,32 @@ package system
 		[native,system_collections_icollection_copyto]
 		public function copyTo(array:_Array_, index:int):void;
 		
+		[native,_system_collections_ilist_isFixedSize_]
+		public function get isFixedSize():Boolean;
+		
+		[native,_system_collections_ilist_isReadOnly_]
+		public function get isReadOnly():Boolean;
+		
+		[native,_system_collections_ilist_add_]
+		private function add(value:*):int;
+		
+		[native,_system_collections_ilist_clear_]
+		private function clear():void;
+		
+		[native,_system_collections_ilist_contains_]
+		private function contains(value:*):Boolean;
+		
+		[native,_system_collections_ilist_indexOf_]
+		private function indexOf(value:*):int;
+		
+		[native,_system_collections_ilist_insert_]
+		private function insert(index:int, value:*):void;
+		
+		[native,_system_collections_ilist_remove_]
+		private function remove(value:*):void;
+		
+		[native,_system_collections_ilist_removeAt_]
+		private function removeAt(index:int):void
 	}
 
 }

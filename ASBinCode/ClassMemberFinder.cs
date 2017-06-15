@@ -108,7 +108,10 @@ namespace ASBinCode
 
         public static bool isImplements(Class implCls, Class _interface)
         {
-            if (!implCls.isInterface && _interface.isInterface)
+            if (!implCls.isInterface && _interface.isInterface
+                ||
+                (implCls.isLink_System && implCls.isInterface && _interface.isInterface )
+                )
             {
                 return implCls.implements.ContainsKey(_interface);
             }

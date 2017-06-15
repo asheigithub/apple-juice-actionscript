@@ -679,19 +679,28 @@ namespace ASCompiler.compiler.builds
                     {
                         var sig = builder.dictSignatures[((InterfaceMethodGetter)bf).refdefinedinblockid][bf];
 
-
-                        InterfaceMethodGetter ifm = 
+                        
+                        InterfaceMethodGetter ifm =
                             new InterfaceMethodGetter(bf.name, cls, ((InterfaceMethodGetter)bf).refdefinedinblockid);
+                        ifm.setLinkMethod((InterfaceMethodGetter)bf);
+
                         bf = ifm;
 
                         if (!builder.dictSignatures.ContainsKey(ifm.refdefinedinblockid))
                         {
                             builder.dictSignatures.Add(ifm.refdefinedinblockid, new Dictionary<IMember, ASBinCode.rtti.FunctionSignature>());
                         }
-
+                        
                         builder.dictSignatures[ifm.refdefinedinblockid].Add(ifm, sig);
                     }
-
+                    else if (bf is ClassPropertyGetter)
+                    {
+                        ClassPropertyGetter cg = new ClassPropertyGetter(bf.name, cls, cls.classMembers.Count);
+                        cg.valueType = ((ClassPropertyGetter)bf).valueType;
+                        cg.getter = ((ClassPropertyGetter)bf).getter;
+                        cg.setter = ((ClassPropertyGetter)bf).setter;
+                        bf = cg;
+                    }
 
                     ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(sm.name, cls, bf);
                     member.defaultValue = sm.defaultValue;
@@ -846,17 +855,20 @@ namespace ASCompiler.compiler.builds
                 if (m.bindField is ClassPropertyGetter)
                 {
                     ClassPropertyGetter pg = (ClassPropertyGetter)m.bindField;
-                    pg.getter = null;
-                    pg.setter = null;
-                    for (int j = 0; j < cls.classMembers.Count; j++)
+                    //if (pg._class == cls)
                     {
-                        if (cls.classMembers[j].name == "@" + pg.name + "_get")
+                        pg.getter = null;
+                        pg.setter = null;
+                        for (int j = 0; j < cls.classMembers.Count; j++)
                         {
-                            pg.getter = (InterfaceMethodGetter)cls.classMembers[j].bindField;
-                        }
-                        else if (cls.classMembers[j].name == "@" + pg.name + "_set")
-                        {
-                            pg.setter = (InterfaceMethodGetter)cls.classMembers[j].bindField;
+                            if (cls.classMembers[j].name == "@" + pg.name + "_get")
+                            {
+                                pg.getter = (InterfaceMethodGetter)cls.classMembers[j].bindField;
+                            }
+                            else if (cls.classMembers[j].name == "@" + pg.name + "_set")
+                            {
+                                pg.setter = (InterfaceMethodGetter)cls.classMembers[j].bindField;
+                            }
                         }
                     }
                 }

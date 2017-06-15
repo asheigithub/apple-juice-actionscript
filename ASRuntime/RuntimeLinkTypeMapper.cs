@@ -15,6 +15,7 @@ namespace ASRuntime
         RunTimeDataType _objectType_;
 
         RunTimeDataType _OBJECT_LINK = -999;
+        RunTimeDataType _DICT_KEY = -998;
 
         public sealed override void init(CSWC swc)
         {
@@ -28,6 +29,7 @@ namespace ASRuntime
             link_type.Add(typeof(uint), RunTimeDataType.rt_uint);
             link_type.Add(typeof(ASBinCode.rtData.rtArray), RunTimeDataType.rt_array);
             link_type.Add(typeof(ASBinCode.rtData.rtFunction), RunTimeDataType.rt_function);
+            link_type.Add(typeof(DictionaryKey), _DICT_KEY);
             link_type.Add(typeof(RunTimeValueBase), _OBJECT_LINK);
 
             foreach (var item in swc.creator_Class)
@@ -47,6 +49,7 @@ namespace ASRuntime
             type_link.Add(RunTimeDataType.rt_uint, typeof(uint));
             type_link.Add(RunTimeDataType.rt_array, typeof(ASBinCode.rtData.rtArray));
             type_link.Add(RunTimeDataType.rt_function, typeof(ASBinCode.rtData.rtFunction));
+            type_link.Add(_DICT_KEY, typeof(DictionaryKey));
             type_link.Add(_OBJECT_LINK, typeof(RunTimeValueBase));
 
             foreach (var item in swc.creator_Class)
@@ -58,6 +61,14 @@ namespace ASRuntime
         public sealed override Type getLinkType(RunTimeDataType rtType)
         {
             if (rtType == RunTimeDataType._OBJECT)
+            {
+                return type_link[_OBJECT_LINK];
+            }
+            else if (rtType == RunTimeDataType.rt_void) //undefined
+            {
+                return type_link[_OBJECT_LINK];
+            }
+            else if (rtType == RunTimeDataType.rt_null)
             {
                 return type_link[_OBJECT_LINK];
             }
@@ -111,6 +122,15 @@ namespace ASRuntime
                 {
                     rt = getRuntimeDataType(obj.GetType());
                 }
+
+                if (rt == _DICT_KEY)
+                {
+                    DictionaryKey key = (DictionaryKey)obj;
+                    rt = _OBJECT_LINK;
+                    obj = key.key;
+
+                }
+
                 if (rt == RunTimeDataType._OBJECT)
                 {
                     rt = _OBJECT_LINK;
@@ -124,7 +144,7 @@ namespace ASRuntime
                         return;
                     }
                 }
-
+                
 
                 if (rt == RunTimeDataType.rt_int)
                 {

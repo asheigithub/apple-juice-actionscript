@@ -6,13 +6,25 @@ using System.Text;
 
 namespace ASRuntime
 {
-    struct DictionaryKey:DictionaryObject.IDictionaryKey,IEquatable<DictionaryKey>
+    public struct DictionaryKey:DictionaryObject.IDictionaryKey,IEquatable<DictionaryKey>
     {
         public readonly RunTimeValueBase key;
         public DictionaryKey(RunTimeValueBase key)
         {
             key = (RunTimeValueBase)key.Clone();
             this.key = key;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is DictionaryKey)
+            {
+                return Equals((DictionaryKey)obj);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool Equals(DictionaryKey other)
@@ -55,7 +67,10 @@ namespace ASRuntime
 
 
         }
-
+        public override string ToString()
+        {
+            return key.ToString();
+        }
     }
 
     class DictionarySlot : ObjectMemberSlot,ILinkSlot

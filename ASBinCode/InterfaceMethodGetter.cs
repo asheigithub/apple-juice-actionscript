@@ -6,7 +6,7 @@ using ASBinCode.rtData;
 
 namespace ASBinCode
 {
-    public class InterfaceMethodGetter : MethodGetterBase
+    public sealed class InterfaceMethodGetter : MethodGetterBase
     {
         public InterfaceMethodGetter(string name, rtti.Class _class
             , int refdefinedinblockid
@@ -23,6 +23,27 @@ namespace ASBinCode
             }
 
             indexofMember = value;
+        }
+
+        private InterfaceMethodGetter link;
+        public void setLinkMethod(InterfaceMethodGetter link)
+        {
+            this.link = link;
+        }
+
+        public sealed override int functionId
+        {
+            get
+            {
+                if (link == null)
+                {
+                    return functionid;
+                }
+                else
+                {
+                    return link.functionId;
+                }
+            }
         }
 
         public sealed override RunTimeValueBase getConstructor(RunTimeScope scope)
@@ -46,7 +67,18 @@ namespace ASBinCode
 
             if (instance_class.isInterface && instance_class.isLink_System)
             {//***可能是链接到系统的接口****
-                var vmember = (InterfaceMethodGetter)instance_class.classMembers[indexofMember].bindField;
+#if DEBUG
+                if (instance_class != _class)
+                {
+                    if (!instance_class.implements.ContainsKey(_class))
+                    {
+                        throw new ASBinCode.ASRunTimeException();
+                    }
+                }
+#endif
+
+
+                var vmember = (InterfaceMethodGetter)_class.classMembers[indexofMember].bindField;
 
                 rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
                 method.bind(rtObj.objScope);

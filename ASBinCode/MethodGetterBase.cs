@@ -20,10 +20,12 @@ namespace ASBinCode
             this.functionid = functionid;
         }
 
-        public int functionId
-        {
-            get { return functionid; }
-        }
+        public abstract int functionId { get; }
+
+        //public int functionId
+        //{
+        //    get { return functionid; }
+        //}
 
         /// <summary>
         /// 比如说，私有方法就肯定不是虚方法
