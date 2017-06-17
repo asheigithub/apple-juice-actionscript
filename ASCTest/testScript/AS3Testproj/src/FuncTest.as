@@ -11,6 +11,7 @@ package
 	import system.UInt64;
 	import system._Object_;
 	import system._Array_;
+	import system.collections.ArrayList;
 	import system.collections.Hashtable;
 	import system.collections.ICollection;
 	import system.collections.IDictionary;
@@ -125,6 +126,17 @@ package
 				trace(enum.current);
 			}
 			
+			
+			
+			var al:ArrayList = new ArrayList();
+			
+			
+			
+			al = ArrayList.createInstance(hashtable);
+			
+			al.addRange(arr);
+			
+			trace(al.count);
 			
 		}
 		

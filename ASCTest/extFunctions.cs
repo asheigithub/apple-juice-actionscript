@@ -276,7 +276,7 @@ namespace ASCTest
             bin.regNativeFunction(new system_datetime_subtract_timespan());
 
             system_collections_hashtable_buildin.regNativeFunctions(bin);
-
+            system_collections_arraylist_buildin.regNativeFunctions(bin);
         }
     }
 }

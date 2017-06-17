@@ -37,7 +37,7 @@ package system.collections
 		function remove(value:*):void;
 		
 		[native,_system_collections_ilist_removeAt_]
-		function removeAt(index:int):void
+		function removeAt(index:int):void;
 	}
 	
 }

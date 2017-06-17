@@ -62,6 +62,7 @@
     <Compile Include="regNativeFunctions\system_arrays_buildin.cs" />
     <Compile Include="regNativeFunctions\system_byte_buildin.cs" />
     <Compile Include="regNativeFunctions\system_char_buildin.cs" />
+    <Compile Include="regNativeFunctions\system_collections_arraylist_buildin.cs" />
     <Compile Include="regNativeFunctions\system_collections_hashtable_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetimekind_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetime_buildin.cs" />
