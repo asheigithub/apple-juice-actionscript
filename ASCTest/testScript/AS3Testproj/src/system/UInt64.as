@@ -2,7 +2,7 @@ package system
 {
 	[struct]
 	[link_system]
-	public final class UInt64 extends _Object_ 
+	public final class UInt64 extends _Object_ implements IComparable
 	{
 		[native, _system_UInt64_MaxValue_getter]
 		public static const MaxValue:UInt64;
@@ -26,6 +26,9 @@ package system
 		
 		[native,_system_UInt64_ctor]
 		public function UInt64(v:Number=0);
+		
+		[native,_system_icomparable_compareto_]
+		public function compareTo(obj:_Object_):int;
 		
 		[native,_system_UInt64_valueOf]
 		public function valueOf():Number;

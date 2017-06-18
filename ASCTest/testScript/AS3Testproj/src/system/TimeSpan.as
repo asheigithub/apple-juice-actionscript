@@ -3,7 +3,7 @@ package system
 	
 	[struct]
 	[link_system]
-	public final class TimeSpan extends _Object_
+	public final class TimeSpan extends _Object_ implements IComparable
 	{
 		[native, _system_TimeSpan_static_MaxValue_getter]
 		public static const MaxValue:TimeSpan;

@@ -2,7 +2,7 @@ package system
 {
 	[struct]
 	[link_system]
-	public final class DateTime extends _Object_ 
+	public final class DateTime extends _Object_ implements IComparable
 	{
 		[native, _system_DateTime_static_MaxValue_getter]
 		public static const MaxValue:DateTime;

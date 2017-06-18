@@ -7,7 +7,7 @@ package system
 	 * ...
 	 * @author 
 	 */
-	public final class Int64 extends _Object_
+	public final class Int64 extends _Object_ implements IComparable
 	{
 		[native, _system_Int64_MaxValue_getter]// , _system_Int64_MaxValue_setter]
 		public static const MaxValue:Int64;
@@ -35,7 +35,9 @@ package system
 		[native,_system_Int64_ctor]
 		public function Int64(v:Number=0);
 		
-
+		[native,_system_icomparable_compareto_]
+		public function compareTo(obj:_Object_):int;
+		
 		[native,_system_Int64_valueOf]
 		public function valueOf():Number;
 		

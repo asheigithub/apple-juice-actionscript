@@ -210,6 +210,16 @@ package
 			q.clear();
 			trace(q.count);
 			
+			
+			var d1:DateTime = DateTime.now;
+			var d2:DateTime = d1;
+			
+			trace(d1.compareTo(d2));
+			
+			
+			trace( UInt64(5).compareTo(UInt64(3)) );
+			
+			
 		}
 		
 		public static function PrintValues(  myArr:IList, mySeparator:String ):void

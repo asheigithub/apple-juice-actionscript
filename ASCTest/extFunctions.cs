@@ -275,6 +275,7 @@ namespace ASCTest
             bin.regNativeFunction(new system_datetime_subtract());
             bin.regNativeFunction(new system_datetime_subtract_timespan());
 
+            system_icomparable_buildin.regNativeFunctions(bin);
             system_collections_hashtable_buildin.regNativeFunctions(bin);
             system_collections_arraylist_buildin.regNativeFunctions(bin);
             system_collections_stack_buildin.regNativeFunctions(bin);

@@ -2,7 +2,7 @@ package system
 {
 	[struct]
 	[link_system]
-	public final class SByte extends _Object_ 
+	public final class SByte extends _Object_ implements IComparable
 	{
 		[native, _system_SByte_MaxValue_getter]
 		public static const MaxValue:SByte;
@@ -33,6 +33,9 @@ package system
 		
 		[native,_system_SByte_toString_]
 		public function toString_(format:String):String;
+		
+		[native,_system_icomparable_compareto_]
+		function compareTo(obj:_Object_):int;
 	}
 
 }

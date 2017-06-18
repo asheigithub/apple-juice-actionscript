@@ -2,7 +2,7 @@ package system
 {
 	[struct]
 	[link_system]
-	public final class Char extends _Object_ 
+	public final class Char extends _Object_ implements IComparable
 	{
 		[native, _system_Char_MaxValue_getter]
 		public static const MaxValue:Char;
@@ -25,6 +25,8 @@ package system
 		[native,_system_Char_valueOf]
 		public function valueOf():Number;
 		
+		[native,_system_icomparable_compareto_]
+		function compareTo(obj:_Object_):int;
 	}
 
 }
