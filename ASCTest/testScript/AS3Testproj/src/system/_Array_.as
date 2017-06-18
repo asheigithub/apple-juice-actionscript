@@ -98,7 +98,7 @@ package system
 		private function remove(value:*):void;
 		
 		[native,_system_collections_ilist_removeAt_]
-		private function removeAt(index:int):void
+		private function removeAt(index:int):void;
 	}
 
 }

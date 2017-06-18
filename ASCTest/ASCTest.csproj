@@ -64,6 +64,8 @@
     <Compile Include="regNativeFunctions\system_char_buildin.cs" />
     <Compile Include="regNativeFunctions\system_collections_arraylist_buildin.cs" />
     <Compile Include="regNativeFunctions\system_collections_hashtable_buildin.cs" />
+    <Compile Include="regNativeFunctions\system_collections_queue_buildin.cs" />
+    <Compile Include="regNativeFunctions\system_collections_stack_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetimekind_buildin.cs" />
     <Compile Include="regNativeFunctions\system_datetime_buildin.cs" />
     <Compile Include="regNativeFunctions\system_dayofweek_buildin.cs" />

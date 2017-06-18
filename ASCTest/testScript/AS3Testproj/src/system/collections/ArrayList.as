@@ -83,6 +83,8 @@ package system.collections
 		
 		[native,system_collections_arraylist_sort]
 		public function sort():void;
+		
+		
 	}
 
 }

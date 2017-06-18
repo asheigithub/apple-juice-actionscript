@@ -18,6 +18,8 @@ package
 	import system.collections.IDictionaryEnumerator;
 	import system.collections.IEnumerable;
 	import system.collections.IList;
+	import system.collections.Queue;
+	import system.collections.Stack;
 	import system.collections._IEnumerable_;
 	import system.collections._IEnumerator_;
 	[Doc]
@@ -148,7 +150,8 @@ package
 			  mySourceList.add( "in" );
 			  mySourceList.add( "the" );
 			  mySourceList.add( "barn" );
-
+			  
+			  
 			var myTargetArray:_Array_ = _Array_.createInstance(String, 15);  //new String[15];
 			  myTargetArray[0] = "The";
 			  myTargetArray[1] = "quick";
@@ -165,11 +168,47 @@ package
 			
 			mySourceList.sort();
 			
-      // Displays the values of the target Array.
-      PrintValues( mySourceList, ' ' );
+			
+			var stack:Stack = new Stack();
+			
+			stack = Stack.createInstance(myTargetArray);
+			
+			trace(stack.contains("the"));
+			
+			trace(stack.peek());
+			
+			stack.push("push into stack");
+			
+			while (stack.count>0) 
+			{
+				trace(stack.pop());
+			}
+			
+			
+			trace(stack.toArray().rank);
 
-
-
+			Queue.createInstance_(3);
+			
+			var q:Queue = Queue.createInstance(myTargetArray);
+			
+			q.enqueue("queue enqueue");
+			
+			var qe = q.getEnumerator();
+			qe.reset();
+			while (qe.moveNext()) 
+			{
+				trace("qe:", qe.current);
+				
+			}
+			trace(q.peek());
+			trace(q.dequeue());
+			
+			trace(q.toArray());
+			trace(q.count);
+			q.trimToSize();
+			trace(q.count);
+			q.clear();
+			trace(q.count);
 			
 		}
 		
