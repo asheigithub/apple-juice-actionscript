@@ -59,8 +59,15 @@ package system.collections
 		[native,system_collections_icollection_count]
 		public function get count():int;
 		
+		[native,system_collections_arraylist_copyto]
+		public function copyTo_(array:_Array_):void;
+		
 		[native,system_collections_icollection_copyto]
 		public function copyTo(array:_Array_, index:int):void;
+		
+		[native,system_collections_arraylist_copyto_]
+		public function copyTo__(index:int,array:_Array_,arrayIndex:int,count:int):void;
+		
 		
 		[native,system_collections_ienumerable_getenumerator_]
 		public function getEnumerator():_IEnumerator_;
@@ -70,6 +77,12 @@ package system.collections
 		
 		[native,system_collections_arraylist_addrange]
 		public function addRange(c:ICollection):void;
+		
+		[native,system_collections_arraylist_reverse]
+		public function reverse():void;
+		
+		[native,system_collections_arraylist_sort]
+		public function sort():void;
 	}
 
 }

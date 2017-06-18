@@ -138,7 +138,53 @@ package
 			
 			trace(al.count);
 			
+			//al.copyTo_(arr2);
+			
+			
+			var mySourceList:ArrayList = new ArrayList();
+			  mySourceList.add( "three" );
+			  mySourceList.add( "napping" );
+			  mySourceList.add( "cats" );
+			  mySourceList.add( "in" );
+			  mySourceList.add( "the" );
+			  mySourceList.add( "barn" );
+
+			var myTargetArray:_Array_ = _Array_.createInstance(String, 15);  //new String[15];
+			  myTargetArray[0] = "The";
+			  myTargetArray[1] = "quick";
+			  myTargetArray[2] = "brown";
+			  myTargetArray[3] = "fox";
+			  myTargetArray[4] = "jumped";
+			  myTargetArray[5] = "over";
+			  myTargetArray[6] = "the";
+			  myTargetArray[7] = "lazy";
+			  myTargetArray[8] = "dog";
+
+			mySourceList.copyTo_( myTargetArray );
+
+			
+			mySourceList.sort();
+			
+      // Displays the values of the target Array.
+      PrintValues( mySourceList, ' ' );
+
+
+
+			
 		}
+		
+		public static function PrintValues(  myArr:IList, mySeparator:String ):void
+		{
+			for (var i:int = 0; i < myArr.count	; i++) 
+			{
+				trace(mySeparator, myArr[i]);
+			}
+			
+		  //for ( int i = 0; i < myArr.Length; i++ )
+			 //Console.Write( "{0}{1}", mySeparator, myArr[i] );
+		  //Console.WriteLine();
+	   }
+
 		
 		public function makfunc()
 		{

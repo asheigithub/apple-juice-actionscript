@@ -536,7 +536,7 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
-                        stackframe.player.linktypemapper.getRuntimeDataType(collection.GetType().GetElementType())
+                        functionDefine.signature.parameters[0].type
                         );
                     success = false;
                 }
@@ -695,7 +695,13 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[0], 
+                    
+                    (ilist is Array) ? ilist.GetType().GetElementType(): 
+                    stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+                    , 
+                    
+                    bin, true, out lo
                     ))
                 {
                     ilist[index]=lo;
@@ -705,7 +711,12 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
-                        stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        (ilist is Array)?
+                        stackframe.player.linktypemapper.getRuntimeDataType(       
+                            ilist.GetType().GetElementType()
+                            )
+                            :
+                            argements[0].rtType
                         );
                     success = false;
                 }
@@ -953,7 +964,11 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[0],
+                     (ilist is Array) ? ilist.GetType().GetElementType() :
+                    stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+                    ,
+                    bin, true, out lo
                     ))
                 {
 
@@ -963,7 +978,9 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
-                        stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        (ilist is Array)?
+                        stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType()):
+                        argements[0].rtType
                         );
                     success = false;
                 }
@@ -1120,7 +1137,11 @@ namespace ASCTest.regNativeFunctions
             {
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[0],
+                     (ilist is Array) ? ilist.GetType().GetElementType() :
+                    stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+                    ,
+                    bin, true, out lo
                     ))
                 {
                     if (ilist.Contains(lo))
@@ -1136,7 +1157,10 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
+                        (ilist is Array)?
                         stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        :
+                        functionDefine.signature.parameters[0].type
                         );
                     success = false;
                 }
@@ -1216,7 +1240,11 @@ namespace ASCTest.regNativeFunctions
             {
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[0],
+                     (ilist is Array) ? ilist.GetType().GetElementType() :
+                    stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+                    ,
+                    bin, true, out lo
                     ))
                 {
                     returnSlot.setValue(ilist.IndexOf(lo));
@@ -1225,7 +1253,10 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
+                        (ilist is Array)?
                         stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        :
+                        functionDefine.signature.parameters[0].type
                         );
                     success = false;
                 }
@@ -1308,7 +1339,11 @@ namespace ASCTest.regNativeFunctions
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[1], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[1],
+                     (ilist is Array) ? ilist.GetType().GetElementType() :
+                    stackframe.player.linktypemapper.getLinkType(argements[1].rtType)
+                    ,
+                    bin, true, out lo
                     ))
                 {
                     ilist.Insert(index, lo);
@@ -1316,8 +1351,11 @@ namespace ASCTest.regNativeFunctions
                 }
                 else
                 {
-                    stackframe.throwCastException(token, argements[0].rtType,
+                    stackframe.throwCastException(token, argements[1].rtType,
+                        (ilist is Array)?
                         stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        :
+                        functionDefine.signature.parameters[1].type
                         );
                     success = false;
                 }
@@ -1397,7 +1435,11 @@ namespace ASCTest.regNativeFunctions
             {
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], ilist.GetType().GetElementType(), bin, true, out lo
+                    argements[0],
+                     (ilist is Array) ? ilist.GetType().GetElementType() :
+                    stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+                    ,
+                    bin, true, out lo
                     ))
                 {
                     ilist.Remove(lo);
@@ -1407,7 +1449,10 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
+                        (ilist is Array)?
                         stackframe.player.linktypemapper.getRuntimeDataType(ilist.GetType().GetElementType())
+                        :
+                        functionDefine.signature.parameters[0].type
                         );
                     success = false;
                 }
@@ -1859,7 +1904,7 @@ namespace ASCTest.regNativeFunctions
                 else
                 {
                     stackframe.throwCastException(token, argements[0].rtType,
-                        stackframe.player.linktypemapper.getRuntimeDataType(idictionary.GetType().GetElementType())
+                        functionDefine.signature.parameters[0].type
                         );
                     success = false;
                 }
