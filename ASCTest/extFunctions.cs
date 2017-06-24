@@ -280,6 +280,9 @@ namespace ASCTest
             system_collections_arraylist_buildin.regNativeFunctions(bin);
             system_collections_stack_buildin.regNativeFunctions(bin);
             system_collections_queue_buildin.regNativeFunctions(bin);
+
+            system_StringSplitOptions_buildin.regNativeFunctions(bin);
+
         }
     }
 }

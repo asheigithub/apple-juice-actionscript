@@ -1,0 +1,74 @@
+﻿		class {0} : ASRuntime.nativefuncs.NativeConstParameterFunction
+		{
+			public {0}() : base(2)
+			{
+				para = new List<RunTimeDataType>();
+				para.Add(RunTimeDataType.rt_void);
+				para.Add(RunTimeDataType.rt_void);
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "{0}";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+				{1} ts1;
+
+				if (argements[0].rtType == RunTimeDataType.rt_null)
+				{
+					ts1 = default({1});
+				}
+				else
+				{
+					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[0]).value;
+					ts1 = ({1})argObj.value;
+				}
+
+				{1} ts2;
+
+				if (argements[1].rtType == RunTimeDataType.rt_null)
+				{
+					ts2 = default({1});
+				}
+				else
+				{
+					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value;
+					ts2 = ({1})argObj.value;
+				}
+
+				((StackSlot)returnSlot).setLinkObjectValue(
+					bin.getClassByRunTimeDataType(functionDefine.signature.returnType), stackframe.player, ts1 | ts2);
+
+				success = true;
+			}
+		}

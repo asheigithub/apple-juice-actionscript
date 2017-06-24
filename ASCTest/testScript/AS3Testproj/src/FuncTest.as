@@ -7,6 +7,7 @@ package
 	import system.DayOfWeek;
 	import system.Int64;
 	import system.SByte;
+	import system.StringSplitOptions;
 	import system.TimeSpan;
 	import system.UInt64;
 	import system._Object_;
@@ -216,9 +217,13 @@ package
 			
 			trace(d1.compareTo(d2));
 			
+			var uq:usequeue = new usequeue();
+			uq.queue.enqueue(4);
+			uq.queue.enqueue(6);
 			
-			trace( UInt64(5).compareTo(UInt64(3)) );
+			uq.queue.enqueue(StringSplitOptions.RemoveEmptyEntries);
 			
+			trace(uq.queue.toArray()[2]);
 			
 		}
 		
@@ -249,4 +254,14 @@ package
 		}
 	}
 
+}
+import system.collections.Queue;
+
+class usequeue
+{
+	public var queue:Queue;
+	public function usequeue()
+	{
+		queue = new Queue();
+	}
 }
