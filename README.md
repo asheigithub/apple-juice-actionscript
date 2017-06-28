@@ -4,7 +4,7 @@
 包括 类继承，接口，原型链,结构化异常处理 try catch ,语句块标签label。
 未实现且不准备实现的语言要素为 namespace和with。
 实现了完整的编译期类型检查。错误提示和Adobe Air尽量一致。
-可使用flash develop作为ide进行as3脚本编辑器
+可使用flash develop作为ide进行as3脚本编辑
 
 
 ### 扩展语法
