@@ -63,7 +63,20 @@ namespace ASCTest
                 Console.Write("输入as文件所在路径");
                 return;
             }
-           
+
+
+			//*********加入API*****
+			string apidir = @"E:\ASTool\LinkCodeGen\bin\Debug\as3api";
+			if (System.IO.Directory.Exists(apidir))
+			{
+				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+				string[] n = new string[files.Length + linkapi.Length];
+				linkapi.CopyTo(n, 0);
+				files.CopyTo(n, linkapi.Length);
+				files = n;
+			}
+			//*********************
+
 
             var proj = new ASTool.AS3.AS3Proj();
             var srcout = new ASTool.ConSrcOut();
@@ -101,7 +114,7 @@ namespace ASCTest
                     return;
                 }
 #if DEBUG
-                Console.Clear();
+                //Console.Clear();
 #endif
             }
 

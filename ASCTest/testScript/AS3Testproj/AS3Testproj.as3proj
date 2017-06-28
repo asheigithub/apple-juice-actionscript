@@ -17,6 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="..\api" />
+    <class path="..\..\..\LinkCodeGen\bin\Debug\as3api" />
   </classpaths>
   <!-- Build options -->
   <build>

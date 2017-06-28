@@ -3025,7 +3025,7 @@ namespace ASCompiler.compiler.builds
                 {
                     throw new BuildException(
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                        v1.valueType + "不能执行位或操作"));
+                        getTypeName(v1.valueType) + "不能执行位或操作"));
                 }
                 if (!ASRuntime.TypeConverter.testImplicitConvert(v2.valueType, RunTimeDataType.rt_int,builder)
                     ||
@@ -3034,7 +3034,7 @@ namespace ASCompiler.compiler.builds
                 {
                     throw new BuildException(
                         new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                        v2.valueType + "不能执行位或操作"));
+                        getTypeName(v2.valueType) + "不能执行位或操作"));
                 }
 
                 {

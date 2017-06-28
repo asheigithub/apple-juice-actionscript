@@ -223,18 +223,21 @@ namespace LinkCodeGen
             //****创建枚举成员***
             foreach (var item in type.GetFields( System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
             {
+				string enumItemName = item.Name;
+				if (enumItemName == "Class") { enumItemName = "Class_"; }
+				if (enumItemName == "Object") { enumItemName = "Object_"; }
 
-                object v = item.GetValue(null);
+				object v = item.GetValue(null);
                 as3api.Append("\t\t");
                 as3api.AppendLine("/**");
-                as3api.AppendLine("\t\t *" + item.Name+" = "+Convert.ToInt32(v) );
+                as3api.AppendLine("\t\t *" + enumItemName+" = "+Convert.ToInt32(v) );
                 as3api.AppendLine("\t\t */");
 
                 as3api.Append("\t\t");
                 as3api.AppendFormat("[native,{0}];", GetEnumItemNativeFuncName(item) );
                 as3api.AppendLine();
                 as3api.Append("\t\t");
-                as3api.AppendFormat("public static const {0}:{1};",item.Name,name);
+                as3api.AppendFormat("public static const {0}:{1};", enumItemName, name);
                 as3api.AppendLine();
                 as3api.AppendLine();
 
@@ -242,7 +245,7 @@ namespace LinkCodeGen
                 string nf = "\t\t\tbin.regNativeFunction(";
                 nf += "LinkSystem_Buildin.getStruct_static_field_getter(\"" +GetEnumItemNativeFuncName(item)+ "\"";
                 nf += ",";
-                nf += "()=>{ return "+ type.FullName + "." + item.Name +";}";
+                nf += "()=>{ return "+ type.FullName + "." + enumItemName + ";}";
                 nf += ")";
                 nf += ");";
 

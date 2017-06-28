@@ -2,6 +2,7 @@ package
 {
 	import system.Byte;
 	import system.Char;
+	import system.ConsoleColor;
 	import system.DateTime;
 	import system.DateTimeKind;
 	import system.DayOfWeek;
@@ -9,6 +10,7 @@ package
 	import system.SByte;
 	import system.StringSplitOptions;
 	import system.TimeSpan;
+	import system.TypeCode;
 	import system.UInt64;
 	import system._Object_;
 	import system._Array_;
@@ -224,6 +226,8 @@ package
 			uq.queue.enqueue(StringSplitOptions.RemoveEmptyEntries);
 			
 			trace(uq.queue.toArray()[2]);
+			
+			trace(ConsoleColor.White);
 			
 		}
 		
