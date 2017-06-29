@@ -63,10 +63,11 @@ namespace ASCTest.regNativeFunctions
                 IComparable icomp =
                     (IComparable)((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value).GetLinkData();
 
+				
                 try
                 {
                     object lo;
-                    if (stackframe.player.linktypemapper.rtValueToLinkObject(
+                    if (!stackframe.player.linktypemapper.rtValueToLinkObject(
                         argements[0],
 
                         stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
@@ -74,21 +75,20 @@ namespace ASCTest.regNativeFunctions
                         bin, true, out lo
                         ))
                     {
-                        int r = icomp.CompareTo(lo);
+						stackframe.throwCastException(token, argements[0].rtType,
 
-                        returnSlot.setValue(r);
-
-                        success = true;
+							functionDefine.signature.parameters[0].type
+							);
+						success = false;
+						return;
                     }
-                    else
-                    {
-                        stackframe.throwCastException(token, argements[0].rtType,
 
-                            functionDefine.signature.parameters[0].type
-                            );
-                        success = false;
-                    }
-                }
+
+					int r = icomp.CompareTo(lo);
+					returnSlot.setValue(r);
+					success = true;
+
+				}
                 catch (InvalidCastException ic)
                 {
                     success = false;

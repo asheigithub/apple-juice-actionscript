@@ -142,5 +142,71 @@ namespace LinkCodeGen.Properties {
                 return ResourceManager.GetString("EnumItemBitOr", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 					object arg{argindex};
+        ///					if (!stackframe.player.linktypemapper.rtValueToLinkObject(
+        ///						argements[{argindex}],
+        ///
+        ///						stackframe.player.linktypemapper.getLinkType(argements[{argindex}].rtType)
+        ///						,
+        ///						bin, true, out arg{argindex}
+        ///						))
+        ///					{
+        ///						stackframe.throwCastException(token, argements[{argindex}].rtType,
+        ///
+        ///							functionDefine.signature.parameters[{argindex}].type
+        ///							);
+        ///						success = false;
+        ///						return;
+        ///					} 的本地化字符串。
+        /// </summary>
+        internal static string LoadArgement {
+            get {
+                return ResourceManager.GetString("LoadArgement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string MethodFunc {
+            get {
+                return ResourceManager.GetString("MethodFunc", resourceCulture);
+            }
+        }
     }
 }

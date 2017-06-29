@@ -478,7 +478,7 @@ namespace ASCTest
 			system_security_accesscontrol_ControlFlags_buildin.regNativeFunctions(bin);
 			system_security_principal_WellKnownSidType_buildin.regNativeFunctions(bin);
 			system_runtime_versioning_ResourceScope_buildin.regNativeFunctions(bin);
-
+			system_ICloneable_buildin.regNativeFunctions(bin);
 		}
 
 	}

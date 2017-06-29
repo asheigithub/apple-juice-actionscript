@@ -44,7 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreatorBase.cs" />
     <Compile Include="EnumCreator.cs" />
+    <Compile Include="InterfaceCreator.cs" />
+    <Compile Include="MethodNativeCodeCreator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -58,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\EnumCtor.txt" />
+    <Content Include="templates\LoadArgement.txt" />
+    <Content Include="templates\MethodFunc.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -67,6 +72,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\EnumItemBitOr.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ASBinCode\ASBinCode.csproj">
+      <Project>{42a041bf-f7b9-47c4-8147-1a7987ee8416}</Project>
+      <Name>ASBinCode</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

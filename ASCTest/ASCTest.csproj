@@ -81,6 +81,7 @@
     <Compile Include="autoCreateCodes\buildins\system_globalization_GregorianCalendarTypes_buildin.cs" />
     <Compile Include="autoCreateCodes\buildins\system_globalization_NumberStyles_buildin.cs" />
     <Compile Include="autoCreateCodes\buildins\system_globalization_UnicodeCategory_buildin.cs" />
+    <Compile Include="autoCreateCodes\buildins\system_ICloneable_buildin.cs" />
     <Compile Include="autoCreateCodes\buildins\system_io_DriveType_buildin.cs" />
     <Compile Include="autoCreateCodes\buildins\system_io_FileAccess_buildin.cs" />
     <Compile Include="autoCreateCodes\buildins\system_io_FileAttributes_buildin.cs" />

@@ -7,18 +7,13 @@ namespace LinkCodeGen
     /// <summary>
     /// 创建枚举的代码
     /// </summary>
-    class EnumCreator
+    class EnumCreator : CreatorBase
     {
-        private Type type;
-        private string as3apidocpath;
-        private string csharpnativecodepath;
+        
 
-        public readonly bool isfinal;
-        public readonly bool isStruct;
+        
 
-        public readonly string name;
-
-        public EnumCreator(Type enumtype,string as3apidocpath,string csharpnativecodepath)
+        public EnumCreator(Type enumtype,string as3apidocpath,string csharpnativecodepath):base(enumtype,as3apidocpath,csharpnativecodepath)
         {
             if (!enumtype.IsEnum)
             {
@@ -29,50 +24,22 @@ namespace LinkCodeGen
             isStruct = false;
 
             this.name = enumtype.Name;
-            this.type = enumtype;
-            this.as3apidocpath = as3apidocpath;
-            this.csharpnativecodepath = csharpnativecodepath;
         }
 
-        /// <summary>
-        /// 获取转换成as3 package
-        /// </summary>
-        /// <param name="csharptype"></param>
-        /// <returns></returns>
-        public static string GetPackageName(Type csharptype)
-        {
-            string ns = csharptype.Namespace;
-            return ns.ToLower();
-        }
+        
 
-        public static string GetCreatorNativeFuncName(Type csharptype)
-        {
-            return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name  + "_creator";
-        }
-
-        public static string GetCtorNativeFuncName(Type csharptype)
-        {
-            return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name + "_ctor";
-        }
-
-        public static string GetNativeFunctionClassName(Type csharptype)
-        {
-            return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name + "_buildin";
-        }
-
-
-        public void GenAS3FileHead(StringBuilder as3sb)
+        private void GenAS3FileHead(StringBuilder as3sb)
         {
             as3sb.AppendLine("package " + GetPackageName(type));
             as3sb.AppendLine("{");
         }
 
-        public void EndAS3File(StringBuilder as3sb)
+		private void EndAS3File(StringBuilder as3sb)
         {
             as3sb.AppendLine("}");
         }
 
-        public void GenClassDefine(StringBuilder as3sb)
+		private void GenClassDefine(StringBuilder as3sb)
         {
             as3sb.Append("\t");
 
@@ -90,7 +57,7 @@ namespace LinkCodeGen
         }
 
 
-        public void EndClassDefine(StringBuilder as3sb)
+		private void EndClassDefine(StringBuilder as3sb)
         {
             as3sb.Append("\t");
             as3sb.AppendLine("}");
@@ -136,7 +103,7 @@ namespace LinkCodeGen
             nativesb.AppendLine("}");
         }
 
-        public void BeginRegFunction(StringBuilder nativesb)
+		private void BeginRegFunction(StringBuilder nativesb)
         {
             nativesb.Append("\t\t");
             nativesb.AppendLine("public static void regNativeFunctions(CSWC bin)");
@@ -144,7 +111,7 @@ namespace LinkCodeGen
             nativesb.AppendLine("{");
         }
 
-        public void EndRegFunction(StringBuilder nativesb)
+		private void EndRegFunction(StringBuilder nativesb)
         {
             nativesb.Append("\t\t");
             nativesb.AppendLine("}");
@@ -159,7 +126,7 @@ namespace LinkCodeGen
         }
 
 
-        public void Create()
+        public override void Create()
         {
             StringBuilder nativefunc = new StringBuilder();
             GenNativeFuncImport(nativefunc);

@@ -124,4 +124,10 @@
   <data name="EnumItemBitOr" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\enumitembitor.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="LoadArgement" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\loadargement.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MethodFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\methodfunc.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>
