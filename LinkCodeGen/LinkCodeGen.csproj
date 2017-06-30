@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassCreator.cs" />
     <Compile Include="CreatorBase.cs" />
     <Compile Include="EnumCreator.cs" />
     <Compile Include="InterfaceCreator.cs" />

@@ -6,7 +6,7 @@ namespace LinkCodeGen
 {
 	class InterfaceCreator : CreatorBase
 	{
-		public static List<Type> GetExtendInterfaces(Type interfacetype)
+		private static List<Type> GetExtendInterfaces(Type interfacetype)
 		{
 			List<Type> extinterfaces = new List<Type>(interfacetype.GetInterfaces());
 
@@ -22,6 +22,13 @@ namespace LinkCodeGen
 				for (int i = 0; i < extinterfaces.Count; i++)
 				{
 					var it = extinterfaces[i];
+
+					if (it.IsGenericType)
+					{
+						extinterfaces.RemoveAt(i);
+						f = true;
+						goto research;
+					}
 
 					List<Type> extList = new List<Type>(it.GetInterfaces());
 
@@ -73,7 +80,7 @@ namespace LinkCodeGen
 			{
 				if (!typeCreators.ContainsKey(item))
 				{
-					typeCreators.Add(item, new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators));
+					typeCreators.Add(item, null); typeCreators[item]= new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators);
 				}
 			}
 
@@ -94,14 +101,38 @@ namespace LinkCodeGen
 			var methods = interfacetype.GetMethods();
 			foreach (var item in methods)
 			{
-				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(item.ReturnType);
-				if (rt > ASBinCode.RunTimeDataType.unknown)
+				if (item.IsGenericMethod)
 				{
-					if (item.ReturnType.IsInterface) //***Class代码还没做****
+					continue;
+				}
+
+				if (item.ReturnType.IsGenericType)
+				{
+					continue;
+				}
+				
+				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(item.ReturnType);
+				if (rt > ASBinCode.RunTimeDataType.unknown && !IsSkipType(item.ReturnType))
+				{
+					if (item.ReturnType.IsInterface)
 					{
 						if (!typeCreators.ContainsKey(item.ReturnType))
 						{
-							typeCreators.Add(item.ReturnType, new InterfaceCreator(item.ReturnType, as3apidocpath, csharpnativecodepath, typeCreators));
+							typeCreators.Add(item.ReturnType, null); typeCreators[item.ReturnType] = new InterfaceCreator(item.ReturnType, as3apidocpath, csharpnativecodepath, typeCreators);
+						}
+					}
+					else if (item.ReturnType.IsEnum)
+					{
+						if (!typeCreators.ContainsKey(item.ReturnType))
+						{
+							typeCreators.Add(item.ReturnType, null); typeCreators[item.ReturnType] = new EnumCreator(item.ReturnType, as3apidocpath, csharpnativecodepath);
+						}
+					}
+					else if (item.ReturnType.IsClass || item.ReturnType.IsValueType)
+					{
+						if (!typeCreators.ContainsKey(item.ReturnType))
+						{
+							typeCreators.Add(item.ReturnType, null); typeCreators[item.ReturnType] = new ClassCreator(item.ReturnType, as3apidocpath, csharpnativecodepath, typeCreators);
 						}
 					}
 				}
@@ -109,17 +140,36 @@ namespace LinkCodeGen
 				var paras = item.GetParameters();
 				foreach (var p in paras)
 				{
-					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
-					if (pt > ASBinCode.RunTimeDataType.unknown)
+					if (p.ParameterType.IsGenericType)
 					{
-						if (p.ParameterType.IsInterface) //***Class代码还没做****
+						break;
+					}
+					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
+					if (pt > ASBinCode.RunTimeDataType.unknown && !IsSkipType(p.ParameterType))
+					{
+						if (p.ParameterType.IsInterface)
 						{
 							if (!typeCreators.ContainsKey(p.ParameterType))
 							{
-								typeCreators.Add(p.ParameterType, new InterfaceCreator(p.ParameterType, as3apidocpath, csharpnativecodepath, typeCreators));
+								typeCreators.Add(p.ParameterType, null); typeCreators[p.ParameterType] = new InterfaceCreator(p.ParameterType, as3apidocpath, csharpnativecodepath, typeCreators);
+							}
+						}
+						else if (p.ParameterType.IsEnum)
+						{
+							if (!typeCreators.ContainsKey(p.ParameterType))
+							{
+								typeCreators.Add(p.ParameterType, null); typeCreators[p.ParameterType] = new EnumCreator(p.ParameterType, as3apidocpath, csharpnativecodepath);
+							}
+						}
+						else if (p.ParameterType.IsClass || p.ParameterType.IsValueType)
+						{
+							if (!typeCreators.ContainsKey(p.ParameterType))
+							{
+								typeCreators.Add(p.ParameterType, null); typeCreators[p.ParameterType] = new ClassCreator(p.ParameterType, as3apidocpath, csharpnativecodepath, typeCreators);
 							}
 						}
 					}
+
 				}
 
 			}
@@ -139,74 +189,9 @@ namespace LinkCodeGen
 		}
 
 
-		private string GetAS3TypeString(Type type,Dictionary<Type,string> typeimports )
-		{
-			ASBinCode.RunTimeDataType rttype = MethodNativeCodeCreator.GetAS3Runtimetype(type);
-			if (rttype == ASBinCode.RunTimeDataType.fun_void)
-			{
-				return "void";
-			}
-			else if (rttype == ASBinCode.RunTimeDataType.rt_number)
-			{
-				return "Number";
-			}
-			else if (rttype == ASBinCode.RunTimeDataType.rt_int)
-			{
-				return "int";
-			}
-			else if (rttype == ASBinCode.RunTimeDataType.rt_uint)
-			{
-				return "uint";
-			}
-			else if (rttype == ASBinCode.RunTimeDataType.rt_boolean)
-			{
-				return "Boolean";
-			}
-			else if (rttype == ASBinCode.RunTimeDataType.rt_string)
-			{
-				return "String";
-			}
+		
 
-
-			if (this.type.Namespace != type.Namespace)
-			{
-				if (!typeimports.ContainsKey(type))
-				{
-					typeimports.Add(type, "import " + type.Namespace.ToLower() + "." + GetAS3ClassOrInterfaceName(type) + ";");
-				}
-			}
-
-			return GetAS3ClassOrInterfaceName(type);
-		}
-
-		private string GetMethodName(string dotName,System.Reflection.MethodInfo method)
-		{
-			var methods = type.GetMethods();
-
-			string ext = string.Empty;
-
-			for (int i = 0; i < methods.Length; i++)
-			{
-				if (methods[i].Name == dotName)
-				{
-					if (methods[i].Equals(method))
-					{
-						break;
-					}
-					else
-					{
-						ext = ext + "_";
-					}
-				}
-			}
-
-
-
-			return dotName.Substring(0, 1).ToLower() + dotName.Substring(1) + ext;
-
-			
-
-		}
+		
 
 
 		private void GenNativeFuncImport(StringBuilder nativesb)
@@ -251,6 +236,44 @@ namespace LinkCodeGen
 			nativesb.AppendLine("}");
 			nativesb.AppendLine("}");
 		}
+
+		public static string GetMethodNativeFunctionName(System.Reflection.MethodInfo method,Type type)
+		{
+			string nativefunName;
+
+			System.Reflection.PropertyInfo pinfo;
+			if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo))
+			{
+				
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "getThisItem");
+				
+			}
+			else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
+			{
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type));
+
+			}
+			else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo))
+			{
+				//****索引器****
+				
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "setThisItem");
+				
+			}
+			else if (MethodNativeCodeCreator.CheckIsSetter(method, type, out pinfo))
+			{
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type));
+
+			}
+			else
+			{
+
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type));
+			}
+
+			return nativefunName;
+		}
+
 
 		public override void Create()
 		{
@@ -301,26 +324,67 @@ namespace LinkCodeGen
 					continue;
 				}
 
+				if (IsSkipType(method.ReturnType))
+				{
+					Console.WriteLine(method.ToString() + "返回类型被配置为需要跳过");
+					continue;
+				}
+
 				string returntype = GetAS3TypeString(method.ReturnType,typeimports);
 
 				var paras = method.GetParameters();
 
+				bool parachecked = true;
 				foreach (var para in paras)
 				{
 					if (para.IsOut)
 					{
 						Console.WriteLine(method.ToString()+"参数"+ para.Position+" " +para+ "为out,跳过");
-						continue;
+						parachecked=false;
+						break;
 					}
 					if (para.ParameterType.IsByRef)
 					{
 						Console.WriteLine(method.ToString() + "参数" + para.Position + " " + para + "为byref,跳过");
-						continue;
+						parachecked = false;
+						break;
 					}
+					if (para.ParameterType.IsGenericType)
+					{
+						Console.WriteLine(method.ToString() + "参数" + para.Position + " " + para + "为泛型,跳过");
+						parachecked = false;
+						break;
+					}
+
+					if (para.IsOptional)
+					{
+						if (para.RawDefaultValue != null)
+						{
+							var rt = MethodNativeCodeCreator.GetAS3Runtimetype(para.ParameterType);
+							if (rt > ASBinCode.RunTimeDataType.unknown)
+							{
+								Console.WriteLine(method.ToString() + "参数" + para.Position + " " + para + "为可选，并且默认值不是基本类型");
+								parachecked = false;
+								break;
+							}
+						}
+					}
+
+					if (IsSkipType(para.ParameterType))
+					{
+						Console.WriteLine(method.ToString() + "参数" + para.Position + " " + para + "被配置为需要跳过");
+						parachecked = false;
+						break;
+					}
+
 				}
 
+				if (!parachecked)
+				{
+					continue;
+				}
 
-				string nativefunName;
+				string nativefunName = GetMethodNativeFunctionName(method,type);
 
 				System.Reflection.PropertyInfo pinfo;
 				if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo))
@@ -329,8 +393,7 @@ namespace LinkCodeGen
 					as3api.Append("\t\t");
 					as3api.AppendLine("[get_this_item];");
 
-					nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "getThisItem");
-
+					
 					as3api.Append("\t\t");
 					as3api.AppendFormat("[native,{0}];", nativefunName);
 					as3api.AppendLine();
@@ -340,8 +403,6 @@ namespace LinkCodeGen
 				}
 				else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
 				{
-					nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method));
-
 
 					as3api.Append("\t\t");
 					as3api.AppendFormat("[native,{0}]", nativefunName);
@@ -349,16 +410,13 @@ namespace LinkCodeGen
 
 					as3api.Append("\t\t");
 					as3api.Append("function get ");
-					as3api.Append(GetMethodName(pinfo.Name, method));
+					as3api.Append(GetMethodName(pinfo.Name, method,type));
 				}
 				else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo))
 				{
 					//****索引器****
 					as3api.Append("\t\t");
 					as3api.AppendLine("[set_this_item];");
-
-					nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "setThisItem");
-
 
 					as3api.Append("\t\t");
 					as3api.AppendFormat("[native,{0}];", nativefunName);
@@ -369,29 +427,26 @@ namespace LinkCodeGen
 				}
 				else if (MethodNativeCodeCreator.CheckIsSetter(method,type,out pinfo))
 				{
-					nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method));
-
-
+					
 					as3api.Append("\t\t");
 					as3api.AppendFormat("[native,{0}]", nativefunName);
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
 					as3api.Append("function set ");
-					as3api.Append(GetMethodName(pinfo.Name, method));
+					as3api.Append(GetMethodName(pinfo.Name, method,type));
 				}
 				else
 				{
 
-					nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method));
-
+					
 					as3api.Append("\t\t");
 					as3api.AppendFormat("[native,{0}]",nativefunName);
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
 					as3api.Append("function ");
-					as3api.Append(GetMethodName(method.Name,method));
+					as3api.Append(GetMethodName(method.Name,method,type));
 				}
 
 				as3api.Append("(");
@@ -409,7 +464,19 @@ namespace LinkCodeGen
 
 						if (para.RawDefaultValue != null)
 						{
-							as3api.Append(para.RawDefaultValue.ToString());
+							var rt = MethodNativeCodeCreator.GetAS3Runtimetype(para.ParameterType);
+							if (rt == ASBinCode.RunTimeDataType.rt_string)
+							{
+								string str = para.RawDefaultValue.ToString();
+								str = str.Replace("\\","\\\\");
+								str = str.Replace("\"", "\\\"");
+
+								as3api.Append("\""+str+"\""  );
+							}
+							else
+							{
+								as3api.Append(para.RawDefaultValue.ToString());
+							}
 						}
 						else
 						{
@@ -471,11 +538,11 @@ namespace LinkCodeGen
 			string as3file = "as3api/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
 			string nativefunfile = "buildins/" + GetNativeFunctionClassName(type) + ".cs";
 
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
-			System.IO.File.WriteAllText(as3file, as3api.ToString());
+			//System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
+			//System.IO.File.WriteAllText(as3file, as3api.ToString());
 
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(nativefunfile));
-			System.IO.File.WriteAllText(nativefunfile, nativefunc.ToString());
+			//System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(nativefunfile));
+			//System.IO.File.WriteAllText(nativefunfile, nativefunc.ToString());
 
 
 

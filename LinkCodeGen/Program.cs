@@ -44,28 +44,43 @@ namespace LinkCodeGen
 
 			//		if (!creators.ContainsKey(item))
 			//		{
-			//			InterfaceCreator itc = new InterfaceCreator(item, "", "", creators);
+			//			creators.Add(item, null);
+			//			creators[item]= new InterfaceCreator(item, "", "", creators);
 
-			//			creators.Add(item, itc);
+
 			//		}
 
 			//	}
 
 			//}
 
-			var interfacetype = typeof(ICloneable);
-			if (!creators.ContainsKey(interfacetype))
-			{
-				InterfaceCreator itc = new InterfaceCreator(interfacetype, "", "", creators);
+			//var interfacetype = typeof(System.Collections.ICollection);
+			//if (!creators.ContainsKey(interfacetype))
+			//{
+			//	creators.Add(interfacetype, null);
 
-				creators.Add(interfacetype, itc);
+			//	creators[interfacetype] = new InterfaceCreator(interfacetype, "", "", creators);
+
+
+			//}
+			//foreach (var item in creators.Values)
+			//{
+			//	item.Create();
+			//}
+
+			//*****类*******
+
+			var classtype = typeof(System.Data.SqlClient.SqlConnection);
+			if (!creators.ContainsKey(classtype))
+			{
+				creators.Add(classtype, null);
+				creators[classtype] = new ClassCreator(classtype, "", "", creators);
+
 			}
 			foreach (var item in creators.Values)
 			{
 				item.Create();
 			}
-
-
 
 			//System.IO.File.WriteAllText("retNativeCode.txt", regclassSb.ToString());
 
@@ -75,4 +90,7 @@ namespace LinkCodeGen
 		
 
 	}
+
+	
+
 }
