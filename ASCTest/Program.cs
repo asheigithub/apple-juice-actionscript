@@ -78,7 +78,7 @@ namespace ASCTest
 			//*********************
 
 
-            var proj = new ASTool.AS3.AS3Proj();
+			var proj = new ASTool.AS3.AS3Proj();
             var srcout = new ASTool.ConSrcOut();
 
             for (int i = 0; i < files.Length; i++)
