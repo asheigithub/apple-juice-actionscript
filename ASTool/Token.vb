@@ -19,16 +19,21 @@
         ''' </summary>
         super_pointer
 
-        ''' <summary>
-        ''' 字符串常量
-        ''' </summary>
-        ''' <remarks></remarks>
-        const_string
-        ''' <summary>
-        ''' 数值常量
-        ''' </summary>
-        ''' <remarks></remarks>
-        const_number
+		''' <summary>
+		''' 字符串常量
+		''' </summary>
+		''' <remarks></remarks>
+		const_string
+		''' <summary>
+		''' 内嵌正则表达式
+		''' </summary>
+		const_regexp
+
+		''' <summary>
+		''' 数值常量
+		''' </summary>
+		''' <remarks></remarks>
+		const_number
 
         ''' <summary>
         ''' 注释

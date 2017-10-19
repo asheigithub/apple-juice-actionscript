@@ -5,9 +5,92 @@ using System.Text;
 
 namespace ASCompiler.compiler.builds
 {
-    class FuncCallBuilder
-    {
-        public void buildFuncCall(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
+	class FuncCallBuilder
+	{
+		private bool searchbuildin(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder ,string name )
+		{
+			var util = TypeReader.findClassFromImports("@__buildin__", builder, step.token);
+			if (util.Count == 1)
+			{
+				if (env.isEval)
+				{
+					return true;
+				}
+
+				var bi = util[0].staticClass;
+
+				var member = ClassMemberFinder.find(bi, name, bi);
+				if (member != null && member.valueType == RunTimeDataType.rt_function)
+				{
+					OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+						new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+					stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+						new ASBinCode.rtData.rtInt(bi.instanceClass.classid));
+					stepInitClass.arg1Type = bi.getRtType();
+					env.block.opSteps.Add(stepInitClass);
+
+					var _buildin_ = new StaticClassDataGetter(bi);
+					var eaxfunc = env.getAdditionalRegister();
+					{
+
+						eaxfunc.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+						AccessBuilder.make_dotStep(env, member, step.token, eaxfunc, _buildin_);
+
+					}
+					{
+						OpStep op = new OpStep(OpCode.call_function,
+							new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+						var eax = env.createASTRegister(step.Arg1.Reg.ID);
+						eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+						op.reg = eax;
+						op.regType = RunTimeDataType.rt_void;
+						eax.isFuncResult = true;
+
+						op.arg1 = eaxfunc;
+						op.arg1Type = RunTimeDataType.rt_function;
+
+						build_member_parameterSteps((RightValueBase)member.bindField,
+							builder, eax, op, step, env, null, eaxfunc, null);
+
+						env.block.opSteps.Add(op);
+
+					}
+
+					//build_member(member.bindField, step, builder, env, bi, name);
+					return true;
+				}
+
+			}
+
+			return false;
+		}
+
+
+		private bool FindPackageFunction(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, Builder builder)
+		{
+			
+			{
+				string name = step.Arg2.Data.Value.ToString();
+
+				var find = TypeReader.findPackageFunctionFromImports(name, builder, step.token);
+				if (find.Count == 1 && find[0].isPackageFunction)
+				{
+					if (searchbuildin(env, step, builder, (find[0].package + "." + find[0].name).Replace(".","_") ))
+					{
+						return true;
+					}
+				}
+				
+
+			}
+			
+
+
+			return false;
+		}
+
+		public void buildFuncCall(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step,Builder builder)
         {
             if (env.isEval)
             {
@@ -36,10 +119,20 @@ namespace ASCompiler.compiler.builds
                 RightValueBase rValue = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
                 if (rValue is PackagePathGetter)
                 {
+					PackagePathGetter pf = (PackagePathGetter)rValue;
+					var find = TypeReader.findPackageFunction(pf.path, builder, step.token);
+					if (find.Count==1)
+					{
+						if (searchbuildin(env, step, builder, (find[0].package + "." + find[0].name).Replace(".", "_")))
+						{
+							return;
+						}
+					}
 
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "类型" + ((PackagePathGetter)rValue).path + "没有找到."
-                            );
+
+                    throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
+                            "类型" + ((PackagePathGetter)rValue).path + "没有找到."
+                        );
                     
 
                 }
@@ -114,110 +207,131 @@ namespace ASCompiler.compiler.builds
             }
             else if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
             {
+				
+
+
                 #region "查找@__buildin__"
                 {
                     string name = step.Arg2.Data.Value.ToString();
 
-                    //***从__buildin__中查找
-                    var buildin = TypeReader.findClassFromImports("@__buildin__", builder, step.token);
-                    if (buildin.Count == 1)
-                    {
-                        if (env.isEval)
-                        {
-                            return;
-                        }
+					if (searchbuildin(env, step, builder, name))
+					{
+						return;
+					}
 
-                        var bi = buildin[0].staticClass;
+                    ////***从__buildin__中查找
+                    //var buildin = TypeReader.findClassFromImports("@__buildin__", builder, step.token);
+                    //if (buildin.Count == 1)
+                    //{
+                    //    if (env.isEval)
+                    //    {
+                    //        return;
+                    //    }
 
-                        var member = ClassMemberFinder.find(bi, name, bi);
-                        if (member != null && member.valueType == RunTimeDataType.rt_function)
-                        {
-                            OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
-                                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-                            stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
-                                new ASBinCode.rtData.rtInt(bi.instanceClass.classid));
-                            stepInitClass.arg1Type = bi.getRtType();
-                            env.block.opSteps.Add(stepInitClass);
+                    //    var bi = buildin[0].staticClass;
 
-                            var _buildin_ = new StaticClassDataGetter(bi);
-                            var eaxfunc = env.getAdditionalRegister();
-                            {
+                    //    var member = ClassMemberFinder.find(bi, name, bi);
+                    //    if (member != null && member.valueType == RunTimeDataType.rt_function)
+                    //    {
+                    //        OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+                    //            new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    //        stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+                    //            new ASBinCode.rtData.rtInt(bi.instanceClass.classid));
+                    //        stepInitClass.arg1Type = bi.getRtType();
+                    //        env.block.opSteps.Add(stepInitClass);
 
-                                eaxfunc.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
-                                AccessBuilder.make_dotStep(env, member, step.token, eaxfunc, _buildin_);
+                    //        var _buildin_ = new StaticClassDataGetter(bi);
+                    //        var eaxfunc = env.getAdditionalRegister();
+                    //        {
 
-                            }
-                            {
-                                OpStep op = new OpStep(OpCode.call_function,
-                                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                    //            eaxfunc.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                    //            AccessBuilder.make_dotStep(env, member, step.token, eaxfunc, _buildin_);
 
-                                var eax = env.createASTRegister(step.Arg1.Reg.ID);
-                                eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
-                                op.reg = eax;
-                                op.regType = RunTimeDataType.rt_void;
-                                eax.isFuncResult = true;
+                    //        }
+                    //        {
+                    //            OpStep op = new OpStep(OpCode.call_function,
+                    //                new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                                op.arg1 = eaxfunc;
-                                op.arg1Type = RunTimeDataType.rt_function;
+                    //            var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    //            eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                    //            op.reg = eax;
+                    //            op.regType = RunTimeDataType.rt_void;
+                    //            eax.isFuncResult = true;
 
-                                build_member_parameterSteps((RightValueBase)member.bindField,
-                                    builder, eax, op, step, env, null, eaxfunc, null);
+                    //            op.arg1 = eaxfunc;
+                    //            op.arg1Type = RunTimeDataType.rt_function;
 
-                                env.block.opSteps.Add(op);
+                    //            build_member_parameterSteps((RightValueBase)member.bindField,
+                    //                builder, eax, op, step, env, null, eaxfunc, null);
 
-                            }
+                    //            env.block.opSteps.Add(op);
 
-                            //build_member(member.bindField, step, builder, env, bi, name);
-                            return;
-                        }
+                    //        }
 
-                    }
+                    //        //build_member(member.bindField, step, builder, env, bi, name);
+                    //        return;
+                    //    }
+
+                    //}
 
                 }
-                #endregion
-                //if (step.Arg2.Data.Value.ToString() == "trace")
-                //{
-                //    if (env.isEval)
-                //    {
-                //        return;
-                //    }
+				#endregion
 
-                //    OpStep op = new OpStep(OpCode.native_trace,
-                //        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+				#region 查找@_flash.utils.getDefinitionByName
 
-                //    var eax = env.createASTRegister(step.Arg1.Reg.ID);
-                //    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
-                //    op.reg = eax;
-                //    op.regType = RunTimeDataType.rt_void;
+				if (FindPackageFunction(env,step,builder))
+				{
+					return;
+				}
+
+				#endregion
 
 
-                //    List<ASTool.AS3.Expr.AS3DataStackElement> args
-                //        = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
 
-                //    if (args.Count > 1)
-                //    {
-                //        throw new BuildException(
-                //            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                //            "trace函数目前只接受1个函数"));
-                //    }
-                //    else if (args.Count > 0)
-                //    {
-                //        op.arg1 = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
-                //        op.arg1Type = op.arg1.valueType;
-                //    }
-                //    else
-                //    {
-                //        op.arg1 = null;
-                //        op.arg1Type = RunTimeDataType.unknown;
-                //    }
-                //    op.arg2 = null;
-                //    op.arg2Type = RunTimeDataType.unknown;
 
-                //    env.block.opSteps.Add(op);
-                //}
-                //else
-                {
-                    string name = step.Arg2.Data.Value.ToString();
+				//if (step.Arg2.Data.Value.ToString() == "trace")
+				//{
+				//    if (env.isEval)
+				//    {
+				//        return;
+				//    }
+
+				//    OpStep op = new OpStep(OpCode.native_trace,
+				//        new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+
+				//    var eax = env.createASTRegister(step.Arg1.Reg.ID);
+				//    eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+				//    op.reg = eax;
+				//    op.regType = RunTimeDataType.rt_void;
+
+
+				//    List<ASTool.AS3.Expr.AS3DataStackElement> args
+				//        = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
+
+				//    if (args.Count > 1)
+				//    {
+				//        throw new BuildException(
+				//            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+				//            "trace函数目前只接受1个函数"));
+				//    }
+				//    else if (args.Count > 0)
+				//    {
+				//        op.arg1 = ExpressionBuilder.getRightValue(env, args[0], step.token, builder);
+				//        op.arg1Type = op.arg1.valueType;
+				//    }
+				//    else
+				//    {
+				//        op.arg1 = null;
+				//        op.arg1Type = RunTimeDataType.unknown;
+				//    }
+				//    op.arg2 = null;
+				//    op.arg2Type = RunTimeDataType.unknown;
+
+				//    env.block.opSteps.Add(op);
+				//}
+				//else
+				{
+					string name = step.Arg2.Data.Value.ToString();
 
                     ASBinCode.rtti.Class _cls = null;
 

@@ -52,10 +52,14 @@
 	}
 }
 
+import flash.errors.*;
+
 var err:Error=new Error();
 var typeerr:TypeError=new TypeError();
 var argementerr:ArgumentError=new ArgumentError();
 var aneerr:AneError=new AneError();
+var ioerror:IOError=new IOError();
+var eoferror:EOFError=new EOFError();
 
 var i:int=new int();
 var ui:uint=new uint();

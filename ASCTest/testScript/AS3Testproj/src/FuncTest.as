@@ -227,7 +227,7 @@ package
 			
 			trace(uq.queue.toArray()[2]);
 			
-			trace(ConsoleColor.White);
+			
 			
 		}
 		

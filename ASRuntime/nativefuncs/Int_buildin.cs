@@ -337,7 +337,10 @@ namespace ASRuntime.nativefuncs
                         int sign = 1;
                         if (toCast < 0) { toCast = -toCast;sign = -1; }
 
-                        while ( toCast > 0)
+						result = symbols[toCast % r].ToString();
+						toCast = toCast / r;
+
+						while ( toCast > 0)
                         {
                             result = symbols[toCast % r] + result;
                             toCast = toCast / r;

@@ -20,52 +20,56 @@ namespace ASCompiler.compiler.builds
                     if (step.Arg2.IsReg)
                     {
                         var cls = ExpressionBuilder.getRightValue(env, step.Arg2, step.token, builder);
-                        if (cls is ASBinCode.StaticClassDataGetter)
-                        {
-                            _class = builder.getClassByRunTimeDataType(cls.valueType).instanceClass;
-                            build_class(env, _class, step, builder);
-                            return;
-                        }
-                        else if (cls is MethodGetterBase)
-                        { 
-                            throw new BuildException(
-                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "Method cannot be used as a constructor."));
-                        }
-                        else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function)
-                        {
-                            //从Class对象中new
-                            build_void(env, cls, step, builder);
-                            return;
-                        }
-                        else if (cls.valueType > ASBinCode.RunTimeDataType.unknown)
-                        {
-                            _class = builder.getClassByRunTimeDataType(cls.valueType);
+						if (cls is ASBinCode.StaticClassDataGetter)
+						{
+							_class = builder.getClassByRunTimeDataType(cls.valueType).instanceClass;
+							build_class(env, _class, step, builder);
+							return;
+						}
+						else if (cls is MethodGetterBase)
+						{
+							throw new BuildException(
+								new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+								"Method cannot be used as a constructor."));
+						}
+						else if (cls.valueType == ASBinCode.RunTimeDataType.rt_void || cls.valueType == ASBinCode.RunTimeDataType.rt_function)
+						{
+							//从Class对象中new
+							build_void(env, cls, step, builder);
+							return;
+						}
+						else if (cls.valueType > ASBinCode.RunTimeDataType.unknown)
+						{
+							_class = builder.getClassByRunTimeDataType(cls.valueType);
 
-                            if (_class.isInterface)
-                            {
-                                throw new BuildException(
-                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                _class.name+" Interfaces cannot be instantiated with the new operator."));
-                            }
-                            else if (_class.staticClass != null)
-                            {
-                                build_class(env, _class, step, builder);
-                            }
-                            else
-                            {
-                                throw new BuildException(
-                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "类型" + cls.valueType + "不能new"));
-                            }
-                            return;
-                        }
-                        else
-                        {
-                            throw new BuildException(
-                                new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                                "类型" + cls.valueType + "不能new"));
-                        }
+							if (_class.isInterface)
+							{
+								throw new BuildException(
+								new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+								_class.name + " Interfaces cannot be instantiated with the new operator."));
+							}
+							else if (_class.staticClass != null)
+							{
+								build_class(env, _class, step, builder);
+							}
+							else if ( cls is Register && ((Register)cls).isFindByPath && _class.staticClass==null )
+							{
+								build_class(env, _class.instanceClass, step, builder);
+							}
+							else
+							{
+								throw new BuildException(
+								new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+								"类型" + cls.valueType + "不能new"));
+							}
+							return;
+						}
+						else
+						{
+							throw new BuildException(
+								new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+								"类型" + cls.valueType + "不能new"));
+						}
                     }
                     else
                     {
@@ -198,7 +202,7 @@ namespace ASCompiler.compiler.builds
             
 
             List<ASTool.AS3.Expr.AS3DataStackElement> args;
-            if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_vector)
+            if (!step.Arg2.IsReg && step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_vector)
             {
                 ASTool.AS3.AS3Vector vector = (ASTool.AS3.AS3Vector)step.Arg2.Data.Value;
 
@@ -241,7 +245,7 @@ namespace ASCompiler.compiler.builds
                 args
                 );
 
-            if (step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_vector)
+            if (!step.Arg2.IsReg && step.Arg2.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_vector)
             {
                 ASTool.AS3.AS3Vector vector = (ASTool.AS3.AS3Vector)step.Arg2.Data.Value;
                 if (vector.Constructor != null && vector.isInitData)

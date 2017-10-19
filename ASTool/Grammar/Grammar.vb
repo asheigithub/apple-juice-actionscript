@@ -888,10 +888,10 @@ Public Class Grammar
             End If
         End If
 
-        If node.Type = GrammarNodeType.conststring And token.Type = ASTool.Token.TokenType.const_string Then
-            Return True
-        ElseIf node.Type = GrammarNodeType.eof And token.Type = ASTool.Token.TokenType.eof Then
-            Return True
+		If node.Type = GrammarNodeType.conststring And (token.Type = ASTool.Token.TokenType.const_string Or token.Type = Token.TokenType.const_regexp) Then
+			Return True
+		ElseIf node.Type = GrammarNodeType.eof And token.Type = ASTool.Token.TokenType.eof Then
+			Return True
         End If
 
         If node.Type = GrammarNodeType.identifier And token.Type = ASTool.Token.TokenType.identifier Then

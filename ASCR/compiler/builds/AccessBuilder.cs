@@ -51,9 +51,8 @@ namespace ASCompiler.compiler.builds
                             string path = pd.path + "." + step.Arg3.Data.Value.ToString();
 
                             //**尝试查找类***
-
-                            //查找导入的类
-                            var found = TypeReader.findClassFromImports(path, builder, step.token);
+							
+                            var found = TypeReader.findClassFromProject(path, builder, step.token);
                             if (found.Count == 1)
                             {
                                 var item = found[0];
@@ -67,6 +66,8 @@ namespace ASCompiler.compiler.builds
 
                                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
                                 eax.setEAXTypeWhenCompile(item.staticClass.getRtType());
+								eax.isFindByPath = true;
+								//eax._pathGetter = new PackagePathGetter(path);
 
                                 OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                                 op.reg = eax;
@@ -143,7 +144,9 @@ namespace ASCompiler.compiler.builds
                     {
                         if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown)
                         {
-                            if (builder.bin.primitive_to_class_table[v1.valueType] != null)
+                            if (
+								builder.bin !=null &&
+								builder.bin.primitive_to_class_table[v1.valueType] != null)
                             {
                                 var cls = builder.bin.primitive_to_class_table[v1.valueType];
                                 v1 = ExpressionBuilder.addCastOpStep(env, v1, builder.bin.primitive_to_class_table[v1.valueType].getRtType(),

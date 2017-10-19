@@ -73,7 +73,7 @@ namespace ASRuntime.operators
             check_para_id = 0;
             pushedArgs = 0;
             hasReleased = false;
-            ischeckfailed = false;
+            
         }
 
         
@@ -424,7 +424,7 @@ namespace ASRuntime.operators
             _getArgementSlot(para_id).directSet(value);
         }
 
-        private bool ischeckfailed;
+        
         private void check_para()
         {
             while (check_para_id < pushedArgs)

@@ -403,8 +403,27 @@ namespace ASCompiler.compiler.builds
                                                                    "[_class_]只能指定一次");
                                 }
                             }
-                            
-                        }
+							else if (m.Value.Data.Value.ToString() == "_regexp_")
+							{
+								if (builder.bin.RegExpClass == null)
+								{
+									builder.bin.RegExpClass = cls;
+								}
+								else
+								{
+									throw new BuildException(as3class.token.line,
+											   as3class.token.ptr, as3class.token.sourceFile,
+																   "[_regexp_]只能指定一次");
+								}
+							}
+							else if (m.Value.Data.Value.ToString() == "_package_function_")
+							{
+								cls.isPackageFunction = true;
+								cls.no_constructor = true;
+							}
+							
+
+						}
                     }
                 }
                 
@@ -465,6 +484,7 @@ namespace ASCompiler.compiler.builds
 
             cls.staticClass = metaclass;
             metaclass.instanceClass = cls;
+			metaclass.isPackageFunction = cls.isPackageFunction;
 
             //ASBinCode.CodeBlock metablock = new ASBinCode.CodeBlock(metablockid, metaclass.name,metaclass.classid,false);
             //metablock.scope = new ASBinCode.scopes.ObjectInstanceScope(metaclass);
@@ -838,20 +858,34 @@ namespace ASCompiler.compiler.builds
 
                         for (int j = 0; j < cls.classMembers.Count; j++)
                         {
+							if (cls.classMembers[j].name == funcname
+								&&
+								cls.classMembers[j].inheritFrom==null
+								)
+							{
+								
+								throw new BuildException(
+									new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+															"重复的类成员:" + as3function.Name)
+									);
+							}
+
+
                             if (cls.classMembers[j].name == funcname //as3function.Name
                                 &&
                                 (
-                                    cls.classMembers[j].inheritFrom == null
-                                    ||
-                                    (
-                                        cls.classMembers[j].isPublic 
-                                        && 
-                                        as3function.Access.IsPublic
-                                        &&
-                                        !cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
-                                    )
-
-                                )
+                                    cls.classMembers[j].inheritFrom != null
+                                    //||
+                                    //(
+                                    //    cls.classMembers[j].isPublic 
+                                    //    && 
+                                    //    as3function.Access.IsPublic
+                                    //    &&
+                                    //    !cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
+                                    //)
+									&&
+										!cls.classMembers[j].inheritFrom.classMembers[j].isConstructor
+								)
                             )
                             {
                                 if (as3function.Access.IsOverride
@@ -882,34 +916,15 @@ namespace ASCompiler.compiler.builds
                                     continue;
                                 }
 
-                                //if (
-                                //    cls.classMembers[j].bindField is ClassPropertyGetter 
-
+                                //if (cls.classMembers[j].inheritFrom == null                                   
                                 //    )
                                 //{
-                                //    ClassPropertyGetter pg = (ClassPropertyGetter)cls.classMembers[j].bindField;
-
-                                //    //ASTool.AS3.AS3Function pf = 
-                                //    //    (ASTool.AS3.AS3Function)builder._buildingmembers[cls.classMembers[j]];
-                                //    if ((pg.getter ==null && as3function.IsGet)
-                                //        ||
-                                //        (pg.setter ==null && as3function.IsSet)
-                                //        )
-                                //    {
-                                //        continue;
-                                //    }
-
+                                //    throw new BuildException(
+                                //        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                //                                "重复的类成员:" + as3function.Name)
+                                //        );
                                 //}
-
-                                if (cls.classMembers[j].inheritFrom == null                                   
-                                    )
-                                {
-                                    throw new BuildException(
-                                        new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                                "重复的类成员:" + as3function.Name)
-                                        );
-                                }
-                                else
+                                //else
                                 {
                                     throw new BuildException(
                                         new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
@@ -1219,11 +1234,60 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        throw new BuildException(
-                                    new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                            "'function' is not allowed here")
-                                    );
-                    }
+						bool isthrow = true;
+						//***如果是直接被作为参数使用***
+						var scope = as3function.ParentScope;
+						if (scope != null)
+						{
+							if (scope.StamentsStack.Count > 0)
+							{
+								var liststmt = scope.StamentsStack.Peek();
+								foreach (var item in liststmt)
+								{
+									if (item == stmt)
+									{
+										continue;
+									}
+									else if(item is ASTool.AS3.AS3Member )
+									{
+										var member = (ASTool.AS3.AS3Member)item;
+										if (member.ValueExpr != null)
+										{
+											var exprList = member.ValueExpr.exprStepList;
+											foreach (var expr in exprList)
+											{
+												if (expr.Arg3 != null && expr.Arg3.Data !=null && expr.Arg3.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.as3_callargements
+													)
+												{
+													List<ASTool.AS3.Expr.AS3DataStackElement> args = expr.Arg3.Data.Value as List<ASTool.AS3.Expr.AS3DataStackElement>;
+													if (args != null)
+													{
+														foreach (var a in args)
+														{
+															if (a.Data !=null && a.Data.Value == as3function)
+															{
+																isthrow = false;
+																break;
+															}
+														}
+													}
+												}
+											}
+
+										}
+									}
+								}
+
+							}
+						}
+						if (isthrow)
+						{
+							throw new BuildException(
+										new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+																"'function' is not allowed here")
+										);
+						}
+					}
                 }
             }
             else if (stmt is ASTool.AS3.AS3Variable)
@@ -1278,7 +1342,7 @@ namespace ASCompiler.compiler.builds
                                     throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
                                                                    "Meta 格式错误,至少有1个设置");
                                 }
-                                else
+                                else if(!data[0].IsReg)
                                 {
                                     string meta = data[0].Data.Value.ToString();
                                     if (meta == "native")

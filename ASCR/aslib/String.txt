@@ -87,6 +87,21 @@
 			return args.join("");
 		}
 
+		public function match(pattern:*):Array
+		{
+			if(pattern is RegExp)
+			{
+				return ["is pattern"];
+			}
+			else
+			{
+				return [ String(pattern) ];
+			}
+
+		}
+		
+
+
 		public function toString () : String{ return _v; }
 
 		public function valueOf () : String{ return _v; }

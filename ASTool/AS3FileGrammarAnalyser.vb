@@ -179,7 +179,371 @@ Public Class AS3FileGrammarAnalyser
 
 #Region "遍历节点"
 
-    Private nodevisited As New Dictionary(Of GrammerExpr, Action(Of GrammerExpr))
+	Private Sub doVisName(name As String, node As GrammerExpr)
+		Select Case name
+			Case "PACKAGE"
+				_PACKAGE(node)
+			Case "PACKAGE_NAME"
+				_PACKAGE_NAME(node)
+			Case "PACKAGEBODY"
+				_PACKAGEBODY(node)
+			Case "OUT_PACKAGE"
+				_OUT_PACKAGE(node)
+			Case "PACKAGE_STMTS"
+				_PACKAGE_STMTS(node)
+			Case "ClassPath"
+				_ClassPath(node)
+			Case "PACKAGE_STMT"
+				_PACKAGE_STMT(node)
+			Case "PACKAGE_STMTS1"
+				_PACKAGE_STMTS1(node)
+			Case "PACKAGE_BLOCK"
+				_PACKAGE_BLOCK(node)
+			Case "PACKAGE_BLOCK_2"
+				_PACKAGE_BLOCK_2(node)
+			Case "PACKAGE_EXPR"
+				_PACKAGE_EXPR(node)
+			Case "ACCESS_DEF"
+				_ACCESS_DEF(node)
+			Case "Syntax"
+				_Syntax(node)
+			Case "Import"
+				_Import(node)
+			Case "Import_ClassPath"
+				_Import_ClassPath(node)
+			Case "Import_ClassName"
+				_Import_ClassName(node)
+			Case "Import_ClassPath_1"
+				_Import_ClassPath_1(node)
+			Case "Use"
+				_Use(node)
+			Case "ClassName"
+				_ClassName(node)
+			Case "ClassPath_1"
+				_ClassPath_1(node)
+			Case "ClassMetaProperty"
+				_ClassMetaProperty(node)
+			Case "Access"
+				_Access(node)
+			Case "NSAccess"
+				_NSAccess(node)
+			Case "NameSpace"
+				_NameSpace(node)
+			Case "NameSpaceDefaultValue"
+				_NameSpaceDefaultValue(node)
+			Case "Expression"
+				_Expression(node)
+			Case "DefClass"
+				_DefClass(node)
+			Case "Extends"
+				_Extends(node)
+			Case "Implements"
+				_Implements(node)
+			Case "ClassBody"
+				_ClassBody(node)
+			Case "ImplList"
+				_ImplList(node)
+			Case "ImplList1"
+				_ImplList1(node)
+			Case "DefInterface"
+				_DefInterface(node)
+			Case "InterfaceName"
+				_InterfaceName(node)
+			Case "ACCESS_KEYWORD"
+				_ACCESS_KEYWORD(node)
+			Case "Function"
+				_Function(node)
+			Case "Const"
+				_Const(node)
+			Case "Variable"
+				_Variable(node)
+			Case "Stmts"
+				_Stmts(node)
+			Case "Stmt"
+				_Stmt(node)
+			Case "StmtList"
+				_StmtList(node)
+			Case "BLOCK"
+				_BLOCK(node)
+			Case "BP2"
+				_BP2(node)
+			Case "ACCESS_MEMBER"
+				_ACCESS_MEMBER(node)
+			Case "EatAnSemicolon"
+				_EatAnSemicolon(node)
+			Case "IF"
+				_IF(node)
+			Case "FOR_STMT"
+				_FOR_STMT(node)
+			Case "WHILE"
+				_WHILE(node)
+			Case "WITH"
+				_WITH(node)
+			Case "DO"
+				_DO(node)
+			Case "TRY"
+				_TRY(node)
+			Case "THROW"
+				_THROW(node)
+			Case "SWITCH"
+				_SWITCH(node)
+			Case "Return"
+				_Return(node)
+			Case "Break"
+				_Break(node)
+			Case "Continue"
+				_Continue(node)
+			Case "ACCESS_MEMBER_KEYWORD"
+				_ACCESS_MEMBER_KEYWORD(node)
+			Case "ExpressionList"
+				_ExpressionList(node)
+			Case "AExprList"
+				_AExprList(node)
+			Case "ID_EABLED_KEYWORD"
+				_ID_EABLED_KEYWORD(node)
+			Case "DefineType"
+				_DefineType(node)
+			Case "DefineTypeVector"
+				_DefineTypeVector(node)
+			Case "VariableDefineList"
+				_VariableDefineList(node)
+			Case "VariableDefine"
+				_VariableDefine(node)
+			Case "VariableDefineList1"
+				_VariableDefineList1(node)
+			Case "VariableName"
+				_VariableName(node)
+			Case "VariableDEFType"
+				_VariableDEFType(node)
+			Case "VariableDefaultValue"
+				_VariableDefaultValue(node)
+			Case "VariableType"
+				_VariableType(node)
+			Case "ConstDefineList"
+				_ConstDefineList(node)
+			Case "ConstDefine"
+				_ConstDefine(node)
+			Case "ConstDefineList1"
+				_ConstDefineList1(node)
+			Case "ConstName"
+				_ConstName(node)
+			Case "ConstDEFType"
+				_ConstDEFType(node)
+			Case "ConstDefaultValue"
+				_ConstDefaultValue(node)
+			Case "ConstType"
+				_ConstType(node)
+			Case "FunctionProperty"
+				_FunctionProperty(node)
+			Case "Parameters"
+				_Parameters(node)
+			Case "FunctionReturnType"
+				_FunctionReturnType(node)
+			Case "FunctionCode"
+				_FunctionCode(node)
+			Case "FunctionBody"
+				_FunctionBody(node)
+			Case "FunctionName"
+				_FunctionName(node)
+			Case "FunctionType"
+				_FunctionType(node)
+			Case "Parameter_list"
+				_Parameter_list(node)
+			Case "Parameter_Array"
+				_Parameter_Array(node)
+			Case "Parameter"
+				_Parameter(node)
+			Case "Parameter_list1"
+				_Parameter_list1(node)
+			Case "ParameterDEFType"
+				_ParameterDEFType(node)
+			Case "ParameterDefaultValue"
+				_ParameterDefaultValue(node)
+			Case "ParameterName"
+				_ParameterName(node)
+			Case "ParameterType"
+				_ParameterType(node)
+			Case "ReturnValue"
+				_ReturnValue(node)
+			Case "IFElse"
+				_IFElse(node)
+			Case "FORTYPE"
+				_FORTYPE(node)
+			Case "Each"
+				_Each(node)
+			Case "FOR_FORIN"
+				_FOR_FORIN(node)
+			Case "Each_TEMP1"
+				_Each_TEMP1(node)
+			Case "ForVar"
+				_ForVar(node)
+			Case "Each_TEMP2"
+				_Each_TEMP2(node)
+			Case "FOR_TEMP1"
+				_FOR_TEMP1(node)
+			Case "FOR_TEMP2"
+				_FOR_TEMP2(node)
+			Case "FOR"
+				_FOR(node)
+			Case "FORIN"
+				_FORIN(node)
+			Case "FORPART2"
+				_FORPART2(node)
+			Case "FORPART3"
+				_FORPART3(node)
+			Case "FORPART1"
+				_FORPART1(node)
+			Case "DO_CONDITION"
+				_DO_CONDITION(node)
+			Case "TRYBLOCK"
+				_TRYBLOCK(node)
+			Case "CATCHLIST"
+				_CATCHLIST(node)
+			Case "FINALLY"
+				_FINALLY(node)
+			Case "THROWEXCEPTION"
+				_THROWEXCEPTION(node)
+			Case "CATCH"
+				_CATCH(node)
+			Case "CATCHLIST1"
+				_CATCHLIST1(node)
+			Case "CATCHBLOCK"
+				_CATCHBLOCK(node)
+			Case "FINALLYBLOCK"
+				_FINALLYBLOCK(node)
+			Case "CASEBODY"
+				_CASEBODY(node)
+			Case "SWITCH_CASE"
+				_SWITCH_CASE(node)
+			Case "CASESTMT"
+				_CASESTMT(node)
+			Case "CASELIST"
+				_CASELIST(node)
+			Case "CASELIST1"
+				_CASELIST1(node)
+			Case "Assigning"
+				_Assigning(node)
+			Case "Ternary"
+				_Ternary(node)
+			Case "AssigningOpt"
+				_AssigningOpt(node)
+			Case "LogicOr"
+				_LogicOr(node)
+			Case "TernaryOpt"
+				_TernaryOpt(node)
+			Case "LogicAnd"
+				_LogicAnd(node)
+			Case "LogicOrOpt"
+				_LogicOrOpt(node)
+			Case "BitOr"
+				_BitOr(node)
+			Case "LogicAndOpt"
+				_LogicAndOpt(node)
+			Case "BitXor"
+				_BitXor(node)
+			Case "BitOrOpt"
+				_BitOrOpt(node)
+			Case "BitAnd"
+				_BitAnd(node)
+			Case "BitXorOpt"
+				_BitXorOpt(node)
+			Case "LogicEQ"
+				_LogicEQ(node)
+			Case "BitAndOpt"
+				_BitAndOpt(node)
+			Case "Logic"
+				_Logic(node)
+			Case "LogicEQOpt"
+				_LogicEQOpt(node)
+			Case "BitShift"
+				_BitShift(node)
+			Case "LogicOpt"
+				_LogicOpt(node)
+			Case "Plus"
+				_Plus(node)
+			Case "BitShiftOpt"
+				_BitShiftOpt(node)
+			Case "Multiply"
+				_Multiply(node)
+			Case "PlusOpt"
+				_PlusOpt(node)
+			Case "Unary"
+				_Unary(node)
+			Case "MultiplyOpt"
+				_MultiplyOpt(node)
+			Case "Unit"
+				_Unit(node)
+			Case "AccessOpt"
+				_AccessOpt(node)
+			Case "NSAccessOpt"
+				_NSAccessOpt(node)
+			Case "UnitSuffix"
+				_UnitSuffix(node)
+			Case "Call"
+				_Call(node)
+			Case "Object"
+				_Object(node)
+			Case "E4XAccess"
+				_E4XAccess(node)
+			Case "Array"
+				_Array(node)
+			Case "Vector"
+				_Vector(node)
+			Case "Argements"
+				_Argements(node)
+			Case "ArrayElements"
+				_ArrayElements(node)
+			Case "ArrayExpressionList"
+				_ArrayExpressionList(node)
+			Case "Expression_1"
+				_Expression_1(node)
+			Case "ArrayCommaOpt"
+				_ArrayCommaOpt(node)
+			Case "CommaOpt"
+				_CommaOpt(node)
+			Case "CommaOpt_1"
+				_CommaOpt_1(node)
+			Case "ACommaOpt"
+				_ACommaOpt(node)
+			Case "ACommaOpt_1"
+				_ACommaOpt_1(node)
+			Case "VectorConstructor"
+				_VectorConstructor(node)
+			Case "ObjectBody"
+				_ObjectBody(node)
+			Case "ObjMembers"
+				_ObjMembers(node)
+			Case "ObjMember"
+				_ObjMember(node)
+			Case "ObjMembers1"
+				_ObjMembers1(node)
+			Case "CaseDefultOrXMLUse_1"
+				_CaseDefultOrXMLUse_1(node)
+			Case "E4XAccessOpt"
+				_E4XAccessOpt(node)
+			Case "E4XFilter"
+				_E4XFilter(node)
+			Case "E4XNSAPPEND"
+				_E4XNSAPPEND(node)
+			Case "New"
+				_New(node)
+			Case "NewClassOrVector"
+				_NewClassOrVector(node)
+			Case "NewOpt"
+				_NewOpt(node)
+			Case "ThisSuper"
+				_ThisSuper(node)
+			Case "A_FC"
+				_A_FC(node)
+			Case "YIELD"
+				_YIELD(node)
+			Case "YIELD_RB"
+				_YIELD_RB(node)
+		End Select
+	End Sub
+
+
+	Private nodevisited As New Dictionary(Of GrammerExpr, Action(Of GrammerExpr))
 
     Private visitednodes As New HashSet(Of GrammerExpr)()
 
@@ -194,368 +558,9 @@ Public Class AS3FileGrammarAnalyser
             name = name.Substring(2)
         End If
 
-        Select Case name
-            Case "PACKAGE"
-                _PACKAGE(node)
-            Case "PACKAGE_NAME"
-                _PACKAGE_NAME(node)
-            Case "PACKAGEBODY"
-                _PACKAGEBODY(node)
-            Case "OUT_PACKAGE"
-                _OUT_PACKAGE(node)
-            Case "PACKAGE_STMTS"
-                _PACKAGE_STMTS(node)
-            Case "ClassPath"
-                _ClassPath(node)
-            Case "PACKAGE_STMT"
-                _PACKAGE_STMT(node)
-            Case "PACKAGE_STMTS1"
-                _PACKAGE_STMTS1(node)
-            Case "PACKAGE_BLOCK"
-                _PACKAGE_BLOCK(node)
-            Case "PACKAGE_BLOCK_2"
-                _PACKAGE_BLOCK_2(node)
-            Case "PACKAGE_EXPR"
-                _PACKAGE_EXPR(node)
-            Case "ACCESS_DEF"
-                _ACCESS_DEF(node)
-            Case "Syntax"
-                _Syntax(node)
-            Case "Import"
-                _Import(node)
-            Case "Import_ClassPath"
-                _Import_ClassPath(node)
-            Case "Import_ClassName"
-                _Import_ClassName(node)
-            Case "Import_ClassPath_1"
-                _Import_ClassPath_1(node)
-            Case "Use"
-                _Use(node)
-            Case "ClassName"
-                _ClassName(node)
-            Case "ClassPath_1"
-                _ClassPath_1(node)
-            Case "ClassMetaProperty"
-                _ClassMetaProperty(node)
-            Case "Access"
-                _Access(node)
-            Case "NSAccess"
-                _NSAccess(node)
-            Case "NameSpace"
-                _NameSpace(node)
-            Case "NameSpaceDefaultValue"
-                _NameSpaceDefaultValue(node)
-            Case "Expression"
-                _Expression(node)
-            Case "DefClass"
-                _DefClass(node)
-            Case "Extends"
-                _Extends(node)
-            Case "Implements"
-                _Implements(node)
-            Case "ClassBody"
-                _ClassBody(node)
-            Case "ImplList"
-                _ImplList(node)
-            Case "ImplList1"
-                _ImplList1(node)
-            Case "DefInterface"
-                _DefInterface(node)
-            Case "InterfaceName"
-                _InterfaceName(node)
-            Case "ACCESS_KEYWORD"
-                _ACCESS_KEYWORD(node)
-            Case "Function"
-                _Function(node)
-            Case "Const"
-                _Const(node)
-            Case "Variable"
-                _Variable(node)
-            Case "Stmts"
-                _Stmts(node)
-            Case "Stmt"
-                _Stmt(node)
-            Case "StmtList"
-                _StmtList(node)
-            Case "BLOCK"
-                _BLOCK(node)
-            Case "BP2"
-                _BP2(node)
-            Case "ACCESS_MEMBER"
-                _ACCESS_MEMBER(node)
-            Case "EatAnSemicolon"
-                _EatAnSemicolon(node)
-            Case "IF"
-                _IF(node)
-            Case "FOR_STMT"
-                _FOR_STMT(node)
-            Case "WHILE"
-                _WHILE(node)
-            Case "WITH"
-                _WITH(node)
-            Case "DO"
-                _DO(node)
-            Case "TRY"
-                _TRY(node)
-            Case "THROW"
-                _THROW(node)
-            Case "SWITCH"
-                _SWITCH(node)
-            Case "Return"
-                _Return(node)
-            Case "Break"
-                _Break(node)
-            Case "Continue"
-                _Continue(node)
-            Case "ACCESS_MEMBER_KEYWORD"
-                _ACCESS_MEMBER_KEYWORD(node)
-            Case "ExpressionList"
-                _ExpressionList(node)
-            Case "AExprList"
-                _AExprList(node)
-            Case "ID_EABLED_KEYWORD"
-                _ID_EABLED_KEYWORD(node)
-            Case "DefineType"
-                _DefineType(node)
-            Case "DefineTypeVector"
-                _DefineTypeVector(node)
-            Case "VariableDefineList"
-                _VariableDefineList(node)
-            Case "VariableDefine"
-                _VariableDefine(node)
-            Case "VariableDefineList1"
-                _VariableDefineList1(node)
-            Case "VariableName"
-                _VariableName(node)
-            Case "VariableDEFType"
-                _VariableDEFType(node)
-            Case "VariableDefaultValue"
-                _VariableDefaultValue(node)
-            Case "VariableType"
-                _VariableType(node)
-            Case "ConstDefineList"
-                _ConstDefineList(node)
-            Case "ConstDefine"
-                _ConstDefine(node)
-            Case "ConstDefineList1"
-                _ConstDefineList1(node)
-            Case "ConstName"
-                _ConstName(node)
-            Case "ConstDEFType"
-                _ConstDEFType(node)
-            Case "ConstDefaultValue"
-                _ConstDefaultValue(node)
-            Case "ConstType"
-                _ConstType(node)
-            Case "FunctionProperty"
-                _FunctionProperty(node)
-            Case "Parameters"
-                _Parameters(node)
-            Case "FunctionReturnType"
-                _FunctionReturnType(node)
-            Case "FunctionCode"
-                _FunctionCode(node)
-            Case "FunctionBody"
-                _FunctionBody(node)
-            Case "FunctionName"
-                _FunctionName(node)
-            Case "FunctionType"
-                _FunctionType(node)
-            Case "Parameter_list"
-                _Parameter_list(node)
-            Case "Parameter_Array"
-                _Parameter_Array(node)
-            Case "Parameter"
-                _Parameter(node)
-            Case "Parameter_list1"
-                _Parameter_list1(node)
-            Case "ParameterDEFType"
-                _ParameterDEFType(node)
-            Case "ParameterDefaultValue"
-                _ParameterDefaultValue(node)
-            Case "ParameterName"
-                _ParameterName(node)
-            Case "ParameterType"
-                _ParameterType(node)
-            Case "ReturnValue"
-                _ReturnValue(node)
-            Case "IFElse"
-                _IFElse(node)
-            Case "FORTYPE"
-                _FORTYPE(node)
-            Case "Each"
-                _Each(node)
-            Case "FOR_FORIN"
-                _FOR_FORIN(node)
-            Case "Each_TEMP1"
-                _Each_TEMP1(node)
-            Case "ForVar"
-                _ForVar(node)
-            Case "Each_TEMP2"
-                _Each_TEMP2(node)
-            Case "FOR_TEMP1"
-                _FOR_TEMP1(node)
-            Case "FOR_TEMP2"
-                _FOR_TEMP2(node)
-            Case "FOR"
-                _FOR(node)
-            Case "FORIN"
-                _FORIN(node)
-            Case "FORPART2"
-                _FORPART2(node)
-            Case "FORPART3"
-                _FORPART3(node)
-            Case "FORPART1"
-                _FORPART1(node)
-            Case "DO_CONDITION"
-                _DO_CONDITION(node)
-            Case "TRYBLOCK"
-                _TRYBLOCK(node)
-            Case "CATCHLIST"
-                _CATCHLIST(node)
-            Case "FINALLY"
-                _FINALLY(node)
-            Case "THROWEXCEPTION"
-                _THROWEXCEPTION(node)
-            Case "CATCH"
-                _CATCH(node)
-            Case "CATCHLIST1"
-                _CATCHLIST1(node)
-            Case "CATCHBLOCK"
-                _CATCHBLOCK(node)
-            Case "FINALLYBLOCK"
-                _FINALLYBLOCK(node)
-            Case "CASEBODY"
-                _CASEBODY(node)
-            Case "SWITCH_CASE"
-                _SWITCH_CASE(node)
-            Case "CASESTMT"
-                _CASESTMT(node)
-            Case "CASELIST"
-                _CASELIST(node)
-            Case "CASELIST1"
-                _CASELIST1(node)
-            Case "Assigning"
-                _Assigning(node)
-            Case "Ternary"
-                _Ternary(node)
-            Case "AssigningOpt"
-                _AssigningOpt(node)
-            Case "LogicOr"
-                _LogicOr(node)
-            Case "TernaryOpt"
-                _TernaryOpt(node)
-            Case "LogicAnd"
-                _LogicAnd(node)
-            Case "LogicOrOpt"
-                _LogicOrOpt(node)
-            Case "BitOr"
-                _BitOr(node)
-            Case "LogicAndOpt"
-                _LogicAndOpt(node)
-            Case "BitXor"
-                _BitXor(node)
-            Case "BitOrOpt"
-                _BitOrOpt(node)
-            Case "BitAnd"
-                _BitAnd(node)
-            Case "BitXorOpt"
-                _BitXorOpt(node)
-            Case "LogicEQ"
-                _LogicEQ(node)
-            Case "BitAndOpt"
-                _BitAndOpt(node)
-            Case "Logic"
-                _Logic(node)
-            Case "LogicEQOpt"
-                _LogicEQOpt(node)
-            Case "BitShift"
-                _BitShift(node)
-            Case "LogicOpt"
-                _LogicOpt(node)
-            Case "Plus"
-                _Plus(node)
-            Case "BitShiftOpt"
-                _BitShiftOpt(node)
-            Case "Multiply"
-                _Multiply(node)
-            Case "PlusOpt"
-                _PlusOpt(node)
-            Case "Unary"
-                _Unary(node)
-            Case "MultiplyOpt"
-                _MultiplyOpt(node)
-            Case "Unit"
-                _Unit(node)
-            Case "AccessOpt"
-                _AccessOpt(node)
-            Case "NSAccessOpt"
-                _NSAccessOpt(node)
-            Case "UnitSuffix"
-                _UnitSuffix(node)
-            Case "Call"
-                _Call(node)
-            Case "Object"
-                _Object(node)
-            Case "E4XAccess"
-                _E4XAccess(node)
-            Case "Array"
-                _Array(node)
-            Case "Vector"
-                _Vector(node)
-            Case "Argements"
-                _Argements(node)
-            Case "ArrayElements"
-                _ArrayElements(node)
-            Case "ArrayExpressionList"
-                _ArrayExpressionList(node)
-            Case "Expression_1"
-                _Expression_1(node)
-            Case "ArrayCommaOpt"
-                _ArrayCommaOpt(node)
-            Case "CommaOpt"
-                _CommaOpt(node)
-            Case "CommaOpt_1"
-                _CommaOpt_1(node)
-            Case "ACommaOpt"
-                _ACommaOpt(node)
-            Case "ACommaOpt_1"
-                _ACommaOpt_1(node)
-            Case "VectorConstructor"
-                _VectorConstructor(node)
-            Case "ObjectBody"
-                _ObjectBody(node)
-            Case "ObjMembers"
-                _ObjMembers(node)
-            Case "ObjMember"
-                _ObjMember(node)
-            Case "ObjMembers1"
-                _ObjMembers1(node)
-            Case "CaseDefultOrXMLUse_1"
-                _CaseDefultOrXMLUse_1(node)
-            Case "E4XAccessOpt"
-                _E4XAccessOpt(node)
-            Case "E4XFilter"
-                _E4XFilter(node)
-            Case "E4XNSAPPEND"
-                _E4XNSAPPEND(node)
-            Case "New"
-                _New(node)
-            Case "NewClassOrVector"
-                _NewClassOrVector(node)
-            Case "NewOpt"
-                _NewOpt(node)
-            Case "ThisSuper"
-                _ThisSuper(node)
-            Case "A_FC"
-                _A_FC(node)
-            Case "YIELD"
-                _YIELD(node)
-            Case "YIELD_RB"
-                _YIELD_RB(node)
-        End Select
+		doVisName(name, node)
 
-        visitednodes.Add(node)
+		visitednodes.Add(node)
 
         For Each c In node.Nodes
             VisitNodes(c)
@@ -1346,37 +1351,37 @@ Public Class AS3FileGrammarAnalyser
         If Not mt.preToken Is Nothing AndAlso mt.preToken.StringValue = vbLf Then
 
         ElseIf node.Parent.Parent.SelectGrammerLine.Derivation(0).Name = "Stmt" Then
-            If mt.StringValue <> ";" Then
-                If mt.StringValue <> vbLf Then
+			If mt.StringValue <> ";" Then
+				If mt.StringValue <> vbLf Then
 
-                    If mt.Type = Token.TokenType.other Then
+					If mt.Type = Token.TokenType.other Then
 
-                        Dim nt = mt.nextToken
+						Dim nt = mt.nextToken
 
-                        While Not nt Is Nothing
+						While Not nt Is Nothing
 
-                            If nt.StringValue = ";" Then
-                                Exit While
-                            ElseIf nt.sourceFile = vbLf Then
-                                Exit While
-                            ElseIf nt.Type = Token.TokenType.comments Then
-                            ElseIf nt.Type = Token.TokenType.whitespace Then
-                            Else
-                                Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
-                            End If
-
-
-                            nt = nt.nextToken
-                        End While
-                    Else
-                        Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
-
-                    End If
+							If nt.StringValue = ";" Then
+								Exit While
+							ElseIf nt.sourceFile = vbLf Then
+								Exit While
+							ElseIf nt.Type = Token.TokenType.comments Then
+							ElseIf nt.Type = Token.TokenType.whitespace Then
+							Else
+								Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+							End If
 
 
-                End If
-                End If
-        End If
+							nt = nt.nextToken
+						End While
+					Else
+						Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+
+					End If
+
+
+				End If
+			End If
+			End If
 
 
 
@@ -3366,9 +3371,14 @@ Public Class AS3FileGrammarAnalyser
             MemberScopeStack.Peek().ExprDataStack.Push(v)
         ElseIf node.Nodes(0).GrammerLeftNode.Type = GrammarNodeType.conststring Then
             Dim v As New AS3.Expr.AS3DataStackElement()
-            v.Data = New AS3.Expr.AS3DataValue()
-            v.Data.FF1Type = Expr.FF1DataValueType.const_string
-            v.Data.Value = node.Nodes(0).MatchedToken.StringValue
+			v.Data = New AS3.Expr.AS3DataValue()
+			If node.Nodes(0).MatchedToken.Type = Token.TokenType.const_regexp Then
+				v.Data.FF1Type = Expr.FF1DataValueType.const_regexp
+			Else
+				v.Data.FF1Type = Expr.FF1DataValueType.const_string
+			End If
+
+			v.Data.Value = node.Nodes(0).MatchedToken.StringValue
             MemberScopeStack.Peek().ExprDataStack.Push(v)
 
         ElseIf node.Nodes(0).GrammerLeftNode.Name = "Object" Then

@@ -4,14 +4,15 @@ using ASRuntime.operators;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
-    class Function_fill : NativeFunctionBase
+    class Function_fill : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Function_fill()
+        public Function_fill():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_void);
@@ -50,18 +51,26 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            ((rtObject)argements[0].getValue()).value.memberData[0].directSet(argements[1].getValue());
-            ((rtFunction)argements[1].getValue()).objHandle.bindFunctionObj = ((rtObject)argements[0].getValue());
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        //{
+            
 
-            errormessage = null;
-            errorno = 0;
-            return rtUndefined.undefined;
+        //    //throw new NotImplementedException();
+        //}
 
-            //throw new NotImplementedException();
-        }
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			((rtObject)argements[0]).value.memberData[0].directSet(argements[1]);
+			((rtFunction)argements[1]).objHandle.bindFunctionObj = ((rtObject)argements[0]);
+
+			success = true;
+			returnSlot.setValue(rtUndefined.undefined);
+
+			//errormessage = null;
+			//errorno = 0;
+			//return rtUndefined.undefined;
+		}
+	}
 
     class Function_load : NativeFunctionBase
     {

@@ -1,0 +1,9 @@
+﻿package flash.utils
+{
+	[_package_function_]
+	//用作占位的类。
+	public final class getDefinitionByName
+	{
+		
+	}
+}

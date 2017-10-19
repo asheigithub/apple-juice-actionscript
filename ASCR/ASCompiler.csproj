@@ -93,6 +93,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <Content Include="aslib\Endian.txt" />
+    <Content Include="aslib\EOFError.txt" />
+    <Content Include="aslib\IDataInput.txt" />
+    <Content Include="aslib\IDataInput2.txt" />
+    <Content Include="aslib\IDataOutput.txt" />
+    <Content Include="aslib\IDataOutput2.txt" />
+    <Content Include="aslib\IExternalizable.txt" />
+    <Content Include="aslib\ByteArray.txt" />
+    <Content Include="aslib\IllegalOperationError.txt" />
+    <Content Include="aslib\IOError.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -112,14 +122,17 @@
     <Content Include="aslib\Dictionary.txt" />
     <Content Include="aslib\Error.txt" />
     <Content Include="aslib\Function.txt" />
+    <Content Include="aslib\getDefinitionByName.txt" />
     <Content Include="aslib\IEnumerable.txt" />
     <Content Include="aslib\IEnumerator.txt" />
     <Content Include="aslib\int.txt" />
     <Content Include="aslib\Math.txt" />
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
+    <Content Include="aslib\RegExp.txt" />
     <Content Include="aslib\Sprite.txt" />
     <Content Include="aslib\String.txt" />
+    <Content Include="aslib\getQualifiedClassName.txt" />
     <Content Include="aslib\TypeError.txt" />
     <Content Include="aslib\uint.txt" />
     <Content Include="aslib\Vector.txt" />

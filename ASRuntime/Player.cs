@@ -43,14 +43,6 @@ namespace ASRuntime
             }
             else
             {
-                //for (int i = 0; i < swc.blocks.Count; i++)
-                //{
-                //    if (swc.blocks[i] != null)
-                //    {
-                //        defaultblock = swc.blocks[i];
-                //        break;
-                //    }
-                //}
                 //查找文档类
                 for (int i = 0; i < swc.classes.Count; i++)
                 {
@@ -98,9 +90,10 @@ namespace ASRuntime
                 }
                 
             }
-            runtimeStack = new Stack<StackFrame>();
-            stackSlots = new StackSlot[1024];
+            
         }
+
+		private bool _hasInitStack=false;
 
 
         /// <summary>
@@ -135,17 +128,29 @@ namespace ASRuntime
                 return null;
             }
 
-            for (int i = 0; i < stackSlots.Length; i++)
-            {
-                stackSlots[i] = new StackSlot(swc);
-            }
-            StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, this);
-            stackSlots[0]._linkObjCache = lobjcache;
-            for (int i = 1; i < stackSlots.Length; i++)
-            {
-                stackSlots[i]._linkObjCache = lobjcache.Clone();
-            }
-
+			if (!_hasInitStack)
+			{
+				runtimeStack = new Stack<StackFrame>();
+				stackSlots = new StackSlot[65535];
+				for (int i = 0; i < stackSlots.Length; i++)
+				{
+					stackSlots[i] = new StackSlot(swc);
+				}
+				StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, this);
+				stackSlots[0]._linkObjCache = lobjcache;
+				for (int i = 1; i < stackSlots.Length; i++)
+				{
+					stackSlots[i]._linkObjCache = lobjcache.Clone();
+				}
+				_hasInitStack = true;
+			}
+			else
+			{
+				for (int i = 0; i < stackSlots.Length; i++)
+				{
+					stackSlots[i].clear();
+				}
+			}
 
             if (swc.ErrorClass !=null)
             {
@@ -279,6 +284,11 @@ namespace ASRuntime
             }
 
         }
+
+
+
+
+
 
         private static readonly HeapSlot[] emptyMembers = new HeapSlot[0];
         internal HeapSlot[] genHeapFromCodeBlock(ASBinCode.CodeBlock calledblock)

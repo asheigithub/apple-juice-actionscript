@@ -24,5 +24,13 @@
 		[native,__buildin__parsefloat]
 		public static function parseFloat(str:String="NaN"):Number;
 
+
+
+		//***flash.utils***
+		[native,_flash_util_functions_getDefinitionByName]
+		public static function flash_utils_getDefinitionByName (name:String) : Object;
+		[native,flash_utils_functions_getQualifiedClassName]
+		public static function flash_utils_getQualifiedClassName (value:*) : String;
+
 	}
 }

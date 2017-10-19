@@ -35,6 +35,8 @@ namespace ASBinCode
 
         public PackagePathGetter _pathGetter;
 
+		public bool isFindByPath;
+
         public bool isFuncResult;
 
         public bool isConvertFromVariable;

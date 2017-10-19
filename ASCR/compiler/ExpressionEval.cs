@@ -10,11 +10,13 @@ namespace ASCompiler.compiler
     /// </summary>
     public class ExpressionEval
     {
+		private static ASRuntime.Player player;
+
         public static ASBinCode.RunTimeValueBase Eval(ASTool.AS3.AS3Expression expression,
             Builder importBuilder=null
             )
         {
-
+			
             try
             {
 
@@ -45,9 +47,11 @@ namespace ASCompiler.compiler
                 {
                     RightValueBase value = builds.ExpressionBuilder.getRightValue(tempEnv, expression.Value, expression.token, builder);
 
-                    ASRuntime.Player player = new ASRuntime.Player();
-                    player.isConsoleOut = false;
-
+					if (player == null)
+					{
+						player = new ASRuntime.Player();
+						player.isConsoleOut = false;
+					}
                     CSWC tempswc = new CSWC();
                     if (importBuilder != null)
                     {

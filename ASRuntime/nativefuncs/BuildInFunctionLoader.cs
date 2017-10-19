@@ -14,6 +14,8 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new __buildin__isfinite());
             bin.regNativeFunction(new __buildin__parseint());
             bin.regNativeFunction(new __buildin__parsefloat());
+			bin.regNativeFunction(new __buildin__getDefinitionByName());
+			bin.regNativeFunction(new __buildin__getQualifiedClassName());
 
             bin.regNativeFunction(new Object_toString());
             bin.regNativeFunction(new Object_valueOf());
@@ -78,7 +80,45 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Array_concat());
             bin.regNativeFunction(new Array_toString());
 
-            bin.regNativeFunction(new Boolean_toString());
+			bin.regNativeFunction(new ByteArray_constructor());
+			bin.regNativeFunction(new ByteArray_clear());
+			bin.regNativeFunction(new ByteArray_bytesAvailable());
+			bin.regNativeFunction(new ByteArray_bytesSetEndian());
+			bin.regNativeFunction(new ByteArray_getlength());
+			bin.regNativeFunction(new ByteArray_setlength());
+			bin.regNativeFunction(new ByteArray_getposition());
+			bin.regNativeFunction(new ByteArray_setposition());
+			bin.regNativeFunction(new ByteArray_compress());
+			bin.regNativeFunction(new ByteArray_uncompress());
+			bin.regNativeFunction(new ByteArray_deflate());
+			bin.regNativeFunction(new ByteArray_inflate());
+			bin.regNativeFunction(new ByteArray_readBoolean());
+			bin.regNativeFunction(new ByteArray_readByte());
+			bin.regNativeFunction(new ByteArray_readBytes());
+			bin.regNativeFunction(new ByteArray_readDouble());
+			bin.regNativeFunction(new ByteArray_readFloat());
+			bin.regNativeFunction(new ByteArray_readInt());
+			bin.regNativeFunction(new ByteArray_readMultiByte());
+			bin.regNativeFunction(new ByteArray_readShort());
+			bin.regNativeFunction(new ByteArray_readUnsignedByte());
+			bin.regNativeFunction(new ByteArray_readUnsignedInt());
+			bin.regNativeFunction(new ByteArray_readUnsignedShort());
+			bin.regNativeFunction(new ByteArray_readUTF());
+			bin.regNativeFunction(new ByteArray_readUTFBytes());
+			bin.regNativeFunction(new ByteArray_toString());
+			bin.regNativeFunction(new ByteArray_writeBoolean());
+			bin.regNativeFunction(new ByteArray_writeByte());
+			bin.regNativeFunction(new ByteArray_writeBytes());
+			bin.regNativeFunction(new ByteArray_writeDouble());
+			bin.regNativeFunction(new ByteArray_writeFloat());
+			bin.regNativeFunction(new ByteArray_writeInt());
+			bin.regNativeFunction(new ByteArray_writeMultiByte());
+			bin.regNativeFunction(new ByteArray_writeShort());
+			bin.regNativeFunction(new ByteArray_writeUnsignedInt());
+			bin.regNativeFunction(new ByteArray_writeUTF());
+			bin.regNativeFunction(new ByteArray_writeUTFBytes());
+
+			bin.regNativeFunction(new Boolean_toString());
 
             bin.regNativeFunction(new String_length());
             bin.regNativeFunction(new String_charAt());

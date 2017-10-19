@@ -221,10 +221,11 @@ Public Class Lex
                                 gc = getNextChar(input, currentptr)
                             End While
 
-                            Console.WriteLine("代码中发现内嵌正则表达式" & result.StringValue)
+							result.Type = TokenType.const_regexp
+							Console.WriteLine("代码中发现内嵌正则表达式" & result.StringValue)
+							Console.WriteLine("    " & File)
 
-
-                            Exit While
+							Exit While
                         End If
                     ElseIf nc = "\" Then
                         result.StringValue &= nc

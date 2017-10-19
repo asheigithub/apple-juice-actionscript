@@ -15,6 +15,11 @@ namespace ASBinCode.rtti
         /// </summary>
         public bool isInterface;
 
+		/// <summary>
+		/// 指明这是否是一个包级函数
+		/// </summary>
+		public bool isPackageFunction;
+
         /// <summary>
         /// 是否文档类
         /// </summary>

@@ -73,6 +73,12 @@ namespace ASBinCode
         /// </summary>
         public Class DictionaryClass;
 
+		/// <summary>
+		/// 正则类
+		/// </summary>
+		public Class RegExpClass;
+
+
 
         public OperatorFunctions operatorOverrides;
 
@@ -115,10 +121,34 @@ namespace ASBinCode
         public Class getClassByRunTimeDataType(RunTimeDataType rttype)
         {
             return classes[rttype - RunTimeDataType._OBJECT];
-
             //throw new NotImplementedException();
         }
 
-        
-    }
+
+		private Dictionary<string, Class> dictionary;
+
+		public Class getClassDefinitionByName(string name)
+		{
+			if (dictionary == null)
+			{
+				dictionary = new Dictionary<string, Class>();
+				foreach (var item in classes)
+				{
+					dictionary.Add(item.package + "." + item.name, item);
+					dictionary.Add(item.package + "::" + item.name, item);
+				}
+			}
+
+			Class r;
+			if (dictionary.TryGetValue(name, out r))
+			{
+				return r;
+			}
+			else
+			{
+				return null;
+			}
+
+		}
+	}
 }

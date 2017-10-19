@@ -1,0 +1,20 @@
+﻿package
+{
+	[_regexp_]
+	public dynamic class RegExp extends Object
+	{
+		private var initPattern:String;
+
+		public function RegExp (pattern:String=null, options:String=null)
+		{
+			initPattern=pattern;
+		}
+
+
+		public function toString():String
+		{
+			return initPattern;
+		}
+
+	}
+}

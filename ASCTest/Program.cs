@@ -25,8 +25,10 @@ namespace ASCTest
             {
                 string path = args[0];
 
-                
-                if (path.EndsWith(".as"))
+				//path = "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as";
+
+
+				if (path.EndsWith(".as"))
                 {
                     path = System.IO.Path.GetDirectoryName(path);
                 }
@@ -36,7 +38,8 @@ namespace ASCTest
                     path=".\\";
                 }
 
-                //path = "D:\\tas3";
+				//path = "";
+                //files =new string[] { "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as" };
 
 
                 string[] ps = path.Split(System.IO.Path.DirectorySeparatorChar);
@@ -66,7 +69,7 @@ namespace ASCTest
 
 
 			//*********加入API*****
-			string apidir = @"E:\ASTool\LinkCodeGen\bin\Debug\as3api";
+			string apidir = @"F:\ASTOOL\ASTool\LinkCodeGen\bin\Debug\as3api";
 			if (System.IO.Directory.Exists(apidir))
 			{
 				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);

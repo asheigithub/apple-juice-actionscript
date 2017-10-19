@@ -7,8 +7,9 @@
         super_pointer
 
         const_number
-        const_string
-        as3_function
+		const_string
+		const_regexp
+		as3_function
         as3_array
         as3_vector
         as3_callargements

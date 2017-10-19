@@ -1210,9 +1210,49 @@ namespace ASRuntime
             }
         }
 
-        
+		public void throwIOException(ASBinCode.SourceToken token, string errormessage)
+		{
+			if (player.swc.ErrorClass != null)
+			{
+				//***直接开上帝视角从对象里取值赋值***
+				var errorinstance =
+					((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[4].getValue());
 
-        private bool isclosed;
+				errorinstance.value.memberData[0].directSet(new rtString(errormessage));
+				errorinstance.value.memberData[1].directSet(new rtString("IOError"));
+				errorinstance.value.memberData[2].directSet(new rtInt(0));
+				errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
+				runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+
+			}
+			else
+			{
+				runtimeError = (new error.InternalError(token, errormessage));
+			}
+		}
+
+		public void throwEOFException(ASBinCode.SourceToken token, string errormessage)
+		{
+			if (player.swc.ErrorClass != null)
+			{
+				//***直接开上帝视角从对象里取值赋值***
+				var errorinstance =
+					((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[5].getValue());
+
+				errorinstance.value.memberData[0].directSet(new rtString(errormessage));
+				errorinstance.value.memberData[1].directSet(new rtString("Error"));
+				errorinstance.value.memberData[2].directSet(new rtInt(2030));
+				errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
+				runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+
+			}
+			else
+			{
+				runtimeError = (new error.InternalError(token, errormessage));
+			}
+		}
+
+		private bool isclosed;
         /// <summary>
         /// 退出程序栈时
         /// </summary>

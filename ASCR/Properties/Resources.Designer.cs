@@ -19,7 +19,7 @@ namespace ASCompiler.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -82,9 +82,7 @@ namespace ASCompiler.Properties {
         ///		public static function isFinite(value:Number):Boolean;
         ///
         ///		[native,__buildin__parseint]
-        ///		public static function parseInt(str:String=&quot;NaN&quot;, radix:uint = 0):Number;
-        ///
-        ///		[n [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public static function parseInt(str:String=&quot;NaN&quot;, radix:ui [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string @__buildin__ {
             get {
@@ -228,6 +226,25 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
+        ///   查找类似 //
+        ///// C:\Users\Manju-pc\AppData\Local\FlashDevelop\Apps\ascsdk\27.0.0\frameworks\libs\air\airglobal.swc\flash\utils\ByteArray
+        /////
+        ///package flash.utils
+        ///{
+        ///	import flash.utils.ByteArray;
+        ///	import flash.errors.IllegalOperationError;
+        ///	/**
+        ///	 * ByteArray 类提供用于优化读取、写入以及处理二进制数据的方法和属性。
+        ///	 * 
+        ///	 *   &lt;p class=&quot;- topic/p &quot;&gt;&lt;i class=&quot;+ topic/ph hi-d/i &quot;&gt;注意：&lt;/i&gt;ByteArray 类适用于需要在字节层访问数据的高级 开发人员。&lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;内存中的数据是一个压缩字节数组（数据类型的最紧凑表示形式），但可以使用标准 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;[]&lt;/codeph&gt;（数组访问）运算符来操作 ByteArr [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string ByteArray {
+            get {
+                return ResourceManager.GetString("ByteArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 package
         ///{
         ///	[_class_]
@@ -297,6 +314,48 @@ namespace ASCompiler.Properties {
         internal static string Dictionary {
             get {
                 return ResourceManager.GetString("Dictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 //
+        ///// C:\Users\Manju-pc\AppData\Local\FlashDevelop\Apps\ascsdk\27.0.0\frameworks\libs\air\airglobal.swc\flash\utils\Endian
+        /////
+        ///package flash.utils
+        ///{
+        ///	/**
+        ///	 * Endian 类中包含一些值，它们表示用于表示多字节数字的字节顺序。字节顺序为 bigEndian（最高有效字节位于最前）或 littleEndian（最低有效字节位于最前）。
+        ///	 * 
+        ///	 *   &lt;p class=&quot;- topic/p &quot;&gt;&lt;ph class=&quot;- topic/ph &quot;&gt;Flash Player 或&lt;/ph&gt; Adobe&lt;sup class=&quot;+ topic/ph hi-d/sup &quot;&gt;®&lt;/sup&gt; AIR™ 中的内容可以通过使用服务器的二进制协议直接与该服务器连接。某些服务器使用 bigEndian 字节顺序，某些服务器则使用 littleEndian 字节顺序。Internet 上的大多数服务器使用 bigEndian 字节顺序，因为“网络字节顺序”为 bigEndian。l [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Endian {
+            get {
+                return ResourceManager.GetString("Endian", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.errors 
+        ///{
+        ///	/**
+        ///	 * ...
+        ///	 * @author 
+        ///	 */
+        ///	public final class EOFError extends Error 
+        ///	{
+        ///		
+        ///		public function EOFError(message:String=&quot;&quot;, id:*=0) 
+        ///		{
+        ///			super(message, id);
+        ///		}
+        ///		
+        ///	}
+        ///
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string EOFError {
+            get {
+                return ResourceManager.GetString("EOFError", resourceCulture);
             }
         }
         
@@ -374,6 +433,104 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
+        ///   查找类似 package flash.utils
+        ///{
+        ///	[_package_function_]
+        ///	//用作占位的类。
+        ///	public final class getDefinitionByName
+        ///	{
+        ///		
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string getDefinitionByName {
+            get {
+                return ResourceManager.GetString("getDefinitionByName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.utils
+        ///{
+        ///	[_package_function_]
+        ///	//用作占位的类。
+        ///	public final class getQualifiedClassName
+        ///	{
+        ///		
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string getQualifiedClassName {
+            get {
+                return ResourceManager.GetString("getQualifiedClassName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 //
+        ///// C:\Users\Manju-pc\AppData\Local\FlashDevelop\Apps\ascsdk\27.0.0\frameworks\libs\air\airglobal.swc\flash\utils\IDataInput
+        /////
+        ///package flash.utils
+        ///{
+        ///	import flash.utils.ByteArray;
+        ///
+        ///	/**
+        ///	 * IDataInput 接口提供一组用于读取二进制数据的方法。此接口是写入二进制数据的 IDataOutput 接口的 I/O 对应接口。
+        ///	 * &lt;p class=&quot;- topic/p &quot;&gt;默认情况下，所有 IDataInput 和 IDataOutput 操作均为“bigEndian”（序列中的最高有效字节存储在最低或第一个存储地址），而且都不分块。如果可用数据不足，则会引发 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;EOFError&lt;/codeph&gt; 异常。使用 &lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;IDataInput.bytesAvailabl [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string IDataInput {
+            get {
+                return ResourceManager.GetString("IDataInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.utils 
+        ///{
+        ///	
+        ///	public interface IDataInput2 extends IDataInput
+        ///	{	}
+        ///	
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string IDataInput2 {
+            get {
+                return ResourceManager.GetString("IDataInput2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 //
+        ///// C:\Users\Manju-pc\AppData\Local\FlashDevelop\Apps\ascsdk\27.0.0\frameworks\libs\air\airglobal.swc\flash\utils\IDataOutput
+        /////
+        ///package flash.utils
+        ///{
+        ///	import flash.utils.ByteArray;
+        ///
+        ///	/**
+        ///	 * IDataOutput 接口提供一组用于写入二进制数据的方法。此接口是读取二进制数据的 IDataInput 接口的 I/O 对应接口。IDataOutput 接口是由 FileStream、Socket 和 ByteArray 类实现的。
+        ///	 * &lt;p class=&quot;- topic/p &quot;&gt;默认情况下，所有 IDataInput 和 IDataOutput 操作均为“bigEndian”（序列中的最高有效字节存储在最低或第一个存储地址），而且都不分块。 &lt;/p&gt;&lt;p class=&quot;- topic/p &quot;&gt;符号扩展名仅在读取数据时有效，写入数据时无效。因此，无需单独的写入方法就可以使用 &lt;codeph class=&quot;+ topi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string IDataOutput {
+            get {
+                return ResourceManager.GetString("IDataOutput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.utils 
+        ///{
+        ///	public interface IDataOutput2 extends IDataOutput
+        ///	{	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string IDataOutput2 {
+            get {
+                return ResourceManager.GetString("IDataOutput2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 package system.collections
         ///{
         ///	[_IEnumerable_]
@@ -411,6 +568,80 @@ namespace ASCompiler.Properties {
         }
         
         /// <summary>
+        ///   查找类似 //
+        ///// C:\Users\Manju-pc\AppData\Local\FlashDevelop\Apps\ascsdk\27.0.0\frameworks\libs\air\airglobal.swc\flash\utils\IExternalizable
+        /////
+        ///package flash.utils
+        ///{
+        ///	import flash.utils.IDataOutput;
+        ///	import flash.utils.IDataInput;
+        ///
+        ///	public interface IExternalizable
+        ///	{
+        ///		function readExternal (input:IDataInput) : void;
+        ///
+        ///		function writeExternal (output:IDataOutput) : void;
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string IExternalizable {
+            get {
+                return ResourceManager.GetString("IExternalizable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.errors 
+        ///{
+        ///	/**
+        ///	 * ...
+        ///	 * @author 
+        ///	 */
+        ///	public dynamic final class IllegalOperationError extends Error 
+        ///	{
+        ///		
+        ///		public function IllegalOperationError(message:String=&quot;&quot;, id:*=0) 
+        ///		{
+        ///			super(message, id);
+        ///		}
+        ///		
+        ///	}
+        ///
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string IllegalOperationError {
+            get {
+                return ResourceManager.GetString("IllegalOperationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package flash.errors 
+        ///{
+        ///	/**
+        ///	 * ...
+        ///	 * @author 
+        ///	 */
+        ///	public final class IOError extends Error 
+        ///	{
+        ///		
+        ///		public function IOError(message:String=&quot;&quot;, id:*=0) 
+        ///		{
+        ///			super(message, id);
+        ///		}
+        ///		
+        ///	}
+        ///
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string IOError {
+            get {
+                return ResourceManager.GetString("IOError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 package
         ///{
         ///	/**
@@ -444,8 +675,8 @@ namespace ASCompiler.Properties {
         ///	{
         ///		[native,_Object_toString]
         ///		private static var toString= function():String;
-        ///		
-        ///		private static var valueOf = function():*{ return this };
+        ///		[native,_Object_valueOf]
+        ///		private static var valueOf = function():*;
         ///
         ///		[native,_Object_hasOwnProperty]
         ///		private static var hasOwnProperty=function(name:String):Boolean;
@@ -454,7 +685,7 @@ namespace ASCompiler.Properties {
         ///		private static var isPrototypeOf=function(V:*=null):Boolean;
         ///		
         ///		[native,_Object_propertyIsEnumerable]
-        ///		private static var propertyIsEnumerable=function(name: [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		private static var propertyIsEnumerable=funct [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Object {
             get {
@@ -486,12 +717,27 @@ namespace ASCompiler.Properties {
         ///
         ///&lt;Expression&gt; ::= &lt;Multiply&gt; &lt;PlusOpt&gt;;
         ///&lt;PlusOpt&gt; ::= &quot;+&quot; &lt;Multiply&gt;&lt;PlusOpt&gt; | &quot;-&quot; &lt;Multiply&gt;&lt;PlusOpt&gt; | null;
-        ///&lt;Multiply&gt; ::= &lt;Unit&gt; &lt;MultiplyOpt&gt;;
-        ///&lt;Multip [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///&lt;Multiply&gt; ::= &lt;Unit&gt; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string PG1 {
             get {
                 return ResourceManager.GetString("PG1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	public dynamic class RegExp extends Object
+        ///	{
+        ///		public function RegExp (pattern:String=null, options:*=null);
+        ///	}
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string RegExp {
+            get {
+                return ResourceManager.GetString("RegExp", resourceCulture);
             }
         }
         
@@ -569,12 +815,12 @@ namespace ASCompiler.Properties {
         ///{
         ///	[imports]
         ///	[hosted]
-        ///	public class Vector.&lt;T&gt;
+        ///	public final class Vector.&lt;&amp;T&gt;
         ///	{
-        ///		private const t = T;
+        ///		private const t = &amp;T;
         ///
         ///		[native,_vector_constructor]
-        ///		public function Vector.&lt;T&gt;(length:uint = 0, fixed:Boolean = false);
+        ///		public function Vector.&lt;&amp;T&gt;(length:uint = 0, fixed:Boolean = false);
         ///
         ///		[native,_vector_getfixed]
         ///		public function get fixed() : Boolean;
@@ -586,7 +832,7 @@ namespace ASCompiler.Properties {
         ///		[native,_vector_setlength]
         ///    		public function set length(value:uint):void;
         ///
-        ///		public function toString():S [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		p [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Vector {
             get {

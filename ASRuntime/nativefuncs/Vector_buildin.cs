@@ -233,11 +233,11 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Vector_getLength : NativeFunctionBase
+    class Vector_getLength : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_getLength()
+        public Vector_getLength():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -274,19 +274,34 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
-            return
-                new rtUInt(
-                    (uint)((Vector_Data)
-                    ((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count
-                )
-                ;
-        }
-    }
+        //    return
+        //        new rtUInt(
+        //            (uint)((Vector_Data)
+        //            ((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count
+        //        )
+        //        ;
+        //}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			returnSlot.setValue((uint)((Vector_Data)
+					((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count);
+
+			//return
+			//	new rtUInt(
+			//		(uint)((Vector_Data)
+			//		((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count
+			//	)
+			//	;
+		}
+	}
 
     class Vector_setLength : NativeFunctionBase
     {

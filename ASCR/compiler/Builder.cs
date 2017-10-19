@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ASBinCode;
+using ASBinCode.rtti;
 
 namespace ASCompiler.compiler
 {
@@ -2683,7 +2684,9 @@ namespace ASCompiler.compiler
             return lib.SrcFiles[0].Package.MainClass.Name;
         }
 
-
-
-    }
+		public Class getClassDefinitionByName(string name)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

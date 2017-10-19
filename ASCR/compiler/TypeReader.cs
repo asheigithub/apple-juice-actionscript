@@ -128,7 +128,9 @@ namespace ASCompiler.compiler
                 
                 for (int i = 0; i < imports.Count; i++)
                 {
-                    if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
+					if (imports[i].isPackageFunction)
+						continue;
+					if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
                     {
                         if ((imports[i].package + "." + imports[i].name).Equals(t, StringComparison.Ordinal))
                         {
@@ -155,6 +157,173 @@ namespace ASCompiler.compiler
             return result;
         }
 
+		public static List<ASBinCode.rtti.Class> findClassFromProject(string t,
+			Builder builder, ASTool.Token token)
+		{
+			List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
 
-    }
+			if (!builder.isEval)
+			{
+				if (t.StartsWith("Vector.<"))
+				{
+					ASBinCode.rtti.Class outvectortype = null;
+					t = builder.build_vector(t, token, out outvectortype);    //如果是Vector,则先编译Vector类
+
+					result.Add(outvectortype);
+					return result;
+				}
+			}
+			
+			if (builder.buildingclasses.Count > 0)
+			{
+				//在所有类中查找
+				List<ASBinCode.rtti.Class> imports = new List<ASBinCode.rtti.Class>();
+				foreach (var item in builder.buildingclasses)
+				{
+					imports.Add(item.Value);
+				}
+
+
+				for (int i = 0; i < imports.Count; i++)
+				{
+					if (imports[i].isPackageFunction)
+						continue;
+
+					if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
+					{
+						if ((imports[i].package + "." + imports[i].name).Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+					else
+					{
+						string name = imports[i].name;
+
+						if (name.Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+				}
+
+
+
+			}
+
+
+
+			return result;
+		}
+
+
+
+		public static List<ASBinCode.rtti.Class> findPackageFunctionFromImports(string t,
+			Builder builder, ASTool.Token token)
+		{
+			List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
+
+			if (!builder.isEval)
+			{
+				if (t.StartsWith("Vector.<"))
+				{
+					return result;
+				}
+			}
+			
+			if (builder._currentImports.Count > 0)
+			{
+				//**查找当前导入的类
+				var imports = builder._currentImports.Peek();
+
+				for (int i = 0; i < imports.Count; i++)
+				{
+					if (!imports[i].isPackageFunction)
+						continue;
+
+					if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
+					{
+						if ((imports[i].package + "." + imports[i].name).Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+					else
+					{
+						string name = imports[i].name;
+
+						if (name.Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+				}
+
+
+
+			}
+
+
+
+			return result;
+		}
+
+
+
+		public static List<ASBinCode.rtti.Class> findPackageFunction(string t,
+			Builder builder, ASTool.Token token)
+		{
+			List<ASBinCode.rtti.Class> result = new List<ASBinCode.rtti.Class>();
+
+			if (!builder.isEval)
+			{
+				if (t.StartsWith("Vector.<"))
+				{
+					return result;
+				}
+			}
+
+			if (builder.buildingclasses.Count > 0)
+			{
+				//在所有类中查找
+				List<ASBinCode.rtti.Class> imports = new List<ASBinCode.rtti.Class>();
+				foreach (var item in builder.buildingclasses)
+				{
+					imports.Add(item.Value);
+				}
+
+
+				for (int i = 0; i < imports.Count; i++)
+				{
+					if (!imports[i].isPackageFunction)
+						continue;
+
+					if (t.IndexOf(".") > -1 && !t.StartsWith("Vector.<")) //完全限定名
+					{
+						if ((imports[i].package + "." + imports[i].name).Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+					else
+					{
+						string name = imports[i].name;
+
+						if (name.Equals(t, StringComparison.Ordinal))
+						{
+							result.Add(imports[i]);
+						}
+					}
+				}
+
+
+
+			}
+
+
+
+			return result;
+		}
+
+	}
 }

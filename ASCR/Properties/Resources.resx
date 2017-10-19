@@ -187,4 +187,43 @@
   <data name="AneError" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\aslib\aneerror.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="getDefinitionByName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\getdefinitionbyname.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IDataInput" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\idatainput.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IDataInput2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\idatainput2.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="IDataOutput" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\idataoutput.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IDataOutput2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\idataoutput2.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="IExternalizable" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\iexternalizable.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="Endian" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\endian.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="ByteArray" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\bytearray.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="EOFError" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\eoferror.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IllegalOperationError" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\illegaloperationerror.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="IOError" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\ioerror.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
+  </data>
+  <data name="getQualifiedClassName" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\getqualifiedclassname.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="RegExp" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\aslib\regexp.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

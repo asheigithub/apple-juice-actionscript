@@ -3,6 +3,7 @@ using ASBinCode.rtData;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
@@ -664,6 +665,186 @@ namespace ASRuntime.nativefuncs
 
         }
     }
+
+	class __buildin__getDefinitionByName : nativefuncs.NativeConstParameterFunction
+	{
+		public __buildin__getDefinitionByName():base(1)
+		{
+			para = new List<RunTimeDataType>();
+			para.Add(RunTimeDataType.rt_string);
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_flash_util_functions_getDefinitionByName";
+			}
+		}
+
+		List<RunTimeDataType> para;
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return para;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType._OBJECT;
+			}
+		}
+
+		public override bool isMethod
+		{
+			get { return true; }
+		}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			string classname = TypeConverter.ConvertToString(argements[0], stackframe, token);
+
+			if (classname==null)
+			{
+				success = false;
+				stackframe.throwArgementException(token, "Argument name cannot be null");
+			}
+			else
+			{
+				var c = bin.getClassDefinitionByName(classname);
+
+				if (c != null)
+				{
+					if (!operators.InstanceCreator.init_static_class(c, stackframe.player, token))
+					{
+						success = false;
+						return;
+					}
+					else
+					{
+						success = true;
+
+						returnSlot.directSet(stackframe.player.static_instance[c.staticClass.classid]);
+
+					}
+
+					
+					
+					//returnSlot.directSet(new ASBinCode.rtData.rtObject(c,null));
+
+				}
+				else
+				{
+					success = false;
+					stackframe.throwError(token,1065, "Variable "+classname+" is not defined");
+				}
+			}
+
+			
+		}
+	}
+
+
+	class __buildin__getQualifiedClassName : nativefuncs.NativeConstParameterFunction
+	{
+		public __buildin__getQualifiedClassName() : base(1)
+		{
+			para = new List<RunTimeDataType>();
+			para.Add(RunTimeDataType.rt_void);
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "flash_utils_functions_getQualifiedClassName";
+			}
+		}
+
+		List<RunTimeDataType> para;
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return para;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.rt_string;
+			}
+		}
+
+		public override bool isMethod
+		{
+			get { return true; }
+		}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			var type = argements[0].rtType;
+
+			switch (type)
+			{
+				case RunTimeDataType.fun_void:
+					returnSlot.setValue("void");
+					break;
+				case RunTimeDataType.rt_array:
+					returnSlot.setValue("Array");
+					break;
+				case RunTimeDataType.rt_boolean:
+					returnSlot.setValue("Boolean");
+					break;
+				case RunTimeDataType.rt_function:
+					returnSlot.setValue("Function");
+					break;
+				case RunTimeDataType.rt_int:
+					returnSlot.setValue("int");
+					break;
+				case RunTimeDataType.rt_null:
+					returnSlot.setValue("null");
+					break;
+				case RunTimeDataType.rt_number:
+					returnSlot.setValue("Number");
+					break;
+				case RunTimeDataType.rt_string:
+					returnSlot.setValue("String");
+					break;
+				case RunTimeDataType.rt_uint:
+					returnSlot.setValue("uint");
+					break;
+				case RunTimeDataType.rt_void:
+					returnSlot.setValue("void");
+					break;
+				case RunTimeDataType.unknown:
+					returnSlot.setValue("void");
+					break;
+				case RunTimeDataType._OBJECT:
+					returnSlot.setValue("Object");
+					break;
+
+				default:
+
+					var c = stackframe.player.swc.getClassByRunTimeDataType(type);
+					if (c.instanceClass != null)
+						c = c.instanceClass;
+
+					returnSlot.setValue(c.package+"::"+c.name);
+					break;
+			}
+
+
+
+			success = true;
+		}
+	}
 
 
 }

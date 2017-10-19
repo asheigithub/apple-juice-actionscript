@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
@@ -111,9 +112,9 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Yield_current : NativeFunctionBase
+    class Yield_current : NativeConstParameterFunction
     {
-        public Yield_current()
+        public Yield_current():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -153,21 +154,29 @@ namespace ASRuntime.nativefuncs
         }
 
        
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
-            ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)
-                ((ASBinCode.rtData.rtObject)thisObj).value;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
+        //    ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)
+        //        ((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            var result= yieldObj.returnSlot.getValue();
-            //yieldObj.returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
-            return result;
-        }
+        //    var result= yieldObj.returnSlot.getValue();
+        //    //yieldObj.returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
+        //    return result;
+        //}
 
-        
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)
+				((ASBinCode.rtData.rtObject)thisObj).value;
 
-        
-    }
+
+			var result = yieldObj.returnSlot.getValue();
+			//yieldObj.returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
+			returnSlot.directSet(result);
+		}
+	}
 }

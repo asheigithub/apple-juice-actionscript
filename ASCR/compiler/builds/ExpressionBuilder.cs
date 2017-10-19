@@ -505,6 +505,13 @@ namespace ASCompiler.compiler.builds
 
                     RightValueBase rv = getRightValue(env, step.Arg2, step.token, builder);
 
+					if (rv is PackagePathGetter)
+					{
+						throw new BuildException(
+							new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+							"Package cannot be used as a value: '"+ ((PackagePathGetter)rv).path +"'."));
+					}
+
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
 
                     if (eax._hasUnaryOrShuffixOrDelete)
@@ -1288,7 +1295,46 @@ namespace ASCompiler.compiler.builds
                             (string)data.Data.Value)
                         );
                 }
-                else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
+				else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.const_regexp && !env.isEval)
+				{
+					string pattern = (string)data.Data.Value;
+
+					//**创建一个RegExp***
+					Register eax = env.getAdditionalRegister();
+					//***创建对象实例
+					{
+						var found = TypeReader.findClassFromImports("RegExp", builder, matchtoken);
+						var item = found[0];
+						OpStep stepInitClass = new OpStep(OpCode.init_staticclass, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+						stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+							new ASBinCode.rtData.rtInt(item.classid));
+						stepInitClass.arg1Type = item.staticClass.getRtType();
+						env.block.opSteps.Add(stepInitClass);
+
+						eax.setEAXTypeWhenCompile(item.getRtType());
+
+						ConstructorBuilder cb = new ConstructorBuilder();
+
+
+						var args = new List<ASTool.AS3.Expr.AS3DataStackElement>();
+						ASTool.AS3.Expr.AS3DataStackElement arg = new ASTool.AS3.Expr.AS3DataStackElement();
+						arg.Data = new ASTool.AS3.Expr.AS3DataValue();
+						arg.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string;
+						arg.Data.Value = pattern;
+						arg.IsReg = false;
+
+						args.Add(arg);
+						cb.build_class(env, item, matchtoken, builder, eax, args);
+
+					}
+					
+					return eax;
+
+
+
+
+				}
+				else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.identifier)
                 {
                     if (data.Data.Value.ToString() == "null")
                     {
