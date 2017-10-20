@@ -728,12 +728,51 @@ namespace ASCompiler.Properties {
         /// <summary>
         ///   查找类似 package
         ///{
+        ///	public dynamic class ReferenceError extends Error
+        ///	{
+        ///		public function ReferenceError (message:String=&quot;&quot;, id:int=0);
+        ///	}
+        ///} 的本地化字符串。
+        /// </summary>
+        internal static string ReferenceError {
+            get {
+                return ResourceManager.GetString("ReferenceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 package
+        ///{
+        ///	[_regexp_]
         ///	public dynamic class RegExp extends Object
         ///	{
-        ///		public function RegExp (pattern:String=null, options:*=null);
-        ///	}
-        ///}
-        /// 的本地化字符串。
+        ///		private var initPattern:String;
+        ///
+        ///		private var _dotall:Boolean;
+        ///
+        ///		private var _extended:Boolean;
+        ///
+        ///		private var _global:Boolean;
+        ///
+        ///		private var _ignoreCase:Boolean;
+        ///
+        ///		private var _multiline:Boolean;
+        ///
+        ///		private var _source:String;
+        ///
+        ///		private var _lastIndex:Number;
+        ///
+        ///
+        ///		private var _linkregexp;
+        ///
+        ///		public function get dotall():Boolean
+        ///		{
+        ///			return _dotall;
+        ///		}
+        ///
+        ///		public function get extended():Boolean
+        ///		{
+        ///		 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string RegExp {
             get {

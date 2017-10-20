@@ -299,7 +299,20 @@ namespace ASCompiler
                 }
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "TypeError.as3"));
             }
-            {
+
+			{
+				string _error = Properties.Resources.ReferenceError;
+				var tree = grammar.ParseTree(_error, ASTool.AS3LexKeywords.LEXKEYWORDS,
+							ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "ReferenceError.as3");
+
+				if (grammar.hasError)
+				{
+					return null;
+				}
+				trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "ReferenceError.as3"));
+			}
+
+			{
                 string _error = Properties.Resources.ArgumentError;
                 var tree = grammar.ParseTree(_error, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "ArgumentError.as3");

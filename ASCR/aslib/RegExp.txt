@@ -5,12 +5,98 @@
 	{
 		private var initPattern:String;
 
-		public function RegExp (pattern:String=null, options:String=null)
+		private var _dotall:Boolean;
+
+		private var _extended:Boolean;
+
+		private var _global:Boolean;
+
+		private var _ignoreCase:Boolean;
+
+		private var _multiline:Boolean;
+
+		private var _source:String;
+
+		private var _lastIndex:Number;
+
+
+		private var _linkregexp;
+
+		public function get dotall():Boolean
 		{
-			initPattern=pattern;
+			return _dotall;
+		}
+
+		public function get extended():Boolean
+		{
+			return _extended;
+		}
+
+		public function get global():Boolean
+		{
+			return _global;
+		}
+
+		public function get ignoreCase():Boolean
+		{
+			return _ignoreCase;
+		}
+
+		public function get multiline():Boolean
+		{
+			return _multiline;
+		}
+
+		public function get source():String
+		{
+			return _source;
+		}
+
+		public function get lastIndex():Number
+		{
+			return _lastIndex;
+		}
+
+   		public function set lastIndex(value:Number):void
+		{
+			_lastIndex=int(value);
 		}
 
 
+		[native,_regexp_test]
+		public function test(str:String):Boolean;
+
+
+		private function get_execresult(str:String):Array
+		{
+			var arr:Array=[];
+			//arr["index"]=0;
+			arr["input"]=str;
+			return arr;
+		}
+
+		
+		public function exec(str:String):Object
+		{
+			var arr:Array = get_execresult(str);
+			return _exec(str,arr,false);
+		}
+
+		internal function _exec_string(str:String):Object
+		{
+			var arr:Array = get_execresult(str);
+			return _exec(str,arr,true);
+		}
+
+
+		[native,_regexp_exec]
+		private function _exec(str:String,arr:Object,noglobal:Boolean):Object;
+		
+
+
+		[native,_regexp_constructor]
+		public function RegExp (pattern:String=null, options:String=null);
+		
 		public function toString():String
 		{
 			return initPattern;

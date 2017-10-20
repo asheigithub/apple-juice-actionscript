@@ -200,6 +200,10 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Error_getstack());
 
 
+			bin.regNativeFunction(new RegExp_constructor());
+			bin.regNativeFunction(new RegExp_test());
+			bin.regNativeFunction(new RegExp_exec());
+
             bin.regNativeFunction(new system_enum_valueOf());
         }
 

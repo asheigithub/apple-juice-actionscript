@@ -129,6 +129,7 @@
     <Content Include="aslib\Math.txt" />
     <Content Include="aslib\Number.txt" />
     <Content Include="aslib\Object.txt" />
+    <Content Include="aslib\ReferenceError.txt" />
     <Content Include="aslib\RegExp.txt" />
     <Content Include="aslib\Sprite.txt" />
     <Content Include="aslib\String.txt" />

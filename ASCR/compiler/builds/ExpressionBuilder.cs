@@ -706,10 +706,11 @@ namespace ASCompiler.compiler.builds
                         //**隐式类型转换检查
                         if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType,builder))
                         {
+
                             throw new BuildException( new BuildTypeError( step.token.line, step.token.ptr, step.token.sourceFile,
                                 rv.valueType ,lv.valueType ,builder));
                         }
-
+						
                         if (rv.valueType != lv.valueType)
                         {
                             //插入转型代码
@@ -1317,13 +1318,32 @@ namespace ASCompiler.compiler.builds
 
 
 						var args = new List<ASTool.AS3.Expr.AS3DataStackElement>();
-						ASTool.AS3.Expr.AS3DataStackElement arg = new ASTool.AS3.Expr.AS3DataStackElement();
-						arg.Data = new ASTool.AS3.Expr.AS3DataValue();
-						arg.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string;
-						arg.Data.Value = pattern;
-						arg.IsReg = false;
 
-						args.Add(arg);
+
+						pattern = pattern.Substring(1);
+						int last = pattern.LastIndexOf('/');
+
+						string p1 = pattern.Substring(0, last);
+						string p2 = pattern.Substring(last + 1);
+						{
+							ASTool.AS3.Expr.AS3DataStackElement arg = new ASTool.AS3.Expr.AS3DataStackElement();
+							arg.Data = new ASTool.AS3.Expr.AS3DataValue();
+							arg.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string;
+							arg.Data.Value = p1;
+							arg.IsReg = false;
+
+							args.Add(arg);
+						}
+						{
+							ASTool.AS3.Expr.AS3DataStackElement arg = new ASTool.AS3.Expr.AS3DataStackElement();
+							arg.Data = new ASTool.AS3.Expr.AS3DataValue();
+							arg.Data.FF1Type = ASTool.AS3.Expr.FF1DataValueType.const_string;
+							arg.Data.Value = p2;
+							arg.IsReg = false;
+
+							args.Add(arg);
+						}
+
 						cb.build_class(env, item, matchtoken, builder, eax, args);
 
 					}

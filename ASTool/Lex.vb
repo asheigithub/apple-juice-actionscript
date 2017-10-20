@@ -210,34 +210,37 @@ Public Class Lex
                 While s1 > 0
                     Dim nc = getNextChar(input, currentptr)
 
-                    If nc = "/" Then
-                        s1 -= 1
-                        result.StringValue &= nc
-                        If s1 = 0 Then
-                            Dim gc = getNextChar(input, currentptr)
-                            While Char.IsLetter(gc)
-                                result.StringValue &= gc
+					If nc = "/" Then
+						s1 -= 1
+						result.StringValue &= nc
+						If s1 = 0 Then
+							Dim gc = getNextChar(input, currentptr)
+							While Char.IsLetter(gc)
+								result.StringValue &= gc
 
-                                gc = getNextChar(input, currentptr)
-                            End While
+								gc = getNextChar(input, currentptr)
+							End While
 
 							result.Type = TokenType.const_regexp
 							Console.WriteLine("代码中发现内嵌正则表达式" & result.StringValue)
 							Console.WriteLine("    " & File)
 
 							Exit While
-                        End If
-                    ElseIf nc = "\" Then
-                        result.StringValue &= nc
-                        Dim s2 = getNextChar(input, currentptr)
+						End If
+					ElseIf nc = "\" Then
+						result.StringValue &= nc
+						Dim s2 = getNextChar(input, currentptr)
 
-                        If s2 = "/" Then
-                            result.StringValue &= s2
-                            'getNextChar(input, currentptr)
-                        End If
+						If s2 = "/" Then
 
-                    Else
-                        result.StringValue &= nc
+							Throw New LexException("Syntax error: '/' is not allowed here", cline, linepos)
+
+						Else
+							result.StringValue &= s2
+						End If
+
+					Else
+						result.StringValue &= nc
                         'getNextChar(input, currentptr)
                     End If
 

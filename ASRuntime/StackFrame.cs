@@ -15,12 +15,17 @@ namespace ASRuntime
         static StackFrame()
         {
             pool = new Stack<StackFrame>();
-            for (int i = 0; i < 1024; i++)
+            for (int i = 0; i < 256; i++)
             {
                 pool.Push(new StackFrame(null));
             }
         }
-        
+
+		public static bool hasCacheObj()
+		{
+			return pool.Count > 0;
+		}
+
         public static StackFrame create(CodeBlock block)
         {
             StackFrame frame = pool.Pop();
@@ -35,7 +40,7 @@ namespace ASRuntime
 
         public static void checkpool()
         {
-            if (pool.Count != 1024)
+            if (pool.Count != 256)
             {
                 throw new ASRunTimeException("缓存池异常");
             }
@@ -153,11 +158,20 @@ namespace ASRuntime
             return  codeLinePtr >= stepCount ;
         }
 
+		/// <summary>
+		/// 标记是否运行过。当上一个堆栈结束时有回调操作，这个堆栈又是池中允许的最后一个，并且上一个堆栈回掉又请求分配新堆栈时，
+		/// 会出现本堆栈未执行就需要关闭的情况。
+		/// 此标记说明这种情况
+		/// </summary>
+		private bool hascallstep;
+
         /// <summary>
         /// 运行一行
         /// </summary>
         public void step()
         {
+			hascallstep = true;
+
             OpStep step = block.opSteps[codeLinePtr];
             //exec(step);
 #if DEBUG
@@ -612,8 +626,15 @@ namespace ASRuntime
             endStep(block.opSteps[codeLinePtr]);
         }
 
+		
         internal void endStep(OpStep step)
         {
+			if (!hascallstep)
+			{
+				codeLinePtr = stepCount;
+				player.exitStackFrameWithError(runtimeError, this);
+				return;
+			}
 #if DEBUG
             if (!execing || isclosed)
             {
@@ -630,7 +651,8 @@ namespace ASRuntime
             {
                 codeLinePtr++;
             }
-            
+
+			
         }
 #if DEBUG
         internal bool execing = false;
@@ -1305,6 +1327,9 @@ namespace ASRuntime
             trystateCount = 0;
             
             typeconvertoperator = null;
+
+			hascallstep = false;
+
 #if DEBUG
             execing = false;
 #endif   

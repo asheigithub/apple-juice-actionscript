@@ -28,7 +28,7 @@
 
 		//***flash.utils***
 		[native,_flash_util_functions_getDefinitionByName]
-		public static function flash_utils_getDefinitionByName (name:String) : Object;
+		public static function flash_utils_getDefinitionByName (name:String) : *;
 		[native,flash_utils_functions_getQualifiedClassName]
 		public static function flash_utils_getQualifiedClassName (value:*) : String;
 

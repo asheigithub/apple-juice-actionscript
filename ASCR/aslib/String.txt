@@ -89,17 +89,89 @@
 
 		public function match(pattern:*):Array
 		{
-			if(pattern is RegExp)
+			if(pattern == null)
 			{
-				return ["is pattern"];
+				return null;
+			}
+			else if(pattern is RegExp)
+			{
+				if( !RegExp(pattern).global)
+				{
+					var r=RegExp(pattern).exec(_v);
+					if(r !=null)
+					{
+						return [ r[0] ];
+					}
+					else
+					{
+						return [];
+					}
+				}
+				else
+				{
+					var regexp:RegExp=RegExp(pattern);
+
+					regexp.lastIndex=0;
+					
+					var r:Array=[];
+
+					var result:Object = regexp.exec(_v);
+					
+					 while (result != null) {
+						 r[r.length]=result[0];
+						 result = regexp.exec(_v);
+					 }
+
+					 regexp.lastIndex=0;
+
+					 return r;
+					
+
+				}
+
 			}
 			else
 			{
-				return [ String(pattern) ];
+				var sp:String=String(pattern);
+
+				var idx:int=indexOf(sp);
+				if(idx==-1)
+				{
+					return null;
+				}
+				else
+				{
+					return [sp];
+				}
+
 			}
 
 		}
 		
+		public function search(pattern:*):int
+		{
+			if(pattern==null)
+			{
+				return -1;
+			}
+			else if(pattern is RegExp)
+			{
+				var r=RegExp(pattern)._exec_string(_v);
+				if(r !=null)
+				{
+					return int(r["index"]);
+				}
+				else
+				{
+					return -1;
+				}
+
+			}
+			else
+			{
+				return indexOf(String(pattern));
+			}
+		}
 
 
 		public function toString () : String{ return _v; }

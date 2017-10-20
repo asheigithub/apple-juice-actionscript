@@ -131,7 +131,7 @@ namespace ASRuntime
 			if (!_hasInitStack)
 			{
 				runtimeStack = new Stack<StackFrame>();
-				stackSlots = new StackSlot[65535];
+				stackSlots = new StackSlot[1024*16];
 				for (int i = 0; i < stackSlots.Length; i++)
 				{
 					stackSlots[i] = new StackSlot(swc);
@@ -362,7 +362,7 @@ namespace ASRuntime
 
             StackFrame frame = null;
 
-            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length)
+            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length || !StackFrame.hasCacheObj())
             {
                 //runtimeError = new error.InternalError(token, "stack overflow");
                 if (callbacker != null)

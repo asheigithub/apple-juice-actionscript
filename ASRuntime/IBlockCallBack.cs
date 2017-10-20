@@ -18,7 +18,7 @@ namespace ASRuntime
 
     class BlockCallBackBase : IBlockCallBack
     {
-        private static List<BlockCallBackBase> oo;
+        //private static List<BlockCallBackBase> oo;
 
         private static Stack<BlockCallBackBase> pool;
         static BlockCallBackBase()
@@ -29,7 +29,7 @@ namespace ASRuntime
                 pool.Push(new BlockCallBackBase());
             }
 
-            oo = new List<BlockCallBackBase>();
+            //oo = new List<BlockCallBackBase>();
         }
         
         public static BlockCallBackBase create()
@@ -38,7 +38,7 @@ namespace ASRuntime
             cb.hasnoticed = false;
             cb.hasreleased = false;
 
-            oo.Add(cb);
+            //oo.Add(cb);
 
             return cb;
         }
@@ -46,7 +46,7 @@ namespace ASRuntime
         private static void ret(BlockCallBackBase c)
         {
             pool.Push(c);
-            oo.Remove(c);
+            //oo.Remove(c);
         }
 
         public static void checkpool()

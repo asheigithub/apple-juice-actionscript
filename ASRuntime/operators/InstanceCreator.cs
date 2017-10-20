@@ -346,6 +346,12 @@ namespace ASRuntime.operators
                 RunTimeScopeType.outpackagemember
                 );
 
+			if (rtscope == null)
+			{
+				invokerFrame.endStep(step);
+				return false;
+			}
+
             globalObj.objScope = rtscope;
             player.outpackage_runtimescope.Add(cls.classid, rtscope);
             {
@@ -673,16 +679,37 @@ namespace ASRuntime.operators
 
             result.objScope = objScope;
 
-            //***把父类的初始化函数推到栈上去***
-            var ss = cls.super;
+			if (objScope == null)
+			{
+				if (callbacker != null)
+				{
+					callbacker.noticeRunFailed();
+				}
+
+				return null;
+			}
+
+			//***把父类的初始化函数推到栈上去***
+			var ss = cls.super;
             while (ss != null)
             {
-                player.callBlock(player.swc.blocks[ss.blockid],
+                var scope=player.callBlock(player.swc.blocks[ss.blockid],
                     (ObjectMemberSlot[])obj.memberData,
                     null, null, token, null, result, RunTimeScopeType.objectinstance
                     );
 
                 ss = ss.super;
+
+				if (scope == null)
+				{
+					if (callbacker != null)
+					{
+						callbacker.noticeRunFailed();
+					}
+					
+					return null;
+				}
+
             }
 
 

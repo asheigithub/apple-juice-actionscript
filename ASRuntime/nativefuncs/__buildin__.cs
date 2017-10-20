@@ -695,7 +695,7 @@ namespace ASRuntime.nativefuncs
 		{
 			get
 			{
-				return RunTimeDataType._OBJECT;
+				return RunTimeDataType.rt_void;
 			}
 		}
 

@@ -467,6 +467,11 @@ namespace ASRuntime
                 return true;
             }
 
+			if (f > rt.unknown && t == rt.rt_boolean)
+			{
+				return true;
+			}
+
             if (f > rt.unknown && t == ASBinCode.RunTimeDataType.rt_void)
             {
                 return true;
@@ -542,7 +547,7 @@ namespace ASRuntime
                 //    return false;
                 //}
 
-                if (ASBinCode.ClassMemberFinder.isInherits(c1, c2)) //检查集成关系
+                if (ASBinCode.ClassMemberFinder.isInherits(c1, c2)) //检查继承关系
                 {
                     return true;
                 }
