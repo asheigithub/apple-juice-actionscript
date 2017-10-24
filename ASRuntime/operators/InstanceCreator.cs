@@ -47,7 +47,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
             
-            constructorCaller = FunctionCaller.create(player, invokerFrame, token);
+            constructorCaller = player.funcCallerPool.create(player, invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
             if (!constructorCaller.createParaScope()) { return false; }
@@ -56,7 +56,7 @@ namespace ASRuntime.operators
 
             if (constructor != null)
             {
-                _function_constructor = FunctionCaller.create(player, invokerFrame, token);
+                _function_constructor = player.funcCallerPool.create(player, invokerFrame, token);
                 _function_constructor._tempSlot = invokerFrame._tempSlot1;
                 _function_constructor.toCallFunc = 
                     player.swc.functions[ ((ASBinCode.rtData.rtFunction)
@@ -472,7 +472,7 @@ namespace ASRuntime.operators
                 _function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
                 _function_constructor.function.setThis(rtobject);
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = player.blockCallBackPool.create();
                 cb.args = cb.cacheObjects; //new object[] { rtobject , _temp };
                 cb.cacheObjects[0] = rtobject;
                 cb.cacheObjects[1] = _temp;

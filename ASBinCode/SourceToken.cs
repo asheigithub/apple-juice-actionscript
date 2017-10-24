@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class SourceToken
+	[Serializable]
+	public class SourceToken
     {
         public int line;
         public int ptr;

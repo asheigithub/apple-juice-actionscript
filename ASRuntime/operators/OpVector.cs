@@ -204,7 +204,7 @@ namespace ASRuntime.operators
                 }
             }
 
-            BlockCallBackBase cb = BlockCallBackBase.create();
+            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -274,7 +274,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_allpushed);
@@ -312,7 +312,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_allpushed);
@@ -334,7 +334,7 @@ namespace ASRuntime.operators
             IBlockCallBack callbacker
             )
         {
-            BlockCallBackBase convertCb = BlockCallBackBase.create();
+            BlockCallBackBase convertCb = frame.player.blockCallBackPool.create();
             convertCb._intArg = 0;
             convertCb.setCallBacker(_convertCB);
 

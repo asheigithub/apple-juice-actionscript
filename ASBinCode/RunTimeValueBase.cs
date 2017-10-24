@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 标记是一个运行时的值
-    /// </summary>
-    public abstract class RunTimeValueBase:ICloneable
+	[Serializable]
+	/// <summary>
+	/// 标记是一个运行时的值
+	/// </summary>
+	public abstract class RunTimeValueBase:ICloneable
     {
         public RunTimeDataType  rtType;
 

@@ -431,7 +431,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                BlockCallBackBase cb_tostr_arr = BlockCallBackBase.create();
+                BlockCallBackBase cb_tostr_arr = frame.player.blockCallBackPool.create();
                 cb_tostr_arr.scope = scope;
                 cb_tostr_arr.step = step;
                 object[] args = cb_tostr_arr.cacheObjects; //new object[2];
@@ -510,7 +510,7 @@ namespace ASRuntime.operators
             }
 
             //***将key转为字符串***
-            BlockCallBackBase cb_tostr_obj = BlockCallBackBase.create();
+            BlockCallBackBase cb_tostr_obj = frame.player.blockCallBackPool.create();
             cb_tostr_obj.scope = scope;
             cb_tostr_obj.step = step;
             object[] a = cb_tostr_obj.cacheObjects; //new object[2];
@@ -737,7 +737,7 @@ namespace ASRuntime.operators
             if(f !=null)
             {
                 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
@@ -783,7 +783,7 @@ namespace ASRuntime.operators
                 )
             {
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_GTVoid_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;
@@ -871,7 +871,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
@@ -915,7 +915,7 @@ namespace ASRuntime.operators
                 )
             {
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_GEVoid_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;
@@ -1032,7 +1032,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -1077,7 +1077,7 @@ namespace ASRuntime.operators
 
                )
             {
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_LTVoid_TwoString_Callbacker);
                 cb.scope = scope;
                 cb.args = frame;
@@ -1134,7 +1134,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -1175,7 +1175,7 @@ namespace ASRuntime.operators
                 //)
                 )
             {
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_LEVoid_TwoString_Callbacker);
                 cb.args = frame;
                 cb.step = step;
@@ -1233,7 +1233,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -1273,7 +1273,7 @@ namespace ASRuntime.operators
             if (needInvokeToString(v1, v2, frame.player))
             {
                 //***转成字符串比较***
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_EQ_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;
@@ -1324,7 +1324,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -1363,7 +1363,7 @@ namespace ASRuntime.operators
             if (needInvokeToString(v1, v2, frame.player))//v1.rtType > ASBinCode.RunTimeDataType.unknown || v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
                 //***转成字符串比较***
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_NOTEQ_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;

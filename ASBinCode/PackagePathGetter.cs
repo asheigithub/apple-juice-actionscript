@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public sealed class PackagePathGetter : LeftValueBase
+	
+	public sealed class PackagePathGetter : LeftValueBase
     {
         public readonly string path;
         public PackagePathGetter(string path)

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 表示是变量
-    /// </summary>
-    public abstract class VariableBase : LeftValueBase,IMember
+	[Serializable]
+	/// <summary>
+	/// 表示是变量
+	/// </summary>
+	public abstract class VariableBase : LeftValueBase,IMember
     {
         //private RunTimeDataType type;
 

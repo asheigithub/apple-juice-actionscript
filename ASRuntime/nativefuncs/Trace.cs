@@ -17,7 +17,7 @@ namespace ASRuntime.nativefuncs
             {
                 var totrace = step.arg1.getValue(scope,frame);
 
-                BlockCallBackBase cb= BlockCallBackBase.create();
+                BlockCallBackBase cb= frame.player.blockCallBackPool.create();
                 cb.args = frame;
                 cb.setCallBacker(cast_back);
 

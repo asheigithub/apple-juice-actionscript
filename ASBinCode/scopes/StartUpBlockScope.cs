@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode.scopes
 {
-    public class StartUpBlockScope : ScopeBase
+	public class StartUpBlockScope : ScopeBase
     {
     }
 }

@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-    public sealed class rtObject :RunTimeValueBase
+	
+    public class rtObject :RunTimeValueBase
     {
 
         public RunTimeScope objScope;
@@ -17,10 +18,15 @@ namespace ASBinCode.rtData
             
         }
 
-        public override double toNumber()
+        public sealed override double toNumber()
         {
             return double.NaN;
         }
+
+		public virtual rtObject getSrcObject()
+		{
+			return this;
+		}
 
        
         public sealed override  object Clone()
@@ -28,17 +34,10 @@ namespace ASBinCode.rtData
             if (value._class.isLink_System)
             {
                 rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
-                //if (lobj.__iscreateout)
-                //{
-                    //lobj.__iscreateout = false;
-
-                //    return this;
-                //}
-                //else
-                //{
-                    rtObject clone = new rtObject(((rtti.LinkSystemObject)value).Clone(),
-                        null
-                        );
+                
+                rtObject clone = new rtObject((lobj).Clone(),
+                    null
+                    );
 
                 RunTimeScope scope =
                     new RunTimeScope(null, objScope.blockId, null, 
@@ -47,7 +46,6 @@ namespace ASBinCode.rtData
 
                 return clone;
 
-                //}
             }
             else
             {
@@ -58,7 +56,7 @@ namespace ASBinCode.rtData
         }
 
 
-        public override bool Equals(object obj)
+        public sealed override bool Equals(object obj)
         {
             rtObject o = obj as rtObject;
             if (o == null)
@@ -70,13 +68,13 @@ namespace ASBinCode.rtData
         }
 
 
-        public override int GetHashCode()
+        public sealed override int GetHashCode()
         {
             return value.GetHashCode();
         }
 
         
-        public override string ToString()
+        public sealed override string ToString()
         {
             if (value == null)
             {

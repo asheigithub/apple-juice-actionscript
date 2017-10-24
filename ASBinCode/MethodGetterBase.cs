@@ -5,7 +5,8 @@ using ASBinCode.rtData;
 
 namespace ASBinCode
 {
-    public abstract class MethodGetterBase : LeftValueBase,IMember
+	[Serializable]
+	public abstract class MethodGetterBase : LeftValueBase,IMember
     {
         protected readonly ASBinCode.rtti.Class _class;
         protected int indexofMember;
@@ -80,7 +81,7 @@ namespace ASBinCode
                 return indexofMember;
             }
         }
-
+		
         private static MethodSlot _temp= MethodSlot.instance;
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)

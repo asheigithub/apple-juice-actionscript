@@ -11,14 +11,77 @@ namespace ASRuntime.nativefuncs
     /// </summary>
     public abstract class NativeConstParameterFunction : NativeFunctionBase
     {
+		//public class Argement
+		//{
+		//	private StackSlot[] argementslots;
+
+		//	public Argement(int count,CSWC swc,Player player)
+		//	{
+		//		argementslots = new StackSlot[count];
+		//		if (count > 0)
+		//		{
+		//			for (int i = 0; i < argementslots.Length; i++)
+		//			{
+		//				argementslots[i] = new StackSlot(swc);
+		//			}
+		//			StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, player);
+		//			argementslots[0]._linkObjCache = lobjcache;
+		//			for (int i = 1; i < argementslots.Length; i++)
+		//			{
+		//				argementslots[i]._linkObjCache = lobjcache.Clone();
+		//			}
+		//		}
+		//	}
+
+		//	public int Length
+		//	{
+		//		get
+		//		{
+		//			return argementslots.Length;
+		//		}
+		//	}
+
+		//	public RunTimeValueBase this[int index]
+		//	{
+		//		get
+		//		{
+		//			return argementslots[index].getValue();
+		//		}
+		//		set
+		//		{
+		//			argementslots[index].directSet(value);
+		//		}
+		//	}
+
+		//}
+
+		//private int totalArgs;
         public NativeConstParameterFunction(int totalArgements)
         {
-            argements = new RunTimeValueBase[totalArgements];
+			//totalArgs = totalArgements;
+			argements = new RunTimeValueBase[totalArgements];
+			//argements = new Argement[totalArgements];
         }
 
-        protected RunTimeValueBase[] argements;
+		//private bool hasinited;
+		//public void initArgements(CSWC swc,Player player)
+		//{
+		//	if (!hasinited)
+		//	{
+		//		argements = new Argement(totalArgs,swc,player);
+		//		//for (int i = 0; i < argements.Length; i++)
+		//		//{
+		//		//	argements[i]=new Argement()
+		//		//}
+		//		hasinited = true;
+		//	}
+		//}
 
-        public sealed override NativeFunctionMode mode
+		protected RunTimeValueBase[] argements;
+
+		//protected Argement argements;
+
+		public sealed override NativeFunctionMode mode
         {
             get
             {

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 表示需对寄存器操作
-    /// </summary>
-    public sealed class Register : LeftValueBase
+	[Serializable]
+	/// <summary>
+	/// 表示需对寄存器操作
+	/// </summary>
+	public sealed class Register : LeftValueBase
     {
         
 
@@ -32,7 +33,7 @@ namespace ASBinCode
         public bool _hasUnaryOrShuffixOrDelete;
         
         
-
+		[NonSerialized]
         public PackagePathGetter _pathGetter;
 
 		public bool isFindByPath;

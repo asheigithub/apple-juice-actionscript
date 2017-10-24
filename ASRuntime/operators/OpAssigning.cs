@@ -68,7 +68,7 @@ namespace ASRuntime.operators
 
                         if (slot is OpVector.vectorSLot)    //Vector类型不匹配
                         {
-                            BlockCallBackBase cb =  BlockCallBackBase.create();
+                            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                             cb.scope = scope;
                             cb.step = step;
                             cb.args = frame;
@@ -215,7 +215,7 @@ namespace ASRuntime.operators
                 }
                 //***调用设置器***
 
-                var funCaller =  FunctionCaller.create(player, frame, step.token);
+                var funCaller = frame.player.funcCallerPool.create(player, frame, step.token);
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
@@ -233,7 +233,7 @@ namespace ASRuntime.operators
                 funCaller._tempSlot = frame._tempSlot1;
                 funCaller.returnSlot = frame._tempSlot1;
 
-                BlockCallBackBase cb =  BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_assign_callbacker);
                 cb.step = step;
                 cb.args = frame;
@@ -269,7 +269,7 @@ namespace ASRuntime.operators
             
             //***调用设置器***
 
-            var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+            var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
             funCaller.function = (ASBinCode.rtData.rtFunction)func;
             funCaller.loadDefineFromFunction();
             if (!funCaller.createParaScope()) { return; }
@@ -295,7 +295,7 @@ namespace ASRuntime.operators
             funCaller._tempSlot = frame._tempSlot1;
             funCaller.returnSlot = frame._tempSlot1;
 
-            BlockCallBackBase cb = BlockCallBackBase.create();
+            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.setCallBacker(_setthisitem_callbacker);
             cb.step = step;
             cb.args = frame;

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 类字段
-    /// </summary>
-    public sealed class Field : VariableBase
+	[Serializable]
+	/// <summary>
+	/// 类字段
+	/// </summary>
+	public sealed class Field : VariableBase
     {
         public bool isPublic;
         public bool isInternal;

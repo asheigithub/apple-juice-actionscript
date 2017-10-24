@@ -27,7 +27,7 @@ namespace ASRuntime.operators
                 v1.rtType, v2.rtType);
             if (f != null)
             {
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;

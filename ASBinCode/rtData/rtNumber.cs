@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
+	[Serializable]
     /// <summary>
     /// 运行时基本数据类型Number (64位浮点数)
     /// </summary>

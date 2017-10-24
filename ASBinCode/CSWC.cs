@@ -5,6 +5,7 @@ using ASBinCode.rtti;
 
 namespace ASBinCode
 {
+	[Serializable]
     /// <summary>
     /// 输出的类库
     /// </summary>
@@ -20,18 +21,21 @@ namespace ASBinCode
         /// </summary>
         public List<rtti.Class> primitive_to_class_table = new List<Class>();
 
-
-        public readonly List<NativeFunctionBase> nativefunctions = new List<NativeFunctionBase>();
-        public readonly Dictionary<string, int> nativefunctionNameIndex = new Dictionary<string, int>();
+		
+		public readonly List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
+		
+		public readonly Dictionary<string, int> nativefunctionNameIndex;// = new Dictionary<string, int>();
 
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
 
-        public readonly Dictionary<ILinkSystemObjCreator, Class> creator_Class
-            = new Dictionary<ILinkSystemObjCreator, Class>();
-        public readonly Dictionary<Class, ILinkSystemObjCreator> class_Creator
-            = new Dictionary<Class, ILinkSystemObjCreator>();
-
+		
+		public readonly Dictionary<ILinkSystemObjCreator, Class> creator_Class;
+		//= new Dictionary<ILinkSystemObjCreator, Class>();
+		
+		public readonly Dictionary<Class, ILinkSystemObjCreator> class_Creator;
+            //= new Dictionary<Class, ILinkSystemObjCreator>();
+		
 
         /// <summary>
         /// 链接到系统Object的类型
@@ -84,7 +88,12 @@ namespace ASBinCode
 
         public CSWC()
         {
-            for (int i = 0; i < RunTimeDataType.unknown; i++)
+			nativefunctions = new List<NativeFunctionBase>();
+			nativefunctionNameIndex = new Dictionary<string, int>();
+			creator_Class = new Dictionary<ILinkSystemObjCreator, Class>();
+			class_Creator = new Dictionary<Class, ILinkSystemObjCreator>();
+
+			for (int i = 0; i < RunTimeDataType.unknown; i++)
             {
                 primitive_to_class_table.Add(null);
             }
@@ -92,7 +101,13 @@ namespace ASBinCode
             operatorOverrides = new OperatorFunctions();
         }
 
-        public void regNativeFunction(NativeFunctionBase nativefunction)
+		public void unLoadNativeFunctions()
+		{
+			nativefunctionNameIndex.Clear();
+			nativefunctions.Clear();
+		}
+
+		public void regNativeFunction(NativeFunctionBase nativefunction)
         {
             if (!nativefunctionNameIndex.ContainsKey(nativefunction.name))
             {

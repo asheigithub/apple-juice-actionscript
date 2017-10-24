@@ -86,6 +86,7 @@ package
 			
 			trace(ar,  ar.getValue(1) , c.array, c.array.getValue(1).getValue(1) );
 			
+			
 			var k = new Array(ar);
 			
 			trace(k[0]===c.array);

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
+	[Serializable]
     public sealed class rtBoolean : RunTimeValueBase
     {
         public static readonly rtBoolean False = new rtBoolean(false);

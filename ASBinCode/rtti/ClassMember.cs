@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-    /// <summary>
-    /// 类成员
-    /// </summary>
-    public class ClassMember
+	[Serializable]
+	/// <summary>
+	/// 类成员
+	/// </summary>
+	public class ClassMember
     {
         
         public bool isPublic;

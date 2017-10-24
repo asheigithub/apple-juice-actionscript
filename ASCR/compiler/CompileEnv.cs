@@ -104,7 +104,7 @@ namespace ASCompiler.compiler
 
         public void convertVarToReg(Builder builder,ASBinCode.rtti.FunctionDefine f)
         {
-            
+			
             List<CodeBlock> blocks = new List<CodeBlock>();
             foreach (var b in builder.bin.blocks)
             {
@@ -266,6 +266,191 @@ namespace ASCompiler.compiler
         }
 
 
+		class sslot
+		{
+			public Register register;
+			public int index;
+		}
+
+		private void combieRegs()
+		{
+			var steps = block.opSteps;
+			//槽位池
+			Queue<sslot> slotpool = new Queue<sslot>();
+			//寄存器分配的槽位
+			Dictionary<Register, sslot> regisetSlot = new Dictionary<Register, sslot>();
+			//最后访问寄存器的操作行
+			Dictionary<Register, OpStep> regLastStep = new Dictionary<Register, OpStep>();
+			//某个操作行前要插入对寄存器的初始化
+			Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
+
+			List<sslot> allocedslots = new List<sslot>();
+
+			for (int i = 0; i < steps.Count; i++)
+			{
+				OpStep step = steps[i];
+
+				List<Register> testregisters = new List<Register>();
+				if (step.reg is Register)
+				{
+					testregisters.Add((Register)step.reg);
+				}
+				if (step.arg1 is Register)
+				{
+					testregisters.Add((Register)step.arg1);
+				}
+				if (step.arg2 is Register)
+				{
+					testregisters.Add((Register)step.arg2);
+				}
+
+				foreach (var reg in testregisters)
+				{
+					//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
+					//{
+					//	continue;
+					//}
+
+					if (!regisetSlot.ContainsKey(reg))
+					{
+						if (slotpool.Count > 0 )
+						{
+							sslot s = slotpool.Dequeue(); //复用
+
+							if (s.register._isassigntarget || s.register._hasUnaryOrShuffixOrDelete || s.register.isFuncResult)
+							//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
+							{
+								dictAddResetStackOp.Add(reg, step);
+							}
+
+							s.register = reg;
+							regisetSlot.Add(reg, s);
+
+						}
+						else
+						{
+							sslot s = new sslot();
+							s.register = reg;
+							s.index = allocedslots.Count;
+
+							
+							allocedslots.Add(s);
+							
+							
+							regisetSlot.Add(reg, s);
+							
+						
+						}
+
+
+						{
+							//查找这个寄存器最后一次出现的行
+							for (int j = steps.Count - 1; j >= 0; j--)
+							{
+								var sl = steps[j];
+								if (ReferenceEquals(sl.reg, reg) ||
+									ReferenceEquals(sl.arg1, reg) ||
+									ReferenceEquals(sl.arg2, reg)
+									)
+								{
+									regLastStep.Add(reg, sl);
+									break;
+								}
+							}
+						}
+					}
+
+					
+
+				}
+
+
+				//***查找这一行释放的槽***
+
+				bool found = true;
+				while (found)
+				{
+					found = false;
+					foreach (var item in regLastStep)
+					{
+						if (item.Value == step)
+						{
+							if (slotpool.Contains(regisetSlot[item.Key]))
+							{
+								throw new Exception("重复的寄存器池");
+							}
+
+							//if (!(item.Key.isFuncResult))
+							{
+								slotpool.Enqueue(regisetSlot[item.Key]);
+							}
+							regLastStep.Remove(item.Key);
+
+							found = true;
+							break;
+						}
+					}
+				}
+			}
+
+			//插入需要追加Reset的操作
+			foreach (var item in dictAddResetStackOp)
+			{
+				OpStep step = item.Value;
+
+				for (int i = 0; i < steps.Count; i++)
+				{
+					if (steps[i] == step)
+					{
+						OpStep insetStep = new OpStep(OpCode.reset_stackslot, step.token);
+						insetStep.arg1 = item.Key;
+						steps.Insert(i, insetStep);
+						break;
+					}
+				}
+
+			}
+
+			
+			List<Register> reglist = new List<Register>();
+			foreach (var item in dictCompileRegisters.Values)
+			{
+				reglist.Add(item);
+			}
+
+			
+
+
+			Dictionary<int, int> dictnumber = new Dictionary<int, int>();
+
+			Dictionary<sslot, int> dictslot = new Dictionary<sslot, int>();
+
+			for (int i = 0; i < reglist.Count; i++)
+			{
+				var reg = reglist[i];
+				if (regisetSlot.ContainsKey(reg))
+				{
+					sslot s = regisetSlot[reg];
+					reg._index = s.index;
+
+				}
+				else
+				{
+					
+					//无用寄存器
+					reg._index = -1;
+
+					
+
+				}
+
+				
+
+			}
+
+
+
+		}
 
         /// <summary>
         /// 刷新条件跳转语句等的目标行
@@ -284,240 +469,245 @@ namespace ASCompiler.compiler
                     break;
                 }
             }
-            
 
-            for (int i = 0; i < block.opSteps.Count; i++)
-            {
-                ASBinCode.OpStep step = block.opSteps[i];
+			//////***合并寄存器***
+			////List<Register> reglist = new List<Register>();
+			////var steps = block.opSteps;
+			////foreach (var item in dictCompileRegisters.Values)
+			////{
+			////	reglist.Add(item);
+			////}
 
-                string findflag = null;
-
-                if (step.opCode == ASBinCode.OpCode.if_jmp
-                    )
-                {
-                    findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null,null)).value;
-                }
-                else if (step.opCode == ASBinCode.OpCode.jmp)
-                {
-                    findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null,null)).value;
-                }
-               
-                if (findflag != null)
-                {
-
-                    bool isfound = false;
-                    for (int j = 0; j < block.opSteps.Count; j++)
-                    {
-                        if (block.opSteps[j].flag == findflag)
-                        {
-                            step.jumoffset = j - i;
-                            isfound = true;
-                            break;
-                        }
-                    }
-
-                    if (!isfound)
-                    {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
-                    }
-
-                }
-            }
+			////Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
 
 
-            Stack<trystate> trys = new Stack<trystate>();
-            for (int i = 0; i < block.opSteps.Count; i++)
-            {
-                ASBinCode.OpStep step = block.opSteps[i];
-                if (step.opCode == ASBinCode.OpCode.enter_try)
-                {
-                    block.hasTryStmt = true;
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    trys.Push(new trystate(0, tryid));
-                }
-                else if (step.opCode == ASBinCode.OpCode.quit_try)
-                {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    var s = trys.Pop();
-                    if (s.tryid != tryid || s.type !=0)
-                    {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "try块不匹配");
-                    }
-                }
-                else if (step.opCode == OpCode.enter_catch)
-                {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    trys.Push(new trystate(1, tryid));
-                }
-                else if (step.opCode == ASBinCode.OpCode.quit_catch)
-                {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    var s = trys.Pop();
-                    if (s.tryid != tryid || s.type != 1)
-                    {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "catch块不匹配");
-                    }
-                }
-                else if (step.opCode == OpCode.enter_finally)
-                {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    trys.Push(new trystate(2, tryid));
-                }
-                else if (step.opCode == ASBinCode.OpCode.quit_finally)
-                {
-                    int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null,null)).value;
-                    var s = trys.Pop();
-                    if (s.tryid != tryid || s.type != 2)
-                    {
-                        throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "finally块不匹配");
-                    }
-                }
-                else if (trys.Count > 0)
-                {
-                    //step.trys = new Stack<int>();
-                    trystate[] toadd = trys.ToArray();
-                    for (int j = 0; j < toadd.Length; j++)
-                    {
-                        //step.trys.Push(toadd[j]);
-                        step.tryid = toadd[j].tryid;
-                        step.trytype = toadd[j].type;
-                    }
-                }
-                else
-                {
-                    step.tryid = -1;
-                }
+			////for (int i = 0; i < reglist.Count; i++)
+			////{
+			////	bool found = false;
 
-            }
-            
-            //***合并寄存器***
-            List<Register> reglist = new List<Register>();
-            var steps = block.opSteps;
-            foreach (var item in dictCompileRegisters.Values)
-            {
-                reglist.Add(item);
-            }
-
-            
-
-            for (int i = 0; i < reglist.Count; i++)
-            {
-                bool found = false;
-
-                var reg = reglist[i];
-                if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
-                {
-                    continue;
-                }
-                
-                ////任意类型的寄存器，可能是链接对象，所以不能重用。
-                //if (reg.valueType == RunTimeDataType.rt_void)
-                //{
-                //    continue;
-                //}
-                //if (reg.valueType > RunTimeDataType.unknown)
-                //{
-                //    bool f2 = false;
-                //    //var c=builder._classbuildingEnv;
-                //    foreach (var item in builder._classbuildingEnv)
-                //    {
-                //        if (item.Key.getRtType() == reg.valueType)
-                //        {
-                //            f2 = true;
-                //            if (item.Key.isLink_System)
-                //            {
-                //                continue;
-                //            }
-                //        }
-                //    }
-                //    if (!f2)
-                //    {
-                //        continue;
-                //    }
-                //}
+			////	var reg = reglist[i];
+			////	//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
+			////	//{
+			////	//	continue;
+			////	//}
 
 
+			////	int firstline = reglist.Count;
+			////	int lastline = -1;
+
+			////	for (int j = 0; j < steps.Count; j++)
+			////	{
+			////		var step = steps[j];
+			////		if (ReferenceEquals(step.reg, reg) ||
+			////			ReferenceEquals(step.arg1, reg) ||
+			////			ReferenceEquals(step.arg2, reg)
+			////			)
+			////		{
+			////			if (j < firstline)
+			////			{
+			////				firstline = j;
+			////			}
+			////			if (j > lastline)
+			////			{
+			////				lastline = j;
+			////			}
+			////		}
+			////	}
 
 
-                int firstline = reglist.Count;
-                int lastline = -1;
+			////	//***查找刚才寄存器最后一次出现后，才出现的新寄存器,公用一个槽****
+			////	for (int j = 0; j < reglist.Count; j++)
+			////	{
+			////		var r2 = reglist[j];
+			////		if (ReferenceEquals(r2, reg)
+			////			||
+			////			//r2._isassigntarget || r2._hasUnaryOrShuffixOrDelete
+			////			//||
+			////			r2._index != r2.Id
+			////			)
+			////		{
+			////			continue;
+			////		}
 
-                for (int j = 0; j < steps.Count; j++)
-                {
-                    var step = steps[j];
-                    if (ReferenceEquals(step.reg, reg) ||
-                        ReferenceEquals(step.arg1, reg) ||
-                        ReferenceEquals(step.arg2, reg) 
-                        )
-                    {
-                        if (j < firstline)
-                        {
-                            firstline = j;
-                        }
-                        if (j > lastline)
-                        {
-                            lastline = j;
-                        }
-                    }
-                }
+			////		for (int k = 0; k < steps.Count; k++)
+			////		{
+			////			var step = steps[k];
+			////			if (ReferenceEquals(step.reg, r2) ||
+			////				ReferenceEquals(step.arg1, r2) ||
+			////				ReferenceEquals(step.arg2, r2)
+			////				)
+			////			{
+			////				if (k <= lastline)
+			////				{
+			////					break;
+			////				}
+			////				else
+			////				{
+			////					if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
+			////					{
+			////						dictAddResetStackOp.Add(r2, step);
+			////					}
 
-                //***查找刚才寄存器最后一次出现后，才出现的新寄存器,公用一个槽****
-                for (int j = 0; j < reglist.Count; j++)
-                {
-                    var r2 = reglist[j];
-                    if (ReferenceEquals(r2, reg)
-                        ||
-                        r2._isassigntarget || r2._hasUnaryOrShuffixOrDelete
-                        ||
-                        r2._index != r2.Id
-                        )
-                    {
-                        continue;
-                    }
 
-                    for (int k = 0; k < steps.Count; k++)
-                    {
-                        var step = steps[k];
-                        if (ReferenceEquals(step.reg, r2) ||
-                            ReferenceEquals(step.arg1, r2) ||
-                            ReferenceEquals(step.arg2, r2)
-                            )
-                        {
-                            if (k <= lastline)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                r2._index = reg._index;
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (found)
-                    {
-                        break;
-                    }
-                }
+			////					r2._index = reg._index;
+			////					found = true;
+			////					break;
+			////				}
+			////			}
+			////		}
+			////		if (found)
+			////		{
 
-                
+			////			break;
+			////		}
+			////	}
+			////}
 
-            }
+			//////插入需要追加Reset的操作
+			////foreach (var item in dictAddResetStackOp)
+			////{
+			////	OpStep step = item.Value;
 
-            Dictionary<int, int> dictnumber = new Dictionary<int, int>();
-            for (int i = 0; i < reglist.Count; i++)
-            {
-                var idx = reglist[i]._index;
-                if (!dictnumber.ContainsKey(idx))
-                {
-                    dictnumber.Add(idx, dictnumber.Count);
-                }
+			////	for (int i = 0; i < steps.Count; i++)
+			////	{
+			////		if (steps[i] == step)
+			////		{
+			////			OpStep insetStep = new OpStep(OpCode.reset_stackslot, step.token);
+			////			insetStep.arg1 = item.Key;
+			////			steps.Insert(i, insetStep);
+			////			break;
+			////		}
+			////	}
 
-                reglist[i]._index = dictnumber[idx];
+			////}
 
-            }
+
+			////Dictionary<int, int> dictnumber = new Dictionary<int, int>();
+			////for (int i = 0; i < reglist.Count; i++)
+			////{
+			////	var idx = reglist[i]._index;
+			////	if (!dictnumber.ContainsKey(idx))
+			////	{
+			////		dictnumber.Add(idx, dictnumber.Count);
+			////	}
+
+			////	reglist[i]._index = dictnumber[idx];
+
+			////}
+			combieRegs();
+
+			completJump();
+
         }
+
+		private void completJump()
+		{
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				ASBinCode.OpStep step = block.opSteps[i];
+
+				string findflag = null;
+
+				if (step.opCode == ASBinCode.OpCode.if_jmp
+					)
+				{
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
+				}
+				else if (step.opCode == ASBinCode.OpCode.jmp)
+				{
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
+				}
+
+				if (findflag != null)
+				{
+
+					bool isfound = false;
+					for (int j = 0; j < block.opSteps.Count; j++)
+					{
+						if (block.opSteps[j].flag == findflag)
+						{
+							step.jumoffset = j - i;
+							isfound = true;
+							break;
+						}
+					}
+
+					if (!isfound)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
+					}
+
+				}
+			}
+
+
+			Stack<trystate> trys = new Stack<trystate>();
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				ASBinCode.OpStep step = block.opSteps[i];
+				if (step.opCode == ASBinCode.OpCode.enter_try)
+				{
+					block.hasTryStmt = true;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(0, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_try)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 0)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "try块不匹配");
+					}
+				}
+				else if (step.opCode == OpCode.enter_catch)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(1, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_catch)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 1)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "catch块不匹配");
+					}
+				}
+				else if (step.opCode == OpCode.enter_finally)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(2, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_finally)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 2)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "finally块不匹配");
+					}
+				}
+				else if (trys.Count > 0)
+				{
+					//step.trys = new Stack<int>();
+					trystate[] toadd = trys.ToArray();
+					for (int j = 0; j < toadd.Length; j++)
+					{
+						//step.trys.Push(toadd[j]);
+						step.tryid = toadd[j].tryid;
+						step.trytype = toadd[j].type;
+					}
+				}
+				else
+				{
+					step.tryid = -1;
+				}
+
+			}
+		}
+
+
 
         public readonly bool isEval;
 

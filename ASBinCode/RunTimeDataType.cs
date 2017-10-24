@@ -4,11 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-
-    /// <summary>
-    /// 凡大与unknow的都是对象类型
-    /// </summary>
-    public struct RunTimeDataType
+	[Serializable]
+	/// <summary>
+	/// 凡大与unknow的都是对象类型
+	/// </summary>
+	public struct RunTimeDataType
     {
         public override string ToString()
         {

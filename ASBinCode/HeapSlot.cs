@@ -103,7 +103,8 @@ namespace ASBinCode
                                     }
                                     else
                                     {
-                                        ro.value = ((rtObject)value).value;
+										((rtObject)this.value).value = ro.value; 
+                                        //ro.value = ((rtObject)value).value;
                                     }
                                 }
                                 else

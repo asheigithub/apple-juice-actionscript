@@ -843,9 +843,9 @@ Public Class AS3FileGrammarAnalyser
 
     Sub _Expression(node As GrammerExpr)
 
-        current_visiting_expression.Push(node)
+		current_visiting_expression.Push(node)
 
-        VisitNodes(node.Nodes(0))
+		VisitNodes(node.Nodes(0))
 
         node.exprsteplist = node.Nodes(0).exprsteplist
 

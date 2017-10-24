@@ -86,6 +86,7 @@
     <Compile Include="operators\OpUnaryPlus.cs" />
     <Compile Include="operators\OpVector.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PoolBase.cs" />
     <Compile Include="RTInternalException.cs" />
     <Compile Include="RuntimeLinkTypeMapper.cs" />
     <Compile Include="StackFrame.cs" />

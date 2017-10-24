@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 代码块
-    /// </summary>
-    public class CodeBlock
+	[Serializable]
+	/// <summary>
+	/// 代码块
+	/// </summary>
+	public class CodeBlock
     {
         public readonly int id;
         public readonly string name;

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// 访问父类的成员
-    /// </summary>
-    public sealed class SuperPointer : RightValueBase
+	[Serializable]
+	/// <summary>
+	/// 访问父类的成员
+	/// </summary>
+	public sealed class SuperPointer : RightValueBase
     {
         public rtti.Class superClass;
 

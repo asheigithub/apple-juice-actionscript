@@ -46,7 +46,7 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller =  FunctionCaller.create(frame.player, frame, step.token);
+                    var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
                     funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
@@ -55,7 +55,7 @@ namespace ASRuntime.operators
                     funCaller._tempSlot = frame._tempSlot1;
                     funCaller.returnSlot = frame._tempSlot1;
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_getEnumerator_callbacker);
                     cb.step = step;
                     cb.args = frame;
@@ -131,7 +131,7 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller =FunctionCaller.create(frame.player, frame, step.token);
+                    var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
                     funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
@@ -140,7 +140,7 @@ namespace ASRuntime.operators
                     funCaller._tempSlot = frame._tempSlot1;
                     funCaller.returnSlot = frame._tempSlot1;
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_getEnumerator_callbacker);
                     cb.step = step;
                     cb.args = frame;
@@ -193,7 +193,7 @@ namespace ASRuntime.operators
                         (((rtObject)saveObj.hosted_object)) );
 
                     //***调用方法***
-                    var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+                    var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
                     funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
@@ -202,7 +202,7 @@ namespace ASRuntime.operators
                     funCaller._tempSlot = step.reg.getSlot(scope, frame);
                     funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_enumerator_operator_callbacker);
                     cb.step = step;
                     cb.args = frame;
@@ -251,7 +251,7 @@ namespace ASRuntime.operators
                         ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object));
 
                     //***调用方法***
-                    var funCaller = FunctionCaller.create(frame.player, frame, step.token);
+                    var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
                     funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
@@ -260,7 +260,7 @@ namespace ASRuntime.operators
                     funCaller._tempSlot = step.reg.getSlot(scope, frame);
                     funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_enumerator_operator_callbacker);
                     cb.step = step;
                     cb.args = frame;

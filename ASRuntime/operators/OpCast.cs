@@ -30,7 +30,7 @@ namespace ASRuntime.operators
             else
             {
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_CastCallBacker);
                 cb.args = frame;
                 cb.scope = scope;
@@ -476,13 +476,13 @@ namespace ASRuntime.operators
 
                     if (function != null)
                     {
-                        BlockCallBackBase toStringCB =  BlockCallBackBase.create();
+                        BlockCallBackBase toStringCB = frame.player.blockCallBackPool.create();
                         toStringCB.setCallBacker(_toString_CB);
                         toStringCB._intArg = targetType;
 
 
 
-                        operators.FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                        operators.FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
                         //fc.releaseAfterCall = true;
                         object[] sendargs = toStringCB.cacheObjects; //new object[7];
                         sendargs[0] = frame;
@@ -569,7 +569,7 @@ namespace ASRuntime.operators
 
                                 funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
                                 //fc.releaseAfterCall = true;
                                 fc.function = funConv;
                                 fc.loadDefineFromFunction();
@@ -579,7 +579,7 @@ namespace ASRuntime.operators
                                 fc._tempSlot = frame._tempSlot1;
                                 fc.returnSlot = storeto;
 
-                                BlockCallBackBase cb = BlockCallBackBase.create();
+                                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                                 cb.setCallBacker(_primivite_Obj);
 
                                 //object[] sendargs = new object[5];
@@ -634,7 +634,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        BlockCallBackBase valueofCB = BlockCallBackBase.create();
+                        BlockCallBackBase valueofCB = frame.player.blockCallBackPool.create();
                         valueofCB.setCallBacker(_Cast_ValueOf_CB);
                         valueofCB._intArg = targetType;
 
@@ -769,7 +769,7 @@ namespace ASRuntime.operators
 
             )
         {
-            BlockCallBackBase cb1 = BlockCallBackBase.create();
+            BlockCallBackBase cb1 = frame.player.blockCallBackPool.create();
             cb1._intArg = targetType;
             cb1.setCallBacker(_CastTwoValue_Backer);
 
@@ -838,7 +838,7 @@ namespace ASRuntime.operators
 
                     funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                    FunctionCaller fc =  FunctionCaller.create(frame.player, frame, token);
+                    FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
                     //fc.releaseAfterCall = true;
                     fc.function = funConv;
                     fc.loadDefineFromFunction();
@@ -848,7 +848,7 @@ namespace ASRuntime.operators
                     fc._tempSlot = _tempstoreto;
                     fc.returnSlot = _tempstoreto;
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_primitive_to_obj_callbacker);
                     cb.step = step;
                     cb.scope = scope;
@@ -930,7 +930,7 @@ namespace ASRuntime.operators
 
             if (srcValue1 is rtObject)
             {
-                BlockCallBackBase callbacker =BlockCallBackBase.create();
+                BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                 {
                     object[] backargs = callbacker.cacheObjects; //new object[6];
                     backargs[0] = _tempstoreto1;
@@ -943,7 +943,7 @@ namespace ASRuntime.operators
                     callbacker.setCallBacker(_exec_valueof_callback);
                 }
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 object[] tosend = cb.cacheObjects; //new object[6];
                 tosend[0] = srcValue2;
                 tosend[1] = frame;
@@ -961,7 +961,7 @@ namespace ASRuntime.operators
                 _tempstoreto1.directSet(srcValue1);
                 if (srcValue2 is rtObject)
                 {
-                    BlockCallBackBase callbacker = BlockCallBackBase.create();
+                    BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                     {
                         object[] backargs = callbacker.cacheObjects; //new object[6];
                         backargs[0] = _tempstoreto1;
@@ -974,7 +974,7 @@ namespace ASRuntime.operators
                         callbacker.setCallBacker(_exec_valueof_callback);
                     }
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_AfterGetTwoValueOf);
                     cb.args = callbacker;
                     InvokeValueOf((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
@@ -1003,7 +1003,7 @@ namespace ASRuntime.operators
 
             if (srcValue2 is rtObject)
             {
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_AfterGetTwoValueOf);
                 cb.args = callbacker;
                 InvokeValueOf((rtObject)srcValue2, frame, token, scope, storeto, cb);
@@ -1127,10 +1127,10 @@ namespace ASRuntime.operators
 
             if (function != null)
             {
-                BlockCallBackBase valueofCB = BlockCallBackBase.create();
+                BlockCallBackBase valueofCB = frame.player.blockCallBackPool.create();
                 valueofCB.setCallBacker(_InvokeValueOf_Backer);
 
-                FunctionCaller fc = FunctionCaller.create(frame.player, frame, token);
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
                 //fc.releaseAfterCall = true;
                 object[] sendargs = valueofCB.cacheObjects; //new object[5];
                 sendargs[0] = obj;
@@ -1213,7 +1213,7 @@ namespace ASRuntime.operators
 
             if (srcValue1 is rtObject)
             {
-                BlockCallBackBase callbacker = BlockCallBackBase.create();
+                BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                 {
                     object[] backargs = callbacker.cacheObjects; //new object[6];
                     backargs[0] = _tempstoreto1;
@@ -1226,7 +1226,7 @@ namespace ASRuntime.operators
                     callbacker.setCallBacker(_exec_toString_callback);
                 }
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 object[] tosend = cb.cacheObjects; //new object[6];
                 tosend[0] = srcValue2;
                 tosend[1] = frame;
@@ -1244,7 +1244,7 @@ namespace ASRuntime.operators
                 _tempstoreto1.directSet(srcValue1);
                 if (srcValue2 is rtObject)
                 {
-                    BlockCallBackBase callbacker = BlockCallBackBase.create();
+                    BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                     {
                         object[] backargs = callbacker.cacheObjects; //new object[6];
                         backargs[0] = _tempstoreto1;
@@ -1257,7 +1257,7 @@ namespace ASRuntime.operators
                         callbacker.setCallBacker(_exec_toString_callback);
                     }
 
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_AfterGetTwoToString);
                     cb.args = callbacker;
                     InvokeToString((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
@@ -1286,7 +1286,7 @@ namespace ASRuntime.operators
 
             if (srcValue2 is rtObject)
             {
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_AfterGetTwoToString);
                 cb.args = callbacker;
                 InvokeToString((rtObject)srcValue2, frame, token, scope, storeto, cb);
@@ -1401,10 +1401,10 @@ namespace ASRuntime.operators
 
             if (function != null)
             {
-                BlockCallBackBase toStringCB = BlockCallBackBase.create();
+                BlockCallBackBase toStringCB = frame.player.blockCallBackPool.create();
                 toStringCB.setCallBacker(_InvokeToString_Backer);
 
-                operators.FunctionCaller fc = FunctionCaller.create(frame.player, frame, token);
+                operators.FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
                 //fc.releaseAfterCall = true;
                 object[] sendargs = toStringCB.cacheObjects; //new object[5];
                 sendargs[0] = obj;

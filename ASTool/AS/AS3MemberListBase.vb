@@ -94,9 +94,12 @@
         Public Function LastRegId() As Integer Implements IAS3MemberList.LastRegId
             Return _regid
         End Function
-        Private _stamentsStack As New Stack(Of List(Of IAS3Stmt))({New List(Of IAS3Stmt)})
 
-        Public ReadOnly Property StamentsStack As Stack(Of System.Collections.Generic.List(Of IAS3Stmt)) Implements IAS3MemberList.StamentsStack
+
+
+		Private _stamentsStack As New Stack(Of List(Of IAS3Stmt))({New List(Of IAS3Stmt)})
+
+		Public ReadOnly Property StamentsStack As Stack(Of System.Collections.Generic.List(Of IAS3Stmt)) Implements IAS3MemberList.StamentsStack
             Get
                 Return _stamentsStack
             End Get

@@ -220,7 +220,7 @@ namespace ASRuntime.operators
                             rtObj
                             );
 
-                        var funCaller = FunctionCaller.create(player, frame, step.token);
+                        var funCaller = player.funcCallerPool.create(player, frame, step.token);
                         funCaller.function = (ASBinCode.rtData.rtFunction)func;
                         funCaller.loadDefineFromFunction();
                         if (!funCaller.createParaScope()) { return; }
@@ -238,7 +238,7 @@ namespace ASRuntime.operators
                         funCaller._tempSlot = frame._tempSlot1;
                         funCaller.returnSlot = register.getSlot(scope, frame);
 
-                        BlockCallBackBase cb = BlockCallBackBase.create();
+                        BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                         cb.setCallBacker(_get_this_item_callbacker);
                         cb.step = step;
                         cb.args = frame;
@@ -348,7 +348,7 @@ namespace ASRuntime.operators
                 else
                 {
 
-                    BlockCallBackBase cb =BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_convert_callbacker);
                     cb.scope = scope;
                     cb.step = step;

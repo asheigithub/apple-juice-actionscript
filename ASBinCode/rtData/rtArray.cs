@@ -4,10 +4,13 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
+	[Serializable]
     public sealed class rtArray : RunTimeValueBase
     {
+		[Serializable]
         public class arrayObjHandle
         {
+			[NonSerialized]
             public rtObject bindArrayObject;
             //public override int GetHashCode()
             //{
@@ -42,7 +45,7 @@ namespace ASBinCode.rtData
         private List<RunTimeValueBase> array;
         public List<RunTimeValueBase> innerArray {
             get { return array; } }
-
+		
         public arrayObjHandle objHandle;
         
         public rtArray():base(RunTimeDataType.rt_array)

@@ -7,45 +7,65 @@ namespace ASRuntime.operators
 {
     class FunctionCaller : IBlockCallBack
     {
-        private static Stack<FunctionCaller> pool;
-        static FunctionCaller()
-        {
-            pool = new Stack<FunctionCaller>();
-            for (int i = 0; i < 256; i++)
-            {
-                pool.Push(new FunctionCaller(null, null, null));
-            }
-        }
-        
-        public static FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
-        {
-            FunctionCaller fc = pool.Pop();
-            fc.player = player;
-            fc.invokerFrame = invokerFrame;
-            fc.token = token;
+		internal class FunctionCallerPool : PoolBase<FunctionCaller>
+		{
+			public FunctionCallerPool() : base(256) { }
 
-            fc.check_para_id = 0;
-            fc.pushedArgs = 0;
-            fc.hasReleased = false;
-            
-            return fc;
-        }
+			public  FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
+			{
+				FunctionCaller fc = base.create();
+				fc.player = player;
+				fc.invokerFrame = invokerFrame;
+				fc.token = token;
 
-        public static void checkpool()
-        {
-            if (pool.Count != 256)
-            {
-                throw new ASRunTimeException("缓存池异常");
-            }
-        }
+				fc.check_para_id = 0;
+				fc.pushedArgs = 0;
+				fc.hasReleased = false;
 
-        private static void ret(FunctionCaller c)
-        {
-            pool.Push(c);
-        }
+				return fc;
+			}
+
+		}
+
+		//private static Stack<FunctionCaller> pool;
+		//static FunctionCaller()
+		//{
+		//    pool = new Stack<FunctionCaller>();
+		//    for (int i = 0; i < 256; i++)
+		//    {
+		//        pool.Push(new FunctionCaller());
+		//    }
+		//}
+
+		//public static FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
+		//{
+		//    FunctionCaller fc = pool.Pop();
+		//    fc.player = player;
+		//    fc.invokerFrame = invokerFrame;
+		//    fc.token = token;
+
+		//    fc.check_para_id = 0;
+		//    fc.pushedArgs = 0;
+		//    fc.hasReleased = false;
+
+		//    return fc;
+		//}
+
+		//public static void checkpool()
+		//{
+		//    if (pool.Count != 256)
+		//    {
+		//        throw new ASRunTimeException("缓存池异常");
+		//    }
+		//}
+
+		//private static void ret(FunctionCaller c)
+		//{
+		//    pool.Push(c);
+		//}
 
 
-        private HeapSlot[] CallFuncHeap;
+		private HeapSlot[] CallFuncHeap;
 
         public ASBinCode.rtData.rtFunction function;
         public ASBinCode.rtti.FunctionDefine toCallFunc;
@@ -63,6 +83,12 @@ namespace ASRuntime.operators
         private StackFrame invokerFrame;
         private SourceToken token;
         private int check_para_id;
+
+
+		public FunctionCaller():this(null,null,null)
+		{
+
+		}
 
         private FunctionCaller(Player player,StackFrame invokerFrame, SourceToken token)
         {
@@ -91,13 +117,14 @@ namespace ASRuntime.operators
                 _tempSlot = null;
                 callbacker = null;
                 
-                player = null;
+                
                 invokerFrame = null;
                 token = null;
                 check_para_id = 0;
 
-                
-                ret(this);
+                player.funcCallerPool.ret(this);
+				player = null;
+
             }
             
         }
@@ -436,7 +463,7 @@ namespace ASRuntime.operators
                     toCallFunc.signature.parameters[check_para_id].type != RunTimeDataType.rt_void
                     )
                 {
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = player.blockCallBackPool.create();
                     cb.args = argement;
                     cb._intArg = check_para_id;
                     cb.setCallBacker(check_para_callbacker);
@@ -606,7 +633,7 @@ namespace ASRuntime.operators
                 if (!ReferenceEquals(callbacker, this))
                 {
                     //***执行完成后，先清理参数***
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = player.blockCallBackPool.create();
                     cb.args = cb.cacheObjects;
                     cb.cacheObjects[0] = callbacker;
                     cb.cacheObjects[1] = invokerFrame;

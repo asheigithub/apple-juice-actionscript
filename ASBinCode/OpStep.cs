@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public class OpStep
+	[Serializable]
+	public class OpStep
     {
         public SourceToken token;
 

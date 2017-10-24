@@ -31,7 +31,9 @@ namespace ASRuntime
             linktypemapper = new RuntimeLinkTypeMapper();
             linktypemapper.init(swc);
 
-            //****************
+			//****************
+			
+
 
             if (block != null)
             {
@@ -112,7 +114,11 @@ namespace ASRuntime
         private Stack<StackFrame> runtimeStack;
         StackSlot[] stackSlots;
         private FrameInfo displayStackFrame;
-        
+
+		internal StackFrame.StackFramePool stackframePool;
+		internal operators.FunctionCaller.FunctionCallerPool funcCallerPool;
+		internal BlockCallBackBase.BlockCallBackBasePool blockCallBackPool;
+
         public RunTimeValueBase run2(RightValueBase result)
         {
 
@@ -130,8 +136,12 @@ namespace ASRuntime
 
 			if (!_hasInitStack)
 			{
+				stackframePool = new StackFrame.StackFramePool();
+				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool();
+				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
+
 				runtimeStack = new Stack<StackFrame>();
-				stackSlots = new StackSlot[1024*16];
+				stackSlots = new StackSlot[1024];
 				for (int i = 0; i < stackSlots.Length; i++)
 				{
 					stackSlots[i] = new StackSlot(swc);
@@ -175,79 +185,78 @@ namespace ASRuntime
                 );
             displayStackFrame = runtimeStack.Peek().getInfo();
 
+			while (true)
+			{
+				//try
+				{
+					while (step())
+					{
 
-            while (true)
-            {
-                //try
-                {
-                    while (step())
-                    {
+					}
+					break;
+				}
+				//catch (ASRunTimeException)   //引擎抛出的异常直接抛出
+				//{
+				//    throw;
+				//}
+				//catch (StackOverflowException)
+				//{
+				//    throw;
+				//}
+				//catch (OutOfMemoryException)
+				//{
+				//    throw;
+				//}
+				//catch (Exception le)    //捕获外部函数异常
+				//{
+				//    if (currentRunFrame != null)
+				//    {
+				//        if (_nativefuncCaller != null)
+				//        {
+				//            if (_nativefuncCaller.callbacker != null)
+				//            {
+				//                _nativefuncCaller.callbacker.noticeRunFailed();
+				//            }
+				//            _nativefuncCaller.release();
+				//            _nativefuncCaller = null;
+				//        }
 
-                    }
-                    break;
-                }
-                //catch (ASRunTimeException)   //引擎抛出的异常直接抛出
-                //{
-                //    throw;
-                //}
-                //catch (StackOverflowException)
-                //{
-                //    throw;
-                //}
-                //catch (OutOfMemoryException)
-                //{
-                //    throw;
-                //}
-                //catch (Exception le)    //捕获外部函数异常
-                //{
-                //    if (currentRunFrame != null)
-                //    {
-                //        if (_nativefuncCaller != null)
-                //        {
-                //            if (_nativefuncCaller.callbacker != null)
-                //            {
-                //                _nativefuncCaller.callbacker.noticeRunFailed();
-                //            }
-                //            _nativefuncCaller.release();
-                //            _nativefuncCaller = null;
-                //        }
+				//        SourceToken token;
 
-                //        SourceToken token;
+				//        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
+				//        {
+				//            token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
+				//        }
+				//        else
+				//        {
+				//            token = new SourceToken(0, 0, string.Empty);
+				//        }
 
-                //        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
-                //        {
-                //            token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
-                //        }
-                //        else
-                //        {
-                //            token = new SourceToken(0, 0, string.Empty);
-                //        }
+				//        currentRunFrame.throwAneException(token
+				//            , le.Message);
+				//        currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
 
-                //        currentRunFrame.throwAneException(token
-                //            , le.Message);
-                //        currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
-
-                //        continue;
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
-            }
-            
-
-            
+				//        continue;
+				//    }
+				//    else
+				//    {
+				//        throw;
+				//    }
+				//}
+			}
 
 
-            if (runtimeError != null)
+
+
+
+			if (runtimeError != null)
             {
                 outPutErrorMessage(runtimeError);
             }
 
-            operators.FunctionCaller.checkpool();
-            BlockCallBackBase.checkpool();
-            StackFrame.checkpool();
+            funcCallerPool.checkpool();
+            blockCallBackPool.checkpool();
+			stackframePool.checkpool();
 
 #if DEBUG
             if (isConsoleOut)
@@ -362,7 +371,7 @@ namespace ASRuntime
 
             StackFrame frame = null;
 
-            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length || !StackFrame.hasCacheObj())
+            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length || !stackframePool.hasCacheObj())
             {
                 //runtimeError = new error.InternalError(token, "stack overflow");
                 if (callbacker != null)
@@ -379,7 +388,7 @@ namespace ASRuntime
             }
             else
             {
-                frame = StackFrame.create(calledblock);
+                frame = stackframePool.create(calledblock);
                 frame.codeLinePtr = 0;
                 frame.player = this;
                 frame.returnSlot = returnSlot;
@@ -401,42 +410,81 @@ namespace ASRuntime
                     var slot = (StackSlot)regvar.getSlot(null, frame);
                     TypeConverter.setDefaultValueToStackSlot(
                         regvar.valueType,slot
-                        );
-
-                    //block.regConvFromVar[i].getSlot(null, frame).directSet(
-                    //    TypeConverter.getDefaultValue(block.regConvFromVar[i].valueType).getValue(null, null)
-                    //    );
+                        ); 
                 }
 
             }
 
 
-            if (
-                ReferenceEquals(membersHeap, emptyMembers)
-                && type == RunTimeScopeType.function
-                &&
-                this_pointer is rtObject
-                &&
-                (callerScope == null ||
-                callerScope.scopeType != RunTimeScopeType.function)
-                )
-            {
-                frame.scope = ((rtObject)this_pointer).objScope; //callerScope;
-            }
-            else
-            {
-                RunTimeScope scope;
+			//if (
+			//    ReferenceEquals(membersHeap, emptyMembers)
+			//    && type == RunTimeScopeType.function
+			//    &&
+			//    this_pointer is rtObject
+			//    &&
+			//    (callerScope == null ||
+			//    callerScope.scopeType != RunTimeScopeType.function)
+			//    )
+			//{
+			//    frame.scope = ((rtObject)this_pointer).objScope; //callerScope;
+			//}
+			if (ReferenceEquals(membersHeap, emptyMembers) && type== RunTimeScopeType.function)
+			{
+				if (this_pointer is rtObject)
+				{
+					if (callerScope == null || callerScope.scopeType != RunTimeScopeType.function)
+					{
+						frame.scope = ((rtObject)this_pointer).objScope;
+					}
+					else
+					{
+						RunTimeScope scope;
 
-                scope = new RunTimeScope(
-                    membersHeap, calledblock.id, callerScope
-                    ,
-                    this_pointer,
-                    type
-                );
+						scope = new RunTimeScope(
+							membersHeap, calledblock.id, callerScope
+							,
+							this_pointer,
+							type
+						);
 
-                frame.scope = scope;
-                
-            }
+						frame.scope = scope;
+					}
+				}
+				else
+				{
+					if (callerScope == null)
+					{
+						RunTimeScope scope;
+
+						scope = new RunTimeScope(
+							membersHeap, calledblock.id, callerScope
+							,
+							this_pointer,
+							type
+						);
+
+						frame.scope = scope;
+					}
+					else
+					{
+						frame.scope = callerScope;
+					}
+				}
+			}
+			else
+			{
+				RunTimeScope scope;
+
+				scope = new RunTimeScope(
+					membersHeap, calledblock.id, callerScope
+					,
+					this_pointer,
+					type
+				);
+
+				frame.scope = scope;
+
+			}
             //frame.scope_thispointer = this_pointer;
             
             return frame.scope;
@@ -455,14 +503,15 @@ namespace ASRuntime
         internal bool step_toStackflag(int stackflag)
         {
             int f = stackflag;
-            while (step() && receive_error==null)
+            while (step())// && receive_error==null)
             {
                 if (runtimeStack.Count == f)
                 {
-                    return true;
+					break;
+                    //return (receive_error==null);
                 }
             }
-            return false;
+            return (receive_error == null);
 
         }
 
@@ -506,7 +555,7 @@ namespace ASRuntime
                     
                 }
 
-                currentRunFrame.close();
+                currentRunFrame.close(); stackframePool.ret(currentRunFrame);
                 runtimeStack.Pop();
 
                 //runtimeStack.Pop(); //出栈
@@ -564,7 +613,7 @@ namespace ASRuntime
 
             runtimeStack.Pop();
 
-            raiseframe.close();
+            raiseframe.close(); stackframePool.ret(raiseframe);
 
 #if DEBUG
 

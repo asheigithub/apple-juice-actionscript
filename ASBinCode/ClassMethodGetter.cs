@@ -5,7 +5,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public sealed class ClassMethodGetter : MethodGetterBase
+	[Serializable]
+	public sealed class ClassMethodGetter : MethodGetterBase
     {
         public ClassMethodGetter(string name, rtti.Class _class, int indexofMember
             , int refdefinedinblockid
@@ -81,6 +82,7 @@ namespace ASBinCode
                     return (rtFunction)cache.Target;
                 }
             }
+
 
             if (!isNotReadVirtual)
             {

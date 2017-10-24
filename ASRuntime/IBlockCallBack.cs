@@ -18,46 +18,72 @@ namespace ASRuntime
 
     class BlockCallBackBase : IBlockCallBack
     {
-        //private static List<BlockCallBackBase> oo;
+		//private static List<BlockCallBackBase> oo;
 
-        private static Stack<BlockCallBackBase> pool;
-        static BlockCallBackBase()
-        {
-            pool = new Stack<BlockCallBackBase>();
-            for (int i = 0; i < 1024; i++)
-            {
-                pool.Push(new BlockCallBackBase());
-            }
+		//private static Stack<BlockCallBackBase> pool;
+		//static BlockCallBackBase()
+		//{
+		//    pool = new Stack<BlockCallBackBase>();
+		//    for (int i = 0; i < 1024; i++)
+		//    {
+		//        pool.Push(new BlockCallBackBase());
+		//    }
 
-            //oo = new List<BlockCallBackBase>();
-        }
-        
-        public static BlockCallBackBase create()
-        {
-            BlockCallBackBase cb = pool.Pop();
-            cb.hasnoticed = false;
-            cb.hasreleased = false;
+		//    //oo = new List<BlockCallBackBase>();
+		//}
 
-            //oo.Add(cb);
+		//public static BlockCallBackBase create()
+		//{
+		//    BlockCallBackBase cb = pool.Pop();
+		//    cb.hasnoticed = false;
+		//    cb.hasreleased = false;
 
-            return cb;
-        }
+		//    //oo.Add(cb);
 
-        private static void ret(BlockCallBackBase c)
-        {
-            pool.Push(c);
-            //oo.Remove(c);
-        }
+		//    return cb;
+		//}
 
-        public static void checkpool()
-        {
-            if (pool.Count != 1024)
-            {
-                throw new ASBinCode.ASRunTimeException("缓存池异常");
-            }
-        }
+		//private static void ret(BlockCallBackBase c)
+		//{
+		//    pool.Push(c);
+		//    //oo.Remove(c);
+		//}
 
-        public delegate void dgeCallbacker(BlockCallBackBase sender, object args);
+		//public static void checkpool()
+		//{
+		//    if (pool.Count != 1024)
+		//    {
+		//        throw new ASBinCode.ASRunTimeException("缓存池异常");
+		//    }
+		//}
+
+		internal class BlockCallBackBasePool : PoolBase<BlockCallBackBase>
+		{
+			Player player;
+			public BlockCallBackBasePool(Player player):base(1024)
+			{
+				this.player = player;
+			}
+
+			public override BlockCallBackBase create()
+			{
+				BlockCallBackBase cb = base.create();
+				cb.hasnoticed = false;
+				cb.hasreleased = false;
+				cb.player = player;
+				//oo.Add(cb);
+
+				return cb;
+			}
+			public override void ret(BlockCallBackBase c)
+			{
+				c.player = null;
+				base.ret(c);
+			}
+		}
+
+
+		public delegate void dgeCallbacker(BlockCallBackBase sender, object args);
         public bool isSuccess;
 
         public int _intArg;
@@ -73,7 +99,9 @@ namespace ASRuntime
         private bool hasreleased;
         private bool hasnoticed;
 
-        private BlockCallBackBase()
+		private Player player;
+
+        public BlockCallBackBase()
         {
             cacheObjects = new object[10];
         }
@@ -183,7 +211,7 @@ namespace ASRuntime
                 cacheObjects[8] = null;
                 cacheObjects[9] = null;
 
-                ret(this);
+                player.blockCallBackPool.ret(this);
 
             }
         }

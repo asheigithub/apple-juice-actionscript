@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public sealed class Variable:VariableBase
+	[Serializable]
+	public sealed class Variable:VariableBase
     {
         public Variable(string name, int index, int refblockid) : this(name, index, false, refblockid, false)
         {

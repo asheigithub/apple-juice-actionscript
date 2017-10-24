@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-    /// <summary>
-    /// 函数形参
-    /// </summary>
-    public class FunctionParameter
+	[Serializable]
+	/// <summary>
+	/// 函数形参
+	/// </summary>
+	public class FunctionParameter
     {
         /// <summary>
         /// 参数名

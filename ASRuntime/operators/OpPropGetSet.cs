@@ -33,7 +33,7 @@ namespace ASRuntime.operators
                     rtObj
                     );
 
-                var funCaller = FunctionCaller.create(player, frame, step.token);
+                var funCaller = player.funcCallerPool.create(player, frame, step.token);
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
@@ -57,7 +57,7 @@ namespace ASRuntime.operators
                 ret._cache_setthisslot.setindex = v2;
 
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_get_this_item_callbacker);
                 cb.step = step;
                 cb.args = frame;
@@ -168,7 +168,7 @@ namespace ASRuntime.operators
 
                 //***调用设置器***
 
-                var funCaller =  FunctionCaller.create(player, frame, step.token);
+                var funCaller = player.funcCallerPool.create(player, frame, step.token);
                 //funCaller.releaseAfterCall = true;
                 funCaller.function = (ASBinCode.rtData.rtFunction)func;
                 funCaller.loadDefineFromFunction();
@@ -181,7 +181,7 @@ namespace ASRuntime.operators
                 ((StackSlot)funCaller.returnSlot).propBindObj = propBindObj;   //propslot.bindObj;
 
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_getter_callbacker);
                 cb.step = step;
                 cb.args = frame;

@@ -55,7 +55,7 @@ namespace ASRuntime.operators
                 v1.rtType, v2.rtType);
             if (f != null)
             {
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token);
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 //fc.releaseAfterCall = true;
@@ -166,7 +166,7 @@ namespace ASRuntime.operators
             else if (finalType == ASBinCode.RunTimeDataType.rt_string)
             {
 
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_Cast_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;

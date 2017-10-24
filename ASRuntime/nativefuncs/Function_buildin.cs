@@ -262,7 +262,7 @@ namespace ASRuntime.nativefuncs
             rtFunction toApply= (rtFunction)func.Clone();
 
             //toApply.setThis(thisArg);
-            FunctionCaller caller =  FunctionCaller.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+            FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
@@ -427,7 +427,7 @@ namespace ASRuntime.nativefuncs
             rtFunction toApply = (rtFunction)func.Clone();
 
             //toApply.setThis(thisArg);
-            FunctionCaller caller =  FunctionCaller.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+            FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();

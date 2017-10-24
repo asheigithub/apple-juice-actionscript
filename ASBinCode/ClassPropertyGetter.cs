@@ -5,7 +5,8 @@ using System.Text;
 
 namespace ASBinCode
 {
-    public sealed class ClassPropertyGetter :LeftValueBase, IMember 
+	[Serializable]
+	public sealed class ClassPropertyGetter :LeftValueBase, IMember 
     {
         public readonly ASBinCode.rtti.Class _class;
         private readonly int indexofMember;
@@ -107,7 +108,7 @@ namespace ASBinCode
         {
             return name + "{" + (getter!=null?"get;":" ") + (setter !=null?"set;":" ")+ "}";
         }
-
+		[Serializable]
         public sealed class PropertySlot : SLOT
         {
             //public rtObject bindObj;

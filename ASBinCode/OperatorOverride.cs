@@ -79,13 +79,13 @@ namespace ASBinCode
         
 
     }
-
-    class DefineAndFunc
+	
+	class DefineAndFunc
     {
         public rtti.FunctionDefine define;
         public rtData.rtFunction func;
     }
-
+	[Serializable]
     public class OperatorFunctions
     {
         private Dictionary<OperatorFunctionKey, DefineAndFunc>[] operFunctions;

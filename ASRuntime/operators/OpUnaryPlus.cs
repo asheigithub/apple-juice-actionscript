@@ -16,7 +16,7 @@ namespace ASRuntime.operators
             if (f != null)
             {
 
-                FunctionCaller fc =  FunctionCaller.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
                 bool success;
@@ -29,7 +29,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                BlockCallBackBase cb = BlockCallBackBase.create();
+                BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.scope = scope;
                 cb.step = step;
                 cb.args = frame;

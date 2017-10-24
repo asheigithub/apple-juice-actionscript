@@ -4,7 +4,8 @@ using System.Text;
 
 namespace ASBinCode.scopes
 {
-    public class FunctionScope :ScopeBase
+	[Serializable]
+	public class FunctionScope :ScopeBase
     {
         public readonly ASBinCode.rtti.FunctionDefine function;
         public FunctionScope(rtti.FunctionDefine function)

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace ASBinCode
 {
-    /// <summary>
-    /// this指针
-    /// </summary>
-    public sealed class ThisPointer : RightValueBase
+	[Serializable]
+	/// <summary>
+	/// this指针
+	/// </summary>
+	public sealed class ThisPointer : RightValueBase
     {
 
         //RunTimeDataType _vt;

@@ -216,7 +216,7 @@ namespace ASRuntime.operators
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                var funcCaller =  FunctionCaller.create(frame.player, frame, step.token);
+                var funcCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 funcCaller.function = function;
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();
@@ -370,7 +370,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    BlockCallBackBase cb = BlockCallBackBase.create();
+                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.step = step;
                     cb.args = frame;
                     cb.setCallBacker(_convert_cb);

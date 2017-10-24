@@ -168,7 +168,6 @@ namespace ASRuntime
                             rtObject obj = (rtObject)value;
                             if (obj.value._class.isLink_System)
                             {
-
                                 //链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
                                 //要重新创建rtObject,而是直接更新缓存的rtObject.
                                 var cacheobj = _linkObjCache.getCacheObj(obj.value._class);
@@ -177,15 +176,26 @@ namespace ASRuntime
                                 if (obj.value._class.isStruct)
                                 {
                                     link.CopyStructData((ASBinCode.rtti.LinkSystemObject)obj.value);
-                                }
+									
+								}
                                 else
                                 {
-                                    link._class = obj.value._class;
-                                    link.SetLinkData(((ASBinCode.rtti.LinkSystemObject)obj.value).GetLinkData());
-                                    cacheobj.rtType = obj.rtType;
-                                    cacheobj.objScope.blockId = obj.value._class.blockid;
-                                    
-                                }
+									link._class = obj.value._class;
+									link.SetLinkData(((ASBinCode.rtti.LinkSystemObject)obj.value).GetLinkData());
+									cacheobj.rtType = obj.rtType;
+									cacheobj.objScope.blockId = obj.value._class.blockid;
+									
+								}
+
+								
+								var srcObj = ((rtObject)value).getSrcObject();
+								if (!(srcObj is StackLinkObjectCache.StackCacheObject))
+								{
+									//当对象方法调用已绑定了这个槽中的链接对象，然后下面又复用了这个槽时
+									//为了避免下面寄存器复用破坏缓存中的LinkSystemObject对象，缓存一份
+									_linkObjCache.srcObject = srcObj;
+								}
+								
 
                                 store[RunTimeDataType._OBJECT] = cacheobj;
                                 
@@ -208,7 +218,7 @@ namespace ASRuntime
             index = RunTimeDataType._OBJECT;
 
             var cacheobj = _linkObjCache.getCacheObj(clsType);
-            
+			
             if (clsType.isStruct)
             {
                 var link = (ASBinCode.rtti.LinkObj<T>)cacheobj.value;
@@ -236,8 +246,26 @@ namespace ASRuntime
             }
             else
             {
-                return store[index];
-            }
+				return store[index];
+				//var k = store[index];
+				//if (k is rtObject)
+				//{
+				//	if (((rtObject)k).value._class.isLink_System)
+				//	{
+				//		return k;
+				//		//return (RunTimeValueBase)k.Clone();
+				//	}
+				//	else
+				//	{
+				//		return k;
+				//	}
+				//}
+				//else
+				//{
+				//	return k;
+				//}
+
+			}
             //throw new NotImplementedException();
         }
 
@@ -362,7 +390,8 @@ namespace ASRuntime
             _cache_prototypeSlot.clear();
             _cache_setthisslot.clear();
             _linkObjCache.clearRefObj();
-            
+			_linkObjCache.srcObject = null;
+
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;
             store[RunTimeDataType.rt_array] = rtNull.nullptr;
@@ -370,5 +399,31 @@ namespace ASRuntime
 
             index = (int)RunTimeDataType.unknown;
         }
+
+		/// <summary>
+		/// 重置除_linkObjCache外的所有缓存
+		/// </summary>
+		public void resetSlot()
+		{
+			linktarget = null;
+			propGetSet = null;
+			propBindObj = null;
+			superPropBindClass = null;
+
+			_temp_try_write_setthisitem = null;
+
+			_cache_vectorSlot.clear();
+			_cache_prototypeSlot.clear();
+			_cache_setthisslot.clear();
+			_linkObjCache.clearRefObj();
+
+			store[RunTimeDataType.rt_string] = rtNull.nullptr;
+			store[RunTimeDataType.rt_function] = rtNull.nullptr;
+			store[RunTimeDataType.rt_array] = rtNull.nullptr;
+			store[RunTimeDataType._OBJECT] = rtNull.nullptr;
+
+			index = (int)RunTimeDataType.unknown;
+		}
+
     }
 }

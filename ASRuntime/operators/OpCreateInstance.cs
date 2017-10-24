@@ -328,7 +328,7 @@ namespace ASRuntime.operators
 
             
 
-            BlockCallBackBase cb = BlockCallBackBase.create();
+            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -344,7 +344,7 @@ namespace ASRuntime.operators
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
 
-            BlockCallBackBase cb = BlockCallBackBase.create();
+            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;

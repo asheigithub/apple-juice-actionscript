@@ -681,7 +681,7 @@ namespace ASRuntime.nativefuncs
             }
 
 
-            BlockCallBackBase sepcb =  BlockCallBackBase.create();
+            BlockCallBackBase sepcb = frame.player.blockCallBackPool.create();
             sepcb.scope = scope;
             sepcb._intArg = 0;
 
@@ -722,7 +722,7 @@ namespace ASRuntime.nativefuncs
 
             List<RunTimeValueBase> array = (List<RunTimeValueBase>)receiveArgs[1];
 
-            BlockCallBackBase valueCB = BlockCallBackBase.create();
+            BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
             valueCB._intArg = sender._intArg + 1;
             valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
             valueCB.setCallBacker(_ValueToString_CB);
@@ -750,7 +750,7 @@ namespace ASRuntime.nativefuncs
             if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
             {
                 ((rtInt)receiveArgs[8]).value = 0;
-                BlockCallBackBase valueCB =  BlockCallBackBase.create();
+                BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                 valueCB._intArg = sender._intArg;
                 valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
@@ -785,7 +785,7 @@ namespace ASRuntime.nativefuncs
                     else
                     {
                         
-                        BlockCallBackBase valueCB = BlockCallBackBase.create();
+                        BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                         valueCB._intArg = sender._intArg + 1;
                         valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                         valueCB.setCallBacker(_ValueToString_CB);

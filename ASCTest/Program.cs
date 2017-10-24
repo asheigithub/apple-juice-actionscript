@@ -23,7 +23,7 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0];
+                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
 
 				//path = "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as";
 
@@ -144,7 +144,35 @@ namespace ASCTest
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
-                if (swc != null)
+				//byte[] bin;
+				//{
+				//	swc.unLoadNativeFunctions();
+
+				//	System.IO.MemoryStream _memory = new System.IO.MemoryStream();
+				//	System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter
+				//		= new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+				//	formatter.Serialize(_memory, swc);
+
+				//	bin = _memory.ToArray();
+				//	_memory.Close();
+				//}
+				//{
+				//	ASBinCode.CSWC _newOjb = null;
+
+				//	System.IO.MemoryStream _memory = new System.IO.MemoryStream(bin);
+				//	_memory.Position = 0;
+				//	System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+				//	_newOjb = (ASBinCode.CSWC)formatter.Deserialize(_memory);
+				//	_memory.Close();
+
+
+				//	swc = _newOjb;
+
+				//	ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
+				//}
+
+
+				if (swc != null)
                 {
 #if DEBUG
                     
@@ -167,8 +195,7 @@ namespace ASCTest
                     {
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
-
-
+						
                         Console.WriteLine();
                         Console.WriteLine("====程序输出====");
 

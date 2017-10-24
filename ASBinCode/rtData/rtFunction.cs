@@ -4,10 +4,13 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
+	[Serializable]
     public sealed class rtFunction : RunTimeValueBase
     {
+		[Serializable]
         public class functionObjHandle
         {
+			[NonSerialized]
             public rtObject bindFunctionObj;
 
             //public override int GetHashCode()
@@ -35,7 +38,7 @@ namespace ASBinCode.rtData
 
         private int _objid;
         private static int _seed;
-
+		[NonSerialized]
         private RunTimeScope _bindScope;
 
         public RunTimeScope bindScope
@@ -50,7 +53,7 @@ namespace ASBinCode.rtData
             get { return _this_pointer; }
         }
 
-
+		
         public functionObjHandle objHandle;
 
 
@@ -92,7 +95,14 @@ namespace ASBinCode.rtData
 
         public void setThis(RunTimeValueBase obj)
         {
-            _this_pointer = obj;
+			if (obj is rtObject)
+			{
+				_this_pointer = ((rtObject)obj).getSrcObject();
+			}
+			else
+			{
+				_this_pointer = obj;
+			}
         }
 
         public override double toNumber()

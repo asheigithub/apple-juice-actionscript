@@ -202,10 +202,12 @@
         Public Function LastRegId() As Integer Implements IAS3MemberList.LastRegId
             Return _regid
         End Function
+
+
 #End Region
 
-        
-    End Class
+
+	End Class
 End Namespace
 
 

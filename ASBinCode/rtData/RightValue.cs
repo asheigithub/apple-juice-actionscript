@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
+	[Serializable]
     public sealed class RightValue : RightValueBase
     {
         private readonly RunTimeValueBase value;

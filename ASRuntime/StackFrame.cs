@@ -11,51 +11,30 @@ namespace ASRuntime
     /// </summary>
     public sealed class StackFrame :RunTimeDataHolder
     {
-        private static Stack<StackFrame> pool;
-        static StackFrame()
-        {
-            pool = new Stack<StackFrame>();
-            for (int i = 0; i < 256; i++)
-            {
-                pool.Push(new StackFrame(null));
-            }
-        }
-
-		public static bool hasCacheObj()
+		internal class StackFramePool : PoolBase<StackFrame>
 		{
-			return pool.Count > 0;
+			public StackFramePool() : base(256)
+			{
+			}
+
+			public StackFrame create(CodeBlock block)
+			{
+				StackFrame frame = base.create();
+				frame.block = block;
+				frame.stepCount = block.opSteps.Count;
+
+				frame.isclosed = false;
+
+
+				return frame;
+			}
+
 		}
 
-        public static StackFrame create(CodeBlock block)
-        {
-            StackFrame frame = pool.Pop();
-            frame.block = block;
-            frame.stepCount = block.opSteps.Count;
-
-            frame.isclosed = false;
-
-            
-            return frame;
-        }
-
-        public static void checkpool()
-        {
-            if (pool.Count != 256)
-            {
-                throw new ASRunTimeException("缓存池异常");
-            }
-        }
-
-        private static void ret(StackFrame c)
-        {
-            
-            pool.Push(c);
-        }
 
 
-
-        internal int stepCount;
-        private StackFrame(CodeBlock block)
+		internal int stepCount;
+        public StackFrame()
         {
             //this.block = block;
             //stepCount = block.opSteps.Count;
@@ -611,6 +590,12 @@ namespace ASRuntime
                     returnSlot.directSet(rtUndefined.undefined);
                     endStep(step);
                     break;
+				case OpCode.reset_stackslot:
+
+					((StackSlot)((Register)step.arg1).getSlot(scope, this)).resetSlot(); 
+
+					endStep(step);
+					break;
                 default:
 
                     runtimeError = (new error.InternalError(step.token,
@@ -1300,11 +1285,7 @@ namespace ASRuntime
                 stack[i].clear();
             }
 
-            
-            //_tempSlot1.clear();
-            //_tempSlot2.clear();
-            //_dictMethods.Clear();
-
+			
 
             tryCatchState.Clear();
             block = null;
@@ -1335,7 +1316,7 @@ namespace ASRuntime
 #endif   
 
 
-            ret(this);
+            
             
             
         }

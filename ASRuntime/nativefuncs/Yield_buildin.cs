@@ -80,7 +80,7 @@ namespace ASRuntime.nativefuncs
             CallFuncHeap[CallFuncHeap.Length - 1].directSet(ASBinCode.rtData.rtBoolean.False);
 
 
-            BlockCallBackBase cb = BlockCallBackBase.create();
+            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = yieldObj;
             cb.setCallBacker(_movenext_callbacker);
 

@@ -452,5 +452,9 @@ namespace ASBinCode
 
         yield_continuetoline=112,
 
+
+
+		///重置StackSlot;
+		reset_stackslot=113
     }
 }
