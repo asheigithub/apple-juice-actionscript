@@ -22,6 +22,8 @@ namespace ASRuntime.operators
 				fc.pushedArgs = 0;
 				fc.hasReleased = false;
 
+				fc.tag = null;
+
 				return fc;
 			}
 
@@ -78,12 +80,14 @@ namespace ASRuntime.operators
 
         public IBlockCallBack callbacker;
 
+		
 
         public Player player;
         private StackFrame invokerFrame;
         private SourceToken token;
         private int check_para_id;
 
+		public object tag;
 
 		public FunctionCaller():this(null,null,null)
 		{
@@ -121,6 +125,8 @@ namespace ASRuntime.operators
                 invokerFrame = null;
                 token = null;
                 check_para_id = 0;
+
+				tag = null;
 
                 player.funcCallerPool.ret(this);
 				player = null;

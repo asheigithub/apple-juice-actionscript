@@ -261,18 +261,74 @@ namespace ASRuntime.nativefuncs
             rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
             rtFunction toApply= (rtFunction)func.Clone();
 
-            //toApply.setThis(thisArg);
-            FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+
+			if (!func.ismethod) //方法无法更改this
+			{
+				if (!(thisArg is rtObject))
+				{
+					var player = ((StackFrame)stackframe).player;
+					var objtype = thisArg.rtType;
+					if (objtype < RunTimeDataType.unknown
+						&&
+						player.swc.primitive_to_class_table[objtype] != null
+						)
+					{
+						FunctionCaller toinsert = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+						toinsert.callbacker = (IBlockCallBack)callbacker;
+						toinsert.function = toApply;
+						toinsert.loadDefineFromFunction();
+						toinsert._tempSlot = ((StackFrame)stackframe)._tempSlot1;
+						toinsert.returnSlot = resultSlot;
+						toinsert.tag = argements;
+						stackCallers.Push(toinsert);
+
+						//***转换为对象***
+
+						OpCast.Primitive_to_Object(thisArg, (StackFrame)stackframe, token, scope,
+							((StackFrame)stackframe)._tempSlot1,
+							null, _primitive_toObj);
+
+
+
+
+						
+
+						return;
+					}
+					else
+					{
+						var fd = player.swc.functions[toApply.functionId];
+						var block = player.swc.blocks[fd.blockid];
+						//if (block.isoutclass )将this复位
+						{
+
+							var oc = player.outpackage_runtimescope[block.define_class_id];
+							toApply.setThis(oc.this_pointer);
+						}
+
+						//caller.function.setThis(caller.function.bindScope.this_pointer);
+					}
+				}
+				else
+				{
+					toApply.setThis((rtObject)thisArg);
+				}
+			}
+
+
+
+
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
             caller.loadDefineFromFunction();
-            if (!caller.createParaScope()) {  return; }
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
+			if (!caller.createParaScope()) { return; }
 
-            //caller.releaseAfterCall = true;
 
-            if (argements[1].getValue().rtType != rtNull.nullptr.rtType)
+
+			if (argements[1].getValue().rtType != rtNull.nullptr.rtType)
             {
                 rtArray argArray = (rtArray)argements[1].getValue();
                 for (int i = 0; i < argArray.innerArray.Count; i++)
@@ -282,46 +338,6 @@ namespace ASRuntime.nativefuncs
                 }
             }
 
-            if (!func.ismethod) //方法无法更改this
-            {
-                if (!(thisArg is rtObject))
-                {
-                    var player = ((StackFrame)stackframe).player;
-                    var objtype = thisArg.rtType;
-                    if (objtype < RunTimeDataType.unknown
-                        &&
-                        player.swc.primitive_to_class_table[objtype] != null
-                        )
-                    {
-                        //***转换为对象***
-
-                        OpCast.Primitive_to_Object(thisArg, (StackFrame)stackframe, token, scope,
-                            ((StackFrame)stackframe)._tempSlot1,
-                            null, _primitive_toObj);
-
-                        stackCallers.Push(caller);
-
-                        return;
-                    }
-                    else
-                    {
-                        var fd = player.swc.functions[caller.function.functionId];
-                        var block = player.swc.blocks[fd.blockid];
-                        //if (block.isoutclass )将this复位
-                        {
-
-                            var oc = player.outpackage_runtimescope[block.define_class_id];
-                            caller.function.setThis(oc.this_pointer);
-                        }
-
-                        //caller.function.setThis(caller.function.bindScope.this_pointer);
-                    }
-                }
-                else
-                {
-                    caller.function.setThis((rtObject)thisArg);
-                }
-            }
             caller.call();
             
         }
@@ -336,24 +352,29 @@ namespace ASRuntime.nativefuncs
             var c = stackCallers.Pop();
             if (v1.rtType < RunTimeDataType.unknown)
             {
-                
                 c.function.setThis(null);
-                c.call();
-                
-                return;
             }
             else
             {
                 rtObject rtObj = (rtObject)v1;
                 c.function.setThis(rtObj);
-                c.call();
-                
-                return;
             }
-            
 
-            
-        }
+			if (!c.createParaScope()) { return; }
+
+			SLOT[] argements = (SLOT[])c.tag;
+
+			if (argements[1].getValue().rtType != rtNull.nullptr.rtType)
+			{
+				rtArray argArray = (rtArray)argements[1].getValue();
+				for (int i = 0; i < argArray.innerArray.Count; i++)
+				{
+					bool success;
+					c.pushParameter(argArray.innerArray[i], i, out success);
+				}
+			}
+			c.call();
+		}
 
     }
 
@@ -426,16 +447,70 @@ namespace ASRuntime.nativefuncs
             rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
             rtFunction toApply = (rtFunction)func.Clone();
 
-            //toApply.setThis(thisArg);
-            FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+
+			if (!func.ismethod) //方法无法更改this
+			{
+				if (!(thisArg is rtObject))
+				{
+					var player = ((StackFrame)stackframe).player;
+					var objtype = thisArg.rtType;
+					if (objtype < RunTimeDataType.unknown
+						&&
+						player.swc.primitive_to_class_table[objtype] != null
+						)
+					{
+						FunctionCaller toInsertStack = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+						toInsertStack.callbacker = (IBlockCallBack)callbacker;
+						toInsertStack.function = toApply;
+						toInsertStack._tempSlot = ((StackFrame)stackframe)._tempSlot1;
+						toInsertStack.returnSlot = resultSlot;
+						toInsertStack.tag = argements;
+
+						stackCallers.Push(toInsertStack);
+
+						//***转换为对象***
+						OpCast.Primitive_to_Object(thisArg, (StackFrame)stackframe, token, scope,
+							((StackFrame)stackframe)._tempSlot1,
+							null, _primitive_toObj);
+
+						
+						return;
+					}
+					else
+					{
+						var fd = player.swc.functions[toApply.functionId];
+						var block = player.swc.blocks[fd.blockid];
+						//if (block.isoutclass )将this复位
+						{
+
+							var oc = player.outpackage_runtimescope[block.define_class_id];
+							toApply.setThis(oc.this_pointer);
+						}
+						//else
+						//{
+						//    caller.function.setThis(null);
+						//}
+
+
+					}
+				}
+				else
+				{
+					toApply.setThis((rtObject)thisArg);
+				}
+			}
+
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.function = toApply;
-            caller.loadDefineFromFunction();
-            if (!caller.createParaScope()) {  return; }
-            caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
-            caller.returnSlot = resultSlot;
+			caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
+			caller.returnSlot = resultSlot;
 
-            //caller.releaseAfterCall = true;
+			caller.loadDefineFromFunction();
+            if (!caller.createParaScope()) {  return; }
+            
+
+ 
 
             if (argements[1].getValue().rtType == RunTimeDataType.rt_array)
             {
@@ -447,50 +522,7 @@ namespace ASRuntime.nativefuncs
                 }
             }
 
-            if (!func.ismethod) //方法无法更改this
-            {
-                if (!(thisArg is rtObject))
-                {
-                    var player = ((StackFrame)stackframe).player;
-                    var objtype = thisArg.rtType;
-                    if (objtype < RunTimeDataType.unknown
-                        &&
-                        player.swc.primitive_to_class_table[objtype] != null
-                        )
-                    {
-                        //***转换为对象***
-
-                        OpCast.Primitive_to_Object(thisArg, (StackFrame)stackframe, token, scope,
-                            ((StackFrame)stackframe)._tempSlot1,
-                            null, _primitive_toObj);
-
-                        stackCallers.Push(caller);
-
-                        return;
-                    }
-                    else
-                    {
-                        var fd = player.swc.functions[caller.function.functionId];
-                        var block = player.swc.blocks[fd.blockid];
-                        //if (block.isoutclass )将this复位
-                        {
-                            
-                            var oc= player.outpackage_runtimescope[block.define_class_id];
-                            caller.function.setThis(oc.this_pointer);
-                        }
-                        //else
-                        //{
-                        //    caller.function.setThis(null);
-                        //}
-
-                        
-                    }
-                }
-                else
-                {
-                    caller.function.setThis((rtObject)thisArg);
-                }
-            }
+            
             caller.call();
         }
 
@@ -505,20 +537,33 @@ namespace ASRuntime.nativefuncs
             if (v1.rtType < RunTimeDataType.unknown)
             {
                 c.function.setThis(null);
-                c.call();
-                return;
+                
             }
             else
             {
                 rtObject rtObj = (rtObject)v1;
                 c.function.setThis(rtObj);
-                c.call();
-                return;
+                
             }
+			
+			c.loadDefineFromFunction();
+			if (!c.createParaScope()) { return; }
 
+			SLOT[] argements = (SLOT[])c.tag;
 
+			if (argements[1].getValue().rtType == RunTimeDataType.rt_array)
+			{
+				rtArray argArray = (rtArray)argements[1].getValue();
+				for (int i = 0; i < argArray.innerArray.Count; i++)
+				{
+					bool success;
+					c.pushParameter(argArray.innerArray[i], i, out success);
+				}
+			}
 
-        }
+			c.call();
+
+		}
 
     }
 
