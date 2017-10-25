@@ -24,7 +24,7 @@ namespace ASRuntime
 			}
 
 			
-			public sealed override rtObject getSrcObject()
+			public  rtObject getSrcObject()
 			{
 				if (cache.srcObject == null
 					||

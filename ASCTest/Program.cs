@@ -23,7 +23,7 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+                string path = args[0]; path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
 
 				//path = "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as";
 

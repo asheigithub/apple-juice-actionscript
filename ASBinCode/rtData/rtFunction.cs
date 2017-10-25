@@ -95,11 +95,11 @@ namespace ASBinCode.rtData
 
         public void setThis(RunTimeValueBase obj)
         {
-			if (obj is rtObject)
-			{
-				_this_pointer = ((rtObject)obj).getSrcObject();
-			}
-			else
+			//if (obj is rtObject)
+			//{
+			//	_this_pointer = ((rtObject)obj).getSrcObject();
+			//}
+			//else
 			{
 				_this_pointer = obj;
 			}

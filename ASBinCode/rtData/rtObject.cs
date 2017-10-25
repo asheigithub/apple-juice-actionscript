@@ -23,10 +23,10 @@ namespace ASBinCode.rtData
             return double.NaN;
         }
 
-		public virtual rtObject getSrcObject()
-		{
-			return this;
-		}
+		//public virtual rtObject getSrcObject()
+		//{
+		//	return this;
+		//}
 
        
         public sealed override  object Clone()

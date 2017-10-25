@@ -187,8 +187,16 @@ namespace ASRuntime
 									
 								}
 
-								
-								var srcObj = ((rtObject)value).getSrcObject();
+
+
+
+								rtObject srcObj = ((rtObject)value);
+								StackLinkObjectCache.StackCacheObject ss = srcObj as StackLinkObjectCache.StackCacheObject;
+								if (ss != null)
+								{
+									srcObj = ss.getSrcObject();
+								}
+
 								if (!(srcObj is StackLinkObjectCache.StackCacheObject))
 								{
 									//当对象方法调用已绑定了这个槽中的链接对象，然后下面又复用了这个槽时
@@ -246,24 +254,16 @@ namespace ASRuntime
             }
             else
             {
-				return store[index];
-				//var k = store[index];
-				//if (k is rtObject)
-				//{
-				//	if (((rtObject)k).value._class.isLink_System)
-				//	{
-				//		return k;
-				//		//return (RunTimeValueBase)k.Clone();
-				//	}
-				//	else
-				//	{
-				//		return k;
-				//	}
-				//}
-				//else
-				//{
-				//	return k;
-				//}
+				//return store[index];
+				var k = store[index];
+				if (k is StackLinkObjectCache.StackCacheObject)
+				{
+					return ((StackLinkObjectCache.StackCacheObject)k).getSrcObject();
+				}
+				else
+				{
+					return k;
+				}
 
 			}
             //throw new NotImplementedException();

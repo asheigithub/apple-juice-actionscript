@@ -147,8 +147,30 @@ namespace ASRuntime.operators
                 nf.bin = player.swc;
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
-                    ((nativefuncs.NativeConstParameterFunction)nf).prepareParameter(toCallFunc);
+					nativefuncs.NativeConstParameterFunction func = ((nativefuncs.NativeConstParameterFunction)nf);
+					invokerFrame.call_parameter_slotCount = func.TotalArgs;
 
+					if (invokerFrame.offset +
+							invokerFrame.block.totalRegisters + 1 + 1 +
+							invokerFrame.call_parameter_slotCount >= invokerFrame.stack.Length)
+					{
+
+						invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
+						invokerFrame.endStep();
+						if (callbacker != null)
+						{
+							callbacker.noticeRunFailed();
+						}
+						release();
+
+						return false;
+					}
+
+
+
+					func.prepareParameter(toCallFunc,invokerFrame.stack ,invokerFrame.offset +
+							invokerFrame.block.totalRegisters + 1 + 1);
+					
                     return true;
                 }
             }
@@ -782,6 +804,8 @@ namespace ASRuntime.operators
                         );
                     player._nativefuncCaller = null;
                     ((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
+
+					clear_para_slot(invokerFrame);
 
                     if (success)
                     {
