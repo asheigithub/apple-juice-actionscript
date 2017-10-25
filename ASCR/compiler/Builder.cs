@@ -2480,7 +2480,7 @@ namespace ASCompiler.compiler
             {
                 RightValueBase rv = new ASBinCode.rtData.RightValue(value);
 
-                ASBinCode.Register eax = env.createASTRegister(testexpr.Value.Reg.ID);
+                ASBinCode.Register eax = env.createASTRegister(testexpr.Value.Reg);
                 eax.setEAXTypeWhenCompile(rv.valueType);
 
                 OpStep op = new OpStep(OpCode.assigning, new SourceToken(testexpr.token.line, testexpr.token.ptr, testexpr.token.sourceFile));

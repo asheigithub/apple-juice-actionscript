@@ -32,7 +32,7 @@ namespace ASCompiler.compiler
 
             //return reg;
 
-            ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count);
+            ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count,ushort.MaxValue);
             dictCompileRegisters.Add("ADDITIONAL" + reg.Id, reg);
 
             return reg;
@@ -43,16 +43,16 @@ namespace ASCompiler.compiler
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ASBinCode.Register createASTRegister(int id)
+        public ASBinCode.Register createASTRegister(ASTool.AS3.Expr.AS3Reg as3reg)
         {
-            if (dictCompileRegisters.ContainsKey("V" + id))
+            if (dictCompileRegisters.ContainsKey("V" + as3reg.ID))
             {
-                return dictCompileRegisters["V" + id];
+                return dictCompileRegisters["V" + as3reg.ID];
             }
             else
             {
-                ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count);
-                dictCompileRegisters.Add("V" + id, reg);
+                ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count,as3reg.StmtID);
+                dictCompileRegisters.Add("V" + as3reg.ID, reg);
                 return reg;
             }
         }
@@ -306,18 +306,14 @@ namespace ASCompiler.compiler
 
 				foreach (var reg in testregisters)
 				{
-					//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
-					//{
-					//	continue;
-					//}
-
+					
 					if (!regisetSlot.ContainsKey(reg))
 					{
 						if (slotpool.Count > 0 )
 						{
 							sslot s = slotpool.Dequeue(); //复用
 
-							if (s.register._isassigntarget || s.register._hasUnaryOrShuffixOrDelete || s.register.isFuncResult)
+							if (s.register._isassigntarget || s.register._hasUnaryOrShuffixOrDelete || s.register.isFuncResult || s.register._isDotAccessTarget )
 							//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
 							{
 								dictAddResetStackOp.Add(reg, step);
@@ -344,17 +340,55 @@ namespace ASCompiler.compiler
 
 
 						{
-							//查找这个寄存器最后一次出现的行
-							for (int j = steps.Count - 1; j >= 0; j--)
+							if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult || reg._isDotAccessTarget)
 							{
-								var sl = steps[j];
-								if (ReferenceEquals(sl.reg, reg) ||
-									ReferenceEquals(sl.arg1, reg) ||
-									ReferenceEquals(sl.arg2, reg)
-									)
+								//***查找所属stmtid最后一次出现的行
+								int stmtid = reg.stmtid;
+
+								for (int j = steps.Count - 1; j >= 0; j--)
 								{
-									regLastStep.Add(reg, sl);
-									break;
+									var sl = steps[j];
+									{
+										Register r = sl.reg as Register;
+										if (r !=null && r.stmtid == stmtid)
+										{
+											regLastStep.Add(reg, sl);
+											break;
+										}
+									}
+									{
+										Register r = sl.arg1 as Register;
+										if (r != null && r.stmtid == stmtid)
+										{
+											regLastStep.Add(reg, sl);
+											break;
+										}
+									}
+									{
+										Register r = sl.arg2 as Register;
+										if (r != null && r.stmtid == stmtid)
+										{
+											regLastStep.Add(reg, sl);
+											break;
+										}
+									}
+								}
+
+							}
+							else
+							{
+								//查找这个寄存器最后一次出现的行
+								for (int j = steps.Count - 1; j >= 0; j--)
+								{
+									var sl = steps[j];
+									if (ReferenceEquals(sl.reg, reg) ||
+										ReferenceEquals(sl.arg1, reg) ||
+										ReferenceEquals(sl.arg2, reg)
+										)
+									{
+										regLastStep.Add(reg, sl);
+										break;
+									}
 								}
 							}
 						}
@@ -380,10 +414,8 @@ namespace ASCompiler.compiler
 								throw new Exception("重复的寄存器池");
 							}
 
-							//if (!(item.Key.isFuncResult))
-							{
-								slotpool.Enqueue(regisetSlot[item.Key]);
-							}
+							slotpool.Enqueue(regisetSlot[item.Key]);
+							
 							regLastStep.Remove(item.Key);
 
 							found = true;

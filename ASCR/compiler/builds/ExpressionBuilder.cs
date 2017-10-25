@@ -512,7 +512,7 @@ namespace ASCompiler.compiler.builds
 							"Package cannot be used as a value: '"+ ((PackagePathGetter)rv).path +"'."));
 					}
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
 
                     if (eax._hasUnaryOrShuffixOrDelete)
                     {
@@ -766,7 +766,7 @@ namespace ASCompiler.compiler.builds
                 if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
                     (OverrideableOperator.addition, v1.valueType, v2.valueType) != null)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(
                         builder.bin.operatorOverrides.getOperatorDefine
                                 (OverrideableOperator.addition, v1.valueType, v2.valueType).signature.returnType);
@@ -821,7 +821,7 @@ namespace ASCompiler.compiler.builds
                             v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                         }
                     }
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(rt);
 
                     ASBinCode.OpStep op;// = new ASBinCode.OpStep(ASBinCode.OpCode.add,new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -870,7 +870,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v2.valueType == RunTimeDataType.rt_void)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         
                         ASBinCode.OpStep op;
@@ -893,7 +893,7 @@ namespace ASCompiler.compiler.builds
                         ASBinCode.rtti.FunctionDefine f = null; if(!env.isEval) f= builder.bin.operatorOverrides.getOperatorDefine(OverrideableOperator.subtraction, v1.valueType, v2.valueType);
                         if (f != null)
                         {
-                            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                             eax.setEAXTypeWhenCompile(f.signature.returnType);
 
                             ASBinCode.OpStep op;
@@ -949,7 +949,7 @@ namespace ASCompiler.compiler.builds
                                 v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                             }
                         }
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(rt);
 
                         //ASBinCode.OpStep op = new ASBinCode.OpStep(ASBinCode.OpCode.sub,
@@ -1064,7 +1064,7 @@ namespace ASCompiler.compiler.builds
                         v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                     }
                 }
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(rt);
 
                 
@@ -1943,7 +1943,7 @@ namespace ASCompiler.compiler.builds
                         "类型[" + v1.valueType + "]不能进行后缀操作[" + step.OpCode + "]");
                 }
 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(v1.valueType);
                 eax._hasUnaryOrShuffixOrDelete = true;
 
@@ -2087,7 +2087,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v1.valueType > RunTimeDataType.unknown)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         if (!env.isEval && v1.valueType > RunTimeDataType.unknown)
                         {
@@ -2125,7 +2125,7 @@ namespace ASCompiler.compiler.builds
                                 "类型[" + v1.valueType + "]不能进行一元操作[+]");
                         }
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_number);
 
                         if (v1.valueType != RunTimeDataType.rt_number)
@@ -2170,7 +2170,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v1.valueType > RunTimeDataType.unknown)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         if (!env.isEval && v1.valueType > RunTimeDataType.unknown)
                         {
@@ -2209,7 +2209,7 @@ namespace ASCompiler.compiler.builds
                                 "类型[" + v1.valueType + "]不能进行一元操作[-]");
                         }
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_number);
 
                         ASBinCode.OpStep op
@@ -2252,7 +2252,7 @@ namespace ASCompiler.compiler.builds
                             "类型[" + v1.valueType + "]不能进行一元操作[~]");
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
 
@@ -2296,7 +2296,7 @@ namespace ASCompiler.compiler.builds
                             "类型[" + v1.valueType + "]不能进行一元操作[!]");
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
 
@@ -2369,7 +2369,7 @@ namespace ASCompiler.compiler.builds
 
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.OpStep op
@@ -2411,7 +2411,7 @@ namespace ASCompiler.compiler.builds
                     {
                         
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_string);
 
                         ASBinCode.OpStep op
@@ -2440,7 +2440,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.OpStep op
@@ -2568,7 +2568,7 @@ namespace ASCompiler.compiler.builds
                     op.arg2 = null;
                     op.arg2Type = RunTimeDataType.unknown;
 
-                    Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(v1.valueType);
                     eax._hasUnaryOrShuffixOrDelete = true;
 
@@ -2658,7 +2658,7 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode opcode = OpCode.gt_void;
@@ -2788,7 +2788,7 @@ namespace ASCompiler.compiler.builds
                         opcode = OpCode.logic_instanceof;
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -2833,7 +2833,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -2870,7 +2870,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -2915,7 +2915,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode code = step.OpCode=="==" ? OpCode.equality: OpCode.not_equality ;
@@ -2970,7 +2970,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode code = step.OpCode == "===" ? OpCode.strict_equality : OpCode.not_strict_equality ;
@@ -3030,7 +3030,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                 ASBinCode.OpStep op
@@ -3065,7 +3065,7 @@ namespace ASCompiler.compiler.builds
                 if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
                    (OverrideableOperator.bitOr, v1.valueType, v2.valueType) != null)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(
                         builder.bin.operatorOverrides.getOperatorDefine
                                 (OverrideableOperator.bitOr, v1.valueType, v2.valueType).signature.returnType);
@@ -3104,7 +3104,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3155,7 +3155,7 @@ namespace ASCompiler.compiler.builds
                 }
 
 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                 ASBinCode.OpStep op
@@ -3209,7 +3209,7 @@ namespace ASCompiler.compiler.builds
                     }
 
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3258,7 +3258,7 @@ namespace ASCompiler.compiler.builds
                             v2.valueType + "不能执行移位操作"));
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3308,7 +3308,7 @@ namespace ASCompiler.compiler.builds
                             v2.valueType + "不能执行移位操作"));
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg.ID);
+                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_uint);
 
                     ASBinCode.OpStep op

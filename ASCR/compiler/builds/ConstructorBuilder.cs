@@ -238,7 +238,7 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
-            Register insEax = env.createASTRegister(step.Arg1.Reg.ID);
+            Register insEax = env.createASTRegister(step.Arg1.Reg);
 
             build_class(env, _class, step.token, builder,
                 insEax,
@@ -342,7 +342,7 @@ namespace ASCompiler.compiler.builds
                                 new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
             opnewclass.arg1 = cls;
             opnewclass.arg1Type = RunTimeDataType.rt_void;
-            Register _eax = env.createASTRegister(step.Arg1.Reg.ID);
+            Register _eax = env.createASTRegister(step.Arg1.Reg);
             _eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
             opnewclass.reg = _eax;
             opnewclass.regType = RunTimeDataType.rt_void;

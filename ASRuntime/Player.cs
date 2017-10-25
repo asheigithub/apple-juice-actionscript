@@ -65,7 +65,7 @@ namespace ASRuntime
                             OpStep step = new OpStep(OpCode.new_instance, new SourceToken(0, 0, ""));
                             step.arg1 = new RightValue(new rtInt(swc.classes[i].classid));
                             step.arg1Type = swc.classes[i].getRtType();
-                            step.reg = new Register(0);
+                            step.reg = new Register(0,ushort.MaxValue);
                             step.regType = swc.classes[i].getRtType();
 
                             defaultblock.opSteps.Add(step);
@@ -557,31 +557,6 @@ namespace ASRuntime
 
                 currentRunFrame.close(); stackframePool.ret(currentRunFrame);
                 runtimeStack.Pop();
-
-                //runtimeStack.Pop(); //出栈
-                //var toclose = currentRunFrame;
-                
-
-                //if (currentRunFrame.callbacker != null)
-                //{
-                //    IBlockCallBack temp = currentRunFrame.callbacker;
-                //    currentRunFrame.callbacker = null;
-                //    temp.call(temp.args);
-
-                //    if (receive_error != null)
-                //    {
-                //        var t = receive_error;
-                //        receive_error = null;
-                //        currentRunFrame.receiveErrorFromStackFrame(t);
-                //        return true;
-                //    }
-                    
-                //}
-
-                //toclose.close();
-                
-                
-
 
                 if (runtimeStack.Count > 0)
                 {

@@ -31,7 +31,11 @@ namespace ASBinCode
         /// 指示是否对其有++,--操作
         /// </summary>
         public bool _hasUnaryOrShuffixOrDelete;
-        
+
+		/// <summary>
+		/// 只是是否. [] 操作的目标
+		/// </summary>
+		public bool _isDotAccessTarget;
         
 		[NonSerialized]
         public PackagePathGetter _pathGetter;
@@ -52,10 +56,14 @@ namespace ASBinCode
 
         public int _index;
 
-        public Register(int id)
+		public readonly int stmtid;
+
+        public Register(int id,int stmtid)
         {
             this.Id = id;
             _index = id;
+			this.stmtid = stmtid;
+
             //type = RunTimeDataType.unknown;
             valueType = RunTimeDataType.unknown;
         }
@@ -80,7 +88,7 @@ namespace ASBinCode
         
         public override string ToString()
         {
-            return "EAX(" + Id + "\t" +valueType+ ")";
+            return "EAX(" + Id + "("+_index+")(S:"+stmtid+")\t" +valueType+ ")";
         }
 
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)

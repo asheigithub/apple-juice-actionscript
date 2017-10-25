@@ -5,7 +5,7 @@ using System.Text;
 namespace ASBinCode.rtData
 {
 	
-    public class rtObject :RunTimeValueBase
+    public  class rtObject :RunTimeValueBase
     {
 
         public RunTimeScope objScope;

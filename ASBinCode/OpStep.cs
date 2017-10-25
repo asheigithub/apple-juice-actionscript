@@ -65,61 +65,66 @@ namespace ASBinCode
 
         public override string ToString()
         {
-            if (opCode == OpCode.increment || opCode == OpCode.decrement
-                ||
-                opCode == OpCode.increment_int || opCode == OpCode.increment_number
-                ||
-                opCode == OpCode.increment_uint
-                ||
-                opCode == OpCode.decrement_int || opCode == OpCode.decrement_number || opCode == OpCode.decrement_uint
-                )
-            {
-                return arg1.ToString() + "\t" + opCode.ToString() + "\t";
-            }
-            else if (opCode == OpCode.if_jmp)
-            {
-                return opCode.ToString() + "\t" + arg1.ToString() + "\t" + arg2.ToString();
-            }
-            else if (opCode == OpCode.jmp)
-            {
-                return opCode.ToString() + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.flag)
-            {
-                return flag + ":";
-            }
-            else if (opCode == OpCode.raise_error)
-            {
-                return "throw" + "\t" + (arg1 != null ? arg1.ToString() : "");
-            }
-            else if (opCode == OpCode.enter_try)
-            {
-                return "enter_try" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.quit_try)
-            {
-                return "quit_try" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.enter_catch)
-            {
-                return "enter_catch" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.quit_catch)
-            {
-                return "quit_catch" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.enter_finally)
-            {
-                return "enter_finally" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.quit_finally)
-            {
-                return "quit_finally" + "\t" + arg1.ToString();
-            }
-            else if (opCode == OpCode.bind_scope)
-            {
-                return "bind scope" + "\t" + arg1.ToString();
-            }
+			if (opCode == OpCode.increment || opCode == OpCode.decrement
+				||
+				opCode == OpCode.increment_int || opCode == OpCode.increment_number
+				||
+				opCode == OpCode.increment_uint
+				||
+				opCode == OpCode.decrement_int || opCode == OpCode.decrement_number || opCode == OpCode.decrement_uint
+				)
+			{
+				return arg1.ToString() + "\t" + opCode.ToString() + "\t";
+			}
+			else if (opCode == OpCode.if_jmp)
+			{
+				return opCode.ToString() + "\t" + arg1.ToString() + "\t" + arg2.ToString();
+			}
+			else if (opCode == OpCode.jmp)
+			{
+				return opCode.ToString() + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.flag)
+			{
+				return flag + ":";
+			}
+			else if (opCode == OpCode.raise_error)
+			{
+				return "throw" + "\t" + (arg1 != null ? arg1.ToString() : "");
+			}
+			else if (opCode == OpCode.enter_try)
+			{
+				return "enter_try" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.quit_try)
+			{
+				return "quit_try" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.enter_catch)
+			{
+				return "enter_catch" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.quit_catch)
+			{
+				return "quit_catch" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.enter_finally)
+			{
+				return "enter_finally" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.quit_finally)
+			{
+				return "quit_finally" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.bind_scope)
+			{
+				return "bind scope" + "\t" + arg1.ToString();
+			}
+			else if (opCode == OpCode.push_parameter)
+			{
+				return "push_parameter" + "\t" + arg1.ToString() + "\t" + arg2.ToString();
+			}
+
 
             if (reg == null)
             {

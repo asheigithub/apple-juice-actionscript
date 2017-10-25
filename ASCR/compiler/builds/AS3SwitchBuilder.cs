@@ -70,7 +70,7 @@ namespace ASCompiler.compiler.builds
                         if (v != null && c.Condition.Value.IsReg)
                         {
                             OpStep op = new OpStep(OpCode.assigning, new SourceToken(c.token.line, c.token.ptr, c.token.sourceFile));
-                            var eax = env.createASTRegister(c.Condition.Value.Reg.ID);
+                            var eax = env.createASTRegister(c.Condition.Value.Reg);
                             eax.setEAXTypeWhenCompile(v.rtType);
 
                             op.reg = eax;

@@ -41,7 +41,7 @@ namespace ASCompiler.compiler.builds
 						OpStep op = new OpStep(OpCode.call_function,
 							new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-						var eax = env.createASTRegister(step.Arg1.Reg.ID);
+						var eax = env.createASTRegister(step.Arg1.Reg);
 						eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 						op.reg = eax;
 						op.regType = RunTimeDataType.rt_void;
@@ -141,7 +141,7 @@ namespace ASCompiler.compiler.builds
                 OpStep op = new OpStep(OpCode.call_function,
                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                var eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                 op.reg = eax;
                 op.regType = RunTimeDataType.rt_void;
@@ -391,7 +391,7 @@ namespace ASCompiler.compiler.builds
                                         OpStep op = new OpStep(OpCode.call_function,
                                             new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                                        var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                        var eax = env.createASTRegister(step.Arg1.Reg);
                                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                                         op.reg = eax;
                                         op.regType = RunTimeDataType.rt_void;
@@ -425,7 +425,7 @@ namespace ASCompiler.compiler.builds
                                     OpStep op = new OpStep(OpCode.assigning,
                                         new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                                    var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                    var eax = env.createASTRegister(step.Arg1.Reg);
                                     eax.setEAXTypeWhenCompile(ct.valueType);
                                     op.reg = eax;
                                     op.regType = ct.valueType;
@@ -480,7 +480,7 @@ namespace ASCompiler.compiler.builds
                                 OpStep op = new OpStep(OpCode.call_function,
                                     new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                                var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                                var eax = env.createASTRegister(step.Arg1.Reg);
                                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                                 op.reg = eax;
                                 op.regType = RunTimeDataType.rt_void;
@@ -661,7 +661,7 @@ namespace ASCompiler.compiler.builds
                 OpStep op = new OpStep(OpCode.call_function,
                 new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
 
-                var eax = env.createASTRegister(step.Arg1.Reg.ID);
+                var eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                 op.reg = eax;
                 op.regType = RunTimeDataType.rt_void;

@@ -400,29 +400,10 @@ namespace ASRuntime
             index = (int)RunTimeDataType.unknown;
         }
 
-		/// <summary>
-		/// 重置除_linkObjCache外的所有缓存
-		/// </summary>
+		
 		public void resetSlot()
 		{
-			linktarget = null;
-			propGetSet = null;
-			propBindObj = null;
-			superPropBindClass = null;
-
-			_temp_try_write_setthisitem = null;
-
-			_cache_vectorSlot.clear();
-			_cache_prototypeSlot.clear();
-			_cache_setthisslot.clear();
-			_linkObjCache.clearRefObj();
-
-			store[RunTimeDataType.rt_string] = rtNull.nullptr;
-			store[RunTimeDataType.rt_function] = rtNull.nullptr;
-			store[RunTimeDataType.rt_array] = rtNull.nullptr;
-			store[RunTimeDataType._OBJECT] = rtNull.nullptr;
-
-			index = (int)RunTimeDataType.unknown;
+			clear();
 		}
 
     }

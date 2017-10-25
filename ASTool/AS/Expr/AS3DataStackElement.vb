@@ -16,8 +16,8 @@
            
             If IsReg Then
 
-                Return "<V" & Reg.ID & ">"
-            Else
+				Return "<V" & Reg.ID & " G:" & Reg.StmtID & ">"
+			Else
 
                 If Not Data.Value Is Nothing Then
 
@@ -99,17 +99,17 @@
         End Function
 
 
-        Public Shared Function MakeReg(regno As Integer) As AS3DataStackElement
+		Public Shared Function MakeReg(regno As Integer, groupid As Integer) As AS3DataStackElement
 
-            Dim r As New AS3DataStackElement()
-            r.IsReg = True
-            r.Reg = New AS3.Expr.AS3Reg()
-            r.Reg.ID = regno
+			Dim r As New AS3DataStackElement()
+			r.IsReg = True
+			r.Reg = New AS3.Expr.AS3Reg(regno, groupid)
+			'r.Reg.ID = regno
 
-            Return r
-        End Function
+			Return r
+		End Function
 
 
-    End Class
+	End Class
 
 End Namespace
