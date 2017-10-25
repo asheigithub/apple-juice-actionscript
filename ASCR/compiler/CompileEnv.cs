@@ -340,7 +340,7 @@ namespace ASCompiler.compiler
 
 
 						{
-							if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult || reg._isDotAccessTarget)
+							//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult || reg._isDotAccessTarget)
 							{
 								//***查找所属stmtid最后一次出现的行
 								int stmtid = reg.stmtid;
@@ -375,22 +375,22 @@ namespace ASCompiler.compiler
 								}
 
 							}
-							else
-							{
-								//查找这个寄存器最后一次出现的行
-								for (int j = steps.Count - 1; j >= 0; j--)
-								{
-									var sl = steps[j];
-									if (ReferenceEquals(sl.reg, reg) ||
-										ReferenceEquals(sl.arg1, reg) ||
-										ReferenceEquals(sl.arg2, reg)
-										)
-									{
-										regLastStep.Add(reg, sl);
-										break;
-									}
-								}
-							}
+							//else
+							//{
+							//	//查找这个寄存器最后一次出现的行
+							//	for (int j = steps.Count - 1; j >= 0; j--)
+							//	{
+							//		var sl = steps[j];
+							//		if (ReferenceEquals(sl.reg, reg) ||
+							//			ReferenceEquals(sl.arg1, reg) ||
+							//			ReferenceEquals(sl.arg2, reg)
+							//			)
+							//		{
+							//			regLastStep.Add(reg, sl);
+							//			break;
+							//		}
+							//	}
+							//}
 						}
 					}
 

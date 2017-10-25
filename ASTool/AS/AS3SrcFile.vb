@@ -3,9 +3,17 @@
 
 
 
-        Public srcFile As String
+		Public ReadOnly srcFile As String
 
-        Public Package As AS3Package
+		Public ReadOnly md5Key As String
+
+		Public Sub New(srcfile As String, md5key As String)
+			Me.srcFile = srcfile
+			Me.md5Key = md5key
+		End Sub
+
+
+		Public Package As AS3Package
 
         ''' <summary>
         ''' 包外程序代码 比如 if trace等

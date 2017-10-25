@@ -5,7 +5,7 @@ using System.Text;
 namespace ASBinCode.rtData
 {
 	[Serializable]
-    public sealed class rtNull : RunTimeValueBase
+    public sealed class rtNull : RunTimeValueBase,IEquatable<rtNull>
     {
         public static rtNull nullptr = new rtNull();
 
@@ -26,5 +26,23 @@ namespace ASBinCode.rtData
             return "rtNull";
         }
 
-    }
+		public override int GetHashCode()
+		{
+			return this.rtType.GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			rtNull other = obj as rtNull;
+			if (other == null)
+				return false;
+			else
+				return true;
+		}
+
+		public bool Equals(rtNull other)
+		{
+			return true;
+		}
+	}
 }

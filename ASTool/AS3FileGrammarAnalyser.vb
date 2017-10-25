@@ -103,9 +103,9 @@ Public Class AS3FileGrammarAnalyser
     End Function
 
 
-    Private as3file As New AS3SrcFile()
+	Private as3file As AS3SrcFile
 
-    Public err As GrammarException
+	Public err As GrammarException
 
     Public Function Analyse(grammer As Grammar, tree As GrammerTree) As Boolean
 
@@ -113,7 +113,9 @@ Public Class AS3FileGrammarAnalyser
             Throw New Exception("不能重复使用")
         End If
 
-        currentPackage = Nothing
+		as3file = New AS3SrcFile(srcFile, tree.Root.getMd5Key())
+
+		currentPackage = Nothing
         inpackimports = New List(Of AS3Import)()
         outpackimports = New List(Of AS3Import)()
 
@@ -170,8 +172,10 @@ Public Class AS3FileGrammarAnalyser
             Throw New Exception()
         End If
 
-        as3file.srcFile = srcFile
-        as3file.OutPackageImports.AddRange(outpackimports)
+
+
+
+		as3file.OutPackageImports.AddRange(outpackimports)
 
         proj.SrcFiles.Add(as3file)
 
@@ -935,8 +939,8 @@ Public Class AS3FileGrammarAnalyser
     End Sub
 
     Sub _DefClass(node As GrammerExpr)
-        Dim as3class As New AS3Class(node.MatchedToken)
-        as3class.Name = GrammerExpr.getNodeValue(node.Nodes(1))
+		Dim as3class As New AS3Class(node.MatchedToken, as3file)
+		as3class.Name = GrammerExpr.getNodeValue(node.Nodes(1))
         as3class.Package = as3file.Package
 
         MemberScopeStack.Push(as3class)
@@ -1017,8 +1021,8 @@ Public Class AS3FileGrammarAnalyser
 
     End Sub
     Sub _DefInterface(node As GrammerExpr)
-        Dim as3inteface As New AS3Interface(node.MatchedToken)
-        as3inteface.Name = GrammerExpr.getNodeValue(node.Nodes(1))
+		Dim as3inteface As New AS3Interface(node.MatchedToken, as3file)
+		as3inteface.Name = GrammerExpr.getNodeValue(node.Nodes(1))
         as3inteface.Package = as3file.Package
 
         MemberScopeStack.Push(as3inteface)

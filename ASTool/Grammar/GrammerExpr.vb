@@ -19,11 +19,36 @@ Public Class GrammerExpr
     Friend exprsteplist As AS3.Expr.AS3ExprStepList
 
 
+	Public Function getMd5Key() As String
+
+		Dim md5p As New System.Security.Cryptography.MD5CryptoServiceProvider()
+
+		Dim sb As New Text.StringBuilder()
+
+		visMD5Token(Me, sb)
+
+		Dim buff = System.Text.Encoding.UTF8.GetBytes(sb.ToString())
+
+		Dim md5out = md5p.ComputeHash(buff)
+
+		Return System.Convert.ToBase64String(md5out)
+	End Function
+
+	Private Sub visMD5Token(node As GrammerExpr, sb As Text.StringBuilder)
+		sb.Append(node.MatchedToken.Type.ToString())
+		sb.Append(node.MatchedToken.StringValue)
+
+		For Each child In node.Nodes
+			visMD5Token(child, sb)
+		Next
 
 
-  
 
-    Public Function GetTreeString(tabs As Integer) As String
+	End Sub
+
+
+
+	Public Function GetTreeString(tabs As Integer) As String
         Return GetTreeString(tabs, vbTab)
     End Function
 

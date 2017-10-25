@@ -21,10 +21,10 @@ namespace ASBinCode
         /// </summary>
         public List<rtti.Class> primitive_to_class_table = new List<Class>();
 
-		
-		public readonly List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
-		
-		public readonly Dictionary<string, int> nativefunctionNameIndex;// = new Dictionary<string, int>();
+		[NonSerialized]
+		public List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
+		[NonSerialized]
+		public Dictionary<string, int> nativefunctionNameIndex;// = new Dictionary<string, int>();
 
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
@@ -131,9 +131,40 @@ namespace ASBinCode
         }
 
 
+		public byte[] toBytes()
+		{
+			byte[] bin;
+			{
+				System.IO.MemoryStream _memory = new System.IO.MemoryStream();
+				System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter
+					= new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+				formatter.Serialize(_memory, this);
+
+				bin = _memory.ToArray();
+				_memory.Close();
+			}
+			return bin;
+		}
+
+		public static CSWC loadFromBytes(byte[] data)
+		{
+			CSWC _newOjb;
+
+			System.IO.MemoryStream _memory = new System.IO.MemoryStream(data);
+			_memory.Position = 0;
+			System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+			_newOjb = (ASBinCode.CSWC)formatter.Deserialize(_memory);
+			_memory.Close();
 
 
-        public Class getClassByRunTimeDataType(RunTimeDataType rttype)
+			_newOjb.nativefunctions = new List<NativeFunctionBase>();
+			_newOjb.nativefunctionNameIndex = new Dictionary<string, int>();
+
+			return _newOjb;
+		}
+
+
+		public Class getClassByRunTimeDataType(RunTimeDataType rttype)
         {
             return classes[rttype - RunTimeDataType._OBJECT];
             //throw new NotImplementedException();

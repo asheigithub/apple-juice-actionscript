@@ -13,22 +13,34 @@ namespace ASCompiler.compiler.builds
             ASBinCode.rtti.Class mainClass,
             ASTool.AS3.AS3SrcFile as3srcfile, bool isbuildvector, RunTimeDataType vectortype)
         {
-            int classid = builder.getClassId();
+			if (builder.buildingclasses.isExistsBuildSuccess(new ASBinCode.rtti.Class(-1, -1, builder.bin, as3srcfile.md5Key + "_" + as3interface.Name) { name=as3interface.Name , package=as3interface.Package.Name   }))
+			{
+				//重复编译，跳过
+				return null;
+			}
+
+			int classid = builder.getClassId();
             int blockid = builder.getBlockId();
 
-            ASBinCode.rtti.Class cls = new ASBinCode.rtti.Class(classid, blockid, builder.bin);
-            builder.buildingclasses.Add(as3interface, cls);
+            ASBinCode.rtti.Class cls = new ASBinCode.rtti.Class(classid, blockid, builder.bin,as3srcfile.md5Key +"_"+ as3interface.Name);
+			cls.package = as3interface.Package.Name;
+			cls.name = as3interface.Name;
+
+			
+
+			builder.buildingclasses.Add(as3interface, cls);
 
             if (isbuildvector)
             {
                 builder.bin.dict_Vector_type.Add(cls, vectortype);
             }
 
-            cls.package = as3interface.Package.Name;
+            
             cls.ispackageout = false;
             cls.isPublic = as3interface.Access.IsPublic;
-            cls.name = as3interface.Name;
-            cls.no_constructor = true;
+			cls.package = as3interface.Package.Name;
+			cls.name = as3interface.Name;
+			cls.no_constructor = true;
             cls.isInterface = true;
             if (as3interface.Access.IsDynamic)
             {
@@ -149,7 +161,7 @@ namespace ASCompiler.compiler.builds
             int metaclassid = builder.getClassId();
             int metablockid = builder.getBlockId();
 
-            ASBinCode.rtti.Class metaclass = new ASBinCode.rtti.Class(metaclassid, metablockid, builder.bin);
+            ASBinCode.rtti.Class metaclass = new ASBinCode.rtti.Class(metaclassid, metablockid, builder.bin,as3srcfile.md5Key + "_metaclass_" + "$" + as3interface.Name);
             metaclass.package = as3interface.Package.Name;
             metaclass.ispackageout = false;
             metaclass.isPublic = as3interface.Access.IsPublic;

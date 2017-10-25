@@ -5,7 +5,7 @@ using System.Text;
 namespace ASBinCode.rtData
 {
 	[Serializable]
-    public sealed class rtBoolean : RunTimeValueBase
+    public sealed class rtBoolean : RunTimeValueBase,IEquatable<rtBoolean>
     {
         public static readonly rtBoolean False = new rtBoolean(false);
         public static readonly rtBoolean True = new rtBoolean(true);
@@ -16,7 +16,30 @@ namespace ASBinCode.rtData
             value = v;
         }
 
-        public override double toNumber()
+		public override int GetHashCode()
+		{
+			return value.GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			rtBoolean other = obj as rtBoolean;
+
+			if (other == null)
+				return false;
+			else
+			{
+				return value == other.value;
+			}
+
+		}
+
+		public bool Equals(rtBoolean other)
+		{
+			return value == other.value;
+		}
+
+		public override double toNumber()
         {
             if (value)
             {
@@ -45,5 +68,6 @@ namespace ASBinCode.rtData
             }
         }
 
-    }
+		
+	}
 }

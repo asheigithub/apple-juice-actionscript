@@ -9,7 +9,7 @@ namespace ASBinCode.rtti
     /// 类定义
     /// (或者接口定义)接口定义也继承自Class的。
     /// </summary>
-    public class Class :IImportable
+    public sealed class Class :IImportable
     {
         /// <summary>
         /// 指明这是否是一个接口定义
@@ -49,16 +49,22 @@ namespace ASBinCode.rtti
         /// </summary>
         public ClassMember linkObjCreator;
 
-
+		/// <summary>
+		/// 是否已编译成功
+		/// </summary>
+		public bool isbuildSuccess;
         /// <summary>
         /// 是否不可实例化
         /// </summary>
         public bool no_constructor;
 
+		public readonly string md5key;
+
         public readonly int classid;
-        public Class(int id,int blockid,CSWC swc)
+        public Class(int id,int blockid,CSWC swc,string md5key)
         {
             _swc = swc;
+			this.md5key = md5key;
             classid = id;
             this.blockid = blockid;
             classMembers = new List<ClassMember>();
@@ -71,7 +77,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 类定义代码所在blockid
         /// </summary>
-        public int blockid;
+        public readonly int blockid;
 
         /// <summary>
         /// 包外代码所在blockid;
@@ -176,7 +182,7 @@ namespace ASBinCode.rtti
         /// </summary>
         public Dictionary<Class, int[]> implements;
 
-        private CSWC _swc;
+        private readonly CSWC _swc;
         public CSWC assembly
         {
             get
@@ -202,5 +208,22 @@ namespace ASBinCode.rtti
             }
         }
 
-    }
+
+		public override int GetHashCode()
+		{
+			return md5key.GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			Class other = obj as Class;
+			if (obj == null)
+				return false;
+
+			return md5key == other.md5key && name==other.name && package==other.package;
+
+		}
+
+
+	}
 }

@@ -14,12 +14,11 @@ Public Class GrammerTree
 
     End Function
 
-
-    ''' <summary>
-    ''' 遍历节点
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Sub VisitNodes()
+	''' <summary>
+	''' 遍历节点
+	''' </summary>
+	''' <remarks></remarks>
+	Public Sub VisitNodes()
         VisitNodes(Root)
     End Sub
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public abstract class NativeFunctionBase
     {
         public enum NativeFunctionMode

@@ -12,8 +12,13 @@ namespace ASCTest
 
         static void Main(string[] args)
         {
+			//ASCompiler.compiler.Builder bu = new ASCompiler.compiler.Builder();
+			//byte[] b=bu.BuildLibBin();
+			//System.IO.File.WriteAllBytes("astoolglobal.swc", b);
 
-            ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
+
+
+			ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";
             string teststring = "package{}";//System.IO.File.ReadAllText("../../testScript/AS3Testproj/src/Main.as");
@@ -23,7 +28,7 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\label\";
 
 				//path = "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as";
 
@@ -79,8 +84,7 @@ namespace ASCTest
 				files = n;
 			}
 			//*********************
-
-
+			
 			var proj = new ASTool.AS3.AS3Proj();
             var srcout = new ASTool.ConSrcOut();
 
@@ -136,7 +140,7 @@ namespace ASCTest
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
-
+			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
             
             builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
@@ -144,33 +148,6 @@ namespace ASCTest
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
-				//byte[] bin;
-				//{
-				//	swc.unLoadNativeFunctions();
-
-				//	System.IO.MemoryStream _memory = new System.IO.MemoryStream();
-				//	System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter
-				//		= new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-				//	formatter.Serialize(_memory, swc);
-
-				//	bin = _memory.ToArray();
-				//	_memory.Close();
-				//}
-				//{
-				//	ASBinCode.CSWC _newOjb = null;
-
-				//	System.IO.MemoryStream _memory = new System.IO.MemoryStream(bin);
-				//	_memory.Position = 0;
-				//	System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-				//	_newOjb = (ASBinCode.CSWC)formatter.Deserialize(_memory);
-				//	_memory.Close();
-
-
-				//	swc = _newOjb;
-
-				//	ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
-				//}
-
 
 				if (swc != null)
                 {

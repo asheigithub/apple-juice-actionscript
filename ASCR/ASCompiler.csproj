@@ -46,6 +46,7 @@
     <Compile Include="compiler\Builder.cs" />
     <Compile Include="compiler\BuildError.cs" />
     <Compile Include="compiler\BuildException.cs" />
+    <Compile Include="compiler\BuildingClassDictionary.cs" />
     <Compile Include="compiler\builds\AccessBuilder.cs" />
     <Compile Include="compiler\builds\AS3BreakBuilder.cs" />
     <Compile Include="compiler\builds\AS3ClassBuilder.cs" />

@@ -3,12 +3,12 @@
         Inherits AS3ClassInterfaceBase
         Public ImplementsNames As New List(Of String)
 
-        Public Sub New(token As Token)
-            MyBase.New(token)
-            Me.Access.IsInternal = True
-        End Sub
+		Public Sub New(token As Token, as3SrcFile As AS3SrcFile)
+			MyBase.New(token, as3SrcFile)
+			Me.Access.IsInternal = True
+		End Sub
 
-        Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
+		Public Overrides Sub Write(tabs As Integer, srcout As ISrcOut)
 
             srcout.WriteLn("package " & Package.Name, tabs)
             srcout.WriteLn("{", tabs)

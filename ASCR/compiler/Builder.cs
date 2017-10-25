@@ -29,15 +29,16 @@ namespace ASCompiler.compiler
         /// 记录当前正在编译的function
         /// </summary>
         internal Stack<ASTool.AS3.AS3Function> buildingfunctons = new Stack<ASTool.AS3.AS3Function>();
-        internal Dictionary<ASBinCode.rtti.FunctionDefine, CodeBlock> dictfunctionblock = new Dictionary<ASBinCode.rtti.FunctionDefine, CodeBlock>();
+		internal Dictionary<ASBinCode.rtti.FunctionDefine, CodeBlock> dictfunctionblock = new Dictionary<ASBinCode.rtti.FunctionDefine, CodeBlock>();
 
         internal Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>
             buildoutfunctions = new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>();
 
 
-        internal Dictionary<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>
-            buildingclasses = new Dictionary<ASTool.AS3.AS3ClassInterfaceBase, ASBinCode.rtti.Class>();
-        internal Dictionary<ASBinCode.rtti.ClassMember,ASTool.AS3.IAS3Stmt>
+        internal BuildingClassDictionary
+            buildingclasses = new BuildingClassDictionary();
+
+		internal Dictionary<ASBinCode.rtti.ClassMember,ASTool.AS3.IAS3Stmt>
             _buildingmembers = new Dictionary< ASBinCode.rtti.ClassMember,ASTool.AS3.IAS3Stmt>();
         internal Dictionary<ASBinCode.rtti.Class, CompileEnv> _classbuildingEnv =
             new Dictionary<ASBinCode.rtti.Class, CompileEnv>();
@@ -139,24 +140,90 @@ namespace ASCompiler.compiler
             }
         }
 
-        public void Build(ASTool.AS3.AS3Proj proj,IList<ASBinCode.INativeFunctionRegister> extfunctions)
+		public byte[] BuildLibBin()
+		{
+			Builder b = new Builder();
+			b.Build(new ASTool.AS3.AS3Proj(), null);
+
+			byte[] data= b.getBuildOutSWC().toBytes();
+			return data;
+		}
+
+		public void LoadLibrary(byte[] data)
+		{
+			{
+				ASBinCode.CSWC _newOjb = CSWC.loadFromBytes(data);
+				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(_newOjb);
+				bin = _newOjb;
+
+				foreach (var item in _newOjb.classes)
+				{
+					item.isdocumentclass = false; //作为类库加载的类取消文档类特性
+
+					buildingclasses.AppendLibClass(item);
+
+					foreach (var member in item.classMembers)
+					{
+						if (!item.fields.Contains(member))
+						{
+							if (member.bindField is MethodGetterBase && member.inheritFrom==null)
+							{
+								MethodGetterBase mb = (MethodGetterBase)member.bindField;
+								if (!dictSignatures.ContainsKey(mb.refdefinedinblockid))
+								{
+									dictSignatures.Add(mb.refdefinedinblockid, new Dictionary<IMember, FunctionSignature>());
+								}
+
+								Dictionary<IMember, FunctionSignature> dict = dictSignatures[mb.refdefinedinblockid];
+								if (!dict.ContainsKey(mb))
+								{
+									dict.Add(mb, _newOjb.functions[mb.functionId].signature);
+								}
+								
+							}
+						}
+					}
+
+
+				}
+
+				classseed = buildingclasses.Count;
+				blockseed = _newOjb.blocks.Count;
+				functionseed = _newOjb.functions.Count;
+			}
+
+
+		}
+
+
+
+		public void Build(ASTool.AS3.AS3Proj proj,IList<ASBinCode.INativeFunctionRegister> extfunctions)
         {
             buildErrors.Clear();
 
-            var lib= Grammar.makeLibProj();
-            if (lib == null)
-            {
-                
-                if (isConsoleOut)
-                {
-                    Console.WriteLine("lib库编译失败，编译已终止");
-                }
-                return;
-            }
+			ASTool.AS3.AS3Proj lib = null; 
 
-            bin = new CSWC();
-            ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
-            if (extfunctions != null)
+			if (bin == null)
+			{
+				bin = new CSWC();
+				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
+
+				//基础库编译
+				lib = Grammar.makeLibProj();
+				if (lib == null)
+				{
+					if (isConsoleOut)
+					{
+						Console.WriteLine("lib库编译失败，编译已终止");
+					}
+					return;
+				}
+
+			}
+
+			
+
+			if (extfunctions != null)
             {
                 for (int i = 0; i < extfunctions.Count; i++)
                 {
@@ -166,15 +233,18 @@ namespace ASCompiler.compiler
 
             try
             {
-                List<ASTool.AS3.AS3SrcFile> tobuildfiles = new List<ASTool.AS3.AS3SrcFile>();
-                tobuildfiles.AddRange(lib.SrcFiles);
-                build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
-                //lib库代码编译
+				List<ASTool.AS3.AS3SrcFile> tobuildfiles = new List<ASTool.AS3.AS3SrcFile>();
+				if (lib != null)
+				{					
+					tobuildfiles.AddRange(lib.SrcFiles);
+					build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
+					//lib库代码编译
+					tobuildfiles.Clear();					
+				}
 
-                tobuildfiles.Clear();
-                tobuildfiles.AddRange(proj.SrcFiles);
-                //ASTool.AS3.AS3SrcFile docfile=null;
-                build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
+				tobuildfiles.AddRange(proj.SrcFiles);
+				//ASTool.AS3.AS3SrcFile docfile=null;
+				build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
 
 
                 if (isConsoleOut)
@@ -238,6 +308,13 @@ namespace ASCompiler.compiler
                     builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
                     var c = builder.buildClassDefine(srcfile.Package.MainClass, this, null, srcfile, isbuildvector, vectortype);
 
+					if (c == null)
+					{
+						tobuildfiles.RemoveAt(i);
+						i--;
+						continue;
+					}
+
                     if (c.isdocumentclass)
                     {
                         //docfile = srcfile;
@@ -275,6 +352,13 @@ namespace ASCompiler.compiler
                     builds.AS3InterfaceBuilder builder = new builds.AS3InterfaceBuilder();
                     var c = builder.buildInterfaceDefine(
                         srcfile.Package.MainInterface, this, null, srcfile, isbuildvector, vectortype);
+					if (c == null)
+					{
+						tobuildfiles.RemoveAt(i);
+						i--;
+						continue;
+					}
+
 
                     builds.AS3ClassBuilder cb = new builds.AS3ClassBuilder();
                     for (int j = 0; j < srcfile.Package.MainInterface.innerClass.Count; j++)
@@ -734,9 +818,7 @@ namespace ASCompiler.compiler
                         );
 
                     block.scope = new ASBinCode.scopes.OutPackageMemberScope(buildingclasses[srcfile.Package.MainClass]);
-                    //((ASBinCode.scopes.OutPackageMemberScope)block.scope).parentScope
-                    //    = _classbuildingEnv[buildingclasses[srcfile.Package.MainClass].staticClass].block.scope;
-
+                    
                     buildingclasses[srcfile.Package.MainClass].outscopeblockid = block.id;
                     buildCodeBlock(outstmts, block);
 
@@ -831,13 +913,15 @@ namespace ASCompiler.compiler
                     {
                         var nf = ovt.Key;
 
-                        var nfs = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[nf]].signature;
+						var nfs = dictSignatures[nf.refClass.blockid][nf.bindField]; //buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[nf]].signature;
 
                         bool ispass = true;
                         for (int i = 0; i < ovt.Value.Count; i++)
                         {
                             var toovf = ovt.Value[i];   //***要重写的目标***
-                            var otovfs = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[toovf.inheritSrcMember]].signature;
+														//var otovfs = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[toovf.inheritSrcMember]].signature;
+							var otovfs = dictSignatures[toovf.inheritSrcMember.refClass.blockid][toovf.inheritSrcMember.bindField];
+
 
                             if (otovfs.returnType != nfs.returnType)
                             {
@@ -1163,6 +1247,7 @@ namespace ASCompiler.compiler
                         bin.classes.Add(null);
                     }
                     bin.classes[item.Value.classid] = item.Value;
+					item.Value.isbuildSuccess = true;
 
                     if (item.Value.constructor != null)
                     {
@@ -1190,6 +1275,7 @@ namespace ASCompiler.compiler
                         bin.classes.Add(null);
                     }
                     bin.classes[item.Value.staticClass.classid] = item.Value.staticClass;
+					item.Value.staticClass.isbuildSuccess = true;
                 }
 
             }

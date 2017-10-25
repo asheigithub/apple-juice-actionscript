@@ -12,18 +12,19 @@
         Public innerClass As New List(Of AS3Class)()
         Public innerInterface As New List(Of AS3Interface)()
 
+		Public ReadOnly as3SrcFile As AS3SrcFile
 
-        ''' <summary>
-        ''' 是否是包外类
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public IsOutPackage As Boolean
+		''' <summary>
+		''' 是否是包外类
+		''' </summary>
+		''' <remarks></remarks>
+		Public IsOutPackage As Boolean
 
-        Public Sub New(token As Token)
-            MyBase.New(token)
+		Public Sub New(token As Token, as3SrcFile As AS3SrcFile)
+			MyBase.New(token)
+			Me.as3SrcFile = as3SrcFile
+		End Sub
 
-        End Sub
 
-
-    End Class
+	End Class
 End Namespace
