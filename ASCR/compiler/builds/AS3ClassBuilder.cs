@@ -287,15 +287,17 @@ namespace ASCompiler.compiler.builds
                         {
                             if (m.Value.Data.Value.ToString() == "Doc")
                             {
-                                for (int i = 0; i < builder.buildingclasses.Count; i++)
-                                {
-                                    if (builder.buildingclasses[as3class].isdocumentclass)
-                                    {
-                                        throw new BuildException(as3class.token.line,
-                                            as3class.token.ptr, as3class.token.sourceFile,
-                                                                "只能有1个文档类");
-                                    }
-                                }
+								foreach (var item in builder.buildingclasses )
+								{
+									if (item.Value.isdocumentclass)
+									{
+										throw new BuildException(as3class.token.line,
+											as3class.token.ptr, as3class.token.sourceFile,
+																"只能有1个文档类");
+									}
+								}
+
+                                
 
                                 if (!cls.ispackageout && cls.isPublic)
                                 {

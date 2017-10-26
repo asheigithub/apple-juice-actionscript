@@ -26,9 +26,12 @@ namespace ASRuntime.operators
                 return;
             }
 
-            //if (!slot.isPropGetterSetter)
+			bool success;
+
+			var lt= slot.assign(v, out success);
+
             {
-                if (!slot.directSet(v))
+                if (!success) //(!slot.directSet(v))
                 {
                     
                     if (!(slot is StackSlot)) //直接赋值时
@@ -40,7 +43,8 @@ namespace ASRuntime.operators
                         StackSlot oslot = (StackSlot)slot;
                         //if (oslot.linktarget != null)
                         {
-                            slot = oslot.linktarget;
+							//slot = oslot.linktarget;
+							slot = lt;
                         }
 
                         if (slot is SetThisItemSlot)
@@ -73,6 +77,7 @@ namespace ASRuntime.operators
                             cb.step = step;
                             cb.args = frame;
                             cb.setCallBacker(_vectorConvertCallBacker);
+							cb.cacheObjects[0] = slot; 
 
                             //***调用强制类型转换***
                             OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
@@ -136,13 +141,18 @@ namespace ASRuntime.operators
             OpStep step = sender.step;
 
             ASBinCode.RunTimeValueBase v = frame._tempSlot1.getValue();
-            ASBinCode.SLOT slot = step.reg.getSlot(sender.scope, frame);
+			//ASBinCode.SLOT slot = step.reg.getSlot(sender.scope, frame);
 
-            if (!slot.directSet(v))
+			OpVector.vectorSLot slot = (OpVector.vectorSLot)sender.cacheObjects[0];
+
+			bool success;
+			slot.assign(v, out success);
+
+            if (!success)
             {
                 frame.throwCastException(step.token,
                        step.arg1.getValue(sender.scope, frame).rtType,
-                       ((OpVector.vectorSLot)((StackSlot)slot).linktarget).vector_data.vector_type
+                       slot.vector_data.vector_type
                         );
             }
 

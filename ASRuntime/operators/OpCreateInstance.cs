@@ -150,7 +150,7 @@ namespace ASRuntime.operators
                 int id = ((ASBinCode.rtData.rtInt)step.arg2.getValue(frame.scope, frame)).value;
                 RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
 
-                frame.instanceCreator.push_parameter(arg, id);
+				frame.instanceCreator.push_parameter(arg, id);
                 
             }
             frame.endStep(step);

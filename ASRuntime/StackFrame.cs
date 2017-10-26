@@ -432,7 +432,7 @@ namespace ASRuntime
                     }
                     break;
                 case OpCode.native_trace:
-                    nativefuncs.Trace.exec(this, step, scope);
+                //    nativefuncs.Trace.exec(this, step, scope);
                     break;
                 case OpCode.bind_scope:
                     operators.OpCallFunction.bind(this, step, scope);
@@ -1277,10 +1277,13 @@ namespace ASRuntime
             funCaller = null;
             instanceCreator = null;
 
-            
 
-            //清除执行栈
-            for (int i = offset; i < offset + block.totalRegisters + 1+1 + call_parameter_slotCount; i++)
+			if (call_parameter_slotCount != 0)
+			{
+				throw new ASRunTimeException();
+			}
+			//清除执行栈
+			for (int i = offset; i < offset + block.totalRegisters + 1+1 + call_parameter_slotCount; i++)
             {
                 stack[i].clear();
             }

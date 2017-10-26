@@ -21,7 +21,7 @@ namespace ASRuntime.operators
 				fc.check_para_id = 0;
 				fc.pushedArgs = 0;
 				fc.hasReleased = false;
-
+				fc.onstackparametercount = 0;
 				fc.tag = null;
 
 				return fc;
@@ -89,6 +89,8 @@ namespace ASRuntime.operators
 
 		public object tag;
 
+		private int onstackparametercount;
+
 		public FunctionCaller():this(null,null,null)
 		{
 
@@ -127,7 +129,7 @@ namespace ASRuntime.operators
                 check_para_id = 0;
 
 				tag = null;
-
+				onstackparametercount = 0;
                 player.funcCallerPool.ret(this);
 				player = null;
 
@@ -140,6 +142,39 @@ namespace ASRuntime.operators
             toCallFunc = player.swc.functions[function.functionId];
            
         }
+
+		public static RunTimeValueBase getDefaultParameterValue(ASBinCode.rtti.FunctionSignature signature,int i)
+		{
+			var dt = signature.parameters[i].type;
+			var dv = signature.parameters[i].defaultValue.getValue(null, null);
+
+			if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
+			{
+				if (dt == RunTimeDataType.rt_int)
+				{
+					dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, null, null));
+				}
+				else if (dt == RunTimeDataType.rt_uint)
+				{
+					dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, null, null));
+				}
+				else if (dt == RunTimeDataType.rt_number)
+				{
+					dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
+				}
+				else if (dt == RunTimeDataType.rt_string)
+				{
+					dv = new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(dv, null, null));
+				}
+				else if (dt == RunTimeDataType.rt_boolean)
+				{
+					dv = TypeConverter.ConvertToBoolean(dv, null, null);
+				}
+			}
+
+			return dv;
+		}
+
 
         public bool createParaScope()
         {
@@ -154,11 +189,11 @@ namespace ASRuntime.operators
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
 					nativefuncs.NativeConstParameterFunction func = ((nativefuncs.NativeConstParameterFunction)nf);
-					invokerFrame.call_parameter_slotCount = func.TotalArgs;
+					
 
 					if (invokerFrame.offset +
 							invokerFrame.block.totalRegisters + 1 + 1 +
-							invokerFrame.call_parameter_slotCount >= invokerFrame.stack.Length)
+							invokerFrame.call_parameter_slotCount + func.TotalArgs >= invokerFrame.stack.Length)
 					{
 
 						invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
@@ -171,11 +206,11 @@ namespace ASRuntime.operators
 
 						return false;
 					}
-
-
+					invokerFrame.call_parameter_slotCount += func.TotalArgs;
+					onstackparametercount = func.TotalArgs;
 
 					func.prepareParameter(toCallFunc,invokerFrame.stack ,invokerFrame.offset +
-							invokerFrame.block.totalRegisters + 1 + 1);
+							invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount - onstackparametercount);
 					
                     return true;
                 }
@@ -183,10 +218,10 @@ namespace ASRuntime.operators
 
             ASBinCode.rtti.FunctionSignature signature = toCallFunc.signature;
 
-            invokerFrame.call_parameter_slotCount = signature.onStackParameters;
+            
             if (invokerFrame.offset + 
                 invokerFrame.block.totalRegisters + 1 + 1 + 
-                invokerFrame.call_parameter_slotCount >= invokerFrame.stack.Length)
+                invokerFrame.call_parameter_slotCount+signature.onStackParameters >= invokerFrame.stack.Length)
             {
 
                 invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
@@ -199,42 +234,43 @@ namespace ASRuntime.operators
 
                 return false;
             }
+			invokerFrame.call_parameter_slotCount += signature.onStackParameters;
+			onstackparametercount = signature.onStackParameters;
 
-
-            CallFuncHeap =
+			CallFuncHeap =
                 player.genHeapFromCodeBlock(player.swc.blocks[toCallFunc.blockid]);
 
             for (int i = 0; i < signature.parameters.Count; i++)
             {
                 if (signature.parameters[i].defaultValue != null)
                 {
-                    var dt = signature.parameters[i].type;
-                    var dv = signature.parameters[i].defaultValue.getValue(null, null);
+					//var dt = signature.parameters[i].type;
+					//var dv = signature.parameters[i].defaultValue.getValue(null, null);
 
-                    if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
-                    {
-                        if (dt == RunTimeDataType.rt_int)
-                        {
-                            dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, invokerFrame, token));
-                        }
-                        else if (dt == RunTimeDataType.rt_uint)
-                        {
-                            dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, invokerFrame, token));
-                        }
-                        else if (dt == RunTimeDataType.rt_number)
-                        {
-                            dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
-                        }
-                        else if (dt == RunTimeDataType.rt_string)
-                        {
-                            dv = new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(dv, invokerFrame, token));
-                        }
-                        else if (dt == RunTimeDataType.rt_boolean)
-                        {
-                            dv = TypeConverter.ConvertToBoolean(dv, invokerFrame, token);
-                        }
-                    }
-
+					//if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
+					//{
+					//    if (dt == RunTimeDataType.rt_int)
+					//    {
+					//        dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, invokerFrame, token));
+					//    }
+					//    else if (dt == RunTimeDataType.rt_uint)
+					//    {
+					//        dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, invokerFrame, token));
+					//    }
+					//    else if (dt == RunTimeDataType.rt_number)
+					//    {
+					//        dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
+					//    }
+					//    else if (dt == RunTimeDataType.rt_string)
+					//    {
+					//        dv = new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(dv, invokerFrame, token));
+					//    }
+					//    else if (dt == RunTimeDataType.rt_boolean)
+					//    {
+					//        dv = TypeConverter.ConvertToBoolean(dv, invokerFrame, token);
+					//    }
+					//}
+					var dv = getDefaultParameterValue(signature,i);
                     
                     _storeArgementToSlot(i, dv);
                 }
@@ -329,10 +365,12 @@ namespace ASRuntime.operators
                     }
                     else
                     {
+						clear_para_slot(invokerFrame, onstackparametercount);
                         if (callbacker != null)
                         {
                             callbacker.noticeRunFailed();
                         }
+						release();
                     }
                     return;
                 }
@@ -384,8 +422,8 @@ namespace ASRuntime.operators
                             //***中断本帧本次代码执行进入try catch阶段
                             success = false;
 
-
-                            if (callbacker != null)
+							clear_para_slot(invokerFrame, onstackparametercount);
+							if (callbacker != null)
                             {
                                 callbacker.noticeRunFailed();
                             }
@@ -426,8 +464,8 @@ namespace ASRuntime.operators
                             );
                 success = false;
 
-
-                if (callbacker != null)
+				clear_para_slot(invokerFrame, onstackparametercount);
+				if (callbacker != null)
                 {
                     callbacker.noticeRunFailed();
                 }
@@ -668,6 +706,8 @@ namespace ASRuntime.operators
 
                     cb.setCallBacker(callfun_cb);
                     cb.setWhenFailed(callfun_failed);
+					cb._intArg = onstackparametercount;
+					onstackparametercount = 0;
 
                     player.callBlock(
                         player.swc.blocks[toCallFunc.blockid],
@@ -811,7 +851,8 @@ namespace ASRuntime.operators
                     player._nativefuncCaller = null;
                     ((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
 
-					clear_para_slot(invokerFrame);
+					clear_para_slot(invokerFrame,onstackparametercount);
+					onstackparametercount = 0;
 
                     if (success)
                     {
@@ -840,15 +881,20 @@ namespace ASRuntime.operators
 
         private void callfun_failed(BlockCallBackBase sender, object args)
         {
-            StackFrame frame = (StackFrame)sender.cacheObjects[1];
-            clear_para_slot(frame);
+			IBlockCallBack callbacker = sender.cacheObjects[0] as IBlockCallBack;
+			StackFrame frame = (StackFrame)sender.cacheObjects[1];
+            clear_para_slot(frame,sender._intArg);
+			if (callbacker != null)
+			{
+				callbacker.noticeRunFailed();
+			}
         }
 
         private static void callfun_cb(BlockCallBackBase sender, object args)
         {
             IBlockCallBack callbacker = sender.cacheObjects[0] as IBlockCallBack;
             StackFrame frame = (StackFrame)sender.cacheObjects[1];
-            clear_para_slot(frame);
+            clear_para_slot(frame,sender._intArg);
             if (callbacker != null)
             {
                 callbacker.call(callbacker.args);
@@ -856,21 +902,32 @@ namespace ASRuntime.operators
             
         }
 
-        private static void clear_para_slot(StackFrame invokerFrame)
+        private static void clear_para_slot(StackFrame invokerFrame,int count)
         {
-            if (invokerFrame.call_parameter_slotCount > 0)
-            {
-                //**清理**
-                for (int i = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1;
-                    i < invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount
-                    ; i++)
-                {
-                    invokerFrame.stack[i].clear();
-                }
+			while (count>0)
+			{
+				int i = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount;
+				--invokerFrame.call_parameter_slotCount;
+				--i;
+				--count;
+				invokerFrame.stack[i].clear();
+				
+			}
+			
 
-                invokerFrame.call_parameter_slotCount = 0;
-            }
-        }
+			//if (invokerFrame.call_parameter_slotCount > 0)
+			//{
+			//	//**清理**
+			//	for (int i = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1;
+			//		i < invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount
+			//		; i++)
+			//	{
+			//		invokerFrame.stack[i].clear();
+			//	}
+
+			//	invokerFrame.call_parameter_slotCount = 0;
+			//}
+		}
 
 
         public void call()
@@ -894,7 +951,8 @@ namespace ASRuntime.operators
         void IBlockCallBack.call(object args)
         {
             
-            clear_para_slot(invokerFrame);
+            clear_para_slot(invokerFrame,onstackparametercount);
+			onstackparametercount = 0;
             invokerFrame.endStep();
             release();
             
@@ -903,7 +961,8 @@ namespace ASRuntime.operators
         public void noticeRunFailed()
         {
             
-            clear_para_slot(invokerFrame);
+            clear_para_slot(invokerFrame,onstackparametercount);
+			onstackparametercount = 0;
             release();
         }
     }

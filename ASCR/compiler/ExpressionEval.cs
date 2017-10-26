@@ -49,8 +49,8 @@ namespace ASCompiler.compiler
 
 					if (player == null)
 					{
-						player = new ASRuntime.Player();
-						player.isConsoleOut = false;
+						player = new ASRuntime.Player(null);
+						
 					}
                     CSWC tempswc = new CSWC();
                     if (importBuilder != null)

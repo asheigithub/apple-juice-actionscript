@@ -13,6 +13,7 @@ namespace ASCompiler.compiler
 
         private Dictionary<string, ASBinCode.Register> dictCompileRegisters;
 
+		private int lastStmtId = short.MaxValue;
 
         private int labelIdx=0;
         public string makeLabel(string labelHead)
@@ -32,7 +33,7 @@ namespace ASCompiler.compiler
 
             //return reg;
 
-            ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count,ushort.MaxValue);
+            ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count, lastStmtId);
             dictCompileRegisters.Add("ADDITIONAL" + reg.Id, reg);
 
             return reg;
@@ -53,6 +54,7 @@ namespace ASCompiler.compiler
             {
                 ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count,as3reg.StmtID);
                 dictCompileRegisters.Add("V" + as3reg.ID, reg);
+				lastStmtId = as3reg.StmtID;
                 return reg;
             }
         }
@@ -313,10 +315,10 @@ namespace ASCompiler.compiler
 						{
 							sslot s = slotpool.Dequeue(); //复用
 
-							if (s.register._isassigntarget || s.register._hasUnaryOrShuffixOrDelete || s.register.isFuncResult || s.register._isDotAccessTarget )
+							//if (s.register._isassigntarget || s.register._hasUnaryOrShuffixOrDelete || s.register.isFuncResult || s.register._isDotAccessTarget )
 							//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
 							{
-								dictAddResetStackOp.Add(reg, step);
+								//dictAddResetStackOp.Add(reg, step);
 							}
 
 							s.register = reg;

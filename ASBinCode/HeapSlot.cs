@@ -35,8 +35,14 @@ namespace ASBinCode
             value = v; //TypeConverter.getDefaultValue(rtType).getValue(null);
         }
 
+		public override SLOT assign(RunTimeValueBase value, out bool success)
+		{
+			//throw new NotImplementedException();
+			success = directSet(value);
+			return this;
+		}
 
-        public override bool directSet(RunTimeValueBase value)
+		public override bool directSet(RunTimeValueBase value)
         {
             //value只会在内部new出来，因此，如果value不为null,也肯定是自己new出来的
             rtType = value.rtType;

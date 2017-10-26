@@ -203,7 +203,7 @@ namespace ASCompiler.compiler.builds
 
                 Register tempreg = env.getAdditionalRegister();
                 tempreg.setEAXTypeWhenCompile(dstType);
-                op.reg = tempreg;
+                op.reg = tempreg;tempreg.isFuncResult = true;
                 op.regType = dstType;
 
                 op.arg1 = src;
@@ -2366,8 +2366,9 @@ namespace ASCompiler.compiler.builds
                             "Attempt to delete the fixed property prototype.  Only dynamically defined properties can be deleted.");
                         }
                         ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
+						((Register)v1)._isdeletetarget = true;
 
-                    }
+					}
 
                     ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);

@@ -30,7 +30,8 @@ namespace ASRuntime.operators
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
                 fc.function = f;
                 fc.loadDefineFromFunction();
-                bool success;
+				if (!fc.createParaScope()) { return; }
+				bool success;
                 fc.pushParameter(v1, 0, out success);
                 fc.pushParameter(v2, 1, out success);
                 fc.returnSlot = step.reg.getSlot(scope, frame);

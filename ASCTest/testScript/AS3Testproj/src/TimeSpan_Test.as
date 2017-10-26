@@ -16,7 +16,7 @@ package
 	import system.Int64;
 	import system.TimeSpan;
 	
-	
+	[Doc]
 	/**
 	 * ...
 	 * @author 
@@ -40,6 +40,7 @@ package
 		
 		public function TimeSpan_Test() 
 		{
+			
 			//var dk = DateTimeKind.Local;
 			//trace( int(DateTimeKind.Local));
 			

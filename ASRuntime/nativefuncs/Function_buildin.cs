@@ -277,6 +277,7 @@ namespace ASRuntime.nativefuncs
 						toinsert.callbacker = (IBlockCallBack)callbacker;
 						toinsert.function = toApply;
 						toinsert.loadDefineFromFunction();
+						if (!toinsert.createParaScope()) {  return; }
 						toinsert._tempSlot = ((StackFrame)stackframe)._tempSlot1;
 						toinsert.returnSlot = resultSlot;
 						toinsert.tag = argements;
@@ -324,7 +325,7 @@ namespace ASRuntime.nativefuncs
             caller.loadDefineFromFunction();
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
-			if (!caller.createParaScope()) { return; }
+			if (!caller.createParaScope()) {  return; }
 
 
 

@@ -13,7 +13,7 @@ namespace ASCTest
         static void Main(string[] args)
         {
 			//ASCompiler.compiler.Builder bu = new ASCompiler.compiler.Builder();
-			//byte[] b=bu.BuildLibBin();
+			//byte[] b = bu.BuildLibBin();
 			//System.IO.File.WriteAllBytes("astoolglobal.swc", b);
 
 
@@ -28,10 +28,9 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\label\";
-
-				//path = "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as";
-
+                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+				//path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
 
 				if (path.EndsWith(".as"))
                 {
@@ -148,6 +147,8 @@ namespace ASCTest
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
+				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
+
 
 				if (swc != null)
                 {

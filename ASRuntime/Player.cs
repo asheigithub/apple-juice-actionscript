@@ -8,8 +8,7 @@ namespace ASRuntime
 {
     public class Player
     {
-        public bool isConsoleOut = true;
-
+		internal IRuntimeOutput infoOutput;
 
         internal Dictionary<int, rtObject> static_instance;
         internal Dictionary<int, RunTimeScope> outpackage_runtimescope;
@@ -119,17 +118,24 @@ namespace ASRuntime
 		internal operators.FunctionCaller.FunctionCallerPool funcCallerPool;
 		internal BlockCallBackBase.BlockCallBackBasePool blockCallBackPool;
 
+		public Player(IRuntimeOutput output)
+		{
+			infoOutput = output;
+		}
+		public Player():this(new ConsoleOutput()) { }
+
+
         public RunTimeValueBase run2(RightValueBase result)
         {
 
             if (defaultblock == null || swc == null || swc.blocks.Count == 0)
             {
-                if (isConsoleOut)
+                if (infoOutput !=null )
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("====没有找到可执行的代码====");
-                    Console.WriteLine("用[Doc]标记文档类");
-                    Console.WriteLine("或者第一个类文件的包外代码作为入口");
+					infoOutput.Info(string.Empty);
+					infoOutput.Info("====没有找到可执行的代码====");
+					infoOutput.Info("用[Doc]标记文档类");
+					infoOutput.Info("或者第一个类文件的包外代码作为入口");
                 }
                 return null;
             }
@@ -258,31 +264,31 @@ namespace ASRuntime
             blockCallBackPool.checkpool();
 			stackframePool.checkpool();
 
-#if DEBUG
-            if (isConsoleOut)
-            {
+//#if DEBUG
+//            if (infoOutput !=null)
+//            {
                
-                Console.WriteLine();
-                Console.WriteLine("====程序状态====");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Variables:");
+//                Console.WriteLine();
+//                Console.WriteLine("====程序状态====");
+//                Console.ForegroundColor = ConsoleColor.Yellow;
+//                Console.WriteLine("Variables:");
 
-                for (int i = 0; i < displayStackFrame.block.scope.members.Count; i++)
-                {
-                    Console.WriteLine("\t" + displayStackFrame.block.scope.members[i].name + "\t|\t" + displayStackFrame.scope.memberData[i].getValue());
-                }
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Registers:");
-                for (int i = 0; i < displayStackFrame.block.totalRegisters; i++)
-                {
-                    if (stackSlots[i].getValue()!=null)
-                    {
-                        Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
-                    }
-                }
-                Console.ResetColor();
-            }
-#endif
+//                for (int i = 0; i < displayStackFrame.block.scope.members.Count; i++)
+//                {
+//                    Console.WriteLine("\t" + displayStackFrame.block.scope.members[i].name + "\t|\t" + displayStackFrame.scope.memberData[i].getValue());
+//                }
+//                Console.ForegroundColor = ConsoleColor.Green;
+//                Console.WriteLine("Registers:");
+//                for (int i = 0; i < displayStackFrame.block.totalRegisters; i++)
+//                {
+//                    if (stackSlots[i].getValue()!=null)
+//                    {
+//                        Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
+//                    }
+//                }
+//                Console.ResetColor();
+//            }
+//#endif
             if (result != null && runtimeError==null)
             {
                 return result.getValue(topscope,displayStackFrame);
@@ -588,7 +594,9 @@ namespace ASRuntime
 
             runtimeStack.Pop();
 
-            raiseframe.close(); stackframePool.ret(raiseframe);
+			
+
+			raiseframe.close(); stackframePool.ret(raiseframe);
 
 #if DEBUG
 
@@ -614,10 +622,10 @@ namespace ASRuntime
 
         internal void outPutErrorMessage(error.InternalError err)
         {
-            if (isConsoleOut)
+            if (infoOutput !=null)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("运行时错误");
+
+				infoOutput.Error("运行时错误");
                 //Console.WriteLine("file :" + err.token.sourceFile);
                 //Console.WriteLine("line :" + err.token.line + " ptr :" + err.token.ptr);
 
@@ -636,11 +644,11 @@ namespace ASRuntime
                     }
 
 
-                    Console.WriteLine("[故障] " + "信息=" + errinfo);
+					infoOutput.Error("[故障] " + "信息=" + errinfo);
                 }
                 else
                 {
-                    Console.WriteLine(err.message);
+					infoOutput.Error(err.message);
                 }
 
                 Stack<FrameInfo> _temp = new Stack<FrameInfo>();
@@ -655,19 +663,19 @@ namespace ASRuntime
                 {
                     if (item.codeLinePtr < item.block.opSteps.Count)
                     {
-                        Console.WriteLine(item.block.name + " at file:" + item.block.opSteps[item.codeLinePtr].token.sourceFile);
-                        Console.WriteLine("\t\t line:" + (item.block.opSteps[item.codeLinePtr].token.line+1 ) + " ptr:" + (item.block.opSteps[item.codeLinePtr].token.ptr+1));
+						infoOutput.Error(item.block.name + " at file:" + item.block.opSteps[item.codeLinePtr].token.sourceFile);
+						infoOutput.Error("\t\t line:" + (item.block.opSteps[item.codeLinePtr].token.line+1 ) + " ptr:" + (item.block.opSteps[item.codeLinePtr].token.ptr+1));
                     }
                     else
                     {
-                        Console.WriteLine(item.block.name);
+						infoOutput.Error(item.block.name);
                     }
 
-                    Console.WriteLine("----");
+					infoOutput.Error("----");
                 }
 
 
-                Console.ResetColor();
+                
             }
         }
 

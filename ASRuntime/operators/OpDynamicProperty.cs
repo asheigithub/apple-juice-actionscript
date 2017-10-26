@@ -15,9 +15,12 @@ namespace ASRuntime.operators
         {
             {
                 StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope,frame);
-                if (slot.linktarget is DynamicPropertySlot)
+
+				var ls = slot.getLinkSlot();
+
+                if (ls is DynamicPropertySlot)
                 {
-                    DynamicPropertySlot link = (DynamicPropertySlot)slot.linktarget;
+                    DynamicPropertySlot link = (DynamicPropertySlot)ls;
                     if (link._canDelete)
                     {
                         ((ASBinCode.rtti.DynamicObject)link.obj.value).deleteProperty(link._propname);
@@ -29,25 +32,36 @@ namespace ASRuntime.operators
                             link.directSet(link.backup);
                         }
                     }
-                }
-                else if (slot.linktarget is DictionarySlot)
-                {
-                    DictionarySlot link = (DictionarySlot)slot.linktarget;
-                    ((ASBinCode.rtti.DictionaryObject)link.obj.value).RemoveKey(link._key);
-                }
-                else if (slot.linktarget is OpAccess_Dot.arraySlot) //(slot.fromArray != null)
-                {
-                    slot.directSet(rtUndefined.undefined);
-                    //slot.fromArray.innerArray[slot.fromArrayIndex] = rtUndefined.undefined;
-                }
-                else if (slot.linktarget is OpAccess_Dot.prototypeSlot)
-                {   //原型链对象，不可删除
 
+					
                 }
-                else if (slot.linktarget is OpVector.vectorSLot)
+                else if (ls is DictionarySlot)
                 {
-                    //数组链接，跳过
-                }
+                    DictionarySlot link = (DictionarySlot)ls;
+                    ((ASBinCode.rtti.DictionaryObject)link.obj.value).RemoveKey(link._key);
+
+					
+				}
+                else if (ls is OpAccess_Dot.arraySlot) //(slot.fromArray != null)
+                {
+					//slot.directSet(rtUndefined.undefined);
+					//bool success;
+					//slot.assign(rtUndefined.undefined,out success);
+
+					((OpAccess_Dot.arraySlot)ls).delete();
+
+
+					//slot.fromArray.innerArray[slot.fromArrayIndex] = rtUndefined.undefined;
+				}
+                else if (ls is OpAccess_Dot.prototypeSlot)
+                {   //原型链对象，不可删除
+					
+				}
+                else if (ls is OpVector.vectorSLot)
+                {
+					//数组链接，跳过
+					
+				}
                 else
                 {
                     frame.throwError(
@@ -57,7 +71,9 @@ namespace ASRuntime.operators
 
                 }
 
-                frame.endStep(step);
+				slot.linkTo(null);
+
+				frame.endStep(step);
             }
         }
 

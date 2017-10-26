@@ -34,11 +34,11 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    class Vector_constructor : NativeFunctionBase
+    class Vector_constructor : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_constructor()
+        public Vector_constructor():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_uint);
@@ -77,36 +77,67 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
 
-            uint length = ((rtUInt)argements[0].getValue()).value;
-            bool isfixed = ( (rtBoolean)argements[1].getValue()).value;
+		//    uint length = ((rtUInt)argements[0].getValue()).value;
+		//    bool isfixed = ( (rtBoolean)argements[1].getValue()).value;
 
-            //throw new NotImplementedException();
+		//    //throw new NotImplementedException();
 
-            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+		//    ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
-            RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
+		//    RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
 
 
-            Vector_Data data = new Vector_Data(vector_type);
-            data.isFixed = isfixed;
-            data.innnerList = new List<RunTimeValueBase>();
+		//    Vector_Data data = new Vector_Data(vector_type);
+		//    data.isFixed = isfixed;
+		//    data.innnerList = new List<RunTimeValueBase>();
 
-            while (data.innnerList.Count < length)
-            {
-                data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null,null));
-            }
+		//    while (data.innnerList.Count < length)
+		//    {
+		//        data.innnerList.Add( TypeConverter.getDefaultValue( vector_type ).getValue(null,null));
+		//    }
 
-            rtObj.hosted_object = data;
+		//    rtObj.hosted_object = data;
 
-            return ASBinCode.rtData.rtUndefined.undefined;
-        }
-    }
+		//    return ASBinCode.rtData.rtUndefined.undefined;
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+
+			uint length = ((rtUInt)argements[0]).value;
+			bool isfixed = ((rtBoolean)argements[1]).value;
+
+			//throw new NotImplementedException();
+
+			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+
+			RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
+
+
+			Vector_Data data = new Vector_Data(vector_type);
+			data.isFixed = isfixed;
+			data.innnerList = new List<RunTimeValueBase>();
+
+			while (data.innnerList.Count < length)
+			{
+				data.innnerList.Add(TypeConverter.getDefaultValue(vector_type).getValue(null, null));
+			}
+
+			rtObj.hosted_object = data;
+
+			returnSlot.directSet(rtUndefined.undefined);
+			//return ASBinCode.rtData.rtUndefined.undefined;
+		}
+
+	}
 
 
 

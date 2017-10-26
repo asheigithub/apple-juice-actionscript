@@ -141,7 +141,16 @@ namespace ASRuntime.nativefuncs
 				// argements[i] = ASBinCode.rtData.rtUndefined.undefined;
 
 				argements.SetSlot(slots[stidx + i], i);
-				argements[i] = ASBinCode.rtData.rtUndefined.undefined;
+				if (functionDefine.signature.parameters[i].defaultValue != null)
+				{
+					argements[i] = operators.FunctionCaller.getDefaultParameterValue(
+						functionDefine.signature, i
+						); //functionDefine.signature.parameters[i].defaultValue.getValue(null, null);
+				}
+				else
+				{
+					argements[i] =  ASBinCode.rtData.rtUndefined.undefined;
+				}
 			}
         }
 

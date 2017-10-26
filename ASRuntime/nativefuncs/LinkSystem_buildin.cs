@@ -289,10 +289,10 @@ namespace ASRuntime.nativefuncs
 
     #region equals
 
-    class equals : NativeFunctionBase
+    class equals : NativeConstParameterFunction
     {
         string funcname;
-        public equals(string name)
+        public equals(string name):base(1)
         {
             funcname = name;
             para = new List<RunTimeDataType>();
@@ -332,55 +332,87 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+		//public override NativeFunctionMode mode
+		//{
+		//    get
+		//    {
+		//        return NativeFunctionMode.normal_1;
+		//    }
+		//}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new ASRunTimeException();
-        }
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    throw new ASRunTimeException();
+		//}
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            
-            success = true;
+		//public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+		//{
 
-            ASBinCode.rtData.rtObject obj = argements[0].getValue() as ASBinCode.rtData.rtObject;
-            if (obj == null)
-            {
-                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
-                return;
-            }
+		//    success = true;
 
-            LinkSystemObject other = obj.value as LinkSystemObject;
-            if (other == null)
-            {
-                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
-                return;
-            }
+		//    ASBinCode.rtData.rtObject obj = argements[0].getValue() as ASBinCode.rtData.rtObject;
+		//    if (obj == null)
+		//    {
+		//        returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+		//        return;
+		//    }
+
+		//    LinkSystemObject other = obj.value as LinkSystemObject;
+		//    if (other == null)
+		//    {
+		//        returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+		//        return;
+		//    }
 
 
-            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
+		//    LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
 
-            if (System.Object.Equals(iv, other))
-            {
-                returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
-                return;
-            }
-            else
-            {
-                returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
-                return;
-            }
-            
-        }
+		//    if (System.Object.Equals(iv, other))
+		//    {
+		//        returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+		//        return;
+		//    }
+		//    else
+		//    {
+		//        returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+		//        return;
+		//    }
 
-    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			ASBinCode.rtData.rtObject obj = argements[0] as ASBinCode.rtData.rtObject;
+			if (obj == null)
+			{
+				returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+				return;
+			}
+
+			LinkSystemObject other = obj.value as LinkSystemObject;
+			if (other == null)
+			{
+				returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+				return;
+			}
+
+
+			LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
+
+			if (System.Object.Equals(iv, other))
+			{
+				returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+				return;
+			}
+			else
+			{
+				returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+				return;
+			}
+		}
+	}
 
     #endregion
 

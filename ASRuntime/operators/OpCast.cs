@@ -83,7 +83,7 @@ namespace ASRuntime.operators
                     {
                         storeto.setValue(
                             TypeConverter.ConvertToBoolean(
-                            srcValue, frame, token, true
+                            srcValue, frame, token
                         )
                             );
                         //callbacker.isSuccess = true;
@@ -94,7 +94,7 @@ namespace ASRuntime.operators
                     {
                         storeto.setValue(
                          TypeConverter.ConvertToInt(
-                            srcValue, frame, token, true
+                            srcValue, frame, token
                         )
                         );
                         //callbacker.isSuccess = true;
@@ -105,7 +105,7 @@ namespace ASRuntime.operators
                     {
                         storeto.setValue(
                             TypeConverter.ConvertToUInt(
-                            srcValue, frame, token, true
+                            srcValue, frame, token
                         )
                             );
                         //callbacker.isSuccess = true;
@@ -126,7 +126,7 @@ namespace ASRuntime.operators
                 case ASBinCode.RunTimeDataType.rt_string:
                     {
                         string str = TypeConverter.ConvertToString(
-                            srcValue, frame, token, true
+                            srcValue, frame, token
                         );
 
                         storeto.setValue(
@@ -498,7 +498,7 @@ namespace ASRuntime.operators
                         fc.loadDefineFromFunction();
                         fc.returnSlot = storeto;
                         fc.callbacker = toStringCB;
-                        if (!fc.createParaScope()) { return; }
+                        if (!fc.createParaScope()) { callbacker.noticeRunFailed(); return; }
                         fc.call();
                     }
                     else
@@ -1144,7 +1144,7 @@ namespace ASRuntime.operators
                 fc.loadDefineFromFunction();
                 fc.returnSlot = storeto;
                 fc.callbacker = valueofCB;
-                if (!fc.createParaScope()) { return; }
+                if (!fc.createParaScope()) { callbacker.noticeRunFailed(); valueofCB.noticeRunFailed(); return; }
                 fc.call();
             }
             else
@@ -1418,7 +1418,7 @@ namespace ASRuntime.operators
                 fc.loadDefineFromFunction();
                 fc.returnSlot = storeto;
                 fc.callbacker = toStringCB;
-                if (!fc.createParaScope()) { return; }
+                if (!fc.createParaScope()) { callbacker.noticeRunFailed(); toStringCB.noticeRunFailed(); return; }
                 fc.call();
             }
             else

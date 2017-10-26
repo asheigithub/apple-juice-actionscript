@@ -7,9 +7,9 @@ using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
-    class String_length : NativeFunctionBase
+    class String_length : NativeConstParameterFunction
     {
-        public String_length()
+        public String_length():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -49,33 +49,58 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(),null,null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(),null,null);
 
-            if (b==null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
-                
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                return new ASBinCode.rtData.rtInt(b.Length);
-            }
+		//    if (b==null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-        }
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        return new ASBinCode.rtData.rtInt(b.Length);
+		//    }
 
-    }
+		//}
 
-    class String_charAt : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				//errormessage = "Cannot access a property or method of a null object reference.";
+				//errorno = 1009;
+
+				//return ASBinCode.rtData.rtUndefined.undefined;
+				success = false;
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				//return new ASBinCode.rtData.rtInt(b.Length);
+				returnSlot.setValue(b.Length);
+			}
+		}
+
+	}
+
+    class String_charAt : NativeConstParameterFunction
     {
-        public String_charAt()
+        public String_charAt():base(1)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_number);
@@ -116,38 +141,74 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                int idx = TypeConverter.ConvertToInt(argements[0].getValue(),null,null);
-                if (idx < 0 || idx >= b.Length)
-                {
-                    return new rtString(string.Empty);
-                }
-                else
-                {
-                    return new rtString(b[idx].ToString());
-                }
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        int idx = TypeConverter.ConvertToInt(argements[0].getValue(),null,null);
+		//        if (idx < 0 || idx >= b.Length)
+		//        {
+		//            return new rtString(string.Empty);
+		//        }
+		//        else
+		//        {
+		//            return new rtString(b[idx].ToString());
+		//        }
 
-            }
+		//    }
 
-        }
+		//}
 
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				//errormessage = "Cannot access a property or method of a null object reference.";
+				//errorno = 1009;
+
+				//return ASBinCode.rtData.rtUndefined.undefined;
+				success = false;
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				int idx = TypeConverter.ConvertToInt(argements[0], null, null);
+				if (idx < 0 || idx >= b.Length)
+				{
+					//return new rtString(string.Empty);
+					returnSlot.setValue(string.Empty);
+				}
+				else
+				{
+					//return new rtString(b[idx].ToString());
+					returnSlot.setValue(b[idx].ToString());
+				}
+
+			}
+		}
+
+	}
 
 
     class String_charCodeAt : NativeConstParameterFunction
@@ -312,9 +373,9 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class String_indexOf : NativeFunctionBase
+    class String_indexOf : NativeConstParameterFunction
     {
-        public String_indexOf()
+        public String_indexOf():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_string);
@@ -356,33 +417,64 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                string search = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
-                int st = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        string search = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
+		//        int st = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
 
-                return new rtInt(  b.IndexOf(search,st));
+		//        return new rtInt(  b.IndexOf(search,st));
 
-            }
+		//    }
 
-        }
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
 
-    }
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				//errormessage = "Cannot access a property or method of a null object reference.";
+				//errorno = 1009;
+
+				//return ASBinCode.rtData.rtUndefined.undefined;
+
+				success = false;
+
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				string search = TypeConverter.ConvertToString(argements[0], null, null);
+				int st = TypeConverter.ConvertToInt(argements[1], null, null);
+
+				//return new rtInt(b.IndexOf(search, st));
+				success = true;
+
+				returnSlot.setValue(b.IndexOf(search, st));
+
+			}
+		}
+	}
 
     class String_lastindexOf : NativeFunctionBase
     {
@@ -456,6 +548,11 @@ namespace ASRuntime.nativefuncs
                 else
                 {
                     st = (int)sst;
+
+					if (st <= 0x7FFFFFFF-search.Length)
+					{
+						st = st + search.Length;
+					}
                 }
 
                 //****坑****
@@ -463,7 +560,7 @@ namespace ASRuntime.nativefuncs
                 //var p = text.lastIndexOf('ss', 5);
                 //p=5  !!!
 
-                st = st + search.Length;
+                
 
                 if (st < 0) st = 0;
                 if (st > b.Length) { st = b.Length; }
@@ -477,9 +574,9 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    class String_slice : NativeFunctionBase
+    class String_slice : NativeConstParameterFunction
     {
-        public String_slice()
+        public String_slice():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_number);
@@ -521,72 +618,137 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                
-                int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-                int ed = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
 
-                if (st > b.Length)
-                {
-                    return new rtString(string.Empty);
-                }
-                else if (st < 0)
-                {
-                    st = b.Length + st;
-                    if (st < 0)
-                    {
-                        st = 0;
-                    }
-                }
+		//        int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
+		//        int ed = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
 
-                if (ed < 0)
-                {
-                    ed =b.Length + ed;
-                    if (ed < 0)
-                    {
-                        ed = 0;
-                    }
-                }
+		//        if (st > b.Length)
+		//        {
+		//            return new rtString(string.Empty);
+		//        }
+		//        else if (st < 0)
+		//        {
+		//            st = b.Length + st;
+		//            if (st < 0)
+		//            {
+		//                st = 0;
+		//            }
+		//        }
+
+		//        if (ed < 0)
+		//        {
+		//            ed =b.Length + ed;
+		//            if (ed < 0)
+		//            {
+		//                ed = 0;
+		//            }
+		//        }
 
 
-                int len = ed - st;
-                if (len == 0)
-                {
-                    return new rtString(string.Empty);
-                }
-                if (len > b.Length - st)
-                {
-                    return new rtString(b.Substring(st));
-                }
-                else
-                {
-                    return new rtString(b.Substring(st,len));
-                }
-            }
+		//        int len = ed - st;
+		//        if (len == 0)
+		//        {
+		//            return new rtString(string.Empty);
+		//        }
+		//        if (len > b.Length - st)
+		//        {
+		//            return new rtString(b.Substring(st));
+		//        }
+		//        else
+		//        {
+		//            return new rtString(b.Substring(st,len));
+		//        }
+		//    }
 
-        }
+		//}
 
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-    class String_split : NativeFunctionBase
+			if (b == null)
+			{
+				success = false;
+				//errormessage = "Cannot access a property or method of a null object reference.";
+				//errorno = 1009;
+
+				//return ASBinCode.rtData.rtUndefined.undefined;
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				int st = TypeConverter.ConvertToInt(argements[0], null, null);
+				int ed = TypeConverter.ConvertToInt(argements[1], null, null);
+
+				if (st > b.Length)
+				{
+					//return new rtString(string.Empty);
+					returnSlot.setValue(string.Empty);
+				}
+				else if (st < 0)
+				{
+					st = b.Length + st;
+					if (st < 0)
+					{
+						st = 0;
+					}
+				}
+
+				if (ed < 0)
+				{
+					ed = b.Length + ed;
+					if (ed < 0)
+					{
+						ed = 0;
+					}
+				}
+
+
+				int len = ed - st;
+				if (len == 0)
+				{
+					//return new rtString(string.Empty);
+					returnSlot.setValue(string.Empty);
+				}
+				if (len > b.Length - st)
+				{
+					//return new rtString(b.Substring(st));
+					returnSlot.setValue(b.Substring(st));
+				}
+				else
+				{
+					//return new rtString(b.Substring(st, len));
+					returnSlot.setValue(b.Substring(st, len));
+				}
+			}
+		}
+
+	}
+
+    class String_split : NativeConstParameterFunction
     {
-        public String_split()
+        public String_split():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_string);
@@ -628,48 +790,86 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                string delimiter = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
-                int maxcount = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        string delimiter = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
+		//        int maxcount = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
 
-                if (maxcount < 0) { return new rtArray(); }
-
-                
-                var split = b.Split(new string[] { delimiter }, StringSplitOptions.None );
-                rtArray result = new rtArray();
-                for (int i = 0; i < split.Length && i<maxcount; i++)
-                {
-                    result.innerArray.Add(new rtString(split[i]));
-                }
-
-                return result;
-            }
-
-        }
-
-    }
+		//        if (maxcount < 0) { return new rtArray(); }
 
 
+		//        var split = b.Split(new string[] { delimiter }, StringSplitOptions.None );
+		//        rtArray result = new rtArray();
+		//        for (int i = 0; i < split.Length && i<maxcount; i++)
+		//        {
+		//            result.innerArray.Add(new rtString(split[i]));
+		//        }
 
-    class String_substr : NativeFunctionBase
+		//        return result;
+		//    }
+
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+
+				success = false;
+				
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				string delimiter = TypeConverter.ConvertToString(argements[0], null, null);
+				int maxcount = TypeConverter.ConvertToInt(argements[1], null, null);
+
+				if (maxcount < 0) //{ return new rtArray(); }
+				{
+					returnSlot.directSet(new rtArray());
+				}
+
+				var split = b.Split(new string[] { delimiter }, StringSplitOptions.None);
+				rtArray result = new rtArray();
+				for (int i = 0; i < split.Length && i < maxcount; i++)
+				{
+					result.innerArray.Add(new rtString(split[i]));
+				}
+
+				//return result;
+				returnSlot.directSet(result);
+
+			}
+		}
+
+	}
+
+
+
+    class String_substr : NativeConstParameterFunction
     {
-        public String_substr()
+        public String_substr():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_number);
@@ -711,63 +911,117 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
 
-                int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-                int len = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+		//        int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
+		//        int len = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
 
-                if (st > b.Length)
-                {
-                    return new rtString(string.Empty);
-                }
-                else if (st < 0)
-                {
-                    st = b.Length + st;
-                    if (st < 0)
-                    {
-                        st = 0;
-                    }
-                }
+		//        if (st > b.Length)
+		//        {
+		//            return new rtString(string.Empty);
+		//        }
+		//        else if (st < 0)
+		//        {
+		//            st = b.Length + st;
+		//            if (st < 0)
+		//            {
+		//                st = 0;
+		//            }
+		//        }
 
-                if (len < 0)
-                {
-                    len = 0;
-                }
+		//        if (len < 0)
+		//        {
+		//            len = 0;
+		//        }
 
 
-                if (len > b.Length - st)
-                {
-                    return new rtString(b.Substring(st));
-                }
-                else
-                {
-                    return new rtString(b.Substring(st, len));
-                }
-            }
+		//        if (len > b.Length - st)
+		//        {
+		//            return new rtString(b.Substring(st));
+		//        }
+		//        else
+		//        {
+		//            return new rtString(b.Substring(st, len));
+		//        }
+		//    }
 
-        }
+		//}
 
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
 
-    class String_substring : NativeFunctionBase
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				int st = TypeConverter.ConvertToInt(argements[0], null, null);
+				int len = TypeConverter.ConvertToInt(argements[1], null, null);
+
+				if (st > b.Length)
+				{
+					//return new rtString(string.Empty);
+					returnSlot.setValue(string.Empty);
+				}
+				else if (st < 0)
+				{
+					st = b.Length + st;
+					if (st < 0)
+					{
+						st = 0;
+					}
+				}
+
+				if (len < 0)
+				{
+					len = 0;
+				}
+
+
+				if (len > b.Length - st)
+				{
+					//return new rtString(b.Substring(st));
+					returnSlot.setValue(b.Substring(st));
+				}
+				else
+				{
+					//return new rtString(b.Substring(st, len));
+					returnSlot.setValue(b.Substring(st, len));
+				}
+			}
+		}
+
+
+	}
+
+    class String_substring : NativeConstParameterFunction
     {
-        public String_substring()
+        public String_substring():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_number);
@@ -809,65 +1063,117 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
 
-                int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-                int ed = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
+		//        int st = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
+		//        int ed = TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
 
-                if (st > ed)
-                {
-                    int temp = st;
-                    st = ed;
-                    ed = temp;
-                }
-
-
-                if (st > b.Length)
-                {
-                    return new rtString(string.Empty);
-                }
-                else if (st < 0)
-                {
-                    st = 0;
-                }
-
-                int len = ed - st;
-
-                if (len > b.Length - st)
-                {
-                    return new rtString(b.Substring(st));
-                }
-                else
-                {
-                    return new rtString(b.Substring(st, len));
-                }
-            }
-
-        }
-
-    }
+		//        if (st > ed)
+		//        {
+		//            int temp = st;
+		//            st = ed;
+		//            ed = temp;
+		//        }
 
 
+		//        if (st > b.Length)
+		//        {
+		//            return new rtString(string.Empty);
+		//        }
+		//        else if (st < 0)
+		//        {
+		//            st = 0;
+		//        }
 
-    class String_tolower : NativeFunctionBase
+		//        int len = ed - st;
+
+		//        if (len > b.Length - st)
+		//        {
+		//            return new rtString(b.Substring(st));
+		//        }
+		//        else
+		//        {
+		//            return new rtString(b.Substring(st, len));
+		//        }
+		//    }
+
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				int st = TypeConverter.ConvertToInt(argements[0], null, null);
+				int ed = TypeConverter.ConvertToInt(argements[1], null, null);
+
+				if (st > ed)
+				{
+					int temp = st;
+					st = ed;
+					ed = temp;
+				}
+
+
+				if (st > b.Length)
+				{
+					//return new rtString(string.Empty);
+					returnSlot.setValue(string.Empty);
+				}
+				else if (st < 0)
+				{
+					st = 0;
+				}
+
+				int len = ed - st;
+
+				if (len > b.Length - st)
+				{
+					//return new rtString(b.Substring(st));
+					returnSlot.setValue(b.Substring(st));
+				}
+				else
+				{
+					//return new rtString(b.Substring(st, len));
+					returnSlot.setValue(b.Substring(st, len));
+				}
+			}
+		}
+
+	}
+
+
+
+    class String_tolower : NativeConstParameterFunction
     {
-        public String_tolower()
+        public String_tolower():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -907,33 +1213,52 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                return new ASBinCode.rtData.rtString(b.ToLower());
-            }
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        return new ASBinCode.rtData.rtString(b.ToLower());
+		//    }
 
-        }
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-    }
+			if (b == null)
+			{
+				success = false;
 
-    class String_toupper : NativeFunctionBase
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				//return new ASBinCode.rtData.rtString(b.ToLower());
+				returnSlot.setValue(b.ToLower());
+			}
+		}
+	}
+
+    class String_toupper : NativeConstParameterFunction
     {
-        public String_toupper()
+        public String_toupper():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -973,35 +1298,54 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
-                return new ASBinCode.rtData.rtString(b.ToUpper());
-            }
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
+		//        return new ASBinCode.rtData.rtString(b.ToUpper());
+		//    }
 
-        }
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
 
-    }
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				//return new ASBinCode.rtData.rtString(b.ToLower());
+				returnSlot.setValue(b.ToUpper());
+			}
+		}
+	}
 
 
 
-    class String_replace : NativeFunctionBase
+    class String_replace : NativeConstParameterFunction
     {
-        public String_replace()
+        public String_replace():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_string);
@@ -1043,39 +1387,69 @@ namespace ASRuntime.nativefuncs
         }
 
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+		//    string b = TypeConverter.ConvertToString(
+		//        ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
 
-            if (b == null)
-            {
-                errormessage = "Cannot access a property or method of a null object reference.";
-                errorno = 1009;
+		//    if (b == null)
+		//    {
+		//        errormessage = "Cannot access a property or method of a null object reference.";
+		//        errorno = 1009;
 
-                return ASBinCode.rtData.rtUndefined.undefined;
-            }
-            else
-            {
+		//        return ASBinCode.rtData.rtUndefined.undefined;
+		//    }
+		//    else
+		//    {
 
-                string pattern = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
-                string repl = TypeConverter.ConvertToString(argements[1].getValue(), null, null);
+		//        string pattern = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
+		//        string repl = TypeConverter.ConvertToString(argements[1].getValue(), null, null);
 
-                if (pattern == null) pattern = string.Empty;
-                if (repl == null) repl = string.Empty;
+		//        if (pattern == null) pattern = string.Empty;
+		//        if (repl == null) repl = string.Empty;
 
 
-                return new rtString(b.Replace(pattern, repl));
+		//        return new rtString(b.Replace(pattern, repl));
 
-                
-            }
 
-        }
+		//    }
 
-    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+
+			string b = TypeConverter.ConvertToString(
+				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+
+			if (b == null)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				success = true;
+				string pattern = TypeConverter.ConvertToString(argements[0], null, null);
+				string repl = TypeConverter.ConvertToString(argements[1], null, null);
+
+				if (pattern == null) pattern = string.Empty;
+				if (repl == null) repl = string.Empty;
+
+
+				//return new rtString(b.Replace(pattern, repl));
+				returnSlot.setValue(b.Replace(pattern, repl));
+
+			}
+		}
+
+	}
 
 
 }

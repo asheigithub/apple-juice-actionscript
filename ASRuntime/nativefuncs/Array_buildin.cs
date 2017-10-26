@@ -7,11 +7,11 @@ using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
-    class Array_constructor : NativeConstParameterFunction
+    class Array_constructor : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_constructor():base(1)
+        public Array_constructor()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_array);
@@ -49,77 +49,18 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        //{
-        //    errormessage = null;
-        //    errorno = 0;
-
-        //    var newvalue = new ASBinCode.rtData.rtArray();
-        //    newvalue.objHandle.bindArrayObject = (rtObject)thisObj;
-
-        //    ((rtObject)thisObj).value.memberData[0].directSet(newvalue);
-            
-
-        //    var args = argements[0].getValue();
-
-        //    if(args.rtType == RunTimeDataType.rt_array)
-        //    {
-        //        rtArray arr = (rtArray)args;
-
-        //        if (arr.innerArray.Count == 1)
-        //        {
-        //            var a1 = arr.innerArray[0];
-        //            if (TypeConverter.ObjectImplicit_ToNumber(a1.rtType, bin))
-        //            {
-        //                a1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)a1);
-        //            }
-
-        //            if (a1.rtType == RunTimeDataType.rt_int || a1.rtType == RunTimeDataType.rt_uint || a1.rtType == RunTimeDataType.rt_number)
-        //            {
-        //                int c = TypeConverter.ConvertToInt(a1, null, null);
-
-        //                if (c < 0)
-        //                {
-        //                    errormessage = "Array index is not a positive integer (" + c + ").";
-        //                    errorno = 1005;
-        //                    return ASBinCode.rtData.rtUndefined.undefined;
-        //                }
-        //                else
-        //                {
-        //                    while (newvalue.innerArray.Count < c)
-        //                    {
-        //                        newvalue.innerArray.Add(rtUndefined.undefined);
-        //                    }
-        //                }
-
-        //            }
-        //            else
-        //            {
-        //                newvalue.innerArray.Add(a1);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            newvalue.innerArray.AddRange(arr.innerArray);
-        //        }
-
-        //    }
-            
-        //    //throw new NotImplementedException();
-
-        //    return ASBinCode.rtData.rtUndefined.undefined;
-        //}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
 		{
-			
+			errormessage = null;
+			errorno = 0;
+
 			var newvalue = new ASBinCode.rtData.rtArray();
 			newvalue.objHandle.bindArrayObject = (rtObject)thisObj;
 
 			((rtObject)thisObj).value.memberData[0].directSet(newvalue);
 
 
-			var args = argements[0];
+			var args = argements[0].getValue();
 
 			if (args.rtType == RunTimeDataType.rt_array)
 			{
@@ -139,14 +80,9 @@ namespace ASRuntime.nativefuncs
 
 						if (c < 0)
 						{
-							//errormessage = "Array index is not a positive integer (" + c + ").";
-							//errorno = 1005;
-							//return ASBinCode.rtData.rtUndefined.undefined;
-							success = false;
-							stackframe.throwError(token, 1005, "Array index is not a positive integer (" + c + ").");
-
-							returnSlot.directSet(rtUndefined.undefined);
-							return;
+							errormessage = "Array index is not a positive integer (" + c + ").";
+							errorno = 1005;
+							return ASBinCode.rtData.rtUndefined.undefined;
 						}
 						else
 						{
@@ -170,9 +106,73 @@ namespace ASRuntime.nativefuncs
 			}
 
 			//throw new NotImplementedException();
-			success = true;
-			returnSlot.directSet(rtUndefined.undefined);
+
+			return ASBinCode.rtData.rtUndefined.undefined;
 		}
+
+	//	public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+	//	{
+			
+	//		var newvalue = new ASBinCode.rtData.rtArray();
+	//		newvalue.objHandle.bindArrayObject = (rtObject)thisObj;
+
+	//		((rtObject)thisObj).value.memberData[0].directSet(newvalue);
+
+
+	//		var args = argements[0];
+
+	//		if (args.rtType == RunTimeDataType.rt_array)
+	//		{
+	//			rtArray arr = (rtArray)args;
+
+	//			if (arr.innerArray.Count == 1)
+	//			{
+	//				var a1 = arr.innerArray[0];
+	//				if (TypeConverter.ObjectImplicit_ToNumber(a1.rtType, bin))
+	//				{
+	//					a1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)a1);
+	//				}
+
+	//				if (a1.rtType == RunTimeDataType.rt_int || a1.rtType == RunTimeDataType.rt_uint || a1.rtType == RunTimeDataType.rt_number)
+	//				{
+	//					int c = TypeConverter.ConvertToInt(a1, null, null);
+
+	//					if (c < 0)
+	//					{
+	//						//errormessage = "Array index is not a positive integer (" + c + ").";
+	//						//errorno = 1005;
+	//						//return ASBinCode.rtData.rtUndefined.undefined;
+	//						success = false;
+	//						stackframe.throwError(token, 1005, "Array index is not a positive integer (" + c + ").");
+
+	//						returnSlot.directSet(rtUndefined.undefined);
+	//						return;
+	//					}
+	//					else
+	//					{
+	//						while (newvalue.innerArray.Count < c)
+	//						{
+	//							newvalue.innerArray.Add(rtUndefined.undefined);
+	//						}
+	//					}
+
+	//				}
+	//				else
+	//				{
+	//					newvalue.innerArray.Add(a1);
+	//				}
+	//			}
+	//			else
+	//			{
+	//				newvalue.innerArray.AddRange(arr.innerArray);
+	//			}
+
+	//		}
+
+	//		//throw new NotImplementedException();
+	//		success = true;
+	//		returnSlot.directSet(rtUndefined.undefined);
+	//	}
 	}
 
 
@@ -393,11 +393,11 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Array_setLength : NativeFunctionBase
+    class Array_setLength : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_setLength()
+        public Array_setLength():base(1)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_uint);
@@ -435,38 +435,63 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            var list = ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray;
+		//    var list = ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray;
 
-            uint newlen = ((rtUInt)argements[0].getValue()).value;
+		//    uint newlen = ((rtUInt)argements[0].getValue()).value;
 
-            if (newlen > list.Count)
-            {
-                while (list.Count < newlen)
-                {
-                    list.Add(rtUndefined.undefined);
-                }
-            }
-            else if (newlen < list.Count)
-            {
-                list.RemoveRange((int)newlen, list.Count - (int)newlen);
-            }
+		//    if (newlen > list.Count)
+		//    {
+		//        while (list.Count < newlen)
+		//        {
+		//            list.Add(rtUndefined.undefined);
+		//        }
+		//    }
+		//    else if (newlen < list.Count)
+		//    {
+		//        list.RemoveRange((int)newlen, list.Count - (int)newlen);
+		//    }
 
 
-            return rtUndefined.undefined;
-                
-        }
-    }
+		//    return rtUndefined.undefined;
 
-    class Array_insertAt : NativeFunctionBase
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			var list = ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray;
+
+			uint newlen = ((rtUInt)argements[0]).value;
+
+			if (newlen > list.Count)
+			{
+				while (list.Count < newlen)
+				{
+					list.Add(rtUndefined.undefined);
+				}
+			}
+			else if (newlen < list.Count)
+			{
+				list.RemoveRange((int)newlen, list.Count - (int)newlen);
+			}
+
+
+			returnSlot.directSet(rtUndefined.undefined);
+		}
+
+	}
+
+    class Array_insertAt : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_insertAt()
+        public Array_insertAt():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -505,32 +530,57 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
 
-            int idx = ((rtInt)argements[0].getValue()).value;
-            var toinsert = argements[1].getValue();
-            if (idx < 0)
-            {
-                idx = arr.innerArray.Count + idx;
-                if (idx < 0) { idx = 0; }
-            }
-            else if (idx > arr.innerArray.Count)
-            {
-                idx = arr.innerArray.Count;
-            }
+		//    int idx = ((rtInt)argements[0].getValue()).value;
+		//    var toinsert = argements[1].getValue();
+		//    if (idx < 0)
+		//    {
+		//        idx = arr.innerArray.Count + idx;
+		//        if (idx < 0) { idx = 0; }
+		//    }
+		//    else if (idx > arr.innerArray.Count)
+		//    {
+		//        idx = arr.innerArray.Count;
+		//    }
 
-            arr.innerArray.Insert(idx, toinsert);
+		//    arr.innerArray.Insert(idx, toinsert);
 
 
-            return rtUndefined.undefined;
+		//    return rtUndefined.undefined;
 
-        }
-    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			int idx = ((rtInt)argements[0]).value;
+			var toinsert = argements[1];
+			if (idx < 0)
+			{
+				idx = arr.innerArray.Count + idx;
+				if (idx < 0) { idx = 0; }
+			}
+			else if (idx > arr.innerArray.Count)
+			{
+				idx = arr.innerArray.Count;
+			}
+
+			arr.innerArray.Insert(idx, (RunTimeValueBase)toinsert.Clone());
+
+			returnSlot.directSet(rtUndefined.undefined);
+			//return rtUndefined.undefined;
+		}
+
+	}
 
 
 
@@ -740,11 +790,11 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    class Array_pop : NativeFunctionBase
+    class Array_pop : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_pop()
+        public Array_pop():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -781,27 +831,48 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
 
-            if (arr.innerArray.Count > 0)
-            {
-                var result = arr.innerArray[arr.innerArray.Count - 1];
-                arr.innerArray.RemoveAt(arr.innerArray.Count-1);
-                return result;
-            }
-            else
-            {
-                return rtUndefined.undefined;
-            }
+		//    if (arr.innerArray.Count > 0)
+		//    {
+		//        var result = arr.innerArray[arr.innerArray.Count - 1];
+		//        arr.innerArray.RemoveAt(arr.innerArray.Count-1);
+		//        return result;
+		//    }
+		//    else
+		//    {
+		//        return rtUndefined.undefined;
+		//    }
 
-            
-        }
-    }
+
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			if (arr.innerArray.Count > 0)
+			{
+				var result = arr.innerArray[arr.innerArray.Count - 1];
+				arr.innerArray.RemoveAt(arr.innerArray.Count - 1);
+				//return result;
+				returnSlot.directSet(result);
+			}
+			else
+			{
+				//return rtUndefined.undefined;
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+		}
+
+	}
 
     class Array_push : NativeFunctionBase
     {
@@ -865,11 +936,11 @@ namespace ASRuntime.nativefuncs
         }
     }
 
-    class Array_removeAt : NativeFunctionBase
+    class Array_removeAt : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_removeAt()
+        public Array_removeAt():base(1)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -907,36 +978,59 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
 
-            int idx = ((rtInt)argements[0].getValue()).value;
-            if (idx < 0)
-            {
-                idx = arr.innerArray.Count + idx;
-                if (idx < 0) { idx = 0; }
-            }
-            else if (idx > arr.innerArray.Count-1)
-            {
-                return rtUndefined.undefined;
-            }
+		//    int idx = ((rtInt)argements[0].getValue()).value;
+		//    if (idx < 0)
+		//    {
+		//        idx = arr.innerArray.Count + idx;
+		//        if (idx < 0) { idx = 0; }
+		//    }
+		//    else if (idx > arr.innerArray.Count-1)
+		//    {
+		//        return rtUndefined.undefined;
+		//    }
 
-            var r = arr.innerArray[idx];
-            arr.innerArray.RemoveAt(idx);
-            return r;
+		//    var r = arr.innerArray[idx];
+		//    arr.innerArray.RemoveAt(idx);
+		//    return r;
 
-        }
-    }
+		//}
 
-    class Array_reverse : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			int idx = ((rtInt)argements[0]).value;
+			if (idx < 0)
+			{
+				idx = arr.innerArray.Count + idx;
+				if (idx < 0) { idx = 0; }
+			}
+			else if (idx > arr.innerArray.Count - 1)
+			{
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+
+			var r = arr.innerArray[idx];
+			arr.innerArray.RemoveAt(idx);
+			//return r;
+			returnSlot.directSet(r);
+		}
+
+	}
+
+    class Array_reverse : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_reverse()
+        public Array_reverse():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -973,24 +1067,34 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
-            arr.innerArray.Reverse();
-            return arr;
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    arr.innerArray.Reverse();
+		//    return arr;
 
 
-        }
-    }
+		//}
 
-    class Array_shift : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			arr.innerArray.Reverse();
+			//return arr;
+			returnSlot.directSet(arr);
+		}
+
+	}
+
+    class Array_shift : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_shift()
+        public Array_shift():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -1027,33 +1131,55 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
 
-            if (arr.innerArray.Count > 0)
-            {
-                var result = arr.innerArray[0];
-                arr.innerArray.RemoveAt(0);
-                return result;
-            }
-            else
-            {
-                return rtUndefined.undefined;
-            }
+		//    if (arr.innerArray.Count > 0)
+		//    {
+		//        var result = arr.innerArray[0];
+		//        arr.innerArray.RemoveAt(0);
+		//        return result;
+		//    }
+		//    else
+		//    {
+		//        return rtUndefined.undefined;
+		//    }
 
 
-        }
-    }
+		//}
 
-    class Array_slice : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			if (arr.innerArray.Count > 0)
+			{
+				var result = arr.innerArray[0];
+				arr.innerArray.RemoveAt(0);
+				//return result;
+				returnSlot.directSet(result);
+			}
+			else
+			{
+				//return rtUndefined.undefined;
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+		}
+
+
+	}
+
+    class Array_slice : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_slice()
+        public Array_slice():base(2)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -1092,52 +1218,98 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
 
-            int startindex =  ((rtInt)argements[0].getValue()).value;
-            int endindex = ((rtInt)argements[1].getValue()).value;
+		//    int startindex =  ((rtInt)argements[0].getValue()).value;
+		//    int endindex = ((rtInt)argements[1].getValue()).value;
 
-            if (startindex >= arr.innerArray.Count)
-            {
-                return new rtArray();
-            }
-            else if (startindex < 0)
-            {
-                startindex = arr.innerArray.Count + startindex;
-                if (startindex < 0)
-                {
-                    startindex = 0;
-                }
-            }
+		//    if (startindex >= arr.innerArray.Count)
+		//    {
+		//        return new rtArray();
+		//    }
+		//    else if (startindex < 0)
+		//    {
+		//        startindex = arr.innerArray.Count + startindex;
+		//        if (startindex < 0)
+		//        {
+		//            startindex = 0;
+		//        }
+		//    }
 
-            if (endindex > arr.innerArray.Count)
-            {
-                endindex = arr.innerArray.Count ;
-            }
-            else if (endindex < 0)
-            {
-                endindex = arr.innerArray.Count + endindex;
-                if (endindex < 0)
-                {
-                    endindex = 0;
-                }
-            }
+		//    if (endindex > arr.innerArray.Count)
+		//    {
+		//        endindex = arr.innerArray.Count ;
+		//    }
+		//    else if (endindex < 0)
+		//    {
+		//        endindex = arr.innerArray.Count + endindex;
+		//        if (endindex < 0)
+		//        {
+		//            endindex = 0;
+		//        }
+		//    }
 
-            rtArray newArray = new rtArray();
-            for (int i = startindex; i < endindex; i++)
-            {
-                newArray.innerArray.Add(arr.innerArray[i]);
-            }
+		//    rtArray newArray = new rtArray();
+		//    for (int i = startindex; i < endindex; i++)
+		//    {
+		//        newArray.innerArray.Add(arr.innerArray[i]);
+		//    }
 
-            return newArray;
+		//    return newArray;
 
-        }
-    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			int startindex = ((rtInt)argements[0]).value;
+			int endindex = ((rtInt)argements[1]).value;
+
+			if (startindex >= arr.innerArray.Count)
+			{
+				//return new rtArray();
+				returnSlot.directSet(new rtArray());
+			}
+			else if (startindex < 0)
+			{
+				startindex = arr.innerArray.Count + startindex;
+				if (startindex < 0)
+				{
+					startindex = 0;
+				}
+			}
+
+			if (endindex > arr.innerArray.Count)
+			{
+				endindex = arr.innerArray.Count;
+			}
+			else if (endindex < 0)
+			{
+				endindex = arr.innerArray.Count + endindex;
+				if (endindex < 0)
+				{
+					endindex = 0;
+				}
+			}
+
+			rtArray newArray = new rtArray();
+			for (int i = startindex; i < endindex; i++)
+			{
+				newArray.innerArray.Add(arr.innerArray[i]);
+			}
+
+			returnSlot.directSet(newArray);
+			//return newArray;
+		}
+	}
 
     class Array_splice : NativeFunctionBase
     {
@@ -1369,11 +1541,11 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Array_toString : NativeFunctionBase
+    class Array_toString : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Array_toString()
+        public Array_toString():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -1410,18 +1582,29 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            return new rtString(arr.ToString());
-        }
-    }
+		//    rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+		//    return new rtString(arr.ToString());
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+
+			//return new rtString(arr.ToString());
+			returnSlot.setValue(arr.ToString());
+		}
+
+	}
 
 
 }

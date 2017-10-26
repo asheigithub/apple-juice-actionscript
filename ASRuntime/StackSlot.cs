@@ -16,7 +16,7 @@ namespace ASRuntime
             store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
 
-            
+			_cache_arraySlot = new operators.OpAccess_Dot.arraySlot(null,0);
             _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
             _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
             _cache_setthisslot = new SetThisItemSlot();
@@ -45,8 +45,8 @@ namespace ASRuntime
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
-        
 
+		internal operators.OpAccess_Dot.arraySlot _cache_arraySlot;
         internal operators.OpVector.vectorSLot _cache_vectorSlot;
         internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
         internal SetThisItemSlot _cache_setthisslot;
@@ -55,12 +55,19 @@ namespace ASRuntime
 
         internal StackLinkObjectCache _linkObjCache;
 
-        internal SLOT linktarget;
+
+		const int LINKMODEINDEX = -1;
+
+        private SLOT linktarget;
         public void linkTo(SLOT linktarget)
         {
             this.linktarget = linktarget;
         }
 
+		public SLOT getLinkSlot()
+		{
+			return linktarget;
+		}
 
         private int index;
         private RunTimeValueBase[] store;
@@ -95,7 +102,27 @@ namespace ASRuntime
             }
         }
 
-        public sealed override bool directSet(RunTimeValueBase value)
+		public override SLOT assign(RunTimeValueBase value, out bool success)
+		{
+			if (linktarget != null)
+			{
+				linktarget.assign(value,out success);
+
+				var result = linktarget;
+
+				linktarget = null;
+
+				return result;
+			}
+			else
+			{
+				success = directSet(value);
+				return this;
+			}
+		}
+
+
+		public sealed override bool directSet(RunTimeValueBase value)
         {
             if (linktarget != null)
             {
@@ -386,6 +413,7 @@ namespace ASRuntime
 
             _temp_try_write_setthisitem = null;
 
+			_cache_arraySlot.clear();
             _cache_vectorSlot.clear();
             _cache_prototypeSlot.clear();
             _cache_setthisslot.clear();

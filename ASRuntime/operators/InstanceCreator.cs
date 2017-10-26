@@ -69,17 +69,26 @@ namespace ASRuntime.operators
             return true;
         }
 
-        public void push_parameter(RunTimeValueBase arg,int id)
+        public bool push_parameter(RunTimeValueBase arg,int id)
         {
             bool success;
             if (constructor == null)
             {
                 constructorCaller.pushParameter(arg, id,out success);
+				if (!success)
+				{
+					constructorCaller.noticeRunFailed();
+				}
             }
             else
             {
                 _function_constructor.pushParameter(arg, id,out success);
+				if (!success)
+				{
+					_function_constructor.noticeRunFailed();
+				}
             }
+			return success;
         }
 
         public static bool init_static_class(Class cls,Player player,SourceToken token)
@@ -809,6 +818,7 @@ namespace ASRuntime.operators
                 ic.constructorCaller.noticeRunFailed();
                 ic.constructorCaller = null;
             }
+			
             if (ic.callbacker != null)
             {
                 ic.callbacker.noticeRunFailed();

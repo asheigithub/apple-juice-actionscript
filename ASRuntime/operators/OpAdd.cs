@@ -58,6 +58,11 @@ namespace ASRuntime.operators
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 fc.function = f;
                 fc.loadDefineFromFunction();
+				if (!fc.createParaScope())
+				{
+					return;
+				}
+
                 //fc.releaseAfterCall = true;
 
                 bool success;

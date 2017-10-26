@@ -25,7 +25,7 @@ package
 	import system.collections.Stack;
 	import system.collections._IEnumerable_;
 	import system.collections._IEnumerator_;
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author ...
@@ -42,6 +42,9 @@ package
 			//
 			//o = k;
 			//trace(o);
+			
+			
+			
 			
 			var hashtable:Hashtable = new Hashtable();
 			

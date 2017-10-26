@@ -3,14 +3,15 @@ using ASBinCode.rtData;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
-    class Error_getstack : NativeFunctionBase
+    class Error_getstack : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Error_getstack()
+        public Error_getstack():base(0)
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -47,16 +48,25 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            StackFrame frame = (StackFrame)stackframe;
-            return new rtString(frame.player.stackTrace(1));
+		//    StackFrame frame = (StackFrame)stackframe;
+		//    return new rtString(frame.player.stackTrace(1));
 
-            //throw new NotImplementedException();
-        }
-    }
+		//    //throw new NotImplementedException();
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+
+			StackFrame frame = (StackFrame)stackframe;
+			returnSlot.setValue(frame.player.stackTrace(1));
+		}
+	}
 
 }

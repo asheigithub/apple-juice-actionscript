@@ -16,6 +16,7 @@ namespace ASBinCode
 
         public virtual bool isSetThisItem { get { return false; } }
 
+		public abstract SLOT assign(RunTimeValueBase value, out bool success);
 
         public abstract bool directSet(RunTimeValueBase value);
 

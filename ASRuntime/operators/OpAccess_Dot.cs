@@ -950,31 +950,52 @@ namespace ASRuntime.operators
             {
                 if ((int)number >= 0)
                 {
-                    if ((int)number >= ((rtArray)obj).innerArray.Count)
-                    {
-                        var toadd = ((rtArray)obj).innerArray;
-                        int addnum = (int)number+1 - toadd.Count;
+					//***访问数组的内容***
+					Register register = (Register)step.reg;
+					StackSlot stackSlot= (StackSlot)register.getSlot(scope,frame);
 
-                        while (addnum>0)
-                        {
-                            addnum--;
-                            toadd.Add(rtUndefined.undefined);
-                        }
-                    }
+					if (register._isdeletetarget)
+					{
+						int index = (int)number;
+						var arr = ((rtArray)obj).innerArray;
 
+						if (index < arr.Count)
+						{
+							arr[index] = rtUndefined.undefined;
+						}
+						stackSlot._cache_arraySlot.idx = index;
+						stackSlot._cache_arraySlot.array = (rtArray)obj;
+						stackSlot.linkTo(stackSlot._cache_arraySlot);
+					}
+					else
+					{
+						if ((int)number >= ((rtArray)obj).innerArray.Count)
+						{
+							var toadd = ((rtArray)obj).innerArray;
+							int addnum = (int)number + 1 - toadd.Count;
 
-                    //***访问数组的内容***
-                    Register register = (Register)step.reg;
-                    StackSlot stackSlot= (StackSlot)register.getSlot(scope,frame);
+							while (addnum > 0)
+							{
+								addnum--;
+								toadd.Add(rtUndefined.undefined);
+							}
+						}
 
-                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
-                    {
-                        stackSlot.linkTo(new arraySlot((rtArray)obj, (int)number));
-                    }
-                    else
-                    {
-                        stackSlot.directSet(((rtArray)obj).innerArray[(int)number]);
-                    }
+						if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+						{
+							stackSlot._cache_arraySlot.idx = (int)number;
+							stackSlot._cache_arraySlot.array = (rtArray)obj;
+
+							stackSlot.linkTo( stackSlot._cache_arraySlot );
+						}
+						else
+						{
+							stackSlot.directSet(((rtArray)obj).innerArray[(int)number]);
+						}
+
+					}
+
+                    
                     frame.endStep();
                     return true;
                 }
@@ -984,32 +1005,47 @@ namespace ASRuntime.operators
 
         internal sealed class arraySlot : SLOT
         {
-            rtArray array;
-            int idx;
+            internal rtArray array;
+            internal int idx;
             public arraySlot(rtArray array,int idx)
             {
                 this.array = array;
                 this.idx = idx;
             }
 
-            //public sealed override bool isPropGetterSetter
-            //{
-            //    get
-            //    {
-            //        return false;
-            //    }
-            //}
+			public override SLOT assign(RunTimeValueBase value, out bool success)
+			{
+				array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone
+				success = true;
+				return this;
+			}
 
-            public sealed override void clear()
+			public void delete()
+			{
+				//array.innerArray.RemoveAt(idx);
+			}
+
+			//public sealed override bool isPropGetterSetter
+			//{
+			//    get
+			//    {
+			//        return false;
+			//    }
+			//}
+
+			public sealed override void clear()
             {
+				array = null;
+				idx = 0;
+
                 //throw new NotImplementedException();
             }
 
             public sealed override bool directSet(RunTimeValueBase value)
             {
-                array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone
-                return true;
-                //throw new NotImplementedException();
+                //array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone
+                //return true;
+                throw new NotImplementedException();
             }
 
             public sealed override RunTimeValueBase getValue()
@@ -1091,23 +1127,44 @@ namespace ASRuntime.operators
                 //throw new NotImplementedException();
             }
 
-            public sealed override bool directSet(RunTimeValueBase value)
-            {
-                //throw new NotImplementedException();
-                
-                if (_protoRootObj.value._class.dynamic)
-                {
-                    DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true,functionClassRtType);
-                    heapslot._propname = _protoname;
-                    heapslot.directSet(value);
+			public override SLOT assign(RunTimeValueBase value, out bool success)
+			{
+				if (_protoRootObj.value._class.dynamic)
+				{
+					DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true, functionClassRtType);
+					heapslot._propname = _protoname;
+					heapslot.directSet(value);
 
-                    ((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+					((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
+					//return true;
+					success = true;
+				}
+				else
+				{
+					//return false;
+					success = false;
+				}
+
+				return this;
+			}
+
+			public sealed override bool directSet(RunTimeValueBase value)
+            {
+                throw new NotImplementedException();
+                
+                //if (_protoRootObj.value._class.dynamic)
+                //{
+                //    DynamicPropertySlot heapslot = new DynamicPropertySlot(_protoRootObj, true,functionClassRtType);
+                //    heapslot._propname = _protoname;
+                //    heapslot.directSet(value);
+
+                //    ((DynamicObject)_protoRootObj.value).createproperty(_protoname, heapslot);
+                //    return true;
+                //}
+                //else
+                //{
+                //    return false;
+                //}
                 
             }
 

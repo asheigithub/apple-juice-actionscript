@@ -21,8 +21,10 @@ namespace ASBinCode
         /// </summary>
         public RightValueBase _regMemberSrcObj;
 
-        
-        
+		/// <summary>
+		/// 指示是否delete目标
+		/// </summary>
+		public bool _isdeletetarget;
         /// <summary>
         /// 指示是否对其有=赋值操作
         /// </summary>

@@ -283,7 +283,24 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown
+						if (v1.valueType == RunTimeDataType.rt_array)
+						{
+							var v2 = ExpressionBuilder.getRightValue(env, step.Arg3, step.token, builder);
+							if (v2.valueType == RunTimeDataType.rt_int || v2.valueType == RunTimeDataType.rt_number || v2.valueType == RunTimeDataType.rt_uint)
+							{
+								build_bracket_access(env, step, v1, builder);
+							}
+							else
+							{
+								v1 = ExpressionBuilder.addCastOpStep(env, v1, builder.bin.primitive_to_class_table[v1.valueType].getRtType(),
+									new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+									, builder
+									);
+								build_bracket_access(env, step, v1, builder);
+							}
+
+						}
+						else if (v1.valueType != RunTimeDataType.rt_void && v1.valueType < RunTimeDataType.unknown
                             )
                         {
                             if (builder.bin.primitive_to_class_table[v1.valueType] != null)

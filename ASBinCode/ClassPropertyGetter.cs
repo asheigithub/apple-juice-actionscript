@@ -134,10 +134,18 @@ namespace ASBinCode
                 throw new NotImplementedException();
             }
 
-            public sealed override bool directSet(RunTimeValueBase value)
+			public override SLOT assign(RunTimeValueBase value, out bool success)
+			{
+				//throw new NotImplementedException();
+				success = false;
+				return this;
+			}
+
+			public sealed override bool directSet(RunTimeValueBase value)
             {
-                return false;
-            }
+				//return false;
+				throw new NotImplementedException();
+			}
 
             public sealed override RunTimeValueBase getValue()
             {

@@ -76,7 +76,7 @@ namespace ASRuntime
 
         #region 类型转换
 
-        public static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static ASBinCode.rtData.rtBoolean ConvertToBoolean(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token)
         {
             switch (src.rtType)
             {
@@ -134,10 +134,7 @@ namespace ASRuntime
                 case rt.rt_array:
                     return ASBinCode.rtData.rtBoolean.True;
                 case rt.unknown:
-                    if (isthrow)
-                    {
-                        frame.throwCastException(token, rt.unknown, rt.rt_boolean);
-                    }
+                    
                     return ASBinCode.rtData.rtBoolean.False;
                 default:
                     //凡是大于unknown的都是对象
@@ -147,7 +144,7 @@ namespace ASRuntime
         }
 
 
-        public static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token , bool isthrow=false)
+        public static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token )
         {
             switch (src.rtType)
             {
@@ -219,7 +216,7 @@ namespace ASRuntime
             }
         }
 
-        public static uint ConvertToUInt(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static uint ConvertToUInt(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token)
         {
             switch (src.rtType)
             {
@@ -347,7 +344,7 @@ namespace ASRuntime
         }
 
 
-        public static string ConvertToString(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token, bool isthrow = false)
+        public static string ConvertToString(ASBinCode.RunTimeValueBase src, StackFrame frame, ASBinCode.SourceToken token)
         {
             switch (src.rtType)
             {

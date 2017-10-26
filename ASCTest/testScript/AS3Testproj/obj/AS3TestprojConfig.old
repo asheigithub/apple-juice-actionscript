@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2017/6/9'</value>
+      <value>'2017/10/26'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -30,13 +30,14 @@
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
-      <path-element>D:\ASTool\ASCTest\testScript\AS3Testproj\src</path-element>
-      <path-element>D:\ASTool\ASCTest\testScript\api</path-element>
-      <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
+      <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src</path-element>
+      <path-element>F:\ASTool\ASCTest\testScript\api</path-element>
+      <path-element>F:\ASTool\LinkCodeGen\bin\Debug\as3api</path-element>
+      <path-element>D:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>D:\ASTool\ASCTest\testScript\AS3Testproj\src\TimeSpan_Test.as</path-element>
+    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\ArrayTest.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

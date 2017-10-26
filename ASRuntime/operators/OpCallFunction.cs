@@ -61,11 +61,11 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            if (frame.player.isConsoleOut)
+                            if (frame.player.infoOutput !=null)
                             {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("当前函数没有this指针。也许不是从文档类启动，而是从包外代码启动的");
-                                Console.ResetColor();
+
+								frame.player.infoOutput.Warring("当前函数没有this指针。也许不是从文档类启动，而是从包外代码启动的");
+                                
                             }
                         }
                     }
@@ -274,6 +274,7 @@ namespace ASRuntime.operators
             {
                 bool success;
                 frame.funCaller.pushParameter(arg, id,out success);
+				
             }
             frame.endStep(step);
         }

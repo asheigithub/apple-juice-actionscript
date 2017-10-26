@@ -23,9 +23,12 @@ namespace ASRuntime.operators
             }
             else if (slot.isSetThisItem)
             {
-                SetThisItemSlot sslot = (SetThisItemSlot)((StackSlot)slot).linktarget;
-                //***调用索引器get***
-                RunTimeValueBase func;
+                SetThisItemSlot sslot = (SetThisItemSlot)((StackSlot)slot).getLinkSlot();
+
+				((StackSlot)slot).linkTo(null);
+
+				//***调用索引器get***
+				RunTimeValueBase func;
                 var rtObj = sslot.bindObj;
                 var player = frame.player;
                 var v2 = sslot.setindex;
@@ -76,9 +79,10 @@ namespace ASRuntime.operators
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
 
-                if (d != null && s != null && s.linktarget != null)
+                if (d != null && s != null && s.getLinkSlot() != null)
                 {
-                    d.linkTo(s.linktarget);
+					s.linkTo(null);
+                    d.linkTo(s.getLinkSlot());
                 }
                 else
                 {

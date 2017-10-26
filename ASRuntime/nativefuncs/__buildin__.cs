@@ -7,10 +7,10 @@ using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
-    class __buildin__ismethod : NativeFunctionBase
+    class __buildin__ismethod : NativeConstParameterFunction
     {
         List<RunTimeDataType> para;
-        public __buildin__ismethod()
+        public __buildin__ismethod():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_function);
@@ -48,29 +48,59 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
-            if (argements[0].getValue().rtType == RunTimeDataType.rt_null)
-            {
-                return ASBinCode.rtData.rtBoolean.False;
-            }
-            else
-            {
-                ASBinCode.rtData.rtFunction f = (ASBinCode.rtData.rtFunction)argements[0].getValue();
-                if (f.ismethod)
-                {
-                    return ASBinCode.rtData.rtBoolean.True;
-                }
-                else
-                {
-                    return ASBinCode.rtData.rtBoolean.False;
-                }
-            }
-        }
-    }
+        //    if (argements[0].getValue().rtType == RunTimeDataType.rt_null)
+        //    {
+        //        return ASBinCode.rtData.rtBoolean.False;
+        //    }
+        //    else
+        //    {
+        //        ASBinCode.rtData.rtFunction f = (ASBinCode.rtData.rtFunction)argements[0].getValue();
+        //        if (f.ismethod)
+        //        {
+        //            return ASBinCode.rtData.rtBoolean.True;
+        //        }
+        //        else
+        //        {
+        //            return ASBinCode.rtData.rtBoolean.False;
+        //        }
+        //    }
+        //}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			//errormessage = null;
+			//errorno = 0;
+
+			success = true;
+
+			if (argements[0].rtType == RunTimeDataType.rt_null)
+			{
+				//return ASBinCode.rtData.rtBoolean.False;
+				returnSlot.directSet(rtBoolean.False);
+			}
+			else
+			{
+				ASBinCode.rtData.rtFunction f = (ASBinCode.rtData.rtFunction)argements[0];
+				if (f.ismethod)
+				{
+					//return ASBinCode.rtData.rtBoolean.True;
+					returnSlot.directSet(rtBoolean.True);
+				}
+				else
+				{
+					//return ASBinCode.rtData.rtBoolean.False;
+					returnSlot.directSet(rtBoolean.False);
+				}
+			}
+
+			//throw new NotImplementedException();
+		}
+	}
 
     class __buildin__trace : NativeFunctionBase
     {
@@ -134,7 +164,10 @@ namespace ASRuntime.nativefuncs
 
             if (argements[0].getValue().rtType == RunTimeDataType.rt_null)
             {
-                Console.WriteLine();
+				if (frame.player.infoOutput != null)
+				{
+					frame.player.infoOutput.Info(string.Empty);
+				}
                 cb.call(cb.args);
                 return;
             }
@@ -143,7 +176,10 @@ namespace ASRuntime.nativefuncs
 
             if (array.innerArray.Count == 0)
             {
-                Console.WriteLine();
+				if (frame.player.infoOutput != null)
+				{
+					frame.player.infoOutput.Info(string.Empty);
+				}
                 cb.call(cb.args);
                 return;
             }
@@ -260,11 +296,13 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                //ISLOT result = (ISLOT)receiveArgs[7];
+				//ISLOT result = (ISLOT)receiveArgs[7];
 
-                //result.directSet(new rtString(sb.ToString()));
-                Console.WriteLine(sb.ToString());
-
+				//result.directSet(new rtString(sb.ToString()));
+				if (frame.player.infoOutput != null)
+				{
+					frame.player.infoOutput.Info(sb.ToString());
+				}
                 IBlockCallBack cb = (IBlockCallBack)receiveArgs[0];
                 cb.call(cb.args);
             }
@@ -274,10 +312,10 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class __buildin__isnan : NativeFunctionBase
+    class __buildin__isnan : NativeConstParameterFunction
     {
         List<RunTimeDataType> para;
-        public __buildin__isnan()
+        public __buildin__isnan():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_number);
@@ -315,30 +353,48 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
-            double num = TypeConverter.ConvertToNumber(argements[0].getValue());
+        //    double num = TypeConverter.ConvertToNumber(argements[0].getValue());
 
-            if (double.IsNaN(num))
-            {
-                return rtBoolean.True;
-            }
-            else
-            {
-                return rtBoolean.False;
-            }
+        //    if (double.IsNaN(num))
+        //    {
+        //        return rtBoolean.True;
+        //    }
+        //    else
+        //    {
+        //        return rtBoolean.False;
+        //    }
 
-        }
-    }
+        //}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			double num = TypeConverter.ConvertToNumber(argements[0]);
+
+			if (double.IsNaN(num))
+			{
+				//return rtBoolean.True;
+				returnSlot.directSet(rtBoolean.True);
+			}
+			else
+			{
+				//return rtBoolean.False;
+				returnSlot.directSet(rtBoolean.False);
+			}
+		}
+
+	}
 
 
-    class __buildin__isfinite : NativeFunctionBase
+    class __buildin__isfinite : NativeConstParameterFunction
     {
         List<RunTimeDataType> para;
-        public __buildin__isfinite()
+        public __buildin__isfinite():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_number);
@@ -376,29 +432,47 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
-            double num = TypeConverter.ConvertToNumber(argements[0].getValue());
+        //    double num = TypeConverter.ConvertToNumber(argements[0].getValue());
 
-            if (double.IsInfinity(num))
-            {
-                return rtBoolean.True;
-            }
-            else
-            {
-                return rtBoolean.False;
-            }
+        //    if (double.IsInfinity(num))
+        //    {
+        //        return rtBoolean.True;
+        //    }
+        //    else
+        //    {
+        //        return rtBoolean.False;
+        //    }
 
-        }
-    }
+        //}
 
-    class __buildin__parseint : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			double num = TypeConverter.ConvertToNumber(argements[0]);
+
+			if (!double.IsInfinity(num))
+			{
+				//return rtBoolean.True;
+				returnSlot.directSet(rtBoolean.True);
+			}
+			else
+			{
+				//return rtBoolean.False;
+				returnSlot.directSet(rtBoolean.False);
+			}
+		}
+
+	}
+
+    class __buildin__parseint : NativeConstParameterFunction
     {
         List<RunTimeDataType> para;
-        public __buildin__parseint()
+        public __buildin__parseint():base(2)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_string);
@@ -437,66 +511,121 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string str= TypeConverter.ConvertToString(argements[0].getValue(),null,null);
-            uint radix = TypeConverter.ConvertToUInt(argements[1].getValue(), null, null);
+		//    string str= TypeConverter.ConvertToString(argements[0].getValue(),null,null);
+		//    uint radix = TypeConverter.ConvertToUInt(argements[1].getValue(), null, null);
 
-            if (String.IsNullOrEmpty(str))
-            {
-                return new rtNumber(double.NaN);
-            }
-            //ASCII 48-57 : 0-9 ,65-90 : A-Z;
+		//    if (String.IsNullOrEmpty(str))
+		//    {
+		//        return new rtNumber(double.NaN);
+		//    }
+		//    //ASCII 48-57 : 0-9 ,65-90 : A-Z;
 
-            str = str.ToUpper();
-            str=str.TrimStart();
-            str=str.TrimStart('0');
+		//    str = str.ToUpper();
+		//    str=str.TrimStart();
+		//    str=str.TrimStart('0');
 
-            if (radix == 0) { radix = 10; }
-            if (radix < 2 || radix > 36) { return new rtNumber(double.NaN); }
+		//    if (radix == 0) { radix = 10; }
+		//    if (radix < 2 || radix > 36) { return new rtNumber(double.NaN); }
 
-            uint allowidx = 48 + radix;
+		//    uint allowidx = 48 + radix;
 
-            if (radix > 10)
-            {
-                allowidx = 65 + radix - 10;
-            }
+		//    if (radix > 10)
+		//    {
+		//        allowidx = 65 + radix - 10;
+		//    }
 
-            double output = double.NaN;
+		//    double output = double.NaN;
 
-            for (int i = 0; i < str.Length; i++)
-            {
-                char c = str[i];
-                if (c < allowidx && ((c < 58 && c >= 48) || c>= 65))
-                {
-                    if (double.IsNaN(output))
-                    {
-                        output = c < 58 ? (c - 48) : (c - 65 + 10);
-                    }
-                    else
-                    {
-                        output = output * radix + (c < 58 ? (c - 48) : (c - 65 + 10));
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
+		//    for (int i = 0; i < str.Length; i++)
+		//    {
+		//        char c = str[i];
+		//        if (c < allowidx && ((c < 58 && c >= 48) || c>= 65))
+		//        {
+		//            if (double.IsNaN(output))
+		//            {
+		//                output = c < 58 ? (c - 48) : (c - 65 + 10);
+		//            }
+		//            else
+		//            {
+		//                output = output * radix + (c < 58 ? (c - 48) : (c - 65 + 10));
+		//            }
+		//        }
+		//        else
+		//        {
+		//            break;
+		//        }
+		//    }
 
 
-            return new rtNumber(output);
+		//    return new rtNumber(output);
 
-        }
-    }
+		//}
 
-    class __buildin__parsefloat : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			string str = TypeConverter.ConvertToString(argements[0], null, null);
+			uint radix = TypeConverter.ConvertToUInt(argements[1], null, null);
+
+			if (String.IsNullOrEmpty(str))
+			{
+				returnSlot.setValue(double.NaN);
+				 //new rtNumber(double.NaN);
+			}
+			//ASCII 48-57 : 0-9 ,65-90 : A-Z;
+
+			str = str.ToUpper();
+			str = str.TrimStart();
+			str = str.TrimStart('0');
+
+			if (radix == 0) { radix = 10; }
+			if (radix < 2 || radix > 36) { returnSlot.setValue(double.NaN); }//return new rtNumber(double.NaN); }
+
+			uint allowidx = 48 + radix;
+
+			if (radix > 10)
+			{
+				allowidx = 65 + radix - 10;
+			}
+
+			double output = double.NaN;
+
+			for (int i = 0; i < str.Length; i++)
+			{
+				char c = str[i];
+				if (c < allowidx && ((c < 58 && c >= 48) || c >= 65))
+				{
+					if (double.IsNaN(output))
+					{
+						output = c < 58 ? (c - 48) : (c - 65 + 10);
+					}
+					else
+					{
+						output = output * radix + (c < 58 ? (c - 48) : (c - 65 + 10));
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			returnSlot.setValue(output);
+			//return new rtNumber(output);
+		}
+
+	}
+
+    class __buildin__parsefloat : NativeConstParameterFunction
     {
         List<RunTimeDataType> para;
-        public __buildin__parsefloat()
+        public __buildin__parsefloat():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_string);
@@ -534,137 +663,275 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            string str = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
-            
-            if (String.IsNullOrEmpty(str))
-            {
-                return new rtNumber(double.NaN);
-            }
+		//    string str = TypeConverter.ConvertToString(argements[0].getValue(), null, null);
 
-            str=str.Trim();
+		//    if (String.IsNullOrEmpty(str))
+		//    {
+		//        return new rtNumber(double.NaN);
+		//    }
 
-            bool hasreaddot=false;
+		//    str=str.Trim();
 
-            string newstr = string.Empty;
-            for (int i = 0; i < str.Length; i++)
-            {
-                char c = str[i];
+		//    bool hasreaddot=false;
 
-                if (c == '.')
-                {
-                    if (hasreaddot)
-                    {
-                        break;
-                    }
-                    hasreaddot = true;
-                }
-                else if (c == '-' || c == '+')
-                {
-                    if (!string.IsNullOrEmpty(newstr))
-                    {
-                        break;
-                    }
-                    if (i + 1 >= str.Length)
-                    {
-                        return new rtNumber(double.NaN);
-                    }
-                    char n = str[i + 1];
+		//    string newstr = string.Empty;
+		//    for (int i = 0; i < str.Length; i++)
+		//    {
+		//        char c = str[i];
 
-                    if (n == '.')
-                    {
-                        if (i + 2 >= str.Length)
-                        {
-                            return new rtNumber(double.NaN);
-                        }
+		//        if (c == '.')
+		//        {
+		//            if (hasreaddot)
+		//            {
+		//                break;
+		//            }
+		//            hasreaddot = true;
+		//        }
+		//        else if (c == '-' || c == '+')
+		//        {
+		//            if (!string.IsNullOrEmpty(newstr))
+		//            {
+		//                break;
+		//            }
+		//            if (i + 1 >= str.Length)
+		//            {
+		//                return new rtNumber(double.NaN);
+		//            }
+		//            char n = str[i + 1];
 
-                        n = str[i + 2];
-                        if (n < 48 || n > 57)
-                        {
-                            return new rtNumber(double.NaN);
-                        }
-                    }
-                    else if (n < 48 || n > 57)
-                    {
-                        return new rtNumber(double.NaN);
-                    }
+		//            if (n == '.')
+		//            {
+		//                if (i + 2 >= str.Length)
+		//                {
+		//                    return new rtNumber(double.NaN);
+		//                }
 
-
-                }
-                else if (c == 'e' || c == 'E')
-                {
-                    if (string.IsNullOrEmpty(newstr))
-                    {
-                        return new rtNumber(double.NaN);
-                    }
-                    else
-                    {
-                        if (i + 1 >= str.Length)
-                        {
-                            break;
-                        }
-
-                        string epart = "e";
-                        int st = i + 1;
-                        char ep = str[st];
-                        if (ep == '+' || ep == '-')
-                        {
-                            epart += ep;
-                            st++;
-
-                            if (!(st < str.Length))
-                            {
-                                break;
-                            }
-
-                            ep = str[st];
-                            if (ep < 48 || ep > 57)
-                            {
-                                break;
-                            }
-                            epart += ep;
-                            st++;
-                        }
+		//                n = str[i + 2];
+		//                if (n < 48 || n > 57)
+		//                {
+		//                    return new rtNumber(double.NaN);
+		//                }
+		//            }
+		//            else if (n < 48 || n > 57)
+		//            {
+		//                return new rtNumber(double.NaN);
+		//            }
 
 
-                        for (int j = st; j < str.Length; j++)
-                        {
-                            char n = str[j];
-                            if (n < 48 || n > 57)
-                            {
-                                break;
-                            }
-                            epart += n;
-                        }
-                        newstr += epart;
+		//        }
+		//        else if (c == 'e' || c == 'E')
+		//        {
+		//            if (string.IsNullOrEmpty(newstr))
+		//            {
+		//                return new rtNumber(double.NaN);
+		//            }
+		//            else
+		//            {
+		//                if (i + 1 >= str.Length)
+		//                {
+		//                    break;
+		//                }
 
-                        break;
-                    }
+		//                string epart = "e";
+		//                int st = i + 1;
+		//                char ep = str[st];
+		//                if (ep == '+' || ep == '-')
+		//                {
+		//                    epart += ep;
+		//                    st++;
 
-                }
-                else if (c < 48 || c > 57)
-                {
-                    if (string.IsNullOrEmpty(newstr))
-                    {
-                        return new rtNumber(double.NaN);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                newstr = newstr + c;
+		//                    if (!(st < str.Length))
+		//                    {
+		//                        break;
+		//                    }
 
-            }
+		//                    ep = str[st];
+		//                    if (ep < 48 || ep > 57)
+		//                    {
+		//                        break;
+		//                    }
+		//                    epart += ep;
+		//                    st++;
+		//                }
 
-            return new rtNumber(double.Parse(newstr));
 
-        }
-    }
+		//                for (int j = st; j < str.Length; j++)
+		//                {
+		//                    char n = str[j];
+		//                    if (n < 48 || n > 57)
+		//                    {
+		//                        break;
+		//                    }
+		//                    epart += n;
+		//                }
+		//                newstr += epart;
+
+		//                break;
+		//            }
+
+		//        }
+		//        else if (c < 48 || c > 57)
+		//        {
+		//            if (string.IsNullOrEmpty(newstr))
+		//            {
+		//                return new rtNumber(double.NaN);
+		//            }
+		//            else
+		//            {
+		//                break;
+		//            }
+		//        }
+		//        newstr = newstr + c;
+
+		//    }
+
+		//    return new rtNumber(double.Parse(newstr));
+
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			string str = TypeConverter.ConvertToString(argements[0], null, null);
+
+			if (String.IsNullOrEmpty(str))
+			{
+				//return new rtNumber(double.NaN);
+				returnSlot.setValue(double.NaN);
+			}
+
+			str = str.Trim();
+
+			bool hasreaddot = false;
+
+			string newstr = string.Empty;
+			for (int i = 0; i < str.Length; i++)
+			{
+				char c = str[i];
+
+				if (c == '.')
+				{
+					if (hasreaddot)
+					{
+						break;
+					}
+					hasreaddot = true;
+				}
+				else if (c == '-' || c == '+')
+				{
+					if (!string.IsNullOrEmpty(newstr))
+					{
+						break;
+					}
+					if (i + 1 >= str.Length)
+					{
+						//return new rtNumber(double.NaN);
+						returnSlot.setValue(double.NaN);
+					}
+					char n = str[i + 1];
+
+					if (n == '.')
+					{
+						if (i + 2 >= str.Length)
+						{
+							//return new rtNumber(double.NaN);
+							returnSlot.setValue(double.NaN);
+						}
+
+						n = str[i + 2];
+						if (n < 48 || n > 57)
+						{
+							//return new rtNumber(double.NaN);
+							returnSlot.setValue(double.NaN);
+						}
+					}
+					else if (n < 48 || n > 57)
+					{
+						//return new rtNumber(double.NaN);
+						returnSlot.setValue(double.NaN);
+					}
+
+
+				}
+				else if (c == 'e' || c == 'E')
+				{
+					if (string.IsNullOrEmpty(newstr))
+					{
+						//return new rtNumber(double.NaN);
+						returnSlot.setValue(double.NaN);
+					}
+					else
+					{
+						if (i + 1 >= str.Length)
+						{
+							break;
+						}
+
+						string epart = "e";
+						int st = i + 1;
+						char ep = str[st];
+						if (ep == '+' || ep == '-')
+						{
+							epart += ep;
+							st++;
+
+							if (!(st < str.Length))
+							{
+								break;
+							}
+
+							ep = str[st];
+							if (ep < 48 || ep > 57)
+							{
+								break;
+							}
+							epart += ep;
+							st++;
+						}
+
+
+						for (int j = st; j < str.Length; j++)
+						{
+							char n = str[j];
+							if (n < 48 || n > 57)
+							{
+								break;
+							}
+							epart += n;
+						}
+						newstr += epart;
+
+						break;
+					}
+
+				}
+				else if (c < 48 || c > 57)
+				{
+					if (string.IsNullOrEmpty(newstr))
+					{
+						//return new rtNumber(double.NaN);
+						returnSlot.setValue(double.NaN);
+					}
+					else
+					{
+						break;
+					}
+				}
+				newstr = newstr + c;
+
+			}
+
+			//return new rtNumber(double.Parse(newstr));
+			returnSlot.setValue(double.Parse(newstr));
+		}
+
+	}
 
 	class __buildin__getDefinitionByName : nativefuncs.NativeConstParameterFunction
 	{

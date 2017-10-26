@@ -410,36 +410,74 @@ namespace ASRuntime.operators
                 idx = 0;
             }
 
-            public sealed override bool directSet(RunTimeValueBase value)
+			public override SLOT assign(RunTimeValueBase value, out bool success)
+			{
+				if (vector_data.vector_type != value.rtType
+					&&
+					!
+					(
+						//***检查子类关系****
+						(vector_data.vector_type > RunTimeDataType.unknown &&
+						value.rtType > RunTimeDataType.unknown &&
+						(
+						ClassMemberFinder.check_isinherits(value, vector_data.vector_type, classfinder)
+						||
+						ClassMemberFinder.check_isImplements(value, vector_data.vector_type, classfinder)
+						)
+						)
+						||
+						(
+							vector_data.vector_type > RunTimeDataType.unknown &&
+							value.rtType == RunTimeDataType.rt_null
+						)
+
+					)
+					)
+				{
+					//return false;
+					success = false;
+					return this;
+				}
+				else
+				{
+					vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
+																				   //return true;
+					success = true;
+					return this;
+				}
+
+			}
+
+			public sealed override bool directSet(RunTimeValueBase value)
             {
-                if (vector_data.vector_type != value.rtType
-                    &&
-                    !
-                    (
-                        //***检查子类关系****
-                        (vector_data.vector_type > RunTimeDataType.unknown &&
-                        value.rtType > RunTimeDataType.unknown &&
-                        (
-                        ClassMemberFinder.check_isinherits(value,vector_data.vector_type, classfinder)
-                        ||
-                        ClassMemberFinder.check_isImplements(value, vector_data.vector_type, classfinder)
-                        )
-                        )
-                        ||
-                        (
-                            vector_data.vector_type > RunTimeDataType.unknown &&
-                            value.rtType == RunTimeDataType.rt_null
-                        )
+                //if (vector_data.vector_type != value.rtType
+                //    &&
+                //    !
+                //    (
+                //        //***检查子类关系****
+                //        (vector_data.vector_type > RunTimeDataType.unknown &&
+                //        value.rtType > RunTimeDataType.unknown &&
+                //        (
+                //        ClassMemberFinder.check_isinherits(value,vector_data.vector_type, classfinder)
+                //        ||
+                //        ClassMemberFinder.check_isImplements(value, vector_data.vector_type, classfinder)
+                //        )
+                //        )
+                //        ||
+                //        (
+                //            vector_data.vector_type > RunTimeDataType.unknown &&
+                //            value.rtType == RunTimeDataType.rt_null
+                //        )
 
-                    )
-                    )
-                {
-                    return false;
-                }
+                //    )
+                //    )
+                //{
+                //    return false;
+                //}
 
-                vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
-                return true;
-                //throw new NotImplementedException();
+                //vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
+                //return true;
+                throw new NotImplementedException();
             }
 
             public sealed override RunTimeValueBase getValue()
