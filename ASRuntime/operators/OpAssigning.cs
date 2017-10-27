@@ -10,7 +10,7 @@ namespace ASRuntime.operators
     {
         public static void execAssigning(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
+            
             ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope, frame);
             if (slot == null)
             {
@@ -26,6 +26,7 @@ namespace ASRuntime.operators
                 return;
             }
 
+			ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
 			bool success;
 
 			var lt= slot.assign(v, out success);
@@ -226,7 +227,7 @@ namespace ASRuntime.operators
                 //***调用设置器***
 
                 var funCaller = frame.player.funcCallerPool.create(player, frame, step.token);
-                funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                funCaller.SetFunction((ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
 
@@ -280,7 +281,7 @@ namespace ASRuntime.operators
             //***调用设置器***
 
             var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
-            funCaller.function = (ASBinCode.rtData.rtFunction)func;
+            funCaller.SetFunction((ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
             funCaller.loadDefineFromFunction();
             if (!funCaller.createParaScope()) { return; }
 

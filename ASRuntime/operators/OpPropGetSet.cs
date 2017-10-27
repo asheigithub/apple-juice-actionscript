@@ -37,7 +37,7 @@ namespace ASRuntime.operators
                     );
 
                 var funCaller = player.funcCallerPool.create(player, frame, step.token);
-                funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                funCaller.SetFunction((ASBinCode.rtData.rtFunction)func);((ASBinCode.rtData.rtFunction)func).Clear();
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
 
@@ -174,8 +174,9 @@ namespace ASRuntime.operators
 
                 var funCaller = player.funcCallerPool.create(player, frame, step.token);
                 //funCaller.releaseAfterCall = true;
-                funCaller.function = (ASBinCode.rtData.rtFunction)func;
-                funCaller.loadDefineFromFunction();
+                funCaller.SetFunction( (ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
+
+				funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
 
                 funCaller._tempSlot = frame._tempSlot1;

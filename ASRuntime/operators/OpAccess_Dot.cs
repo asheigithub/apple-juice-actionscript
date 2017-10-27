@@ -122,12 +122,14 @@ namespace ASRuntime.operators
                     {
                         if (step.arg1 is SuperPointer)
                         {
-                            slot.directSet( ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass));
+							var sf = ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+                            slot.directSet(sf );((rtFunction)sf).Clear();
                         }
                         else
                         {
-                            slot.directSet(((MethodGetterBase)step.arg2).getMethod(rtObj));
-                        }
+							var sf = ((MethodGetterBase)step.arg2).getMethod(rtObj);
+                            slot.directSet(sf); ((rtFunction)sf).Clear();
+						}
 
                         //slot.directSet(lintoslot.getValue());
                     }
@@ -221,7 +223,7 @@ namespace ASRuntime.operators
                             );
 
                         var funCaller = player.funcCallerPool.create(player, frame, step.token);
-                        funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                        funCaller.SetFunction((ASBinCode.rtData.rtFunction)func);((ASBinCode.rtData.rtFunction)func).Clear();
                         funCaller.loadDefineFromFunction();
                         if (!funCaller.createParaScope()) { return; }
 
@@ -696,7 +698,8 @@ namespace ASRuntime.operators
                                     }
                                     else
                                     {
-                                        slot.directSet(((MethodGetterBase)member.bindField).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass));
+										var sf = ((MethodGetterBase)member.bindField).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+                                        slot.directSet(sf);((rtFunction)sf).Clear();
 
                                         break;
                                     }
@@ -717,8 +720,9 @@ namespace ASRuntime.operators
                                     }
                                     else
                                     {
-                                        slot.directSet(((MethodGetterBase)member.bindField).getMethod(rtObj));
-                                        break;
+										var sf = ((MethodGetterBase)member.bindField).getMethod(rtObj);
+                                        slot.directSet(sf); ((rtFunction)sf).Clear();
+										break;
                                     }
                                     //linkto = ((MethodGetterBase)member.bindField).getVirtualSlot(rtObj.objScope);
                                 }

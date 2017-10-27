@@ -16,7 +16,7 @@ package
 	import system.Int64;
 	import system.TimeSpan;
 	
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 

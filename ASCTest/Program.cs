@@ -140,15 +140,16 @@ namespace ASCTest
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
-            
-            builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
+			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
+
+			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
 
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
-
+				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
 
 				if (swc != null)
                 {

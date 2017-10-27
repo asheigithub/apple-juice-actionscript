@@ -35,6 +35,10 @@ package
 				trace(e);
 			}
 			
+			var kk = test;
+			
+			trace(kk);
+			
 		}
 		
 		private function test( k:int)

@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2017/10/26'</value>
+      <value>'2017/10/27'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -37,7 +37,7 @@
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\ArrayTest.as</path-element>
+    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\VectorTest.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>
