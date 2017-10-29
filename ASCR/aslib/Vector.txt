@@ -218,6 +218,8 @@
 			return false;
 		}
 
+		[native,_vector_sort]
+		public function sort (compareFunction:Function):Vector.<&T>;
 
 		public function splice(startIndex:int, deleteCount:uint = 4294967295, ...items):Vector.<&T>
 		{

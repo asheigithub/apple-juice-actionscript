@@ -74,7 +74,34 @@ package
 			trace( names.slice(3,8));
 			
 			
+			var names:Vector.<String> = Vector.<String>(["John Q. Smith", "Jane Doe", "Mike Jones"]); 
+			function orderLastName(a, b):int 
+			{ 
+				var lastName:RegExp = /\b\S+$/; 
+				var name1 = a.match(lastName); 
+				var name2 = b.match(lastName); 
+				if (name1 < name2) 
+				{ 
+					return -1; 
+				} 
+				else if (name1 > name2) 
+				{ 
+					return 1; 
+				} 
+				else 
+				{ 
+					//throw new Error("抛个异常玩");
+					return 0; 
+				} 
+			} 
+			trace(names); // output: John Q. Smith,Jane Doe,Mike Jones 
+			names.sort(orderLastName); 
+			trace(names); // output: Jane Doe,Mike Jones,John Q. Smith
 			
+			var str1:String = "abc12 def34";
+			var pattern:RegExp = /([a-z]+)([0-9]+)/;
+			//var str2:String = str1.replace(pattern, replFN);
+			trace(str1.match(pattern));
 		}
 		
 		

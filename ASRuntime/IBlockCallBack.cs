@@ -71,6 +71,8 @@ namespace ASRuntime
 				cb.hasnoticed = false;
 				cb.hasreleased = false;
 				cb.player = player;
+				cb.isSuccess = false;
+				cb._intArg = 0; cb._intArg2 = 0;
 				//oo.Add(cb);
 
 				return cb;
@@ -192,16 +194,16 @@ namespace ASRuntime
             {
                 hasreleased = true;
 
-                isSuccess = false;
-                _intArg = 0;_intArg2 = 0;
+                
                 scope = null;
                 step = null;
                 callbacker = null;
                 args = null;
                 whenFailed = null;
+				isSuccess = false;
+				_intArg = 0; _intArg2 = 0;
 
-
-                cacheObjects[0] = null;
+				cacheObjects[0] = null;
                 cacheObjects[1] = null;
                 cacheObjects[2] = null;
                 cacheObjects[3] = null;

@@ -229,7 +229,7 @@ namespace ASRuntime.operators
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                var funcCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
+                var funcCaller = frame.player.funcCallerPool.create( frame, step.token);
                 funcCaller.SetFunction(function);if (toclear != null) { toclear.Clear(); }
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();

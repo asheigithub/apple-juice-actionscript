@@ -47,7 +47,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
             
-            constructorCaller = player.funcCallerPool.create(player, invokerFrame, token);
+            constructorCaller = player.funcCallerPool.create( invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
             if (!constructorCaller.createParaScope()) { return false; }
@@ -56,7 +56,7 @@ namespace ASRuntime.operators
 
             if (constructor != null)
             {
-                _function_constructor = player.funcCallerPool.create(player, invokerFrame, token);
+                _function_constructor = player.funcCallerPool.create(invokerFrame, token);
                 _function_constructor._tempSlot = invokerFrame._tempSlot1;
                 _function_constructor.toCallFunc = 
                     player.swc.functions[ ((ASBinCode.rtData.rtFunction)

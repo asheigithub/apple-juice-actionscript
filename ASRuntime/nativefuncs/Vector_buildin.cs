@@ -1815,4 +1815,144 @@ namespace ASRuntime.nativefuncs
 		}
 
 	}
+
+
+
+	class Vector_sort : NativeConstParameterFunction
+	{
+		private List<RunTimeDataType> _paras;
+
+		public Vector_sort() : base(1)
+		{
+			_paras = new List<RunTimeDataType>();
+			_paras.Add(RunTimeDataType.rt_function);
+		}
+
+		public override bool isMethod
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_vector_sort";
+			}
+		}
+
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return _paras;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.rt_void;
+			}
+		}
+
+		class SortException : InvalidOperationException
+		{
+			public readonly error.InternalError error;
+			public SortException(error.InternalError error)
+			{
+				this.error = error;
+			}
+		}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+
+
+			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+
+			var source = (Vector_Data)(((HostedObject)((rtObject)thisObj).value).hosted_object);
+
+			var arr = source.innnerList;
+
+			if (argements[0].rtType == RunTimeDataType.rt_null)
+			{
+				success = false;
+				stackframe.throwError(token, 1009, "排序函数不能为空");
+				returnSlot.directSet(rtUndefined.undefined);
+				returnSlot.directSet(rtUndefined.undefined);
+			}
+			else
+			{
+				rtFunction sortFunction = (rtFunction)argements[0];
+
+				var signature = stackframe.player.swc.functions[sortFunction.functionId].signature;
+
+				if ((signature.returnType != RunTimeDataType.rt_number && signature.returnType != RunTimeDataType.rt_int)
+					||
+					(signature.parameters.Count !=2 || signature.parameters[1].isPara)
+					)
+				{
+					success = false;
+					stackframe.throwError(token, 5555, "排序函数必须返回数值类型,并接受2个参数");
+					returnSlot.directSet(rtUndefined.undefined);
+				}
+				else
+				{
+					
+					try
+					{
+						arr.Sort(
+						(v1, v2) =>
+						{
+							error.InternalError error;
+
+							if (!stackframe.player.runFunction(sortFunction,sortFunction.this_pointer, stackframe._tempSlot2, token,out error, v1, v2))
+							{
+								throw new SortException(error) ;
+							}
+							else
+							{
+								return TypeConverter.ConvertToInt(stackframe._tempSlot2.getValue(), stackframe, token);
+							}
+
+						}
+						);
+
+						success = true;
+						returnSlot.directSet(thisObj);
+					}
+					catch (SortException e)
+					{
+						success = false;
+						stackframe.throwError(((SortException)e.InnerException).error);
+						returnSlot.directSet(rtUndefined.undefined);
+					}
+					catch (InvalidOperationException e)
+					{
+						success = false;
+						if (e.InnerException is SortException)
+						{
+							stackframe.throwError( ((SortException)e.InnerException).error);
+						}
+						else
+						{
+							stackframe.throwAneException(token, e.Message);
+						}
+						returnSlot.directSet(rtUndefined.undefined);
+					}
+				}
+				//return new rtInt(startindex);
+			}
+		}
+
+	}
+
+
+
+
 }

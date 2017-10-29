@@ -16,6 +16,7 @@ namespace ASRuntime
 
         RunTimeDataType _OBJECT_LINK = -999;
         RunTimeDataType _DICT_KEY = -998;
+		RunTimeDataType _FLOAT = -997;
 
         public sealed override void init(CSWC swc)
         {
@@ -31,6 +32,7 @@ namespace ASRuntime
             link_type.Add(typeof(ASBinCode.rtData.rtFunction), RunTimeDataType.rt_function);
             link_type.Add(typeof(DictionaryKey), _DICT_KEY);
             link_type.Add(typeof(RunTimeValueBase), _OBJECT_LINK);
+			link_type.Add(typeof(float), _FLOAT);
 
             foreach (var item in swc.creator_Class)
             {
@@ -51,6 +53,7 @@ namespace ASRuntime
             type_link.Add(RunTimeDataType.rt_function, typeof(ASBinCode.rtData.rtFunction));
             type_link.Add(_DICT_KEY, typeof(DictionaryKey));
             type_link.Add(_OBJECT_LINK, typeof(RunTimeValueBase));
+			type_link.Add(_FLOAT, typeof(float));
 
             foreach (var item in swc.creator_Class)
             {
@@ -144,15 +147,48 @@ namespace ASRuntime
                         return;
                     }
                 }
-                
+
+
+				var realObjType = getRuntimeDataType(obj.GetType());
 
                 if (rt == RunTimeDataType.rt_int)
                 {
-                    returnSlot.setValue((int)obj);
+					if (realObjType == RunTimeDataType.rt_uint)
+					{
+						returnSlot.setValue((int)(uint)obj);
+					}
+					else if (realObjType == RunTimeDataType.rt_number)
+					{
+						returnSlot.setValue((int)(double)obj);
+					}
+					else if (realObjType == _FLOAT)
+					{
+						returnSlot.setValue((int)(float)obj);
+					}
+					else
+					{
+						returnSlot.setValue((int)obj);
+					}
+                    
                 }
                 else if (rt == RunTimeDataType.rt_uint)
                 {
-                    returnSlot.setValue((uint)obj);
+					if (realObjType == RunTimeDataType.rt_int)
+					{
+						returnSlot.setValue((uint)(int)obj);
+					}
+					else if (realObjType == RunTimeDataType.rt_number)
+					{
+						returnSlot.setValue((uint)(double)obj);
+					}
+					else if (realObjType == _FLOAT)
+					{
+						returnSlot.setValue((uint)(float)obj);
+					}
+					else
+					{
+						returnSlot.setValue((uint)obj);
+					}
                 }
                 else if (rt == RunTimeDataType.rt_string)
                 {
@@ -160,7 +196,22 @@ namespace ASRuntime
                 }
                 else if (rt == RunTimeDataType.rt_number)
                 {
-                    returnSlot.setValue((double)obj);
+					if (realObjType == RunTimeDataType.rt_uint)
+					{
+						returnSlot.setValue((double)(uint)obj);
+					}
+					else if (realObjType == RunTimeDataType.rt_int)
+					{
+						returnSlot.setValue((double)(int)obj);
+					}
+					else if (realObjType == _FLOAT)
+					{
+						returnSlot.setValue((double)(float)obj);
+					}
+					else
+					{
+						returnSlot.setValue((double)obj);
+					}
                 }
                 else if (rt == RunTimeDataType.rt_boolean)
                 {

@@ -360,7 +360,7 @@ namespace ASRuntime.operators
 
 
 
-                        operators.FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
+                        operators.FunctionCaller fc = frame.player.funcCallerPool.create(frame, token);
                         //fc.releaseAfterCall = true;
                         object[] sendargs = toStringCB.cacheObjects; //new object[7];
                         sendargs[0] = frame;
@@ -449,7 +449,7 @@ namespace ASRuntime.operators
 
                                 funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
+                                FunctionCaller fc = frame.player.funcCallerPool.create( frame, token);
                                 
                                 fc.SetFunction(funConv);funConv.Clear();//这里得funConv是一个缓存对象，复制完后立刻复位。
                                 fc.loadDefineFromFunction();
@@ -720,7 +720,7 @@ namespace ASRuntime.operators
 
                     funConv.setThis(frame.player.static_instance[cls.classid]);
 
-                    FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
+                    FunctionCaller fc = frame.player.funcCallerPool.create(frame, token);
                     
                     fc.SetFunction(funConv);funConv.Clear();
                     fc.loadDefineFromFunction();
@@ -1012,7 +1012,7 @@ namespace ASRuntime.operators
                 BlockCallBackBase valueofCB = frame.player.blockCallBackPool.create();
                 valueofCB.setCallBacker(_InvokeValueOf_Backer);
 
-                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
+                FunctionCaller fc = frame.player.funcCallerPool.create( frame, token);
                 //fc.releaseAfterCall = true;
                 object[] sendargs = valueofCB.cacheObjects; //new object[5];
                 sendargs[0] = obj;
@@ -1286,7 +1286,7 @@ namespace ASRuntime.operators
                 BlockCallBackBase toStringCB = frame.player.blockCallBackPool.create();
                 toStringCB.setCallBacker(_InvokeToString_Backer);
 
-                operators.FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
+                operators.FunctionCaller fc = frame.player.funcCallerPool.create( frame, token);
                 //fc.releaseAfterCall = true;
                 object[] sendargs = toStringCB.cacheObjects; //new object[5];
                 sendargs[0] = obj;

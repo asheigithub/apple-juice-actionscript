@@ -68,3 +68,5 @@ var n:Number=new Number();
 var s:String = new String();
 var a:Array = new Array();
 var f:Object=Object(function(){});
+
+var isnan=isNaN(1);

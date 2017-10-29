@@ -9,15 +9,16 @@ namespace ASRuntime.operators
     {
 		internal class FunctionCallerPool : PoolBase<FunctionCaller>
 		{
-			public FunctionCallerPool() : base(256) { }
+			private Player player;
+			public FunctionCallerPool(Player player) : base(256) { this.player = player; }
 
-			public  FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
+			public FunctionCaller create(StackFrame invokerFrame, SourceToken token)
 			{
 				FunctionCaller fc = base.create();
-				fc.player = player;
+				
 				fc.invokerFrame = invokerFrame;
 				fc.token = token;
-
+				fc.player = player;
 				fc.check_para_id = 0;
 				fc.pushedArgs = 0;
 				fc.hasReleased = false;
@@ -56,7 +57,7 @@ namespace ASRuntime.operators
 
         public ASBinCode.rtti.FunctionDefine toCallFunc;
 
-        public int pushedArgs;
+        private int pushedArgs;
 
         public SLOT returnSlot;
 
@@ -66,7 +67,7 @@ namespace ASRuntime.operators
 
 		
 
-        public Player player;
+        private Player player;
         private StackFrame invokerFrame;
         private SourceToken token;
         private int check_para_id;
@@ -161,6 +162,7 @@ namespace ASRuntime.operators
 			return dv;
 		}
 
+		
 
         public bool createParaScope()
         {
@@ -600,7 +602,7 @@ namespace ASRuntime.operators
                             )
                             
                             );
-
+						clear_para_slot(invokerFrame, onstackparametercount);onstackparametercount = 0;
                         //***中断本帧本次代码执行进入try catch阶段
                         invokerFrame.endStep();
 
@@ -622,7 +624,8 @@ namespace ASRuntime.operators
                     operators.InstanceCreator ic = new InstanceCreator(player, invokerFrame, token, player.swc.YieldIteratorClass);
                     if (!ic.init_static_class(player.swc.YieldIteratorClass))
                     {
-                        invokerFrame.endStep();
+						
+						invokerFrame.endStep();
 
                         if (callbacker != null)
                         {
@@ -849,7 +852,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        invokerFrame.endStep();
+						invokerFrame.endStep();             
                         if (callbacker != null)
                         {
                             callbacker.noticeRunFailed();

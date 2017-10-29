@@ -63,7 +63,7 @@ namespace ASCompiler.compiler
                     
                     player.loadCode(tempswc,tempEnv.block);
 
-                    RunTimeValueBase result=  player.run2(value);
+                    RunTimeValueBase result=  player.run(value);
 
                     return result;
                     //IRunTimeScope scope = player.run();

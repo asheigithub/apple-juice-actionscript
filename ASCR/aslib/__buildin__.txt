@@ -32,5 +32,31 @@
 		[native,flash_utils_functions_getQualifiedClassName]
 		public static function flash_utils_getQualifiedClassName (value:*) : String;
 
+
+		//****工具程序*****
+		private static function _getMethod(obj:*,name:String):Function
+		{
+			return obj[name];
+		}
+
+		private static function _createInstance(cls:Class,args:int,...para):Object
+		{
+			if(args==0)
+			{
+				return new cls();
+			}
+			else if(args==1)
+			{
+				return new cls(para[0]);
+			}
+			else
+			{
+				throw new Error("更多参数的构造还没写呢");
+				null;
+			}
+
+		}
+
+		
 	}
 }
