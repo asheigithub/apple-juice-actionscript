@@ -1,0 +1,165 @@
+package system 
+{
+	
+	[struct]
+	[link_system]
+	public final class TimeSpan extends _Object_ implements IComparable
+	{
+		[native, _system_TimeSpan_static_MaxValue_getter]
+		public static const MaxValue:TimeSpan;
+		[native, _system_TimeSpan_static_MinValue_getter]
+		public static const MinValue:TimeSpan;
+		[native, _system_TimeSpan_static_TicksPerDay_getter]
+		public static const TicksPerDay:Int64;
+		[native, _system_TimeSpan_static_TicksPerHour_getter]
+		public static const TicksPerHour:Int64;
+		[native, _system_TimeSpan_static_TicksPerMillisecond_getter]
+		public static const TicksPerMillisecond:Int64;
+		[native, _system_TimeSpan_static_TicksPerMinute_getter]
+		public static const TicksPerMinute:Int64;
+		[native, _system_TimeSpan_static_TicksPerSecond_getter]
+		public static const TicksPerSecond:Int64;
+		[native, _system_TimeSpan_static_Zero_getter]
+		public static const Zero:TimeSpan;
+		
+		
+		
+		[operator,">"];
+		[native, _system_TimeSpan_operator_greaterThan];
+		private static function greaterThan(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"<"];
+		[native, _system_TimeSpan_operator_lessThan];
+		private static function lessThan(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"=="];
+		[native, _system_TimeSpan_operator_equality];
+		private static function equality(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"!="];
+		[native, _system_TimeSpan_operator_inequality];
+		private static function inequality(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,">="];
+		[native, _system_TimeSpan_operator_greaterThanOrEqual];
+		private static function greaterThanOrEqual(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		[operator,"<="];
+		[native, _system_TimeSpan_operator_lessThanOrEqual];
+		private static function lessThanOrEqual(t1:TimeSpan,t2:TimeSpan):Boolean;
+		
+		
+		[operator,"+"];
+		[native, _system_TimeSpan_operator_unaryPlus];
+		private static function unaryPlus(t1:TimeSpan):TimeSpan;
+		
+		[operator,"-"];
+		[native, _system_TimeSpan_operator_unaryNegation];
+		private static function unaryNegation(t1:TimeSpan):TimeSpan;
+		
+		[operator,"+"];
+		[native, _system_TimeSpan_operator_addition];
+		private static function addition(t1:TimeSpan,t2:TimeSpan):TimeSpan;
+		
+		[operator,"-"];
+		[native, _system_TimeSpan_operator_subtraction];
+		private static function subtraction(t1:TimeSpan,t2:TimeSpan):TimeSpan;
+		
+		[creator];
+		[native, _system_TimeSpan_creator__];
+		private static function _creator(type:Class):*;
+		
+		[native,_system_TimeSpan_static_compare]
+		public static function compare(t1:TimeSpan,t2:TimeSpan):int;
+		
+		[native,_system_TimeSpan_static_constructor_]
+		public static function constructor_(days:int,hours:int,minutes:int,seconds:int):TimeSpan;
+		
+		[native,_system_TimeSpan_static_constructor__]
+		public static function constructor__(days:int,hours:int,minutes:int,seconds:int,milliseconds:int):TimeSpan;
+		
+		
+		[native,_system_TimeSpan_static_constructor___]
+		public static function constructor___(ticks:Int64):TimeSpan;
+		
+		[native,_system_TimeSpan_static_fromDays]
+		public static function fromDays(days:Number):TimeSpan;
+		
+		[native,_system_TimeSpan_static_fromHours]
+		public static function fromHours(hours:Number):TimeSpan;
+		
+		[native,_system_TimeSpan_static_fromMilliseconds]
+		public static function fromMilliseconds(milliseconds:Number):TimeSpan;
+		
+		[native,_system_TimeSpan_static_fromMinutes]
+		public static function fromMinutes(minutes:Number):TimeSpan;
+		
+		[native,_system_TimeSpan_static_fromSeconds]
+		public static function fromSeconds(seconds:Number):TimeSpan;
+		
+		[native,_system_TimeSpan_static_constructor___]
+		public static function fromTicks(ticks:Int64):TimeSpan;
+		
+		[native,_system_TimeSpan_parse]
+		public static function parse(s:String):TimeSpan;
+		
+		
+		[native,_system_TimeSpan_ctor]
+		public function TimeSpan(hours:int,minutes:int,seconds:int);
+		
+		
+		[native,_system_TimeSpan_add]
+		public function add(ts:TimeSpan):TimeSpan;
+		
+		[native,_system_TimeSpan_subtract]
+		public function subtract(ts:TimeSpan):TimeSpan;
+		
+		[native,_system_TimeSpan_duration]
+		public function duration():TimeSpan;
+		
+		[native,_system_TimeSpan_negate]
+		public function negate():TimeSpan;
+		
+		[native,_system_TimeSpan_days]
+		public function get days():int;
+		
+		[native,_system_TimeSpan_hours]
+		public function get hours():int;
+		
+		[native,_system_TimeSpan_milliseconds]
+		public function get milliseconds():int;
+		
+		[native,_system_TimeSpan_minutes]
+		public function get minutes():int;
+		
+		[native,_system_TimeSpan_seconds]
+		public function get seconds():int;
+		
+		[native,_system_TimeSpan_ticks]
+		public function get ticks():Int64;
+		
+		[native,_system_TimeSpan_totalDays]
+		public function get totalDays():Number;
+		
+		[native,_system_TimeSpan_totalHours]
+		public function get totalHours():Number;
+		
+		[native,_system_TimeSpan_totalMilliseconds]
+		public function get totalMilliseconds():Number;
+		
+		[native,_system_TimeSpan_totalMinutes]
+		public function get totalMinutes():Number;
+		
+		[native,_system_TimeSpan_totalSeconds]
+		public function get totalSeconds():Number;
+		
+		
+		[native,_system_TimeSpan_compareTo]
+		public function compareTo(value:_Object_):int;
+		
+		[native,_system_TimeSpan_compareTo_TimeSpan]
+		public function compareTo_TimeSpan(value:TimeSpan):int;
+		
+	}
+
+}

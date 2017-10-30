@@ -1,0 +1,35 @@
+package system 
+{
+	/**
+	 * ...
+	 * @author 
+	 */
+	[no_constructor]
+	[link_system]
+	public final class DateTimeKind 
+	{
+		[native, _system_DateTimeKind_Unspecified_getter]
+		public static const Unspecified:DateTimeKind;
+		[native, _system_DateTimeKind_Local_getter]// , _system_Int64_MaxValue_setter]
+		public static const Local:DateTimeKind;
+		[native, _system_DateTimeKind_Utc_getter]
+		public static const Utc:DateTimeKind;
+		
+		[creator];
+		[native, _system_DateTimeKind_creator__];
+		private static function _creator(type:Class):*;
+		
+		[native,_system_DateTimeKind_ctor]
+		public function DateTimeKind();
+		
+		
+		[operator,"|"];
+		[native, _system_DateTimeKind_operator_bitOr];
+		private static function bitOr(t1:DateTimeKind,t2:DateTimeKind):DateTimeKind;
+		
+		[native, _system_Enum_valueOf];
+		public function valueOf():int;
+		
+	}
+
+}
