@@ -17,6 +17,8 @@ namespace ASRuntime
         RunTimeDataType _OBJECT_LINK = -999;
         RunTimeDataType _DICT_KEY = -998;
 		RunTimeDataType _FLOAT = -997;
+		RunTimeDataType _SHORT = -996;
+		RunTimeDataType _USHORT = -995;
 
         public sealed override void init(CSWC swc)
         {
@@ -33,6 +35,8 @@ namespace ASRuntime
             link_type.Add(typeof(DictionaryKey), _DICT_KEY);
             link_type.Add(typeof(RunTimeValueBase), _OBJECT_LINK);
 			link_type.Add(typeof(float), _FLOAT);
+			link_type.Add(typeof(short), _SHORT);
+			link_type.Add(typeof(ushort), _USHORT);
 
             foreach (var item in swc.creator_Class)
             {
@@ -54,6 +58,8 @@ namespace ASRuntime
             type_link.Add(_DICT_KEY, typeof(DictionaryKey));
             type_link.Add(_OBJECT_LINK, typeof(RunTimeValueBase));
 			type_link.Add(_FLOAT, typeof(float));
+			type_link.Add(_SHORT, typeof(short));
+			type_link.Add(_USHORT, typeof(ushort));
 
             foreach (var item in swc.creator_Class)
             {
@@ -124,6 +130,13 @@ namespace ASRuntime
                 if (rt == RunTimeDataType.rt_void)
                 {
                     rt = getRuntimeDataType(obj.GetType());
+
+					if (rt == _FLOAT)
+						rt = RunTimeDataType.rt_number;
+					else if (rt == _SHORT)
+						rt = RunTimeDataType.rt_int;
+					else if (rt == _USHORT)
+						rt = RunTimeDataType.rt_uint;
                 }
 
                 if (rt == _DICT_KEY)
@@ -147,7 +160,7 @@ namespace ASRuntime
                         return;
                     }
                 }
-
+				
 
 				var realObjType = getRuntimeDataType(obj.GetType());
 
@@ -164,6 +177,14 @@ namespace ASRuntime
 					else if (realObjType == _FLOAT)
 					{
 						returnSlot.setValue((int)(float)obj);
+					}
+					else if (realObjType == _SHORT)
+					{
+						returnSlot.setValue((int)(short)obj);
+					}
+					else if (realObjType == _USHORT)
+					{
+						returnSlot.setValue((int)(ushort)obj);
 					}
 					else
 					{
@@ -184,6 +205,14 @@ namespace ASRuntime
 					else if (realObjType == _FLOAT)
 					{
 						returnSlot.setValue((uint)(float)obj);
+					}
+					else if (realObjType == _SHORT)
+					{
+						returnSlot.setValue((uint)(short)obj);
+					}
+					else if (realObjType == _USHORT)
+					{
+						returnSlot.setValue((uint)(ushort)obj);
 					}
 					else
 					{
@@ -207,6 +236,14 @@ namespace ASRuntime
 					else if (realObjType == _FLOAT)
 					{
 						returnSlot.setValue((double)(float)obj);
+					}
+					else if (realObjType == _SHORT)
+					{
+						returnSlot.setValue((double)(short)obj);
+					}
+					else if (realObjType == _USHORT)
+					{
+						returnSlot.setValue((double)(ushort)obj);
 					}
 					else
 					{

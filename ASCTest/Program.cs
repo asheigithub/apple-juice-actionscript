@@ -175,9 +175,9 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
-						//var d=player.createInstance("system.Int64", 1,(ulong)5);
+						//var d=player.createInstance("system.Int64");
 						//var f = player.getMethod(d, "compareTo");
-						//var r= player.invokeMethod(f, d, 1, player.createInstance("system.Int64", 1, 4));
+						//var r= player.invokeMethod(d, f, 1, player.createInstance("system.Int64",(short)5),null,null,null,null,null);
 
                         Console.WriteLine();
                         Console.WriteLine("====程序输出====");

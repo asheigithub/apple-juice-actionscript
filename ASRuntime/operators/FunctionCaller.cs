@@ -184,7 +184,7 @@ namespace ASRuntime.operators
 							invokerFrame.call_parameter_slotCount + func.TotalArgs >= invokerFrame.stack.Length)
 					{
 
-						invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
+						invokerFrame.throwError(new error.InternalError(invokerFrame.player.swc,token, "stack overflow"));
 						invokerFrame.endStep();
 						if (callbacker != null)
 						{
@@ -212,7 +212,7 @@ namespace ASRuntime.operators
                 invokerFrame.call_parameter_slotCount+signature.onStackParameters >= invokerFrame.stack.Length)
             {
 
-                invokerFrame.throwError(new error.InternalError(token, "stack overflow"));
+                invokerFrame.throwError(new error.InternalError(invokerFrame.player.swc, token, "stack overflow"));
                 invokerFrame.endStep();
                 if (callbacker != null)
                 {

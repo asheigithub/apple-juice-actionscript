@@ -598,7 +598,7 @@ namespace ASRuntime
 					break;
                 default:
 
-                    runtimeError = (new error.InternalError(step.token,
+                    runtimeError = (new error.InternalError(player.swc,step.token,
                          step.opCode + "操作未实现"
                          ));
                     endStep();
@@ -1115,12 +1115,12 @@ namespace ASRuntime
                 errorinstance.value.memberData[1].directSet(new rtString("TypeError"));
                 errorinstance.value.memberData[2].directSet(new rtInt(1034));
                 errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
-                runtimeError = (new error.InternalError(token,message,errorinstance));
+                runtimeError = (new error.InternalError(player.swc, token,message,errorinstance));
 
             }
             else
             {
-                runtimeError = (new error.InternalError(token, "类型转换失败:" + src + "->" + dst));
+                runtimeError = (new error.InternalError(player.swc, token, "类型转换失败:" + src + "->" + dst));
             }
         }
 
@@ -1136,12 +1136,12 @@ namespace ASRuntime
                 errorinstance.value.memberData[1].directSet(new rtString("ArgumentError"));
                 errorinstance.value.memberData[2].directSet(new rtInt(1063));
                 errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
-                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage, errorinstance));
 
             }
             else
             {
-                runtimeError = (new error.InternalError(token, errormessage));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage));
             }
         }
 
@@ -1158,12 +1158,12 @@ namespace ASRuntime
                 errorinstance.value.memberData[2].directSet(new rtInt(0));
                 errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
 
-                runtimeError = (new error.InternalError(token, "无法执行操作" + opcode, errorinstance));
+                runtimeError = (new error.InternalError(player.swc, token, "无法执行操作" + opcode, errorinstance));
 
             }
             else
             {
-                runtimeError = (new error.InternalError(token, "无法执行操作" + opcode));
+                runtimeError = (new error.InternalError(player.swc, token, "无法执行操作" + opcode));
             }
         }
 
@@ -1185,12 +1185,12 @@ namespace ASRuntime
                 errorinstance.value.memberData[2].directSet(new rtInt(code));
                 errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
 
-                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage, errorinstance));
 
             }
             else
             {
-                runtimeError = (new error.InternalError(token, errormessage));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage));
             }
 
             
@@ -1208,12 +1208,12 @@ namespace ASRuntime
                 errorinstance.value.memberData[1].directSet(new rtString("AneError"));
                 errorinstance.value.memberData[2].directSet(new rtInt(10001));
                 errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
-                runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage, errorinstance));
 
             }
             else
             {
-                runtimeError = (new error.InternalError(token, errormessage));
+                runtimeError = (new error.InternalError(player.swc, token, errormessage));
             }
         }
 
@@ -1229,12 +1229,12 @@ namespace ASRuntime
 				errorinstance.value.memberData[1].directSet(new rtString("IOError"));
 				errorinstance.value.memberData[2].directSet(new rtInt(0));
 				errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
-				runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+				runtimeError = (new error.InternalError(player.swc, token, errormessage, errorinstance));
 
 			}
 			else
 			{
-				runtimeError = (new error.InternalError(token, errormessage));
+				runtimeError = (new error.InternalError(player.swc, token, errormessage));
 			}
 		}
 
@@ -1250,12 +1250,12 @@ namespace ASRuntime
 				errorinstance.value.memberData[1].directSet(new rtString("Error"));
 				errorinstance.value.memberData[2].directSet(new rtInt(2030));
 				errorinstance.value.memberData[3].directSet(new rtString(player.stackTrace(0)));
-				runtimeError = (new error.InternalError(token, errormessage, errorinstance));
+				runtimeError = (new error.InternalError(player.swc, token, errormessage, errorinstance));
 
 			}
 			else
 			{
-				runtimeError = (new error.InternalError(token, errormessage));
+				runtimeError = (new error.InternalError(player.swc, token, errormessage));
 			}
 		}
 

@@ -318,7 +318,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    frame.throwError((new error.InternalError(step.token,
+                                    frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                          "遭遇了异常的_prototype_"
                                          )));
                                     break;

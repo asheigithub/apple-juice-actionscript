@@ -140,7 +140,7 @@ namespace ASRuntime.operators
             if (frame.instanceCreator.constructorCaller == null)
             {
                 frame.throwError(
-                    new error.InternalError(step.token,
+                    new error.InternalError(frame.player.swc, step.token,
                                 "没有初始化构造函数参数就推送了参数"
                                 )
                     );

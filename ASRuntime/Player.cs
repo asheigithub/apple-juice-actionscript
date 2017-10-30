@@ -235,7 +235,73 @@ namespace ASRuntime
 			return swc.getClassDefinitionByName(name);
 		}
 
-		public ASBinCode.rtData.rtObject createInstance(string classname,int argcount, object v1 )
+
+
+		private RunTimeValueBase prepareParameter(ASBinCode.rtti.FunctionSignature sig, int paraIndex, object value, StackSlot tempSLot )
+		{
+			RunTimeValueBase vb1 = null;
+			try
+			{
+
+				if (sig.parameters.Count > paraIndex)
+				{
+					if (sig.parameters[paraIndex].isPara)
+					{
+						linktypemapper.storeLinkObject_ToSlot(value, RunTimeDataType.rt_void, tempSLot, swc, this);
+						vb1 = tempSLot.getValue();
+					}
+					else
+					{
+						linktypemapper.storeLinkObject_ToSlot(value, sig.parameters[paraIndex].type, tempSLot, swc, this);
+						vb1 = tempSLot.getValue();
+					}
+					return vb1;
+
+				}
+				else
+				{
+					linktypemapper.storeLinkObject_ToSlot(value, RunTimeDataType.rt_void, tempSLot, swc, this);
+					vb1 = tempSLot.getValue();
+					return vb1;
+				}
+			}
+			catch (KeyNotFoundException e)
+			{
+				throw new ASRunTimeException("构造函数参数转换失败", e);
+			}
+			catch (ArgumentException e)
+			{
+				throw new ASRunTimeException("构造函数参数转换失败", e);
+			}
+			catch (InvalidCastException e)
+			{
+				throw new ASRunTimeException("构造函数参数转换失败", e);
+			}
+			catch (IndexOutOfRangeException e)
+			{
+				throw new ASRunTimeException("构造函数参数转换失败", e);
+			}
+		}
+
+
+
+
+		public ASBinCode.rtData.rtObject createInstance(string classname)
+		{
+			return createInstance(classname, 0, null, null, null, null);
+		}
+
+		public ASBinCode.rtData.rtObject createInstance(string classname,object v1)
+		{
+			return createInstance(classname, 1, v1, null, null, null);
+		}
+
+		public ASBinCode.rtData.rtObject createInstance(string classname, object v1,object v2)
+		{
+			return createInstance(classname, 2, v1, v2, null, null);
+		}
+
+		public ASBinCode.rtData.rtObject createInstance(string classname,int argcount, object v1,object v2,object v3,params object[] args )
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -243,48 +309,66 @@ namespace ASRuntime
 			try
 			{
 				initPlayer();
-				CallBlankBlock(null); CallBlankBlock(null);
-
-
+				
 				var cls = getClass(classname);
+				if (cls == null)
+				{
+					throw new ASRunTimeException(classname + "类型未找到");
+				}
+
+				CallBlankBlock(null);
 
 				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
 				{
-					return null;
+					throw new ASRunTimeException("初始化静态实例时失败");
 				}
 
-				RunTimeValueBase vb1 = null;
 				var sig = swc.functions[cls.constructor_functionid].signature;
-				try
-				{
+				RunTimeValueBase vb1 = null;
+				RunTimeValueBase vb2 = null;
+				RunTimeValueBase vb3 = null;
 
-					if (sig.parameters.Count > 0)
+				RunTimeValueBase[] paraArgs = null;
+
+				currentRunFrame.call_parameter_slotCount += argcount;
+				int slotidx = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+				int stslotidx = slotidx;
+				if (argcount > 0)
+				{
+					vb1 = prepareParameter(sig, 0, v1, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 1)
+				{
+					vb2 = prepareParameter(sig, 1, v2, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 2)
+				{
+					vb3 = prepareParameter(sig, 2, v3, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 3)
+				{
+					paraArgs = new RunTimeValueBase[argcount - 3];
+					for (int i = 0; i < paraArgs.Length; i++)
 					{
-						linktypemapper.storeLinkObject_ToSlot(v1, sig.parameters[0].type, currentRunFrame._tempSlot1, swc, this);
-						vb1 = currentRunFrame._tempSlot1.getValue();
+						paraArgs[i] = prepareParameter(sig, i + 3, args[i], stackSlots[slotidx]);
+						slotidx++;
 					}
 				}
-				catch (KeyNotFoundException)
-				{
-					return null;
-				}
-				catch (ArgumentException)
-				{
-					return null;
-				}
-				catch (InvalidCastException)
-				{
-					return null;
-				}
-				catch (IndexOutOfRangeException)
-				{
-					return null;
-				}
+
 
 				error.InternalError err;
 				bool issuccess = runFunction(_createinstance,_buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0,0,string.Empty),out err, 
 					static_instance[cls.staticClass.classid],
-					new rtInt(argcount),vb1);
+					new rtInt(argcount),vb1,vb2,vb3,paraArgs);
+
+				currentRunFrame.call_parameter_slotCount = 0;
+				for (int i = stslotidx; i < slotidx; i++)
+				{
+					stackSlots[slotidx].clear();
+				}
 
 				if (!issuccess)
 				{
@@ -292,7 +376,14 @@ namespace ASRuntime
 					{
 
 					}
-					return null;
+					if (err != null)
+					{
+						throw new ASRunTimeException(err.getErrorInfo());
+					}
+					else
+					{
+						throw new ASRunTimeException("对象创建失败");
+					}
 				}
 				else
 				{
@@ -304,8 +395,10 @@ namespace ASRuntime
 					}
 
 					if (err != null)
-						return null;
-
+					{
+						throw new ASRunTimeException(err.message);
+					}
+					
 					return v as rtObject;
 				}
 
@@ -327,7 +420,7 @@ namespace ASRuntime
 			try
 			{
 				initPlayer();
-				CallBlankBlock(null); CallBlankBlock(null);
+				CallBlankBlock(null);
 
 				error.InternalError err;
 				bool issuccess=
@@ -365,7 +458,32 @@ namespace ASRuntime
 			}
 		}
 
-		public object invokeMethod(rtFunction function, RunTimeValueBase thisObj, int argscount,object v1)
+
+		public object invokeMethod(rtObject thisObj, rtFunction method)
+		{
+			return invokeMethod(thisObj, method, 0, null, null, null, null, null, null);
+		}
+		public object invokeMethod(rtObject thisObj, rtFunction method,object v1)
+		{
+			return invokeMethod(thisObj, method, 1, v1, null, null, null, null, null);
+		}
+		public object invokeMethod(rtObject thisObj, rtFunction method, object v1,object v2)
+		{
+			return invokeMethod(thisObj, method, 2, v1, v2, null, null, null, null);
+		}
+		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2,object v3)
+		{
+			return invokeMethod(thisObj, method, 3, v1, v2, v3, null, null, null);
+		}
+		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2, object v3,object v4)
+		{
+			return invokeMethod(thisObj, method, 4, v1, v2, v3, v4, null, null);
+		}
+		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2, object v3,object v4,object v5)
+		{
+			return invokeMethod(thisObj, method, 5, v1, v2, v3, v4, v5, null);
+		}
+		public object invokeMethod( rtObject thisObj, rtFunction method,int argcount,object v1,object v2,object v3,object v4,object v5, params object[] args)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -373,36 +491,98 @@ namespace ASRuntime
 			try
 			{
 				initPlayer();
-				CallBlankBlock(null); CallBlankBlock(null);
+				CallBlankBlock(null);
 
-				
+				var signature = swc.functions[method.functionId].signature;
 
-				var signature = swc.functions[function.functionId].signature;
 				RunTimeValueBase vb1 = null;
+				RunTimeValueBase vb2 = null;
+				RunTimeValueBase vb3 = null;
+				RunTimeValueBase vb4 = null;
+				RunTimeValueBase vb5 = null;
 
-				if (argscount > 0)
+				RunTimeValueBase[] paraArgs = null;
+
+				currentRunFrame.call_parameter_slotCount += argcount;
+
+				int slotidx = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+				int stslotidx = slotidx;
+				if (argcount > 0)
 				{
-					linktypemapper.storeLinkObject_ToSlot(v1, signature.parameters[0].type, currentRunFrame._tempSlot1, swc, this);
-					vb1 = currentRunFrame._tempSlot1.getValue();
+					vb1 = prepareParameter(signature, 0, v1, stackSlots[slotidx]);
+					slotidx++;
 				}
+				if (argcount > 1)
+				{
+					vb2 = prepareParameter(signature, 1, v2, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 2)
+				{
+					vb3 = prepareParameter(signature, 2, v3, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 3)
+				{
+					vb4 = prepareParameter(signature, 3, v4, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 4)
+				{
+					vb5 = prepareParameter(signature, 4, v5, stackSlots[slotidx]);
+					slotidx++;
+				}
+				if (argcount > 5)
+				{
+					paraArgs = new RunTimeValueBase[argcount - 5];
+					for (int i = 0; i < paraArgs.Length; i++)
+					{
+						paraArgs[i] = prepareParameter(signature, i + 5, args[i], stackSlots[slotidx]);
+						slotidx++;
+					}
+				}
+
 
 				error.InternalError err;
 				RunTimeValueBase v = null;
-				bool issuccess = runFunction(function, thisObj, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
-					,vb1
+				bool issuccess = runFunction(method, thisObj, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
+					,vb1,vb2,vb3,vb4,vb5,paraArgs
 					);
+
+				currentRunFrame.call_parameter_slotCount = 0;
+				for (int i = stslotidx; i < slotidx; i++)
+				{
+					stackSlots[slotidx].clear();
+				}
+
 				if (issuccess)
 				{
-					v= (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
-				}
+					v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
+					while (step())
+					{
 
-				while (step())
+					}
+					if (err != null)
+					{
+						throw new ASRunTimeException(err.message);
+					}
+				}
+				else
 				{
+					while (step())
+					{
 
+					}
+					if (err != null)
+					{
+						throw new ASRunTimeException(err.getErrorInfo());
+					}
+					else
+					{
+						throw new ASRunTimeException("方法调用失败");
+					}
 				}
 
-				if (!issuccess)
-					return null;
 
 				object obj;
 				if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType( signature.returnType ), swc, true, out obj))
@@ -411,7 +591,7 @@ namespace ASRuntime
 				}
 				else
 				{
-					return null;
+					throw new ASRunTimeException("返回值转化失败");
 				}
 			}
 			finally
@@ -659,7 +839,7 @@ namespace ASRuntime
                 //currentRunFrame.receiveErrorFromStackFrame(runtimeError);
                 //runtimeError = null;
 
-                currentRunFrame.receiveErrorFromStackFrame(new error.InternalError(token, "stack overflow"));
+                currentRunFrame.receiveErrorFromStackFrame(new error.InternalError( swc, token, "stack overflow"));
 
                 return null;
             }
@@ -824,7 +1004,7 @@ namespace ASRuntime
 			RunTimeValueBase v3,
 			RunTimeValueBase v4,
 			RunTimeValueBase v5,
-			params RunTimeValueBase[] args
+			RunTimeValueBase[] paraArgs
 			)
 		{
 			var funcCaller = funcCallerPool.create(currentRunFrame,token);
@@ -832,7 +1012,7 @@ namespace ASRuntime
 			funcCaller.SetFunctionThis(thisObj);
 			funcCaller.loadDefineFromFunction();
 			
-			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError==null?new error.InternalError(token, "创建参数失败"):receive_error ; return false ; }
+			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError==null?new error.InternalError(swc,token, "创建参数失败"):receive_error ; return false ; }
 			#region pushparameter
 			int c = 0;
 			bool success;
@@ -841,7 +1021,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v1,c,out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
@@ -851,7 +1031,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v2, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
@@ -861,7 +1041,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v3, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
@@ -871,7 +1051,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v4, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
@@ -881,20 +1061,20 @@ namespace ASRuntime
 				funcCaller.pushParameter(v5, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
 			}
 			
-			if (args != null)
+			if (paraArgs != null)
 			{
-				for (int i = 0; i < args.Length; i++)
+				for (int i = 0; i < paraArgs.Length; i++)
 				{
-					funcCaller.pushParameter(args[i], c, out success);
+					funcCaller.pushParameter(paraArgs[i], c, out success);
 					if (!success)
 					{
-						error = currentRunFrame.runtimeError == null ? new error.InternalError(token, "创建参数失败") : receive_error;
+						error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
 						return false;
 					}
 					c++;
@@ -953,11 +1133,11 @@ namespace ASRuntime
 				{
 					if (currentRunFrame == null)
 					{
-						error = runtimeError == null ? new error.InternalError(token, "函数执行失败") : runtimeError;
+						error = runtimeError == null ? new error.InternalError(swc,token, "函数执行失败") : runtimeError;
 					}
 					else
 					{
-						error = receive_error == null ? new error.InternalError(token, "函数执行失败") : receive_error;
+						error = receive_error == null ? new error.InternalError(swc,token, "函数执行失败") : receive_error;
 					}
 				}
 
@@ -1091,30 +1271,32 @@ namespace ASRuntime
             {
 
 				infoOutput.Error("运行时错误");
-                //Console.WriteLine("file :" + err.token.sourceFile);
-                //Console.WriteLine("line :" + err.token.line + " ptr :" + err.token.ptr);
+				//Console.WriteLine("file :" + err.token.sourceFile);
+				//Console.WriteLine("line :" + err.token.line + " ptr :" + err.token.ptr);
 
-                if (err.errorValue != null)
-                {
-                    string errinfo= err.errorValue.ToString();
-                    if (err.errorValue.rtType > RunTimeDataType.unknown && swc.ErrorClass !=null)
-                    {
-                        if (ClassMemberFinder.check_isinherits(err.errorValue, swc.ErrorClass.getRtType(), swc))
-                        {
-                            errinfo =
-                                ((rtObject)err.errorValue).value.memberData[1].getValue().ToString()+" #"+
-                                ((rtObject)err.errorValue).value.memberData[2].getValue().ToString()+" " +
-                                ((rtObject)err.errorValue).value.memberData[0].getValue().ToString();
-                        }
-                    }
+				infoOutput.Error( err.getErrorInfo());
+
+     //           if (err.errorValue != null)
+     //           {
+     //               string errinfo= err.errorValue.ToString();
+     //               if (err.errorValue.rtType > RunTimeDataType.unknown && swc.ErrorClass !=null)
+     //               {
+     //                   if (ClassMemberFinder.check_isinherits(err.errorValue, swc.ErrorClass.getRtType(), swc))
+     //                   {
+     //                       errinfo =
+     //                           ((rtObject)err.errorValue).value.memberData[1].getValue().ToString()+" #"+
+     //                           ((rtObject)err.errorValue).value.memberData[2].getValue().ToString()+" " +
+     //                           ((rtObject)err.errorValue).value.memberData[0].getValue().ToString();
+     //                   }
+     //               }
 
 
-					infoOutput.Error("[故障] " + "信息=" + errinfo);
-                }
-                else
-                {
-					infoOutput.Error(err.message);
-                }
+					//infoOutput.Error("[故障] " + "信息=" + errinfo);
+     //           }
+     //           else
+     //           {
+					//infoOutput.Error(err.message);
+     //           }
 
                 Stack<FrameInfo> _temp = new Stack<FrameInfo>();
 

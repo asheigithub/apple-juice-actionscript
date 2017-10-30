@@ -49,9 +49,25 @@
 			{
 				return new cls(para[0]);
 			}
+			else if(args==2)
+			{
+				return new cls(para[0],para[1]);
+			}
+			else if(args==3)
+			{
+				return new cls(para[0],para[1],para[2]);
+			}
+			else if(args==4)
+			{
+				return new cls(para[0],para[1],para[2],para[3]);
+			}
+			else if(args==5)
+			{
+				return new cls(para[0],para[1],para[2],para[3],para[4]);
+			}
 			else
 			{
-				throw new Error("更多参数的构造还没写呢");
+				throw new Error("大于5个参数的构造还没写呢");
 				null;
 			}
 

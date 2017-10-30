@@ -35,13 +35,13 @@ namespace ASRuntime.operators
                     {
                         if (step.arg2 is VariableBase)
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc,step.token,
                                 "成员" + ((VariableBase)step.arg2).name +"没有找到" 
                                 )));
                         }
                         else
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                 "没有获取到成员数据"
                                 )));
                         }
@@ -71,7 +71,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    frame.throwError((new error.InternalError(step.token,
+                    frame.throwError((new error.InternalError(frame.player.swc, step.token,
                          "dot操作结果必然是一个StackSlot"
                          )));
                 }
@@ -136,7 +136,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    frame.throwError((new error.InternalError(step.token,
+                    frame.throwError((new error.InternalError(frame.player.swc, step.token,
                          "dot操作结果必然是一个StackSlot"
                          )));
                 }
@@ -258,7 +258,7 @@ namespace ASRuntime.operators
                     {
                         if (rtObj.value._class.get_this_item == null)
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc, step.token,
                              "有set_this_item则必须有get_this_item"
                              )));
                             frame.endStep(step);
@@ -340,7 +340,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        frame.throwError((new error.InternalError(step.token,
+                        frame.throwError((new error.InternalError(frame.player.swc, step.token,
                              "dot操作结果必然是一个StackSlot"
                              )));
                     }
@@ -438,7 +438,7 @@ namespace ASRuntime.operators
                     else
                     {
                         haserror = true;
-                        frame.throwError((new error.InternalError(token,
+                        frame.throwError((new error.InternalError(frame.player.swc, token,
                              "遭遇了异常的_prototype_"
                              )));
                         break;
@@ -497,7 +497,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                  "dot操作结果必然是一个StackSlot"
                                  )));
                         }
@@ -522,7 +522,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                  "dot操作结果必然是一个StackSlot"
                                  )));
                         }
@@ -611,7 +611,7 @@ namespace ASRuntime.operators
                             }
                             else
                             {
-                                frame.throwError((new error.InternalError(step.token,
+                                frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                      "dot操作结果必然是一个StackSlot"
                                      )));
                             }
@@ -649,7 +649,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    frame.throwError((new error.InternalError(step.token,
+                                    frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                          "dot操作结果必然是一个StackSlot"
                                          )));
                                 }
@@ -772,7 +772,7 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            frame.throwError((new error.InternalError(step.token,
+                            frame.throwError((new error.InternalError(frame.player.swc, step.token,
                                  "dot操作结果必然是一个StackSlot"
                                  )));
                         }
@@ -917,8 +917,8 @@ namespace ASRuntime.operators
             if (v1.rtType < RunTimeDataType.unknown)
             {
                 frame.throwError(
-                    new error.InternalError(
-                    step.token, "基本数据类型没有转换为引用类型",
+                    new error.InternalError(frame.player.swc,
+					step.token, "基本数据类型没有转换为引用类型",
                     new rtString("基本数据类型没有转换为引用类型"
                     )
                     )
@@ -935,8 +935,8 @@ namespace ASRuntime.operators
             else
             {
                 frame.throwError(
-                    new error.InternalError(
-                    step.token, "数值未实现",
+                    new error.InternalError(frame.player.swc,
+					step.token, "数值未实现",
                     new rtString("数组未实现"
                     )
                     )

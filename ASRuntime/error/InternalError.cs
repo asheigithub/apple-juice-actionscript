@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ASBinCode;
+using ASBinCode.rtData;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,7 +22,14 @@ namespace ASRuntime.error
 
         internal Stack<FrameInfo> callStack;
 
-        public InternalError(ASBinCode.SourceToken token,string message)
+		private CSWC swc;
+
+		private InternalError(CSWC swc)
+		{
+			this.swc = swc;
+		}
+
+        public InternalError(CSWC swc,ASBinCode.SourceToken token,string message):this(swc)
         {
             this.token = token;
             this.message = message;
@@ -35,14 +44,14 @@ namespace ASRuntime.error
         }
 
 
-        public InternalError(ASBinCode.SourceToken token, string message ,ASBinCode.RunTimeValueBase errorValue )
+        public InternalError(CSWC swc,ASBinCode.SourceToken token, string message ,ASBinCode.RunTimeValueBase errorValue ):this(swc)
         {
             this.token = token;
             this.message = message;
             this.errorValue = errorValue;
         }
 
-        public InternalError(ASBinCode.SourceToken token, ASBinCode.RunTimeValueBase errorValue)
+        public InternalError(CSWC swc,ASBinCode.SourceToken token, ASBinCode.RunTimeValueBase errorValue):this(swc)
         {
             this.token = token;
             this.errorValue = errorValue;
@@ -52,5 +61,57 @@ namespace ASRuntime.error
             }
         }
 
-    }
+
+		public string getErrorInfo()
+		{
+			if (errorValue != null && swc !=null)
+			{
+				string errinfo = errorValue.ToString();
+				if (errorValue.rtType > RunTimeDataType.unknown && swc.ErrorClass != null)
+				{
+					if (ClassMemberFinder.check_isinherits(errorValue, swc.ErrorClass.getRtType(), swc))
+					{
+						errinfo =
+							((rtObject)errorValue).value.memberData[1].getValue().ToString() + " #" +
+							((rtObject)errorValue).value.memberData[2].getValue().ToString() + " " +
+							((rtObject)errorValue).value.memberData[0].getValue().ToString();
+					}
+				}
+
+
+				return "[故障] " + "信息=" + errinfo;
+			}
+			else
+			{
+				return message;
+			}
+		}
+
+		public string getStackTrace()
+		{
+			if (errorValue != null )
+			{
+				string errinfo = string.Empty;
+				if (errorValue.rtType > RunTimeDataType.unknown && swc.ErrorClass != null)
+				{
+					if (ClassMemberFinder.check_isinherits(errorValue, swc.ErrorClass.getRtType(), swc))
+					{
+						errinfo =
+							((rtObject)errorValue).value.memberData[3].getValue().ToString();
+					}
+				}
+
+				return  "\t"+errinfo;
+			}
+			else
+			{
+				return string.Empty;
+			}
+		}
+
+		public override string ToString()
+		{
+			return getErrorInfo() + getStackTrace();
+		}
+	}
 }

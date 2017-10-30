@@ -211,7 +211,7 @@ namespace ASRuntime.operators
                     frame.typeconvertoperator.targettype !=cls
                     )
                 {
-                    frame.throwError(new error.InternalError(step.token, "类型转换函数发现内部错误"
+                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "类型转换函数发现内部错误"
                         ));
                     return;
                 }
@@ -319,7 +319,7 @@ namespace ASRuntime.operators
 
                     )
                 {
-                    frame.throwError(new error.InternalError(step.token, "应该是强制类型转换，内部异常"));
+                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "应该是强制类型转换，内部异常"));
 
                     frame.endStep(step);
                     return;
@@ -351,7 +351,7 @@ namespace ASRuntime.operators
                 if (!frame.funCaller.isFuncEquals(function))
                 {
 					if (toclear != null) { toclear.Clear(); }
-                    frame.throwError(new error.InternalError(step.token, "运行时异常，调用函数不对"));
+                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "运行时异常，调用函数不对"));
                     frame.endStep(step);
                     return;
                 }
@@ -377,7 +377,7 @@ namespace ASRuntime.operators
             {
                 if (frame.typeconvertoperator.targettype.instanceClass == null)
                 {
-                    frame.throwError(new error.InternalError(step.token, "强制类型转换类型错误",
+                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "强制类型转换类型错误",
                         new ASBinCode.rtData.rtString("强制类型转换类型错误")));
 
                     frame.endStep(step);
