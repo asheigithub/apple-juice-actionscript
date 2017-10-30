@@ -88,9 +88,8 @@ namespace ASRuntime.operators
 
             if (step.arg2 is MethodGetterBase)
             {
-				var sf = ((MethodGetterBase)step.arg2).getMethod(scope);
-                heapslot.directSet(sf ); ((rtFunction)sf).Clear();
-			}
+                heapslot.directSet( ((MethodGetterBase)step.arg2).getMethod(scope));
+            }
             else
             {
                 heapslot.directSet(step.arg2.getValue(scope, frame));

@@ -739,7 +739,7 @@ namespace ASRuntime.operators
                 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 //fc.releaseAfterCall = true;
-                fc.SetFunction(f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
                 bool success;
@@ -874,7 +874,7 @@ namespace ASRuntime.operators
 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 //fc.releaseAfterCall = true;
-                fc.SetFunction(f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
                 bool success;
@@ -1035,7 +1035,7 @@ namespace ASRuntime.operators
             {
 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
-                fc.SetFunction(f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
                 bool success;
@@ -1138,7 +1138,7 @@ namespace ASRuntime.operators
             {
 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
-                fc.SetFunction(f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
                 bool success;
@@ -1238,7 +1238,7 @@ namespace ASRuntime.operators
             {
 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
-                fc.SetFunction(f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
 				bool success;
@@ -1330,7 +1330,7 @@ namespace ASRuntime.operators
             {
 
                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
-                fc.SetFunction( f);
+                fc.function = f;
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope()) { return; }
 				bool success;

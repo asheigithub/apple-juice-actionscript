@@ -55,13 +55,7 @@ package
             companyProductStr = strHelper.trim(companyProductStr, emptyStr);
             trace("'" + companyProductStr + "'");    // 'Company X Product Z Professional'
 
-			StringTest.prototype.valueOf = function()
-			{
-				return "valueof:" + 45678;
-			}
 			
-			
-			trace(this+1);
 		}
 		
 	}

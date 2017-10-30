@@ -18,7 +18,7 @@ namespace ASRuntime.operators
                 if (f != null)
                 {
                     FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token); //fc.releaseAfterCall = true;
-                    fc.SetFunction(f);
+                    fc.function = f;
                     fc.loadDefineFromFunction();
 					if (!fc.createParaScope()) { return; }
 					bool success;

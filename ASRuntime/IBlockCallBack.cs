@@ -86,7 +86,6 @@ namespace ASRuntime
 		public delegate void dgeCallbacker(BlockCallBackBase sender, object args);
         public bool isSuccess;
 
-		public int _intArg2;
         public int _intArg;
         public ASBinCode.RunTimeScope scope;
         public ASBinCode.OpStep step;
@@ -193,7 +192,7 @@ namespace ASRuntime
                 hasreleased = true;
 
                 isSuccess = false;
-                _intArg = 0;_intArg2 = 0;
+                _intArg = 0;
                 scope = null;
                 step = null;
                 callbacker = null;

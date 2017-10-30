@@ -13,9 +13,8 @@ namespace ASBinCode
             , int refdefinedinblockid
             ):base(name,_class,0,refdefinedinblockid)
         {
-			//cache = new WeakReference(null);
-			_cachemethod = new rtFunction(-1, false);
-		}
+            cache = new WeakReference(null);
+        }
 
         public void setIndexMember(int value,Class setter)
         {
@@ -48,25 +47,23 @@ namespace ASBinCode
             }
         }
 
-		private rtFunction _cachemethod;
-
-		public sealed override RunTimeValueBase getConstructor(RunTimeScope scope)
+        public sealed override RunTimeValueBase getConstructor(RunTimeScope scope)
         {
             throw new NotImplementedException();
         }
 
         public override RunTimeValueBase getMethod(rtObject rtObj)
         {
-            //if (cache.IsAlive)
-            //{
-            //    if (ReferenceEquals(((rtFunction)cache.Target).this_pointer, rtObj))
-            //    {
-            //        if (((rtFunction)cache.Target).this_pointer == rtObj)
-            //        {
-            //            return (rtFunction)cache.Target;
-            //        }
-            //    }
-            //}
+            if (cache.IsAlive)
+            {
+                if (ReferenceEquals(((rtFunction)cache.Target).this_pointer, rtObj))
+                {
+                    if (((rtFunction)cache.Target).this_pointer == rtObj)
+                    {
+                        return (rtFunction)cache.Target;
+                    }
+                }
+            }
             var instance_class = rtObj.value._class;
 
             if (instance_class.isInterface && instance_class.isLink_System)
@@ -84,51 +81,41 @@ namespace ASBinCode
 
                 var vmember = (InterfaceMethodGetter)_class.classMembers[indexofMember].bindField;
 
-				//rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
-				//method.bind(rtObj.objScope);
-				//method.setThis(rtObj);
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
 
-				//cache.Target = method;
+                cache.Target = method;
 
-				//return method;
-				_cachemethod.SetValue(vmember.functionId, true);
-				_cachemethod.bind(rtObj.objScope);
-				_cachemethod.setThis(rtObj);
-
-				return _cachemethod;
-			}
+                return method;
+            }
             else
             {
                 var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
 
-				//rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
-				//method.bind(rtObj.objScope);
-				//method.setThis(rtObj);
+                rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+                method.bind(rtObj.objScope);
+                method.setThis(rtObj);
 
-				//cache.Target = method;
+                cache.Target = method;
 
-				//return method;
-				_cachemethod.SetValue(vmember.functionId, true);
-				_cachemethod.bind(rtObj.objScope);
-				_cachemethod.setThis(rtObj);
-
-				return _cachemethod;
-			}
+                return method;
+            }
         }
 
 
-        
+        WeakReference cache;
         public sealed override RunTimeValueBase getMethod(RunTimeScope scope)
         {
             //throw new NotImplementedException();
 
-            //if (cache.IsAlive)
-            //{
-            //    if (((rtFunction)cache.Target).bindScope == scope)
-            //    {
-            //        return (rtFunction)cache.Target;
-            //    }
-            //}
+            if (cache.IsAlive)
+            {
+                if (((rtFunction)cache.Target).bindScope == scope)
+                {
+                    return (rtFunction)cache.Target;
+                }
+            }
 
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
@@ -139,19 +126,13 @@ namespace ASBinCode
             var instance_class = ((rtObject)scope.this_pointer).value._class;
             var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
 
-			//rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
-			//method.bind(scope);
-			//method.setThis(scope.this_pointer);
+            rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+            method.bind(scope);
+            method.setThis(scope.this_pointer);
 
-			//cache.Target = method;
+            cache.Target = method;
 
-			//return method;
-
-			_cachemethod.SetValue(vmember.functionId, true);
-			_cachemethod.bind(scope);
-			_cachemethod.setThis(scope.this_pointer);
-
-			return _cachemethod;
+            return method;
         }
 
         
@@ -161,14 +142,33 @@ namespace ASBinCode
             throw new NotImplementedException();
         }
 
-        
+        //public sealed override SLOT getSuperSlot(RunTimeScope scope, Class superClass)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public sealed override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
         {
             throw new NotImplementedException();
         }
 
-        
+        //public sealed override SLOT getVirtualSlot(RunTimeScope scope)
+        //{
+        //    while (scope.scopeType != RunTimeScopeType.objectinstance)
+        //    {
+        //        scope = scope.parent;
+        //    }
+
+        //    var instance_class = ((rtObject)scope.this_pointer).value._class;
+        //    var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
+
+
+
+        //    rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);
+        //    method.bind(scope);
+        //    method.setThis(scope.this_pointer);
+        //    return new MethodSlot(method);
+        //}
 
 
 

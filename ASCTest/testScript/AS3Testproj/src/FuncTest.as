@@ -210,11 +210,11 @@ package
 			trace(q.dequeue());
 			
 			trace(q.toArray());
-			trace("q.count",q.count);
+			trace(q.count);
 			q.trimToSize();
-			trace("q.count",q.count);
+			trace(q.count);
 			q.clear();
-			trace("q.count",q.count);
+			trace(q.count);
 			
 			
 			var d1:DateTime = DateTime.now;

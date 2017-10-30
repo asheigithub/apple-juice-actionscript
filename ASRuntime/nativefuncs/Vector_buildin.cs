@@ -141,11 +141,11 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Vector_getIsFixed : NativeConstParameterFunction
+    class Vector_getIsFixed : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_getIsFixed():base(0)
+        public Vector_getIsFixed()
         {
             _paras = new List<RunTimeDataType>();
             
@@ -183,52 +183,33 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
 
-
-		//    ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
-
-
-		//    if (((Vector_Data)rtObj.hosted_object).isFixed)
-		//    {
-		//        return rtBoolean.True;
-		//    }
-		//    else
-		//    {
-		//        return rtBoolean.False;
-		//    }
-
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			success = true;
-			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+           
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
 
-			if (((Vector_Data)rtObj.hosted_object).isFixed)
-			{
-				//return rtBoolean.True;
-				returnSlot.directSet(rtBoolean.True);
-			}
-			else
-			{
-				//return rtBoolean.False;
-				returnSlot.directSet(rtBoolean.False);
-			}
-		}
+            if (((Vector_Data)rtObj.hosted_object).isFixed)
+            {
+                return rtBoolean.True;
+            }
+            else
+            {
+                return rtBoolean.False;
+            }
+           
+        }
+    }
 
-	}
-
-    class Vector_setIsFixed : NativeConstParameterFunction
+    class Vector_setIsFixed : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_setIsFixed():base(1)
+        public Vector_setIsFixed()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_boolean);
@@ -267,31 +248,19 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
 
-		//    ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
 
-		//    ((Vector_Data)rtObj.hosted_object).isFixed = ((rtBoolean)argements[0].getValue()).value;
+            ((Vector_Data)rtObj.hosted_object).isFixed = ((rtBoolean)argements[0].getValue()).value;
 
-		//    return rtUndefined.undefined;
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			success = true;
-
-			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
-
-			((Vector_Data)rtObj.hosted_object).isFixed = ((rtBoolean)argements[0]).value;
-
-			//return rtUndefined.undefined;
-			returnSlot.directSet(rtUndefined.undefined);
-		}
-	}
+            return rtUndefined.undefined;
+        }
+    }
 
 
 
@@ -365,11 +334,11 @@ namespace ASRuntime.nativefuncs
 		}
 	}
 
-    class Vector_setLength : NativeConstParameterFunction
+    class Vector_setLength : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_setLength():base(1)
+        public Vector_setLength()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_uint);
@@ -407,101 +376,56 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-		//    if (vd.isFixed)
-		//    {
-		//        errormessage = "Cannot change the length of a fixed Vector";
-		//        errorno = 1126;
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errormessage = "Cannot change the length of a fixed Vector";
+                errorno = 1126;
 
-		//        return rtUndefined.undefined;
-		//    }
-
-
-
-		//    var list = vd.innnerList;
+                return rtUndefined.undefined;
+            }
 
 
 
-		//    uint newlen = ((rtUInt)argements[0].getValue()).value;
+            var list = vd.innnerList;
 
-		//    if (newlen > list.Count)
-		//    {
-		//        var t = Vector_Util.getVectorType(thisObj, bin);
+            
 
-		//        while (list.Count < newlen)
-		//        {
-		//            list.Add( TypeConverter.getDefaultValue( t ).getValue(null,null) );
-		//        }
-		//    }
-		//    else if (newlen < list.Count)
-		//    {
-		//        list.RemoveRange((int)newlen, list.Count - (int)newlen);
-		//    }
+            uint newlen = ((rtUInt)argements[0].getValue()).value;
 
+            if (newlen > list.Count)
+            {
+                var t = Vector_Util.getVectorType(thisObj, bin);
 
-		//    return rtUndefined.undefined;
-
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				success = false;
-				//errormessage = "Cannot change the length of a fixed Vector";
-				//errorno = 1126;
+                while (list.Count < newlen)
+                {
+                    list.Add( TypeConverter.getDefaultValue( t ).getValue(null,null) );
+                }
+            }
+            else if (newlen < list.Count)
+            {
+                list.RemoveRange((int)newlen, list.Count - (int)newlen);
+            }
 
 
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector");
-				//return rtUndefined.undefined;
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			else
-			{
+            return rtUndefined.undefined;
 
-				var list = vd.innnerList;
-
-
-
-				uint newlen = ((rtUInt)argements[0]).value;
-
-				if (newlen > list.Count)
-				{
-					var t = Vector_Util.getVectorType(thisObj, bin);
-
-					while (list.Count < newlen)
-					{
-						list.Add(TypeConverter.getDefaultValue(t).getValue(null, null));
-					}
-				}
-				else if (newlen < list.Count)
-				{
-					list.RemoveRange((int)newlen, list.Count - (int)newlen);
-				}
-				success = true;
-				returnSlot.directSet(rtUndefined.undefined);
-				//return rtUndefined.undefined;
-			}
-		}
-
-	}
+        }
+    }
 
 
 
 
-    class Vector_toString : NativeConstParameterFunction
+    class Vector_toString : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_toString():base(0)
+        public Vector_toString()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -540,67 +464,40 @@ namespace ASRuntime.nativefuncs
 
 
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            
+            var list = vd.innnerList;
 
-		//    var list = vd.innnerList;
+            StringBuilder asb = new StringBuilder();
 
-		//    StringBuilder asb = new StringBuilder();
-
-		//    for (int i = 0; i < list.Count; i++)
-		//    {
-		//        asb.Append(
-		//            list[i].rtType != RunTimeDataType.rt_void ?
-		//            (list[i].rtType == RunTimeDataType.rt_string ?
-		//            ((rtString)list[i]).valueString() :
-		//            (list[i].rtType == RunTimeDataType.rt_null ? String.Empty : list[i].ToString())) : String.Empty);
-		//        asb.Append(",");
-		//    }
-		//    if (asb.Length > 0)
-		//    {
-		//        asb.Remove(asb.Length - 1, 1);
-		//    }
-		//    return new rtString(asb.ToString());
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-
-			var list = vd.innnerList;
-
-			StringBuilder asb = new StringBuilder();
-
-			for (int i = 0; i < list.Count; i++)
-			{
-				asb.Append(
-					list[i].rtType != RunTimeDataType.rt_void ?
-					(list[i].rtType == RunTimeDataType.rt_string ?
-					((rtString)list[i]).valueString() :
-					(list[i].rtType == RunTimeDataType.rt_null ? String.Empty : list[i].ToString())) : String.Empty);
-				asb.Append(",");
-			}
-			if (asb.Length > 0)
-			{
-				asb.Remove(asb.Length - 1, 1);
-			}
-			success = true;
-			returnSlot.setValue(asb.ToString());
-			//return new rtString(asb.ToString());
-		}
-
-	}
+            for (int i = 0; i < list.Count; i++)
+            {
+                asb.Append(
+                    list[i].rtType != RunTimeDataType.rt_void ?
+                    (list[i].rtType == RunTimeDataType.rt_string ?
+                    ((rtString)list[i]).valueString() :
+                    (list[i].rtType == RunTimeDataType.rt_null ? String.Empty : list[i].ToString())) : String.Empty);
+                asb.Append(",");
+            }
+            if (asb.Length > 0)
+            {
+                asb.Remove(asb.Length - 1, 1);
+            }
+            return new rtString(asb.ToString());
+        }
+    }
 
 
-    class Vector__concat : NativeConstParameterFunction
+    class Vector__concat : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector__concat():base(2)
+        public Vector__concat()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_void);
@@ -641,64 +538,36 @@ namespace ASRuntime.nativefuncs
 
 
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe, out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe, out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)argements[0].getValue()).value).hosted_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)argements[0].getValue()).value).hosted_object);
 
-		//    if (argements[1].getValue().rtType == RunTimeDataType.rt_null)
-		//    {
-		//        errormessage = "Cannot access a property or method of a null object reference.";
-		//        errorno = 1009;
-		//        return rtUndefined.undefined;
-		//    }
+            if (argements[1].getValue().rtType == RunTimeDataType.rt_null)
+            {
+                errormessage = "Cannot access a property or method of a null object reference.";
+                errorno = 1009;
+                return rtUndefined.undefined;
+            }
 
-		//    var vs = ((Vector_Data)((HostedObject)((rtObject)argements[1].getValue()).value).hosted_object);
+            var vs = ((Vector_Data)((HostedObject)((rtObject)argements[1].getValue()).value).hosted_object);
 
-		//    vd.innnerList.AddRange(vs.innnerList);
+            vd.innnerList.AddRange(vs.innnerList);
 
 
-		//    return rtUndefined.undefined;
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)argements[0]).value).hosted_object);
-
-			if (argements[1].rtType == RunTimeDataType.rt_null)
-			{
-				success = false;
-				//errormessage = "Cannot access a property or method of a null object reference.";
-				//errorno = 1009;
-				//return rtUndefined.undefined;
-
-				stackframe.throwError(token, 1009, "Cannot access a property or method of a null object reference.");
-				returnSlot.directSet(rtUndefined.undefined);
-				return;
-			}
-			else
-			{
-				var vs = ((Vector_Data)((HostedObject)((rtObject)argements[1]).value).hosted_object);
-
-				vd.innnerList.AddRange(vs.innnerList);
-				success = true;
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			//return rtUndefined.undefined;
-		}
-	}
+            return rtUndefined.undefined;
+        }
+    }
 
 
 
-    class Vector_insertAt : NativeConstParameterFunction
+    class Vector_insertAt : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_insertAt():base(2)
+        public Vector_insertAt()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -737,80 +606,40 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-		//    if (vd.isFixed)
-		//    {
-		//        errorno = 1126;
-		//        errormessage = "Cannot change the length of a fixed Vector.";
-		//        return rtUndefined.undefined;
-		//    }
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
 
-		//    var arr = vd.innnerList;
+            var arr = vd.innnerList;
 
-		//    int idx = ((rtInt)argements[0].getValue()).value;
-		//    var toinsert = argements[1].getValue();
-		//    if (idx < 0)
-		//    {
-		//        idx = arr.Count + idx;
-		//        if (idx < 0) { idx = 0; }
-		//    }
-		//    else if (idx > arr.Count)
-		//    {
-		//        idx = arr.Count;
-		//    }
+            int idx = ((rtInt)argements[0].getValue()).value;
+            var toinsert = argements[1].getValue();
+            if (idx < 0)
+            {
+                idx = arr.Count + idx;
+                if (idx < 0) { idx = 0; }
+            }
+            else if (idx > arr.Count)
+            {
+                idx = arr.Count;
+            }
 
-		//    arr.Insert(idx, toinsert);
+            arr.Insert(idx, toinsert);
 
 
-		//    return rtUndefined.undefined;
+            return rtUndefined.undefined;
 
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				//errorno = 1126;
-				//errormessage = "Cannot change the length of a fixed Vector.";
-				//return rtUndefined.undefined;
-				success = false;
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-				returnSlot.directSet(rtUndefined.undefined);
-				return;
-			}
-			else
-			{
-				var arr = vd.innnerList;
-
-				int idx = ((rtInt)argements[0]).value;
-				var toinsert = argements[1];
-				if (idx < 0)
-				{
-					idx = arr.Count + idx;
-					if (idx < 0) { idx = 0; }
-				}
-				else if (idx > arr.Count)
-				{
-					idx = arr.Count;
-				}
-
-				arr.Insert(idx, toinsert);
-
-				success = true;
-				returnSlot.directSet(rtUndefined.undefined);
-				//return rtUndefined.undefined;
-			}
-		}
-
-	}
+        }
+    }
 
     class Vector_join : NativeFunctionBase
     {
@@ -1020,11 +849,11 @@ namespace ASRuntime.nativefuncs
         }
     }
 
-    class Vector_pop : NativeConstParameterFunction
+    class Vector_pop : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_pop():base(0)
+        public Vector_pop()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -1061,75 +890,40 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-		//    if (vd.isFixed)
-		//    {
-		//        errorno = 1126;
-		//        errormessage = "Cannot change the length of a fixed Vector.";
-		//        return rtUndefined.undefined;
-		//    }
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
 
-		//    var arr = vd.innnerList;
+            var arr = vd.innnerList;
 
-		//    if (arr.Count > 0)
-		//    {
-		//        var result = arr[arr.Count - 1];
-		//        arr.RemoveAt(arr.Count - 1);
-		//        return result;
-		//    }
-		//    else
-		//    {
-		//        return rtUndefined.undefined;
-		//    }
+            if (arr.Count > 0)
+            {
+                var result = arr[arr.Count - 1];
+                arr.RemoveAt(arr.Count - 1);
+                return result;
+            }
+            else
+            {
+                return rtUndefined.undefined;
+            }
 
-		//}
+        }
+    }
 
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				//errorno = 1126;
-				//errormessage = "Cannot change the length of a fixed Vector.";
-				//return rtUndefined.undefined;
-				success = false;
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			else
-			{
-				success = true;
-				var arr = vd.innnerList;
-
-				if (arr.Count > 0)
-				{
-					var result = arr[arr.Count - 1];
-					arr.RemoveAt(arr.Count - 1);
-					returnSlot.directSet(result);
-					//return result;
-				}
-				else
-				{
-					//return rtUndefined.undefined;
-					returnSlot.directSet(rtUndefined.undefined);
-				}
-			}
-		}
-
-	}
-
-    class Vector_push : NativeConstParameterFunction
+    class Vector_push : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_push():base(1)
+        public Vector_push()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_void);
@@ -1167,57 +961,33 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-        //{
-        //    errormessage = null;
-        //    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-        //    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-        //    if (vd.isFixed)
-        //    {
-        //        errorno = 1126;
-        //        errormessage = "Cannot change the length of a fixed Vector.";
-        //        return rtUndefined.undefined;
-        //    }
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
 
-        //    var arr = vd.innnerList;
+            var arr = vd.innnerList;
 
-        //    arr.Add(argements[0].getValue());
+            arr.Add(argements[0].getValue());
 
-        //    return new rtUInt((uint)arr.Count);
-        //}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				success = false;
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			else
-			{
-				var arr = vd.innnerList;
-
-				arr.Add(argements[0]);
-
-				//return new rtUInt((uint)arr.Count);
-				success = true;
-				returnSlot.setValue((uint)arr.Count);
-			}
-		}
-
-	}
+            return new rtUInt((uint)arr.Count);
+        }
+    }
 
 
-    class Vector_removeAt : NativeConstParameterFunction
+    class Vector_removeAt : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_removeAt():base(1)
+        public Vector_removeAt()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -1255,88 +1025,48 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-		//    if (vd.isFixed)
-		//    {
-		//        errorno = 1126;
-		//        errormessage = "Cannot change the length of a fixed Vector.";
-		//        return rtUndefined.undefined;
-		//    }
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
 
-		//    var arr = vd.innnerList;
+            var arr = vd.innnerList;
 
-		//    int idx = ((rtInt)argements[0].getValue()).value;
-		//    if (idx < 0)
-		//    {
-		//        idx = arr.Count + idx;
-		//        if (idx < 0) { idx = 0; }
-		//    }
-		//    else if (idx > arr.Count - 1)
-		//    {
-		//        errorno = 1125;
-		//        errormessage = "The index "+idx+" is out of range "+arr.Count+".";
+            int idx = ((rtInt)argements[0].getValue()).value;
+            if (idx < 0)
+            {
+                idx = arr.Count + idx;
+                if (idx < 0) { idx = 0; }
+            }
+            else if (idx > arr.Count - 1)
+            {
+                errorno = 1125;
+                errormessage = "The index "+idx+" is out of range "+arr.Count+".";
 
-		//        return rtUndefined.undefined;
-		//    }
+                return rtUndefined.undefined;
+            }
 
-		//    var r = arr[idx];
-		//    arr.RemoveAt(idx);
-		//    return r;
+            var r = arr[idx];
+            arr.RemoveAt(idx);
+            return r;
 
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				success = false;
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			else
-			{
-				var arr = vd.innnerList;
-
-				int idx = ((rtInt)argements[0]).value;
-				if (idx < 0)
-				{
-					idx = arr.Count + idx;
-					if (idx < 0) { idx = 0; }
-				}
-				else if (idx > arr.Count - 1)
-				{
-					//errorno = 1125;
-					//errormessage = "The index " + idx + " is out of range " + arr.Count + ".";
-
-					//return rtUndefined.undefined;
-					success = false;
-
-					stackframe.throwError(token,1125, "The index " + idx + " is out of range " + arr.Count + ".");
-					returnSlot.directSet(rtUndefined.undefined);
-					return;
-				}
-				success = true;
-				var r = arr[idx];
-				arr.RemoveAt(idx);
-				returnSlot.directSet(r);
-			}
-		}
-
-	}
+        }
+    }
 
 
-    class Vector_reverse : NativeConstParameterFunction
+    class Vector_reverse : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_reverse():base(0)
+        public Vector_reverse()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -1373,45 +1103,29 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            
 
+            var arr = vd.innnerList;
 
-		//    var arr = vd.innnerList;
+            arr.Reverse();
 
-		//    arr.Reverse();
-
-		//    return thisObj;
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			success = true;
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-
-
-			var arr = vd.innnerList;
-
-			arr.Reverse();
-
-			//return thisObj;
-			returnSlot.directSet(thisObj);
-		}
-
-	}
+            return thisObj;
+        }
+    }
 
 
 
-    class Vector_shift : NativeConstParameterFunction
+    class Vector_shift : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_shift():base(0)
+        public Vector_shift()
         {
             _paras = new List<RunTimeDataType>();
         }
@@ -1448,81 +1162,41 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-		//    if (vd.isFixed)
-		//    {
-		//        errorno = 1126;
-		//        errormessage = "Cannot change the length of a fixed Vector.";
-		//        return rtUndefined.undefined;
-		//    }
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            if (vd.isFixed)
+            {
+                errorno = 1126;
+                errormessage = "Cannot change the length of a fixed Vector.";
+                return rtUndefined.undefined;
+            }
 
-		//    var arr = vd.innnerList;
+            var arr = vd.innnerList;
 
-		//    if (arr.Count > 0)
-		//    {
-		//        var result = arr[0];
-		//        arr.RemoveAt(0);
-		//        return result;
-		//    }
-		//    else
-		//    {
-		//        return rtUndefined.undefined;
-		//    }
+            if (arr.Count > 0)
+            {
+                var result = arr[0];
+                arr.RemoveAt(0);
+                return result;
+            }
+            else
+            {
+                return rtUndefined.undefined;
+            }
 
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-			if (vd.isFixed)
-			{
-				success = false;
-				stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-				returnSlot.directSet(rtUndefined.undefined);
-			}
-			else
-			{
-				success = true;
-				var arr = vd.innnerList;
-
-				if (arr.Count > 0)
-				{
-					var result = arr[0];
-					arr.RemoveAt(0);
-					//return result;
-					returnSlot.directSet(result);
-				}
-				else
-				{
-					if (vd.vector_type == RunTimeDataType.rt_int ||
-						vd.vector_type == RunTimeDataType.rt_uint ||
-						vd.vector_type == RunTimeDataType.rt_number
-						)
-					{
-						returnSlot.setValue(0);
-					}
-					else
-					{
-						returnSlot.directSet(rtUndefined.undefined);
-					}
-					//return rtUndefined.undefined;
-				}
-			}
-		}
-
-	}
+        }
+    }
 
 
-    class Vector_slice : NativeConstParameterFunction
+    class Vector_slice : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_slice():base(3)
+        public Vector_slice()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -1562,109 +1236,61 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
 
-		//    var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object).innnerList;
+            var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object).innnerList;
 
-		//    var arr = source;
+            var arr = source;
 
-		//    int startindex = ((rtInt)argements[0].getValue()).value;
-		//    int endindex = ((rtInt)argements[1].getValue()).value;
+            int startindex = ((rtInt)argements[0].getValue()).value;
+            int endindex = ((rtInt)argements[1].getValue()).value;
 
-		//    if (startindex >= arr.Count)
-		//    {
-		//        return new rtArray();
-		//    }
-		//    else if (startindex < 0)
-		//    {
-		//        startindex = arr.Count + startindex;
-		//        if (startindex < 0)
-		//        {
-		//            startindex = 0;
-		//        }
-		//    }
+            if (startindex >= arr.Count)
+            {
+                return new rtArray();
+            }
+            else if (startindex < 0)
+            {
+                startindex = arr.Count + startindex;
+                if (startindex < 0)
+                {
+                    startindex = 0;
+                }
+            }
 
-		//    if (endindex > arr.Count)
-		//    {
-		//        endindex = arr.Count;
-		//    }
-		//    else if (endindex < 0)
-		//    {
-		//        endindex = arr.Count + endindex;
-		//        if (endindex < 0)
-		//        {
-		//            endindex = 0;
-		//        }
-		//    }
+            if (endindex > arr.Count)
+            {
+                endindex = arr.Count;
+            }
+            else if (endindex < 0)
+            {
+                endindex = arr.Count + endindex;
+                if (endindex < 0)
+                {
+                    endindex = 0;
+                }
+            }
 
-		//    for (int i = startindex; i < endindex; i++)
-		//    {
-		//        vd.innnerList.Add(arr[i]);
-		//    }
+            for (int i = startindex; i < endindex; i++)
+            {
+                vd.innnerList.Add(arr[i]);
+            }
 
-		//    return thisObj;
+            return thisObj;
 
-		//}
+        }
+    }
 
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			success = true;
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-
-			var source = ((Vector_Data)((HostedObject)((rtObject)argements[2]).value).hosted_object).innnerList;
-
-			var arr = source;
-
-			int startindex = ((rtInt)argements[0]).value;
-			int endindex = ((rtInt)argements[1]).value;
-
-			if (startindex >= arr.Count)
-			{
-				returnSlot.directSet(new rtArray());
-				//return new rtArray();
-			}
-			else if (startindex < 0)
-			{
-				startindex = arr.Count + startindex;
-				if (startindex < 0)
-				{
-					startindex = 0;
-				}
-			}
-
-			if (endindex > arr.Count)
-			{
-				endindex = arr.Count;
-			}
-			else if (endindex < 0)
-			{
-				endindex = arr.Count + endindex;
-				if (endindex < 0)
-				{
-					endindex = 0;
-				}
-			}
-
-			for (int i = startindex; i < endindex; i++)
-			{
-				vd.innnerList.Add(arr[i]);
-			}
-			returnSlot.directSet(thisObj);
-			//return thisObj;
-		}
-
-	}
-
-    class Vector_splice : NativeConstParameterFunction
+    class Vector_splice : NativeFunctionBase
     {
         private List<RunTimeDataType> _paras;
 
-        public Vector_splice():base(3)
+        public Vector_splice()
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_int);
@@ -1704,115 +1330,59 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
-		//{
-		//    errormessage = null;
-		//    errorno = 0;
+        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+        {
+            errormessage = null;
+            errorno = 0;
 
-		//    var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+            var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
 
-		//    var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object);
+            var source = ((Vector_Data)((HostedObject)((rtObject)argements[2].getValue()).value).hosted_object);
+            
+            var arr = source.innnerList;
 
-		//    var arr = source.innnerList;
+            int startindex = ((rtInt)argements[0].getValue()).value;
+            uint deleteCount = ((rtUInt)argements[1].getValue()).value;
 
-		//    int startindex = ((rtInt)argements[0].getValue()).value;
-		//    uint deleteCount = ((rtUInt)argements[1].getValue()).value;
+            List<RunTimeValueBase> insert = null;
+            if (argements[2].getValue().rtType == RunTimeDataType.rt_array)
+            {
+                insert = ((rtArray)argements[2].getValue()).innerArray;
+            }
 
-		//    List<RunTimeValueBase> insert = null;
-		//    if (argements[2].getValue().rtType == RunTimeDataType.rt_array)
-		//    {
-		//        insert = ((rtArray)argements[2].getValue()).innerArray;
-		//    }
+            if (startindex < 0)
+            {
+                startindex = arr.Count + startindex;
+                if (startindex < 0)
+                {
+                    startindex = 0;
+                }
+            }
 
-		//    if (startindex < 0)
-		//    {
-		//        startindex = arr.Count + startindex;
-		//        if (startindex < 0)
-		//        {
-		//            startindex = 0;
-		//        }
-		//    }
+            var newArray = vd.innnerList;
 
-		//    var newArray = vd.innnerList;
+            int st = startindex;
+            while (deleteCount > 0 && st < arr.Count)
+            {
+                if (source.isFixed)
+                {
+                    errorno = 1126;
+                    errormessage = "Cannot change the length of a fixed Vector.";
+                    return rtUndefined.undefined;
+                }
 
-		//    int st = startindex;
-		//    while (deleteCount > 0 && st < arr.Count)
-		//    {
-		//        if (source.isFixed)
-		//        {
-		//            errorno = 1126;
-		//            errormessage = "Cannot change the length of a fixed Vector.";
-		//            return rtUndefined.undefined;
-		//        }
+                newArray.Add(arr[st]);
+                st++;
+                deleteCount--;
+            }
 
-		//        newArray.Add(arr[st]);
-		//        st++;
-		//        deleteCount--;
-		//    }
+            if (newArray.Count > 0)
+            {
+                arr.RemoveRange(startindex, newArray.Count);
+            }
 
-		//    if (newArray.Count > 0)
-		//    {
-		//        arr.RemoveRange(startindex, newArray.Count);
-		//    }
+            return new rtInt(startindex);
 
-		//    return new rtInt(startindex);
-
-		//}
-
-		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-		{
-			
-
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
-
-			var source = ((Vector_Data)((HostedObject)((rtObject)argements[2]).value).hosted_object);
-
-			var arr = source.innnerList;
-
-			int startindex = ((rtInt)argements[0]).value;
-			uint deleteCount = ((rtUInt)argements[1]).value;
-
-			List<RunTimeValueBase> insert = null;
-			if (argements[2].rtType == RunTimeDataType.rt_array)
-			{
-				insert = ((rtArray)argements[2]).innerArray;
-			}
-
-			if (startindex < 0)
-			{
-				startindex = arr.Count + startindex;
-				if (startindex < 0)
-				{
-					startindex = 0;
-				}
-			}
-
-			var newArray = vd.innnerList;
-
-			int st = startindex;
-			while (deleteCount > 0 && st < arr.Count)
-			{
-				if (source.isFixed)
-				{
-					success = false;
-					stackframe.throwError(token, 1126, "Cannot change the length of a fixed Vector.");
-					returnSlot.directSet(rtUndefined.undefined);
-					return;
-				}
-
-				newArray.Add(arr[st]);
-				st++;
-				deleteCount--;
-			}
-
-			if (newArray.Count > 0)
-			{
-				arr.RemoveRange(startindex, newArray.Count);
-			}
-			success = true;
-			returnSlot.setValue(startindex);
-			//return new rtInt(startindex);
-		}
-
-	}
+        }
+    }
 }

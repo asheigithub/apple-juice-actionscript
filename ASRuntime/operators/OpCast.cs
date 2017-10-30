@@ -228,7 +228,130 @@ namespace ASRuntime.operators
                     frame.endStep();
                     callbacker.noticeRunFailed();
                 }
-               
+                //switch (targetType)
+                //{
+                //    case ASBinCode.RunTimeDataType.rt_boolean:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToBoolean(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_int:
+                //        {
+                //            storeto.setValue(
+                //             TypeConverter.ConvertToInt(
+                //                srcValue, frame, token, true
+                //            )
+                //            );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_uint:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToUInt(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_number:
+                //        {
+                //            storeto.setValue(
+                //                TypeConverter.ConvertToNumber(
+                //                srcValue, frame, token, true
+                //            )
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_string:
+                //        {
+                //            string str = TypeConverter.ConvertToString(
+                //                srcValue, frame, token, true
+                //            );
+
+                //            storeto.setValue(
+                //                str
+                //                );
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_void:
+                //    case ASBinCode.RunTimeDataType.rt_null:
+                //    case ASBinCode.RunTimeDataType.fun_void:
+                //        {
+                //            storeto.directSet(srcValue);
+                //            callbacker.isSuccess = true;
+                //            callbacker.call(null);
+                //            return;
+                //        }
+                //    case ASBinCode.RunTimeDataType.rt_function:
+                //        {
+                //            if (srcValue.rtType == ASBinCode.RunTimeDataType.rt_function
+                //                ||
+                //                srcValue.rtType == ASBinCode.RunTimeDataType.rt_null
+                //                ||
+                //                srcValue.rtType == ASBinCode.RunTimeDataType.rt_void
+                //                )
+                //            {
+                //                {
+                //                    storeto.directSet(srcValue);
+                //                    callbacker.isSuccess = true;
+                //                    callbacker.call(null);
+                //                    return;
+                //                }
+                //            }
+                //            else
+                //            {
+                //                {
+                //                    frame.throwCastException(token, srcValue.rtType, targetType);
+                //                    frame.endStep();
+
+                //                    return;
+                //                }
+                //            }
+                //        }
+                //    case RunTimeDataType.rt_array:
+                //        {
+                //            if (srcValue.rtType == RunTimeDataType.rt_null)
+                //            {
+                //                storeto.directSet(srcValue);
+                //                callbacker.isSuccess = true;
+                //                callbacker.call(null);
+                //                return;
+                //            }
+                //            else
+                //            {
+                //                frame.throwCastException(token, srcValue.rtType, targetType);
+                //                frame.endStep();
+
+                //                return;
+                //            }
+                //        }
+                //    case ASBinCode.RunTimeDataType.unknown:
+                //        {
+                //            frame.throwCastException(token, srcValue.rtType, targetType);
+                //            frame.endStep();
+                //            return;
+                //        }
+                //    default:
+                //        {
+                //            frame.throwCastException(token, srcValue.rtType, targetType);
+                //            frame.endStep();
+                //            return;
+                //        }
+                //}
             }
             else
             {
@@ -261,7 +384,7 @@ namespace ASRuntime.operators
                     var toStr = (ASBinCode.ClassMemberFinder.find(obj.value._class, "toString", obj.value._class));
 
                     rtFunction function = null;
-					rtFunction toclear = null;
+
                     if (
                         toStr != null
                         && toStr.valueType == RunTimeDataType.rt_function
@@ -274,7 +397,6 @@ namespace ASRuntime.operators
                         )
                     {
                         function = (rtFunction)((MethodGetterBase)toStr.bindField).getMethod(obj);
-						toclear = function;
                     }
                     else
                     {
@@ -368,12 +490,11 @@ namespace ASRuntime.operators
                         sendargs[2] = scope;
                         sendargs[3] = storeto;
                         sendargs[4] = callbacker;
-                        //sendargs[5] = function;
+                        sendargs[5] = function;
                         sendargs[6] = srcValue;
                         toStringCB.args = sendargs;
-						toStringCB._intArg2 = function.functionId;
 
-                        fc.SetFunction(function);if (toclear != null) { toclear.Clear(); }
+                        fc.function = function;
                         fc.loadDefineFromFunction();
                         fc.returnSlot = storeto;
                         fc.callbacker = toStringCB;
@@ -440,7 +561,6 @@ namespace ASRuntime.operators
                                 
                                 if (!operators.InstanceCreator.init_static_class(cls.instanceClass,frame.player,token))
                                 {
-									funConv.Clear();
                                     callbacker.noticeRunFailed();
                                     return;
                                 }
@@ -450,8 +570,8 @@ namespace ASRuntime.operators
                                 funConv.setThis(frame.player.static_instance[cls.classid]);
 
                                 FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
-                                
-                                fc.SetFunction(funConv);funConv.Clear();//这里得funConv是一个缓存对象，复制完后立刻复位。
+                                //fc.releaseAfterCall = true;
+                                fc.function = funConv;
                                 fc.loadDefineFromFunction();
                                 if (!fc.createParaScope()) { callbacker.noticeRunFailed(); return; }
                                 bool success;
@@ -546,13 +666,12 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
-			//rtFunction fc = (rtFunction)a[5];
-			int fcid = sender._intArg2;
+            rtFunction fc = (rtFunction)a[5];
 
             var rv =  ((SLOT)a[3]).getValue();
 
             if (rv.rtType > RunTimeDataType.unknown ||
-                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[fcid].signature.returnType == RunTimeDataType.rt_void)
+                (rv.rtType == RunTimeDataType.rt_null) && frame.player.swc.functions[fc.functionId].signature.returnType == RunTimeDataType.rt_void)
             {
                 BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
 
@@ -714,15 +833,14 @@ namespace ASRuntime.operators
                     var funConv = (rtFunction)((ClassMethodGetter)cls.implicit_from.bindField).getImplicitConvertFunction(scope);
                     if (!operators.InstanceCreator.init_static_class(cls.instanceClass, frame.player, token))
                     {
-						funConv.Clear();
                         return;
                     }
 
                     funConv.setThis(frame.player.static_instance[cls.classid]);
 
                     FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, token);
-                    
-                    fc.SetFunction(funConv);funConv.Clear();
+                    //fc.releaseAfterCall = true;
+                    fc.function = funConv;
                     fc.loadDefineFromFunction();
                     if (!fc.createParaScope()) { return;  }
                     bool success;
@@ -909,7 +1027,7 @@ namespace ASRuntime.operators
         {
             //***调用valueOf()
             var valueOf = (ASBinCode.ClassMemberFinder.find(obj.value._class, "valueOf", obj.value._class));
-            rtFunction function = null;rtFunction toclear = null;
+            rtFunction function = null;
             if (
                 valueOf != null
                 && valueOf.valueType == RunTimeDataType.rt_function
@@ -920,7 +1038,7 @@ namespace ASRuntime.operators
                 && !valueOf.isSetter
                 )
             {
-                function = (rtFunction)((MethodGetterBase)valueOf.bindField).getMethod(obj);toclear = function;
+                function = (rtFunction)((MethodGetterBase)valueOf.bindField).getMethod(obj);
             }
             else
             {
@@ -1022,7 +1140,7 @@ namespace ASRuntime.operators
                 //sendargs[4] = token;
                 valueofCB.args = sendargs;
 
-                fc.SetFunction(  function);if (toclear != null) { toclear.Clear(); }
+                fc.function = function;
                 fc.loadDefineFromFunction();
                 fc.returnSlot = storeto;
                 fc.callbacker = valueofCB;
@@ -1192,7 +1310,7 @@ namespace ASRuntime.operators
         {
             //***调用toString()
             var toString = (ASBinCode.ClassMemberFinder.find(obj.value._class, "toString", obj.value._class));
-            rtFunction function = null;rtFunction toclear = null;
+            rtFunction function = null;
             if (
                 toString != null
                 && toString.valueType == RunTimeDataType.rt_function
@@ -1203,7 +1321,7 @@ namespace ASRuntime.operators
                 && !toString.isSetter
                 )
             {
-                function = (rtFunction)((MethodGetterBase)toString.bindField).getMethod(obj);toclear = function;
+                function = (rtFunction)((MethodGetterBase)toString.bindField).getMethod(obj);
             }
             else
             {
@@ -1296,7 +1414,7 @@ namespace ASRuntime.operators
                 //sendargs[4] = token;
                 toStringCB.args = sendargs;
 
-                fc.SetFunction(function);if (toclear != null) { toclear.Clear(); }
+                fc.function = function;
                 fc.loadDefineFromFunction();
                 fc.returnSlot = storeto;
                 fc.callbacker = toStringCB;

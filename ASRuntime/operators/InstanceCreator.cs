@@ -431,11 +431,12 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function =
                     (ASBinCode.rtData.rtFunction)((MethodGetterBase)obj._class.constructor.bindField).getConstructor(objScope);
-                
+                //(ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
+
 
                 HeapSlot _temp = new HeapSlot();
                 constructorCaller.returnSlot = _temp;
-				constructorCaller.SetFunction(function);function.Clear();
+                constructorCaller.function = function;
 
 
                 afterCallConstructor callbacker = new afterCallConstructor();
@@ -477,9 +478,8 @@ namespace ASRuntime.operators
             {
                 HeapSlot _temp = new HeapSlot();
                 _function_constructor.returnSlot = _temp;
-				//_function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
-				//_function_constructor.function.setThis(rtobject);
-				_function_constructor.SetFunction((ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor), rtobject);
+                _function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
+                _function_constructor.function.setThis(rtobject);
 
                 BlockCallBackBase cb = player.blockCallBackPool.create();
                 cb.args = cb.cacheObjects; //new object[] { rtobject , _temp };

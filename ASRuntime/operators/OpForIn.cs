@@ -48,7 +48,7 @@ namespace ASRuntime.operators
                     //***调用方法***
                     var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.SetFunction((rtFunction)method);((rtFunction)method).Clear();
+                    funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -133,7 +133,7 @@ namespace ASRuntime.operators
                     //***调用方法***
                     var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.SetFunction((rtFunction)method);((rtFunction)method).Clear();
+                    funCaller.function = (rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -195,7 +195,7 @@ namespace ASRuntime.operators
                     //***调用方法***
                     var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.SetFunction((ASBinCode.rtData.rtFunction)method);((ASBinCode.rtData.rtFunction)method).Clear();
+                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -253,7 +253,7 @@ namespace ASRuntime.operators
                     //***调用方法***
                     var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.SetFunction((ASBinCode.rtData.rtFunction)method);((ASBinCode.rtData.rtFunction)method).Clear();
+                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 

@@ -10,7 +10,7 @@ namespace ASBinCode.rtData
         public static readonly rtBoolean False = new rtBoolean(false);
         public static readonly rtBoolean True = new rtBoolean(true);
 
-        public readonly bool value;
+        public bool value;
         private rtBoolean(bool v):base(RunTimeDataType.rt_boolean)
         {
             value = v;
