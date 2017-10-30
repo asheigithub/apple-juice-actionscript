@@ -54,21 +54,6 @@ namespace ASRuntime
 
 		}
 
-		public void reset()
-		{
-			if (remain != maxcount)
-			{
-				remain = 0;
-				posGet = 0;
-				posRet = 0;
-
-				for (int i = 0; i < maxcount; i++)
-				{
-					ret(pool[i]);
-				}
-			}
-		}
-
 		public virtual T create()
 		{
 			if (remain==0)

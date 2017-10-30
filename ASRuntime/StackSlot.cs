@@ -35,7 +35,6 @@ namespace ASRuntime
             _numberValue = (rtNumber)store[RunTimeDataType.rt_number];
             _intValue = (rtInt)store[RunTimeDataType.rt_int];
             _uintValue = (rtUInt)store[RunTimeDataType.rt_uint];
-			_stringValue = new rtString(string.Empty);
 
 			_functionValue = new rtFunction(-1, false);
         }
@@ -44,7 +43,7 @@ namespace ASRuntime
         private rtInt _intValue;
         private rtUInt _uintValue;
 		private rtFunction _functionValue;
-		private rtString _stringValue;
+        
 
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
@@ -319,18 +318,15 @@ namespace ASRuntime
                 }
                 else
                 {
-					_stringValue.value = value;
-					store[(int)RunTimeDataType.rt_string] = _stringValue;
-
-					//if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
-					//{
-					//    store[(int)RunTimeDataType.rt_string] = new rtString(value);
-					//}
-					//else
-					//{
-					//    ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
-					//}
-				}
+                    if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
+                    {
+                        store[(int)RunTimeDataType.rt_string] = new rtString(value);
+                    }
+                    else
+                    {
+                        ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
+                    }
+                }
             }
         }
 

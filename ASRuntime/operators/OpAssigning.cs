@@ -226,7 +226,7 @@ namespace ASRuntime.operators
                 }
                 //***调用设置器***
 
-                var funCaller = frame.player.funcCallerPool.create(frame, step.token);
+                var funCaller = frame.player.funcCallerPool.create(player, frame, step.token);
                 funCaller.SetFunction((ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
@@ -280,7 +280,7 @@ namespace ASRuntime.operators
             
             //***调用设置器***
 
-            var funCaller = frame.player.funcCallerPool.create(frame, step.token);
+            var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
             funCaller.SetFunction((ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
             funCaller.loadDefineFromFunction();
             if (!funCaller.createParaScope()) { return; }

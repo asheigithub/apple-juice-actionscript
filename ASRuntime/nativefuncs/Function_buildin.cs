@@ -273,7 +273,7 @@ namespace ASRuntime.nativefuncs
 						player.swc.primitive_to_class_table[objtype] != null
 						)
 					{
-						FunctionCaller toinsert = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
+						FunctionCaller toinsert = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
 						toinsert.callbacker = (IBlockCallBack)callbacker;
 						toinsert.SetFunction(toApply);
 						toinsert.loadDefineFromFunction();
@@ -319,7 +319,7 @@ namespace ASRuntime.nativefuncs
 
 
 
-			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create((StackFrame)(stackframe), token);
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.SetFunction ( toApply);
             caller.loadDefineFromFunction();
@@ -460,7 +460,7 @@ namespace ASRuntime.nativefuncs
 						player.swc.primitive_to_class_table[objtype] != null
 						)
 					{
-						FunctionCaller toInsertStack = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
+						FunctionCaller toInsertStack = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
 						toInsertStack.callbacker = (IBlockCallBack)callbacker;
 						toInsertStack.SetFunction(  toApply);
 						toInsertStack._tempSlot = ((StackFrame)stackframe)._tempSlot1;
@@ -501,7 +501,7 @@ namespace ASRuntime.nativefuncs
 				}
 			}
 
-			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
             caller.SetFunction(toApply);
 			caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;

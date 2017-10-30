@@ -222,7 +222,7 @@ namespace ASRuntime.operators
                             rtObj
                             );
 
-                        var funCaller = player.funcCallerPool.create(frame, step.token);
+                        var funCaller = player.funcCallerPool.create(player, frame, step.token);
                         funCaller.SetFunction((ASBinCode.rtData.rtFunction)func);((ASBinCode.rtData.rtFunction)func).Clear();
                         funCaller.loadDefineFromFunction();
                         if (!funCaller.createParaScope()) { return; }

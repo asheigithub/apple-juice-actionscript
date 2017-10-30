@@ -1309,7 +1309,7 @@ namespace ASRuntime
             holdjumptoline = 0;
             jumptoline = 0;
             trystateCount = 0;
-			runtimeError = null;
+            
             typeconvertoperator = null;
 
 			hascallstep = false;

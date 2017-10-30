@@ -33,6 +33,7 @@
 		public static function flash_utils_getQualifiedClassName (value:*) : String;
 
 
+
 		//****工具程序*****
 		private static function _getMethod(obj:*,name:String):Function
 		{
@@ -74,5 +75,6 @@
 		}
 
 		
+
 	}
 }

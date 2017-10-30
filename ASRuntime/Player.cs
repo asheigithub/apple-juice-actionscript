@@ -13,10 +13,6 @@ namespace ASRuntime
         internal Dictionary<int, rtObject> static_instance;
         internal Dictionary<int, RunTimeScope> outpackage_runtimescope;
 
-		private rtObject _buildin_class_;
-		private rtFunction _getMethod;
-		private rtFunction _createinstance;
-
         public LinkTypeMapper linktypemapper;
         
         internal CSWC swc;
@@ -99,7 +95,7 @@ namespace ASRuntime
         }
 
 		private bool _hasInitStack=false;
-		private bool _hasInitBaseCode = false;
+
 
         /// <summary>
         /// 当调用本地函数时，会自动设置这个字段，如果本地函数抛出异常并被try catch到后，会根据这个字段继续后续操作
@@ -121,7 +117,6 @@ namespace ASRuntime
 		internal StackFrame.StackFramePool stackframePool;
 		internal operators.FunctionCaller.FunctionCallerPool funcCallerPool;
 		internal BlockCallBackBase.BlockCallBackBasePool blockCallBackPool;
-		private runFuncResult.ResultPool runFuncresultPool;
 
 		public Player(IRuntimeOutput output)
 		{
@@ -129,36 +124,27 @@ namespace ASRuntime
 		}
 		public Player():this(new ConsoleOutput()) { }
 
-		private void clearEnv()
-		{
-			for (int i = 0; i < stackSlots.Length; i++)
-			{
-				stackSlots[i].clear();
-			}
-			funcCallerPool.reset();
-			blockCallBackPool.reset();
-			stackframePool.reset();
-			runFuncresultPool.reset();
 
-			runtimeStack.Clear();
-			runtimeError = null;
-			receive_error = null;
+        public RunTimeValueBase run2(RightValueBase result)
+        {
 
-			//while (runtimeStack.Count >0)
-			//{
-			//	runtimeStack.Pop().close();
-			//}
-			currentRunFrame = null;
-		}
+            if (defaultblock == null || swc == null || swc.blocks.Count == 0)
+            {
+                if (infoOutput !=null )
+                {
+					infoOutput.Info(string.Empty);
+					infoOutput.Info("====没有找到可执行的代码====");
+					infoOutput.Info("用[Doc]标记文档类");
+					infoOutput.Info("或者第一个类文件的包外代码作为入口");
+                }
+                return null;
+            }
 
-		private void initPlayer()
-		{
 			if (!_hasInitStack)
 			{
 				stackframePool = new StackFrame.StackFramePool();
-				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool(this);
+				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool();
 				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
-				runFuncresultPool = new runFuncResult.ResultPool();
 
 				runtimeStack = new Stack<StackFrame>();
 				stackSlots = new StackSlot[1024];
@@ -173,54 +159,6 @@ namespace ASRuntime
 					stackSlots[i]._linkObjCache = lobjcache.Clone();
 				}
 				_hasInitStack = true;
-			}
-			if (!_hasInitBaseCode)
-			{
-				if (swc.ErrorClass != null)
-				{
-					//***先执行必要代码初始化****
-					var block = swc.blocks[swc.ErrorClass.outscopeblockid];
-					HeapSlot[] initdata = genHeapFromCodeBlock(block);
-					callBlock(block, initdata, new StackSlot(swc), null,
-						new SourceToken(0, 0, ""), null,
-						null, RunTimeScopeType.startup
-						);
-					while (step())
-					{
-
-					}
-
-					foreach (var item in static_instance)
-					{
-						if (item.Value.value._class.name == "$@__buildin__")
-						{
-							_buildin_class_ = item.Value;
-
-							for (int i = 0; i < _buildin_class_.value._class.classMembers.Count; i++)
-							{
-								var m = _buildin_class_.value._class.classMembers[i];
-								if (m.name == "_getMethod")
-								{
-									_getMethod = (rtFunction)((ClassMethodGetter)m.bindField).getMethod(_buildin_class_);
-									continue;
-								}
-								if (m.name == "_createInstance")
-								{
-									_createinstance = (rtFunction)((ClassMethodGetter)m.bindField).getMethod(_buildin_class_);
-									continue;
-								}
-
-							}
-
-
-							break;
-						}
-					}
-
-				}
-
-
-				_hasInitBaseCode = true;
 			}
 		}
 
@@ -592,162 +530,140 @@ namespace ASRuntime
 				else
 				{
 					throw new ASRunTimeException("返回值转化失败");
+
 				}
 			}
-			finally
-			{
-				clearEnv();
-			}
-		}
+
+            if (swc.ErrorClass !=null)
+            {
+                //***先执行必要代码初始化****
+                var block = swc.blocks[swc.ErrorClass.outscopeblockid];
+                HeapSlot[] initdata = genHeapFromCodeBlock(block);
+                callBlock(block, initdata, new StackSlot(swc), null,
+                    new SourceToken(0, 0, ""), null,
+                    null, RunTimeScopeType.startup
+                    );
+                while (step())
+                {
+
+                }
+            }
 
 
-
-		public RunTimeValueBase run(RightValueBase result)
-		{
-			if (defaultblock == null || swc == null || swc.blocks.Count == 0)
-			{
-				if (infoOutput != null)
-				{
-					infoOutput.Info(string.Empty);
-					infoOutput.Info("====没有找到可执行的代码====");
-					infoOutput.Info("用[Doc]标记文档类");
-					infoOutput.Info("或者第一个类文件的包外代码作为入口");
-				}
-				return null;
-			}
-			
-			initPlayer();
-
-			HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
-			return run2(defaultblock,data, result);
-		}
-
-
-        private RunTimeValueBase run2(CodeBlock runblock,HeapSlot[] blockMemberHeap, RightValueBase result)
-        {
-           
-            var topscope = callBlock(runblock, blockMemberHeap, new StackSlot(swc), null, 
+            HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
+            var topscope = callBlock(defaultblock,data ,new StackSlot(swc), null, 
                 new SourceToken(0, 0, ""),null,
                 null, RunTimeScopeType.startup
                 );
             displayStackFrame = runtimeStack.Peek().getInfo();
 
-			try
+			while (true)
 			{
-
-				while (true)
+				//try
 				{
-					//try
+					while (step())
 					{
-						while (step())
-						{
 
-						}
-						break;
 					}
-					//catch (ASRunTimeException)   //引擎抛出的异常直接抛出
-					//{
-					//	throw;
-					//}
-					//catch (StackOverflowException)
-					//{
-					//	throw;
-					//}
-					//catch (OutOfMemoryException)
-					//{
-					//	throw;
-					//}
-					//catch (Exception le)    //捕获外部函数异常
-					//{
-					//	if (currentRunFrame != null)
-					//	{
-					//		if (_nativefuncCaller != null)
-					//		{
-					//			if (_nativefuncCaller.callbacker != null)
-					//			{
-					//				_nativefuncCaller.callbacker.noticeRunFailed();
-					//			}
-					//			_nativefuncCaller.release();
-					//			_nativefuncCaller = null;
-					//		}
-
-					//		SourceToken token;
-
-					//		if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
-					//		{
-					//			token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
-					//		}
-					//		else
-					//		{
-					//			token = new SourceToken(0, 0, string.Empty);
-					//		}
-
-					//		currentRunFrame.throwAneException(token
-					//			, le.Message);
-					//		currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
-
-					//		continue;
-					//	}
-					//	else
-					//	{
-					//		throw;
-					//	}
-					//}
+					break;
 				}
-
-
-
-
-
-				if (runtimeError != null)
-				{
-					outPutErrorMessage(runtimeError);
-				}
-
-				funcCallerPool.checkpool();
-				blockCallBackPool.checkpool();
-				stackframePool.checkpool();
-				runFuncresultPool.checkpool();
-
-				//#if DEBUG
-				//            if (infoOutput !=null)
+				//catch (ASRunTimeException)   //引擎抛出的异常直接抛出
+				//{
+				//    throw;
+				//}
+				//catch (StackOverflowException)
+				//{
+				//    throw;
+				//}
+				//catch (OutOfMemoryException)
+				//{
+				//    throw;
+				//}
+				//catch (Exception le)    //捕获外部函数异常
+				//{
+				//    if (currentRunFrame != null)
+				//    {
+				//        if (_nativefuncCaller != null)
+				//        {
+				//            if (_nativefuncCaller.callbacker != null)
 				//            {
-
-				//                Console.WriteLine();
-				//                Console.WriteLine("====程序状态====");
-				//                Console.ForegroundColor = ConsoleColor.Yellow;
-				//                Console.WriteLine("Variables:");
-
-				//                for (int i = 0; i < displayStackFrame.block.scope.members.Count; i++)
-				//                {
-				//                    Console.WriteLine("\t" + displayStackFrame.block.scope.members[i].name + "\t|\t" + displayStackFrame.scope.memberData[i].getValue());
-				//                }
-				//                Console.ForegroundColor = ConsoleColor.Green;
-				//                Console.WriteLine("Registers:");
-				//                for (int i = 0; i < displayStackFrame.block.totalRegisters; i++)
-				//                {
-				//                    if (stackSlots[i].getValue()!=null)
-				//                    {
-				//                        Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
-				//                    }
-				//                }
-				//                Console.ResetColor();
+				//                _nativefuncCaller.callbacker.noticeRunFailed();
 				//            }
-				//#endif
-				if (result != null && runtimeError == null)
-				{
-					return result.getValue(topscope, displayStackFrame);
-				}
-				else
-				{
-					return null;
-				}
+				//            _nativefuncCaller.release();
+				//            _nativefuncCaller = null;
+				//        }
 
+				//        SourceToken token;
+
+				//        if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
+				//        {
+				//            token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
+				//        }
+				//        else
+				//        {
+				//            token = new SourceToken(0, 0, string.Empty);
+				//        }
+
+				//        currentRunFrame.throwAneException(token
+				//            , le.Message);
+				//        currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
+
+				//        continue;
+				//    }
+				//    else
+				//    {
+				//        throw;
+				//    }
+				//}
 			}
-			finally
-			{
-				clearEnv();
-			}
+
+
+
+
+
+			if (runtimeError != null)
+            {
+                outPutErrorMessage(runtimeError);
+            }
+
+            funcCallerPool.checkpool();
+            blockCallBackPool.checkpool();
+			stackframePool.checkpool();
+
+//#if DEBUG
+//            if (infoOutput !=null)
+//            {
+               
+//                Console.WriteLine();
+//                Console.WriteLine("====程序状态====");
+//                Console.ForegroundColor = ConsoleColor.Yellow;
+//                Console.WriteLine("Variables:");
+
+//                for (int i = 0; i < displayStackFrame.block.scope.members.Count; i++)
+//                {
+//                    Console.WriteLine("\t" + displayStackFrame.block.scope.members[i].name + "\t|\t" + displayStackFrame.scope.memberData[i].getValue());
+//                }
+//                Console.ForegroundColor = ConsoleColor.Green;
+//                Console.WriteLine("Registers:");
+//                for (int i = 0; i < displayStackFrame.block.totalRegisters; i++)
+//                {
+//                    if (stackSlots[i].getValue()!=null)
+//                    {
+//                        Console.WriteLine("\t" + "EAX(" + i + ")\t|\t" + stackSlots[i].getValue());
+//                    }
+//                }
+//                Console.ResetColor();
+//            }
+//#endif
+            if (result != null && runtimeError==null)
+            {
+                return result.getValue(topscope,displayStackFrame);
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
 
@@ -782,7 +698,6 @@ namespace ASRuntime
             if (blankBlock == null)
             {
                 blankBlock = new CodeBlock(int.MaxValue - 1, "#blank", -65535, false);
-				blankBlock.opSteps.Add(new OpStep(OpCode.flag, new SourceToken(0, 0, string.Empty)));
             }
 
             callBlock(blankBlock, null, null, null,null, callbacker, null, RunTimeScopeType.function);
@@ -971,6 +886,7 @@ namespace ASRuntime
             return (receive_error == null);
 
         }
+
 
 		internal bool runFunction(rtFunction function, RunTimeValueBase thisObj, SLOT resultSlot, SourceToken token,out error.InternalError error)
 		{
@@ -1165,6 +1081,7 @@ namespace ASRuntime
 
 		private IBlockCallBack _tempcallbacker;
 
+
         private StackFrame currentRunFrame;
         public bool step()
         {
@@ -1181,10 +1098,7 @@ namespace ASRuntime
             {
                 var temp = receive_error;
                 receive_error = null;
-				
-				currentRunFrame.receiveErrorFromStackFrame(temp);
-				
-				
+                currentRunFrame.receiveErrorFromStackFrame(temp);
                 return true;
             }
 

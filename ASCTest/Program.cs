@@ -139,7 +139,7 @@ namespace ASCTest
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
-			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
+			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
 
 			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
@@ -175,14 +175,16 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
+
 						//var d=player.createInstance("system.Int64");
 						//var f = player.getMethod(d, "compareTo");
 						//var r= player.invokeMethod(d, f, 1, player.createInstance("system.Int64",(short)5),null,null,null,null,null);
 
+
                         Console.WriteLine();
                         Console.WriteLine("====程序输出====");
 
-                        player.run(null);
+                        player.run2(null);
 
 
 

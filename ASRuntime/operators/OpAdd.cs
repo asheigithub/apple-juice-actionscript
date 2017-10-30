@@ -55,7 +55,7 @@ namespace ASRuntime.operators
                 v1.rtType, v2.rtType);
             if (f != null)
             {
-                FunctionCaller fc = frame.player.funcCallerPool.create( frame, step.token);
+                FunctionCaller fc = frame.player.funcCallerPool.create(frame.player, frame, step.token);
                 fc.SetFunction(f);
                 fc.loadDefineFromFunction();
 				if (!fc.createParaScope())
