@@ -140,7 +140,7 @@ namespace ASCTest
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
-			builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
+			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
 
 			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
@@ -175,14 +175,33 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
-						//var d=player.createInstance("SProtoSpace.role_base_info");
-						//var byteArray = player.createInstance("flash.utils.ByteArray");
+						var d = player.createInstance("SProtoSpace.gate_net_info");
+						var byteArray = player.createInstance("flash.utils.ByteArray");
+						player.setMemberValue(d, "groupName", "账号你二大爷");
 
-						//var f = player.getMethod(d, "writeTo");
-						//var r= player.invokeMethod(d,f,byteArray);
-						//var d2 = player.createInstance("SProtoSpace.role_base_info");
-						//var f2 = player.getMethod(d2, "mergeFrom");
-						//var k = player.invokeMethod(d2, f2, byteArray);
+
+						
+						var r = player.invokeMethod(d, "writeTo", byteArray);
+						var d2 = player.createInstance("SProtoSpace.gate_net_info");
+
+						player.setMemberValue(byteArray, "position", 0);
+						var k = player.invokeMethod(d2, "mergeFrom", byteArray);
+						var m = player.getMemberValue(d2, "groupName");
+
+						var ts = player.invokeMethod(byteArray, "toString");
+
+						var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+
+						try
+						{
+							player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
+						}
+						catch (ASBinCode.ASRunTimeException e)
+						{
+							Console.WriteLine(e.ToString());
+						}
+
+						var s = player.invokeMethod("Test", "TTT",3,4);
 
 
 

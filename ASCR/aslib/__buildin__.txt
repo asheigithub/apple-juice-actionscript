@@ -73,6 +73,101 @@
 
 		}
 
-		
+
+
+		//根据路径访问成员
+		private static function _getMemberValue(obj:Object, p1:String=null,p2:String=null, path:Array=null, indexArg:*=null):*
+		{
+			var p:* = obj; 
+			
+			if (p1 != null)
+			{
+				p = obj[p1];
+			}
+			if (p2 != null)
+			{
+				p = p[p2];
+			}
+			
+			if (path != null)
+			{
+				for (var i:int = 0; i < path.length; i++) 
+				{
+					p = p[String(path[i])];
+				}
+			}
+			
+			if (indexArg != null)
+			{
+				return p[indexArg];
+			}
+			else
+			{
+				return p;
+			}
+			
+		}
+
+
+		//根据路径给成员赋值
+		private static function _setMemberValue(obj:Object, value:*, p1:String=null, path:Array=null, indexArg:*=null):void
+		{
+			var p:* = obj; 
+			
+			if (p1 == null)
+			{
+				if (indexArg != null)
+				{
+					p[indexArg]=value;
+				}
+				else
+				{
+					p=value;
+				}
+				
+				return;
+			}
+			
+			if (p1 != null)
+			{
+				if (path == null || path.length==0)
+				{
+					if (indexArg != null)
+					{
+						p[p1][indexArg]=value;
+					}
+					else
+					{
+						p[p1]=value;
+					}
+					
+					return;
+				}
+				else
+				{
+					p = obj[p1];
+				}
+			}
+			
+			if (path != null && path.length>0)
+			{
+				for (var i:int = 0; i < path.length-1; i++) 
+				{
+					p = p[String(path[i])];
+				}
+				
+				if (indexArg != null)
+				{
+					p[path[path.length-1]][indexArg]=value;
+				}
+				else
+				{
+					p[path[path.length-1]]=value;
+				}
+				
+			}
+		}
+
+
 	}
 }

@@ -3351,15 +3351,26 @@ namespace ASRuntime.nativefuncs
 
 			string v = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
-			ms.writeUTF(v);
+			if (v == null)
+			{
+				success = false;
 
-			success = true;
+				stackframe.throwError(token, 2007, "Parameter value must be non-null.");
+
+				returnSlot.setValue(rtUndefined.undefined);
+			}
+			else
+			{
+
+				ms.writeUTF(v);
+
+				success = true;
 
 
 
-			returnSlot.setValue(rtUndefined.undefined);
+				returnSlot.setValue(rtUndefined.undefined);
 
-
+			}
 
 
 		}
@@ -3416,15 +3427,25 @@ namespace ASRuntime.nativefuncs
 
 			string v = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
-			ms.writeUTFBytes(v);
+			if (v == null)
+			{
+				success = false;
 
-			success = true;
+				stackframe.throwError(token, 2007, "Parameter value must be non-null.");
+
+				returnSlot.setValue(rtUndefined.undefined);
+			}
+			else
+			{
+				ms.writeUTFBytes(v);
+
+				success = true;
 
 
 
-			returnSlot.setValue(rtUndefined.undefined);
+				returnSlot.setValue(rtUndefined.undefined);
 
-
+			}
 
 
 		}
