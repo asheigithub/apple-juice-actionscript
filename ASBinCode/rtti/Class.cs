@@ -67,7 +67,7 @@ namespace ASBinCode.rtti
 			this.md5key = md5key;
             classid = id;
             this.blockid = blockid;
-            classMembers = new List<ClassMember>();
+            classMembers = new ClassMemberList();
             fields = new List<ClassMember>();
             implements = new Dictionary<Class, int[]>();
 
@@ -163,7 +163,7 @@ namespace ASBinCode.rtti
         /// <summary>
         /// 类成员定义
         /// </summary>
-        public List<ClassMember> classMembers;
+        public ClassMemberList classMembers;
 
         /// <summary>
         /// 数据字段表

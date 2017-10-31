@@ -13,58 +13,102 @@ namespace ASBinCode
             
             )
         {
-            for (int i = cls.classMembers.Count-1; i >=0; i--)
-            {
-                if (cls.classMembers[i].name == name)
-                {
-                    var member = cls.classMembers[i];
+			//for (int i = cls.classMembers.Count-1; i >=0; i--)
+			//{
+			//    if (cls.classMembers[i].name == name)
+			//    {
+			//        var member = cls.classMembers[i];
 
-                    if (member.inheritSrcMember != null && member.inheritSrcMember.isConstructor)
-                    {
-                        continue;
-                    }
+			//        if (member.inheritSrcMember != null && member.inheritSrcMember.isConstructor)
+			//        {
+			//            continue;
+			//        }
 
-                    if (!member.isPublic)
-                    {
-                        if (finder != null)
-                        {
-                            if (member.isInternal)
-                            {
-                                if (finder.package == cls.package)
-                                {
-                                    return cls.classMembers[i];
-                                }
-                            }
-                            else if (member.isPrivate)
-                            {
-                                if (finder == (member.inheritFrom==null? cls :member.inheritSrcMember.refClass))
-                                {
-                                    return cls.classMembers[i];
-                                }
-                            }
-                            else if (member.isProtectd)
-                            {
-                                if (isInherits(finder, cls))
-                                {
-                                    return cls.classMembers[i];
-                                }
-                            }
+			//        if (!member.isPublic)
+			//        {
+			//            if (finder != null)
+			//            {
+			//                if (member.isInternal)
+			//                {
+			//                    if (finder.package == cls.package)
+			//                    {
+			//                        return cls.classMembers[i];
+			//                    }
+			//                }
+			//                else if (member.isPrivate)
+			//                {
+			//                    if (finder == (member.inheritFrom==null? cls :member.inheritSrcMember.refClass))
+			//                    {
+			//                        return cls.classMembers[i];
+			//                    }
+			//                }
+			//                else if (member.isProtectd)
+			//                {
+			//                    if (isInherits(finder, cls))
+			//                    {
+			//                        return cls.classMembers[i];
+			//                    }
+			//                }
 
-                            if (finder == (member.inheritFrom == null ? cls : member.inheritSrcMember.refClass))
-                            {
-                                return cls.classMembers[i];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        return cls.classMembers[i];
-                    }
-                }
-            }
+			//                if (finder == (member.inheritFrom == null ? cls : member.inheritSrcMember.refClass))
+			//                {
+			//                    return cls.classMembers[i];
+			//                }
+			//            }
+			//        }
+			//        else
+			//        {
+			//            return cls.classMembers[i];
+			//        }
+			//    }
+			//}
 
-            return null;
-        }
+			//return null;
+
+			var member = cls.classMembers.FindByName(name);
+			if (member == null)
+				return null;
+			else
+			{
+				if (!member.isPublic)
+				{
+					if (finder != null)
+					{
+						if (member.isInternal)
+						{
+							if (finder.package == cls.package)
+							{
+								return member;
+							}
+						}
+						else if (member.isPrivate)
+						{
+							if (finder == (member.inheritFrom == null ? cls : member.inheritSrcMember.refClass))
+							{
+								return member;
+							}
+						}
+						else if (member.isProtectd)
+						{
+							if (isInherits(finder, cls))
+							{
+								return member;
+							}
+						}
+
+						if (finder == (member.inheritFrom == null ? cls : member.inheritSrcMember.refClass))
+						{
+							return member;
+						}
+					}
+				}
+				else
+				{
+					return member;
+				}
+			}
+			return null;
+		}
 
 
         public static bool check_isinherits(RunTimeValueBase value,RunTimeDataType type,IClassFinder classfinder)
