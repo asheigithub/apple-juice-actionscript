@@ -47,7 +47,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
             ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
             
-            constructorCaller = player.funcCallerPool.create(player, invokerFrame, token);
+            constructorCaller = player.funcCallerPool.create( invokerFrame, token);
             constructorCaller.toCallFunc = funcDefine;
             constructorCaller._tempSlot = invokerFrame._tempSlot1;
             if (!constructorCaller.createParaScope()) { return false; }
@@ -56,7 +56,7 @@ namespace ASRuntime.operators
 
             if (constructor != null)
             {
-                _function_constructor = player.funcCallerPool.create(player, invokerFrame, token);
+                _function_constructor = player.funcCallerPool.create(invokerFrame, token);
                 _function_constructor._tempSlot = invokerFrame._tempSlot1;
                 _function_constructor.toCallFunc = 
                     player.swc.functions[ ((ASBinCode.rtData.rtFunction)
@@ -431,12 +431,11 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function =
                     (ASBinCode.rtData.rtFunction)((MethodGetterBase)obj._class.constructor.bindField).getConstructor(objScope);
-                //(ASBinCode.rtData.rtFunction)obj.memberData[obj._class.constructor.index].getValue();
-
+                
 
                 HeapSlot _temp = new HeapSlot();
                 constructorCaller.returnSlot = _temp;
-                constructorCaller.function = function;
+				constructorCaller.SetFunction(function);function.Clear();
 
 
                 afterCallConstructor callbacker = new afterCallConstructor();
@@ -478,8 +477,9 @@ namespace ASRuntime.operators
             {
                 HeapSlot _temp = new HeapSlot();
                 _function_constructor.returnSlot = _temp;
-                _function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
-                _function_constructor.function.setThis(rtobject);
+				//_function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
+				//_function_constructor.function.setThis(rtobject);
+				_function_constructor.SetFunction((ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor), rtobject);
 
                 BlockCallBackBase cb = player.blockCallBackPool.create();
                 cb.args = cb.cacheObjects; //new object[] { rtobject , _temp };

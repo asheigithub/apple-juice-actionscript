@@ -180,8 +180,15 @@ namespace ASBinCode
 				dictionary = new Dictionary<string, Class>();
 				foreach (var item in classes)
 				{
-					dictionary.Add(item.package + "." + item.name, item);
-					dictionary.Add(item.package + "::" + item.name, item);
+					if (string.IsNullOrEmpty(item.package))
+					{
+						dictionary.Add(item.name, item);
+					}
+					else
+					{
+						dictionary.Add(item.package + "." + item.name, item);
+						dictionary.Add(item.package + "::" + item.name, item);
+					}
 				}
 			}
 

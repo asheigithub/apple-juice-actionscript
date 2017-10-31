@@ -87,9 +87,11 @@ namespace ASRuntime.operators
         public static void clear_thispointer( StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
         {
             RunTimeValueBase rv;
+			rtFunction toclear = null;
             if (step.arg1 is MethodGetterBase)
             {
                 rv = ((ClassMethodGetter)step.arg1).getMethodForClearThis(frame.scope);
+				toclear = (rtFunction)rv;
             }
             else
             {
@@ -125,6 +127,11 @@ namespace ASRuntime.operators
                     step.reg.getSlot(scope, frame).directSet(rv);
                 }
 
+				if (toclear != null)
+				{
+					toclear.Clear();
+				}
+
                 frame.endStep(step);
                 return;
             }
@@ -151,7 +158,13 @@ namespace ASRuntime.operators
 
                 
             }
-            frame.endStep(step);
+
+			if (toclear != null)
+			{
+				toclear.Clear();
+			}
+
+			frame.endStep(step);
         }
 
 
@@ -174,10 +187,10 @@ namespace ASRuntime.operators
 
         public static void create_paraScope(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            RunTimeValueBase rv;
+            RunTimeValueBase rv;rtFunction toclear = null;
             if (step.arg1 is MethodGetterBase)
             {
-                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
+                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);toclear = (rtFunction)rv;
             }
             else
             {
@@ -216,8 +229,8 @@ namespace ASRuntime.operators
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                var funcCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
-                funcCaller.function = function;
+                var funcCaller = frame.player.funcCallerPool.create( frame, step.token);
+                funcCaller.SetFunction(function);if (toclear != null) { toclear.Clear(); }
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();
                 if (!funcCaller.createParaScope()) { return; }
@@ -285,10 +298,10 @@ namespace ASRuntime.operators
         {
 #if DEBUG
 
-            RunTimeValueBase rv;
+            RunTimeValueBase rv;rtFunction toclear = null;
             if (step.arg1 is MethodGetterBase)
             {
-                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);
+                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);toclear = (rtFunction)rv;
             }
             else
             {
@@ -335,11 +348,10 @@ namespace ASRuntime.operators
                 ASBinCode.rtti.FunctionDefine funcDefine = frame.player.swc.functions[function.functionId];
 
 
-                if (!frame.funCaller.function.Equals(function))
+                if (!frame.funCaller.isFuncEquals(function))
                 {
-
+					if (toclear != null) { toclear.Clear(); }
                     frame.throwError(new error.InternalError(frame.player.swc, step.token, "运行时异常，调用函数不对"));
-
                     frame.endStep(step);
                     return;
                 }

@@ -61,7 +61,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			((rtObject)argements[0]).value.memberData[0].directSet(argements[1]);
-			((rtFunction)argements[1]).objHandle.bindFunctionObj = ((rtObject)argements[0]);
+			((rtFunction)argements[1]).objHandle = ((rtObject)argements[0]);
 
 			success = true;
 			returnSlot.setValue(rtUndefined.undefined);
@@ -119,13 +119,13 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            if (((rtFunction)argements[0].getValue()).objHandle.bindFunctionObj == null)
+            if (((rtFunction)argements[0].getValue()).objHandle == null)
             {
                 return rtNull.nullptr;
             }
             else
             {
-                return ((rtFunction)argements[0].getValue()).objHandle.bindFunctionObj;
+                return ((rtFunction)argements[0].getValue()).objHandle;
             }
         }
     }
@@ -259,7 +259,7 @@ namespace ASRuntime.nativefuncs
             
 
             rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
-            rtFunction toApply= (rtFunction)func.Clone();
+			rtFunction toApply = (rtFunction)func;//.Clone();
 
 
 			if (!func.ismethod) //方法无法更改this
@@ -273,9 +273,9 @@ namespace ASRuntime.nativefuncs
 						player.swc.primitive_to_class_table[objtype] != null
 						)
 					{
-						FunctionCaller toinsert = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+						FunctionCaller toinsert = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
 						toinsert.callbacker = (IBlockCallBack)callbacker;
-						toinsert.function = toApply;
+						toinsert.SetFunction(toApply);
 						toinsert.loadDefineFromFunction();
 						if (!toinsert.createParaScope()) {  return; }
 						toinsert._tempSlot = ((StackFrame)stackframe)._tempSlot1;
@@ -319,9 +319,9 @@ namespace ASRuntime.nativefuncs
 
 
 
-			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create((StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
-            caller.function = toApply;
+            caller.SetFunction ( toApply);
             caller.loadDefineFromFunction();
             caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
             caller.returnSlot = resultSlot;
@@ -353,12 +353,12 @@ namespace ASRuntime.nativefuncs
             var c = stackCallers.Pop();
             if (v1.rtType < RunTimeDataType.unknown)
             {
-                c.function.setThis(null);
+                c.SetFunctionThis(null);
             }
             else
             {
                 rtObject rtObj = (rtObject)v1;
-                c.function.setThis(rtObj);
+                c.SetFunctionThis(rtObj);
             }
 
 			if (!c.createParaScope()) { return; }
@@ -446,7 +446,7 @@ namespace ASRuntime.nativefuncs
 
 
             rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
-            rtFunction toApply = (rtFunction)func.Clone();
+			rtFunction toApply = (rtFunction)func;//.Clone();
 
 
 			if (!func.ismethod) //方法无法更改this
@@ -460,9 +460,9 @@ namespace ASRuntime.nativefuncs
 						player.swc.primitive_to_class_table[objtype] != null
 						)
 					{
-						FunctionCaller toInsertStack = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+						FunctionCaller toInsertStack = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
 						toInsertStack.callbacker = (IBlockCallBack)callbacker;
-						toInsertStack.function = toApply;
+						toInsertStack.SetFunction(  toApply);
 						toInsertStack._tempSlot = ((StackFrame)stackframe)._tempSlot1;
 						toInsertStack.returnSlot = resultSlot;
 						toInsertStack.tag = argements;
@@ -501,9 +501,9 @@ namespace ASRuntime.nativefuncs
 				}
 			}
 
-			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create(((StackFrame)stackframe).player, (StackFrame)(stackframe), token);
+			FunctionCaller caller = ((StackFrame)stackframe).player.funcCallerPool.create( (StackFrame)(stackframe), token);
             caller.callbacker = (IBlockCallBack)callbacker;
-            caller.function = toApply;
+            caller.SetFunction(toApply);
 			caller._tempSlot = ((StackFrame)stackframe)._tempSlot1;
 			caller.returnSlot = resultSlot;
 
@@ -537,14 +537,14 @@ namespace ASRuntime.nativefuncs
             var c = stackCallers.Pop();
             if (v1.rtType < RunTimeDataType.unknown)
             {
-                c.function.setThis(null);
-                
+				//c.function.setThis(null);
+				c.SetFunctionThis(null);
             }
             else
             {
                 rtObject rtObj = (rtObject)v1;
-                c.function.setThis(rtObj);
-                
+				//c.function.setThis(rtObj);
+				c.SetFunctionThis(rtObj);
             }
 			
 			c.loadDefineFromFunction();

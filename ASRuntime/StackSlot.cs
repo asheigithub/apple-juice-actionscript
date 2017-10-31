@@ -35,13 +35,17 @@ namespace ASRuntime
             _numberValue = (rtNumber)store[RunTimeDataType.rt_number];
             _intValue = (rtInt)store[RunTimeDataType.rt_int];
             _uintValue = (rtUInt)store[RunTimeDataType.rt_uint];
+			_stringValue = new rtString(string.Empty);
+
+			_functionValue = new rtFunction(-1, false);
         }
 
         private rtNumber _numberValue;
         private rtInt _intValue;
         private rtUInt _uintValue;
+		private rtFunction _functionValue;
+		private rtString _stringValue;
 
-        
         internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
@@ -167,15 +171,19 @@ namespace ASRuntime
                         break;
                     case RunTimeDataType.rt_function:
                         {//Function需要保存上下文环境。因此需要像值类型那样进行拷贝
-                            
-                            if (store[index].rtType == RunTimeDataType.rt_null)
-                            {
-                                store[index] = (rtFunction)value.Clone();
-                            }
-                            else
-                            {
-                                ((rtFunction)store[index]).CopyFrom((rtFunction)value);
-                            }
+							_functionValue.CopyFrom((rtFunction)value);
+							store[index] = _functionValue;
+							//if (store[index].rtType == RunTimeDataType.rt_null)
+       //                     {
+							//	//store[index] = (rtFunction)value.Clone();
+							//	_functionValue.CopyFrom((rtFunction)value);
+							//	store[index] = _functionValue;
+       //                     }
+       //                     else
+       //                     {
+							//	_functionValue.CopyFrom((rtFunction)value);
+							//	//((rtFunction)store[index]).CopyFrom((rtFunction)value);
+							//}
                         }
                         break;
                     case RunTimeDataType.fun_void:
@@ -311,15 +319,18 @@ namespace ASRuntime
                 }
                 else
                 {
-                    if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
-                    {
-                        store[(int)RunTimeDataType.rt_string] = new rtString(value);
-                    }
-                    else
-                    {
-                        ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
-                    }
-                }
+					_stringValue.value = value;
+					store[(int)RunTimeDataType.rt_string] = _stringValue;
+
+					//if (store[(int)RunTimeDataType.rt_string].rtType == RunTimeDataType.rt_null)
+					//{
+					//    store[(int)RunTimeDataType.rt_string] = new rtString(value);
+					//}
+					//else
+					//{
+					//    ((rtString)store[(int)RunTimeDataType.rt_string]).value = value;
+					//}
+				}
             }
         }
 
@@ -419,6 +430,8 @@ namespace ASRuntime
             _cache_setthisslot.clear();
             _linkObjCache.clearRefObj();
 			_linkObjCache.srcObject = null;
+
+			_functionValue.Clear();
 
             store[RunTimeDataType.rt_string] = rtNull.nullptr;
             store[RunTimeDataType.rt_function] = rtNull.nullptr;

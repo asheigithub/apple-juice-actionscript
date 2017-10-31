@@ -76,8 +76,7 @@ namespace ASBinCode.rtData
 
         public sealed override  object Clone()
         {
-            return this;
-            //return new rtString(value);
+            return new rtString(value);
         }
     }
 }

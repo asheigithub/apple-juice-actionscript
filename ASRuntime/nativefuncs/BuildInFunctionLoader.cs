@@ -150,6 +150,7 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Vector_slice());
             bin.regNativeFunction(new Vector_splice());
             bin.regNativeFunction(new Vector_push());
+			bin.regNativeFunction(new Vector_sort());
 
 
             bin.regNativeFunction(new Date_constructor());

@@ -802,7 +802,7 @@ namespace ASRuntime.nativefuncs
 					idx = arr.Count;
 				}
 
-				arr.Insert(idx, (RunTimeValueBase)toinsert.Clone());
+				arr.Insert(idx, toinsert);
 
 				success = true;
 				returnSlot.directSet(rtUndefined.undefined);
@@ -1202,7 +1202,7 @@ namespace ASRuntime.nativefuncs
 			{
 				var arr = vd.innnerList;
 
-				arr.Add((RunTimeValueBase)argements[0].Clone());
+				arr.Add(argements[0]);
 
 				//return new rtUInt((uint)arr.Count);
 				success = true;

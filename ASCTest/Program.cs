@@ -139,16 +139,17 @@ namespace ASCTest
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
-			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
-            
-            builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
+			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
+			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
+
+			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
 
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
-
+				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
 
 				if (swc != null)
                 {
@@ -174,16 +175,22 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
+						var d=player.createInstance("SProtoSpace.role_base_info");
+						var byteArray = player.createInstance("flash.utils.ByteArray");
 
-						//var d=player.createInstance("system.Int64");
-						//var f = player.getMethod(d, "compareTo");
-						//var r= player.invokeMethod(d, f, 1, player.createInstance("system.Int64",(short)5),null,null,null,null,null);
+						var f = player.getMethod(d, "writeTo");
+						var r= player.invokeMethod(d,f,byteArray);
+						var d2 = player.createInstance("SProtoSpace.role_base_info");
+						var f2 = player.getMethod(d2, "mergeFrom");
+						var k = player.invokeMethod(d2, f2, byteArray);
 
 
-                        Console.WriteLine();
+
+
+						Console.WriteLine();
                         Console.WriteLine("====程序输出====");
 
-                        player.run2(null);
+                        player.run(null);
 
 
 

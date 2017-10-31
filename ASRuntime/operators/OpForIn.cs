@@ -46,9 +46,9 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
+                    var funCaller = player.funcCallerPool.create(frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.function = (rtFunction)method;
+                    funCaller.SetFunction((rtFunction)method);((rtFunction)method).Clear();
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -131,9 +131,9 @@ namespace ASRuntime.operators
                         rtObj);
 
                     //***调用方法***
-                    var funCaller = player.funcCallerPool.create(frame.player, frame, step.token);
+                    var funCaller = player.funcCallerPool.create(frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.function = (rtFunction)method;
+                    funCaller.SetFunction((rtFunction)method);((rtFunction)method).Clear();
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -193,9 +193,9 @@ namespace ASRuntime.operators
                         (((rtObject)saveObj.hosted_object)) );
 
                     //***调用方法***
-                    var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
+                    var funCaller = frame.player.funcCallerPool.create(frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
+                    funCaller.SetFunction((ASBinCode.rtData.rtFunction)method);((ASBinCode.rtData.rtFunction)method).Clear();
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
@@ -251,9 +251,9 @@ namespace ASRuntime.operators
                         ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object));
 
                     //***调用方法***
-                    var funCaller = frame.player.funcCallerPool.create(frame.player, frame, step.token);
+                    var funCaller = frame.player.funcCallerPool.create(frame, step.token);
                     //funCaller.releaseAfterCall = true;
-                    funCaller.function = (ASBinCode.rtData.rtFunction)method;
+                    funCaller.SetFunction((ASBinCode.rtData.rtFunction)method);((ASBinCode.rtData.rtFunction)method).Clear();
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 

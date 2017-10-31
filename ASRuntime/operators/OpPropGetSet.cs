@@ -36,8 +36,8 @@ namespace ASRuntime.operators
                     rtObj
                     );
 
-                var funCaller = player.funcCallerPool.create(player, frame, step.token);
-                funCaller.function = (ASBinCode.rtData.rtFunction)func;
+                var funCaller = player.funcCallerPool.create(frame, step.token);
+                funCaller.SetFunction((ASBinCode.rtData.rtFunction)func);((ASBinCode.rtData.rtFunction)func).Clear();
                 funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
 
@@ -172,10 +172,11 @@ namespace ASRuntime.operators
 
                 //***调用设置器***
 
-                var funCaller = player.funcCallerPool.create(player, frame, step.token);
+                var funCaller = player.funcCallerPool.create(frame, step.token);
                 //funCaller.releaseAfterCall = true;
-                funCaller.function = (ASBinCode.rtData.rtFunction)func;
-                funCaller.loadDefineFromFunction();
+                funCaller.SetFunction( (ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
+
+				funCaller.loadDefineFromFunction();
                 if (!funCaller.createParaScope()) { return; }
 
                 funCaller._tempSlot = frame._tempSlot1;

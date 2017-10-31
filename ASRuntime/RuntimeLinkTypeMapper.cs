@@ -16,11 +16,9 @@ namespace ASRuntime
 
         RunTimeDataType _OBJECT_LINK = -999;
         RunTimeDataType _DICT_KEY = -998;
-
 		RunTimeDataType _FLOAT = -997;
 		RunTimeDataType _SHORT = -996;
 		RunTimeDataType _USHORT = -995;
-
 
         public sealed override void init(CSWC swc)
         {
@@ -36,11 +34,9 @@ namespace ASRuntime
             link_type.Add(typeof(ASBinCode.rtData.rtFunction), RunTimeDataType.rt_function);
             link_type.Add(typeof(DictionaryKey), _DICT_KEY);
             link_type.Add(typeof(RunTimeValueBase), _OBJECT_LINK);
-
 			link_type.Add(typeof(float), _FLOAT);
 			link_type.Add(typeof(short), _SHORT);
 			link_type.Add(typeof(ushort), _USHORT);
-
 
             foreach (var item in swc.creator_Class)
             {
@@ -61,11 +57,9 @@ namespace ASRuntime
             type_link.Add(RunTimeDataType.rt_function, typeof(ASBinCode.rtData.rtFunction));
             type_link.Add(_DICT_KEY, typeof(DictionaryKey));
             type_link.Add(_OBJECT_LINK, typeof(RunTimeValueBase));
-
 			type_link.Add(_FLOAT, typeof(float));
 			type_link.Add(_SHORT, typeof(short));
 			type_link.Add(_USHORT, typeof(ushort));
-
 
             foreach (var item in swc.creator_Class)
             {
@@ -166,7 +160,6 @@ namespace ASRuntime
                         return;
                     }
                 }
-
 				
 
 				var realObjType = getRuntimeDataType(obj.GetType());
@@ -225,7 +218,6 @@ namespace ASRuntime
 					{
 						returnSlot.setValue((uint)obj);
 					}
-
                 }
                 else if (rt == RunTimeDataType.rt_string)
                 {
@@ -233,7 +225,6 @@ namespace ASRuntime
                 }
                 else if (rt == RunTimeDataType.rt_number)
                 {
-
 					if (realObjType == RunTimeDataType.rt_uint)
 					{
 						returnSlot.setValue((double)(uint)obj);
@@ -258,7 +249,6 @@ namespace ASRuntime
 					{
 						returnSlot.setValue((double)obj);
 					}
-
                 }
                 else if (rt == RunTimeDataType.rt_boolean)
                 {

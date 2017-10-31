@@ -9,70 +9,55 @@ namespace ASRuntime.operators
     {
 		internal class FunctionCallerPool : PoolBase<FunctionCaller>
 		{
-			public FunctionCallerPool() : base(256) { }
+			private Player player;
+			public FunctionCallerPool(Player player) : base(256) { this.player = player; }
 
-			public  FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
+			public FunctionCaller create(StackFrame invokerFrame, SourceToken token)
 			{
 				FunctionCaller fc = base.create();
-				fc.player = player;
+				
 				fc.invokerFrame = invokerFrame;
 				fc.token = token;
-
+				fc.player = player;
 				fc.check_para_id = 0;
 				fc.pushedArgs = 0;
 				fc.hasReleased = false;
 				fc.onstackparametercount = 0;
 				fc.tag = null;
 
+				fc.function.Clear();
+
 				return fc;
 			}
 
 		}
-
-		//private static Stack<FunctionCaller> pool;
-		//static FunctionCaller()
-		//{
-		//    pool = new Stack<FunctionCaller>();
-		//    for (int i = 0; i < 256; i++)
-		//    {
-		//        pool.Push(new FunctionCaller());
-		//    }
-		//}
-
-		//public static FunctionCaller create(Player player, StackFrame invokerFrame, SourceToken token)
-		//{
-		//    FunctionCaller fc = pool.Pop();
-		//    fc.player = player;
-		//    fc.invokerFrame = invokerFrame;
-		//    fc.token = token;
-
-		//    fc.check_para_id = 0;
-		//    fc.pushedArgs = 0;
-		//    fc.hasReleased = false;
-
-		//    return fc;
-		//}
-
-		//public static void checkpool()
-		//{
-		//    if (pool.Count != 256)
-		//    {
-		//        throw new ASRunTimeException("缓存池异常");
-		//    }
-		//}
-
-		//private static void ret(FunctionCaller c)
-		//{
-		//    pool.Push(c);
-		//}
-
+		
 
 		private HeapSlot[] CallFuncHeap;
 
-        public ASBinCode.rtData.rtFunction function;
+        private ASBinCode.rtData.rtFunction function;
+
+		public void SetFunction(ASBinCode.rtData.rtFunction rtFunction,RunTimeValueBase thisobj=null)
+		{
+			function.CopyFrom(rtFunction);
+			if (thisobj != null)
+			{
+				function.setThis(thisobj);
+			}
+		}
+		public void SetFunctionThis(RunTimeValueBase thisobj)
+		{
+			function.setThis(thisobj);
+		}
+		public bool isFuncEquals(ASBinCode.rtData.rtFunction function)
+		{
+			return this.function.Equals(function);
+		}
+
+
         public ASBinCode.rtti.FunctionDefine toCallFunc;
 
-        public int pushedArgs;
+        private int pushedArgs;
 
         public SLOT returnSlot;
 
@@ -82,7 +67,7 @@ namespace ASRuntime.operators
 
 		
 
-        public Player player;
+        private Player player;
         private StackFrame invokerFrame;
         private SourceToken token;
         private int check_para_id;
@@ -105,7 +90,8 @@ namespace ASRuntime.operators
             check_para_id = 0;
             pushedArgs = 0;
             hasReleased = false;
-            
+
+			function = new ASBinCode.rtData.rtFunction(-1, false);
         }
 
         
@@ -116,7 +102,7 @@ namespace ASRuntime.operators
             {
                 hasReleased = true;
                 CallFuncHeap = null;
-                function = null;
+                
                 toCallFunc = null;
                 pushedArgs = 0;
                 returnSlot = null;
@@ -133,6 +119,7 @@ namespace ASRuntime.operators
                 player.funcCallerPool.ret(this);
 				player = null;
 
+				function.Clear();
             }
             
         }
@@ -175,6 +162,7 @@ namespace ASRuntime.operators
 			return dv;
 		}
 
+		
 
         public bool createParaScope()
         {
@@ -614,7 +602,7 @@ namespace ASRuntime.operators
                             )
                             
                             );
-
+						clear_para_slot(invokerFrame, onstackparametercount);onstackparametercount = 0;
                         //***中断本帧本次代码执行进入try catch阶段
                         invokerFrame.endStep();
 
@@ -636,7 +624,8 @@ namespace ASRuntime.operators
                     operators.InstanceCreator ic = new InstanceCreator(player, invokerFrame, token, player.swc.YieldIteratorClass);
                     if (!ic.init_static_class(player.swc.YieldIteratorClass))
                     {
-                        invokerFrame.endStep();
+						
+						invokerFrame.endStep();
 
                         if (callbacker != null)
                         {
@@ -863,7 +852,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        invokerFrame.endStep();
+						invokerFrame.endStep();             
                         if (callbacker != null)
                         {
                             callbacker.noticeRunFailed();
