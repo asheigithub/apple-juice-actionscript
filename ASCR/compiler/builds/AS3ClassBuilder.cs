@@ -920,7 +920,36 @@ namespace ASCompiler.compiler.builds
                                             );
                                     }
 
-                                    if (cls.classMembers[j].isFinal)
+									
+									if (((as3function.Access.IsPublic) && ( !cls.classMembers[j].isPublic)) || ((!as3function.Access.IsPublic) && (cls.classMembers[j].isPublic)))
+									{
+										throw new BuildException(
+											new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+																	"Method marked override must override another method.")
+											);
+									}
+									if (((as3function.Access.IsInternal) && (!cls.classMembers[j].isInternal)) || ((!as3function.Access.IsInternal) && (cls.classMembers[j].isInternal)))
+									{
+										throw new BuildException(
+											new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+																	"Method marked override must override another method.")
+											);
+									}
+									if (((as3function.Access.IsProtected) && (!cls.classMembers[j].isProtectd)) 
+										|| 
+										((!as3function.Access.IsProtected) && (cls.classMembers[j].isProtectd))
+										||
+										cls.classMembers[j].isPrivate
+										)
+									{
+										throw new BuildException(
+											new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+																	"Method marked override must override another method.")
+											);
+									}
+
+
+									if (cls.classMembers[j].isFinal)
                                     {
                                         throw new BuildException(
                                             new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,

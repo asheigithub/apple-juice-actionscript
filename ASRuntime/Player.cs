@@ -29,11 +29,15 @@ namespace ASRuntime
 
             static_instance = new Dictionary<int, rtObject>();
             outpackage_runtimescope = new Dictionary<int, RunTimeScope>();
+			_buildin_class_ = null;
+			_getMethod = null;
+			_createinstance = null;
+			_getMemberValue = null;
+			_setMemberValue = null;
 
+			//***初始化类型映射****
 
-            //***初始化类型映射****
-
-            linktypemapper = new RuntimeLinkTypeMapper();
+			linktypemapper = new RuntimeLinkTypeMapper();
             linktypemapper.init(swc);
 
 			//****************

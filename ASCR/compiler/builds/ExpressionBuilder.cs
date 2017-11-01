@@ -32,7 +32,7 @@ namespace ASCompiler.compiler.builds
         {
             if (expression.exprStepList.Count==0
                 &&
-                expression.Value !=null
+                expression.Value !=null && expression.Value.Data !=null
                 &&
                 expression.Value.Data.FF1Type== ASTool.AS3.Expr.FF1DataValueType.identifier
                 )
@@ -1199,7 +1199,7 @@ namespace ASCompiler.compiler.builds
 
                 Register reg = env.loadRegisterByAST(data.Reg.ID);
                 
-                if (reg == null || builder.isEval)
+                if (reg == null )
                 {
                     throw new BuildException(
                             new BuildError(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile,

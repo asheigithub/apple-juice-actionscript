@@ -60,10 +60,17 @@ namespace ASCompiler.compiler
                         tempswc.functions.AddRange(importBuilder.bin.functions);
                     }
                     tempswc.blocks.Add(tempEnv.block);
-                    
+
+					Variable variableResult = new Variable("@@", tempEnv.block.scope.members.Count, tempEnv.block.id);
+					tempEnv.block.scope.members.Add(variableResult);
+					OpStep step = new OpStep(OpCode.assigning, new SourceToken(0, 0, ""));
+					step.reg = variableResult;
+					step.arg1 = value;
+					tempEnv.block.opSteps.Add(step);
+
                     player.loadCode(tempswc,tempEnv.block);
 
-                    RunTimeValueBase result=  player.run(value);
+                    RunTimeValueBase result=  player.run(variableResult);
 
                     return result;
                     //IRunTimeScope scope = player.run();
