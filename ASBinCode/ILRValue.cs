@@ -13,8 +13,9 @@ namespace ASBinCode
     {
         public abstract RunTimeValueBase getValue(RunTimeScope scope , RunTimeDataHolder dataHolder );
 
-        //public abstract RunTimeDataType valueType { get; }
-        public RunTimeDataType valueType;
+		
+		//public abstract RunTimeDataType valueType { get; }
+		public RunTimeDataType valueType;
     }
 	[Serializable]
 	/// <summary>

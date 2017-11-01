@@ -105,34 +105,65 @@ namespace ASRuntime.operators
                     SLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
                     
                     Register register = (Register)step.reg;
-                    if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
-                    {
-                        if (step.arg1 is SuperPointer)
-                        {
-                            lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope,null);
-                        }
-                        else
-                        {
-                            lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope,null);
-                        }
+					
+					if (register._hasUnaryOrShuffix)
+					{
+						MethodGetterBase method = ((MethodGetterBase)step.arg2);
+						if (method.classmember.isGetter)
+						{
+							if (step.arg1 is SuperPointer)
+							{
+								var sf = ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+								slot.directSet(sf); ((rtFunction)sf).Clear();
+							}
+							else
+							{
+								var sf = ((MethodGetterBase)step.arg2).getMethod(rtObj);
+								slot.directSet(sf); ((rtFunction)sf).Clear();
+							}
+						}
+						else
+						{
+							if (step.arg1 is SuperPointer)
+							{
+								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+							}
+							else
+							{
+								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+							}
 
-                        slot.linkTo(lintoslot);
-                    }
-                    else
-                    {
-                        if (step.arg1 is SuperPointer)
-                        {
-							var sf = ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
-                            slot.directSet(sf );((rtFunction)sf).Clear();
-                        }
-                        else
-                        {
-							var sf = ((MethodGetterBase)step.arg2).getMethod(rtObj);
-                            slot.directSet(sf); ((rtFunction)sf).Clear();
+							slot.linkTo(lintoslot);
+						}
+					}
+					else if (register._isassigntarget || register._isdeletetarget)
+					{
+						if (step.arg1 is SuperPointer)
+						{
+							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+						}
+						else
+						{
+							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
 						}
 
-                        //slot.directSet(lintoslot.getValue());
-                    }
+						slot.linkTo(lintoslot);
+					}
+					else
+					{
+						if (step.arg1 is SuperPointer)
+						{
+							var sf = ((MethodGetterBase)step.arg2).getSuperMethod(rtObj.objScope, ((SuperPointer)step.arg1).superClass);
+							slot.directSet(sf); ((rtFunction)sf).Clear();
+						}
+						else
+						{
+							var sf = ((MethodGetterBase)step.arg2).getMethod(rtObj);
+							slot.directSet(sf); ((rtFunction)sf).Clear();
+						}
+
+						//slot.directSet(lintoslot.getValue());
+					}
                 }
                 else
                 {

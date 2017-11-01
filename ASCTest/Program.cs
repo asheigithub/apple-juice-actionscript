@@ -73,17 +73,29 @@ namespace ASCTest
 
 
 			//*********加入API*****
-			string apidir = @"F:\ASTOOL\ASTool\LinkCodeGen\bin\Debug\as3api";
-			if (System.IO.Directory.Exists(apidir))
-			{
-				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
-				string[] n = new string[files.Length + linkapi.Length];
-				linkapi.CopyTo(n, 0);
-				files.CopyTo(n, linkapi.Length);
-				files = n;
-			}
+			//string apidir = @"F:\ASTOOL\ASTool\LinkCodeGen\bin\Debug\as3api";
+			//if (System.IO.Directory.Exists(apidir))
+			//{
+			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//	string[] n = new string[files.Length + linkapi.Length];
+			//	linkapi.CopyTo(n, 0);
+			//	files.CopyTo(n, linkapi.Length);
+			//	files = n;
+			//}
 			//*********************
-			
+
+			//*********加入ProtoBuf API*****
+			//string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+			//if (System.IO.Directory.Exists(apidir))
+			//{
+			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//	string[] n = new string[files.Length + linkapi.Length];
+			//	linkapi.CopyTo(n, 0);
+			//	files.CopyTo(n, linkapi.Length);
+			//	files = n;
+			//}
+			//*********************
+
 			var proj = new ASTool.AS3.AS3Proj();
             var srcout = new ASTool.ConSrcOut();
 
@@ -175,33 +187,34 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
-						var d = player.createInstance("SProtoSpace.gate_net_info");
-						var byteArray = player.createInstance("flash.utils.ByteArray");
-						player.setMemberValue(d, "groupName", "账号你二大爷");
-
+						//var d = player.createInstance("SProtoSpace.gate_net_info");
+						//ASRuntime.flash.utils.ByteArray array;
+						//var byteArray = player.createByteArrayObject(out array);
+						//player.setMemberValue(d, "groupName", "账号你二大爷");
 
 						
-						var r = player.invokeMethod(d, "writeTo", byteArray);
-						var d2 = player.createInstance("SProtoSpace.gate_net_info");
+						
+						//var r = player.invokeMethod(d, "writeTo", byteArray);
+						//var d2 = player.createInstance("SProtoSpace.gate_net_info");
 
-						player.setMemberValue(byteArray, "position", 0);
-						var k = player.invokeMethod(d2, "mergeFrom", byteArray);
-						var m = player.getMemberValue(d2, "groupName");
+						//player.setMemberValue(byteArray, "position", 0);
+						//var k = player.invokeMethod(d2, "mergeFrom", byteArray);
+						//var m = player.getMemberValue(d2, "groupName");
 
-						var ts = player.invokeMethod(byteArray, "toString");
+						//var ts = player.invokeMethod(byteArray, "toString");
 
-						var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+						//var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
 
-						try
-						{
-							player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
-						}
-						catch (ASBinCode.ASRunTimeException e)
-						{
-							Console.WriteLine(e.ToString());
-						}
+						//try
+						//{
+						//	player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
+						//}
+						//catch (ASBinCode.ASRunTimeException e)
+						//{
+						//	Console.WriteLine(e.ToString());
+						//}
 
-						var s = player.invokeMethod("Test", "TTT",3,4);
+						//var s = player.invokeMethod("Test", "TTT",3,4);
 
 
 

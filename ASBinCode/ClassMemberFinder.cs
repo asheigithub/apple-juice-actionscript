@@ -64,7 +64,7 @@ namespace ASBinCode
 			//}
 
 			//return null;
-
+			
 			var member = cls.classMembers.FindByName(name);
 			if (member == null)
 				return null;

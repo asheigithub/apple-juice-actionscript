@@ -2698,7 +2698,14 @@ namespace ASCompiler.compiler
             if (ot == "*")
             {
                 template = template.Replace("private const t = *;", "private const t = undefined;");
-            }
+
+				template = template.Replace("Vector_*_","Vector_void_");
+				TC = "Vector_void_";
+				while (TypeReader.findClassFromImports(TC, this, token).Count > 0)
+				{
+					TC = TC + "_";
+				}
+			}
 
 
             var lib = new ASTool.AS3.AS3Proj();

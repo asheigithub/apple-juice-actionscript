@@ -474,8 +474,9 @@ namespace ASRuntime.nativefuncs
 					else
 					{
 						string result = string.Empty;
+						result = symbols[toCast % r]+result;
+						toCast = toCast / (uint)r;
 
-						
 						while (toCast > 0)
 						{
 							result = symbols[toCast % r] + result;

@@ -1810,6 +1810,29 @@ namespace ASRuntime
 
 		#endregion
 
+
+		#region ByteArray
+
+		/// <summary>
+		/// 创建一个ByteArray对象
+		/// </summary>
+		/// <param name="byteArray"></param>
+		/// <returns></returns>
+		public rtObject createByteArrayObject(out flash.utils.ByteArray byteArray)
+		{
+			var thisObj = createInstance("flash.utils.ByteArray");
+			byteArray =
+					(flash.utils.ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+
+			return thisObj;
+		}
+
+
+		#endregion
+
+
+
+
 		#endregion
 
 

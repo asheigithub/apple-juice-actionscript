@@ -1898,9 +1898,28 @@ namespace ASCompiler.compiler.builds
 
         private void buildSuffix(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step)
         {
-            
-            ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder,true);
-            if (step.Arg1.IsReg)
+
+			ASBinCode.RightValueBase v1= getRightValue(env, step.Arg2, step.token, builder, true); 
+
+			//if (step.Arg2.IsReg)
+			//{
+			//	Register reg = env.loadRegisterByAST(step.Arg2.Reg.ID);
+			//	if (reg._regMember != null &&
+			//		reg._regMember.bindField is ClassPropertyGetter) //属性访问器
+			//	{
+					
+			//		v1 = getRightValue(env, step.Arg2, step.token, builder, true);
+			//	}
+			//	else
+			//	{
+			//		v1 = getRightValue(env, step.Arg2, step.token, builder, true);
+			//	}
+			//}
+			//else
+			//{
+			//	v1= getRightValue(env, step.Arg2, step.token, builder, true);
+			//}
+			if (step.Arg1.IsReg)
             {
                 if (!(v1 is LeftValueBase))
                 {
@@ -1928,10 +1947,11 @@ namespace ASCompiler.compiler.builds
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "Operand of " + step.OpCode + " must be a reference."));
                     }
-                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
-                }
+                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+				}
 
                 if (
+						!(v1 is ClassPropertyGetter ) &&
                         v1.valueType != RunTimeDataType.rt_number &&
                         v1.valueType != RunTimeDataType.rt_int &&
                         v1.valueType != RunTimeDataType.rt_uint &&
@@ -1945,7 +1965,7 @@ namespace ASCompiler.compiler.builds
 
                 ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(v1.valueType);
-                eax._hasUnaryOrShuffixOrDelete = true;
+                eax._hasUnaryOrShuffixOrDelete = true;eax._hasUnaryOrShuffix=true;
 
                 OpCode code;
                 if (step.OpCode == "++")
@@ -2010,22 +2030,22 @@ namespace ASCompiler.compiler.builds
                 //***检查是否是动态属性
                 if (builder._propLines.ContainsKey(v1))
                 {
-                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
-                    var addlines = builder._propLines[v1];
+                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+					var addlines = builder._propLines[v1];
                     foreach (var line in addlines)
                     {
                         if (line.reg is Register)
                         {
-                            ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true;
-                        }
+                            ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true; ((Register)line.reg)._hasUnaryOrShuffix = true;
+						}
                         if (line.arg1 is Register)
                         {
-                            ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true;
-                        }
+                            ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg1)._hasUnaryOrShuffix = true;
+						}
                         if (line.arg2 is Register)
                         {
-                            ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true;
-                        }
+                            ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg2)._hasUnaryOrShuffix  = true;
+						}
                     }
 
 
@@ -2500,8 +2520,8 @@ namespace ASCompiler.compiler.builds
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                                 "Operand of " + step.OpCode + " must be a reference."));
                         }
-                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
-                    }
+                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+					}
                     
                     if (
                         v1.valueType != RunTimeDataType.rt_number &&
@@ -2571,9 +2591,9 @@ namespace ASCompiler.compiler.builds
 
                     Register eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(v1.valueType);
-                    eax._hasUnaryOrShuffixOrDelete = true;
+                    eax._hasUnaryOrShuffixOrDelete = true; eax._hasUnaryOrShuffix = true;
 
-                    op.reg = eax;
+					op.reg = eax;
                     op.regType = eax.valueType;
 
                     env.block.opSteps.Add(op);
@@ -2582,21 +2602,21 @@ namespace ASCompiler.compiler.builds
                     if (builder._propLines.ContainsKey(v1))
                     {
                         var addlines = builder._propLines[v1];
-                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
-                        foreach (var line in addlines)
+                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+						foreach (var line in addlines)
                         {
                             if (line.reg is Register)
                             {
-                                ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true;
-                            }
+                                ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true; ((Register)line.reg)._hasUnaryOrShuffix = true;
+							}
                             if (line.arg1 is Register)
                             {
-                                ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true;
-                            }
+                                ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg1)._hasUnaryOrShuffix = true;
+							}
                             if (line.arg2 is Register)
                             {
-                                ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true;
-                            }
+                                ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg2)._hasUnaryOrShuffix = true;
+							}
                         }
 
                         if (addlines.Count == 1 && addlines[0].opCode == OpCode.try_read_getter)

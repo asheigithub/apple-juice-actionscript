@@ -30,9 +30,13 @@ namespace ASBinCode
         /// </summary>
         public bool _isassigntarget;
         /// <summary>
-        /// 指示是否对其有++,--操作
+        /// 指示是否对其有++,--,delete操作
         /// </summary>
         public bool _hasUnaryOrShuffixOrDelete;
+		/// <summary>
+		/// 指示是否对其有++,--
+		/// </summary>
+		public bool _hasUnaryOrShuffix;
 
 		/// <summary>
 		/// 只是是否. [] 操作的目标

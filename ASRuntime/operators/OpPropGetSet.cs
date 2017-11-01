@@ -15,6 +15,7 @@ namespace ASRuntime.operators
 
             if (slot.isPropGetterSetter)
             {
+				((StackSlot)slot).linkTo(null);	
                 _do_prop_read(
 
                     ((StackSlot)slot).propGetSet,
@@ -81,8 +82,8 @@ namespace ASRuntime.operators
 
                 if (d != null && s != null && s.getLinkSlot() != null)
                 {
-					s.linkTo(null);
                     d.linkTo(s.getLinkSlot());
+					s.linkTo(null);
                 }
                 else
                 {

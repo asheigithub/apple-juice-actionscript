@@ -299,14 +299,22 @@ namespace ASRuntime.operators
 #if DEBUG
 
             RunTimeValueBase rv;rtFunction toclear = null;
-            if (step.arg1 is MethodGetterBase)
-            {
-                rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope);toclear = (rtFunction)rv;
-            }
-            else
-            {
-                rv = step.arg1.getValue(frame.scope, frame);
-            }
+			if (step.arg1 is MethodGetterBase)
+			{
+				rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope); toclear = (rtFunction)rv;
+			}
+			//else if (step.arg1 is Register)
+			//{
+			//	Register register = (Register)step.arg1;
+			//	StackSlot slot = (StackSlot)register.getSlot(scope, frame);
+
+				
+
+			//}
+			else
+			{
+				rv = step.arg1.getValue(frame.scope, frame);
+			}
             if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
             {
                 rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);

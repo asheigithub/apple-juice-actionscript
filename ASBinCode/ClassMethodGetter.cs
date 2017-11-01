@@ -27,7 +27,7 @@ namespace ASBinCode
 			return (RunTimeValueBase)getMethod(scope).Clone();
 			//throw new NotImplementedException();
         }
-
+		
 
 		private rtFunction _cachemethod;
 

@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using ASBinCode.rtti;
+using ASRuntime.flash.utils;
 
-namespace ASRuntime.nativefuncs
+namespace ASRuntime.flash.utils
 {
 	class Endian
 	{
@@ -51,7 +52,7 @@ namespace ASRuntime.nativefuncs
 			// big endian
 			byte[] byteArray = new byte[4];
 			int iBytesRead = this.Read(byteArray, 0, 4);
-			
+
 			int i = byteArray[0 + 0];
 			i = i << 8;
 			i = i | byteArray[0 + 1];
@@ -87,7 +88,7 @@ namespace ASRuntime.nativefuncs
 			int i = byteArray[0 + 0];
 			i = i << 8;
 			i = i | byteArray[0 + 1];
-			
+
 			return (short)i;
 		}
 
@@ -119,9 +120,9 @@ namespace ASRuntime.nativefuncs
 			byteArray[14] = byteArray[1];
 			byteArray[15] = byteArray[0];
 
-			using (System.IO.MemoryStream ms=new System.IO.MemoryStream(byteArray,8,8))
+			using (System.IO.MemoryStream ms = new System.IO.MemoryStream(byteArray, 8, 8))
 			{
-				using (System.IO.BinaryReader br=new System.IO.BinaryReader(ms))
+				using (System.IO.BinaryReader br = new System.IO.BinaryReader(ms))
 				{
 					return br.ReadDouble();
 				}
@@ -138,7 +139,7 @@ namespace ASRuntime.nativefuncs
 			byteArray[5] = byteArray[2];
 			byteArray[6] = byteArray[1];
 			byteArray[7] = byteArray[0];
-			
+
 
 			using (System.IO.MemoryStream ms = new System.IO.MemoryStream(byteArray, 4, 4))
 			{
@@ -264,10 +265,7 @@ namespace ASRuntime.nativefuncs
 
 	}
 
-
-
-
-	class ByteArray : IDisposable
+	public class ByteArray : IDisposable
 	{
 		#region IDisposable Support
 		private bool disposedValue = false; // 要检测冗余调用
@@ -354,7 +352,7 @@ namespace ASRuntime.nativefuncs
 			br = null;
 			bw.Close();
 			bw = null;
-			
+
 
 			ms.Close();
 		}
@@ -399,7 +397,7 @@ namespace ASRuntime.nativefuncs
 			}
 			set
 			{
-				
+
 				try
 				{
 					createMs();
@@ -410,7 +408,7 @@ namespace ASRuntime.nativefuncs
 					{
 						position = (uint)ms.Length;
 					}
-					
+
 				}
 				catch (OutOfMemoryException)
 				{
@@ -429,7 +427,7 @@ namespace ASRuntime.nativefuncs
 			get { return _pos; }
 			set
 			{
-				_pos = value;	
+				_pos = value;
 			}
 		}
 
@@ -472,7 +470,7 @@ namespace ASRuntime.nativefuncs
 			{
 				return true;
 			}
-			
+
 		}
 
 		public int readByte()
@@ -495,7 +493,7 @@ namespace ASRuntime.nativefuncs
 			return b;
 		}
 
-		public void readBytes(ByteArray byteArray,uint offset,uint length)
+		public void readBytes(ByteArray byteArray, uint offset, uint length)
 		{
 			if (isclosed)
 			{
@@ -517,13 +515,13 @@ namespace ASRuntime.nativefuncs
 			{
 				throw new EOFException();
 			}
-			
-			while (ms.Position<ms.Length)
+
+			while (ms.Position < ms.Length)
 			{
 				byteArray.ms.WriteByte((byte)ms.ReadByte());
 			}
 
-			position =(uint)ms.Position;
+			position = (uint)ms.Position;
 		}
 
 		public double readDouble()
@@ -537,10 +535,10 @@ namespace ASRuntime.nativefuncs
 			{
 				throw new EOFException();
 			}
-			
+
 			ms.Position = position;
 
-			double b = isbig?br.ReadDoubleBE(): br.ReadDouble();
+			double b = isbig ? br.ReadDoubleBE() : br.ReadDouble();
 
 			position = (uint)ms.Position;
 
@@ -589,7 +587,7 @@ namespace ASRuntime.nativefuncs
 			return b;
 		}
 
-		public string readMultiByte(uint length,string charSet)
+		public string readMultiByte(uint length, string charSet)
 		{
 			if (isclosed)
 			{
@@ -602,7 +600,7 @@ namespace ASRuntime.nativefuncs
 			}
 
 			ms.Position = position;
-			var buffer=br.ReadBytes((int)length);
+			var buffer = br.ReadBytes((int)length);
 			position = (uint)ms.Position;
 
 			try
@@ -614,7 +612,7 @@ namespace ASRuntime.nativefuncs
 			{
 				return Encoding.Default.GetString(buffer);
 			}
-			
+
 		}
 
 		public int readShort()
@@ -757,7 +755,7 @@ namespace ASRuntime.nativefuncs
 			}
 			else
 			{
-				var buff= ms.ToArray();
+				var buff = ms.ToArray();
 
 				return BitConverter.ToString(buff);
 
@@ -770,7 +768,7 @@ namespace ASRuntime.nativefuncs
 			createMs();
 			if (position > ms.Length)
 			{
-				ms.SetLength(position);	
+				ms.SetLength(position);
 			}
 			ms.Position = position;
 
@@ -833,7 +831,7 @@ namespace ASRuntime.nativefuncs
 			}
 			ms.Position = position;
 
-			
+
 			target.ms.Position = offset;
 			for (int i = 0; i < length; i++)
 			{
@@ -843,6 +841,38 @@ namespace ASRuntime.nativefuncs
 
 			position = (uint)ms.Position;
 		}
+
+		public void writeBytes(byte[] buffer,int offset,int length)
+		{
+			if (offset > buffer.Length)
+			{
+				throw new ArgumentOutOfRangeException();
+			}
+
+			if (length != 0)
+			{
+				if (offset + length > buffer.Length)
+				{
+					length = buffer.Length - offset;
+				}
+			}
+			else
+			{
+				length = buffer.Length - offset;
+			}
+
+			createMs();
+			if (position > ms.Length)
+			{
+				ms.SetLength(position);
+			}
+			ms.Position = position;
+
+			ms.Write(buffer, offset, length);
+
+			position = (uint)ms.Position;
+		}
+
 
 		public void writeDouble(double v)
 		{
@@ -1028,6 +1058,14 @@ namespace ASRuntime.nativefuncs
 			position = (uint)ms.Position;
 		}
 	}
+
+}
+
+namespace ASRuntime.nativefuncs
+{
+	
+
+
 
 
 	class ByteArray_constructor : NativeFunctionBase
