@@ -27,6 +27,11 @@ namespace ASRuntime
         {
             this.swc = swc;
 
+			if (swc.nativefunctions.Count == 0)
+			{
+				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
+			}
+
             static_instance = new Dictionary<int, rtObject>();
             outpackage_runtimescope = new Dictionary<int, RunTimeScope>();
 			_buildin_class_ = null;
@@ -653,16 +658,39 @@ namespace ASRuntime
 			#region pushparameter
 			int c = 0;
 			bool success;
+
+			int args;
+			if (paraArgs != null)
+				args = 6;
+			else if (v5 != null)
+				args = 5;
+			else if (v4 != null)
+				args = 4;
+			else if (v3 != null)
+				args = 3;
+			else if (v2 != null)
+				args = 2;
+			else if (v1 != null)
+				args = 1;
+			else
+				args = 0;
+
 			if (v1 != null)
 			{
-				funcCaller.pushParameter(v1,c,out success);
+				funcCaller.pushParameter(v1, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc,token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
 					return false;
 				}
 				c++;
 			}
+			else if (args > 0)
+			{
+				throw new ArgumentNullException("v1");
+			}
+
+
 			if (v2 != null)
 			{
 				funcCaller.pushParameter(v2, c, out success);
@@ -673,6 +701,11 @@ namespace ASRuntime
 				}
 				c++;
 			}
+			else if (args > 1)
+			{
+				throw new ArgumentNullException("v2");
+			}
+
 			if (v3 != null)
 			{
 				funcCaller.pushParameter(v3, c, out success);
@@ -683,6 +716,11 @@ namespace ASRuntime
 				}
 				c++;
 			}
+			else if (args > 2)
+			{
+				throw new ArgumentNullException("v3");
+			}
+
 			if (v4 != null)
 			{
 				funcCaller.pushParameter(v4, c, out success);
@@ -693,6 +731,11 @@ namespace ASRuntime
 				}
 				c++;
 			}
+			else if (args > 3)
+			{
+				throw new ArgumentNullException("v4");
+			}
+
 			if (v5 != null)
 			{
 				funcCaller.pushParameter(v5, c, out success);
@@ -703,7 +746,11 @@ namespace ASRuntime
 				}
 				c++;
 			}
-			
+			else if (args > 4)
+			{
+				throw new ArgumentNullException("v5");
+			}
+
 			if (paraArgs != null)
 			{
 				for (int i = 0; i < paraArgs.Length; i++)
@@ -717,6 +764,7 @@ namespace ASRuntime
 					c++;
 				}
 			}
+
 			#endregion
 
 			funcCaller.returnSlot = resultSlot;
@@ -885,7 +933,7 @@ namespace ASRuntime
             if (!ReferenceEquals(currentRunFrame, raiseframe))
             {
                 //currentRunFrame.close();
-                throw new ASRunTimeException("");
+                throw new ASRunTimeException("",string.Empty);
             }
 #endif
 
@@ -1035,7 +1083,7 @@ namespace ASRuntime
 				switch (rv.rtType)
 				{
 					case RunTimeDataType.rt_boolean:
-						return TypeConverter.ConvertToBoolean(rv, null, null);
+						return (((rtBoolean)rv).value);
 					case RunTimeDataType.rt_int:
 						return TypeConverter.ConvertToInt(rv, null, null);
 					case RunTimeDataType.rt_uint:
@@ -1147,14 +1195,14 @@ namespace ASRuntime
 				var cls = getClass(classname);
 				if (cls == null)
 				{
-					throw new ASRunTimeException(classname + "类型未找到");
+					throw new ASRunTimeException(classname + "类型未找到",string.Empty);
 				}
 
 				CallBlankBlock(null);
 
 				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
 				{
-					throw new ASRunTimeException("初始化静态实例时失败");
+					throw new ASRunTimeException("初始化静态实例时失败",string.Empty);
 				}
 
 				var sig = swc.functions[cls.constructor_functionid].signature;
@@ -1212,11 +1260,11 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.getErrorInfo());
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 					else
 					{
-						throw new ASRunTimeException("对象创建失败");
+						throw new ASRunTimeException("对象创建失败",string.Empty);
 					}
 				}
 				else
@@ -1230,7 +1278,7 @@ namespace ASRuntime
 
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.message);
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 
 					return v as rtObject;
@@ -1383,7 +1431,7 @@ namespace ASRuntime
 		{
 			var method = getMethod(thisObj, methodname);
 			if (method == null)
-				throw new ASRunTimeException("方法未找到");
+				throw new ASRunTimeException("方法未找到",string.Empty);
 
 			return invokeMethod(thisObj, method, argcount, v1, v2, v3, v4, v5, args);
 		}
@@ -1494,7 +1542,7 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.message);
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 				}
 				else
@@ -1505,11 +1553,11 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.getErrorInfo());
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 					else
 					{
-						throw new ASRunTimeException("方法调用失败");
+						throw new ASRunTimeException("方法调用失败",string.Empty);
 					}
 				}
 
@@ -1525,7 +1573,7 @@ namespace ASRuntime
 				}
 				else
 				{
-					throw new ASRunTimeException("返回值转化失败");
+					throw new ASRunTimeException("返回值转化失败",string.Empty);
 				}
 			}
 			finally
@@ -1551,14 +1599,14 @@ namespace ASRuntime
 				var cls = getClass(type);
 				if (cls == null)
 				{
-					throw new ASRunTimeException(type + "类型未找到");
+					throw new ASRunTimeException(type + "类型未找到",string.Empty);
 				}
 
 				CallBlankBlock(null);
 
 				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
 				{
-					throw new ASRunTimeException("初始化静态实例时失败");
+					throw new ASRunTimeException("初始化静态实例时失败",string.Empty);
 				}
 				while (step()) ;
 				return static_instance[cls.staticClass.classid];
@@ -1603,10 +1651,10 @@ namespace ASRuntime
 				}
 				var signature = swc.functions[_getMemberValue.functionId].signature;
 
-				RunTimeValueBase p1 = null;
-				RunTimeValueBase p2 = null;
-				rtArray extpath = null;
-				RunTimeValueBase index = null;
+				RunTimeValueBase p1 = rtNull.nullptr;
+				RunTimeValueBase p2 = rtNull.nullptr;
+				RunTimeValueBase extpath = rtNull.nullptr;
+				RunTimeValueBase index = rtNull.nullptr;
 
 				if (path.Length > 0)
 				{
@@ -1621,13 +1669,13 @@ namespace ASRuntime
 					extpath = new rtArray();
 					for (int i = 2; i < path.Length; i++)
 					{
-						extpath.innerArray.Add(new rtString(path[i]));
+						((rtArray)extpath).innerArray.Add(new rtString(path[i]));
 					}
 				}
 
 				if (indexArgs != null)
 				{
-					index = prepareParameter(signature, 4, index, currentRunFrame._tempSlot1);
+					index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
 				}
 
 				error.InternalError err;
@@ -1644,7 +1692,7 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.message);
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 				}
 				else
@@ -1655,11 +1703,11 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.getErrorInfo());
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 					else
 					{
-						throw new ASRunTimeException("成员访问失败");
+						throw new ASRunTimeException("成员访问失败",string.Empty);
 					}
 				}
 				object obj;
@@ -1669,7 +1717,7 @@ namespace ASRuntime
 				}
 				else
 				{
-					throw new ASRunTimeException("成员获取返回值转化失败");
+					throw new ASRunTimeException("成员获取返回值转化失败",string.Empty);
 				}
 			}
 			finally
@@ -1712,9 +1760,9 @@ namespace ASRuntime
 				RunTimeValueBase setvalue = null;
 				setvalue = prepareParameter(signature, 1, value, currentRunFrame._tempSlot2);
 
-				RunTimeValueBase p1 = null;
-				rtArray extpath = null;
-				RunTimeValueBase index = null;
+				RunTimeValueBase p1 = rtNull.nullptr;
+				RunTimeValueBase extpath = ASBinCode.rtData.rtNull.nullptr;
+				RunTimeValueBase index = rtNull.nullptr;
 
 				if (path.Length > 0)
 				{
@@ -1725,13 +1773,14 @@ namespace ASRuntime
 					extpath = new rtArray();
 					for (int i = 1; i < path.Length; i++)
 					{
-						extpath.innerArray.Add(new rtString(path[i]));
+						((rtArray)extpath).innerArray.Add(new rtString(path[i]));
 					}
 				}
+				
 
 				if (indexArgs != null)
 				{
-					index = prepareParameter(signature, 5, index, currentRunFrame._tempSlot1);
+					index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
 				}
 
 				error.InternalError err;
@@ -1748,7 +1797,7 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.message);
+						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 				}
 				else
@@ -1759,11 +1808,11 @@ namespace ASRuntime
 					}
 					if (err != null)
 					{
-						throw new ASRunTimeException(err.getErrorInfo());
+						throw new ASRunTimeException(err.message, err.getStackTrace());
 					}
 					else
 					{
-						throw new ASRunTimeException("成员赋值失败");
+						throw new ASRunTimeException("成员赋值失败", String.Empty);
 					}
 				}
 				
@@ -1827,6 +1876,8 @@ namespace ASRuntime
 			var thisObj = createInstance("flash.utils.ByteArray");
 			byteArray =
 					(flash.utils.ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+
+			byteArray.bindAS3Object = thisObj;
 
 			return thisObj;
 		}

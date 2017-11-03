@@ -36,7 +36,7 @@ namespace ASRuntime
 		{
 			if (remain !=maxcount)
 			{
-				throw new ASRunTimeException("缓存池异常");
+				throw new ASRunTimeException("缓存池异常",String.Empty);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace ASRuntime
 		{
 			if (remain == maxcount)
 			{
-				throw new ASRunTimeException("缓存池异常");
+				throw new ASRunTimeException("缓存池异常", String.Empty);
 			}
 
 			remain++;
@@ -73,7 +73,7 @@ namespace ASRuntime
 		{
 			if (remain==0)
 			{
-				throw new ASRunTimeException("缓存池异常");
+				throw new ASRunTimeException("缓存池异常",String.Empty);
 			}
 
 			remain--;

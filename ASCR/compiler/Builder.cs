@@ -283,10 +283,10 @@ namespace ASCompiler.compiler
             for (int i = 0; i < tobuildfiles.Count; i++)
             {
                 ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
-
+				
                 if (!System.IO.Path.GetDirectoryName(srcfile.srcFile)
-                    .Replace(System.IO.Path.DirectorySeparatorChar, '.')
-                    .EndsWith(srcfile.Package.Name))
+                    .Replace('\\', '.').Replace('/','.')
+                    .Equals(srcfile.Package.Name))
                 {
                     throw new BuildException(0, 0, srcfile.srcFile,
                         "包名和路径不匹配"

@@ -24,7 +24,8 @@ namespace ASCTest
             string teststring = "package{}";//System.IO.File.ReadAllText("../../testScript/AS3Testproj/src/Main.as");
 
             string[] files =null;
-            
+
+			Dictionary<string, string> srcFileProjFile = new Dictionary<string, string>();
             
             if (args.Length > 0)
             {
@@ -43,10 +44,10 @@ namespace ASCTest
                 }
 
 				//path = "";
-                //files =new string[] { "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as" };
+				//files =new string[] { "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as" };
 
-
-                string[] ps = path.Split(System.IO.Path.DirectorySeparatorChar);
+				path=path.Replace('\\', '/');
+                string[] ps = path.Split('/');
                 if (ps.Length == 2 && string.IsNullOrEmpty(ps[1])  && ps[0].IndexOf( System.IO.Path.VolumeSeparatorChar)>0)
                 {
                     Console.WriteLine("无法在根目录下搜索.请将as源代码放到一个文件夹内");
@@ -57,6 +58,15 @@ namespace ASCTest
                     //Console.WriteLine(path);
                     //teststring = System.IO.File.ReadAllText(args[0]);
                     files = System.IO.Directory.GetFiles(path, "*.as", System.IO.SearchOption.AllDirectories );
+
+					foreach (var item in files)
+					{
+						string projfile = item.Replace("\\", "/").Replace(path.Replace("\\","/"), "");
+						if (projfile.StartsWith("/"))
+							projfile = projfile.Substring(1);
+						srcFileProjFile.Add(item, projfile);
+					}
+
                 }
             }
             else
@@ -85,15 +95,24 @@ namespace ASCTest
 			//*********************
 
 			//*********加入ProtoBuf API*****
-			//string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-			//if (System.IO.Directory.Exists(apidir))
-			//{
-			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
-			//	string[] n = new string[files.Length + linkapi.Length];
-			//	linkapi.CopyTo(n, 0);
-			//	files.CopyTo(n, linkapi.Length);
-			//	files = n;
-			//}
+			string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+			if (System.IO.Directory.Exists(apidir))
+			{
+				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+				foreach (var item in linkapi)
+				{
+					string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+					if (projfile.StartsWith("/"))
+						projfile = projfile.Substring(1);
+					srcFileProjFile.Add(item, projfile);
+				}
+
+
+				string[] n = new string[files.Length + linkapi.Length];
+				linkapi.CopyTo(n, 0);
+				files.CopyTo(n, linkapi.Length);
+				files = n;
+			}
 			//*********************
 
 			var proj = new ASTool.AS3.AS3Proj();
@@ -110,7 +129,7 @@ namespace ASCTest
 
 				
                 var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  ,files[i]);
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  , srcFileProjFile[files[i]]);
 
                 //System.IO.File.WriteAllText("d:\\" + System.IO.Path.GetFileName(files[i]), tree.GetTreeString());
 
@@ -124,7 +143,7 @@ namespace ASCTest
 
                 
 
-                var analyser = new ASTool.AS3FileGrammarAnalyser(proj, files[i]);
+                var analyser = new ASTool.AS3FileGrammarAnalyser(proj, srcFileProjFile[files[i]]);
                 if (!analyser.Analyse(grammar, tree)) //生成项目的语法树
                 {
                     Console.WriteLine(analyser.err.ToString());
@@ -188,34 +207,46 @@ namespace ASCTest
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
 
-						//var d = player.createInstance("SProtoSpace.gate_net_info");
-						//ASRuntime.flash.utils.ByteArray array;
-						//var byteArray = player.createByteArrayObject(out array);
+
+
+						var d = player.createInstance("SProtoSpace.group_area_info");
+						uint len = (uint)player.getMemberValue(d, "groupids.length");
+						player.setMemberValue(d, "groupids.length", 3);
+						player.setMemberValue(d, "areaGroupName", null);
+
+						for (int i = 0; i < 3; i++)
+						{
+							player.setMemberValue(d, "groupids", i + 5, i);
+						}
+
+						//var d = player.createInstance("SProtoSpace.role_base_info");
+						ASRuntime.flash.utils.ByteArray array;
+						var byteArray = player.createByteArrayObject(out array);
 						//player.setMemberValue(d, "groupName", "账号你二大爷");
 
-						
-						
-						//var r = player.invokeMethod(d, "writeTo", byteArray);
-						//var d2 = player.createInstance("SProtoSpace.gate_net_info");
 
-						//player.setMemberValue(byteArray, "position", 0);
-						//var k = player.invokeMethod(d2, "mergeFrom", byteArray);
-						//var m = player.getMemberValue(d2, "groupName");
 
-						//var ts = player.invokeMethod(byteArray, "toString");
+						var r = player.invokeMethod(d, "writeTo", byteArray);
+						var d2 = player.createInstance("SProtoSpace.group_area_info");
 
-						//var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+						player.setMemberValue(byteArray, "position", 0);
+						var k = player.invokeMethod(d2, "mergeFrom", byteArray);
+						var m = player.getMemberValue(d2, "groupids.length");
 
-						//try
-						//{
-						//	player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
-						//}
-						//catch (ASBinCode.ASRunTimeException e)
-						//{
-						//	Console.WriteLine(e.ToString());
-						//}
+						var ts = player.invokeMethod(byteArray, "toString");
 
-						//var s = player.invokeMethod("Test", "TTT",3,4);
+						var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+
+						try
+						{
+							player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
+						}
+						catch (ASBinCode.ASRunTimeException e)
+						{
+							Console.WriteLine(e.ToString());
+						}
+
+						var s = player.invokeMethod("Test", "TTT", 3, 4);
 
 
 

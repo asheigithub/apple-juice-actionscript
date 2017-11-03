@@ -10,6 +10,7 @@ package flash.errors
 		public function IOError(message:String="", id:*=0) 
 		{
 			super(message, id);
+			name="IOError";
 		}
 		
 	}

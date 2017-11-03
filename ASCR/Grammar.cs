@@ -372,13 +372,13 @@ namespace ASCompiler
 			{
                 string _date = Properties.Resources.Date;
                 var tree = grammar.ParseTree(_date, ASTool.AS3LexKeywords.LEXKEYWORDS,
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "flash/utils/Date.as3");
+                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Date.as3");
 
                 if (grammar.hasError)
                 {
                     return null;
                 }
-                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "flash/utils/Date.as3"));
+                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Date.as3"));
             }
 
             {

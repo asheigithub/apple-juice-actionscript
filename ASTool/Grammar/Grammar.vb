@@ -953,9 +953,9 @@ Public Class Grammar
         Next
 
 
-        My.Computer.FileSystem.WriteAllText("D:\ASCRIPT\ASTool\ASTool\GrammarNodes.txt", sb.ToString(), False)
+		System.IO.File.WriteAllText("D:\ASCRIPT\ASTool\ASTool\GrammarNodes.txt", sb.ToString())
 
-    End Sub
+	End Sub
 
 
 

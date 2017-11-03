@@ -560,7 +560,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                throw new ASRunTimeException("解释器内部错误，参数类型检查");
+                throw new ASRunTimeException("解释器内部错误，参数类型检查",string.Empty);
                 //invokerFrame.throwCastException(token, ((RunTimeValueBase)sender.args).rtType, toCallFunc.signature.parameters[sender._intArg].type);
                 //return;
             }

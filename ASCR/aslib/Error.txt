@@ -37,6 +37,7 @@
 
 		public function toString():String
 		{
+			/*
 			if(message=="")
 			{
 				return "Error";
@@ -45,7 +46,8 @@
 			{
 				return message;
 			}
-
+			*/
+			return name+" "+message;
 		}
 
 

@@ -40,6 +40,9 @@
     <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
     <Compile Include="error\InternalError.cs" />
+    <Compile Include="flash\utils\ByteArray.cs" />
+    <Compile Include="flash\utils\IDataInput.cs" />
+    <Compile Include="flash\utils\IDataOutput.cs" />
     <Compile Include="FrameInfo.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="IRuntimeOutput.cs" />

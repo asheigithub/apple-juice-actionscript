@@ -15,7 +15,7 @@
     End Sub
 
     Public Sub Save(file As String)
-        My.Computer.FileSystem.WriteAllText(file, str.ToString(), False)
-    End Sub
+		System.IO.File.WriteAllText(file, str.ToString())
+	End Sub
 
 End Class

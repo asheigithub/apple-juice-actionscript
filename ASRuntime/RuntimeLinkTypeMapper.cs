@@ -301,7 +301,7 @@ namespace ASRuntime
                 }
                 else
                 {
-                    throw new ASRunTimeException("意外的链接类型");
+                    throw new ASRunTimeException("意外的链接类型", String.Empty);
                 }
             }
         }

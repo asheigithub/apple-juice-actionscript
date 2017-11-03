@@ -16,10 +16,12 @@ namespace ASBinCode
         public bool isProtected;
 
         public bool isStatic;
-        
+
+		public List<FieldMeta> metas;
+
         public Field(string name, int index, int refblockid,bool isConst) : base(name, index, refblockid,isConst)
         {
-
+			metas = new List<FieldMeta>();
         }
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
@@ -95,7 +97,7 @@ namespace ASBinCode
             f.isPrivate = isPrivate;
             f.isProtected = isProtected;
             f.isStatic = isStatic;
-
+			f.metas.AddRange(metas);
             return f;
         }
 

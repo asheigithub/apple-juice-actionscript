@@ -9,10 +9,26 @@ namespace ASBinCode
     /// </summary>
     public class ASRunTimeException :Exception
     {
+		private string as3stacktrace;
+
         public ASRunTimeException() { }
-        public ASRunTimeException(string msg) : base(msg) { }
+        public ASRunTimeException(string msg,string as3stacktrace) : base(msg) { this.as3stacktrace = as3stacktrace; }
 
         public ASRunTimeException(string msg, Exception innerException) : base(msg, innerException) { }
 
-    }
+		public override string StackTrace
+		{
+			get
+			{
+				if (as3stacktrace == null)
+				{
+					return base.StackTrace;
+				}
+				else
+				{
+					return as3stacktrace + "\n" + base.StackTrace;
+				}
+			}
+		}
+	}
 }

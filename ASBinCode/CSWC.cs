@@ -142,6 +142,9 @@ namespace ASBinCode
 
 				bin = _memory.ToArray();
 				_memory.Close();
+
+
+
 			}
 			return bin;
 		}

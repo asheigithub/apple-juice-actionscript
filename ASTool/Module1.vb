@@ -2,9 +2,18 @@
 
 Module Module1
 
+	Public Function IIf(cond As Boolean, iftrue As String, iffalse As String) As String
+
+		If cond Then
+			Return iftrue
+		Else
+			Return iffalse
+		End If
+
+	End Function
 
 
-    Sub Main()
+	Sub Main()
 
         'ReadAllUsedImage()
 
@@ -26,23 +35,23 @@ Module Module1
         Return
 
 
-        'Dim teststring As String = "package{} 6/2/3+(3- 4) * (5 +6)+7//;{123{;13+456;;}{}}"
+		'Dim teststring As String = "package{} 6/2/3+(3- 4) * (5 +6)+7//;{123{;13+456;;}{}}"
 
-        'Dim teststring As String = "package{} for(var i:int;i<5;i++){ (function($what){alert($what)})(i)} " '"package{ var i=new int(); }"
+		'Dim teststring As String = "package{} for(var i:int;i<5;i++){ (function($what){alert($what)})(i)} " '"package{ var i=new int(); }"
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
+		'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScript\src\Main.as")
 
-        Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\ASToolTestScriptOutput\GYLite(v1.10)\GYLite\component\text\GYText.as")
+		Dim teststring As String = System.IO.File.ReadAllText("D:\ASToolTestScriptOutput\GYLite(v1.10)\GYLite\component\text\GYText.as")
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files (x86)\Adobe Gaming SDK 1.4\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\SceneConsole.as")
+		'Dim teststring As String = My.Computer.FileSystem.ReadAllText("C:\Program Files (x86)\Adobe Gaming SDK 1.4\Frameworks\Away3D\src\away3d\loaders\parsers\DAEParser.as")
+		'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\SceneConsole.as")
 
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\flash-x\flashxTools\src\makeMovie\MakeMovieFont.as")
+		'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\flash-x\flashxTools\src\makeMovie\MakeMovieFont.as")
 
-        'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\ui\IForm.as")
+		'Dim teststring As String = My.Computer.FileSystem.ReadAllText("D:\三国2\Sanguo2\trunk\program\client\SG2Mobile\SG2Mobile\src\net\fishluv\sanguo2\client\ui\IForm.as")
 
-        Dim tree = grammar.ParseTree(teststring, AS3LexKeywords.LEXKEYWORDS, AS3LexKeywords.LEXSKIPBLANKWORDS, teststring)
+		Dim tree = grammar.ParseTree(teststring, AS3LexKeywords.LEXKEYWORDS, AS3LexKeywords.LEXSKIPBLANKWORDS, teststring)
 
 
 
@@ -132,8 +141,8 @@ Module Module1
 
         Dim files As New List(Of String)
         For Each r In rootpaths
-            files.AddRange(My.Computer.FileSystem.GetFiles(r, FileIO.SearchOption.SearchAllSubDirectories, "*.as"))
-        Next
+			files.AddRange(System.IO.Directory.GetFiles(r, "*.as", IO.SearchOption.AllDirectories))
+		Next
 
 
 
@@ -142,9 +151,9 @@ Module Module1
 
             grammar.hasError = False
 
-            Dim strProg = My.Computer.FileSystem.ReadAllText(fs)
+			Dim strProg = System.IO.File.ReadAllText(fs)
 
-            If String.IsNullOrEmpty(strProg) Then
+			If String.IsNullOrEmpty(strProg) Then
                 Continue For
             End If
 

@@ -57,7 +57,7 @@ namespace ASRuntime.error
             this.errorValue = errorValue;
             if (errorValue != null)
             {
-                this.message = errorValue.ToString();
+				this.message = getErrorInfo(); //errorValue.ToString();
             }
         }
 

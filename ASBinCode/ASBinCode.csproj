@@ -40,6 +40,7 @@
     <Compile Include="ASRunTimeException.cs" />
     <Compile Include="ClassMemberFinder.cs" />
     <Compile Include="ClassMethodGetter.cs" />
+    <Compile Include="FieldMeta.cs" />
     <Compile Include="HeapSlot.cs" />
     <Compile Include="ILinkSlot.cs" />
     <Compile Include="INativeFunctionRegister.cs" />
