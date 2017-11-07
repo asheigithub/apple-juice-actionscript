@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode.rtData
@@ -93,29 +94,42 @@ namespace ASBinCode.rtData
             //return result;
         }
 
-        //public void CopyFrom(rtArray right)
-        //{
-        //    //_objid = right._objid;
-        //    array = right.array;
-        //    objHandle = right.objHandle;
-        //}
+		//public void CopyFrom(rtArray right)
+		//{
+		//    //_objid = right._objid;
+		//    array = right.array;
+		//    objHandle = right.objHandle;
+		//}
 
-        //public override int GetHashCode()
-        //{
-        //    return array.GetHashCode() ^ objHandle.GetHashCode();
-        //}
+		//public override int GetHashCode()
+		//{
+		//    return array.GetHashCode() ^ objHandle.GetHashCode();
+		//}
 
-        //public override bool Equals(object obj)
-        //{
-        //    rtArray right = obj as rtArray;
-        //    if (right == null)
-        //    {
-        //        return false;
-        //    }
+		//public override bool Equals(object obj)
+		//{
+		//    rtArray right = obj as rtArray;
+		//    if (right == null)
+		//    {
+		//        return false;
+		//    }
 
-        //    return array.Equals(right.array) && objHandle.Equals(right.objHandle);
-        //}
+		//    return array.Equals(right.array) && objHandle.Equals(right.objHandle);
+		//}
 
 
-    }
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write((int)rtType);
+
+			writer.Write(array.Count);
+			for (int i = 0; i < array.Count; i++)
+			{
+				array[i].Serialize(writer, serizlizer);
+			}
+
+		}
+
+
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using ASBinCode;
 
@@ -64,5 +65,10 @@ namespace ASCompiler.compiler
         {
             throw new NotImplementedException();
         }
-    }
+
+		public void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

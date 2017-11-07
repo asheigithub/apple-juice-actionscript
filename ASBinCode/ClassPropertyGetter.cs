@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace ASBinCode
 {
 	[Serializable]
 	public sealed class ClassPropertyGetter :LeftValueBase, IMember 
     {
-        public readonly ASBinCode.rtti.Class _class;
+        public ASBinCode.rtti.Class _class;
         private readonly int indexofMember;
 
         private readonly string _name;
@@ -43,23 +44,7 @@ namespace ASBinCode
             }
         }
 
-        //public sealed override  RunTimeDataType valueType
-        //{
-        //    get
-        //    {
-        //        if (getter == null)
-        //        {
-        //            throw new NotImplementedException();
-        //        }
-        //        else
-        //        {
-        //            throw new NotImplementedException();
-        //            //return getter.valueType;
-        //        }
-                
-        //    }
-        //}
-
+       
         public IMember clone()
         {
             throw new NotImplementedException();
@@ -73,11 +58,6 @@ namespace ASBinCode
 
         private PropertySlot _tempSlot;
 
-        //public PropertySlot propSlot
-        //{
-        //    get { return _tempSlot; }
-        //}
-
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return _tempSlot;
@@ -85,21 +65,6 @@ namespace ASBinCode
 
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            //if (_tempSlot == null)
-            //{
-            //    _tempSlot = new PropertySlot(scope.this_pointer, scope, this);
-
-            //}
-            //else if (!
-            //    (_tempSlot.scope.Equals(scope)
-            //    &&
-            //    _tempSlot.bindObj.Equals(scope.this_pointer)
-            //    ))
-            //{
-            //    _tempSlot.bindObj = scope.this_pointer;
-            //    _tempSlot.scope = scope;
-
-            //}
 
             return _tempSlot;
         }
@@ -108,6 +73,47 @@ namespace ASBinCode
         {
             return name + "{" + (getter!=null?"get;":" ") + (setter !=null?"set;":" ")+ "}";
         }
+
+
+
+		public static ClassPropertyGetter LoadClassPropertyGetter(BinaryReader reader,CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
+		{
+			
+			int indexofMember = reader.ReadInt32();
+			string _name = reader.ReadString();
+
+			ClassPropertyGetter cpg = new ClassPropertyGetter(_name, null, indexofMember);
+			serizlized.Add(key, cpg);
+
+			rtti.Class _class = serizlizer.DeserializeObject<rtti.Class>(reader, rtti.Class.LoadClass);
+			cpg._class = _class;
+			
+
+			cpg.getter = serizlizer.DeserializeObject<MethodGetterBase>(reader, ISWCSerializableLoader.LoadIMember);
+			cpg.setter = serizlizer.DeserializeObject<MethodGetterBase>(reader, ISWCSerializableLoader.LoadIMember);
+
+			return cpg;
+		}
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(2);
+			
+			//private readonly int indexofMember;
+			writer.Write(indexofMember);
+			//private readonly string _name;
+			writer.Write(_name);
+
+			//public readonly ASBinCode.rtti.Class _class;
+			serizlizer.SerializeObject(writer, _class);
+			//public MethodGetterBase getter;
+			serizlizer.SerializeObject(writer, getter);
+			//public MethodGetterBase setter;
+			serizlizer.SerializeObject(writer, setter);
+
+		}
+
 		[Serializable]
         public sealed class PropertySlot : SLOT
         {

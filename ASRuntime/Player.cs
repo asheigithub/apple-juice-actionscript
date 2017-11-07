@@ -23,7 +23,7 @@ namespace ASRuntime
         
         internal CSWC swc;
         private CodeBlock defaultblock;
-        public void loadCode(CSWC swc,CodeBlock block=null)
+        public void loadCode(CSWC swc, CodeBlock block=null)
         {
             this.swc = swc;
 
@@ -418,7 +418,7 @@ namespace ASRuntime
             return memberDataList;
         }
 
-        private static CodeBlock blankBlock;
+        private CodeBlock blankBlock;
         internal void CallBlankBlock(IBlockCallBack callbacker)
         {
             if (blankBlock == null)
@@ -527,7 +527,7 @@ namespace ASRuntime
 			//{
 			//    frame.scope = ((rtObject)this_pointer).objScope; //callerScope;
 			//}
-			if (ReferenceEquals(membersHeap, emptyMembers) && type== RunTimeScopeType.function)
+			if (ReferenceEquals(membersHeap, emptyMembers) && type == RunTimeScopeType.function)
 			{
 				if (this_pointer is rtObject)
 				{
@@ -569,6 +569,10 @@ namespace ASRuntime
 						frame.scope = callerScope;
 					}
 				}
+			}
+			else if (ReferenceEquals(calledblock, blankBlock))
+			{
+				return null;
 			}
 			else
 			{

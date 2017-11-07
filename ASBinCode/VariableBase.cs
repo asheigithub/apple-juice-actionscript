@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -172,5 +173,42 @@ namespace ASBinCode
                 ;
 
         }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			//	private string _name;
+			writer.Write(_name);
+			//protected int _indexOfMembers;
+			writer.Write(_indexOfMembers);
+			//protected readonly int refblockid;
+			writer.Write(refblockid);
+
+			///// <summary>
+			///// 赋值是否忽略编译期类型检查
+			///// </summary>
+			//public readonly bool ignoreImplicitCast;
+			writer.Write(ignoreImplicitCast);
+			///// <summary>
+			///// 是否不可赋值
+			///// </summary>
+			//public readonly bool isConst;
+			writer.Write(isConst);
+
+			base.Serialize(writer, serizlizer);
+		}
+
+	}
 }

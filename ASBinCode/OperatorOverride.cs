@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -85,8 +86,9 @@ namespace ASBinCode
         public rtti.FunctionDefine define;
         public rtData.rtFunction func;
     }
+
 	[Serializable]
-    public class OperatorFunctions
+    public class OperatorFunctions :ISWCSerializable
     {
         private Dictionary<OperatorFunctionKey, DefineAndFunc>[] operFunctions;
 
@@ -180,5 +182,61 @@ namespace ASBinCode
             }
         }
 
-    }
+
+
+
+
+
+		public static OperatorFunctions LoadOperatorFunctions(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int, object> serizlized, int key)
+		{
+			OperatorFunctions operatorFunctions = new OperatorFunctions(); serizlized.Add(key, operatorFunctions);
+			for (int i = 0; i < operatorFunctions.operFunctions.Length; i++)
+			{
+				var dict = operatorFunctions.operFunctions[i];
+				int count = reader.ReadInt32();
+				for (int j = 0; j < count; j++)
+				{
+					RunTimeDataType v1 = reader.ReadInt32();
+					RunTimeDataType v2 = reader.ReadInt32();
+
+					OperatorFunctionKey operatorFunctionKey = new OperatorFunctionKey(v1, v2);
+
+					rtti.FunctionDefine define = serizlizer.DeserializeObject<rtti.FunctionDefine>(reader, rtti.FunctionDefine.LoadFunctionDefine);
+					rtData.rtFunction function = serizlizer.DeserializeObject<rtData.rtFunction>(reader, RunTimeValueBase.LoadRunTimeValueBase);
+
+					DefineAndFunc defineAndFunc = new DefineAndFunc();
+					defineAndFunc.define = define;
+					defineAndFunc.func = function;
+
+					dict.Add(operatorFunctionKey, defineAndFunc);
+
+				}
+			}
+
+			return operatorFunctions;
+
+		}
+
+
+
+		public void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			
+			for (int i = 0; i < operFunctions.Length; i++)
+			{
+				var dict = operFunctions[i];
+				writer.Write(dict.Count);
+				foreach (var item in dict)
+				{
+					writer.Write(item.Key.v1);
+					writer.Write(item.Key.v2);
+
+					serizlizer.SerializeObject(writer, item.Value.define);
+					serizlizer.SerializeObject(writer, item.Value.func);
+				}
+
+			}
+
+		}
+	}
 }

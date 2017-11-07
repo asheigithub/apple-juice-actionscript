@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode.rtData
@@ -166,5 +167,21 @@ namespace ASBinCode.rtData
         {
             return fun1.Equals(fun2);
         }
-    }
+
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(rtType);
+			writer.Write(_functionid);
+			writer.Write(_ismethod);
+			
+		}
+
+
+
+
+	}
 }

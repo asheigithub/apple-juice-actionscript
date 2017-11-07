@@ -34,9 +34,10 @@ namespace ASBinCode
 		//= new Dictionary<ILinkSystemObjCreator, Class>();
 		
 		public readonly Dictionary<Class, ILinkSystemObjCreator> class_Creator;
-            //= new Dictionary<Class, ILinkSystemObjCreator>();
-		
+		//= new Dictionary<Class, ILinkSystemObjCreator>();
 
+		internal Dictionary<string, Class> _dictlinkcreatorfunctionname;
+		
         /// <summary>
         /// 链接到系统Object的类型
         /// </summary>
@@ -92,6 +93,7 @@ namespace ASBinCode
 			nativefunctionNameIndex = new Dictionary<string, int>();
 			creator_Class = new Dictionary<ILinkSystemObjCreator, Class>();
 			class_Creator = new Dictionary<Class, ILinkSystemObjCreator>();
+			_dictlinkcreatorfunctionname = new Dictionary<string, Class>();
 
 			for (int i = 0; i < RunTimeDataType.unknown; i++)
             {
@@ -113,6 +115,22 @@ namespace ASBinCode
             {
                 nativefunctionNameIndex.Add(nativefunction.name, nativefunctions.Count);
                 nativefunctions.Add(nativefunction);
+
+				if (_dictlinkcreatorfunctionname.ContainsKey(nativefunction.name))
+				{
+					if (!class_Creator.ContainsKey(_dictlinkcreatorfunctionname[nativefunction.name]))
+					{
+						class_Creator.Add(_dictlinkcreatorfunctionname[nativefunction.name], (ILinkSystemObjCreator)nativefunction);
+						creator_Class.Add((ILinkSystemObjCreator)nativefunction, _dictlinkcreatorfunctionname[nativefunction.name]);
+					}
+					else
+					{
+						class_Creator[_dictlinkcreatorfunctionname[nativefunction.name]]=(ILinkSystemObjCreator)nativefunction;
+						creator_Class[(ILinkSystemObjCreator)nativefunction]= _dictlinkcreatorfunctionname[nativefunction.name];
+					}
+
+				}
+
             }
             else
             {
@@ -135,15 +153,9 @@ namespace ASBinCode
 		{
 			byte[] bin;
 			{
-				System.IO.MemoryStream _memory = new System.IO.MemoryStream();
-				System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter
-					= new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-				formatter.Serialize(_memory, this);
-
-				bin = _memory.ToArray();
-				_memory.Close();
-
-
+				
+				CSWCSerizlizer serizlizer = new CSWCSerizlizer();
+				bin = serizlizer.Serialize(this);
 
 			}
 			return bin;
@@ -151,19 +163,11 @@ namespace ASBinCode
 
 		public static CSWC loadFromBytes(byte[] data)
 		{
-			CSWC _newOjb;
+			
+			CSWCSerizlizer serizlizer = new CSWCSerizlizer();
+			return serizlizer.Deserialize(data);
 
-			System.IO.MemoryStream _memory = new System.IO.MemoryStream(data);
-			_memory.Position = 0;
-			System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-			_newOjb = (ASBinCode.CSWC)formatter.Deserialize(_memory);
-			_memory.Close();
-
-
-			_newOjb.nativefunctions = new List<NativeFunctionBase>();
-			_newOjb.nativefunctionNameIndex = new Dictionary<string, int>();
-
-			return _newOjb;
+			
 		}
 
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -41,5 +42,37 @@ namespace ASBinCode
             return "super";
         }
 
-    }
+
+
+
+
+
+		public static SuperPointer LoadSuperPointer(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int, object> serizlized, int key)
+		{
+			RunTimeDataType valuetype = reader.ReadInt32();
+			rtti.Class superClass = serizlizer.DeserializeObject<rtti.Class>(reader, rtti.Class.LoadClass);
+			rtti.Class thisClass = serizlizer.DeserializeObject<rtti.Class>(reader, rtti.Class.LoadClass);
+
+			SuperPointer sp = new SuperPointer(superClass, thisClass); serizlized.Add(key, sp);
+			sp.valueType = valuetype;
+
+			return sp;
+
+		}
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(9);
+			base.Serialize(writer, serizlizer);
+
+			serizlizer.SerializeObject(writer, superClass);
+			serizlizer.SerializeObject(writer, thisClass);
+
+			//throw new NotImplementedException();
+		}
+
+	}
 }

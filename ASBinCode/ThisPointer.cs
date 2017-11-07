@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -111,5 +112,29 @@ namespace ASBinCode
             return "this";
         }
 
-    }
+
+
+
+		public static ThisPointer LoadThisPointer(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int, object> serizlized, int key)
+		{
+			RunTimeDataType type = reader.ReadInt32();
+			SourceToken token = serizlizer.DeserializeObject<SourceToken>(reader, SourceToken.LoadToken);
+
+			ThisPointer pointer = new ThisPointer(null, token); serizlized.Add(key, pointer);
+			pointer.valueType = type;
+
+			return pointer;
+		}
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(8);
+			base.Serialize(writer, serizlizer);
+			serizlizer.SerializeObject<SourceToken>(writer, token);
+		}
+
+	}
 }

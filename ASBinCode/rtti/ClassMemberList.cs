@@ -12,10 +12,12 @@ namespace ASBinCode.rtti
 
 		private Dictionary<string, ClassMember> dictionary;
 
+		
 		public ClassMemberList()
 		{
 			list = new List<ClassMember>();
 			dictionary = new Dictionary<string, ClassMember>();
+			
 		}
 
 
@@ -28,7 +30,7 @@ namespace ASBinCode.rtti
 		public void Add(ClassMember item)
 		{
 			list.Add(item);
-
+			
 			if (item.inheritSrcMember != null && item.inheritSrcMember.isConstructor)
 			{
 				return;

@@ -17,7 +17,6 @@ namespace ASCTest
 			//System.IO.File.WriteAllBytes("astoolglobal.swc", b);
 
 
-
 			ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 
             //string teststring = "package{}var a:String = \"first\";var b:String = \"First\"; var c=a==b;";
@@ -31,7 +30,9 @@ namespace ASCTest
             {
                 string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
-				//path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
+									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
+				//path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+
 
 				if (path.EndsWith(".as"))
                 {
@@ -95,24 +96,24 @@ namespace ASCTest
 			//*********************
 
 			//*********加入ProtoBuf API*****
-			string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-			if (System.IO.Directory.Exists(apidir))
-			{
-				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
-				foreach (var item in linkapi)
-				{
-					string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-					if (projfile.StartsWith("/"))
-						projfile = projfile.Substring(1);
-					srcFileProjFile.Add(item, projfile);
-				}
+			//string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+			//if (System.IO.Directory.Exists(apidir))
+			//{
+			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//	foreach (var item in linkapi)
+			//	{
+			//		string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+			//		if (projfile.StartsWith("/"))
+			//			projfile = projfile.Substring(1);
+			//		srcFileProjFile.Add(item, projfile);
+			//	}
 
 
-				string[] n = new string[files.Length + linkapi.Length];
-				linkapi.CopyTo(n, 0);
-				files.CopyTo(n, linkapi.Length);
-				files = n;
-			}
+			//	string[] n = new string[files.Length + linkapi.Length];
+			//	linkapi.CopyTo(n, 0);
+			//	files.CopyTo(n, linkapi.Length);
+			//	files = n;
+			//}
 			//*********************
 
 			var proj = new ASTool.AS3.AS3Proj();
@@ -171,7 +172,7 @@ namespace ASCTest
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
-			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
+			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
 
 			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
@@ -180,11 +181,20 @@ namespace ASCTest
             if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
+
+				//byte[] bin = swc.toBytes();
+
+				//swc = ASBinCode.CSWC.loadFromBytes(bin);
+
+				//ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
+				//(new extFunctions()).registrationFunction(swc);
+
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
 				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
 
 				if (swc != null)
                 {
+					
 #if DEBUG
                     
                     for (int i = 0; i < swc.blocks.Count; i++)
@@ -270,5 +280,56 @@ namespace ASCTest
 #endif
 
         }
+
+
+
+
+		private static void testSer(ASBinCode.CSWC sss)
+		{
+			{
+				ASBinCode.CSWCSerizlizer serizlizer = new ASBinCode.CSWCSerizlizer();
+
+				var bytes= serizlizer.Serialize(sss);
+
+				var swcout= serizlizer.Deserialize(bytes);
+
+
+				//byte[] cd;
+				//using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+				//{
+				//	using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms))
+				//	{
+				//		foreach (var item in sss.blocks)
+				//		{
+				//			serizlizer.SerializeObject(bw, item);
+				//		}
+				//	}
+				//	cd = ms.ToArray();
+				//}
+
+
+
+				//using (System.IO.MemoryStream ms = new System.IO.MemoryStream(cd))
+				//{
+				//	using (System.IO.BinaryReader br = new System.IO.BinaryReader(ms))
+				//	{
+				//		ASBinCode.CSWCSerizlizer dserizlizer = new ASBinCode.CSWCSerizlizer();
+				//		while (ms.Position < ms.Length)
+				//		{
+				//			var dc = dserizlizer.DeserializeObject<ASBinCode.CodeBlock>(br, ASBinCode.CodeBlock.Deserialize);
+				//		}
+
+				//	}
+
+				//}
+
+			}
+		}
+
+
+
+
+
+
     }
 }

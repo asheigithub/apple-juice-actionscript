@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -73,5 +74,43 @@ namespace ASBinCode
         {
             return new Variable(name, _indexOfMembers, ignoreImplicitCast, refblockid, valueType, isConst);
         }
-    }
+
+
+
+		public static Variable LoadVariable(BinaryReader reader,CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
+		{
+			//	private string _name;
+			string _name = reader.ReadString();
+			//protected int _indexOfMembers;
+			int _indexOfMembers = reader.ReadInt32();
+			//protected readonly int refblockid;
+			int refblockid = reader.ReadInt32();
+
+			///// <summary>
+			///// 赋值是否忽略编译期类型检查
+			///// </summary>
+			//public readonly bool ignoreImplicitCast;
+			bool ignoreImplicitCast = reader.ReadBoolean();
+			///// <summary>
+			///// 是否不可赋值
+			///// </summary>
+			//public readonly bool isConst;
+			bool isConst = reader.ReadBoolean();
+
+			RunTimeDataType valuetype = reader.ReadInt32();
+
+			Variable variable = new Variable(_name, _indexOfMembers, ignoreImplicitCast , refblockid,isConst);
+			variable.valueType = valuetype;
+			serizlized.Add(key, variable);
+			return variable;
+		}
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(3);
+			base.Serialize(writer, serizlizer);
+		}
+
+	}
 }

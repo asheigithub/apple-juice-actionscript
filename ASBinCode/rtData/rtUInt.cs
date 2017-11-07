@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode.rtData
@@ -29,5 +30,13 @@ namespace ASBinCode.rtData
             return value.ToString();
         }
 
-    }
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(rtType);
+			writer.Write(value);
+		}
+
+	}
 }

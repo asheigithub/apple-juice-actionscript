@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using ASBinCode.rtData;
 
@@ -8,7 +9,7 @@ namespace ASBinCode
 	[Serializable]
 	public abstract class MethodGetterBase : LeftValueBase,IMember
     {
-        protected readonly ASBinCode.rtti.Class _class;
+        protected ASBinCode.rtti.Class _class;
         protected int indexofMember;
         
         private readonly string _name;
@@ -154,29 +155,37 @@ namespace ASBinCode
             return name;
         }
 
-        //public override int GetHashCode()
-        //{
-        //    return _name.GetHashCode() ^ _class.GetHashCode() ^ indexofMember.GetHashCode() ^ refdefinedinblockid.GetHashCode(); 
-        //}
 
-        //public override bool Equals(object obj)
-        //{
-        //    if (obj == null) { return false; }
 
-        //    if (!(obj.GetType().Equals(this.GetType())))
-        //    {
-        //        return false;
-        //    }
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			
+			//protected int indexofMember;
+			writer.Write(indexofMember);
+			//private readonly string _name;
+			writer.Write(_name);
+			//public readonly int refdefinedinblockid;
+			writer.Write(refdefinedinblockid);
+			//protected int functionid;
+			writer.Write(functionid);
 
-        //    ClassMethodGetter other = (ClassMethodGetter)obj;
-        //    return _name == other._name &&
-        //        _class == other._class &&
-        //        indexofMember == other.indexofMember &&
-        //        refdefinedinblockid == other.refdefinedinblockid;
+			///// <summary>
+			///// 比如说，私有方法就肯定不是虚方法
+			///// </summary>
+			//protected bool isNotReadVirtual = false;
+			writer.Write(isNotReadVirtual);
 
-        //}
+			base.Serialize(writer, serizlizer);
 
-        public sealed class MethodSlot : SLOT
+			//protected readonly ASBinCode.rtti.Class _class;
+			serizlizer.SerializeObject(writer, _class);
+
+		}
+		
+
+		
+
+		public sealed class MethodSlot : SLOT
         {
             //private rtFunction method;
             public static MethodSlot instance = new MethodSlot();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -8,7 +9,7 @@ namespace ASBinCode
 	/// <summary>
 	/// 代码块
 	/// </summary>
-	public class CodeBlock
+	public class CodeBlock : ISWCSerializable
     {
         public readonly int id;
         public readonly string name;
@@ -46,7 +47,7 @@ namespace ASBinCode
             regConvFromVar = new List<Register>();
         }
 
-        public override string ToString()
+		public override string ToString()
         {
             string r = string.Empty;
 
@@ -58,5 +59,78 @@ namespace ASBinCode
             return r;
         }
 
-    }
+
+
+
+
+
+
+		
+
+		public static CodeBlock Deserialize(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
+		{
+
+			var id = reader.ReadInt32();
+			var name = reader.ReadString();  //writer.Write(name);
+			var define_class_id = reader.ReadInt32();  //writer.Write(define_class_id);
+			var isoutclass = reader.ReadBoolean(); //writer.Write(isoutclass);
+			var hasTryStmt = reader.ReadBoolean();// writer.Write(hasTryStmt);
+
+			CodeBlock block = new CodeBlock(id, name, define_class_id, isoutclass);
+			block.hasTryStmt = hasTryStmt;
+			serizlized.Add(key,block);	
+
+			block.totalRegisters = reader.ReadInt32();
+			block.scope = serizlizer.DeserializeObject<scopes.ScopeBase>(reader, scopes.ScopeBase.Deserialize);
+
+			int stepscount = reader.ReadInt32();
+			for (int i = 0; i < stepscount; i++)
+			{
+				OpStep step = serizlizer.DeserializeObject<OpStep>(reader, OpStep.Deserialize);
+				block.opSteps.Add(step);
+			}
+
+			int regconvcount = reader.ReadInt32();
+			for (int i = 0; i < regconvcount; i++)
+			{
+				Register register = (Register)serizlizer.DeserializeObject<ISWCSerializable>(reader, ISWCSerializableLoader.LoadIMember);
+				block.regConvFromVar.Add(register);
+			}
+
+			return block;
+
+			
+		}
+
+		public void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			
+			writer.Write(id);
+			writer.Write(name);
+			writer.Write(define_class_id);
+			writer.Write(isoutclass);
+			writer.Write(hasTryStmt);
+			writer.Write(totalRegisters);
+
+			serizlizer.SerializeObject(writer, (scopes.ScopeBase)scope);
+				
+			writer.Write(opSteps.Count);
+			for (int i = 0; i < opSteps.Count; i++)
+			{
+				var step = opSteps[i];
+				//((ISWCSerializable)step).Serialize(writer, serizlizer);
+				serizlizer.SerializeObject(writer, step);
+			}
+
+			writer.Write(regConvFromVar.Count);
+			for (int i = 0; i < regConvFromVar.Count; i++)
+			{
+				Register conv = regConvFromVar[i];
+				//conv.Serialize(writer, serizlizer);
+				serizlizer.SerializeObject(writer, conv);
+			}
+		}
+
+		
+	}
 }

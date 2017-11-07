@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -148,5 +149,82 @@ namespace ASBinCode
         }
 
 
-    }
+
+
+
+		public static Field LoadField(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int, object> serizlized, int key)
+		{
+			//	private string _name;
+			string _name = reader.ReadString();
+			//protected int _indexOfMembers;
+			int _indexOfMembers = reader.ReadInt32();
+			//protected readonly int refblockid;
+			int refblockid = reader.ReadInt32();
+
+			///// <summary>
+			///// 赋值是否忽略编译期类型检查
+			///// </summary>
+			//public readonly bool ignoreImplicitCast;
+			bool ignoreImplicitCast = reader.ReadBoolean();
+			///// <summary>
+			///// 是否不可赋值
+			///// </summary>
+			//public readonly bool isConst;
+			bool isConst = reader.ReadBoolean();
+
+			RunTimeDataType valuetype = reader.ReadInt32();
+
+			Field field = new Field(_name, _indexOfMembers, refblockid, isConst);
+			field.valueType = valuetype;
+
+			serizlized.Add(key, field);
+
+
+
+			field.isPublic = reader.ReadBoolean();
+			field.isInternal = reader.ReadBoolean();
+			field.isPrivate = reader.ReadBoolean();
+			field.isProtected = reader.ReadBoolean();
+			field.isStatic = reader.ReadBoolean();
+
+			int metas = reader.ReadInt32();
+			for (int i = 0; i < metas; i++)
+			{
+				field.metas.Add(serizlizer.DeserializeObject<FieldMeta>(reader, FieldMeta.LoadFieldMeta));
+			}
+
+			return field;
+		}
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(4);
+			base.Serialize(writer, serizlizer);
+
+			//public bool isPublic;
+			writer.Write(isPublic);
+			//public bool isInternal;
+			writer.Write(isInternal);
+			//public bool isPrivate;
+			writer.Write(isPrivate);
+			//public bool isProtected;
+			writer.Write(isProtected);
+			//public bool isStatic;
+			writer.Write(isStatic);
+			//public List<FieldMeta> metas;
+
+			writer.Write(metas.Count);
+			for (int i = 0; i < metas.Count; i++)
+			{
+				serizlizer.SerializeObject(writer, metas[i]);
+			}
+
+		}
+
+
+
+	}
 }

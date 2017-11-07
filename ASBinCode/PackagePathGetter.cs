@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -35,5 +36,12 @@ namespace ASBinCode
             //***不可能在运行时运行***
             throw new NotImplementedException();
         }
-    }
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			throw new NotImplementedException();
+		}
+
+	}
 }

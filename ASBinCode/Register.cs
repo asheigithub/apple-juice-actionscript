@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -8,7 +9,7 @@ namespace ASBinCode
 	/// <summary>
 	/// 表示需对寄存器操作
 	/// </summary>
-	public sealed class Register : LeftValueBase
+	public sealed class Register : LeftValueBase ,ISWCSerializable
     {
         
 
@@ -109,5 +110,119 @@ namespace ASBinCode
             
         }
 
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(5);
+			base.Serialize(writer, serizlizer);
+
+			//public readonly int Id;
+			writer.Write(Id);
+			//public int _index;
+			writer.Write(_index);
+			//public readonly int stmtid;
+			writer.Write(stmtid);
+
+			///// <summary>
+			///// 指示是否delete目标
+			///// </summary>
+			//public bool _isdeletetarget;
+			writer.Write(_isdeletetarget);
+			///// <summary>
+			///// 指示是否对其有=赋值操作
+			///// </summary>
+			//public bool _isassigntarget;
+			writer.Write(_isassigntarget);
+			///// <summary>
+			///// 指示是否对其有++,--,delete操作
+			///// </summary>
+			//public bool _hasUnaryOrShuffixOrDelete;
+			writer.Write(_hasUnaryOrShuffixOrDelete);
+			///// <summary>
+			///// 指示是否对其有++,--
+			///// </summary>
+			//public bool _hasUnaryOrShuffix;
+			writer.Write(_hasUnaryOrShuffix);
+			///// <summary>
+			///// 只是是否. [] 操作的目标
+			///// </summary>
+			//public bool _isDotAccessTarget;
+			writer.Write(_isDotAccessTarget);
+
+			//public bool isFindByPath;
+			writer.Write(isFindByPath);
+			//public bool isFuncResult;
+			writer.Write(isFuncResult);
+			//public bool isConvertFromVariable;
+			writer.Write(isConvertFromVariable);
+
+			
+
+		}
+
+		public static Register LoadRegister(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
+		{
+			RunTimeDataType valuetype = reader.ReadInt32();
+
+			//public readonly int Id;
+			int id = reader.ReadInt32();
+			//public int _index;
+			int _index = reader.ReadInt32();
+			//public readonly int stmtid;
+			int stmtid = reader.ReadInt32();
+
+
+			Register register = new Register(id,stmtid); serizlized.Add(key, register);
+			register._index = _index;
+
+			///// <summary>
+			///// 指示是否delete目标
+			///// </summary>
+			//public bool _isdeletetarget;
+			register._isdeletetarget = reader.ReadBoolean();
+			///// <summary>
+			///// 指示是否对其有=赋值操作
+			///// </summary>
+			//public bool _isassigntarget;
+			register._isassigntarget = reader.ReadBoolean();
+			///// <summary>
+			///// 指示是否对其有++,--,delete操作
+			///// </summary>
+			//public bool _hasUnaryOrShuffixOrDelete;
+			register._hasUnaryOrShuffixOrDelete = reader.ReadBoolean();
+			///// <summary>
+			///// 指示是否对其有++,--
+			///// </summary>
+			//public bool _hasUnaryOrShuffix;
+			register._hasUnaryOrShuffix = reader.ReadBoolean();
+			///// <summary>
+			///// 只是是否. [] 操作的目标
+			///// </summary>
+			//public bool _isDotAccessTarget;
+			register._isDotAccessTarget = reader.ReadBoolean();
+
+			//public bool isFindByPath;
+			register.isFindByPath = reader.ReadBoolean();
+			//public bool isFuncResult;
+			register.isFuncResult = reader.ReadBoolean();
+			//public bool isConvertFromVariable;
+			register.isConvertFromVariable = reader.ReadBoolean();
+
+			return register;
+			
+		}
+
+		
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace ASBinCode
@@ -9,14 +10,26 @@ namespace ASBinCode
 	/// 右值
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public abstract class RightValueBase
+	public abstract class RightValueBase :ISWCSerializable
     {
         public abstract RunTimeValueBase getValue(RunTimeScope scope , RunTimeDataHolder dataHolder );
 
-		
 		//public abstract RunTimeDataType valueType { get; }
 		public RunTimeDataType valueType;
-    }
+
+
+
+
+
+
+		public virtual void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
+		{
+			writer.Write(valueType);
+		}
+
+
+
+	}
 	[Serializable]
 	/// <summary>
 	/// 左值
