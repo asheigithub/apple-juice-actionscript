@@ -19,3 +19,4 @@ LinkCodeGen/bin/
 *.pdb
 *.cache
 .vs/ASTool/v15/sqlite3/storage.ide
+*.vspx
