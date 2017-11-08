@@ -544,5 +544,15 @@ package flash.utils
 		[native,_bytearray_writeUTFBytes_]
 		public function writeUTFBytes (value:String) : void;
 		
+
+
+		[get_this_item];
+		[native, _flash_utils_bytearray_getThisItem_];
+		public function getThisItem(key:int):Number;
+		
+		[set_this_item];
+		[native, _flash_utils_bytearray_setThisItem_];
+		public function setThisItem(value:Number, key:int):void;
+
 	}
 }

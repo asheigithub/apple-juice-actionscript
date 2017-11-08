@@ -2,7 +2,7 @@ package
 {
 	import flash.display.Sprite;
 	
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 

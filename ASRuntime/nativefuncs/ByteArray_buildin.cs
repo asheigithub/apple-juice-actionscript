@@ -2435,6 +2435,182 @@ namespace ASRuntime.nativefuncs
 		}
 	}
 
+
+	class ByteArray_getThisItem : NativeConstParameterFunction
+	{
+		private List<RunTimeDataType> _paras;
+
+		public ByteArray_getThisItem() : base(1)
+		{
+			_paras = new List<RunTimeDataType>();
+			_paras.Add(RunTimeDataType.rt_int);
+		}
+
+		public override bool isMethod
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_flash_utils_bytearray_getThisItem_";
+			}
+		}
+
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return _paras;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.rt_number;
+			}
+		}
+
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+
+			ByteArray ms =
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+
+			int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+
+			if (index<0)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1069, "Property "+ index +" not found on flash.utils.ByteArray and there is no default value.");
+
+				returnSlot.setValue(rtUndefined.undefined);
+			}
+			else
+			{
+				if (index >= ms.length)
+				{
+					success = true;
+					returnSlot.setValue(rtUndefined.undefined);
+				}
+				else
+				{
+					success = true;
+
+					uint pos = ms.position;
+					ms.position = (uint)index;
+
+					returnSlot.setValue((double)ms.readUnsignedByte());
+
+					ms.position = pos;
+				}
+				
+
+				
+
+			}
+
+
+		}
+	}
+
+	class ByteArray_setThisItem : NativeConstParameterFunction
+	{
+		private List<RunTimeDataType> _paras;
+
+		public ByteArray_setThisItem() : base(2)
+		{
+			_paras = new List<RunTimeDataType>();
+			_paras.Add(RunTimeDataType.rt_number);
+			_paras.Add(RunTimeDataType.rt_int);
+		}
+
+		public override bool isMethod
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_flash_utils_bytearray_setThisItem_";
+			}
+		}
+
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return _paras;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.fun_void;
+			}
+		}
+
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+
+			ByteArray ms =
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+
+			double value = TypeConverter.ConvertToNumber(argements[0]);
+			int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+
+			if (index <0)
+			{
+				success = false;
+
+				stackframe.throwError(token, 1056, " Error #1056: Cannot create property "+index+" on flash.utils.ByteArray.");
+
+				returnSlot.setValue(rtUndefined.undefined);
+			}
+			else
+			{
+				uint oldpos = ms.position;
+				if (oldpos < ms.length)
+				{
+					oldpos = ms.length;
+				}
+
+				while (ms.length < index)
+				{
+					ms.writeByte(0);
+				}
+
+				ms.position = (uint)index;
+				ms.writeByte( (SByte)value );
+
+				ms.position = oldpos;
+
+
+				success = true;
+				returnSlot.setValue(rtUndefined.undefined);
+
+			}
+
+
+		}
+	}
 }
 
 

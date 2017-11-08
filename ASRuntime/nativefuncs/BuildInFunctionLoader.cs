@@ -117,6 +117,8 @@ namespace ASRuntime.nativefuncs
 			bin.regNativeFunction(new ByteArray_writeUnsignedInt());
 			bin.regNativeFunction(new ByteArray_writeUTF());
 			bin.regNativeFunction(new ByteArray_writeUTFBytes());
+			bin.regNativeFunction(new ByteArray_setThisItem());
+			bin.regNativeFunction(new ByteArray_getThisItem());
 
 			bin.regNativeFunction(new Boolean_toString());
 

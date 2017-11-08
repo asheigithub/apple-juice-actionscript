@@ -29,7 +29,7 @@ namespace ASCTest
             if (args.Length > 0)
             {
                 string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
-									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+									   path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 				//path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
 
@@ -172,8 +172,8 @@ namespace ASCTest
             //Console.Read();
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
-			builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
-			//builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
+			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
+			builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
 
 			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
@@ -219,46 +219,46 @@ namespace ASCTest
 
 
 
-						var d = player.createInstance("SProtoSpace.group_area_info");
-						uint len = (uint)player.getMemberValue(d, "groupids.length");
-						player.setMemberValue(d, "groupids.length", 3);
-						player.setMemberValue(d, "areaGroupName", null);
+						//var d = player.createInstance("SProtoSpace.group_area_info");
+						//uint len = (uint)player.getMemberValue(d, "groupids.length");
+						//player.setMemberValue(d, "groupids.length", 3);
+						//player.setMemberValue(d, "areaGroupName", null);
 
-						for (int i = 0; i < 3; i++)
-						{
-							player.setMemberValue(d, "groupids", i + 5, i);
-						}
+						//for (int i = 0; i < 3; i++)
+						//{
+						//	player.setMemberValue(d, "groupids", i + 5, i);
+						//}
 
-						//var d = player.createInstance("SProtoSpace.role_base_info");
-						ASRuntime.flash.utils.ByteArray array;
-						var byteArray = player.createByteArrayObject(out array);
-						//player.setMemberValue(d, "groupName", "账号你二大爷");
-
-
-
-						var r = player.invokeMethod(d, "writeTo", byteArray);
-						var d2 = player.createInstance("SProtoSpace.group_area_info");
-
-						player.setMemberValue(byteArray, "position", 0);
-						var k = player.invokeMethod(d2, "mergeFrom", byteArray);
-						var m = player.getMemberValue(d2, "groupids.length");
-
-						var ts = player.invokeMethod(byteArray, "toString");
-
-						var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
-
-						try
-						{
-							player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
-						}
-						catch (ASBinCode.ASRunTimeException e)
-						{
-							Console.WriteLine(e.ToString());
-						}
-
-						var s = player.invokeMethod("Test", "TTT", 3, 4);
+						////var d = player.createInstance("SProtoSpace.role_base_info");
+						//ASRuntime.flash.utils.ByteArray array;
+						//var byteArray = player.createByteArrayObject(out array);
+						////player.setMemberValue(d, "groupName", "账号你二大爷");
 
 
+
+						//var r = player.invokeMethod(d, "writeTo", byteArray);
+						//var d2 = player.createInstance("SProtoSpace.group_area_info");
+
+						//player.setMemberValue(byteArray, "position", 0);
+						//var k = player.invokeMethod(d2, "mergeFrom", byteArray);
+						//var m = player.getMemberValue(d2, "groupids.length");
+
+						//var ts = player.invokeMethod(byteArray, "toString");
+
+						//var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+
+						//try
+						//{
+						//	player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
+						//}
+						//catch (ASBinCode.ASRunTimeException e)
+						//{
+						//	Console.WriteLine(e.ToString());
+						//}
+
+						//var s = player.invokeMethod("Test", "TTT", 3, 4);
+
+						
 
 
 						Console.WriteLine();
