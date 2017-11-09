@@ -11,8 +11,8 @@ namespace ASRuntime.operators
     /// </summary>
     class InstanceCreator
     {
-        public Player player;
-        private StackFrame invokerFrame;
+        
+        private readonly StackFrame invokerFrame;
         public SourceToken token;
         public OpStep step;
 
@@ -29,16 +29,41 @@ namespace ASRuntime.operators
         public ASBinCode.rtData.rtObject constructor;
         private FunctionCaller _function_constructor;
 
-        public InstanceCreator(Player player, StackFrame invokerFrame, SourceToken token, Class _class)
+        private InstanceCreator(StackFrame invokerFrame)//, SourceToken token, Class _class)
         {
-            this.player = player;
             this.invokerFrame = invokerFrame;
-            this.token = token;
-            this._class = _class;
-
-            
+            //this.token = token;
+            //this._class = _class;
         }
-        
+
+		private Player player
+		{
+			get { return invokerFrame.player; }
+		}
+
+		public static InstanceCreator Create(StackFrame invokerFrame)
+		{
+			return new InstanceCreator(invokerFrame);
+		}
+
+		public void SetTokenAndClass(SourceToken token, Class _class)
+		{
+			this.token = token;
+			this._class = _class;
+		}
+
+
+		public void clear()
+		{
+			token = null;
+			_class = null;
+			step = null;
+			callbacker = null;
+			constructorCaller = null;
+			objectResult = null;
+		}
+
+
         public bool prepareConstructorArgements()
         {
             int classid = _class.classid;

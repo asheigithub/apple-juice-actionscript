@@ -54,7 +54,8 @@ namespace ASRuntime.operators
                 if (_class != null && !_class.no_constructor)
                 {
 
-                    frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
+					//frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
+					frame.activeInstanceCreator(step.token, _class);
                     if (_class.constructor != null)
                     {
                         if (!frame.instanceCreator.prepareConstructorArgements())
@@ -124,7 +125,8 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeScope scope)
         {
             var _class = frame.player.swc.classes[0];
-            frame.instanceCreator = new InstanceCreator(frame.player, frame, step.token, _class);
+			//frame.instanceCreator = new InstanceCreator(frame.player, frame, step.token, _class);
+			frame.activeInstanceCreator(step.token, _class);
             frame.instanceCreator.constructor = (ASBinCode.rtData.rtObject)v1;
             if (!frame.instanceCreator.prepareConstructorArgements())
             {
@@ -174,7 +176,8 @@ namespace ASRuntime.operators
             else
             {
 
-                frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
+				//frame.instanceCreator = new InstanceCreator(player, frame, step.token, _class);
+				frame.activeInstanceCreator(step.token, _class);
                 if (!frame.instanceCreator.prepareConstructorArgements())
                 {
                     return;
@@ -284,13 +287,18 @@ namespace ASRuntime.operators
             var player = frame.player;
             int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope, frame)).value;
             ASBinCode.rtti.Class as3class = player.swc.classes[classid];
-            //init_static_class(player, frame, as3class,step.token, scope);
+			//init_static_class(player, frame, as3class,step.token, scope);
 
-            InstanceCreator ic = new InstanceCreator(player, frame, step.token, as3class);
-            if (ic.init_static_class(as3class))
-            {
-                frame.endStep(step);
-            }
+			if (InstanceCreator.init_static_class(as3class, player, step.token))
+			{
+				frame.endStep(step);
+			}
+
+            //InstanceCreator ic = new InstanceCreator(player, frame, step.token, as3class);
+            //if (ic.init_static_class(as3class))
+            //{
+            //    frame.endStep(step);
+            //}
             
         }
 
@@ -373,8 +381,9 @@ namespace ASRuntime.operators
                 ((StackFrame)sender.args).instanceCreator.objectResult );
 
 
-            ((StackFrame)sender.args).instanceCreator = null;
-            ((StackFrame)sender.args).endStep();
+			//((StackFrame)sender.args).instanceCreator = null;
+			((StackFrame)sender.args).deActiveInstanceCreator();
+			((StackFrame)sender.args).endStep();
         }
 
 

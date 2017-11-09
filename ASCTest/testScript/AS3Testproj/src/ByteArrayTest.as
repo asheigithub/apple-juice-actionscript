@@ -4,7 +4,7 @@ package
 	import flash.errors.EOFError;
 	import flash.utils.ByteArray;
 	
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 
@@ -14,6 +14,21 @@ package
 		
 		public function ByteArrayTest() 
 		{
+			var f=function(){
+				yield return 1;
+				
+				yield return 2;
+				
+				yield return 3;
+			}
+			
+			for each(var k in f())
+			{
+				trace(k);
+			}
+			
+			
+			
 			var byteArr:ByteArray = new ByteArray();
 
             byteArr.writeBoolean(false);

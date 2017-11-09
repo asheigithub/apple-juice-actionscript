@@ -144,7 +144,7 @@ namespace ASRuntime
                     DictionaryKey key = (DictionaryKey)obj;
                     rt = _OBJECT_LINK;
                     obj = key.key;
-
+					
                 }
 
                 if (rt == RunTimeDataType._OBJECT)
@@ -161,11 +161,9 @@ namespace ASRuntime
                     }
                 }
 				
-
-				var realObjType = getRuntimeDataType(obj.GetType());
-
                 if (rt == RunTimeDataType.rt_int)
                 {
+					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_uint)
 					{
 						returnSlot.setValue((int)(uint)obj);
@@ -194,6 +192,7 @@ namespace ASRuntime
                 }
                 else if (rt == RunTimeDataType.rt_uint)
                 {
+					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_int)
 					{
 						returnSlot.setValue((uint)(int)obj);
@@ -221,10 +220,12 @@ namespace ASRuntime
                 }
                 else if (rt == RunTimeDataType.rt_string)
                 {
-                    returnSlot.setValue((string)obj);
+					var realObjType = getRuntimeDataType(obj.GetType());
+					returnSlot.setValue((string)obj);
                 }
                 else if (rt == RunTimeDataType.rt_number)
                 {
+					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_uint)
 					{
 						returnSlot.setValue((double)(uint)obj);
@@ -252,7 +253,7 @@ namespace ASRuntime
                 }
                 else if (rt == RunTimeDataType.rt_boolean)
                 {
-                    if ((bool)obj)
+					if ((bool)obj)
                     {
                         returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
                     }

@@ -1,5 +1,6 @@
 ﻿using ASBinCode;
 using ASBinCode.rtData;
+using ASBinCode.rtti;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,7 +42,7 @@ namespace ASRuntime
 
             
             tryCatchState = new Stack<TryState>();
-            
+			_instanceCreator = operators.InstanceCreator.Create(this);
 
         }
 
@@ -74,7 +75,45 @@ namespace ASRuntime
             public int tryid;
         }
 
-        internal operators.InstanceCreator instanceCreator;
+		internal void activeInstanceCreator(SourceToken token, Class _class)
+		{
+#if DEBUG
+			if (_instanceCreatorIsActive)
+				throw new InvalidOperationException();
+#endif
+
+			_instanceCreator.SetTokenAndClass(token, _class);
+			_instanceCreatorIsActive = true;
+		}
+
+		internal void deActiveInstanceCreator()
+		{
+			if (_instanceCreatorIsActive)
+			{
+				_instanceCreator.clear();
+				_instanceCreatorIsActive = false;
+			}
+		}
+
+
+		internal operators.InstanceCreator instanceCreator
+		{
+			get
+			{
+				if (_instanceCreatorIsActive)
+				{
+					return _instanceCreator;
+				}
+				else
+				{
+					return null;
+				}
+			}
+		}
+		bool _instanceCreatorIsActive;
+		private operators.InstanceCreator _instanceCreator;
+        
+
         internal operators.FunctionCaller funCaller;
         internal operators.OpCallFunction.typeConvertOperator typeconvertoperator;
         internal StackSlot _tempSlot1;
@@ -1275,8 +1314,8 @@ namespace ASRuntime
 
             typeconvertoperator = null;
             funCaller = null;
-            instanceCreator = null;
-
+			
+			deActiveInstanceCreator();
 
 			if (call_parameter_slotCount != 0)
 			{

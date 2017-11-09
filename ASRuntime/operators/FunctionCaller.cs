@@ -621,21 +621,36 @@ namespace ASRuntime.operators
             {
                 if (!player.static_instance.ContainsKey(player.swc.YieldIteratorClass.staticClass.classid))
                 {
-                    operators.InstanceCreator ic = new InstanceCreator(player, invokerFrame, token, player.swc.YieldIteratorClass);
-                    if (!ic.init_static_class(player.swc.YieldIteratorClass))
-                    {
-						
+					if (!InstanceCreator.init_static_class(player.swc.YieldIteratorClass, player, token))
+					{
 						invokerFrame.endStep();
 
-                        if (callbacker != null)
-                        {
-                            callbacker.noticeRunFailed();
-                        }
-                        release();
+						if (callbacker != null)
+						{
+							callbacker.noticeRunFailed();
+						}
+						release();
+
+
+						return;
+					}
+
+
+      //              operators.InstanceCreator ic = new InstanceCreator(player, invokerFrame, token, player.swc.YieldIteratorClass);
+      //              if (!ic.init_static_class(player.swc.YieldIteratorClass))
+      //              {
+						
+						//invokerFrame.endStep();
+
+      //                  if (callbacker != null)
+      //                  {
+      //                      callbacker.noticeRunFailed();
+      //                  }
+      //                  release();
                         
                         
-                        return;
-                    }
+      //                  return;
+      //              }
 
                 }
 
