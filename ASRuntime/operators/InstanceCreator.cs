@@ -29,11 +29,14 @@ namespace ASRuntime.operators
         public ASBinCode.rtData.rtObject constructor;
         private FunctionCaller _function_constructor;
 
+		private HeapSlot tempSlot;
+
         private InstanceCreator(StackFrame invokerFrame)//, SourceToken token, Class _class)
         {
             this.invokerFrame = invokerFrame;
-            //this.token = token;
-            //this._class = _class;
+			//this.token = token;
+			//this._class = _class;
+			tempSlot = new HeapSlot();
         }
 
 		private Player player
@@ -61,6 +64,10 @@ namespace ASRuntime.operators
 			callbacker = null;
 			constructorCaller = null;
 			objectResult = null;
+
+			constructor = null;
+			_function_constructor = null;
+			tempSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 		}
 
 
@@ -172,92 +179,20 @@ namespace ASRuntime.operators
         public bool init_static_class(Class cls)
         {
             return init_static_class(cls, player, token);
-
-            //if (!player.static_instance.ContainsKey(cls.staticClass.classid))
-            //{
-            //    int f = player.getRuntimeStackFlag();
-
-                
-            //    ASBinCode.RunTimeScope objScope;
-            //    ASBinCode.rtti.Object obj = makeObj(player,token, cls.staticClass,
-            //        null, out objScope).value;
-
-            //    player.static_instance.Add(cls.staticClass.classid,
-            //        new ASBinCode.rtData.rtObject(obj, objScope));
-
-            //    if (cls.super != null)
-            //    {
-            //        bool s = init_static_class(cls.super);
-
-            //        if (s)
-            //        {
-            //            ((DynamicObject)obj)._prototype_ = (DynamicObject)(player.static_instance[cls.super.staticClass.classid]).value;
-
-            //            bool result= player.step_toStackflag(f);
-
-            //            if (cls.classid !=2)
-            //            {
-            //                ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
-                                
-            //            }
-
-            //            return result;
-            //        }
-            //        else
-            //        {
-            //            return false;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        bool result= player.step_toStackflag(f);
-
-            //        return result;
-            //    }
-                
-            //}
-            //else
-            //{
-            //    return true;
-            //}
         }
 
 
         public void createInstance()
         {
-            //if (!player.static_instance.ContainsKey(1))
-            //{
-            //    var c = player.swc.getClassByRunTimeDataType(RunTimeDataType._OBJECT);
-            //    init_static_class(c);
-
-            //    if (!player.outpackage_runtimescope.ContainsKey(c.classid))
-            //    {
-            //        int flag = player.getRuntimeStackFlag();
-            //        make_outpackage_scope(c, null);
-            //        player.step_toStackflag(flag);
-            //    }
-            //}
-            //if (!player.static_instance.ContainsKey(3))
-            //{
-            //    var c = player.swc.getClassByRunTimeDataType(RunTimeDataType._OBJECT + 2);
-            //    init_static_class(c);
-
-            //    if (!player.outpackage_runtimescope.ContainsKey(c.classid))
-            //    {
-            //        int flag = player.getRuntimeStackFlag();
-            //        make_outpackage_scope(c, null);
-            //        player.step_toStackflag(flag);
-            //    }
-
-
-            //}
-
 
             if (!player.static_instance.ContainsKey(_class.staticClass.classid))
             {
 
-                afterCreateStaticInstance callbacker = new afterCreateStaticInstance();
-                callbacker.args = this;
+				//afterCreateStaticInstance callbacker = new afterCreateStaticInstance();
+				var callbacker= player.blockCallBackPool.create();
+				callbacker.args = this;
+				callbacker.setCallBacker(afterCreateStaticInstanceCallBacker);
+				callbacker.setWhenFailed(creatorFailed);
 
                 ASBinCode.RunTimeScope objScope;
                 var obj = makeObj(player,token, _class.staticClass, callbacker, out objScope);
@@ -290,7 +225,31 @@ namespace ASRuntime.operators
             }
         }
 
-        private void set_Class_constructor()
+		private static void afterCreateStaticInstanceCallBacker(BlockCallBackBase sender, object args)
+		{
+			InstanceCreator ic = (InstanceCreator)sender.args;
+			
+			ic.set_Class_constructor();
+		}
+
+		private static void creatorFailed(BlockCallBackBase sender, object args)
+		{
+			InstanceCreator ic = (InstanceCreator)args;
+			
+			if (ic.constructorCaller != null)
+			{
+				ic.constructorCaller.noticeRunFailed();
+				ic.constructorCaller = null;
+			}
+
+			if (ic.callbacker != null)
+			{
+				ic.callbacker.noticeRunFailed();
+				ic.callbacker = null;
+			}
+		}
+
+		private void set_Class_constructor()
         {
             if (_class.classid > 2)
             {
@@ -319,8 +278,11 @@ namespace ASRuntime.operators
 
             if (!player.outpackage_runtimescope.ContainsKey(cls.classid))
             {
-                afterCreateOutScope callbacker = new afterCreateOutScope();
+				//afterCreateOutScope callbacker = new afterCreateOutScope();
+				var callbacker= player.blockCallBackPool.create();
                 callbacker.args = this;
+				callbacker.setWhenFailed(creatorFailed);
+				callbacker.setCallBacker(afterCreateOutScopeCallbacker);
 
                 if (make_outpackage_scope(cls, callbacker))
                 {
@@ -361,7 +323,13 @@ namespace ASRuntime.operators
             }
         }
 
-        private bool make_outpackage_scope(Class cls,IBlockCallBack cb)
+		private static void afterCreateOutScopeCallbacker(BlockCallBackBase sender, object args)
+		{
+			((InstanceCreator)sender.args).
+					exec_step1();
+		}
+
+		private bool make_outpackage_scope(Class cls,IBlockCallBack cb)
         {
             
             ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.outscopeblockid];
@@ -419,14 +387,32 @@ namespace ASRuntime.operators
 
         private void exec_step1()
         {
-            afterCreateInstanceData callbacker = new afterCreateInstanceData();
-            callbacker.args = this;
+			//afterCreateInstanceData callbacker = new afterCreateInstanceData();
+			BlockCallBackBase callbacker = player.blockCallBackPool.create();
+			callbacker.args = this;
+
+			callbacker.setCallBacker(afterCreateInstanceDataCallBacker);
+			callbacker.setWhenFailed(creatorFailed);
 
             ASBinCode.RunTimeScope objScope;
+
             makeObj(player,token, _class, callbacker, out objScope);
         }
 
-        private void exec_step2(
+		private static void afterCreateInstanceDataCallBacker(BlockCallBackBase sender, object args)
+		{
+			InstanceCreator ic = (InstanceCreator)sender.args;
+			
+			ASBinCode.rtti.Object obj = (ASBinCode.rtti.Object)sender.cacheObjects[0];
+			RunTimeScope objScope = (RunTimeScope)sender.cacheObjects[2];
+			ASBinCode.rtData.rtObject rtObject = (ASBinCode.rtData.rtObject)sender.cacheObjects[1];
+
+			
+			ic.exec_step2(  obj, objScope, rtObject);
+
+		}
+
+		private void exec_step2(
             ASBinCode.rtti.Object obj,
             RunTimeScope objScope, ASBinCode.rtData.rtObject _object)
         {
@@ -456,18 +442,22 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function =
                     (ASBinCode.rtData.rtFunction)((MethodGetterBase)obj._class.constructor.bindField).getConstructor(objScope);
-                
 
-                HeapSlot _temp = new HeapSlot();
+
+				HeapSlot _temp = tempSlot;
                 constructorCaller.returnSlot = _temp;
 				constructorCaller.SetFunction(function);function.Clear();
+				
 
-
-                afterCallConstructor callbacker = new afterCallConstructor();
+				//afterCallConstructor callbacker = new afterCallConstructor();
+				var callbacker = player.blockCallBackPool.create();
                 callbacker.args = this;
-                callbacker.obj = obj;
-                callbacker.objScope = objScope;
-                callbacker.rtObject = _object;
+				//callbacker.obj = obj;
+				//callbacker.objScope = objScope;
+				//callbacker.rtObject = _object;
+				callbacker.cacheObjects[0] = _object;
+				callbacker.setWhenFailed(creatorFailed);
+				callbacker.setCallBacker(afterCallConstructorCallbacker);
 
                 constructorCaller.callbacker = callbacker;
                 constructorCaller.call();
@@ -481,12 +471,16 @@ namespace ASRuntime.operators
             }
         }
 
-        
+		private static void afterCallConstructorCallbacker(BlockCallBackBase sender, object args)
+		{
+			((InstanceCreator)sender.args).
+			   exec_step3(
+					  //rtObject
+					  (ASBinCode.rtData.rtObject)sender.cacheObjects[0]
+				   );
+		}
 
-
-
-
-        private void exec_step3(ASBinCode.rtData.rtObject rtobject)
+		private void exec_step3(ASBinCode.rtData.rtObject rtobject)
         {
             if (constructor == null)
             {
@@ -500,7 +494,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                HeapSlot _temp = new HeapSlot();
+				HeapSlot _temp = tempSlot; _temp.directSet(ASBinCode.rtData.rtUndefined.undefined);
                 _function_constructor.returnSlot = _temp;
 				//_function_constructor.function = (ASBinCode.rtData.rtFunction)TypeConverter.ObjectImplicit_ToPrimitive(constructor).Clone();
 				//_function_constructor.function.setThis(rtobject);
@@ -526,8 +520,8 @@ namespace ASRuntime.operators
             objectResult = (ASBinCode.rtData.rtObject)a[0];
 
             //***如果有返回值****
-            var returnvalue = ((SLOT)a[1]).getValue();
-            if (returnvalue.rtType != RunTimeDataType.rt_void
+            var returnvalue = ((SLOT)a[1]).getValue(); ((SLOT)a[1]).directSet(ASBinCode.rtData.rtUndefined.undefined);
+			if (returnvalue.rtType != RunTimeDataType.rt_void
                 &&
                 returnvalue.rtType != RunTimeDataType.rt_string
                 &&
@@ -674,7 +668,7 @@ namespace ASRuntime.operators
             Player player,
             SourceToken token,
             ASBinCode.rtti.Class cls,
-            baseinstancecallbacker callbacker, out ASBinCode.RunTimeScope objScope)
+            BlockCallBackBase callbacker, out ASBinCode.RunTimeScope objScope)
         {
 
             ASBinCode.rtti.Object obj = createObject(player.swc, cls);
@@ -750,57 +744,62 @@ namespace ASRuntime.operators
 
             if (callbacker != null)
             {
-                callbacker.obj = obj;
-                callbacker.rtObject = result;
-                callbacker.objScope = objScope;
-            }
+				//callbacker.obj = obj;
+				//callbacker.rtObject = result;
+				//callbacker.objScope = objScope;
+
+				callbacker.cacheObjects[0] = obj;
+				callbacker.cacheObjects[1] = result;
+				callbacker.cacheObjects[2] = objScope;
+				
+			}
 
             return result;
         }
 
 
-        class afterCallConstructor : baseinstancecallbacker
-        {
-            public override void call(object args)
-            {
-                ((InstanceCreator)this.args).
-                exec_step3(
-                       rtObject 
-                    );
-            }
-        }
+        //class afterCallConstructor : baseinstancecallbacker
+        //{
+        //    public override void call(object args)
+        //    {
+        //        ((InstanceCreator)this.args).
+        //        exec_step3(
+        //               rtObject 
+        //            );
+        //    }
+        //}
 
 
-        class afterCreateInstanceData : baseinstancecallbacker
-        {
+        //class afterCreateInstanceData : baseinstancecallbacker
+        //{
 
-            public override void call(object args)
-            {
-                ((InstanceCreator)this.args).
-                    exec_step2(obj,objScope,rtObject);
-            }
-        }
+        //    public override void call(object args)
+        //    {
+        //        ((InstanceCreator)this.args).
+        //            exec_step2(obj,objScope,rtObject);
+        //    }
+        //}
 
 
-        class afterCreateOutScope : baseinstancecallbacker
-        {
-            public override void call(object args)
-            {
-                ((InstanceCreator)this.args). 
-                    exec_step1();
-            }
-        }
+        //class afterCreateOutScope : baseinstancecallbacker
+        //{
+        //    public override void call(object args)
+        //    {
+        //        ((InstanceCreator)this.args). 
+        //            exec_step1();
+        //    }
+        //}
 
-        class afterCreateStaticInstance : baseinstancecallbacker
-        {
-            public override void call(object args)
-            {
+        //class afterCreateStaticInstance : baseinstancecallbacker
+        //{
+        //    public override void call(object args)
+        //    {
               
-                InstanceCreator ic = ((InstanceCreator)this.args);
+        //        InstanceCreator ic = ((InstanceCreator)this.args);
 
-                ic.set_Class_constructor();
-            }
-        }
+        //        ic.set_Class_constructor();
+        //    }
+        //}
     }
 
 
@@ -815,41 +814,41 @@ namespace ASRuntime.operators
 
     
 
-    abstract class baseinstancecallbacker : IBlockCallBack
-    {
-        public object args
-        {
-            get
-            ;
+    //abstract class baseinstancecallbacker : IBlockCallBack
+    //{
+    //    public object args
+    //    {
+    //        get
+    //        ;
 
-            set
-            ;
-        }
+    //        set
+    //        ;
+    //    }
 
-        public ASBinCode.rtti.Object obj { get; set; }
+    //    public ASBinCode.rtti.Object obj { get; set; }
 
-        public ASBinCode.RunTimeScope objScope { get; set; }
+    //    public ASBinCode.RunTimeScope objScope { get; set; }
 
-        public ASBinCode.rtData.rtObject rtObject { get; set; }
+    //    public ASBinCode.rtData.rtObject rtObject { get; set; }
 
-        public abstract void call(object args);
+    //    public abstract void call(object args);
 
-        public void noticeRunFailed()
-        {
-            //throw new NotImplementedException();
-            InstanceCreator ic = (InstanceCreator)args;
-            if (ic.constructorCaller != null)
-            {
-                ic.constructorCaller.noticeRunFailed();
-                ic.constructorCaller = null;
-            }
+    //    public void noticeRunFailed()
+    //    {
+    //        //throw new NotImplementedException();
+    //        InstanceCreator ic = (InstanceCreator)args;
+    //        if (ic.constructorCaller != null)
+    //        {
+    //            ic.constructorCaller.noticeRunFailed();
+    //            ic.constructorCaller = null;
+    //        }
 			
-            if (ic.callbacker != null)
-            {
-                ic.callbacker.noticeRunFailed();
-                ic.callbacker = null;
-            }
-        }
-    }
+    //        if (ic.callbacker != null)
+    //        {
+    //            ic.callbacker.noticeRunFailed();
+    //            ic.callbacker = null;
+    //        }
+    //    }
+    //}
 
 }
