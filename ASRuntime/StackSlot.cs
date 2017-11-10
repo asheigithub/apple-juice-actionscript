@@ -42,11 +42,17 @@ namespace ASRuntime
 
         private rtNumber _numberValue;
         private rtInt _intValue;
-        private rtUInt _uintValue;
-		private rtFunction _functionValue;
+        private rtUInt _uintValue;		
 		private rtString _stringValue;
+#if DEBUG
+		private 
+#else
+		internal
+#endif 
+			rtFunction _functionValue;
 
-        internal ASBinCode.ClassPropertyGetter propGetSet;
+
+		internal ASBinCode.ClassPropertyGetter propGetSet;
         internal ASBinCode.rtData.rtObject propBindObj;
         internal ASBinCode.rtti.Class superPropBindClass;
 
@@ -62,7 +68,12 @@ namespace ASRuntime
 
 		const int LINKMODEINDEX = -1;
 
-        private SLOT linktarget;
+#if DEBUG
+		private 
+#else
+		internal
+#endif
+		SLOT linktarget;
         public void linkTo(SLOT linktarget)
         {
             this.linktarget = linktarget;
@@ -73,8 +84,19 @@ namespace ASRuntime
 			return linktarget;
 		}
 
-        private int index;
-        private RunTimeValueBase[] store;
+#if DEBUG
+		private 
+#else
+		internal
+#endif
+			int index;
+
+#if DEBUG
+		private 
+#else
+		internal
+#endif
+			RunTimeValueBase[] store;
 
         public sealed override bool isPropGetterSetter
         {
@@ -417,28 +439,28 @@ namespace ASRuntime
 
         public sealed override void clear()
         {
-            linktarget = null;
-            propGetSet = null;
-            propBindObj = null;
-            superPropBindClass = null;
+			linktarget = null;
+			propGetSet = null;
+			propBindObj = null;
+			superPropBindClass = null;
 
-            _temp_try_write_setthisitem = null;
+			_temp_try_write_setthisitem = null;
 
 			_cache_arraySlot.clear();
-            _cache_vectorSlot.clear();
-            _cache_prototypeSlot.clear();
-            _cache_setthisslot.clear();
-            _linkObjCache.clearRefObj();
+			_cache_vectorSlot.clear();
+			_cache_prototypeSlot.clear();
+			_cache_setthisslot.clear();
+			_linkObjCache.clearRefObj();
 			_linkObjCache.srcObject = null;
 
 			_functionValue.Clear();
 
-            store[RunTimeDataType.rt_string] = rtNull.nullptr;
-            store[RunTimeDataType.rt_function] = rtNull.nullptr;
-            store[RunTimeDataType.rt_array] = rtNull.nullptr;
-            store[RunTimeDataType._OBJECT] = rtNull.nullptr;
+			store[RunTimeDataType.rt_string] = rtNull.nullptr;
+			store[RunTimeDataType.rt_function] = rtNull.nullptr;
+			store[RunTimeDataType.rt_array] = rtNull.nullptr;
+			store[RunTimeDataType._OBJECT] = rtNull.nullptr;
 
-            index = (int)RunTimeDataType.unknown;
+			index = (int)RunTimeDataType.unknown;
         }
 
 		

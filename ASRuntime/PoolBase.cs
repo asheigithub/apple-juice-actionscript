@@ -14,7 +14,7 @@ namespace ASRuntime
 		int posRet;
 
 		int remain;
-		int maxcount;
+		public readonly int maxcount;
 
 		public PoolBase(int maxcount)
 		{

@@ -149,47 +149,53 @@ namespace ASCompiler.compiler
 			return data;
 		}
 
+		public void LoadLibrary(CSWC lib)
+		{
+			
+			bin = lib;
+
+			foreach (var item in lib.classes)
+			{
+				item.isdocumentclass = false; //作为类库加载的类取消文档类特性
+
+				buildingclasses.AppendLibClass(item);
+
+				foreach (var member in item.classMembers)
+				{
+					if (!item.fields.Contains(member))
+					{
+						if (member.bindField is MethodGetterBase && member.inheritFrom == null)
+						{
+							MethodGetterBase mb = (MethodGetterBase)member.bindField;
+							if (!dictSignatures.ContainsKey(mb.refdefinedinblockid))
+							{
+								dictSignatures.Add(mb.refdefinedinblockid, new Dictionary<IMember, FunctionSignature>());
+							}
+
+							Dictionary<IMember, FunctionSignature> dict = dictSignatures[mb.refdefinedinblockid];
+							if (!dict.ContainsKey(mb))
+							{
+								dict.Add(mb, lib.functions[mb.functionId].signature);
+							}
+
+						}
+					}
+				}
+
+
+			}
+
+			classseed = buildingclasses.Count;
+			blockseed = lib.blocks.Count;
+			functionseed = lib.functions.Count;
+		}
+
 		public void LoadLibrary(byte[] data)
 		{
 			{
 				ASBinCode.CSWC _newOjb = CSWC.loadFromBytes(data);
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(_newOjb);
-				bin = _newOjb;
-
-				foreach (var item in _newOjb.classes)
-				{
-					item.isdocumentclass = false; //作为类库加载的类取消文档类特性
-
-					buildingclasses.AppendLibClass(item);
-
-					foreach (var member in item.classMembers)
-					{
-						if (!item.fields.Contains(member))
-						{
-							if (member.bindField is MethodGetterBase && member.inheritFrom==null)
-							{
-								MethodGetterBase mb = (MethodGetterBase)member.bindField;
-								if (!dictSignatures.ContainsKey(mb.refdefinedinblockid))
-								{
-									dictSignatures.Add(mb.refdefinedinblockid, new Dictionary<IMember, FunctionSignature>());
-								}
-
-								Dictionary<IMember, FunctionSignature> dict = dictSignatures[mb.refdefinedinblockid];
-								if (!dict.ContainsKey(mb))
-								{
-									dict.Add(mb, _newOjb.functions[mb.functionId].signature);
-								}
-								
-							}
-						}
-					}
-
-
-				}
-
-				classseed = buildingclasses.Count;
-				blockseed = _newOjb.blocks.Count;
-				functionseed = _newOjb.functions.Count;
+				LoadLibrary(_newOjb);
 			}
 
 
@@ -2728,7 +2734,7 @@ namespace ASCompiler.compiler
             foreach (var tree in trees)
             {
                 var analyser = new ASTool.AS3FileGrammarAnalyser(lib, tree.item2);
-                if (!analyser.Analyse(grammar, tree.item1)) //生成项目的语法树
+                if (!analyser.Analyse( tree.item1)) //生成项目的语法树
                 {
                     throw new BuildException(token.line, token.ptr, token.sourceFile, "Vector.<" + vt + ">编译失败");
                 }

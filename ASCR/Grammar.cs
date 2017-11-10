@@ -445,7 +445,7 @@ namespace ASCompiler
             foreach (var tree in trees)
             {
                 var analyser = new ASTool.AS3FileGrammarAnalyser(lib, tree.item2);
-                if (!analyser.Analyse(grammar, tree.item1)) //生成项目的语法树
+                if (!analyser.Analyse( tree.item1)) //生成项目的语法树
                 {
                     return null;
                 }

@@ -107,82 +107,82 @@ Public Class AS3FileGrammarAnalyser
 
 	Public err As GrammarException
 
-    Public Function Analyse(grammer As Grammar, tree As GrammerTree) As Boolean
+	Public Function Analyse(tree As GrammerTree) As Boolean
 
-        If Not currentPackage Is Nothing Then
-            Throw New Exception("不能重复使用")
-        End If
+		If Not currentPackage Is Nothing Then
+			Throw New Exception("不能重复使用")
+		End If
 
 		as3file = New AS3SrcFile(srcFile, tree.Root.getMd5Key())
 
 		currentPackage = Nothing
-        inpackimports = New List(Of AS3Import)()
-        outpackimports = New List(Of AS3Import)()
+		inpackimports = New List(Of AS3Import)()
+		outpackimports = New List(Of AS3Import)()
 
-        'classaccessStack = New Stack(Of String)()
-        memberaccessStack = New Stack(Of String)()
+		'classaccessStack = New Stack(Of String)()
+		memberaccessStack = New Stack(Of String)()
 
-        MemberScopeStack = New Stack(Of IAS3MemberList)()
+		MemberScopeStack = New Stack(Of IAS3MemberList)()
 
-        outpackageprivatescope = New AS3MemberListBase(Nothing)
+		outpackageprivatescope = New AS3MemberListBase(Nothing)
 
-        MemberScopeStack.Push(outpackageprivatescope)
+		MemberScopeStack.Push(outpackageprivatescope)
 
-        ExprStack = New Stack(Of AS3Expression)()
+		ExprStack = New Stack(Of AS3Expression)()
 
-        dynamticObjStack = New Stack(Of Hashtable)()
+		dynamticObjStack = New Stack(Of Hashtable)()
 
-        metapropertystack = New Stack(Of AS3Expression)()
+		metapropertystack = New Stack(Of AS3Expression)()
 
-        currentparsefuncstack = New Stack(Of AS3Function)()
+		currentparsefuncstack = New Stack(Of AS3Function)()
 
-        currentparseExprListStack = New Stack(Of List(Of AS3Expression))()
+		currentparseExprListStack = New Stack(Of List(Of AS3Expression))()
 
-        currentSwitchStack = New Stack(Of AS3Switch)
+		currentSwitchStack = New Stack(Of AS3Switch)
 
-        currentTryStack = New Stack(Of AS3Try)
+		currentTryStack = New Stack(Of AS3Try)
 
-        currentLabelStack = New Stack(Of String)
+		currentLabelStack = New Stack(Of String)
 
-        current_expression_canfunctioninvoke = New Stack(Of Boolean)
+		current_expression_canfunctioninvoke = New Stack(Of Boolean)
 
-        current_new_operator = New Stack(Of GrammerExpr)()
-        current_visiting_expression = New Stack(Of GrammerExpr)()
+		current_new_operator = New Stack(Of GrammerExpr)()
+		current_visiting_expression = New Stack(Of GrammerExpr)()
 
-        func_anonymous_scope = New Dictionary(Of IAS3MemberList, Stack(Of GrammerExpr))
+		func_anonymous_scope = New Dictionary(Of IAS3MemberList, Stack(Of GrammerExpr))
 
 		expressionGroup = 0
 
 		currentMain = Nothing
-        currentImpllist = Nothing
+		currentImpllist = Nothing
 
-        Try
-            VisitNodes(tree.Root)
-        Catch ex As GrammarException
-            err = ex
-            Return False
-        End Try
+		Try
+			VisitNodes(tree.Root)
+		Catch ex As GrammarException
+			err = ex
+			Return False
+		End Try
 
-        'If outpackageprivatescope.Count > 0 Then
-        '    If TypeOf currentMain Is AS3Class Then
-        '        CType(currentMain, AS3Class).outpackageinnermembers.AddRange(outpackageprivatescope)
-        '    End If
-        'End If
-        If currentparseExprListStack.Count > 0 Then
-            Throw New Exception()
-        End If
+		'If outpackageprivatescope.Count > 0 Then
+		'    If TypeOf currentMain Is AS3Class Then
+		'        CType(currentMain, AS3Class).outpackageinnermembers.AddRange(outpackageprivatescope)
+		'    End If
+		'End If
+		If currentparseExprListStack.Count > 0 Then
+			Throw New Exception()
+		End If
 
 
 
 
 		as3file.OutPackageImports.AddRange(outpackimports)
 
-        proj.SrcFiles.Add(as3file)
+		proj.SrcFiles.Add(as3file)
 
-        as3file.OutPackagePrivateScope = outpackageprivatescope
+		as3file.OutPackagePrivateScope = outpackageprivatescope
 
-        Return True
-    End Function
+		Return True
+	End Function
 
 
 

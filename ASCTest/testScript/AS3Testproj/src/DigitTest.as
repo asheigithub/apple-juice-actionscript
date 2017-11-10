@@ -1,7 +1,7 @@
 package 
 {
 	import flash.display.Sprite;
-	
+	[Doc]
 	/**
 	 * ...
 	 * @author 
@@ -32,10 +32,28 @@ package
 			
 			
 			
-			
-			
 		}
 		
 	}
 
 }
+
+
+function fibonacci_recursion( n:int ):int
+{
+    if( n <= 2 )
+        return 1;
+
+    return fibonacci_recursion(n-1) + fibonacci_recursion(n-2);
+}
+
+var t:Number = (new Date()).getTime();
+
+
+var f:int = fibonacci_recursion(30);
+
+
+
+trace("actionscript3:", ((new Date()).getTime() - t ));
+trace(f);
+

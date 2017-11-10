@@ -121,14 +121,23 @@ namespace ASRuntime
 
         internal int call_parameter_slotCount;
 
-        //internal Dictionary<ASBinCode.ClassMethodGetter, Dictionary<rtObject, ISLOT>> _dictMethods
-        //    =new Dictionary<ClassMethodGetter, Dictionary<rtObject, ISLOT>>();
 
-        private Stack<TryState> tryCatchState;// = new Stack<TryState>();
-        /// <summary>
-        /// 暂存已发生的错误
-        /// </summary>
-        private error.InternalError holdedError;
+#if DEBUG
+        private
+#else
+		internal
+#endif
+		Stack<TryState> tryCatchState;
+
+		/// <summary>
+		/// 暂存已发生的错误
+		/// </summary>
+#if DEBUG
+        private
+#else
+		internal
+#endif
+		error.InternalError holdedError;
         /// <summary>
         /// 执行阶段发生的错误
         /// </summary>
@@ -181,7 +190,7 @@ namespace ASRuntime
 		/// 会出现本堆栈未执行就需要关闭的情况。
 		/// 此标记说明这种情况
 		/// </summary>
-		private bool hascallstep;
+		internal bool hascallstep;
 
         /// <summary>
         /// 运行一行
@@ -1298,11 +1307,17 @@ namespace ASRuntime
 			}
 		}
 
-		private bool isclosed;
-        /// <summary>
-        /// 退出程序栈时
-        /// </summary>
-        public void close()
+#if DEBUG
+		private 
+#else
+		internal
+#endif
+		bool isclosed;
+
+		/// <summary>
+		/// 退出程序栈时
+		/// </summary>
+		public void close()
         {
 #if DEBUG
             if (isclosed)
@@ -1317,21 +1332,54 @@ namespace ASRuntime
 			
 			deActiveInstanceCreator();
 
+#if DEBUG
 			if (call_parameter_slotCount != 0)
 			{
 				throw new ASRunTimeException();
 			}
+#endif
+			int end = offset + block.totalRegisters + 1 + 1 + call_parameter_slotCount;
 			//清除执行栈
-			for (int i = offset; i < offset + block.totalRegisters + 1+1 + call_parameter_slotCount; i++)
+			for (int i = offset; i < end; i++)
             {
-                stack[i].clear();
-            }
+#if DEBUG
+				stack[i].clear();
+#else
+				StackSlot slot = (StackSlot)stack[i];
+				slot.linktarget = null;
+				slot.propGetSet = null;
+				slot.propBindObj = null;
+				slot.superPropBindClass = null;
+
+				slot._temp_try_write_setthisitem = null;
+
+				slot._cache_arraySlot.clear();
+				slot._cache_vectorSlot.clear();
+				slot._cache_prototypeSlot.clear();
+				slot._cache_setthisslot.clear();
+				slot._linkObjCache.clearRefObj();
+				slot._linkObjCache.srcObject = null;
+
+				slot._functionValue.Clear();
+
+				var store = slot.store;
+				store[RunTimeDataType.rt_string] = rtNull.nullptr;
+				store[RunTimeDataType.rt_function] = rtNull.nullptr;
+				store[RunTimeDataType.rt_array] = rtNull.nullptr;
+				store[RunTimeDataType._OBJECT] = rtNull.nullptr;
+
+				slot.index = (int)RunTimeDataType.unknown;
+
+
+#endif
+
+			}
 
 			
 
             tryCatchState.Clear();
             block = null;
-            scope = null;//scope_thispointer = null;
+            scope = null;
             static_objects = null;
             offset = 0;
             call_parameter_slotCount = 0;
@@ -1355,7 +1403,7 @@ namespace ASRuntime
 
 #if DEBUG
             execing = false;
-#endif   
+#endif
 
 
             

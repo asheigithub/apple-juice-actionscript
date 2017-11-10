@@ -46,6 +46,7 @@
     <Compile Include="FrameInfo.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="IRuntimeOutput.cs" />
+    <Compile Include="MyStack.cs" />
     <Compile Include="nativefuncs\Array_buildin.cs" />
     <Compile Include="nativefuncs\Boolean_buildin.cs" />
     <Compile Include="nativefuncs\BuildInFunctionLoader.cs" />

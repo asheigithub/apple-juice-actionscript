@@ -21,11 +21,11 @@ namespace ASBinCode.rtti
 		}
 
 
-		public ClassMember this[int index] { get => list[index]; set => list[index]=value; }
+		public ClassMember this[int index] { get { return list[index]; } set { list[index] = value; } }
 
-		public int Count => list.Count;
+		public int Count { get { return list.Count; } }
 
-		public bool IsReadOnly => false;
+		public bool IsReadOnly { get { return false; } }
 
 		public void Add(ClassMember item)
 		{

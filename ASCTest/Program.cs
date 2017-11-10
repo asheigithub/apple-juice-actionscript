@@ -29,10 +29,10 @@ namespace ASCTest
             if (args.Length > 0)
             {
                 string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
-									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+									   path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
-				//path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-
+									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+				//path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
 
 				if (path.EndsWith(".as"))
                 {
@@ -145,7 +145,7 @@ namespace ASCTest
                 
 
                 var analyser = new ASTool.AS3FileGrammarAnalyser(proj, srcFileProjFile[files[i]]);
-                if (!analyser.Analyse(grammar, tree)) //生成项目的语法树
+                if (!analyser.Analyse( tree)) //生成项目的语法树
                 {
                     Console.WriteLine(analyser.err.ToString());
                     Console.WriteLine("语义分析失败!");
@@ -173,12 +173,10 @@ namespace ASCTest
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
-			builder.LoadLibrary( System.IO.File.ReadAllBytes("astoolglobal.swc"));
-
-			builder.Build(proj,new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
-
-
-            if (builder.buildErrors.Count == 0)
+			//builder.LoadLibrary(System.IO.File.ReadAllBytes("astoolglobal.swc"));
+			builder.Build(proj, new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
+			
+			if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
 
@@ -191,6 +189,7 @@ namespace ASCTest
 
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
 				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
+				System.IO.File.WriteAllBytes("as3test.cswc", swc.toBytes());
 
 				if (swc != null)
                 {
@@ -282,52 +281,7 @@ namespace ASCTest
         }
 
 
-
-
-		private static void testSer(ASBinCode.CSWC sss)
-		{
-			{
-				ASBinCode.CSWCSerizlizer serizlizer = new ASBinCode.CSWCSerizlizer();
-
-				var bytes= serizlizer.Serialize(sss);
-
-				var swcout= serizlizer.Deserialize(bytes);
-
-
-				//byte[] cd;
-				//using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-				//{
-				//	using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(ms))
-				//	{
-				//		foreach (var item in sss.blocks)
-				//		{
-				//			serizlizer.SerializeObject(bw, item);
-				//		}
-				//	}
-				//	cd = ms.ToArray();
-				//}
-
-
-
-				//using (System.IO.MemoryStream ms = new System.IO.MemoryStream(cd))
-				//{
-				//	using (System.IO.BinaryReader br = new System.IO.BinaryReader(ms))
-				//	{
-				//		ASBinCode.CSWCSerizlizer dserizlizer = new ASBinCode.CSWCSerizlizer();
-				//		while (ms.Position < ms.Length)
-				//		{
-				//			var dc = dserizlizer.DeserializeObject<ASBinCode.CodeBlock>(br, ASBinCode.CodeBlock.Deserialize);
-				//		}
-
-				//	}
-
-				//}
-
-			}
-		}
-
-
-
+		
 
 
 

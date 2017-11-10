@@ -86,13 +86,13 @@ Module Module1
             Dim srcout As New ConSrcOut()
 
             Dim analyser As New AS3FileGrammarAnalyser(proj, teststring)
-            If analyser.Analyse(grammar, tree) Then
+			If analyser.Analyse(tree) Then
 
-                For Each p In proj.SrcFiles  'proj.Packages.Values
-                    p.Write(0, srcout)
-                Next
-            Else
-                Console.WriteLine(analyser.err.ToString())
+				For Each p In proj.SrcFiles  'proj.Packages.Values
+					p.Write(0, srcout)
+				Next
+			Else
+				Console.WriteLine(analyser.err.ToString())
             End If
 
 
@@ -171,15 +171,15 @@ Module Module1
 
 
                 Dim analyser As New AS3FileGrammarAnalyser(proj, fs)
-                If Not analyser.Analyse(grammar, tree) Then
-                    Console.ForegroundColor = ConsoleColor.Red
-                    Console.WriteLine(analyser.err.ToString())
-                    Console.ResetColor()
-                    GoTo over
+				If Not analyser.Analyse(tree) Then
+					Console.ForegroundColor = ConsoleColor.Red
+					Console.WriteLine(analyser.err.ToString())
+					Console.ResetColor()
+					GoTo over
 
-                End If
+				End If
 
-            End If
+			End If
         Next
 
 

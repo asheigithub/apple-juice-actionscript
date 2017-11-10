@@ -151,9 +151,11 @@ namespace ASRuntime.operators
                 if (!function.ismethod)
                 {
                     int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope, frame)).value;
-
-                    var o = frame.player.outpackage_runtimescope[classid];
-                    _do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope, frame), frame,o.this_pointer);
+					RunTimeScope o;
+					if (frame.player.outpackage_runtimescope.TryGetValue(classid, out o))
+					{
+						_do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope, frame), frame, o.this_pointer);
+					}
                 }
 
                 

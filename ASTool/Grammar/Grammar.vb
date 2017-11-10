@@ -8,7 +8,11 @@ Public Class Grammar
 
     Private termianlnodes As New Dictionary(Of GrammarNode, GrammarNode)()
 
-    Private glines As New List(Of GrammarLine)()
+	Private _terminals As New List(Of GrammarNode)
+	Private _identifiers As New List(Of GrammarNode)
+	Private _other As New List(Of GrammarNode)
+
+	Private glines As New List(Of GrammarLine)()
 
     ''' <summary>
     ''' 预测分析表
@@ -244,41 +248,58 @@ Public Class Grammar
             Next
         Next
 
+		For Each k In termianlnodes.Values
+			If k.Type = GrammarNodeType.terminal Then
+				_terminals.Add(k)
+			End If
+		Next
+		For Each k In termianlnodes.Values
+			If k.Type = GrammarNodeType.identifier Then
+				_identifiers.Add(k)
+			End If
+		Next
+		For Each k In termianlnodes.Values
+			If Not k.Type = GrammarNodeType.null Then
+				If k.Type <> GrammarNodeType.terminal AndAlso k.Type <> GrammarNodeType.identifier Then
+					_other.Add(k)
+				End If
+			End If
+		Next
 
-        'Console.WriteLine("预测分析表:")
-        'For Each t In termianlnodes.Values
-        '    If t.Type = GrammarNodeType.null Then
-        '        Continue For
-        '    End If
-        '    Console.Write(vbTab)
-        '    Console.Write("|")
-        '    Console.Write(IIf(t.Type = GrammarNodeType.terminal, """" & t.Name & """", t.Name))
-        'Next
-        'Console.Write(vbTab)
-        'Console.Write("|")
-        'Console.Write(GrammarNode.GNodeEOF.Name)
-        'Console.WriteLine()
+		'Console.WriteLine("预测分析表:")
+		'For Each t In termianlnodes.Values
+		'    If t.Type = GrammarNodeType.null Then
+		'        Continue For
+		'    End If
+		'    Console.Write(vbTab)
+		'    Console.Write("|")
+		'    Console.Write(IIf(t.Type = GrammarNodeType.terminal, """" & t.Name & """", t.Name))
+		'Next
+		'Console.Write(vbTab)
+		'Console.Write("|")
+		'Console.Write(GrammarNode.GNodeEOF.Name)
+		'Console.WriteLine()
 
-        'For Each f In M.Keys
-        '    Console.Write(f.Name)
-        '    For Each t In termianlnodes.Values
-        '        If t.Type = GrammarNodeType.null Then
-        '            Continue For
-        '        End If
-        '        Console.Write(vbTab)
-        '        Console.Write("|")
-        '        Console.Write(M(f)(t))
-        '    Next
-        '    Console.Write(vbTab)
-        '    Console.Write("|")
-        '    Console.Write(M(f)(GrammarNode.GNodeEOF))
-        '    Console.WriteLine()
+		'For Each f In M.Keys
+		'    Console.Write(f.Name)
+		'    For Each t In termianlnodes.Values
+		'        If t.Type = GrammarNodeType.null Then
+		'            Continue For
+		'        End If
+		'        Console.Write(vbTab)
+		'        Console.Write("|")
+		'        Console.Write(M(f)(t))
+		'    Next
+		'    Console.Write(vbTab)
+		'    Console.Write("|")
+		'    Console.Write(M(f)(GrammarNode.GNodeEOF))
+		'    Console.WriteLine()
 
-        'Next
+		'Next
 
 
 
-    End Sub
+	End Sub
 
     Private Function ParseLine(words As TokenList) As List(Of GrammarLine)
         Dim tk As Token = words.CurrentToken
@@ -292,10 +313,10 @@ Public Class Grammar
             If tk.Type = Token.TokenType.identifier Then
                 Dim node As GrammarNode
                 If Not gnodes.ContainsKey(tk.StringValue) Then
-                    node = New GrammarNode()
-                    node.Type = GrammarNodeType.non_terminal
-                    node.Name = tk.StringValue
-                    gnodes.Add(node.Name, node)
+					node = New GrammarNode(tk.StringValue, GrammarNodeType.non_terminal)
+					'node.Type = GrammarNodeType.non_terminal
+					'node.Name = tk.StringValue
+					gnodes.Add(node.Name, node)
 
                 Else
                     node = gnodes(tk.StringValue)
@@ -330,10 +351,10 @@ Public Class Grammar
                 If tk.Type = Token.TokenType.identifier Then
                     Dim node As GrammarNode
                     If Not gnodes.ContainsKey(tk.StringValue) Then
-                        node = New GrammarNode()
-                        node.Type = GrammarNodeType.non_terminal
-                        node.Name = tk.StringValue
-                        gnodes.Add(node.Name, node)
+						node = New GrammarNode(tk.StringValue, GrammarNodeType.non_terminal)
+						'node.Type = GrammarNodeType.non_terminal
+						'node.Name = tk.StringValue
+						gnodes.Add(node.Name, node)
 
                     Else
                         node = gnodes(tk.StringValue)
@@ -350,8 +371,8 @@ Public Class Grammar
                     Throw New Exception("期望标识符")
                 End If
             ElseIf tk.Type = Token.TokenType.identifier Then
-                Dim node As New GrammarNode()
-                If tk.StringValue = "null" Then
+				Dim node As GrammarNode
+				If tk.StringValue = "null" Then
                     node = GrammarNode.GNodeNull
                 ElseIf tk.StringValue = "number" Then
                     node = GrammarNode.GNodeNumber
@@ -380,11 +401,11 @@ Public Class Grammar
 
                 tk = words.GetNextToken()
             ElseIf tk.Type = Token.TokenType.const_string Then
-                Dim node As New GrammarNode()
-                node.Type = GrammarNodeType.terminal
-                node.Name = tk.StringValue
+				Dim node As New GrammarNode(tk.StringValue, GrammarNodeType.terminal)
+				'node.Type = GrammarNodeType.terminal
+				'node.Name = tk.StringValue
 
-                If Not termianlnodes.ContainsKey(node) Then
+				If Not termianlnodes.ContainsKey(node) Then
                     node.FIRST.Add(node)
                     termianlnodes.Add(node, node)
                 End If
@@ -821,107 +842,149 @@ Public Class Grammar
             Return GrammarNode.GNodeWhiteSpace
         End If
 
-        '**定义的关键字优先***
-        For Each k In termianlnodes.Values
-            If k.Type = GrammarNodeType.terminal Then
-                If MathGNodeAndToken(k, token) Then
-                    Return k
-                End If
-            End If
-        Next
-        '***标识符其次***
-        For Each k In termianlnodes.Values
-            If k.Type = GrammarNodeType.identifier Then
-                If MathGNodeAndToken(k, token) Then
-                    Return k
-                End If
-            End If
-        Next
+		'**定义的关键字优先***
+		'For Each k In termianlnodes.Values
+		'    If k.Type = GrammarNodeType.terminal Then
+		'        If MathGNodeAndToken(k, token) Then
+		'            Return k
+		'        End If
+		'    End If
+		'Next
+		For Each k In _terminals
+			If MathGNodeAndToken(k, token) Then
+				Return k
+			End If
+		Next
 
-        For Each k In termianlnodes.Values
-            If Not k.Type = GrammarNodeType.null Then
-                If MathGNodeAndToken(k, token) Then
-                    Return k
-                End If
-            End If
-        Next
+		'***标识符其次***
+		'For Each k In termianlnodes.Values
+		'          If k.Type = GrammarNodeType.identifier Then
+		'              If MathGNodeAndToken(k, token) Then
+		'                  Return k
+		'              End If
+		'          End If
+		'      Next
+		For Each k In _identifiers
+			If MathGNodeAndToken(k, token) Then
+				Return k
+			End If
+		Next
+
+
+		'For Each k In termianlnodes.Values
+		'          If Not k.Type = GrammarNodeType.null Then
+		'              If MathGNodeAndToken(k, token) Then
+		'                  Return k
+		'              End If
+		'          End If
+		'      Next
+		For Each k In _other
+			If MathGNodeAndToken(k, token) Then
+				Return k
+			End If
+		Next
 
 
 
 
+		Return GrammarNode.GNodeWrong
 
-        Return GrammarNode.GNodeWrong
-
-        'If token.Type = ASTool.Token.TokenType.const_number Then
-        '    Return GrammarNode.GNodeNumber
-        'End If
-
-        'If token.Type = ASTool.Token.TokenType.const_string Then
-        '    Return GrammarNode.GNodeString
-        'End If
-
-        'If token.Type = ASTool.Token.TokenType.eof Then
-        '    Return GrammarNode.GNodeEOF
-        'End If
-
-        'If token.Type = ASTool.Token.TokenType.identifier Then
-        '    Return GrammarNode.GNodeIdentifier
-        'End If
-
-        'If token.Type = ASTool.Token.TokenType.other Then
-        '    Dim node As New GrammarNode() With {.Type = GrammarNodeType.terminal, .Name = token.StringValue}
-        '    Return node
-        'End If
-
-        'Throw New Exception("不能识别的token" & token.StringValue)
-
-    End Function
+	End Function
 
     Private Function MathGNodeAndToken(node As GrammarNode, token As Token) As Boolean
-        If node.Type = GrammarNodeType.null Then
-            Return True
-        End If
+		Select Case node.Type
+			Case GrammarNodeType.null
+				Return True
+			Case GrammarNodeType.whitespace
+				If token.Type = ASTool.Token.TokenType.eof OrElse token.Type = ASTool.Token.TokenType.whitespace OrElse token.Type = ASTool.Token.TokenType.comments Then
+					Return True
+				End If
+			Case GrammarNodeType.conststring
+				If (token.Type = ASTool.Token.TokenType.const_string OrElse token.Type = Token.TokenType.const_regexp) Then
+					Return True
+				End If
+			Case GrammarNodeType.eof
+				If token.Type = ASTool.Token.TokenType.eof Then
+					Return True
+				End If
+			Case GrammarNodeType.identifier
+				If token.Type = ASTool.Token.TokenType.identifier Then
+					Return True
+				End If
+			Case GrammarNodeType.label
+				If token.Type = Token.TokenType.label Then
+					Return True
+				End If
+			Case GrammarNodeType.this
+				If token.Type = Token.TokenType.this_pointer Then
+					Return True
+				End If
+			Case GrammarNodeType.super
+				If token.Type = Token.TokenType.super_pointer Then
+					Return True
+				End If
+			Case GrammarNodeType.number
+				If token.Type = ASTool.Token.TokenType.const_number Then
+					Return True
+				End If
 
-        If node.Type = GrammarNodeType.whitespace Then
-            If token.Type = ASTool.Token.TokenType.eof Or token.Type = ASTool.Token.TokenType.whitespace Or token.Type = ASTool.Token.TokenType.comments Then
-                Return True
-            End If
-        End If
+			Case GrammarNodeType.terminal
+				If (token.Type = ASTool.Token.TokenType.other OrElse token.Type = ASTool.Token.TokenType.identifier) _
+						And String.Equals(node.Name, token.StringValue, StringComparison.Ordinal) Then 'node.Name = token.StringValue Then
+					Return True
+				End If
 
-		If node.Type = GrammarNodeType.conststring And (token.Type = ASTool.Token.TokenType.const_string Or token.Type = Token.TokenType.const_regexp) Then
-			Return True
-		ElseIf node.Type = GrammarNodeType.eof And token.Type = ASTool.Token.TokenType.eof Then
-			Return True
-        End If
+			Case Else
 
-        If node.Type = GrammarNodeType.identifier And token.Type = ASTool.Token.TokenType.identifier Then
-            Return True
-        End If
+		End Select
 
-        If node.Type = GrammarNodeType.label And token.Type = Token.TokenType.label Then
-            Return True
-        End If
+		Return False
 
-        If node.Type = GrammarNodeType.this And token.Type = Token.TokenType.this_pointer Then
-            Return True
-        End If
 
-        If node.Type = GrammarNodeType.super And token.Type = Token.TokenType.super_pointer Then
-            Return True
-        End If
+		'If node.Type = GrammarNodeType.null Then
+		'	Return True
+		'End If
 
-        If node.Type = GrammarNodeType.number And token.Type = ASTool.Token.TokenType.const_number Then
-            Return True
-        End If
+		'If node.Type = GrammarNodeType.whitespace Then
+		'          If token.Type = ASTool.Token.TokenType.eof Or token.Type = ASTool.Token.TokenType.whitespace Or token.Type = ASTool.Token.TokenType.comments Then
+		'              Return True
+		'          End If
+		'      End If
 
-        If node.Type = GrammarNodeType.terminal And (token.Type = ASTool.Token.TokenType.other Or token.Type = ASTool.Token.TokenType.identifier) _
-            And node.Name = token.StringValue Then
-            Return True
-        End If
+		'If node.Type = GrammarNodeType.conststring And (token.Type = ASTool.Token.TokenType.const_string Or token.Type = Token.TokenType.const_regexp) Then
+		'	Return True
+		'ElseIf node.Type = GrammarNodeType.eof And token.Type = ASTool.Token.TokenType.eof Then
+		'	Return True
+		'      End If
 
-        Return False
+		'      If node.Type = GrammarNodeType.identifier And token.Type = ASTool.Token.TokenType.identifier Then
+		'          Return True
+		'      End If
 
-    End Function
+		'      If node.Type = GrammarNodeType.label And token.Type = Token.TokenType.label Then
+		'          Return True
+		'      End If
+
+		'      If node.Type = GrammarNodeType.this And token.Type = Token.TokenType.this_pointer Then
+		'          Return True
+		'      End If
+
+		'      If node.Type = GrammarNodeType.super And token.Type = Token.TokenType.super_pointer Then
+		'          Return True
+		'      End If
+
+		'      If node.Type = GrammarNodeType.number And token.Type = ASTool.Token.TokenType.const_number Then
+		'          Return True
+		'      End If
+
+		'If node.Type = GrammarNodeType.terminal And (token.Type = ASTool.Token.TokenType.other Or token.Type = ASTool.Token.TokenType.identifier) _
+		'	And String.Equals(node.Name, token.StringValue, StringComparison.Ordinal) Then 'node.Name = token.StringValue Then
+		'	Return True
+		'End If
+
+		'Return False
+
+	End Function
 
 
     Private Sub ThrowError(msg As String, token As Token)

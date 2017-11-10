@@ -125,7 +125,7 @@ namespace ASRuntime
         /// <summary>
         /// 调用堆栈
         /// </summary>
-        private Stack<StackFrame> runtimeStack;
+        private MyStack runtimeStack;
         StackSlot[] stackSlots;
         private FrameInfo displayStackFrame;
 
@@ -171,7 +171,7 @@ namespace ASRuntime
 				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
 				runFuncresultPool = new runFuncResult.ResultPool();
 
-				runtimeStack = new Stack<StackFrame>();
+				runtimeStack = new MyStack(stackframePool.maxcount);
 				stackSlots = new StackSlot[1024];
 				for (int i = 0; i < stackSlots.Length; i++)
 				{
@@ -279,62 +279,667 @@ namespace ASRuntime
 
 				while (true)
 				{
-					//try
+#if DEBUG
+					while (step())
 					{
-						while (step())
+
+					}
+					break;
+#else
+
+					try
+					{
+						bool isstep = true;
+						while (isstep)
 						{
+							isstep = false;
+							if (runtimeError != null)
+							{
+								isstep= false;continue;
+							}
+							if (currentRunFrame == null)
+							{
+								isstep= false;continue;
+							}
+
+							if (receive_error != null)
+							{
+								var temp = receive_error;
+								receive_error = null;
+
+								currentRunFrame.receiveErrorFromStackFrame(temp);
+
+
+								isstep= true;continue;
+							}
+
+							if (_tempcallbacker != null)
+							{
+								var temp = _tempcallbacker;
+								_tempcallbacker = null;
+								temp.call(temp.args);
+
+								isstep= true;continue;
+							}
+
+							if (currentRunFrame.IsEnd()) //执行完成
+							{
+								if (currentRunFrame.callbacker != null)
+								{
+									_tempcallbacker = currentRunFrame.callbacker;
+									currentRunFrame.callbacker = null;
+
+								}
+
+								currentRunFrame.close();
+								//人肉内联close代码
+								//{
+								//	currentRunFrame.isclosed = true;
+
+								//	currentRunFrame.typeconvertoperator = null;
+								//	currentRunFrame.funCaller = null;
+
+								//	currentRunFrame.deActiveInstanceCreator();
+
+									
+								//	int end = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1 + currentRunFrame.call_parameter_slotCount;
+								//	//清除执行栈
+								//	for (int i = currentRunFrame.offset; i < end; i++)
+								//	{
+								//		StackSlot slot = (StackSlot)currentRunFrame.stack[i];
+								//		slot.linktarget = null;
+								//		slot.propGetSet = null;
+								//		slot.propBindObj = null;
+								//		slot.superPropBindClass = null;
+
+								//		slot._temp_try_write_setthisitem = null;
+
+								//		slot._cache_arraySlot.clear();
+								//		slot._cache_vectorSlot.clear();
+								//		slot._cache_prototypeSlot.clear();
+								//		slot._cache_setthisslot.clear();
+								//		slot._linkObjCache.clearRefObj();
+								//		slot._linkObjCache.srcObject = null;
+
+								//		slot._functionValue.Clear();
+
+								//		var store = slot.store;
+								//		store[RunTimeDataType.rt_string] = rtNull.nullptr;
+								//		store[RunTimeDataType.rt_function] = rtNull.nullptr;
+								//		store[RunTimeDataType.rt_array] = rtNull.nullptr;
+								//		store[RunTimeDataType._OBJECT] = rtNull.nullptr;
+
+								//		slot.index = (int)RunTimeDataType.unknown;
+								//	}
+
+
+
+								//	currentRunFrame.tryCatchState.Clear();
+								//	currentRunFrame.block = null;
+								//	currentRunFrame.scope = null;
+								//	currentRunFrame.static_objects = null;
+								//	currentRunFrame.offset = 0;
+								//	currentRunFrame.call_parameter_slotCount = 0;
+								//	currentRunFrame.stack = null;
+								//	currentRunFrame.player = null;
+								//	currentRunFrame.returnSlot = null;
+								//	currentRunFrame.callbacker = null;
+								//	currentRunFrame.codeLinePtr = 0;
+								//	currentRunFrame.holdedError = null;
+								//	currentRunFrame.hasCallJump = false;
+								//	currentRunFrame.hasCallReturn = false;
+								//	currentRunFrame.holdHasCallReturn = false;
+								//	currentRunFrame.holdhasjumpto = false;
+								//	currentRunFrame.holdjumptoline = 0;
+								//	currentRunFrame.jumptoline = 0;
+								//	currentRunFrame.trystateCount = 0;
+								//	currentRunFrame.runtimeError = null;
+								//	currentRunFrame.typeconvertoperator = null;
+
+								//	currentRunFrame.hascallstep = false;
+
+								//}
+
+
+
+								stackframePool.ret(currentRunFrame);
+								runtimeStack.Pop();
+
+								if (runtimeStack.Count > 0)
+								{
+									currentRunFrame = runtimeStack.Peek();
+								}
+								else
+								{
+									currentRunFrame = null;
+								}
+
+
+							}
+							else
+							{
+
+								#region 人肉内联
+
+								var block = currentRunFrame.block;
+
+								var scope = currentRunFrame.scope;
+
+								currentRunFrame.hascallstep = true;
+
+								OpStep step = block.opSteps[currentRunFrame.codeLinePtr];
+								//exec(step);
+								switch (step.opCode)
+								{
+									case OpCode.cast:
+										operators.OpCast.execCast(currentRunFrame, step, scope);
+										break;
+									case OpCode.cast_primitive:
+										operators.OpCast.exec_CastPrimitive(currentRunFrame, step, scope);
+										break;
+									case OpCode.assigning:
+										operators.OpAssigning.execAssigning(currentRunFrame, step, scope);
+										break;
+
+									case OpCode.add_number:
+										operators.OpAdd.execAdd_Number(currentRunFrame, step, scope);
+										break;
+									case OpCode.add_string:
+										operators.OpAdd.execAdd_String(currentRunFrame, step, scope);
+										break;
+									case OpCode.add:
+										operators.OpAdd.execAdd(currentRunFrame, step, scope);
+										break;
+									case OpCode.sub_number:
+										operators.OpSub.execSub_Number(currentRunFrame, step, scope);
+										break;
+									case OpCode.sub:
+										operators.OpSub.execSub(currentRunFrame, step, scope);
+										break;
+									case OpCode.multi:
+										operators.OpMulti.execMulti(currentRunFrame, step, scope);
+										break;
+									case OpCode.multi_number:
+										operators.OpMulti.exec_MultiNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.div:
+										operators.OpMulti.execDiv(currentRunFrame, step, scope);
+										break;
+									case OpCode.div_number:
+										operators.OpMulti.exec_DivNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.mod:
+										operators.OpMulti.execMod(currentRunFrame, step, scope);
+										break;
+									case OpCode.mod_number:
+										operators.OpMulti.exec_ModNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.unary_plus:
+										operators.OpUnaryPlus.execUnaryPlus(currentRunFrame, step, scope);
+										break;
+									case OpCode.neg:
+										operators.OpNeg.execNeg(currentRunFrame, step, scope);
+										break;
+									case OpCode.gt_num:
+										operators.OpLogic.execGT_NUM(currentRunFrame, step, scope);
+										break;
+									case OpCode.gt_void:
+										operators.OpLogic.execGT_Void(currentRunFrame, step, scope);
+										break;
+									case OpCode.lt_num:
+										operators.OpLogic.execLT_NUM(currentRunFrame, step, scope);
+										break;
+									//case OpCode.lt_int_int:
+									//    operators.OpLogic.execLT_IntInt(this, step, scope);
+									//    break;
+									case OpCode.lt_void:
+										operators.OpLogic.execLT_VOID(currentRunFrame, step, scope);
+										break;
+									case OpCode.ge_num:
+										operators.OpLogic.execGE_NUM(currentRunFrame, step, scope);
+										break;
+									case OpCode.ge_void:
+										operators.OpLogic.execGE_Void(currentRunFrame, step, scope);
+										break;
+									case OpCode.le_num:
+										operators.OpLogic.execLE_NUM(currentRunFrame, step, scope);
+										break;
+									case OpCode.le_void:
+										operators.OpLogic.execLE_VOID(currentRunFrame, step, scope);
+										break;
+									case OpCode.equality:
+										operators.OpLogic.execEQ(currentRunFrame, step, scope);
+										break;
+									case OpCode.not_equality:
+										operators.OpLogic.execNotEQ(currentRunFrame, step, scope);
+										break;
+									case OpCode.equality_num_num:
+										operators.OpLogic.execEQ_NumNum(currentRunFrame, step, scope);
+										break;
+									case OpCode.not_equality_num_num:
+										operators.OpLogic.execNotEQ_NumNum(currentRunFrame, step, scope);
+										break;
+									case OpCode.equality_str_str:
+										operators.OpLogic.execEQ_StrStr(currentRunFrame, step, scope);
+										break;
+									case OpCode.not_equality_str_str:
+										operators.OpLogic.execNotEQ_StrStr(currentRunFrame, step, scope);
+										break;
+									case OpCode.strict_equality:
+										operators.OpLogic.execStrictEQ(currentRunFrame, step, scope);
+										break;
+									case OpCode.not_strict_equality:
+										operators.OpLogic.execStrictNotEQ(currentRunFrame, step, scope);
+										break;
+									case OpCode.logic_not:
+										operators.OpLogic.execNOT(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitAnd:
+										operators.OpBit.execBitAnd(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitOr:
+										operators.OpBit.execBitOR(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitXOR:
+										operators.OpBit.execBitXOR(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitNot:
+										operators.OpBit.execBitNot(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitLeftShift:
+										operators.OpBit.execBitLeftShift(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitRightShift:
+										operators.OpBit.execBitRightShift(currentRunFrame, step, scope);
+										break;
+									case OpCode.bitUnsignedRightShift:
+										operators.OpBit.execBitUnSignRightShift(currentRunFrame, step, scope);
+										break;
+									case OpCode.increment:
+										operators.OpIncrementDecrement.execIncrement(currentRunFrame, step, scope);
+										break;
+									case OpCode.increment_int:
+										operators.OpIncrementDecrement.execIncInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.increment_uint:
+										operators.OpIncrementDecrement.execIncUInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.increment_number:
+										operators.OpIncrementDecrement.execIncNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.decrement:
+										operators.OpIncrementDecrement.execDecrement(currentRunFrame, step, scope);
+										break;
+
+									case OpCode.decrement_int:
+										operators.OpIncrementDecrement.execDecInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.decrement_uint:
+										operators.OpIncrementDecrement.execDecUInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.decrement_number:
+										operators.OpIncrementDecrement.execDecNumber(currentRunFrame, step, scope);
+										break;
+
+									case OpCode.suffix_inc:
+										operators.OpIncrementDecrement.execSuffixInc(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_inc_int:
+										operators.OpIncrementDecrement.execSuffixIncInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_inc_uint:
+										operators.OpIncrementDecrement.execSuffixIncUint(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_inc_number:
+										operators.OpIncrementDecrement.execSuffixIncNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_dec:
+										operators.OpIncrementDecrement.execSuffixDec(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_dec_int:
+										operators.OpIncrementDecrement.execSuffixDecInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_dec_uint:
+										operators.OpIncrementDecrement.execSuffixDecUInt(currentRunFrame, step, scope);
+										break;
+									case OpCode.suffix_dec_number:
+										operators.OpIncrementDecrement.execSuffixDecNumber(currentRunFrame, step, scope);
+										break;
+									case OpCode.flag:
+										//标签行，不做任何操作
+										currentRunFrame.endStep(step);
+										break;
+									case OpCode.if_jmp:
+										{
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+											{
+												if (currentRunFrame.trystateCount != 0)
+												{
+													currentRunFrame.hasCallJump = true;
+													currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
+													currentRunFrame.endStep(step);
+													break;
+												}
+												else
+												{
+													currentRunFrame.codeLinePtr += step.jumoffset - 1;
+													currentRunFrame.endStep(step);
+													break;
+												}
+											}
+											else
+											{
+												currentRunFrame.endStep(step);
+											}
+										}
+										break;
+									case OpCode.jmp:
+										if (currentRunFrame.trystateCount != 0)
+										{
+											currentRunFrame.hasCallJump = true;
+											currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
+											currentRunFrame.endStep(step);
+											break;
+										}
+										else
+										{
+											currentRunFrame.codeLinePtr += step.jumoffset - 1;
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.raise_error:
+										nativefuncs.Throw.exec(currentRunFrame, step, scope);
+										break;
+									case OpCode.enter_try:
+										{
+											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.enter_try(tryid);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.quit_try:
+										{
+											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.quit_try(tryid, step.token);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.enter_catch:
+										{
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.enter_catch(catchid);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.quit_catch:
+										{
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.quit_catch(catchid, step.token);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.enter_finally:
+										{
+											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.enter_finally(finallyid);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.quit_finally:
+										{
+											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											currentRunFrame.quit_finally(finallyid, step.token);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.native_trace:
+										//    nativefuncs.Trace.exec(this, step, scope);
+										break;
+									case OpCode.bind_scope:
+										operators.OpCallFunction.bind(currentRunFrame, step, scope);
+										break;
+									case OpCode.clear_thispointer:
+										operators.OpCallFunction.clear_thispointer(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope:
+										operators.OpCallFunction.create_paraScope(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter:
+										operators.OpCallFunction.push_parameter(currentRunFrame, step, scope);
+										break;
+									case OpCode.call_function:
+										operators.OpCallFunction.exec(currentRunFrame, step, scope);
+										break;
+									case OpCode.function_return:
+										currentRunFrame.hasCallReturn = true;
+										operators.OpCallFunction.exec_return(currentRunFrame, step, scope);
+
+										break;
+
+									case OpCode.new_instance:
+										operators.OpCreateInstance.exec(currentRunFrame, step, scope);
+										break;
+									case OpCode.init_staticclass:
+										operators.OpCreateInstance.init_static(currentRunFrame, step, scope);
+										break;
+									case OpCode.new_instance_class:
+										operators.OpCreateInstance.exec_instanceClass(currentRunFrame, step, scope);
+										break;
+									case OpCode.prepare_constructor_argement:
+										operators.OpCreateInstance.prepareConstructorArgements(currentRunFrame, step, scope);
+										break;
+									case OpCode.prepare_constructor_class_argement:
+										operators.OpCreateInstance.prepareConstructorClassArgements(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter_class:
+										operators.OpCreateInstance.push_parameter_class(currentRunFrame, step, scope);
+										break;
+									case OpCode.access_dot:
+										operators.OpAccess_Dot.exec_dot(currentRunFrame, step, scope);
+										break;
+									case OpCode.access_dot_byname:
+										operators.OpAccess_Dot.exec_dot_byname(currentRunFrame, step, scope);
+										break;
+									case OpCode.bracket_access:
+										operators.OpAccess_Dot.exec_bracket_access(currentRunFrame, step, scope);
+										break;
+									case OpCode.bracket_byname:
+										operators.OpAccess_Dot.exec_dot_byname(currentRunFrame, step, scope);
+										break;
+									case OpCode.access_method:
+										operators.OpAccess_Dot.exec_method(currentRunFrame, step, scope);
+										break;
+									case OpCode.delete_prop:
+										operators.OpDynamicProperty.exec_delete(currentRunFrame, step, scope);
+										break;
+									case OpCode.set_dynamic_prop:
+										operators.OpDynamicProperty.exec_set_dynamic_prop(currentRunFrame, step, scope);
+										break;
+									case OpCode.try_read_getter:
+										operators.OpPropGetSet.exec_try_read_prop(currentRunFrame, step, scope);
+										break;
+									case OpCode.try_write_setter:
+										operators.OpPropGetSet.exec_try_write_prop(currentRunFrame, step, scope);
+										break;
+									case OpCode.array_push:
+										operators.OpArray.exec_Push(currentRunFrame, step, scope);
+										break;
+									case OpCode.array_create:
+										operators.OpArray.exec_create(currentRunFrame, step, scope);
+										break;
+									case OpCode.vectorAccessor_bind:
+										operators.OpVector.exec_AccessorBind(currentRunFrame, step, scope);
+										break;
+									case OpCode.vector_push:
+										operators.OpVector.exec_push(currentRunFrame, step, scope);
+										break;
+									case OpCode.vector_pusharray:
+										operators.OpVector.exec_pusharray(currentRunFrame, step, scope);
+										break;
+									case OpCode.vector_pushvector:
+										operators.OpVector.exec_pushVector(currentRunFrame, step, scope);
+										break;
+									case OpCode.vectorAccessor_convertidx:
+										operators.OpVector.exec_AccessorBind_ConvertIdx(currentRunFrame, step, scope);
+										break;
+									case OpCode.vector_initfrmdata:
+										operators.OpVector.exec_initfromdata(currentRunFrame, step, scope);
+										break;
+									case OpCode.link_outpackagevairable:
+										operators.OpLinkOutPackageScope.exec_link(currentRunFrame, step, scope);
+										break;
+									case OpCode.flag_call_super_constructor:
+										currentRunFrame.endStep(step);
+										break;
+									case OpCode.forin_get_enumerator:
+										operators.OpForIn.forin_get_enumerator(currentRunFrame, step, scope);
+										break;
+									case OpCode.enumerator_movenext:
+										operators.OpForIn.enumerator_movenext(currentRunFrame, step, scope);
+										break;
+									case OpCode.enumerator_current:
+										operators.OpForIn.enumerator_current(currentRunFrame, step, scope);
+										break;
+									case OpCode.enumerator_close:
+										operators.OpForIn.enumerator_close(currentRunFrame, step, scope);
+										break;
+									case OpCode.foreach_get_enumerator:
+										operators.OpForIn.foreach_get_enumerator(currentRunFrame, step, scope);
+										break;
+									case OpCode.logic_is:
+										operators.OpLogic.exec_IS(currentRunFrame, step, scope);
+										break;
+									case OpCode.logic_instanceof:
+										operators.OpLogic.exec_instanceof(currentRunFrame, step, scope);
+										break;
+									case OpCode.convert_as:
+										operators.OpLogic.exec_AS(currentRunFrame, step, scope);
+										break;
+									case OpCode.logic_in:
+										operators.OpLogic.exec_In(currentRunFrame, step, scope);
+										break;
+									case OpCode.unary_typeof:
+										operators.OpTypeOf.exec_TypeOf(currentRunFrame, step, scope);
+										break;
+									case OpCode.function_create:
+										{
+											rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame);
+											int funcid = ((rtInt)arr.innerArray[0]).value;
+											bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
+
+											rtFunction function = new rtFunction(funcid, ismethod);
+											function.bind(scope);
+											step.reg.getSlot(scope, currentRunFrame).directSet(function);
+
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.yield_return:
+
+										operators.OpCallFunction.exec_yieldreturn(currentRunFrame, step, scope);
+
+										break;
+									case OpCode.yield_continuetoline:
+										{
+											//跳转继续下一次yield
+											currentRunFrame.codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.yield_break:
+										currentRunFrame.hasCallReturn = true;
+										currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+										currentRunFrame.endStep(step);
+										break;
+									case OpCode.reset_stackslot:
+
+										((StackSlot)((Register)step.arg1).getSlot(scope, currentRunFrame)).resetSlot();
+
+										currentRunFrame.endStep(step);
+										break;
+									default:
+
+										runtimeError = (new error.InternalError(swc, step.token,
+											 step.opCode + "操作未实现"
+											 ));
+										currentRunFrame.endStep();
+										break;
+								}
+
+
+								#endregion
+
+
+							}
+
+							isstep= true;continue;
+
+
+
+
 
 						}
 						break;
 					}
-					//catch (ASRunTimeException)   //引擎抛出的异常直接抛出
-					//{
-					//	throw;
-					//}
-					//catch (StackOverflowException)
-					//{
-					//	throw;
-					//}
-					//catch (OutOfMemoryException)
-					//{
-					//	throw;
-					//}
-					//catch (Exception le)    //捕获外部函数异常
-					//{
-					//	if (currentRunFrame != null)
-					//	{
-					//		if (_nativefuncCaller != null)
-					//		{
-					//			if (_nativefuncCaller.callbacker != null)
-					//			{
-					//				_nativefuncCaller.callbacker.noticeRunFailed();
-					//			}
-					//			_nativefuncCaller.release();
-					//			_nativefuncCaller = null;
-					//		}
+					catch (ASRunTimeException)   //引擎抛出的异常直接抛出
+					{
+						throw;
+					}
+					catch (StackOverflowException)
+					{
+						throw;
+					}
+					catch (OutOfMemoryException)
+					{
+						throw;
+					}
+					catch (Exception le)    //捕获外部函数异常
+					{
+						if (currentRunFrame != null)
+						{
+							if (_nativefuncCaller != null)
+							{
+								if (_nativefuncCaller.callbacker != null)
+								{
+									_nativefuncCaller.callbacker.noticeRunFailed();
+								}
+								_nativefuncCaller.release();
+								_nativefuncCaller = null;
+							}
 
-					//		SourceToken token;
+							SourceToken token;
 
-					//		if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
-					//		{
-					//			token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
-					//		}
-					//		else
-					//		{
-					//			token = new SourceToken(0, 0, string.Empty);
-					//		}
+							if (currentRunFrame.codeLinePtr < currentRunFrame.block.opSteps.Count)
+							{
+								token = currentRunFrame.block.opSteps[currentRunFrame.codeLinePtr].token;
+							}
+							else
+							{
+								token = new SourceToken(0, 0, string.Empty);
+							}
 
-					//		currentRunFrame.throwAneException(token
-					//			, le.Message);
-					//		currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
+							currentRunFrame.throwAneException(token
+								, le.Message);
+							currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
 
-					//		continue;
-					//	}
-					//	else
-					//	{
-					//		throw;
-					//	}
-					//}
+							continue;
+						}
+						else
+						{
+							throw;
+						}
+					}
+
+#endif
+
+
+
 				}
 
 
@@ -531,7 +1136,7 @@ namespace ASRuntime
 			{
 				if (this_pointer is rtObject)
 				{
-					if (callerScope == null || callerScope.scopeType != RunTimeScopeType.function)
+					if (callerScope.scopeType != RunTimeScopeType.function || callerScope == null)
 					{
 						frame.scope = ((rtObject)this_pointer).objScope;
 					}
@@ -911,8 +1516,469 @@ namespace ASRuntime
             }
             else
             {
-                currentRunFrame.step();
-            }
+#if DEBUG
+				currentRunFrame.step();
+#else
+
+#region 人肉内联
+
+				var block = currentRunFrame.block;
+				
+				var scope = currentRunFrame.scope;
+
+				currentRunFrame.hascallstep = true;
+
+				OpStep step = block.opSteps[currentRunFrame.codeLinePtr];
+				//exec(step);
+				switch (step.opCode)
+				{
+					case OpCode.cast:
+						operators.OpCast.execCast(currentRunFrame, step, scope);
+						break;
+					case OpCode.cast_primitive:
+						operators.OpCast.exec_CastPrimitive(currentRunFrame, step, scope);
+						break;
+					case OpCode.assigning:
+						operators.OpAssigning.execAssigning(currentRunFrame, step, scope);
+						break;
+
+					case OpCode.add_number:
+						operators.OpAdd.execAdd_Number(currentRunFrame, step, scope);
+						break;
+					case OpCode.add_string:
+						operators.OpAdd.execAdd_String(currentRunFrame, step, scope);
+						break;
+					case OpCode.add:
+						operators.OpAdd.execAdd(currentRunFrame, step, scope);
+						break;
+					case OpCode.sub_number:
+						operators.OpSub.execSub_Number(currentRunFrame, step, scope);
+						break;
+					case OpCode.sub:
+						operators.OpSub.execSub(currentRunFrame, step, scope);
+						break;
+					case OpCode.multi:
+						operators.OpMulti.execMulti(currentRunFrame, step, scope);
+						break;
+					case OpCode.multi_number:
+						operators.OpMulti.exec_MultiNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.div:
+						operators.OpMulti.execDiv(currentRunFrame, step, scope);
+						break;
+					case OpCode.div_number:
+						operators.OpMulti.exec_DivNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.mod:
+						operators.OpMulti.execMod(currentRunFrame, step, scope);
+						break;
+					case OpCode.mod_number:
+						operators.OpMulti.exec_ModNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.unary_plus:
+						operators.OpUnaryPlus.execUnaryPlus(currentRunFrame, step, scope);
+						break;
+					case OpCode.neg:
+						operators.OpNeg.execNeg(currentRunFrame, step, scope);
+						break;
+					case OpCode.gt_num:
+						operators.OpLogic.execGT_NUM(currentRunFrame, step, scope);
+						break;
+					case OpCode.gt_void:
+						operators.OpLogic.execGT_Void(currentRunFrame, step, scope);
+						break;
+					case OpCode.lt_num:
+						operators.OpLogic.execLT_NUM(currentRunFrame, step, scope);
+						break;
+					//case OpCode.lt_int_int:
+					//    operators.OpLogic.execLT_IntInt(this, step, scope);
+					//    break;
+					case OpCode.lt_void:
+						operators.OpLogic.execLT_VOID(currentRunFrame, step, scope);
+						break;
+					case OpCode.ge_num:
+						operators.OpLogic.execGE_NUM(currentRunFrame, step, scope);
+						break;
+					case OpCode.ge_void:
+						operators.OpLogic.execGE_Void(currentRunFrame, step, scope);
+						break;
+					case OpCode.le_num:
+						operators.OpLogic.execLE_NUM(currentRunFrame, step, scope);
+						break;
+					case OpCode.le_void:
+						operators.OpLogic.execLE_VOID(currentRunFrame, step, scope);
+						break;
+					case OpCode.equality:
+						operators.OpLogic.execEQ(currentRunFrame, step, scope);
+						break;
+					case OpCode.not_equality:
+						operators.OpLogic.execNotEQ(currentRunFrame, step, scope);
+						break;
+					case OpCode.equality_num_num:
+						operators.OpLogic.execEQ_NumNum(currentRunFrame, step, scope);
+						break;
+					case OpCode.not_equality_num_num:
+						operators.OpLogic.execNotEQ_NumNum(currentRunFrame, step, scope);
+						break;
+					case OpCode.equality_str_str:
+						operators.OpLogic.execEQ_StrStr(currentRunFrame, step, scope);
+						break;
+					case OpCode.not_equality_str_str:
+						operators.OpLogic.execNotEQ_StrStr(currentRunFrame, step, scope);
+						break;
+					case OpCode.strict_equality:
+						operators.OpLogic.execStrictEQ(currentRunFrame, step, scope);
+						break;
+					case OpCode.not_strict_equality:
+						operators.OpLogic.execStrictNotEQ(currentRunFrame, step, scope);
+						break;
+					case OpCode.logic_not:
+						operators.OpLogic.execNOT(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitAnd:
+						operators.OpBit.execBitAnd(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitOr:
+						operators.OpBit.execBitOR(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitXOR:
+						operators.OpBit.execBitXOR(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitNot:
+						operators.OpBit.execBitNot(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitLeftShift:
+						operators.OpBit.execBitLeftShift(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitRightShift:
+						operators.OpBit.execBitRightShift(currentRunFrame, step, scope);
+						break;
+					case OpCode.bitUnsignedRightShift:
+						operators.OpBit.execBitUnSignRightShift(currentRunFrame, step, scope);
+						break;
+					case OpCode.increment:
+						operators.OpIncrementDecrement.execIncrement(currentRunFrame, step, scope);
+						break;
+					case OpCode.increment_int:
+						operators.OpIncrementDecrement.execIncInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.increment_uint:
+						operators.OpIncrementDecrement.execIncUInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.increment_number:
+						operators.OpIncrementDecrement.execIncNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.decrement:
+						operators.OpIncrementDecrement.execDecrement(currentRunFrame, step, scope);
+						break;
+
+					case OpCode.decrement_int:
+						operators.OpIncrementDecrement.execDecInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.decrement_uint:
+						operators.OpIncrementDecrement.execDecUInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.decrement_number:
+						operators.OpIncrementDecrement.execDecNumber(currentRunFrame, step, scope);
+						break;
+
+					case OpCode.suffix_inc:
+						operators.OpIncrementDecrement.execSuffixInc(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_inc_int:
+						operators.OpIncrementDecrement.execSuffixIncInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_inc_uint:
+						operators.OpIncrementDecrement.execSuffixIncUint(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_inc_number:
+						operators.OpIncrementDecrement.execSuffixIncNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_dec:
+						operators.OpIncrementDecrement.execSuffixDec(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_dec_int:
+						operators.OpIncrementDecrement.execSuffixDecInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_dec_uint:
+						operators.OpIncrementDecrement.execSuffixDecUInt(currentRunFrame, step, scope);
+						break;
+					case OpCode.suffix_dec_number:
+						operators.OpIncrementDecrement.execSuffixDecNumber(currentRunFrame, step, scope);
+						break;
+					case OpCode.flag:
+						//标签行，不做任何操作
+						currentRunFrame.endStep(step);
+						break;
+					case OpCode.if_jmp:
+						{
+							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+							{
+								if (currentRunFrame.trystateCount != 0)
+								{
+									currentRunFrame.hasCallJump = true;
+									currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
+									currentRunFrame.endStep(step);
+									break;
+								}
+								else
+								{
+									currentRunFrame.codeLinePtr += step.jumoffset - 1;
+									currentRunFrame.endStep(step);
+									break;
+								}
+							}
+							else
+							{
+								currentRunFrame.endStep(step);
+							}
+						}
+						break;
+					case OpCode.jmp:
+						if (currentRunFrame.trystateCount != 0)
+						{
+							currentRunFrame.hasCallJump = true;
+							currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
+							currentRunFrame.endStep(step);
+							break;
+						}
+						else
+						{
+							currentRunFrame.codeLinePtr += step.jumoffset - 1;
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.raise_error:
+						nativefuncs.Throw.exec(currentRunFrame, step, scope);
+						break;
+					case OpCode.enter_try:
+						{
+							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.enter_try(tryid);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.quit_try:
+						{
+							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.quit_try(tryid, step.token);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.enter_catch:
+						{
+							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.enter_catch(catchid);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.quit_catch:
+						{
+							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.quit_catch(catchid, step.token);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.enter_finally:
+						{
+							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.enter_finally(finallyid);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.quit_finally:
+						{
+							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							currentRunFrame.quit_finally(finallyid, step.token);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.native_trace:
+						//    nativefuncs.Trace.exec(this, step, scope);
+						break;
+					case OpCode.bind_scope:
+						operators.OpCallFunction.bind(currentRunFrame, step, scope);
+						break;
+					case OpCode.clear_thispointer:
+						operators.OpCallFunction.clear_thispointer(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope:
+						operators.OpCallFunction.create_paraScope(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter:
+						operators.OpCallFunction.push_parameter(currentRunFrame, step, scope);
+						break;
+					case OpCode.call_function:
+						operators.OpCallFunction.exec(currentRunFrame, step, scope);
+						break;
+					case OpCode.function_return:
+						currentRunFrame.hasCallReturn = true;
+						operators.OpCallFunction.exec_return(currentRunFrame, step, scope);
+
+						break;
+
+					case OpCode.new_instance:
+						operators.OpCreateInstance.exec(currentRunFrame, step, scope);
+						break;
+					case OpCode.init_staticclass:
+						operators.OpCreateInstance.init_static(currentRunFrame, step, scope);
+						break;
+					case OpCode.new_instance_class:
+						operators.OpCreateInstance.exec_instanceClass(currentRunFrame, step, scope);
+						break;
+					case OpCode.prepare_constructor_argement:
+						operators.OpCreateInstance.prepareConstructorArgements(currentRunFrame, step, scope);
+						break;
+					case OpCode.prepare_constructor_class_argement:
+						operators.OpCreateInstance.prepareConstructorClassArgements(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter_class:
+						operators.OpCreateInstance.push_parameter_class(currentRunFrame, step, scope);
+						break;
+					case OpCode.access_dot:
+						operators.OpAccess_Dot.exec_dot(currentRunFrame, step, scope);
+						break;
+					case OpCode.access_dot_byname:
+						operators.OpAccess_Dot.exec_dot_byname(currentRunFrame, step, scope);
+						break;
+					case OpCode.bracket_access:
+						operators.OpAccess_Dot.exec_bracket_access(currentRunFrame, step, scope);
+						break;
+					case OpCode.bracket_byname:
+						operators.OpAccess_Dot.exec_dot_byname(currentRunFrame, step, scope);
+						break;
+					case OpCode.access_method:
+						operators.OpAccess_Dot.exec_method(currentRunFrame, step, scope);
+						break;
+					case OpCode.delete_prop:
+						operators.OpDynamicProperty.exec_delete(currentRunFrame, step, scope);
+						break;
+					case OpCode.set_dynamic_prop:
+						operators.OpDynamicProperty.exec_set_dynamic_prop(currentRunFrame, step, scope);
+						break;
+					case OpCode.try_read_getter:
+						operators.OpPropGetSet.exec_try_read_prop(currentRunFrame, step, scope);
+						break;
+					case OpCode.try_write_setter:
+						operators.OpPropGetSet.exec_try_write_prop(currentRunFrame, step, scope);
+						break;
+					case OpCode.array_push:
+						operators.OpArray.exec_Push(currentRunFrame, step, scope);
+						break;
+					case OpCode.array_create:
+						operators.OpArray.exec_create(currentRunFrame, step, scope);
+						break;
+					case OpCode.vectorAccessor_bind:
+						operators.OpVector.exec_AccessorBind(currentRunFrame, step, scope);
+						break;
+					case OpCode.vector_push:
+						operators.OpVector.exec_push(currentRunFrame, step, scope);
+						break;
+					case OpCode.vector_pusharray:
+						operators.OpVector.exec_pusharray(currentRunFrame, step, scope);
+						break;
+					case OpCode.vector_pushvector:
+						operators.OpVector.exec_pushVector(currentRunFrame, step, scope);
+						break;
+					case OpCode.vectorAccessor_convertidx:
+						operators.OpVector.exec_AccessorBind_ConvertIdx(currentRunFrame, step, scope);
+						break;
+					case OpCode.vector_initfrmdata:
+						operators.OpVector.exec_initfromdata(currentRunFrame, step, scope);
+						break;
+					case OpCode.link_outpackagevairable:
+						operators.OpLinkOutPackageScope.exec_link(currentRunFrame, step, scope);
+						break;
+					case OpCode.flag_call_super_constructor:
+						currentRunFrame.endStep(step);
+						break;
+					case OpCode.forin_get_enumerator:
+						operators.OpForIn.forin_get_enumerator(currentRunFrame, step, scope);
+						break;
+					case OpCode.enumerator_movenext:
+						operators.OpForIn.enumerator_movenext(currentRunFrame, step, scope);
+						break;
+					case OpCode.enumerator_current:
+						operators.OpForIn.enumerator_current(currentRunFrame, step, scope);
+						break;
+					case OpCode.enumerator_close:
+						operators.OpForIn.enumerator_close(currentRunFrame, step, scope);
+						break;
+					case OpCode.foreach_get_enumerator:
+						operators.OpForIn.foreach_get_enumerator(currentRunFrame, step, scope);
+						break;
+					case OpCode.logic_is:
+						operators.OpLogic.exec_IS(currentRunFrame, step, scope);
+						break;
+					case OpCode.logic_instanceof:
+						operators.OpLogic.exec_instanceof(currentRunFrame, step, scope);
+						break;
+					case OpCode.convert_as:
+						operators.OpLogic.exec_AS(currentRunFrame, step, scope);
+						break;
+					case OpCode.logic_in:
+						operators.OpLogic.exec_In(currentRunFrame, step, scope);
+						break;
+					case OpCode.unary_typeof:
+						operators.OpTypeOf.exec_TypeOf(currentRunFrame, step, scope);
+						break;
+					case OpCode.function_create:
+						{
+							rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame);
+							int funcid = ((rtInt)arr.innerArray[0]).value;
+							bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
+
+							rtFunction function = new rtFunction(funcid, ismethod);
+							function.bind(scope);
+							step.reg.getSlot(scope, currentRunFrame).directSet(function);
+
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.yield_return:
+
+						operators.OpCallFunction.exec_yieldreturn(currentRunFrame, step, scope);
+
+						break;
+					case OpCode.yield_continuetoline:
+						{
+							//跳转继续下一次yield
+							currentRunFrame.codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.yield_break:
+						currentRunFrame.hasCallReturn = true;
+						currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+						currentRunFrame.endStep(step);
+						break;
+					case OpCode.reset_stackslot:
+
+						((StackSlot)((Register)step.arg1).getSlot(scope, currentRunFrame)).resetSlot();
+
+						currentRunFrame.endStep(step);
+						break;
+					default:
+
+						runtimeError = (new error.InternalError(swc, step.token,
+							 step.opCode + "操作未实现"
+							 ));
+						currentRunFrame.endStep();
+						break;
+				}
+
+
+#endregion
+
+#endif
+
+			}
 
             return true;
         }
@@ -1076,7 +2142,7 @@ namespace ASRuntime
 
 
 
-		#region 外部接口
+#region 外部接口
 
 		private object convertReturnValue(object obj)
 		{
@@ -1106,7 +2172,7 @@ namespace ASRuntime
 			}
 		}
 
-		#region getClass
+#region getClass
 
 		public ASBinCode.rtti.Class getClass(string name)
 		{
@@ -1120,7 +2186,7 @@ namespace ASRuntime
 
 #endregion
 
-		#region prepaeParameter
+#region prepaeParameter
 
 		private RunTimeValueBase prepareParameter(ASBinCode.rtti.FunctionSignature sig, int paraIndex, object value, StackSlot tempSLot)
 		{
@@ -1168,9 +2234,9 @@ namespace ASRuntime
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region createInstance
+#region createInstance
 
 		public ASBinCode.rtData.rtObject createInstance(string classname)
 		{
@@ -1295,9 +2361,9 @@ namespace ASRuntime
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region getMethod
+#region getMethod
 
 		private rtFunction getMethod(rtObject thisObj, string name)
 		{
@@ -1371,10 +2437,10 @@ namespace ASRuntime
 			//	}
 			//}
 		}
-		#endregion
+#endregion
 
 
-		#region invokeMethod
+#region invokeMethod
 		public object invokeMethod(string type, string methodname)
 		{
 			return invokeMethod(type, methodname, 0, null, null, null, null, null, null);
@@ -1587,9 +2653,9 @@ namespace ASRuntime
 		}
 
 
-		#endregion
+#endregion
 
-		#region getClassStaticInstance
+#region getClassStaticInstance
 		private rtObject getClassStaticInstance(string type)
 		{
 			
@@ -1622,9 +2688,9 @@ namespace ASRuntime
 			}
 
 		}
-		#endregion
+#endregion
 
-		#region get_set_member
+#region get_set_member
 
 		public object getMemberValue(rtObject thisObj, string memberPath)
 		{
@@ -1865,10 +2931,10 @@ namespace ASRuntime
 			setMemberValue(clsObj, memberPath, value, indexArgs);
 		}
 
-		#endregion
+#endregion
 
 
-		#region ByteArray
+#region ByteArray
 
 		/// <summary>
 		/// 创建一个ByteArray对象
@@ -1887,12 +2953,12 @@ namespace ASRuntime
 		}
 
 
-		#endregion
+#endregion
 
 
 
 
-		#endregion
+#endregion
 
 
 
