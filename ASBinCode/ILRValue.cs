@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 右值
 	/// </summary>
@@ -30,7 +30,7 @@ namespace ASBinCode
 
 
 	}
-	[Serializable]
+	
 	/// <summary>
 	/// 左值
 	/// </summary>

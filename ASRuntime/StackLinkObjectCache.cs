@@ -13,7 +13,7 @@ namespace ASRuntime
     /// </summary>
     class StackLinkObjectCache
     {
-		public rtObject srcObject;
+		//public rtObject srcObject;
 
 		public class StackCacheObject : rtObject
 		{
@@ -24,34 +24,34 @@ namespace ASRuntime
 			}
 
 			
-			public  rtObject getSrcObject()
-			{
-				if (cache.srcObject == null
-					||
-					cache.srcObject.rtType != rtType 
-					||
-					!(ReferenceEquals(((LinkSystemObject)cache.srcObject.value).GetLinkData(), ((LinkSystemObject)value).GetLinkData()))
-					)
-				{
+			//public  rtObject getSrcObject()
+			//{
+			//	if (cache.srcObject == null
+			//		||
+			//		cache.srcObject.rtType != rtType 
+			//		||
+			//		!(ReferenceEquals(((LinkSystemObject)cache.srcObject.value).GetLinkData(), ((LinkSystemObject)value).GetLinkData()))
+			//		)
+			//	{
 					
-					//return this;
-					//if (srcObject == null)
-					//{
+			//		//return this;
+			//		//if (srcObject == null)
+			//		//{
 
-					//}
+			//		//}
 
-					//出现此种情况，说明时链接对象的中间计算步骤。这时因为不是从变量赋值来的，所以没有srcObject
+			//		//出现此种情况，说明时链接对象的中间计算步骤。这时因为不是从变量赋值来的，所以没有srcObject
 
 
 
-					return this;
-				}
-				else
-				{
-					return cache.srcObject;
-				}
-				//throw new Exception();
-			}
+			//		return this;
+			//	}
+			//	else
+			//	{
+			//		return cache.srcObject;
+			//	}
+			//	//throw new Exception();
+			//}
 
 			public static StackCacheObject createFrom(StackLinkObjectCache cache,rtObject src)
 			{

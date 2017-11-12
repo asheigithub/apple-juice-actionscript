@@ -18,8 +18,8 @@ namespace ASRuntime.operators
 				((StackSlot)slot).linkTo(null);	
                 _do_prop_read(
 
-                    ((StackSlot)slot).propGetSet,
-                    frame, step, frame.player, scope, ((StackSlot)slot).propBindObj, ((StackSlot)slot).superPropBindClass
+                    ((StackSlot)slot).stackObjects.propGetSet,
+                    frame, step, frame.player, scope, ((StackSlot)slot).stackObjects.propBindObj, ((StackSlot)slot).stackObjects.superPropBindClass
                     );
             }
             else if (slot.isSetThisItem)
@@ -56,7 +56,7 @@ namespace ASRuntime.operators
                 funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                 StackSlot ret = (StackSlot)funCaller.returnSlot;
-                ret._temp_try_write_setthisitem = ret._cache_setthisslot;
+                ret.stackObjects._temp_try_write_setthisitem = ret._cache_setthisslot;
                 ret._cache_setthisslot.bindObj = rtObj;
                 ret._cache_setthisslot.setindex = v2;
 
@@ -183,8 +183,8 @@ namespace ASRuntime.operators
                 funCaller._tempSlot = frame._tempSlot1;
                 funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
-                ((StackSlot)funCaller.returnSlot).propGetSet = prop;
-                ((StackSlot)funCaller.returnSlot).propBindObj = propBindObj;   //propslot.bindObj;
+                ((StackSlot)funCaller.returnSlot).stackObjects.propGetSet = prop;
+                ((StackSlot)funCaller.returnSlot).stackObjects.propBindObj = propBindObj;   //propslot.bindObj;
 
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
@@ -213,21 +213,21 @@ namespace ASRuntime.operators
         public static void exec_try_write_prop(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope,frame);
-            if (slot.propGetSet != null)
+            if (slot.stackObjects.propGetSet != null)
             {
 
-                OpAssigning._doPropAssigning(slot.propGetSet, frame, step, frame.player, scope,
-                    slot.propBindObj
+                OpAssigning._doPropAssigning(slot.stackObjects.propGetSet, frame, step, frame.player, scope,
+                    slot.stackObjects.propBindObj
                     ,
                     slot.getValue()
                     ,
                     slot
                     );
             }
-            else if (slot._temp_try_write_setthisitem !=null)
+            else if (slot.stackObjects._temp_try_write_setthisitem !=null)
             {
-                SetThisItemSlot sslot = (SetThisItemSlot)slot._temp_try_write_setthisitem;
-                slot._temp_try_write_setthisitem = null;
+                SetThisItemSlot sslot = (SetThisItemSlot)slot.stackObjects._temp_try_write_setthisitem;
+                slot.stackObjects._temp_try_write_setthisitem = null;
 
                 OpAssigning._doSetThisItem(
                     sslot.bindObj,

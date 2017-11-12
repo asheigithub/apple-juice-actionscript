@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 函数签名
 	/// </summary>

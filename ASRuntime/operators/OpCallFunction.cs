@@ -169,25 +169,43 @@ namespace ASRuntime.operators
 			frame.endStep(step);
         }
 
+		public static void create_paraScope_WithSignature(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+				= (rtFunction)step.arg1.getValue(frame.scope, frame);
+			
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); 
+			funcCaller._tempSlot = frame._tempSlot1;
+			funcCaller.toCallFunc = frame.player.swc.functions[function.functionId];
+			if (!funcCaller.createParaScope()) { return; }
 
-        //public static void bind_this(Player player, StackFrame frame, ASBinCode.OpStep step)
-        //{
-        //    var rv = step.arg1.getValue(frame.scope);
-        //    if (rv.rtType != RunTimeDataType.rt_function)
-        //    {
-        //        frame.throwError(new error.InternalError(step.token, "value is not a function",
-        //            new ASBinCode.rtData.rtString("value is not a function")));
-        //    }
-        //    else
-        //    {
-        //        ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-        //        function.setThis(frame.scope.this_pointer);
-        //    }
-        //    frame.endStep(step);
-        //}
+			frame.funCaller = funcCaller;
+			
+			frame.endStep(step);
+		}
+
+		public static void create_paraScope_Method(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+
+				= (rtFunction)((MethodGetterBase)step.arg1).getMethod(frame.scope); 
+			
+			{
+				
+				var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+				funcCaller.SetFunction(function); function.Clear(); 
+				funcCaller._tempSlot = frame._tempSlot1;
+				funcCaller.toCallFunc = frame.player.swc.functions[function.functionId];
+				if (!funcCaller.createParaScope()) { return; }
+
+				frame.funCaller = funcCaller;
+			}
+			frame.endStep(step);
+		}
 
 
-        public static void create_paraScope(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
+		public static void create_paraScope(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             RunTimeValueBase rv;rtFunction toclear = null;
             if (step.arg1 is MethodGetterBase)
@@ -236,14 +254,89 @@ namespace ASRuntime.operators
                 funcCaller._tempSlot = frame._tempSlot1;
                 funcCaller.loadDefineFromFunction();
                 if (!funcCaller.createParaScope()) { return; }
-                //funcCaller.releaseAfterCall = true;
-
+                
                 frame.funCaller = funcCaller;
             }
             frame.endStep(step);
         }
 
-        public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
+
+		public static void push_parameter_nativeconstpara_skipcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+
+#if DEBUG 
+			if (frame.typeconvertoperator != null)
+				throw new ASRunTimeException();
+#endif
+
+			var toCallFunc = frame.funCaller.toCallFunc;var player = frame.player;
+			if (toCallFunc.native_index < 0)
+			{
+				toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+			}
+			var nf = (nativefuncs.NativeConstParameterFunction)player.swc.nativefunctions[toCallFunc.native_index];
+
+			bool success;
+			frame.funCaller.pushParameterNativeModeConstParameter(nf,arg, id, out success);
+
+			
+			frame.endStep(step);
+		}
+
+
+		public static void push_parameter_skipcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+
+#if DEBUG
+			if (frame.typeconvertoperator != null)
+				throw new ASRunTimeException();
+#endif
+			
+			bool success;
+			frame.funCaller.pushParameter_noCheck(arg, id, out success);
+
+			
+			frame.endStep(step);
+		}
+		public static void push_parameter_skipcheck_testnative(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+
+#if DEBUG
+			if (frame.typeconvertoperator != null)
+				throw new ASRunTimeException();
+#endif
+
+			bool success;
+			frame.funCaller.pushParameter_noCheck_TestNative(arg, id, out success);
+
+
+			frame.endStep(step);
+		}
+
+		public static void push_parameter_para(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+
+#if DEBUG
+			if (frame.typeconvertoperator != null)
+				throw new ASRunTimeException();
+#endif
+
+			bool success;
+			frame.funCaller.pushParameter_Para(arg, id, out success);
+
+
+			frame.endStep(step);
+		}
+
+		public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
             RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
@@ -295,91 +388,89 @@ namespace ASRuntime.operators
         }
 
 
+		public static void exec_notcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			var funCaller = frame.funCaller;
+			funCaller.callbacker = funCaller;
+			funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
+			funCaller.call_nocheck();
+
+			frame.funCaller = null;
+			
+		}
 
         public static void exec(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
 #if DEBUG
-
-            RunTimeValueBase rv;rtFunction toclear = null;
-			if (step.arg1 is MethodGetterBase)
-			{
-				rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope); toclear = (rtFunction)rv;
-			}
-			//else if (step.arg1 is Register)
+			#region 函数调用检查  现基本不需要了
+			//         RunTimeValueBase rv;rtFunction toclear = null;
+			//if (step.arg1 is MethodGetterBase)
 			//{
-			//	Register register = (Register)step.arg1;
-			//	StackSlot slot = (StackSlot)register.getSlot(scope, frame);
-
-				
-
+			//	rv = ((MethodGetterBase)step.arg1).getMethod(frame.scope); toclear = (rtFunction)rv;
 			//}
-			else
-			{
-				rv = step.arg1.getValue(frame.scope, frame);
-			}
-            if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
-            {
-                rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);
-            }
-            if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
-            {
-                //***说明要调用强制类型转换***
-                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
-                if (frame.typeconvertoperator == null || frame.typeconvertoperator.targettype != cls
 
-                    )
-                {
-                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "应该是强制类型转换，内部异常"));
+			//else
+			//{
+			//	rv = step.arg1.getValue(frame.scope, frame);
+			//}
+			//         if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
+			//         {
+			//             rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);
+			//         }
+			//         if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
+			//         {
+			//             //***说明要调用强制类型转换***
+			//             ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+			//             if (frame.typeconvertoperator == null || frame.typeconvertoperator.targettype != cls
 
-                    frame.endStep(step);
-                    return;
-                }
-                else if (frame.typeconvertoperator.inputvalue == null)
-                {
-                    frame.throwError(step.token,0, "Argument count mismatch on class coercion.  Expected 1, got 0."
-                        );
+			//                 )
+			//             {
+			//                 frame.throwError(new error.InternalError(frame.player.swc, step.token, "应该是强制类型转换，内部异常"));
 
-                    frame.endStep(step);
-                    return;
-                }
-            }
-            else
-            {
-                if (rv.rtType != RunTimeDataType.rt_function)
-                {
-                    frame.throwError(step.token,0, "value is not a function"
-                        );
+			//                 frame.endStep(step);
+			//                 return;
+			//             }
+			//             else if (frame.typeconvertoperator.inputvalue == null)
+			//             {
+			//                 frame.throwError(step.token,0, "Argument count mismatch on class coercion.  Expected 1, got 0."
+			//                     );
 
-                    frame.endStep(step);
-                    return;
-                }
+			//                 frame.endStep(step);
+			//                 return;
+			//             }
+			//         }
+			//         else
+			//         {
+			//             if (rv.rtType != RunTimeDataType.rt_function)
+			//             {
+			//                 frame.throwError(step.token,0, "value is not a function"
+			//                     );
 
-                ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
-                ASBinCode.rtti.FunctionDefine funcDefine = frame.player.swc.functions[function.functionId];
+			//                 frame.endStep(step);
+			//                 return;
+			//             }
+
+			//             ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
+			//             ASBinCode.rtti.FunctionDefine funcDefine = frame.player.swc.functions[function.functionId];
 
 
-                if (!frame.funCaller.isFuncEquals(function))
-                {
-					if (toclear != null) { toclear.Clear(); }
-                    frame.throwError(new error.InternalError(frame.player.swc, step.token, "运行时异常，调用函数不对"));
-                    frame.endStep(step);
-                    return;
-                }
-            }
+			//             if (!frame.funCaller.isFuncEquals(function))
+			//             {
+			//		if (toclear != null) { toclear.Clear(); }
+			//                 frame.throwError(new error.InternalError(frame.player.swc, step.token, "运行时异常，调用函数不对"));
+			//                 frame.endStep(step);
+			//                 return;
+			//             }
+			//         }
+#endregion
 #endif
 
-            if (frame.typeconvertoperator == null)
+			if (frame.typeconvertoperator == null)
             {
-                //funbacker cb = new funbacker();
-                //object[] args = new object[2];
-                //args[0] = frame;
-                //args[1] = step;
-                //cb.args = args;
-
-                
-                frame.funCaller.callbacker = frame.funCaller;
-                frame.funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
-                frame.funCaller.call();
+				var funCaller = frame.funCaller;
+                funCaller.callbacker = funCaller;
+                funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
+                funCaller.call();
 
                 frame.funCaller = null;
             }

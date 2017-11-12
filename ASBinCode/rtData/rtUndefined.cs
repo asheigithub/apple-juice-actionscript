@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     /// <summary>
     /// void 数据类型仅包含一个值：undefined。
     /// 在早期的 ActionScript 版本中，undefined 是 Object 类实例的默认值。

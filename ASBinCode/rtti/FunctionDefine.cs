@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 函数定义
 	/// </summary>

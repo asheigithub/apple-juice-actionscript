@@ -454,7 +454,30 @@ namespace ASBinCode
 
 
 
-		///重置StackSlot;
-		reset_stackslot=113
-    }
+		//重置StackSlot;
+		reset_stackslot=113,
+		
+		call_function_notcheck = 114,
+		call_function_notcheck_notreturnobject = 115,
+		call_function_notcheck_notreturnobject_notnative = 116,
+
+		cast_int_number =117,
+		cast_number_int = 118,
+		cast_uint_number = 119,
+		cast_number_uint = 120,
+		cast_int_uint =121,
+		cast_uint_int=122,
+
+		push_parameter_skipcheck=123,
+		push_parameter_skipcheck_testnative = 124,
+		push_parameter_nativeconstpara_skipcheck =125,
+
+		push_parameter_para=126,
+		make_para_scope_method=127,
+		make_para_scope_withsignature=128,
+
+		function_return_funvoid=129,
+		function_return_nofunction=130
+		
+	}
 }

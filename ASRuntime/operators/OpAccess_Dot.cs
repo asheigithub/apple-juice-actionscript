@@ -769,11 +769,11 @@ namespace ASRuntime.operators
                                 slot.linkTo(linkto);
                                 if (linkto is ClassPropertyGetter.PropertySlot)
                                 {
-                                    slot.propBindObj = rtObj;
-                                    slot.propGetSet = (ClassPropertyGetter)member.bindField;
+                                    slot.stackObjects.propBindObj = rtObj;
+                                    slot.stackObjects.propGetSet = (ClassPropertyGetter)member.bindField;
                                     if (step.arg1 is SuperPointer)
                                     {
-                                        slot.superPropBindClass = ((SuperPointer)step.arg1).superClass;
+                                        slot.stackObjects.superPropBindClass = ((SuperPointer)step.arg1).superClass;
                                     }
                                 }
                             }

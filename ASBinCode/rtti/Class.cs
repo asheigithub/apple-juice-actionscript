@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-	[Serializable]
+	
     /// <summary>
     /// 类定义
     /// (或者接口定义)接口定义也继承自Class的。

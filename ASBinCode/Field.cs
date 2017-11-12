@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 类字段
 	/// </summary>

@@ -48,7 +48,7 @@ Public Class GrammarNode
 
 
     Public Function Equals1(other As GrammarNode) As Boolean Implements System.IEquatable(Of GrammarNode).Equals
-		Return Type = other.Type AndAlso String.Equals(Name, other.Name, StringComparison.Ordinal)  'Name = other.Name
+		Return Type = other.Type AndAlso StringEquals(Name, other.Name)  'Name = other.Name
 	End Function
 
     Public Overrides Function Equals(obj As Object) As Boolean

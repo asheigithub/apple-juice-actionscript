@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public sealed class ClassPropertyGetter :LeftValueBase, IMember 
     {
         public ASBinCode.rtti.Class _class;
@@ -114,7 +114,7 @@ namespace ASBinCode
 
 		}
 
-		[Serializable]
+		
         public sealed class PropertySlot : SLOT
         {
             //public rtObject bindObj;

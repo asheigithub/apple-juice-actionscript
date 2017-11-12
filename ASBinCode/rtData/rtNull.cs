@@ -5,10 +5,10 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     public sealed class rtNull : RunTimeValueBase,IEquatable<rtNull>
     {
-        public static rtNull nullptr = new rtNull();
+        public static readonly rtNull nullptr = new rtNull();
 
         private rtNull():base(RunTimeDataType.rt_null) { }
 

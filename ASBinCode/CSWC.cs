@@ -5,7 +5,7 @@ using ASBinCode.rtti;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
     /// <summary>
     /// 输出的类库
     /// </summary>

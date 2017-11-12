@@ -8,6 +8,8 @@ namespace ASRuntime
 {
     public class Player
     {
+		internal const int STACKSLOTLENGTH = 1024;
+
 		internal IRuntimeOutput infoOutput;
 
         internal Dictionary<int, rtObject> static_instance;
@@ -142,7 +144,7 @@ namespace ASRuntime
 
 		private void clearEnv()
 		{
-			for (int i = 0; i < stackSlots.Length; i++)
+			for (int i = 0; i < STACKSLOTLENGTH; i++)
 			{
 				stackSlots[i].clear();
 			}
@@ -172,14 +174,14 @@ namespace ASRuntime
 				runFuncresultPool = new runFuncResult.ResultPool();
 
 				runtimeStack = new MyStack(stackframePool.maxcount);
-				stackSlots = new StackSlot[1024];
-				for (int i = 0; i < stackSlots.Length; i++)
+				stackSlots = new StackSlot[STACKSLOTLENGTH];
+				for (int i = 0; i < STACKSLOTLENGTH; i++)
 				{
 					stackSlots[i] = new StackSlot(swc);
 				}
 				StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, this);
 				stackSlots[0]._linkObjCache = lobjcache;
-				for (int i = 1; i < stackSlots.Length; i++)
+				for (int i = 1; i < STACKSLOTLENGTH; i++)
 				{
 					stackSlots[i]._linkObjCache = lobjcache.Clone();
 				}
@@ -322,7 +324,7 @@ namespace ASRuntime
 								isstep= true;continue;
 							}
 
-							if (currentRunFrame.IsEnd()) //执行完成
+							if (currentRunFrame.codeLinePtr >= currentRunFrame.stepCount ) //执行完成
 							{
 								if (currentRunFrame.callbacker != null)
 								{
@@ -857,19 +859,104 @@ namespace ASRuntime
 										currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
 										currentRunFrame.endStep(step);
 										break;
-									case OpCode.reset_stackslot:
-
-										((StackSlot)((Register)step.arg1).getSlot(scope, currentRunFrame)).resetSlot();
-
-										currentRunFrame.endStep(step);
+									case OpCode.call_function_notcheck:
+										operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
 										break;
+									case OpCode.cast_int_number:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.cast_number_int:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtNumber)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.cast_uint_number:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.cast_number_uint:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtNumber)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.cast_int_uint:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.cast_uint_int:
+										{
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
+											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.push_parameter_skipcheck:
+										operators.OpCallFunction.push_parameter_skipcheck(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter_skipcheck_testnative:
+										operators.OpCallFunction.push_parameter_skipcheck_testnative(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter_nativeconstpara_skipcheck:
+										operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter_para:
+										operators.OpCallFunction.push_parameter_para(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_method:
+										operators.OpCallFunction.create_paraScope_Method(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_withsignature:
+										operators.OpCallFunction.create_paraScope_WithSignature(currentRunFrame, step, scope);
+										break;
+									case OpCode.function_return_funvoid:
+										{
+											currentRunFrame.hasCallReturn = true;
+											currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.function_return_nofunction:
+										{
+											currentRunFrame.hasCallReturn = true;
+											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.call_function_notcheck_notreturnobject:
+										{
+
+											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+											currentRunFrame.funCaller.doCall_allcheckpass();
+											currentRunFrame.funCaller = null;
+
+											break;
+										}
+									case OpCode.call_function_notcheck_notreturnobject_notnative:
+										{
+											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+											currentRunFrame.funCaller.doCall_allcheckpass_nonative();
+											currentRunFrame.funCaller = null;
+
+											break;
+										}
 									default:
-
-										runtimeError = (new error.InternalError(swc, step.token,
-											 step.opCode + "操作未实现"
-											 ));
-										currentRunFrame.endStep();
-										break;
+										throw new Exception(step.opCode + "操作未实现");
 								}
 
 
@@ -1069,13 +1156,13 @@ namespace ASRuntime
             {
                 var rs = runtimeStack.Peek();
 
-                startOffset = rs.offset + rs.block.totalRegisters+1+1 + rs.call_parameter_slotCount;
+                startOffset = rs.baseBottomSlotIndex + rs.call_parameter_slotCount;
                 
             }
 
             StackFrame frame = null;
 
-            if (startOffset + calledblock.totalRegisters+1+1 >= stackSlots.Length || !stackframePool.hasCacheObj())
+            if (startOffset + calledblock.totalRegisters+1+1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
             {
                 //runtimeError = new error.InternalError(token, "stack overflow");
                 if (callbacker != null)
@@ -1100,10 +1187,11 @@ namespace ASRuntime
                 frame.static_objects = static_instance;
 
                 frame.offset = startOffset;
+				frame.baseBottomSlotIndex = startOffset + frame.baseUseSlots;
                 frame.stack = stackSlots;
 
-                frame._tempSlot1 = stackSlots[startOffset + frame.block.totalRegisters];
-                frame._tempSlot2 = stackSlots[startOffset + frame.block.totalRegisters+1];
+                frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex-2];
+                frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex-1];
                 runtimeStack.Push(frame);
                 currentRunFrame = frame;
 
@@ -1491,7 +1579,7 @@ namespace ASRuntime
                 return true;
             }
 
-            if (currentRunFrame.IsEnd()) //执行完成
+            if (currentRunFrame.codeLinePtr >= currentRunFrame.stepCount) //执行完成
             {
                 if (currentRunFrame.callbacker != null)
                 {
@@ -1958,19 +2046,105 @@ namespace ASRuntime
 						currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
 						currentRunFrame.endStep(step);
 						break;
-					case OpCode.reset_stackslot:
-
-						((StackSlot)((Register)step.arg1).getSlot(scope, currentRunFrame)).resetSlot();
-
-						currentRunFrame.endStep(step);
+					case OpCode.call_function_notcheck:
+						operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
 						break;
+					case OpCode.cast_int_number:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.cast_number_int:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtNumber)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.cast_uint_number:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.cast_number_uint:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtNumber)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.cast_int_uint:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.cast_uint_int:
+						{
+							var v1 = step.arg1.getValue(scope, currentRunFrame);
+							step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
+							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.push_parameter_skipcheck:
+						operators.OpCallFunction.push_parameter_skipcheck(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter_skipcheck_testnative:
+						operators.OpCallFunction.push_parameter_skipcheck_testnative(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter_nativeconstpara_skipcheck:
+						operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter_para:
+						operators.OpCallFunction.push_parameter_para(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_method:
+						operators.OpCallFunction.create_paraScope_Method(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_withsignature:
+						operators.OpCallFunction.create_paraScope_WithSignature(currentRunFrame, step, scope);
+						break;
+					case OpCode.function_return_funvoid:
+						{
+							currentRunFrame.hasCallReturn = true;
+							currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.function_return_nofunction:
+						{
+							currentRunFrame.hasCallReturn = true;
+							RunTimeValueBase result = step.arg1.getValue(scope, currentRunFrame);
+							currentRunFrame.returnSlot.directSet(result);
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.call_function_notcheck_notreturnobject:
+						{
+
+							currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
+							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+							currentRunFrame.funCaller.doCall_allcheckpass();
+							currentRunFrame.funCaller = null;
+
+							break;
+						}
+					case OpCode.call_function_notcheck_notreturnobject_notnative:
+						{
+							currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
+							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+							currentRunFrame.funCaller.doCall_allcheckpass_nonative();
+							currentRunFrame.funCaller = null;
+
+							break;
+						}
 					default:
-
-						runtimeError = (new error.InternalError(swc, step.token,
-							 step.opCode + "操作未实现"
-							 ));
-						currentRunFrame.endStep();
-						break;
+						throw new Exception(step.opCode + "操作未实现");
 				}
 
 
@@ -2283,7 +2457,7 @@ namespace ASRuntime
 				RunTimeValueBase[] paraArgs = null;
 
 				currentRunFrame.call_parameter_slotCount += argcount;
-				int slotidx = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+				int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
 				int stslotidx = slotidx;
 				if (argcount > 0)
 				{
@@ -2553,7 +2727,7 @@ namespace ASRuntime
 
 				currentRunFrame.call_parameter_slotCount += argcount;
 
-				int slotidx = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+				int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
 				int stslotidx = slotidx;
 				if (argcount > 0)
 				{

@@ -284,7 +284,7 @@ namespace ASCompiler.compiler
 			//最后访问寄存器的操作行
 			Dictionary<Register, OpStep> regLastStep = new Dictionary<Register, OpStep>();
 			//某个操作行前要插入对寄存器的初始化
-			Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
+			//Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
 
 			List<sslot> allocedslots = new List<sslot>();
 
@@ -428,22 +428,22 @@ namespace ASCompiler.compiler
 			}
 
 			//插入需要追加Reset的操作
-			foreach (var item in dictAddResetStackOp)
-			{
-				OpStep step = item.Value;
+			//foreach (var item in dictAddResetStackOp)
+			//{
+			//	OpStep step = item.Value;
 
-				for (int i = 0; i < steps.Count; i++)
-				{
-					if (steps[i] == step)
-					{
-						OpStep insetStep = new OpStep(OpCode.reset_stackslot, step.token);
-						insetStep.arg1 = item.Key;
-						steps.Insert(i, insetStep);
-						break;
-					}
-				}
+			//	for (int i = 0; i < steps.Count; i++)
+			//	{
+			//		if (steps[i] == step)
+			//		{
+			//			OpStep insetStep = new OpStep(OpCode.reset_stackslot, step.token);
+			//			insetStep.arg1 = item.Key;
+			//			steps.Insert(i, insetStep);
+			//			break;
+			//		}
+			//	}
 
-			}
+			//}
 
 			
 			List<Register> reglist = new List<Register>();

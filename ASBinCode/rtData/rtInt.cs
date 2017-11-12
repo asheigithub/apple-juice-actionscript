@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     public sealed class rtInt : RunTimeValueBase
     {
         public int value;

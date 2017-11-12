@@ -50,8 +50,25 @@ namespace ASCompiler.compiler.builds
 						op.arg1 = eaxfunc;
 						op.arg1Type = RunTimeDataType.rt_function;
 
+						bool isfindsignatrue;ASBinCode.rtti.FunctionSignature signature;
 						build_member_parameterSteps((RightValueBase)member.bindField,
-							builder, eax, op, step, env, null, eaxfunc, null);
+							builder, eax, op, step, env, null, eaxfunc, null,out isfindsignatrue,out signature);
+						if(isfindsignatrue)
+						{
+							if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+								op.opCode = OpCode.call_function_notcheck;
+							else
+							{
+								op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+								bool isfindsuccess;
+								if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+								{
+									if(isfindsuccess)
+										op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+								}
+							}
+						}
 
 						env.block.opSteps.Add(op);
 
@@ -161,9 +178,25 @@ namespace ASCompiler.compiler.builds
                                                 "Attempted access of inaccessible method " + reg._regMember.name + " through a reference with static type " + reg._regMember.refClass.name + "."
                                                 );
                         }
-
+						bool findsignatrue;ASBinCode.rtti.FunctionSignature signature;
                         build_member_parameterSteps((RightValueBase)reg._regMember.bindField,
-                            builder, eax, op, step, env, null, rValue, null);
+                            builder, eax, op, step, env, null, rValue, null,out findsignatrue,out signature);
+						if (findsignatrue)
+						{
+							if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+								op.opCode = OpCode.call_function_notcheck;
+							else
+							{
+								op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+								bool isfindsuccess;
+								if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+								{
+									if (isfindsuccess)
+										op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+								}
+							}
+						}
 
                         env.block.opSteps.Add(op);
                         return;
@@ -400,9 +433,26 @@ namespace ASCompiler.compiler.builds
                                         op.arg1 = eaxfunc;
                                         op.arg1Type = RunTimeDataType.rt_function;
 
+										bool findsignature;ASBinCode.rtti.FunctionSignature signature;
                                         build_member_parameterSteps((RightValueBase)cls.explicit_from.bindField,
-                                            builder, eax, op, step, env, null, eaxfunc, null);
+                                            builder, eax, op, step, env, null, eaxfunc, null,out findsignature,out signature);
+										if (findsignature)
+										{
+											if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+												op.opCode = OpCode.call_function_notcheck;
+											else
+											{
+												op.opCode = OpCode.call_function_notcheck_notreturnobject;
 
+												bool isfindsuccess;
+												if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+												{
+													if (isfindsuccess)
+														op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+												}
+											}
+										}
+											
                                         env.block.opSteps.Add(op);
 
                                     }
@@ -489,8 +539,25 @@ namespace ASCompiler.compiler.builds
                                 op.arg1 = eaxfunc;
                                 op.arg1Type = RunTimeDataType.rt_function;
 
+								bool isfindsignature;ASBinCode.rtti.FunctionSignature signature;
                                 build_member_parameterSteps((RightValueBase)fm.classMember.bindField,
-                                    builder, eax, op, step, env, null, eaxfunc, null);
+                                    builder, eax, op, step, env, null, eaxfunc, null,out isfindsignature,out signature);
+								if (isfindsignature)
+								{
+									if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+										op.opCode = OpCode.call_function_notcheck;
+									else
+									{
+										op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+										bool isfindsuccess;
+										if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+										{
+											if (isfindsuccess)
+												op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+										}
+									}
+								}
 
                                 env.block.opSteps.Add(op);
 
@@ -506,9 +573,7 @@ namespace ASCompiler.compiler.builds
                             );
                         }
                     }
-
-                    memberfinded:
-
+					
                     if (member == null)
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -667,8 +732,25 @@ namespace ASCompiler.compiler.builds
                 op.regType = RunTimeDataType.rt_void;
                 eax.isFuncResult = true;
 
-                build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null,originMember);
-                
+				bool findsignature;ASBinCode.rtti.FunctionSignature signature;
+                build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null,originMember,out findsignature,out signature);
+				if (findsignature)
+				{
+					if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+						op.opCode = OpCode.call_function_notcheck;
+					else
+					{
+						op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+						bool isfindsuccess;
+						if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+						{
+							if (isfindsuccess)
+								op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+						}
+					}
+				}
+
                 env.block.opSteps.Add(op);
 
 
@@ -684,11 +766,11 @@ namespace ASCompiler.compiler.builds
 
         private void build_member_parameterSteps(RightValueBase rFunc,Builder builder,Register eax,OpStep op,
             ASTool.AS3.Expr.AS3ExprStep step,CompileEnv env,ASBinCode.rtti.Class _cls,
-            RightValueBase makeParaArg1 ,IMember funcOriginMember
+            RightValueBase makeParaArg1 ,IMember funcOriginMember,out bool findsignature,out ASBinCode.rtti.FunctionSignature sig
             )
         {
-            ASBinCode.rtti.FunctionSignature signature = null;
-
+			ASBinCode.rtti.FunctionSignature signature = null;
+			findsignature = false;sig = null;
             int blockid = env.block.id;
             if (rFunc is VariableBase)
             {
@@ -719,10 +801,12 @@ namespace ASCompiler.compiler.builds
             {
                 if (builder.dictSignatures[blockid].ContainsKey( funcOriginMember ))
                 {
-
+					findsignature = true;
                     signature =
                          builder.dictSignatures[blockid][funcOriginMember];
                     var returnvalueType = signature.returnType;
+
+					sig = signature;
 
                     op.regType = RunTimeDataType.rt_void;
                     eax.setEAXTypeWhenCompile(returnvalueType);
@@ -790,6 +874,40 @@ namespace ASCompiler.compiler.builds
                 opMakeArgs.arg1 = makeParaArg1==null? rFunc : makeParaArg1 ;
                 opMakeArgs.arg1Type = RunTimeDataType.rt_function;
                 toadd.Add(opMakeArgs);
+
+				if (signature != null)
+				{
+					bool findsuccess;
+					var func = findFunction(signature, builder, out findsuccess);
+					if (findsuccess)
+					{
+						if (!func.isConstructor)
+						{
+							if (func.isMethod && opMakeArgs.arg1 is MethodGetterBase)
+							{
+								opMakeArgs.opCode = OpCode.make_para_scope_method;
+							}
+							else
+							{
+								opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+							}
+						}
+					}
+					else
+					{
+						if (opMakeArgs.arg1 is MethodGetterBase)
+						{
+							opMakeArgs.opCode = OpCode.make_para_scope_method;
+						}
+						else
+						{
+							opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+						}
+					}
+				}
+
+				
+
             }
             else
             {
@@ -888,13 +1006,136 @@ namespace ASCompiler.compiler.builds
                 opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(i));
                 opPushArgs.arg2Type = RunTimeDataType.rt_int;
                 toadd.Add(opPushArgs);
-                
+
+				if (signature != null)
+				{
+					if (opPushArgs.opCode == OpCode.push_parameter)
+					{
+						if (arg.valueType != RunTimeDataType.rt_void
+							&&
+							arg.valueType != RunTimeDataType.rt_function 
+							&&
+							arg.valueType != RunTimeDataType._OBJECT 
+							&&
+							arg.valueType != builder.bin.FunctionClass.getRtType()
+							)
+						{
+							if (!hasIntoPara)
+							{
+								bool findsuccess;
+								if (isNativeModeConstPara(signature, builder, out findsuccess))
+								{
+									if (findsuccess)
+										opPushArgs.opCode = OpCode.push_parameter_nativeconstpara_skipcheck;
+								}
+								else
+								{
+									if (findsuccess)
+									{
+										opPushArgs.opCode = OpCode.push_parameter_skipcheck;
+									}
+									else
+									{
+										var testfunc= makeParaArg1 == null ? rFunc : makeParaArg1;
+										if (testfunc is MethodGetterBase
+											||
+											testfunc is VariableBase
+											)
+										{
+											opPushArgs.opCode = OpCode.push_parameter_skipcheck;
+										}
+										else
+										{
+
+											opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+										}
+									}
+								}
+							}
+							else
+							{
+								opPushArgs.opCode = OpCode.push_parameter_para;
+							}
+						}
+					}
+				}
+
             }
 
             env.block.opSteps.AddRange(toadd);
 
         }
 
+		
 
-    }
+		private ASBinCode.rtti.FunctionDefine findFunction(ASBinCode.rtti.FunctionSignature signature,Builder builder,out bool findsuccess)
+		{
+			if (builder._signature_define.ContainsKey(signature))
+			{
+				findsuccess = true;
+				return builder._signature_define[signature];
+			}
+
+			foreach (var item in builder.bin.functions)
+			{
+				if (item == null)
+				{
+					findsuccess = false;
+					return null;
+				}
+
+				if(!builder._signature_define.ContainsKey(item.signature))
+					builder._signature_define.Add(item.signature, item);
+
+				if (Equals(item.signature, signature))
+				{
+					findsuccess = true;
+					return item;
+				}
+			}
+
+			
+
+			foreach (var item in builder.buildoutfunctions)
+			{
+				if (!builder._signature_define.ContainsKey(item.Value.signature))
+					builder._signature_define.Add(item.Value.signature, item.Value);
+
+				if (Equals(item.Value.signature, signature))
+				{
+					findsuccess = true;
+					return item.Value;
+				}
+			}
+			findsuccess = false;
+			return null;
+		}
+
+		private bool isNativeModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder,out bool findsuccess)
+		{
+
+			var func = findFunction(signature, builder,out findsuccess);
+			if (func != null && func.isNative)
+			{
+				if (builder.bin.nativefunctions[
+							builder.bin.nativefunctionNameIndex[func.native_name]].mode
+												== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private bool isNativeFunctionOrYield(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
+		{
+			
+			var func = findFunction(signature, builder, out findsuccess);
+			if (func != null && (func.isNative || func.isYield))
+			{
+				return true;
+			}
+			return false;
+		}
+	}
 }

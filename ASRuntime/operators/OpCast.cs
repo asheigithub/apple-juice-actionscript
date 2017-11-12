@@ -8,7 +8,7 @@ namespace ASRuntime.operators
 {
     class OpCast
     {
-
+		
 
         public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {

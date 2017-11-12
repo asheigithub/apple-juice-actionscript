@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public class OpStep :ISWCSerializable
     {
         public SourceToken token;

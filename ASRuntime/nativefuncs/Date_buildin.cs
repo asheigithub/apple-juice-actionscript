@@ -3,6 +3,7 @@ using ASBinCode.rtData;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ASBinCode.rtti;
 
 namespace ASRuntime.nativefuncs
 {
@@ -13,11 +14,11 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    class Date_constructor : NativeFunctionBase
+    class Date_constructor : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Date_constructor()
+        public Date_constructor():base(7)
         {
             _paras = new List<RunTimeDataType>();
             _paras.Add(RunTimeDataType.rt_void);
@@ -62,145 +63,276 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+        //    ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
 
-            Date_link datelink = new Date_link();
+        //    Date_link datelink = new Date_link();
 
-            rtObj.hosted_object = datelink;
+        //    rtObj.hosted_object = datelink;
 
-            if (argements[0].getValue().rtType == RunTimeDataType.rt_null)
-            {
-                datelink.datetime = DateTime.Now;
-                datelink.isvalid = true;
-            }
-            else
-            {
-                double month = ((rtNumber)argements[1].getValue()).value;
-                double date = ((rtNumber)argements[2].getValue()).value;
-                double hour = ((rtNumber)argements[3].getValue()).value;
-                double minute = ((rtNumber)argements[4].getValue()).value;
-                double second = ((rtNumber)argements[5].getValue()).value;
-                double millisecond = ((rtNumber)argements[6].getValue()).value;
+        //    if (argements[0].getValue().rtType == RunTimeDataType.rt_null)
+        //    {
+        //        datelink.datetime = DateTime.Now;
+        //        datelink.isvalid = true;
+        //    }
+        //    else
+        //    {
+        //        double month = ((rtNumber)argements[1].getValue()).value;
+        //        double date = ((rtNumber)argements[2].getValue()).value;
+        //        double hour = ((rtNumber)argements[3].getValue()).value;
+        //        double minute = ((rtNumber)argements[4].getValue()).value;
+        //        double second = ((rtNumber)argements[5].getValue()).value;
+        //        double millisecond = ((rtNumber)argements[6].getValue()).value;
 
-                if (double.IsNaN(month))
-                {
-                    //***一个参数***
-                    var yearOrTimevalue = argements[0].getValue();
-                    if (yearOrTimevalue.rtType > RunTimeDataType.unknown)
-                    {
-                        RunTimeDataType ot;
-                        if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)yearOrTimevalue).value._class, out ot))
-                        {
-                            yearOrTimevalue = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)yearOrTimevalue);
-                        }
-                    }
+        //        if (double.IsNaN(month))
+        //        {
+        //            //***一个参数***
+        //            var yearOrTimevalue = argements[0].getValue();
+        //            if (yearOrTimevalue.rtType > RunTimeDataType.unknown)
+        //            {
+        //                RunTimeDataType ot;
+        //                if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)yearOrTimevalue).value._class, out ot))
+        //                {
+        //                    yearOrTimevalue = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)yearOrTimevalue);
+        //                }
+        //            }
 
-                    if (yearOrTimevalue.rtType > RunTimeDataType.unknown
-                        ||
-                        (
-                        yearOrTimevalue.rtType != RunTimeDataType.rt_number
-                        &&
-                        yearOrTimevalue.rtType != RunTimeDataType.rt_int
-                        &&
-                        yearOrTimevalue.rtType != RunTimeDataType.rt_uint
-                        )
-                        )
-                    {
-                        string str = TypeConverter.ConvertToString(yearOrTimevalue, null, null);
+        //            if (yearOrTimevalue.rtType > RunTimeDataType.unknown
+        //                ||
+        //                (
+        //                yearOrTimevalue.rtType != RunTimeDataType.rt_number
+        //                &&
+        //                yearOrTimevalue.rtType != RunTimeDataType.rt_int
+        //                &&
+        //                yearOrTimevalue.rtType != RunTimeDataType.rt_uint
+        //                )
+        //                )
+        //            {
+        //                string str = TypeConverter.ConvertToString(yearOrTimevalue, null, null);
 
-                        DateTime r;
-                        if (DateTime.TryParse(str, System.Globalization.CultureInfo.InvariantCulture, 
-                            System.Globalization.DateTimeStyles.AssumeLocal, out r))
-                        {
-                            datelink.isvalid = true;
-                            datelink.datetime = r.ToLocalTime();
-                        }
-                        else
-                        {
-                            if (DateTime.TryParseExact(str,
-                                "ddd MMM d HH:mm:ss 'GMT'zzzzz yyyy",
-                                System.Globalization.CultureInfo.InvariantCulture,
-                                System.Globalization.DateTimeStyles.None, out r))
-                            {
-                                datelink.isvalid = true;
-                                datelink.datetime = r.ToLocalTime();
-                            }
-                            else
-                            {
-                                datelink.isvalid = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        double v = TypeConverter.ConvertToNumber(yearOrTimevalue);
-                        if (double.IsNaN(v))
-                        {
-                            datelink.isvalid = false;
-                        }
-                        else
-                        {
-                            //int t = (int)v;
+        //                DateTime r;
+        //                if (DateTime.TryParse(str, System.Globalization.CultureInfo.InvariantCulture, 
+        //                    System.Globalization.DateTimeStyles.AssumeLocal, out r))
+        //                {
+        //                    datelink.isvalid = true;
+        //                    datelink.datetime = r.ToLocalTime();
+        //                }
+        //                else
+        //                {
+        //                    if (DateTime.TryParseExact(str,
+        //                        "ddd MMM d HH:mm:ss 'GMT'zzzzz yyyy",
+        //                        System.Globalization.CultureInfo.InvariantCulture,
+        //                        System.Globalization.DateTimeStyles.None, out r))
+        //                    {
+        //                        datelink.isvalid = true;
+        //                        datelink.datetime = r.ToLocalTime();
+        //                    }
+        //                    else
+        //                    {
+        //                        datelink.isvalid = false;
+        //                    }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                double v = TypeConverter.ConvertToNumber(yearOrTimevalue);
+        //                if (double.IsNaN(v))
+        //                {
+        //                    datelink.isvalid = false;
+        //                }
+        //                else
+        //                {
+        //                    //int t = (int)v;
 
-                            DateTime bd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(v).ToLocalTime();
-                            datelink.datetime = bd;
-                            datelink.isvalid = true;
-                        }
-                    }
+        //                    DateTime bd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(v).ToLocalTime();
+        //                    datelink.datetime = bd;
+        //                    datelink.isvalid = true;
+        //                }
+        //            }
 
 
-                }
-                else
-                {
-                    try
-                    {
-                        int year = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
+        //        }
+        //        else
+        //        {
+        //            try
+        //            {
+        //                int year = TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
 
-                        if (year < 100) { year = 1900 + year; }
+        //                if (year < 100) { year = 1900 + year; }
 
-                        year = (year-1) % 9999 + 1;
+        //                year = (year-1) % 9999 + 1;
 
                         
 
-                        DateTime t = new DateTime(year,
-                        1,
-                        1,
-                        ((int)hour % 24),
-                        ((int)minute % 60),
-                        ((int)second % 60),
-                        ((int)millisecond % 999), DateTimeKind.Local
-                        );
+        //                DateTime t = new DateTime(year,
+        //                1,
+        //                1,
+        //                ((int)hour % 24),
+        //                ((int)minute % 60),
+        //                ((int)second % 60),
+        //                ((int)millisecond % 999), DateTimeKind.Local
+        //                );
 
-                        t=t.AddMonths((int)month);
-                        t = t.AddDays((int)date - 1);
+        //                t=t.AddMonths((int)month);
+        //                t = t.AddDays((int)date - 1);
 
-                        datelink.datetime = t;
-                        datelink.isvalid = true;
+        //                datelink.datetime = t;
+        //                datelink.isvalid = true;
 
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        datelink.isvalid = false;
-                    }
-                }
-            }
+        //            }
+        //            catch (ArgumentOutOfRangeException)
+        //            {
+        //                datelink.isvalid = false;
+        //            }
+        //        }
+        //    }
 
 
-            return ASBinCode.rtData.rtUndefined.undefined;
-        }
-    }
+        //    return ASBinCode.rtData.rtUndefined.undefined;
+        //}
 
-    class Date_tostring : NativeFunctionBase
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+
+			Date_link datelink = new Date_link();
+
+			rtObj.hosted_object = datelink;
+
+			if (argements[0].rtType == RunTimeDataType.rt_null)
+			{
+				datelink.datetime = DateTime.Now;
+				datelink.isvalid = true;
+			}
+			else
+			{
+				double month = ((rtNumber)argements[1]).value;
+				double date = ((rtNumber)argements[2]).value;
+				double hour = ((rtNumber)argements[3]).value;
+				double minute = ((rtNumber)argements[4]).value;
+				double second = ((rtNumber)argements[5]).value;
+				double millisecond = ((rtNumber)argements[6]).value;
+
+				if (double.IsNaN(month))
+				{
+					//***一个参数***
+					var yearOrTimevalue = argements[0];
+					if (yearOrTimevalue.rtType > RunTimeDataType.unknown)
+					{
+						RunTimeDataType ot;
+						if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)yearOrTimevalue).value._class, out ot))
+						{
+							yearOrTimevalue = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)yearOrTimevalue);
+						}
+					}
+
+					if (yearOrTimevalue.rtType > RunTimeDataType.unknown
+						||
+						(
+						yearOrTimevalue.rtType != RunTimeDataType.rt_number
+						&&
+						yearOrTimevalue.rtType != RunTimeDataType.rt_int
+						&&
+						yearOrTimevalue.rtType != RunTimeDataType.rt_uint
+						)
+						)
+					{
+						string str = TypeConverter.ConvertToString(yearOrTimevalue, null, null);
+
+						DateTime r;
+						if (DateTime.TryParse(str, System.Globalization.CultureInfo.InvariantCulture,
+							System.Globalization.DateTimeStyles.AssumeLocal, out r))
+						{
+							datelink.isvalid = true;
+							datelink.datetime = r.ToLocalTime();
+						}
+						else
+						{
+							if (DateTime.TryParseExact(str,
+								"ddd MMM d HH:mm:ss 'GMT'zzzzz yyyy",
+								System.Globalization.CultureInfo.InvariantCulture,
+								System.Globalization.DateTimeStyles.None, out r))
+							{
+								datelink.isvalid = true;
+								datelink.datetime = r.ToLocalTime();
+							}
+							else
+							{
+								datelink.isvalid = false;
+							}
+						}
+					}
+					else
+					{
+						double v = TypeConverter.ConvertToNumber(yearOrTimevalue);
+						if (double.IsNaN(v))
+						{
+							datelink.isvalid = false;
+						}
+						else
+						{
+							//int t = (int)v;
+
+							DateTime bd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(v).ToLocalTime();
+							datelink.datetime = bd;
+							datelink.isvalid = true;
+						}
+					}
+
+
+				}
+				else
+				{
+					try
+					{
+						int year = TypeConverter.ConvertToInt(argements[0], null, null);
+
+						if (year < 100) { year = 1900 + year; }
+
+						year = (year - 1) % 9999 + 1;
+
+
+
+						DateTime t = new DateTime(year,
+						1,
+						1,
+						((int)hour % 24),
+						((int)minute % 60),
+						((int)second % 60),
+						((int)millisecond % 999), DateTimeKind.Local
+						);
+
+						t = t.AddMonths((int)month);
+						t = t.AddDays((int)date - 1);
+
+						datelink.datetime = t;
+						datelink.isvalid = true;
+
+					}
+					catch (ArgumentOutOfRangeException)
+					{
+						datelink.isvalid = false;
+					}
+				}
+			}
+
+			success = true;
+			returnSlot.directSet(rtUndefined.undefined);
+		}
+
+	}
+
+    class Date_tostring : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Date_tostring()
+        public Date_tostring():base(0)
         {
             _paras = new List<RunTimeDataType>();
 
@@ -239,25 +371,45 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+		//    ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
 
-            Date_link datelink = (Date_link)rtObj.hosted_object;
-            if (datelink.isvalid)
-            {
-                return new rtString(datelink.datetime.ToString("ddd MMM d HH:mm:ss 'GMT'zz00 yyyy",System.Globalization.CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                return new rtString("Invalid Date");
-            }
-        }
-    }
+		//    Date_link datelink = (Date_link)rtObj.hosted_object;
+		//    if (datelink.isvalid)
+		//    {
+		//        return new rtString(datelink.datetime.ToString("ddd MMM d HH:mm:ss 'GMT'zz00 yyyy",System.Globalization.CultureInfo.InvariantCulture));
+		//    }
+		//    else
+		//    {
+		//        return new rtString("Invalid Date");
+		//    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+
+			Date_link datelink = (Date_link)rtObj.hosted_object;
+			if (datelink.isvalid)
+			{
+				returnSlot.setValue(datelink.datetime.ToString("ddd MMM d HH:mm:ss 'GMT'zz00 yyyy", System.Globalization.CultureInfo.InvariantCulture));
+				//return new rtString(datelink.datetime.ToString("ddd MMM d HH:mm:ss 'GMT'zz00 yyyy", System.Globalization.CultureInfo.InvariantCulture));
+			}
+			else
+			{
+				returnSlot.setValue("Invalid Date");
+			}
+		}
+
+	}
 
     class Date_totimestring : NativeFunctionBase
     {
@@ -584,11 +736,11 @@ namespace ASRuntime.nativefuncs
 
 
 
-    class Date_valueof : NativeFunctionBase
+    class Date_valueof : NativeConstParameterFunction
     {
         private List<RunTimeDataType> _paras;
 
-        public Date_valueof()
+        public Date_valueof():base(0)
         {
             _paras = new List<RunTimeDataType>();
 
@@ -627,25 +779,42 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+		//    ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
 
-            Date_link datelink = (Date_link)rtObj.hosted_object;
-            if (datelink.isvalid)
-            {
-                return new rtNumber((datelink.datetime.ToUniversalTime() - new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc)).TotalMilliseconds);
-            }
-            else
-            {
-                return new rtNumber(double.NaN);
-            }
-        }
-    }
+		//    Date_link datelink = (Date_link)rtObj.hosted_object;
+		//    if (datelink.isvalid)
+		//    {
+		//        return new rtNumber((datelink.datetime.ToUniversalTime() - new DateTime(1970,1,1,0,0,0, DateTimeKind.Utc)).TotalMilliseconds);
+		//    }
+		//    else
+		//    {
+		//        return new rtNumber(double.NaN);
+		//    }
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+
+			Date_link datelink = (Date_link)rtObj.hosted_object;
+			if (datelink.isvalid)
+			{
+				returnSlot.setValue((datelink.datetime.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+			}
+			else
+			{
+				returnSlot.setValue(double.NaN);
+			}
+		}
+	}
 
 
     class Date_getdate : NativeFunctionBase

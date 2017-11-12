@@ -7,7 +7,7 @@ using System.IO;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
     public sealed class InterfaceMethodGetter : MethodGetterBase
     {
         public InterfaceMethodGetter(string name, rtti.Class _class

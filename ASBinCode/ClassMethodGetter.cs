@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public sealed class ClassMethodGetter : MethodGetterBase
     {
         public ClassMethodGetter(string name, rtti.Class _class, int indexofMember

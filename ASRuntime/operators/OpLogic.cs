@@ -1011,8 +1011,8 @@ namespace ASRuntime.operators
 
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, frame));
-            double a2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, frame));
+            double a1 = step.arg1.getValue(scope, frame).toNumber();
+            double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             if (a1 <= a2)
             {

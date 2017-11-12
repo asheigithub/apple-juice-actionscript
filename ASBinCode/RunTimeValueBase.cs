@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 标记是一个运行时的值
 	/// </summary>

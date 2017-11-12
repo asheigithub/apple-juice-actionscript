@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.scopes
 {
-	[Serializable]
+	
 	public class FunctionScope :ScopeBase ,ISWCSerializable
     {
         public readonly ASBinCode.rtti.FunctionDefine function;

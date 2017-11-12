@@ -142,7 +142,7 @@ namespace ASCompiler.compiler.builds
                             new SourceToken(expression.token.line, expression.token.ptr, expression.token.sourceFile),builder);
                     }
 
-
+					
                     if (needappendbindscope)
                     {
                         //**绑定环境**
@@ -157,17 +157,34 @@ namespace ASCompiler.compiler.builds
                         env.block.opSteps.Add(stepbind);
                     }
 
-                    OpStep opreturn = new OpStep(OpCode.function_return,
-                        new SourceToken(as3return.Token.line, as3return.Token.ptr, as3return.Token.sourceFile));
-                    opreturn.arg1 = returnValue;
-                    opreturn.arg1Type = returnValue.valueType;
+                    
 
-                    env.block.opSteps.Add(opreturn);
+					if (retType != RunTimeDataType.rt_void &&
+						retType != RunTimeDataType._OBJECT &&
+						retType != RunTimeDataType.rt_function)
+					{
+						OpStep opreturn = new OpStep(OpCode.function_return_nofunction,
+						new SourceToken(as3return.Token.line, as3return.Token.ptr, as3return.Token.sourceFile));
+						opreturn.arg1 = returnValue;
+						opreturn.arg1Type = returnValue.valueType;
 
+						env.block.opSteps.Add(opreturn);
+					}
+					else
+					{
+						OpStep opreturn = new OpStep(OpCode.function_return,
+						new SourceToken(as3return.Token.line, as3return.Token.ptr, as3return.Token.sourceFile));
+						opreturn.arg1 = returnValue;
+						opreturn.arg1Type = returnValue.valueType;
+
+						env.block.opSteps.Add(opreturn);
+					}
                 }
                 else
                 {
-                    OpStep opreturn = new OpStep(OpCode.function_return,
+					
+
+                    OpStep opreturn = new OpStep(OpCode.function_return_funvoid,
                         new SourceToken(as3return.Token.line, as3return.Token.ptr, as3return.Token.sourceFile));
                     opreturn.arg1 = new ASBinCode.rtData.RightValue( ASBinCode.rtData.rtUndefined.undefined);
                     opreturn.arg1Type = RunTimeDataType.rt_void;
@@ -451,6 +468,7 @@ namespace ASCompiler.compiler.builds
                                "A Constructor cannot specify a return type.");
             }
 
+			builder._signature_define.Add(signature, function);
 
             //****查找meta***
             if (as3function.Meta != null)
@@ -1811,7 +1829,12 @@ namespace ASCompiler.compiler.builds
                     )
                 {
                     //***如果是yield类函数***
-                    if (existsOperator(block, OpCode.function_return))
+                    if (existsOperator(block, OpCode.function_return)
+						||
+						existsOperator(block, OpCode.function_return_funvoid)
+						||
+						existsOperator(block, OpCode.function_return_nofunction)
+						)
                     {
                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                    "yield返回和return不能在一起使用");
@@ -1850,7 +1873,12 @@ namespace ASCompiler.compiler.builds
                     )
                 {
                     //查找是否所有分支均有return.
-                    if (!detectingOperator(block, OpCode.function_return))
+                    if (!detectingOperator(block, OpCode.function_return)
+						&&
+						!detectingOperator(block,OpCode.function_return_nofunction)
+						&&
+						!detectingOperator(block,OpCode.function_return_funvoid)
+						)
                     {
                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                    "Function does not return a value.");
@@ -1932,7 +1960,7 @@ namespace ASCompiler.compiler.builds
             
             builder.buildingfunctons.Pop();
             builder.buildoutfunctions.Add(as3function, function);
-
+			
             return func;
         }
 

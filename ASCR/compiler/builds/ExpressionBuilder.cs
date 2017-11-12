@@ -195,6 +195,108 @@ namespace ASCompiler.compiler.builds
 
             }
 
+			if (dstType < RunTimeDataType.unknown && src.valueType < RunTimeDataType.unknown)
+			{
+				if (src.valueType == RunTimeDataType.rt_int && dstType == RunTimeDataType.rt_number)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_int_number, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+
+				}
+				else if (src.valueType == RunTimeDataType.rt_number && dstType == RunTimeDataType.rt_int)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_number_int, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+				}
+				else if (src.valueType == RunTimeDataType.rt_uint && dstType == RunTimeDataType.rt_number)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_uint_number, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+				}
+				else if (src.valueType == RunTimeDataType.rt_number && dstType == RunTimeDataType.rt_uint)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_number_uint, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+				}
+				else if (src.valueType == RunTimeDataType.rt_int && dstType == RunTimeDataType.rt_uint)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_int_uint, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+				}
+				else if (src.valueType == RunTimeDataType.rt_uint && dstType == RunTimeDataType.rt_int)
+				{
+					OpStep op =
+					new OpStep(OpCode.cast_uint_int, token);
+
+					Register tempreg = env.getAdditionalRegister();
+					tempreg.setEAXTypeWhenCompile(dstType);
+					op.reg = tempreg; tempreg.isFuncResult = true;
+					op.regType = dstType;
+
+					op.arg1 = src;
+					op.arg1Type = src.valueType;
+					env.block.opSteps.Add(op);
+
+					return tempreg;
+				}
+			}
+
+
 
             if (src.valueType != dstType && dstType != RunTimeDataType.rt_void)
             {

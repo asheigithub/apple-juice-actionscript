@@ -5,20 +5,13 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     public sealed class rtFunction : RunTimeValueBase
     {
-		//[Serializable]
-  //      public class functionObjHandle
-  //      {
-		//	[NonSerialized]
-  //          public rtObject bindFunctionObj;
-  //      }
-
 
         private int _objid;
         private static int _seed;
-		[NonSerialized]
+		
         private RunTimeScope _bindScope;
 
         public RunTimeScope bindScope
@@ -33,7 +26,7 @@ namespace ASBinCode.rtData
             get { return _this_pointer; }
         }
 
-		[NonSerialized]
+		
 		public rtObject objHandle;
 
 
@@ -117,10 +110,12 @@ namespace ASBinCode.rtData
 
 		public void Clear()
 		{
-			_objid = -1;
-			_functionid = -1;
+			//_objid = -1;
+			//_functionid = -1;
+			//_ismethod = false; //值类型无需清理
+
+
 			_bindScope = null;
-			_ismethod = false;
 			_this_pointer = null;
 			objHandle = null;
 		}

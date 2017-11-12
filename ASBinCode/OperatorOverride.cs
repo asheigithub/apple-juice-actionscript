@@ -87,7 +87,7 @@ namespace ASBinCode
         public rtData.rtFunction func;
     }
 
-	[Serializable]
+	
     public class OperatorFunctions :ISWCSerializable
     {
         private Dictionary<OperatorFunctionKey, DefineAndFunc>[] operFunctions;

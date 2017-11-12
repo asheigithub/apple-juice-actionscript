@@ -5,7 +5,7 @@ using ASBinCode.rtData;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
     /// <summary>
     /// 数据存储槽接口
     /// </summary>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 访问父类的成员
 	/// </summary>

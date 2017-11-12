@@ -6,7 +6,7 @@ using ASBinCode.rtData;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public abstract class MethodGetterBase : LeftValueBase,IMember
     {
         protected ASBinCode.rtti.Class _class;

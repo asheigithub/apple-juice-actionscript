@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     public sealed class rtBoolean : RunTimeValueBase,IEquatable<rtBoolean>
     {
         public static readonly rtBoolean False = new rtBoolean(false);

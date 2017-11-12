@@ -34,6 +34,7 @@ namespace ASCompiler.compiler
         internal Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>
             buildoutfunctions = new Dictionary<ASTool.AS3.AS3Function, ASBinCode.rtti.FunctionDefine>();
 
+		
 
         internal BuildingClassDictionary
             buildingclasses = new BuildingClassDictionary();
@@ -62,6 +63,13 @@ namespace ASCompiler.compiler
             linkinterfaceCreators = new Dictionary<ASBinCode.rtti.Class, NativeFunctionBase>();
 
 
+
+
+
+
+
+		internal Dictionary<FunctionSignature, FunctionDefine> _signature_define = new Dictionary<FunctionSignature, FunctionDefine>();
+		
         internal readonly bool isEval;
         public Builder(bool isEval)
         {
@@ -183,6 +191,11 @@ namespace ASCompiler.compiler
 				}
 
 
+			}
+
+			foreach (var item in lib.functions)
+			{
+				_signature_define.Add(item.signature, item);
 			}
 
 			classseed = buildingclasses.Count;
@@ -1459,7 +1472,6 @@ namespace ASCompiler.compiler
             }
             env.tobuildNamedfunction = null;
 
-
             for (int i = 0; i < statements.Count; i++)
             {
                 buildStmt(env, statements[i]);
@@ -1588,6 +1600,17 @@ namespace ASCompiler.compiler
                             var rtVariable = (VariableBase)member;
 
                             builds.AS3FunctionBuilder builder = new builds.AS3FunctionBuilder();
+
+						if (!dictSignatures.ContainsKey(env.block.id)
+							||
+							!dictSignatures[env.block.id].ContainsKey(member)
+							)
+						{
+							pushBuildError(new BuildError(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+									"函数签名未找到"));
+							return;
+						}
+
                             var func = builder.buildAS3Function(env,
                                 as3function, this, dictSignatures[env.block.id][member]);
 

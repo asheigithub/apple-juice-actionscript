@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public class StaticClassDataGetter : RightValueBase
     {
         public readonly rtti.Class _class;

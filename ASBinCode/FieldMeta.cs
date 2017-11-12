@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public class FieldMeta :ISWCSerializable 
 	{
 		public string MetaName;

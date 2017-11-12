@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 凡大与unknow的都是对象类型
 	/// </summary>

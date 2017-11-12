@@ -26,12 +26,22 @@ namespace ASRuntime
 
 				frame.isclosed = false;
 
+				frame.baseUseSlots = block.totalRegisters + 2;
+				frame.baseBottomSlotIndex = 0;
 
 				return frame;
 			}
 
 		}
 
+		/// <summary>
+		/// 代码段基本使用长度
+		/// </summary>
+		internal int baseUseSlots;
+		/// <summary>
+		/// 栈底位置
+		/// </summary>
+		internal int baseBottomSlotIndex;
 
 
 		internal int stepCount;
@@ -232,7 +242,7 @@ namespace ASRuntime
                     operators.OpAdd.execAdd(this, step, scope);
                     break;
                 case OpCode.sub_number:
-                    operators.OpSub.execSub_Number(this, step, scope);
+					operators.OpSub.execSub_Number(this, step, scope);
                     break;
                 case OpCode.sub:
                     operators.OpSub.execSub(this, step, scope);
@@ -638,19 +648,118 @@ namespace ASRuntime
                     returnSlot.directSet(rtUndefined.undefined);
                     endStep(step);
                     break;
-				case OpCode.reset_stackslot:
+				//case OpCode.reset_stackslot:
 
-					((StackSlot)((Register)step.arg1).getSlot(scope, this)).resetSlot(); 
+				//	((StackSlot)((Register)step.arg1).getSlot(scope, this)).resetSlot(); 
 
-					endStep(step);
+				//	endStep(step);
+				//	break;
+				case OpCode.call_function_notcheck:
+					operators.OpCallFunction.exec_notcheck(this, step, scope);
 					break;
-                default:
+				case OpCode.cast_int_number:
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((double)((rtInt)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.cast_number_int:
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((int)((rtNumber)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.cast_uint_number :
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((double)((rtUInt)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.cast_number_uint:
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((uint)((rtNumber)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.cast_int_uint:
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((uint)((rtInt)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.cast_uint_int:
+					{
+						var v1 = step.arg1.getValue(scope, this);
+						step.reg.getSlot(scope, this).setValue((int)((rtUInt)v1).value);
+						endStep(step);
+						break;
+					}
+				case OpCode.push_parameter_skipcheck:
+					operators.OpCallFunction.push_parameter_skipcheck(this, step, scope);
+					break;
+				case OpCode.push_parameter_skipcheck_testnative:
+					operators.OpCallFunction.push_parameter_skipcheck_testnative(this, step, scope);
+					break;
+				case OpCode.push_parameter_nativeconstpara_skipcheck:
+					operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(this, step, scope);
+					break;
+				case OpCode.push_parameter_para:
+					operators.OpCallFunction.push_parameter_para(this, step, scope);
+					break;
+				case OpCode.make_para_scope_method:
+					operators.OpCallFunction.create_paraScope_Method(this, step, scope);
+					break;
+				case OpCode.make_para_scope_withsignature:
+					operators.OpCallFunction.create_paraScope_WithSignature(this, step, scope);
+					break;
+				case OpCode.function_return_funvoid:
+					{
+						hasCallReturn = true;
+						returnSlot.directSet(rtUndefined.undefined);
+						endStep(step);
+					}
+					break;
+				case OpCode.function_return_nofunction:
+					{
+						hasCallReturn = true;
+						RunTimeValueBase result = step.arg1.getValue(scope, this);
+						returnSlot.directSet(result);
+						endStep(step);
+					}
+					break;
+				case OpCode.call_function_notcheck_notreturnobject:
+					{
+						
+						funCaller.callbacker = funCaller;
+						funCaller.returnSlot = step.reg.getSlot(scope, this);
+						funCaller.doCall_allcheckpass();
+						funCaller = null;
 
-                    runtimeError = (new error.InternalError(player.swc,step.token,
-                         step.opCode + "操作未实现"
-                         ));
-                    endStep();
-                    break;
+						break;
+					}
+				case OpCode.call_function_notcheck_notreturnobject_notnative:
+					{
+						funCaller.callbacker = funCaller;
+						funCaller.returnSlot = step.reg.getSlot(scope, this);
+						funCaller.doCall_allcheckpass_nonative();
+						funCaller = null;
+
+						break;
+					}
+				default:
+
+					//runtimeError = (new error.InternalError(player.swc,step.token,
+					//     step.opCode + "操作未实现"
+					//     ));		
+					//endStep();
+
+					throw new Exception(step.opCode + "操作未实现");
+					
             }
         }
 
@@ -662,6 +771,7 @@ namespace ASRuntime
 		
         internal void endStep(OpStep step)
         {
+			
 			if (!hascallstep)
 			{
 				codeLinePtr = stepCount;
@@ -682,7 +792,7 @@ namespace ASRuntime
             }
             if (!isclosed)//在doTryCatchReturn步骤里可能修改了isclosed.
             {
-                codeLinePtr++;
+                ++codeLinePtr;
             }
 
 			
@@ -1338,36 +1448,31 @@ namespace ASRuntime
 				throw new ASRunTimeException();
 			}
 #endif
-			int end = offset + block.totalRegisters + 1 + 1 + call_parameter_slotCount;
+			//int end = offset + block.totalRegisters + 1 + 1 + call_parameter_slotCount;
 			//清除执行栈
-			for (int i = offset; i < end; i++)
+			for (int i = offset; i < baseBottomSlotIndex+call_parameter_slotCount; i++)
             {
-#if DEBUG
-				stack[i].clear();
+#if DEBUG 
+				((StackSlot)stack[i]).clear();
 #else
 				StackSlot slot = (StackSlot)stack[i];
+				slot.stackObjects = StackSlot.StackObjects.EMPTY;
 				slot.linktarget = null;
-				slot.propGetSet = null;
-				slot.propBindObj = null;
-				slot.superPropBindClass = null;
+				
+				if (slot.needclear)
+				{
+					slot._cache_arraySlot.clear();
+					slot._cache_vectorSlot.clear();
+					slot._cache_prototypeSlot.clear();
+					slot._cache_setthisslot.clear();
+					slot._linkObjCache.clearRefObj();
+					//slot._linkObjCache.srcObject = null;
+					slot._functionValue.Clear();
+					slot.needclear = false;
+				}
 
-				slot._temp_try_write_setthisitem = null;
 
-				slot._cache_arraySlot.clear();
-				slot._cache_vectorSlot.clear();
-				slot._cache_prototypeSlot.clear();
-				slot._cache_setthisslot.clear();
-				slot._linkObjCache.clearRefObj();
-				slot._linkObjCache.srcObject = null;
-
-				slot._functionValue.Clear();
-
-				var store = slot.store;
-				store[RunTimeDataType.rt_string] = rtNull.nullptr;
-				store[RunTimeDataType.rt_function] = rtNull.nullptr;
-				store[RunTimeDataType.rt_array] = rtNull.nullptr;
-				store[RunTimeDataType._OBJECT] = rtNull.nullptr;
-
+				slot.store[StackSlot.COMMREFTYPEOBJ] = rtNull.nullptr;
 				slot.index = (int)RunTimeDataType.unknown;
 
 

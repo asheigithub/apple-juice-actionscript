@@ -165,7 +165,7 @@ namespace ASCompiler.compiler.builds
             {
                 MethodGetterBase field = (MethodGetterBase)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
                 int blockid = field.refdefinedinblockid;
-
+				
                 var signature =
                         builder.dictSignatures[blockid][field];
                 

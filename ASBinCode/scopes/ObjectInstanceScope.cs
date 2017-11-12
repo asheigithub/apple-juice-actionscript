@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.scopes
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 实例对象Scope
 	/// </summary>

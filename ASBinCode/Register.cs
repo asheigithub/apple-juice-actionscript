@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	/// <summary>
 	/// 表示需对寄存器操作
 	/// </summary>
@@ -101,7 +101,6 @@ namespace ASBinCode
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
             return holder.stack[holder.offset + _index];
-            
         }
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)

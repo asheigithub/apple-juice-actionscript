@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtti
 {
-	[Serializable]
+	
 	public class ClassMemberList : IList<ClassMember>
 	{
 		private List<ClassMember> list;

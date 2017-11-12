@@ -60,11 +60,11 @@ namespace ASRuntime.operators
                             ClassPropertyGetter.PropertySlot propslot =
                             (ASBinCode.ClassPropertyGetter.PropertySlot)slot;
                             //***调用访问器。***
-                            ASBinCode.ClassPropertyGetter prop = oslot.propGetSet; //propslot.property;
+                            ASBinCode.ClassPropertyGetter prop = oslot.stackObjects.propGetSet; //propslot.property;
 
                             _doPropAssigning(prop, frame, step, frame.player, scope,
                                 //propslot.bindObj
-                                oslot.propBindObj
+                                oslot.stackObjects.propBindObj
                                 , v,
                                 oslot
                                 );
@@ -211,11 +211,11 @@ namespace ASRuntime.operators
                 //***读取setter***
                 RunTimeValueBase func;
 
-                if (sslot.superPropBindClass != null)
+                if (sslot.stackObjects.superPropBindClass != null)
                 {
                     func = ((MethodGetterBase)setter.bindField).getSuperMethod(
                         bindobj.objScope,
-                        sslot.superPropBindClass
+                        sslot.stackObjects.superPropBindClass
                         );
                 }
                 else

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode
 {
-	[Serializable]
+	
 	public class SourceToken : ISWCSerializable
     {
         public int line;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     /// <summary>
     /// 运行时基本数据类型(String)
     /// </summary>

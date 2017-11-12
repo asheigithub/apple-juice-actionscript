@@ -13,6 +13,24 @@ Module Module1
 	End Function
 
 
+	Public Function StringEquals(str1 As String, str2 As String) As Boolean
+		Return String.Equals(str1, str2, StringComparison.Ordinal)
+		'If str1.Length <> str2.Length Then
+		'	Return False
+		'End If
+		'Dim len As Integer = str1.Length - 1
+		'For index = 0 To len
+
+		'	If str1(index) <> str2(index) Then
+		'		Return False
+		'	End If
+
+		'Next
+
+		'Return True
+	End Function
+
+
 	Sub Main()
 
         'ReadAllUsedImage()

@@ -5,13 +5,13 @@ using System.Text;
 
 namespace ASBinCode.rtData
 {
-	[Serializable]
+	
     public sealed class rtArray : RunTimeValueBase
     {
-		[Serializable]
+		
         public class arrayObjHandle
         {
-			[NonSerialized]
+			
             public rtObject bindArrayObject;
             //public override int GetHashCode()
             //{

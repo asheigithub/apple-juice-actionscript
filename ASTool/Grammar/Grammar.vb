@@ -930,7 +930,8 @@ Public Class Grammar
 
 			Case GrammarNodeType.terminal
 				If (token.Type = ASTool.Token.TokenType.other OrElse token.Type = ASTool.Token.TokenType.identifier) _
-						And String.Equals(node.Name, token.StringValue, StringComparison.Ordinal) Then 'node.Name = token.StringValue Then
+						AndAlso
+						StringEquals(node.Name, token.StringValue) Then 'node.Name = token.StringValue Then
 					Return True
 				End If
 

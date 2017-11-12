@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ASBinCode.scopes
 {
-	[Serializable]
+	
 	public abstract class ScopeBase : IScope, ISWCSerializable
 	{
         private List<IMember> memberlist;
