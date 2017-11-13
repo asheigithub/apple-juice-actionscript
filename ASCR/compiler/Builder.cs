@@ -271,6 +271,19 @@ namespace ASCompiler.compiler
 				//ASTool.AS3.AS3SrcFile docfile=null;
 				build_srcFiles(tobuildfiles, false, RunTimeDataType.unknown);
 
+				if (buildErrors.Count == 0)
+				{
+					//***回调需要检查函数类型
+					foreach (var item in _toOptimizeCallFunctionOpSteps)
+					{
+						item(this);
+					}
+					_toOptimizeCallFunctionOpSteps.Clear();
+				}
+				else
+				{
+					_toOptimizeCallFunctionOpSteps.Clear();
+				}
 
                 if (isConsoleOut)
                 {
@@ -1313,14 +1326,6 @@ namespace ASCompiler.compiler
                     builder.buildParameterDefaultValue(item.Key, item.Value.item1, item.Value.item2, this);
                 }
                 _toEvalDefaultParameters.Clear();
-
-
-				//***回调需要检查函数类型
-				foreach (var item in _toOptimizeCallFunctionOpSteps)
-				{
-					item(this);
-				}
-				_toOptimizeCallFunctionOpSteps.Clear();
             }
             ASBinCode.rtti.FunctionDefine outf;
             if (!bin.operatorOverrides.Check(out outf))
