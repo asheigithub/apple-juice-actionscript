@@ -1,5 +1,5 @@
 # ASTool
-### .net2.0实现的AS3解释器
+### .net2.0实现的ActionScript3 编译器和解释器
 脚本系统的程序核心功能已全部完成。
 包括 类继承，接口，原型链,结构化异常处理 try catch ,语句块标签label。
 未实现且不准备实现的语言要素为 namespace和with。
