@@ -468,7 +468,7 @@ namespace ASCompiler.compiler.builds
                                "A Constructor cannot specify a return type.");
             }
 
-			builder._signature_define.Add(signature, function);
+			
 
             //****查找meta***
             if (as3function.Meta != null)
@@ -1797,9 +1797,18 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
+			
+			builder._signature_define.Add(signature, function);
+			if (isoutclass)
+			{
+				builder._signature_belone.Add(signature, scope);
+			}
+			else
+			{
+				builder._signature_belone.Add(signature,refClass);
+			}
 
-
-            ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope(function);
+			ASBinCode.scopes.FunctionScope funcscope = new ASBinCode.scopes.FunctionScope(function);
             funcscope.parentScope = env.block.scope;
             block.scope = funcscope;
 

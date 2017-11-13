@@ -100,7 +100,7 @@ namespace ASBinCode
 
         public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
         {
-            return holder.stack[holder.offset + _index];
+			return holder.stack[holder.offset + _index];
         }
 
         public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)

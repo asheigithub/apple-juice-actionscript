@@ -55,19 +55,22 @@ namespace ASCompiler.compiler.builds
 							builder, eax, op, step, env, null, eaxfunc, null,out isfindsignatrue,out signature);
 						if(isfindsignatrue)
 						{
-							if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
-								op.opCode = OpCode.call_function_notcheck;
-							else
-							{
-								op.opCode = OpCode.call_function_notcheck_notreturnobject;
+							builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
 
-								bool isfindsuccess;
-								if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+								if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+									op.opCode = OpCode.call_function_notcheck;
+								else
 								{
-									if(isfindsuccess)
-										op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+									op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+									bool isfindsuccess;
+									if (isNotYieldAndNotNative(signature, builder, out isfindsuccess))
+									{
+										if (isfindsuccess)
+											op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+									}
 								}
-							}
+							});
 						}
 
 						env.block.opSteps.Add(op);
@@ -183,19 +186,21 @@ namespace ASCompiler.compiler.builds
                             builder, eax, op, step, env, null, rValue, null,out findsignatrue,out signature);
 						if (findsignatrue)
 						{
-							if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
-								op.opCode = OpCode.call_function_notcheck;
-							else
-							{
-								op.opCode = OpCode.call_function_notcheck_notreturnobject;
-
-								bool isfindsuccess;
-								if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+							builder._toOptimizeCallFunctionOpSteps.Add((b) => {
+								if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+									op.opCode = OpCode.call_function_notcheck;
+								else
 								{
-									if (isfindsuccess)
-										op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+									op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+									bool isfindsuccess;
+									if (isNotYieldAndNotNative(signature, builder, out isfindsuccess))
+									{
+										if (isfindsuccess)
+											op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+									}
 								}
-							}
+							});
 						}
 
                         env.block.opSteps.Add(op);
@@ -438,19 +443,22 @@ namespace ASCompiler.compiler.builds
                                             builder, eax, op, step, env, null, eaxfunc, null,out findsignature,out signature);
 										if (findsignature)
 										{
-											if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
-												op.opCode = OpCode.call_function_notcheck;
-											else
-											{
-												op.opCode = OpCode.call_function_notcheck_notreturnobject;
-
-												bool isfindsuccess;
-												if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+											builder._toOptimizeCallFunctionOpSteps.Add((b) => {
+												if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+													op.opCode = OpCode.call_function_notcheck;
+												else
 												{
-													if (isfindsuccess)
-														op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+													op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+													bool isfindsuccess;
+													if (isNotYieldAndNotNative(signature, builder, out isfindsuccess))
+													{
+														if (isfindsuccess)
+															op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+													}
 												}
-											}
+
+											});
 										}
 											
                                         env.block.opSteps.Add(op);
@@ -544,19 +552,22 @@ namespace ASCompiler.compiler.builds
                                     builder, eax, op, step, env, null, eaxfunc, null,out isfindsignature,out signature);
 								if (isfindsignature)
 								{
-									if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
-										op.opCode = OpCode.call_function_notcheck;
-									else
-									{
-										op.opCode = OpCode.call_function_notcheck_notreturnobject;
-
-										bool isfindsuccess;
-										if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+									builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
+										if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+											op.opCode = OpCode.call_function_notcheck;
+										else
 										{
-											if (isfindsuccess)
-												op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+											op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+											bool isfindsuccess;
+											if (isNotYieldAndNotNative(signature, builder, out isfindsuccess))
+											{
+												if (isfindsuccess)
+													op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+											}
 										}
-									}
+
+									});
 								}
 
                                 env.block.opSteps.Add(op);
@@ -736,19 +747,26 @@ namespace ASCompiler.compiler.builds
                 build_member_parameterSteps(rFunc, builder, eax, op, step, env, _cls,null,originMember,out findsignature,out signature);
 				if (findsignature)
 				{
-					if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
-						op.opCode = OpCode.call_function_notcheck;
-					else
+					builder._toOptimizeCallFunctionOpSteps.Add((bd)=> 
 					{
-						op.opCode = OpCode.call_function_notcheck_notreturnobject;
 
-						bool isfindsuccess;
-						if (!isNativeFunctionOrYield(signature, builder, out isfindsuccess))
+						if (signature.returnType > RunTimeDataType.unknown || signature.returnType == RunTimeDataType.rt_void)
+							op.opCode = OpCode.call_function_notcheck;
+						else
 						{
-							if (isfindsuccess)
-								op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+							op.opCode = OpCode.call_function_notcheck_notreturnobject;
+
+							bool isfindsuccess;
+							if (isNotYieldAndNotNative(signature, builder, out isfindsuccess))
+							{
+								if (isfindsuccess)
+									op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative;
+							}
 						}
-					}
+
+					});
+
+					
 				}
 
                 env.block.opSteps.Add(op);
@@ -877,13 +895,27 @@ namespace ASCompiler.compiler.builds
 
 				if (signature != null)
 				{
-					bool findsuccess;
-					var func = findFunction(signature, builder, out findsuccess);
-					if (findsuccess)
-					{
-						if (!func.isConstructor)
+					builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
+
+						bool findsuccess;
+						var func = findFunction(signature, builder, out findsuccess);
+						if (findsuccess)
 						{
-							if (func.isMethod && opMakeArgs.arg1 is MethodGetterBase)
+							if (!func.isConstructor)
+							{
+								if (func.isMethod && opMakeArgs.arg1 is MethodGetterBase)
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_method;
+								}
+								else
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+								}
+							}
+						}
+						else
+						{
+							if (opMakeArgs.arg1 is MethodGetterBase)
 							{
 								opMakeArgs.opCode = OpCode.make_para_scope_method;
 							}
@@ -892,18 +924,8 @@ namespace ASCompiler.compiler.builds
 								opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
 							}
 						}
-					}
-					else
-					{
-						if (opMakeArgs.arg1 is MethodGetterBase)
-						{
-							opMakeArgs.opCode = OpCode.make_para_scope_method;
-						}
-						else
-						{
-							opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
-						}
-					}
+
+					});
 				}
 
 				
@@ -1022,35 +1044,36 @@ namespace ASCompiler.compiler.builds
 						{
 							if (!hasIntoPara)
 							{
-								bool findsuccess;
-								if (isNativeModeConstPara(signature, builder, out findsuccess))
-								{
-									if (findsuccess)
-										opPushArgs.opCode = OpCode.push_parameter_nativeconstpara_skipcheck;
-								}
-								else
-								{
-									if (findsuccess)
+								builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
+
+									bool findsuccess;
+									if (isNativeModeConstPara(signature, builder, out findsuccess))
 									{
-										opPushArgs.opCode = OpCode.push_parameter_skipcheck;
+										if (findsuccess)
+											opPushArgs.opCode = OpCode.push_parameter_nativeconstpara_skipcheck;
 									}
 									else
 									{
-										var testfunc= makeParaArg1 == null ? rFunc : makeParaArg1;
-										if (testfunc is MethodGetterBase
-											||
-											testfunc is VariableBase
-											)
+										bool checkisnotnative;
+										if (isNotNative(signature, builder, out checkisnotnative))
 										{
-											opPushArgs.opCode = OpCode.push_parameter_skipcheck;
+											if (checkisnotnative)
+											{
+												opPushArgs.opCode = OpCode.push_parameter_skipcheck;
+											}
+											else
+											{
+												opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+											}
 										}
 										else
 										{
-
 											opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
 										}
+
 									}
-								}
+
+								});
 							}
 							else
 							{
@@ -1070,45 +1093,13 @@ namespace ASCompiler.compiler.builds
 
 		private ASBinCode.rtti.FunctionDefine findFunction(ASBinCode.rtti.FunctionSignature signature,Builder builder,out bool findsuccess)
 		{
-			if (builder._signature_define.ContainsKey(signature))
+			//if (builder._signature_define.ContainsKey(signature))
 			{
 				findsuccess = true;
 				return builder._signature_define[signature];
 			}
-
-			foreach (var item in builder.bin.functions)
-			{
-				if (item == null)
-				{
-					findsuccess = false;
-					return null;
-				}
-
-				if(!builder._signature_define.ContainsKey(item.signature))
-					builder._signature_define.Add(item.signature, item);
-
-				if (Equals(item.signature, signature))
-				{
-					findsuccess = true;
-					return item;
-				}
-			}
-
-			
-
-			foreach (var item in builder.buildoutfunctions)
-			{
-				if (!builder._signature_define.ContainsKey(item.Value.signature))
-					builder._signature_define.Add(item.Value.signature, item.Value);
-
-				if (Equals(item.Value.signature, signature))
-				{
-					findsuccess = true;
-					return item.Value;
-				}
-			}
-			findsuccess = false;
-			return null;
+			//findsuccess = false;
+			//return null;
 		}
 
 		private bool isNativeModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder,out bool findsuccess)
@@ -1127,15 +1118,105 @@ namespace ASCompiler.compiler.builds
 			return false;
 		}
 
-		private bool isNativeFunctionOrYield(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
+
+		private bool isNotNative(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
 		{
-			
 			var func = findFunction(signature, builder, out findsuccess);
-			if (func != null && (func.isNative || func.isYield))
+			if (func != null && func.isNative)
+			{
+				return false;
+			}
+			else if (func != null)
+			{
+				if (builder._signature_belone.ContainsKey(signature))
+				{
+					var obj = builder._signature_belone[signature];
+					if (obj == null)
+					{
+						return false;
+					}
+					else if (obj is ASBinCode.rtti.Class)
+					{
+						ASBinCode.rtti.Class cls = (ASBinCode.rtti.Class)obj;
+						if (cls.isInterface)
+						{
+							return false;
+						}
+						else
+						{
+							return true;
+						}
+					}
+					else
+					{
+						return true;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private bool isYield(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
+		{
+			var func = findFunction(signature, builder, out findsuccess);
+			if (func != null && func.isYield)
 			{
 				return true;
 			}
-			return false;
+			else
+			{
+				return false;
+			}
 		}
+
+		private bool isNotYieldAndNotNative(ASBinCode.rtti.FunctionSignature signature, Builder builder,out bool findsuccess)
+		{
+			bool checknative;
+			if (isNotNative(signature, builder, out checknative))
+			{
+				if (checknative)
+				{
+					bool checkyield;
+
+					if (isYield(signature, builder, out checkyield))
+					{
+						findsuccess = checkyield;
+						return false;
+					}
+					else
+					{
+						findsuccess = checkyield;
+						if (checkyield)
+						{
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+						
+					}
+
+				}
+				else
+				{
+					findsuccess = checknative;
+					return false;
+				}
+			}
+			else
+			{
+				findsuccess = checknative;
+				return false;
+			}
+		}
+
 	}
 }

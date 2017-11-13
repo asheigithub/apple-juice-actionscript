@@ -63,13 +63,13 @@ namespace ASCompiler.compiler
             linkinterfaceCreators = new Dictionary<ASBinCode.rtti.Class, NativeFunctionBase>();
 
 
-
+		internal List<Action<Builder>> _toOptimizeCallFunctionOpSteps = new List<System.Action<Builder>>();
 
 
 
 
 		internal Dictionary<FunctionSignature, FunctionDefine> _signature_define = new Dictionary<FunctionSignature, FunctionDefine>();
-		
+		internal Dictionary<FunctionSignature, object> _signature_belone = new Dictionary<FunctionSignature, object>();
         internal readonly bool isEval;
         public Builder(bool isEval)
         {
@@ -185,6 +185,12 @@ namespace ASCompiler.compiler
 							{
 								dict.Add(mb, lib.functions[mb.functionId].signature);
 							}
+
+							if (!_signature_belone.ContainsKey(lib.functions[mb.functionId].signature))
+							{
+								_signature_belone.Add(lib.functions[mb.functionId].signature, item);
+							}
+							
 
 						}
 					}
@@ -1307,6 +1313,14 @@ namespace ASCompiler.compiler
                     builder.buildParameterDefaultValue(item.Key, item.Value.item1, item.Value.item2, this);
                 }
                 _toEvalDefaultParameters.Clear();
+
+
+				//***回调需要检查函数类型
+				foreach (var item in _toOptimizeCallFunctionOpSteps)
+				{
+					item(this);
+				}
+				_toOptimizeCallFunctionOpSteps.Clear();
             }
             ASBinCode.rtti.FunctionDefine outf;
             if (!bin.operatorOverrides.Check(out outf))

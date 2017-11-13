@@ -28,11 +28,11 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"D:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
-									   //path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-				path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\amd";
+				path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
 
 				if (path.EndsWith(".as"))
                 {
@@ -257,7 +257,7 @@ namespace ASCTest
 
 						//var s = player.invokeMethod("Test", "TTT", 3, 4);
 
-						
+
 
 
 						Console.WriteLine();

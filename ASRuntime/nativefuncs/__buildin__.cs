@@ -189,6 +189,7 @@ namespace ASRuntime.nativefuncs
             sepcb.scope = scope;
             sepcb._intArg = 0;
             sepcb.setCallBacker(null);
+			sepcb._intArg2 = 0;
 
             object[] sendargs = sepcb.cacheObjects;
             sendargs[0] = cb;
@@ -199,7 +200,7 @@ namespace ASRuntime.nativefuncs
             sendargs[5] = " ";
             sendargs[6] = new StringBuilder();
             sendargs[7] = resultSlot;
-            sendargs[8] = new rtInt(0);
+            //sendargs[8] = new rtInt(0);
             sepcb.args = sendargs;
 
             _SeptoString_CB(sepcb, sendargs);
@@ -218,7 +219,7 @@ namespace ASRuntime.nativefuncs
             valueCB._intArg = sender._intArg + 1;
             valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
             valueCB.setCallBacker(_ValueToString_CB);
-
+			valueCB._intArg2 = sender._intArg2;
             var v = array.innerArray[sender._intArg];
             if (v.rtType == RunTimeDataType.rt_void)
             {
@@ -244,13 +245,14 @@ namespace ASRuntime.nativefuncs
             StackFrame frame = (StackFrame)receiveArgs[2];
             rtArray array = (rtArray)receiveArgs[1];
 
-            ((rtInt)receiveArgs[8]).value++;
+			//((rtInt)receiveArgs[8]).value++;
+			sender._intArg2++;
 
-            if (((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
+            if (sender._intArg2==10)//((rtInt)receiveArgs[8]).value == 10)    //堆栈清理,防止溢出...
             {
-                ((rtInt)receiveArgs[8]).value = 0;
+				sender._intArg2 = 0; //((rtInt)receiveArgs[8]).value = 0;
                 BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
-                valueCB._intArg = sender._intArg;
+                valueCB._intArg = sender._intArg;valueCB._intArg2 = 0;
                 valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
 
@@ -275,7 +277,7 @@ namespace ASRuntime.nativefuncs
 
 
                 BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
-                valueCB._intArg = sender._intArg + 1;
+                valueCB._intArg = sender._intArg + 1;valueCB._intArg2 = sender._intArg2;
                 valueCB.args = valueCB.copyFromReceiveArgs(receiveArgs);
                 valueCB.setCallBacker(_ValueToString_CB);
 

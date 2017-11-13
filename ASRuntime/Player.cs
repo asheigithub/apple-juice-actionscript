@@ -872,7 +872,7 @@ namespace ASRuntime
 									case OpCode.cast_number_int:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtNumber)v1).value);
+											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
 											currentRunFrame.endStep(step);
 											break;
 										}
@@ -886,7 +886,7 @@ namespace ASRuntime
 									case OpCode.cast_number_uint:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtNumber)v1).value);
+											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
 											currentRunFrame.endStep(step);
 											break;
 										}
@@ -2059,7 +2059,7 @@ namespace ASRuntime
 					case OpCode.cast_number_int:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtNumber)v1).value);
+							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
 							currentRunFrame.endStep(step);
 							break;
 						}
@@ -2073,7 +2073,7 @@ namespace ASRuntime
 					case OpCode.cast_number_uint:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtNumber)v1).value);
+							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
 							currentRunFrame.endStep(step);
 							break;
 						}

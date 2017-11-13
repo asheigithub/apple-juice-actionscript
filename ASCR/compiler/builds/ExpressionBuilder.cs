@@ -298,7 +298,7 @@ namespace ASCompiler.compiler.builds
 
 
 
-            if (src.valueType != dstType && dstType != RunTimeDataType.rt_void)
+			if (src.valueType != dstType && dstType != RunTimeDataType.rt_void)
             {
                 OpStep op =
                     new OpStep(OpCode.cast, token);

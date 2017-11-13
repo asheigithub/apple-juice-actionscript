@@ -137,6 +137,11 @@ namespace ASRuntime.operators
            
         }
 
+
+		private static ASBinCode.rtData.rtInt _cachertint = new ASBinCode.rtData.rtInt(0);
+		private static ASBinCode.rtData.rtUInt _cachertuint = new ASBinCode.rtData.rtUInt(0);
+		private static ASBinCode.rtData.rtNumber _cachertnumber = new ASBinCode.rtData.rtNumber(0);
+
 		public static RunTimeValueBase getDefaultParameterValue(ASBinCode.rtti.FunctionSignature signature,int i)
 		{
 			var dt = signature.parameters[i].type;
@@ -146,15 +151,21 @@ namespace ASRuntime.operators
 			{
 				if (dt == RunTimeDataType.rt_int)
 				{
-					dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, null, null));
+					_cachertint.value = TypeConverter.ConvertToInt(dv, null, null);
+					dv = _cachertint;
+					//dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, null, null));
 				}
 				else if (dt == RunTimeDataType.rt_uint)
 				{
-					dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, null, null));
+					_cachertuint.value = TypeConverter.ConvertToUInt(dv, null, null);
+					dv = _cachertuint;
+					//dv = new ASBinCode.rtData.rtUInt(TypeConverter.ConvertToUInt(dv, null, null));
 				}
 				else if (dt == RunTimeDataType.rt_number)
 				{
-					dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
+					_cachertnumber.value = TypeConverter.ConvertToNumber(dv);
+					dv = _cachertnumber;
+					//dv = new ASBinCode.rtData.rtNumber(TypeConverter.ConvertToNumber(dv));
 				}
 				else if (dt == RunTimeDataType.rt_string)
 				{
@@ -916,24 +927,11 @@ namespace ASRuntime.operators
 		{
 			
 			{
-#if DEBUG
-				if (returnSlot is StackSlot)
-				{
-					TypeConverter.setDefaultValueToStackSlot(
-						toCallFunc.signature.returnType,
-						(StackSlot)returnSlot);
-				}
-				else
-				{
 
-					throw new ASRunTimeException();
-
-				}
-#else
 				TypeConverter.setDefaultValueToStackSlot(
 						toCallFunc.signature.returnType,
 						(StackSlot)returnSlot);
-#endif
+
 
 				player.callBlock(
 					player.swc.blocks[toCallFunc.blockid],

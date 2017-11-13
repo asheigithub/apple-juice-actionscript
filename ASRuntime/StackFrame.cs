@@ -667,7 +667,7 @@ namespace ASRuntime
 				case OpCode.cast_number_int:
 					{
 						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((int)((rtNumber)v1).value);
+						step.reg.getSlot(scope, this).setValue( TypeConverter.ConvertToInt(v1,this,null) );
 						endStep(step);
 						break;
 					}
@@ -681,7 +681,7 @@ namespace ASRuntime
 				case OpCode.cast_number_uint:
 					{
 						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((uint)((rtNumber)v1).value);
+						step.reg.getSlot(scope, this).setValue(TypeConverter.ConvertToUInt(v1,this,null));
 						endStep(step);
 						break;
 					}
