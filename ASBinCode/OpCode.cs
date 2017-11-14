@@ -477,7 +477,10 @@ namespace ASBinCode
 		make_para_scope_withsignature=128,
 
 		function_return_funvoid=129,
-		function_return_nofunction=130
+		function_return_nofunction=130,
+
+		if_jmp_notry=131,
+		jmp_notry=132
 		
 	}
 }

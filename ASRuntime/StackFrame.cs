@@ -397,8 +397,8 @@ namespace ASRuntime
                     operators.OpIncrementDecrement.execSuffixDecNumber(this, step, scope);
                     break;
                 case OpCode.flag:
-                    //标签行，不做任何操作
-                    endStep(step);
+					//标签行，不做任何操作
+					endStepNoError();
                     break;
                 case OpCode.if_jmp:
                     {
@@ -424,7 +424,20 @@ namespace ASRuntime
                         }
                     }
                     break;
-                case OpCode.jmp:
+				case OpCode.if_jmp_notry:
+					{
+						if (((rtBoolean)step.arg1.getValue(scope, this)).value)
+						{
+							codeLinePtr += step.jumoffset-1 ;
+							endStepNoError();
+						}
+						else
+						{
+							endStepNoError();
+						}
+					}
+					break;
+				case OpCode.jmp:
                     if (trystateCount != 0)
                     {
                         hasCallJump = true;
@@ -438,6 +451,12 @@ namespace ASRuntime
                         endStep(step);
                         break;
                     }
+				case OpCode.jmp_notry:
+					{
+						codeLinePtr += step.jumoffset -1;
+						endStepNoError();
+						break;
+					}
                 case OpCode.raise_error:
                     nativefuncs.Throw.exec(this, step, scope);
                     break;
@@ -586,8 +605,8 @@ namespace ASRuntime
                     operators.OpLinkOutPackageScope.exec_link(this, step, scope);
                     break;
                 case OpCode.flag_call_super_constructor:
-                    endStep(step);
-                    break;
+					endStepNoError();
+					break;
                 case OpCode.forin_get_enumerator:
                     operators.OpForIn.forin_get_enumerator(this, step, scope);
                     break;
@@ -627,9 +646,9 @@ namespace ASRuntime
                         rtFunction function = new rtFunction(funcid, ismethod);
                         function.bind(scope);
                         step.reg.getSlot(scope,this).directSet(function);
-                        
-                        endStep(step);
-                    }
+
+						endStepNoError();
+					}
                     break;
                 case OpCode.yield_return:
                     
@@ -640,14 +659,14 @@ namespace ASRuntime
                     {
                         //跳转继续下一次yield
                         codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
-                        endStep(step);
-                    }
+						endStepNoError();
+					}
                     break;
                 case OpCode.yield_break:
                     hasCallReturn = true;
                     returnSlot.directSet(rtUndefined.undefined);
-                    endStep(step);
-                    break;
+					endStepNoError();
+					break;
 				//case OpCode.reset_stackslot:
 
 				//	((StackSlot)((Register)step.arg1).getSlot(scope, this)).resetSlot(); 
@@ -661,42 +680,42 @@ namespace ASRuntime
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue((double)((rtInt)v1).value);
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.cast_number_int:
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue( TypeConverter.ConvertToInt(v1,this,null) );
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.cast_uint_number :
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue((double)((rtUInt)v1).value);
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.cast_number_uint:
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue(TypeConverter.ConvertToUInt(v1,this,null));
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.cast_int_uint:
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue((uint)((rtInt)v1).value);
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.cast_uint_int:
 					{
 						var v1 = step.arg1.getValue(scope, this);
 						step.reg.getSlot(scope, this).setValue((int)((rtUInt)v1).value);
-						endStep(step);
+						endStepNoError();
 						break;
 					}
 				case OpCode.push_parameter_skipcheck:
@@ -721,7 +740,7 @@ namespace ASRuntime
 					{
 						hasCallReturn = true;
 						returnSlot.directSet(rtUndefined.undefined);
-						endStep(step);
+						endStepNoError();
 					}
 					break;
 				case OpCode.function_return_nofunction:
@@ -729,7 +748,7 @@ namespace ASRuntime
 						hasCallReturn = true;
 						RunTimeValueBase result = step.arg1.getValue(scope, this);
 						returnSlot.directSet(result);
-						endStep(step);
+						endStepNoError();
 					}
 					break;
 				case OpCode.call_function_notcheck_notreturnobject:
@@ -763,7 +782,25 @@ namespace ASRuntime
             }
         }
 
-        internal void endStep()
+		/// <summary>
+		/// 确保当前操作肯定不会有异常时调用这个
+		/// </summary>
+		internal void endStepNoError()
+		{
+#if DEBUG
+			if (!execing || isclosed)
+			{
+				throw new ASRunTimeException();
+			}
+			execing = false;
+
+#endif
+			++codeLinePtr;
+
+		}
+
+
+		internal void endStep()
         {
             endStep(block.opSteps[codeLinePtr]);
         }
@@ -772,12 +809,7 @@ namespace ASRuntime
         internal void endStep(OpStep step)
         {
 			
-			if (!hascallstep)
-			{
-				codeLinePtr = stepCount;
-				player.exitStackFrameWithError(runtimeError, this);
-				return;
-			}
+			
 #if DEBUG
             if (!execing || isclosed)
             {
@@ -1152,7 +1184,15 @@ namespace ASRuntime
         internal void receiveErrorFromStackFrame(error.InternalError error)
         {
             runtimeError = error;
-            endStep(block.opSteps[codeLinePtr]);
+
+			if (!hascallstep)
+			{
+				codeLinePtr = stepCount;
+				player.exitStackFrameWithError(runtimeError, this);
+				return;
+			}
+
+			endStep(block.opSteps[codeLinePtr]);
             
         }
 

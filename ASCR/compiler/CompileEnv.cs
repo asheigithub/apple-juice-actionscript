@@ -736,6 +736,15 @@ namespace ASCompiler.compiler
 				else
 				{
 					step.tryid = -1;
+
+					if (step.opCode == OpCode.jmp)
+					{
+						step.opCode = OpCode.jmp_notry;
+					}
+					else if (step.opCode == OpCode.if_jmp)
+					{
+						step.opCode = OpCode.if_jmp_notry;
+					}
 				}
 
 			}

@@ -609,7 +609,7 @@ namespace ASRuntime
 										break;
 									case OpCode.flag:
 										//标签行，不做任何操作
-										currentRunFrame.endStep(step);
+										currentRunFrame.endStepNoError();
 										break;
 									case OpCode.if_jmp:
 										{
@@ -635,6 +635,18 @@ namespace ASRuntime
 											}
 										}
 										break;
+									case OpCode.if_jmp_notry:
+										{
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset;
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
 									case OpCode.jmp:
 										if (currentRunFrame.trystateCount != 0)
 										{
@@ -647,6 +659,11 @@ namespace ASRuntime
 										{
 											currentRunFrame.codeLinePtr += step.jumoffset - 1;
 											currentRunFrame.endStep(step);
+											break;
+										}
+									case OpCode.jmp_notry:
+										{
+											currentRunFrame.codeLinePtr += step.jumoffset;
 											break;
 										}
 									case OpCode.raise_error:
@@ -797,7 +814,7 @@ namespace ASRuntime
 										operators.OpLinkOutPackageScope.exec_link(currentRunFrame, step, scope);
 										break;
 									case OpCode.flag_call_super_constructor:
-										currentRunFrame.endStep(step);
+										currentRunFrame.endStepNoError();
 										break;
 									case OpCode.forin_get_enumerator:
 										operators.OpForIn.forin_get_enumerator(currentRunFrame, step, scope);
@@ -839,7 +856,7 @@ namespace ASRuntime
 											function.bind(scope);
 											step.reg.getSlot(scope, currentRunFrame).directSet(function);
 
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 										}
 										break;
 									case OpCode.yield_return:
@@ -851,13 +868,13 @@ namespace ASRuntime
 										{
 											//跳转继续下一次yield
 											currentRunFrame.codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 										}
 										break;
 									case OpCode.yield_break:
 										currentRunFrame.hasCallReturn = true;
 										currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-										currentRunFrame.endStep(step);
+										currentRunFrame.endStepNoError();
 										break;
 									case OpCode.call_function_notcheck:
 										operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
@@ -866,42 +883,42 @@ namespace ASRuntime
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_int:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_number:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_uint:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_int_uint:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_int:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame);
 											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.push_parameter_skipcheck:
@@ -926,14 +943,14 @@ namespace ASRuntime
 										{
 											currentRunFrame.hasCallReturn = true;
 											currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 										}
 										break;
 									case OpCode.function_return_nofunction:
 										{
 											currentRunFrame.hasCallReturn = true;
 											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
-											currentRunFrame.endStep(step);
+											currentRunFrame.endStepNoError();
 										}
 										break;
 									case OpCode.call_function_notcheck_notreturnobject:
@@ -1796,7 +1813,7 @@ namespace ASRuntime
 						break;
 					case OpCode.flag:
 						//标签行，不做任何操作
-						currentRunFrame.endStep(step);
+						currentRunFrame.endStepNoError();
 						break;
 					case OpCode.if_jmp:
 						{
@@ -1822,6 +1839,18 @@ namespace ASRuntime
 							}
 						}
 						break;
+					case OpCode.if_jmp_notry:
+						{
+							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset;				
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
 					case OpCode.jmp:
 						if (currentRunFrame.trystateCount != 0)
 						{
@@ -1834,6 +1863,11 @@ namespace ASRuntime
 						{
 							currentRunFrame.codeLinePtr += step.jumoffset - 1;
 							currentRunFrame.endStep(step);
+							break;
+						}
+					case OpCode.jmp_notry:
+						{
+							currentRunFrame.codeLinePtr += step.jumoffset ;
 							break;
 						}
 					case OpCode.raise_error:
@@ -1984,7 +2018,7 @@ namespace ASRuntime
 						operators.OpLinkOutPackageScope.exec_link(currentRunFrame, step, scope);
 						break;
 					case OpCode.flag_call_super_constructor:
-						currentRunFrame.endStep(step);
+						currentRunFrame.endStepNoError();
 						break;
 					case OpCode.forin_get_enumerator:
 						operators.OpForIn.forin_get_enumerator(currentRunFrame, step, scope);
@@ -2026,7 +2060,7 @@ namespace ASRuntime
 							function.bind(scope);
 							step.reg.getSlot(scope, currentRunFrame).directSet(function);
 
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 						}
 						break;
 					case OpCode.yield_return:
@@ -2038,13 +2072,13 @@ namespace ASRuntime
 						{
 							//跳转继续下一次yield
 							currentRunFrame.codeLinePtr = ((rtInt)scope.memberData[scope.memberData.Length - 2].getValue()).value - 1;
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 						}
 						break;
 					case OpCode.yield_break:
 						currentRunFrame.hasCallReturn = true;
 						currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-						currentRunFrame.endStep(step);
+						currentRunFrame.endStepNoError();
 						break;
 					case OpCode.call_function_notcheck:
 						operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
@@ -2053,42 +2087,42 @@ namespace ASRuntime
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_number_int:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_uint_number:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_number_uint:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_int_uint:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_uint_int:
 						{
 							var v1 = step.arg1.getValue(scope, currentRunFrame);
 							step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.push_parameter_skipcheck:
@@ -2113,7 +2147,7 @@ namespace ASRuntime
 						{
 							currentRunFrame.hasCallReturn = true;
 							currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 						}
 						break;
 					case OpCode.function_return_nofunction:
@@ -2121,7 +2155,7 @@ namespace ASRuntime
 							currentRunFrame.hasCallReturn = true;
 							RunTimeValueBase result = step.arg1.getValue(scope, currentRunFrame);
 							currentRunFrame.returnSlot.directSet(result);
-							currentRunFrame.endStep(step);
+							currentRunFrame.endStepNoError();
 						}
 						break;
 					case OpCode.call_function_notcheck_notreturnobject:
