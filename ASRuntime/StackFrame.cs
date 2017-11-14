@@ -665,7 +665,7 @@ namespace ASRuntime
                 case OpCode.yield_break:
                     hasCallReturn = true;
                     returnSlot.directSet(rtUndefined.undefined);
-					endStepNoError();
+					endStep(step);
 					break;
 				//case OpCode.reset_stackslot:
 
@@ -740,7 +740,7 @@ namespace ASRuntime
 					{
 						hasCallReturn = true;
 						returnSlot.directSet(rtUndefined.undefined);
-						endStepNoError();
+						endStep(step);
 					}
 					break;
 				case OpCode.function_return_nofunction:
@@ -748,7 +748,20 @@ namespace ASRuntime
 						hasCallReturn = true;
 						RunTimeValueBase result = step.arg1.getValue(scope, this);
 						returnSlot.directSet(result);
-						endStepNoError();
+						endStep(step);
+					}
+					break;
+				case OpCode.function_return_funvoid_notry:
+					{
+						returnSlot.directSet(rtUndefined.undefined);
+						codeLinePtr = stepCount;
+					}
+					break;
+				case OpCode.function_return_nofunction_notry:
+					{
+						RunTimeValueBase result = step.arg1.getValue(scope, this);
+						returnSlot.directSet(result);
+						codeLinePtr = stepCount;
 					}
 					break;
 				case OpCode.call_function_notcheck_notreturnobject:

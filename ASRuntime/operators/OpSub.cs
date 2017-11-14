@@ -15,7 +15,8 @@ namespace ASRuntime.operators
             double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             step.reg.getSlot(scope, frame).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
-            frame.endStep(step);
+			frame.endStepNoError();
+			//frame.endStep(step);
         }
 
         public static void execSub(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)

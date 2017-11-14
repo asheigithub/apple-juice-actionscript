@@ -32,7 +32,7 @@ namespace ASCTest
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-				path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
+				//path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
 
 				if (path.EndsWith(".as"))
                 {

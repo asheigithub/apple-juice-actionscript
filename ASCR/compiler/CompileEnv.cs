@@ -745,6 +745,14 @@ namespace ASCompiler.compiler
 					{
 						step.opCode = OpCode.if_jmp_notry;
 					}
+					else if (step.opCode == OpCode.function_return_funvoid)
+					{
+						step.opCode = OpCode.function_return_funvoid_notry;
+					}
+					else if (step.opCode == OpCode.function_return_nofunction)
+					{
+						step.opCode = OpCode.function_return_nofunction_notry;
+					}
 				}
 
 			}

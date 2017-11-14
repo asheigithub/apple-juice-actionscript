@@ -874,7 +874,7 @@ namespace ASRuntime
 									case OpCode.yield_break:
 										currentRunFrame.hasCallReturn = true;
 										currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-										currentRunFrame.endStepNoError();
+										currentRunFrame.endStep(step);
 										break;
 									case OpCode.call_function_notcheck:
 										operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
@@ -943,14 +943,26 @@ namespace ASRuntime
 										{
 											currentRunFrame.hasCallReturn = true;
 											currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-											currentRunFrame.endStepNoError();
+											currentRunFrame.endStep(step);
 										}
 										break;
 									case OpCode.function_return_nofunction:
 										{
 											currentRunFrame.hasCallReturn = true;
 											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
-											currentRunFrame.endStepNoError();
+											currentRunFrame.endStep(step);
+										}
+										break;
+									case OpCode.function_return_funvoid_notry:
+										{
+											currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+											currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
+										}
+										break;
+									case OpCode.function_return_nofunction_notry:
+										{
+											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+											currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
 										}
 										break;
 									case OpCode.call_function_notcheck_notreturnobject:
@@ -2078,7 +2090,7 @@ namespace ASRuntime
 					case OpCode.yield_break:
 						currentRunFrame.hasCallReturn = true;
 						currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-						currentRunFrame.endStepNoError();
+						currentRunFrame.endStep(step);
 						break;
 					case OpCode.call_function_notcheck:
 						operators.OpCallFunction.exec_notcheck(currentRunFrame, step, scope);
@@ -2147,7 +2159,7 @@ namespace ASRuntime
 						{
 							currentRunFrame.hasCallReturn = true;
 							currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
-							currentRunFrame.endStepNoError();
+							currentRunFrame.endStep(step);
 						}
 						break;
 					case OpCode.function_return_nofunction:
@@ -2155,7 +2167,19 @@ namespace ASRuntime
 							currentRunFrame.hasCallReturn = true;
 							RunTimeValueBase result = step.arg1.getValue(scope, currentRunFrame);
 							currentRunFrame.returnSlot.directSet(result);
-							currentRunFrame.endStepNoError();
+							currentRunFrame.endStep(step);
+						}
+						break;
+					case OpCode.function_return_funvoid_notry:
+						{
+							currentRunFrame.returnSlot.directSet(rtUndefined.undefined);
+							currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
+						}
+						break;
+					case OpCode.function_return_nofunction_notry:
+						{
+							currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+							currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
 						}
 						break;
 					case OpCode.call_function_notcheck_notreturnobject:

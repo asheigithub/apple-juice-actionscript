@@ -213,11 +213,11 @@ namespace ASCompiler.compiler.builds
             return false;
         }
 
-        private bool detectingOperator(CodeBlock block,OpCode operatorCode)
+        private bool detectingOperator(CodeBlock block,OpCode[] operatorCodes)
         {
-            return findReturn(block.opSteps,0,new int[] { },operatorCode);
+            return findReturn(block.opSteps,0,new int[] { },operatorCodes);
         }
-        private bool findReturn(List<OpStep> commands,int st,int[] hasvisited, OpCode operatorCode)
+        private bool findReturn(List<OpStep> commands,int st,int[] hasvisited, OpCode[] operatorCodes)
         {
             Dictionary<int, object> visited = new Dictionary<int, object>();
             for (int i = 0; i < hasvisited.Length; i++)
@@ -225,22 +225,28 @@ namespace ASCompiler.compiler.builds
                 visited.Add(hasvisited[i],null);
             }
 
-            for (int i = st; i < commands.Count  ; i++)
-            {
-                OpStep op = commands[i];
+			for (int i = st; i < commands.Count; i++)
+			{
+				OpStep op = commands[i];
 
-                if (visited.ContainsKey(i))
-                {
-                    return true;
-                }
+				if (visited.ContainsKey(i))
+				{
+					return true;
+				}
 
-                visited.Add(i, null);
+				visited.Add(i, null);
 
-                if (op.opCode == operatorCode || op.opCode == OpCode.raise_error)
-                {
-                    return true;
-                }
-                else if (op.opCode == OpCode.jmp)
+				if (op.opCode == OpCode.raise_error)
+					return true;
+				foreach (var item in operatorCodes)
+				{
+					if (op.opCode == item)
+					{
+						return true;
+					}
+				}
+
+                if (op.opCode == OpCode.jmp)
                 {
                     i += op.jumoffset - 1;
                 }
@@ -251,7 +257,7 @@ namespace ASCompiler.compiler.builds
                     int[] add = new int[visited.Keys.Count ];
                     visited.Keys.CopyTo(add, 0);
 
-                    return findReturn(commands, i + 1,add,operatorCode) && findReturn(commands, line,add,operatorCode);
+                    return findReturn(commands, i + 1,add,operatorCodes) && findReturn(commands, line,add,operatorCodes);
                 }
                 
             }
@@ -1843,6 +1849,10 @@ namespace ASCompiler.compiler.builds
 						existsOperator(block, OpCode.function_return_funvoid)
 						||
 						existsOperator(block, OpCode.function_return_nofunction)
+						||
+						existsOperator(block, OpCode.function_return_funvoid_notry)
+						||
+						existsOperator(block, OpCode.function_return_nofunction_notry)
 						)
                     {
                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
@@ -1882,11 +1892,12 @@ namespace ASCompiler.compiler.builds
                     )
                 {
                     //查找是否所有分支均有return.
-                    if (!detectingOperator(block, OpCode.function_return)
-						&&
-						!detectingOperator(block,OpCode.function_return_nofunction)
-						&&
-						!detectingOperator(block,OpCode.function_return_funvoid)
+                    if (!detectingOperator(block, new OpCode[]{
+						OpCode.function_return,
+						OpCode.function_return_nofunction,
+						OpCode.function_return_funvoid,
+						OpCode.function_return_funvoid_notry,
+						OpCode.function_return_nofunction_notry})
 						)
                     {
                         throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
@@ -1951,7 +1962,7 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        if (!detectingOperator(block, OpCode.flag_call_super_constructor))  //不是所有路径都调用构造
+                        if (!detectingOperator(block, new OpCode[] { OpCode.flag_call_super_constructor }))  //不是所有路径都调用构造
                         {
                             throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
                                         "构造函数需要在所有路径调用");

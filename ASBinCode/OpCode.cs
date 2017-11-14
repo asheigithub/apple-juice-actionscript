@@ -480,7 +480,10 @@ namespace ASBinCode
 		function_return_nofunction=130,
 
 		if_jmp_notry=131,
-		jmp_notry=132
+		jmp_notry=132,
+
+		function_return_funvoid_notry=133,
+		function_return_nofunction_notry=134
 		
 	}
 }
