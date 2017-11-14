@@ -25,7 +25,7 @@ namespace ASRuntime.operators
 				fc.onstackparametercount = 0;
 				fc.tag = null;
 
-				fc.function.Clear();
+				//fc.function.Clear();
 
 				return fc;
 			}
@@ -483,7 +483,7 @@ namespace ASRuntime.operators
 
 		public void pushParameter_noCheck(RunTimeValueBase argement, int id, out bool success)
 		{
-			var parameters = toCallFunc.signature.parameters;
+			
 			_storeArgementToSlot(id, argement);
 
 			pushedArgs++;
@@ -497,7 +497,7 @@ namespace ASRuntime.operators
 				return;
 			}
 
-			var parameters = toCallFunc.signature.parameters;
+			
 			_storeArgementToSlot(id, argement);
 
 			pushedArgs++;

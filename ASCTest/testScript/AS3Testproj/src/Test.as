@@ -9,7 +9,7 @@ package
 	{
 		public static var KV:String = "KV";
 		internal var t:Test;
-		
+		public var m:int;
 		public function Test(t:Test)
 		{
 			this.t = t;

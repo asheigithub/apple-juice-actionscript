@@ -168,11 +168,15 @@ namespace ASRuntime.operators
             if (_class.isInterface)
             {
                 frame.throwError(step.token,0, _class.name + " Interfaces cannot be instantiated with the new operator.");
-            }
+				frame.endStep(step);
+				
+			}
             else if (_class.no_constructor)
             {
                 frame.throwError(step.token,0, _class.name + " is not a constructor");
-            }
+				frame.endStep(step);
+				
+			}
             else
             {
 
@@ -182,15 +186,12 @@ namespace ASRuntime.operators
                 {
                     return;
                 }
-            }
-            //ASBinCode.rtti.FunctionDefine funcDefine = player.swc.functions[player.swc.classes[classid].constructor_functionid];
-            //ASBinCode.rtti.FunctionSignature signature = funcDefine.signature;
 
-            //frame.funCaller = new FunctionCaller(player, frame, step.token);
-            //frame.funCaller.toCallFunc = funcDefine;
-            //frame.funCaller.createParaScope();
+				//frame.endStep(step);
+				frame.endStepNoError();
+			}
 
-            frame.endStep(step);
+            
         }
 
         //abstract class  baseinstancecallbacker : IBlockCallBack
@@ -291,7 +292,8 @@ namespace ASRuntime.operators
 
 			if (InstanceCreator.init_static_class(as3class, player, step.token))
 			{
-				frame.endStep(step);
+				//frame.endStep(step);
+				frame.endStepNoError();
 			}
 
             //InstanceCreator ic = new InstanceCreator(player, frame, step.token, as3class);

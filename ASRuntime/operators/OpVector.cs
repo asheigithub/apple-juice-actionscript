@@ -150,7 +150,8 @@ namespace ASRuntime.operators
 
             o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope, frame).Clone());//直接对容器赋值，必须Clone
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 

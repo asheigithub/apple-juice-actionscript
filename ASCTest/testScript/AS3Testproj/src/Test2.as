@@ -14,6 +14,7 @@ package
 			trace(Test.KV);
 			
 			var t = new Test(null);
+			t.m ++;
 			t.getfunc()();
 			
 		}

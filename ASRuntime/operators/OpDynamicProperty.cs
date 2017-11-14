@@ -104,7 +104,8 @@ namespace ASRuntime.operators
             dobj.createproperty(heapslot._propname, heapslot);
             //直接初始化，可枚举
             heapslot.propertyIsEnumerable = true;
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
     }
 }

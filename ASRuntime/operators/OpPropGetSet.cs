@@ -89,7 +89,8 @@ namespace ASRuntime.operators
                 {
                     regslot.directSet(slot.getValue());
                 }
-                frame.endStep(step);
+				//frame.endStep(step);
+				frame.endStepNoError();
             }
 
            
@@ -239,7 +240,8 @@ namespace ASRuntime.operators
             }
             else
             {
-                frame.endStep(step);
+				//frame.endStep(step);
+				frame.endStepNoError();
             }
 
         }

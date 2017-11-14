@@ -19,8 +19,8 @@ namespace ASRuntime.operators
                         step.token,1009, "Cannot access a property or method of a null object reference."
                             
                         );
-                
-            }
+				frame.endStep(step);
+			}
             else
             {
                 rtObject rtObj =
@@ -51,7 +51,8 @@ namespace ASRuntime.operators
 
                     if (lintoslot is ClassPropertyGetter.PropertySlot)
                     {
-                        frame.endStep(step);
+						frame.endStepNoError();
+                        //frame.endStep(step);
                         return;
                     }
 
@@ -66,19 +67,20 @@ namespace ASRuntime.operators
                         slot.directSet(lintoslot.getValue());
                         
                     }
-                    
-                    
-                }
+					frame.endStepNoError();
+					//frame.endStep(step);
+				}
                 else
                 {
                     frame.throwError((new error.InternalError(frame.player.swc, step.token,
                          "dot操作结果必然是一个StackSlot"
                          )));
-                }
+					frame.endStep(step);
+				}
 
             }
 
-            frame.endStep(step);
+            
         }
 
         public static void exec_method(StackFrame frame, OpStep step, RunTimeScope scope)
@@ -92,8 +94,8 @@ namespace ASRuntime.operators
                         step.token,1009, "Cannot access a property or method of a null object reference."
                            
                         );
-
-            }
+				frame.endStep(step);
+			}
             else
             {
                 rtObject rtObj =
@@ -164,17 +166,21 @@ namespace ASRuntime.operators
 
 						//slot.directSet(lintoslot.getValue());
 					}
-                }
+
+					frame.endStepNoError();
+					//frame.endStep(step);
+				}
                 else
                 {
                     frame.throwError((new error.InternalError(frame.player.swc, step.token,
                          "dot操作结果必然是一个StackSlot"
                          )));
-                }
+					frame.endStep(step);
+				}
 
             }
 
-            frame.endStep(step);
+            
         }
 
         public static void exec_dot_byname(StackFrame frame, OpStep step, RunTimeScope scope)

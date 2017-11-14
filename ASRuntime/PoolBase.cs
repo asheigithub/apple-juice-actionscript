@@ -42,11 +42,12 @@ namespace ASRuntime
 
 		public virtual void ret(T c)
 		{
+#if DEBUG
 			if (remain == maxcount)
 			{
 				throw new ASRunTimeException("缓存池异常", String.Empty);
 			}
-
+#endif
 			remain++;
 			
 			pool[posRet] = c;
@@ -71,11 +72,12 @@ namespace ASRuntime
 
 		public virtual T create()
 		{
+#if DEBUG
 			if (remain==0)
 			{
 				throw new ASRunTimeException("缓存池异常",String.Empty);
 			}
-
+#endif
 			remain--;
 
 			T r = pool[posGet];

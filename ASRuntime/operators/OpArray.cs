@@ -18,8 +18,8 @@ namespace ASRuntime.operators
 
             step.reg.getSlot(scope, frame).directSet(new ASBinCode.rtData.rtArray());
 
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -30,7 +30,8 @@ namespace ASRuntime.operators
             //防止引用了StackSlot中的值类型，因此这里需要Clone()
             array.innerArray.Add((ASBinCode.RunTimeValueBase)step.arg1.getValue(scope, frame).Clone());
 
-            frame.endStep(step);
+			frame.endStepNoError();
+            //frame.endStep(step);
         }
     }
 }

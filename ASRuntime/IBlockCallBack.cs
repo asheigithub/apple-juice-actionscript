@@ -16,47 +16,8 @@ namespace ASRuntime
         void noticeRunFailed();
     }
 
-    class BlockCallBackBase : IBlockCallBack
+    sealed class BlockCallBackBase : IBlockCallBack
     {
-		//private static List<BlockCallBackBase> oo;
-
-		//private static Stack<BlockCallBackBase> pool;
-		//static BlockCallBackBase()
-		//{
-		//    pool = new Stack<BlockCallBackBase>();
-		//    for (int i = 0; i < 1024; i++)
-		//    {
-		//        pool.Push(new BlockCallBackBase());
-		//    }
-
-		//    //oo = new List<BlockCallBackBase>();
-		//}
-
-		//public static BlockCallBackBase create()
-		//{
-		//    BlockCallBackBase cb = pool.Pop();
-		//    cb.hasnoticed = false;
-		//    cb.hasreleased = false;
-
-		//    //oo.Add(cb);
-
-		//    return cb;
-		//}
-
-		//private static void ret(BlockCallBackBase c)
-		//{
-		//    pool.Push(c);
-		//    //oo.Remove(c);
-		//}
-
-		//public static void checkpool()
-		//{
-		//    if (pool.Count != 1024)
-		//    {
-		//        throw new ASBinCode.ASRunTimeException("缓存池异常");
-		//    }
-		//}
-
 		internal class BlockCallBackBasePool : PoolBase<BlockCallBackBase>
 		{
 			Player player;
