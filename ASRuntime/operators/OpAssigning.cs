@@ -32,91 +32,95 @@ namespace ASRuntime.operators
 			var lt= slot.assign(v, out success);
 
             {
-                if (!success) //(!slot.directSet(v))
-                {
-                    
-                    if (!(slot is StackSlot)) //直接赋值时
-                    {
-                        //ext = "Illegal assignment to function " + ((MethodGetterBase)step.reg).name + ".";
-                    }
-                    else
-                    {
-                        StackSlot oslot = (StackSlot)slot;
-                        //if (oslot.linktarget != null)
-                        {
+				if (!success) //(!slot.directSet(v))
+				{
+
+					if (!(slot is StackSlot)) //直接赋值时
+					{
+						//ext = "Illegal assignment to function " + ((MethodGetterBase)step.reg).name + ".";
+					}
+					else
+					{
+						StackSlot oslot = (StackSlot)slot;
+						//if (oslot.linktarget != null)
+						{
 							//slot = oslot.linktarget;
 							slot = lt;
-                        }
+						}
 
-                        if (slot is SetThisItemSlot)
-                        {
-                            _doSetThisItem(((SetThisItemSlot)slot).bindObj, v, ((SetThisItemSlot)slot).setindex , oslot, frame,step);
+						if (slot is SetThisItemSlot)
+						{
+							_doSetThisItem(((SetThisItemSlot)slot).bindObj, v, ((SetThisItemSlot)slot).setindex, oslot, frame, step);
 
-                            return;
-                        }
+							return;
+						}
 
-                        if (slot is ClassPropertyGetter.PropertySlot)
-                        {
-                            ClassPropertyGetter.PropertySlot propslot =
-                            (ASBinCode.ClassPropertyGetter.PropertySlot)slot;
-                            //***调用访问器。***
-                            ASBinCode.ClassPropertyGetter prop = oslot.stackObjects.propGetSet; //propslot.property;
+						if (slot is ClassPropertyGetter.PropertySlot)
+						{
+							ClassPropertyGetter.PropertySlot propslot =
+							(ASBinCode.ClassPropertyGetter.PropertySlot)slot;
+							//***调用访问器。***
+							ASBinCode.ClassPropertyGetter prop = oslot.stackObjects.propGetSet; //propslot.property;
 
-                            _doPropAssigning(prop, frame, step, frame.player, scope,
-                                //propslot.bindObj
-                                oslot.stackObjects.propBindObj
-                                , v,
-                                oslot
-                                );
-                            return;
-                        }
+							_doPropAssigning(prop, frame, step, frame.player, scope,
+								//propslot.bindObj
+								oslot.stackObjects.propBindObj
+								, v,
+								oslot
+								);
+							return;
+						}
 
-                        if (slot is OpVector.vectorSLot)    //Vector类型不匹配
-                        {
-                            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                            cb.scope = scope;
-                            cb.step = step;
-                            cb.args = frame;
-                            cb.setCallBacker(_vectorConvertCallBacker);
-							cb.cacheObjects[0] = slot; 
+						if (slot is OpVector.vectorSLot)    //Vector类型不匹配
+						{
+							BlockCallBackBase cb = frame.player.blockCallBackPool.create();
+							cb.scope = scope;
+							cb.step = step;
+							cb.args = frame;
+							cb.setCallBacker(_vectorConvertCallBacker);
+							cb.cacheObjects[0] = slot;
 
-                            //***调用强制类型转换***
-                            OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
-                                frame, step.token, scope, frame._tempSlot1, cb, false);
+							//***调用强制类型转换***
+							OpCast.CastValue(v, ((OpVector.vectorSLot)slot).vector_data.vector_type,
+								frame, step.token, scope, frame._tempSlot1, cb, false);
 
-                            return;
-                        }
+							return;
+						}
 
-                    }
-                    string ext = String.Empty;
+					}
+					string ext = String.Empty;
 
-                    if (slot is MethodGetterBase.MethodSlot)
-                    {
-                        ext = "Cannot assign to a method ";// + ((ASBinCode.ClassMethodGetter.MethodSlot)slot).method;
-                    }
-                    else if (slot is ObjectMemberSlot)
-                    {
-                        ext = "Illegal write to read-only property ";
-                        //+ ((ObjectMemberSlot)slot).obj.value._class.name
-                        //+" on ppp.PPC."
-                    }
-                    else if (slot is ClassPropertyGetter.PropertySlot)
-                    {
-                        ext = "Illegal write to read-only property ";
-                    }
-                    else if (slot is OpAccess_Dot.prototypeSlot)
-                    {
-                        ext = "Cannot create property "
-                            + ((OpAccess_Dot.prototypeSlot)slot)._protoname +
-                            " on " + ((OpAccess_Dot.prototypeSlot)slot)._protoRootObj.value._class.name ;
-                    }
+					if (slot is MethodGetterBase.MethodSlot)
+					{
+						ext = "Cannot assign to a method ";// + ((ASBinCode.ClassMethodGetter.MethodSlot)slot).method;
+					}
+					else if (slot is ObjectMemberSlot)
+					{
+						ext = "Illegal write to read-only property ";
+						//+ ((ObjectMemberSlot)slot).obj.value._class.name
+						//+" on ppp.PPC."
+					}
+					else if (slot is ClassPropertyGetter.PropertySlot)
+					{
+						ext = "Illegal write to read-only property ";
+					}
+					else if (slot is OpAccess_Dot.prototypeSlot)
+					{
+						ext = "Cannot create property "
+							+ ((OpAccess_Dot.prototypeSlot)slot)._protoname +
+							" on " + ((OpAccess_Dot.prototypeSlot)slot)._protoRootObj.value._class.name;
+					}
 
-                    frame.throwError(
-                        step.token,0, ext
-                        );
-                }
-
-                frame.endStep(step);
+					frame.throwError(
+						step.token, 0, ext
+						);
+					frame.endStep(step);
+				}
+				else
+				{
+					frame.endStepNoError();
+				}
+                
             }
             //else
             //{
@@ -149,15 +153,19 @@ namespace ASRuntime.operators
 			bool success;
 			slot.assign(v, out success);
 
-            if (!success)
-            {
-                frame.throwCastException(step.token,
-                       step.arg1.getValue(sender.scope, frame).rtType,
-                       slot.vector_data.vector_type
-                        );
-            }
-
-            frame.endStep(step);
+			if (!success)
+			{
+				frame.throwCastException(step.token,
+					   step.arg1.getValue(sender.scope, frame).rtType,
+					   slot.vector_data.vector_type
+						);
+				frame.endStep(step);
+			}
+			else
+			{
+				frame.endStepNoError();
+			}
+            
         }
 
 

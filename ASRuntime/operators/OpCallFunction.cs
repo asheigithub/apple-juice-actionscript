@@ -16,7 +16,9 @@ namespace ASRuntime.operators
             {
                 frame.throwError(
                     step.token,0, "value is not a function");
-            }
+				frame.endStep(step);
+				return;
+			}
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
@@ -70,8 +72,9 @@ namespace ASRuntime.operators
                         }
                     }
                 }
+				frame.endStepNoError();
             }
-            frame.endStep(step);
+            
         }
 
         private static void _do_clear_thispointer(Player player, 
@@ -132,7 +135,8 @@ namespace ASRuntime.operators
 					toclear.Clear();
 				}
 
-                frame.endStep(step);
+				frame.endStepNoError();
+                //frame.endStep(step);
                 return;
             }
 
@@ -141,7 +145,14 @@ namespace ASRuntime.operators
             {
                 frame.throwError(
                     step.token,0, "value is not a function");
-            }
+				if (toclear != null)
+				{
+					toclear.Clear();
+				}
+
+				frame.endStep(step);
+				return;
+			}
             else
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
@@ -158,15 +169,15 @@ namespace ASRuntime.operators
 					}
                 }
 
-                
-            }
+				if (toclear != null)
+				{
+					toclear.Clear();
+				}
 
-			if (toclear != null)
-			{
-				toclear.Clear();
+				frame.endStepNoError();
 			}
 
-			frame.endStep(step);
+			
         }
 
 		public static void create_paraScope_WithSignature(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
@@ -181,8 +192,9 @@ namespace ASRuntime.operators
 			if (!funcCaller.createParaScope()) { return; }
 
 			frame.funCaller = funcCaller;
-			
-			frame.endStep(step);
+
+			//frame.endStep(step);
+			frame.endStepNoError();
 		}
 
 		public static void create_paraScope_Method(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
@@ -191,17 +203,18 @@ namespace ASRuntime.operators
 
 				= (rtFunction)((MethodGetterBase)step.arg1).getMethod(frame.scope); 
 			
-			{
+			
 				
-				var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
-				funcCaller.SetFunction(function); function.Clear(); 
-				funcCaller._tempSlot = frame._tempSlot1;
-				funcCaller.toCallFunc = frame.player.swc.functions[function.functionId];
-				if (!funcCaller.createParaScope()) { return; }
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); function.Clear(); 
+			funcCaller._tempSlot = frame._tempSlot1;
+			funcCaller.toCallFunc = frame.player.swc.functions[function.functionId];
+			if (!funcCaller.createParaScope()) { return; }
 
-				frame.funCaller = funcCaller;
-			}
-			frame.endStep(step);
+			frame.funCaller = funcCaller;
+
+			//frame.endStep(step);
+			frame.endStepNoError();
 		}
 
 
@@ -223,7 +236,8 @@ namespace ASRuntime.operators
                 ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
                 if (frame.typeconvertoperator != null)
                 {
-                    frame.endStep(step);
+					frame.endStepNoError();
+                    //frame.endStep(step);
                     return;
                 }
                 else if (frame.typeconvertoperator.targettype.instanceClass == null
@@ -233,7 +247,8 @@ namespace ASRuntime.operators
                 {
                     frame.throwError(new error.InternalError(frame.player.swc, step.token, "类型转换函数发现内部错误"
                         ));
-                    return;
+					frame.endStep(step);
+					return;
                 }
             }
 
@@ -245,6 +260,7 @@ namespace ASRuntime.operators
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(step.token,0, "value is not a function");
+				frame.endStep(step);
             }
             else
             {
@@ -256,8 +272,9 @@ namespace ASRuntime.operators
                 if (!funcCaller.createParaScope()) { return; }
                 
                 frame.funCaller = funcCaller;
+				frame.endStepNoError();
             }
-            frame.endStep(step);
+            
         }
 
 
@@ -281,8 +298,8 @@ namespace ASRuntime.operators
 			bool success;
 			frame.funCaller.pushParameterNativeModeConstParameter(nf,arg, id, out success);
 
-			
-			frame.endStep(step);
+			frame.endStepNoError();
+			//frame.endStep(step);
 		}
 
 
@@ -299,8 +316,8 @@ namespace ASRuntime.operators
 			bool success;
 			frame.funCaller.pushParameter_noCheck(arg, id, out success);
 
-			
-			frame.endStep(step);
+			frame.endStepNoError();
+			//frame.endStep(step);
 		}
 		public static void push_parameter_skipcheck_testnative(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
@@ -315,8 +332,8 @@ namespace ASRuntime.operators
 			bool success;
 			frame.funCaller.pushParameter_noCheck_TestNative(arg, id, out success);
 
-
-			frame.endStep(step);
+			frame.endStepNoError();
+			//frame.endStep(step);
 		}
 
 		public static void push_parameter_para(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
@@ -333,7 +350,8 @@ namespace ASRuntime.operators
 			frame.funCaller.pushParameter_Para(arg, id, out success);
 
 
-			frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
 		}
 
 		public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)

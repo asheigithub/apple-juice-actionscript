@@ -678,7 +678,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.True);
             }
-            frame.endStep(step);
+			frame.endStepNoError();
+            //frame.endStep(step);
         }
 
         
@@ -702,8 +703,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
-            frame.endStep(step);
-            
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execGE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -724,8 +725,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
-
-            frame.endStep(step);
+			frame.endStepNoError();
+            //frame.endStep(step);
         }
 
         public static void execGT_Void(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1001,8 +1002,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
 
-
-            frame.endStep(step);
+			frame.endStepNoError();
+            //frame.endStep(step);
         }
 
         public static void execLE_NUM(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1022,7 +1023,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execLT_VOID(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1425,7 +1427,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execNotEQ_NumNum(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1441,7 +1444,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1457,7 +1461,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execNotEQ_StrStr(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1473,7 +1478,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static bool StrictEqual(ASBinCode.RunTimeValueBase v1,ASBinCode.RunTimeValueBase v2)
@@ -1601,7 +1607,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
         public static void execStrictNotEQ(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
@@ -1613,7 +1620,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(ASBinCode.rtData.rtBoolean.False);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         private static bool needInvokeToString(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,Player player)

@@ -4,7 +4,7 @@ package
 	import flash.errors.EOFError;
 	import flash.utils.ByteArray;
 	
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 

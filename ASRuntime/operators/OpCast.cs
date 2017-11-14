@@ -17,15 +17,20 @@ namespace ASRuntime.operators
             if (step.regType == RunTimeDataType.rt_void)
             {
                 step.reg.getSlot(scope, frame).directSet(v1);
-                frame.endStep(step);
+				//frame.endStep(step);
+				frame.endStepNoError();
             }
             else if (step.regType < RunTimeDataType.unknown && v1.rtType < RunTimeDataType.unknown)
             {
-                if (!CastPrimitive_to_Primitive(step.regType, v1, step.reg.getSlot(scope, frame), frame, step.token))
-                {
-                    frame.throwCastException(step.token, v1.rtType, step.regType);
-                }
-                frame.endStep(step);
+				if (!CastPrimitive_to_Primitive(step.regType, v1, step.reg.getSlot(scope, frame), frame, step.token))
+				{
+					frame.throwCastException(step.token, v1.rtType, step.regType);
+					frame.endStep(step);
+				}
+				else
+				{
+					frame.endStepNoError();
+				}
             }
             else
             {
@@ -49,13 +54,7 @@ namespace ASRuntime.operators
                     );
 
             }
-            //if (!CastValue(
-            //    step.arg1.getValue(scope), step.regType, step.reg.getISlot(scope), frame, step.token, scope))
-            //{
-            //    frame.throwCastException(step.token, step.arg1.getValue(scope).rtType, step.regType);
-            //}
-
-            //frame.endStep(step);
+            
         }
         private static void _CastCallBacker(BlockCallBackBase sender, object args)
         {
@@ -835,6 +834,7 @@ namespace ASRuntime.operators
                 tosend[5] = callbacker;
                 cb.args = tosend;
                 cb.setCallBacker(_AfterGetOneValueOf);
+				cb.setWhenFailed(_GetOneValueOfFailed);
 
                 InvokeValueOf((rtObject)srcValue1, frame, token, scope, _tempstoreto1, cb);
             }
@@ -843,21 +843,22 @@ namespace ASRuntime.operators
                 _tempstoreto1.directSet(srcValue1);
                 if (srcValue2 is rtObject)
                 {
-                    BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
-                    {
-                        object[] backargs = callbacker.cacheObjects; //new object[6];
-                        backargs[0] = _tempstoreto1;
-                        backargs[1] = _tempstoreto2;
-                        backargs[2] = frame;
-                        backargs[3] = step;
-                        backargs[4] = scope;
-                        backargs[5] = exec;
-                        callbacker.args = backargs;
-                        callbacker.setCallBacker(_exec_valueof_callback);
-                    }
+					BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
+					{
+						object[] backargs = callbacker.cacheObjects; //new object[6];
+						backargs[0] = _tempstoreto1;
+						backargs[1] = _tempstoreto2;
+						backargs[2] = frame;
+						backargs[3] = step;
+						backargs[4] = scope;
+						backargs[5] = exec;
+						callbacker.args = backargs;
+						callbacker.setCallBacker(_exec_valueof_callback);
+					}
 
-                    BlockCallBackBase cb = frame.player.blockCallBackPool.create();
+					BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_AfterGetTwoValueOf);
+					cb.setWhenFailed(_GetTwoValueOfFailed);
                     cb.args = callbacker;
                     InvokeValueOf((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
@@ -872,7 +873,19 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
+		private static void _GetTwoValueOfFailed(BlockCallBackBase sender, object args)
+		{
+			((BlockCallBackBase)sender.args).noticeRunFailed();
+		}
+
+		private static void _GetOneValueOfFailed(BlockCallBackBase sender, object args)
+		{
+			object[] a = (object[])sender.args;
+			BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
+			callbacker.noticeRunFailed();
+		}
+
+		private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
             RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
@@ -1027,6 +1040,9 @@ namespace ASRuntime.operators
                 fc.returnSlot = storeto;
                 fc.callbacker = valueofCB;
                 if (!fc.createParaScope()) { callbacker.noticeRunFailed(); valueofCB.noticeRunFailed(); return; }
+
+				valueofCB.setWhenFailed(_InvokeValueOf_Backer_Failed);
+
                 fc.call();
             }
             else
@@ -1044,7 +1060,17 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _InvokeValueOf_Backer(BlockCallBackBase sender, object args)
+		private static void _InvokeValueOf_Backer_Failed(BlockCallBackBase sender, object args)
+		{
+			object[] a = (object[])sender.args;
+
+			SLOT returnValue = (SLOT)a[2];
+			BlockCallBackBase callbacker = (BlockCallBackBase)a[1];
+
+			callbacker.noticeRunFailed();
+		}
+
+		private static void _InvokeValueOf_Backer(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
 
@@ -1141,6 +1167,7 @@ namespace ASRuntime.operators
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_AfterGetTwoToString);
+					cb.setWhenFailed(_GetTwoStringFailed);
                     cb.args = callbacker;
                     InvokeToString((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
@@ -1155,7 +1182,12 @@ namespace ASRuntime.operators
             }
         }
 
-        private static void _AfterGetOneToString(BlockCallBackBase sender, object args)
+		private static void _GetTwoStringFailed(BlockCallBackBase sender, object args)
+		{
+			((BlockCallBackBase)sender.args).noticeRunFailed();
+		}
+
+		private static void _AfterGetOneToString(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
             RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
@@ -1329,8 +1361,8 @@ namespace ASRuntime.operators
                 ( 
                 TypeConverter.ObjectImplicit_ToPrimitive( (rtObject)step.arg1.getValue(scope, frame) )
                 );
-
-            frame.endStep(step);
+			frame.endStepNoError();
+            //frame.endStep(step);
         }
     }
 }

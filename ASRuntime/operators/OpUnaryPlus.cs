@@ -48,7 +48,8 @@ namespace ASRuntime.operators
             OpStep step = sender.step;
 
             step.reg.getSlot(sender.scope, frame).setValue( frame._tempSlot1.getValue().toNumber() );
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
     }
 }

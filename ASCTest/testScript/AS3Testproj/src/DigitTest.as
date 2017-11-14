@@ -57,4 +57,3 @@ var f:int = fibonacci_recursion(30);
 
 trace("actionscript3:", ((new Date()).getTime() - t ));
 trace(f);
-

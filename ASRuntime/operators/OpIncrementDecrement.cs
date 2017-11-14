@@ -81,8 +81,8 @@ namespace ASRuntime.operators
                     }
             }
 
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
         private static void _execIncrement_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
@@ -128,7 +128,8 @@ namespace ASRuntime.operators
                 ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execIncUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -146,7 +147,8 @@ namespace ASRuntime.operators
                 ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -165,7 +167,8 @@ namespace ASRuntime.operators
 
 			}
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -249,7 +252,8 @@ namespace ASRuntime.operators
             }
 
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         private static void _execDecrement_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
@@ -293,7 +297,8 @@ namespace ASRuntime.operators
                 iv.value--;
                 ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -311,7 +316,8 @@ namespace ASRuntime.operators
                 ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 			}
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -329,8 +335,8 @@ namespace ASRuntime.operators
                 iv.value--;
                 ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -438,7 +444,8 @@ namespace ASRuntime.operators
                     }
             }
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         private static void _execSuffixInc_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
@@ -523,9 +530,10 @@ namespace ASRuntime.operators
             step.reg.getSlot(scope, frame).setValue(iv.value);
 
             iv.value++;
-                    
 
-            frame.endStep(step);
+
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execSuffixIncUint(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -547,7 +555,8 @@ namespace ASRuntime.operators
                 iv.value++;
             }
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execSuffixIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -568,7 +577,8 @@ namespace ASRuntime.operators
 
                 iv.value++;
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -679,7 +689,8 @@ namespace ASRuntime.operators
                     }
             }
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         private static void _execSuffixDec_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,

@@ -13,8 +13,8 @@ namespace ASRuntime.operators
             double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             step.reg.getSlot(scope, frame).setValue(a1 * a2);
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void exec_DivNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -23,8 +23,8 @@ namespace ASRuntime.operators
             double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             step.reg.getSlot(scope, frame).setValue(a1 / a2);
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
         public static void exec_ModNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
@@ -32,8 +32,8 @@ namespace ASRuntime.operators
             double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             step.reg.getSlot(scope, frame).setValue(a1 % a2);
-            frame.endStep(step);
-
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execMulti(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -54,7 +54,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(n1 * n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execDiv(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -75,7 +76,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(n1 / n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execMod(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -96,7 +98,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(n1 % n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
     }

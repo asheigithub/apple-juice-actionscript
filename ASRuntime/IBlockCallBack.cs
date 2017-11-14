@@ -157,26 +157,30 @@ namespace ASRuntime
             {
                 hasnoticed = true;
 
-                if (args is object[])
-                {
-                    object[] a = (object[])args;
-                    for (int i = 0; i < a.Length; i++)
-                    {
-                        if (a[i] is IBlockCallBack)
-                        {
-                            ((IBlockCallBack)a[i]).noticeRunFailed();
-                        }
-                    }
-                }
-                else if (args is ASBinCode.rtti.YieldObject)
-                {
-                    ASBinCode.rtti.YieldObject yobj = (ASBinCode.rtti.YieldObject)args;
-                    if (yobj._callbacker !=null)
-                    {
-                        ((IBlockCallBack)yobj._callbacker).noticeRunFailed();
-                        yobj._callbacker = null;
-                    }
-                }
+				if (args is object[])
+				{
+					object[] a = (object[])args;
+					for (int i = 0; i < a.Length; i++)
+					{
+						if (a[i] is IBlockCallBack)
+						{
+							((IBlockCallBack)a[i]).noticeRunFailed();
+						}
+					}
+				}
+				else if (args is IBlockCallBack)
+				{
+					((IBlockCallBack)args).noticeRunFailed();
+				}
+				else if (args is ASBinCode.rtti.YieldObject)
+				{
+					ASBinCode.rtti.YieldObject yobj = (ASBinCode.rtti.YieldObject)args;
+					if (yobj._callbacker != null)
+					{
+						((IBlockCallBack)yobj._callbacker).noticeRunFailed();
+						yobj._callbacker = null;
+					}
+				}
 
                 if (whenFailed != null)
                 {

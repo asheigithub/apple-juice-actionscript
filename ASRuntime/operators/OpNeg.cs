@@ -37,7 +37,8 @@ namespace ASRuntime.operators
             else
             {
                 step.reg.getSlot(scope, frame).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
-                frame.endStep(step);
+																							   //frame.endStep(step);
+				frame.endStepNoError();
             }
         }
 
@@ -55,7 +56,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(
                     -TypeConverter.ConvertToNumber(v1)  
                     );
-                frame.endStep(step);
+				//frame.endStep(step);
+				frame.endStepNoError();
             }
         }
         private static void _execNeg_ToString_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
@@ -66,7 +68,8 @@ namespace ASRuntime.operators
                     -TypeConverter.ConvertToNumber(v1)
                     //-((ASBinCode.rtData.rtNumber)v1).value
                     );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
-            frame.endStep(step);
+					  //frame.endStep(step);
+			frame.endStepNoError();
         }
     }
 }

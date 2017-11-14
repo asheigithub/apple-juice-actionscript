@@ -272,3 +272,4 @@ class usequeue
 		queue = new Queue();
 	}
 }
+

@@ -59,7 +59,8 @@ namespace ASRuntime.operators
             {
                 step.reg.getSlot(scope, frame).setValue(n1 - n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
     }
 }

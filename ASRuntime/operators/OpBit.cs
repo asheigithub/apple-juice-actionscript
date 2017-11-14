@@ -25,7 +25,8 @@ namespace ASRuntime.operators
 
             int r = (int)(n1 & n2);
             step.reg.getSlot(scope, frame).setValue(r);
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -69,7 +70,8 @@ namespace ASRuntime.operators
 
             int r = (int)(n1 | n2);
             step.reg.getSlot(scope, frame).setValue(r);
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
 
@@ -89,7 +91,8 @@ namespace ASRuntime.operators
 
             int r = (int)(n1 ^ n2);
             step.reg.getSlot(scope, frame).setValue(r);
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execBitNot(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -106,7 +109,8 @@ namespace ASRuntime.operators
 
             int r = ~n1;
             step.reg.getSlot(scope, frame).setValue(r);
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execBitLeftShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -127,7 +131,8 @@ namespace ASRuntime.operators
             int r = n1 << n2;
             step.reg.getSlot(scope, frame).setValue(r);
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execBitRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -148,7 +153,8 @@ namespace ASRuntime.operators
             int r = n1 >> n2;
             step.reg.getSlot(scope, frame).setValue(r);
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
         public static void execBitUnSignRightShift(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
@@ -169,7 +175,8 @@ namespace ASRuntime.operators
             uint r = n1 >> n2;
             step.reg.getSlot(scope, frame).setValue(r);
 
-            frame.endStep(step);
+			//frame.endStep(step);
+			frame.endStepNoError();
         }
     }
 }

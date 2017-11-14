@@ -15,7 +15,8 @@ namespace ASRuntime.operators
             double a2 = step.arg2.getValue(scope, frame).toNumber();
 
             step.reg.getSlot(scope, frame).setValue(a1 + a2);//new ASBinCode.rtData.rtNumber(a1.value +a2.value ));
-            frame.endStep(step);
+															 //frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execAdd_String( StackFrame frame,ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -43,7 +44,8 @@ namespace ASRuntime.operators
 
 
             step.reg.getSlot(scope, frame).setValue(a1.valueString() + a2.valueString());// new ASBinCode.rtData.rtString(a1.valueString() + a2.valueString()));
-            frame.endStep(step);
+																						 //frame.endStep(step);
+			frame.endStepNoError();
         }
 
         public static void execAdd(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
@@ -167,6 +169,8 @@ namespace ASRuntime.operators
                     TypeConverter.ConvertToNumber(v2)
 
                     );
+				frame.endStepNoError();
+				return;
             }
             else if (finalType == ASBinCode.RunTimeDataType.rt_string)
             {

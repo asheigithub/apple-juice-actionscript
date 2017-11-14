@@ -807,6 +807,11 @@ namespace ASRuntime
 			}
 			execing = false;
 
+			if (hasCallJump || hasCallReturn || runtimeError != null)
+			{
+				throw new ASRunTimeException();
+			}
+
 #endif
 			++codeLinePtr;
 
