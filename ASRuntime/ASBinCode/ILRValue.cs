@@ -12,7 +12,7 @@ namespace ASBinCode
 	/// <typeparam name="T"></typeparam>
 	public abstract class RightValueBase :ISWCSerializable
     {
-        public abstract RunTimeValueBase getValue(RunTimeScope scope , RunTimeDataHolder dataHolder );
+        public abstract RunTimeValueBase getValue(RunTimeScope scope , ASRuntime.StackSlot[] slots ,int stoffset );
 
 		//public abstract RunTimeDataType valueType { get; }
 		public RunTimeDataType valueType;
@@ -42,9 +42,9 @@ namespace ASBinCode
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        public abstract SLOT getSlot(RunTimeScope scope, RunTimeDataHolder dataHolder);
+        public abstract SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset);
 
-        public abstract SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder dataHolder);
+        public abstract SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset);
     }
 
 

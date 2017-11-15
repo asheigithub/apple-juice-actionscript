@@ -1058,7 +1058,14 @@ namespace ASCompiler.compiler.builds
                         //    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
                         //    );
                         ASBinCode.OpStep op;
-                        if (
+
+						if (v1.valueType == RunTimeDataType.rt_number && v2.valueType == RunTimeDataType.rt_number)
+						{
+							op = new ASBinCode.OpStep(ASBinCode.OpCode.sub_number_number,
+								new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+								);
+						}
+                        else if (
                             (v1.valueType == RunTimeDataType.rt_number || v1.valueType == RunTimeDataType.rt_int || v1.valueType == RunTimeDataType.rt_uint)
                             &&
                             (v2.valueType == RunTimeDataType.rt_number || v2.valueType == RunTimeDataType.rt_int || v2.valueType == RunTimeDataType.rt_uint)

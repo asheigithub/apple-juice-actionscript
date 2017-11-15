@@ -43,8 +43,8 @@ namespace ASBinCode
         }
 
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope,RunTimeDataHolder holder)
-        {
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             while (refblockid != scope.blockId)
             {
                 scope = scope.parent;
@@ -52,8 +52,8 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers].getValue();
         }
 
-        public sealed override SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             while (refblockid != scope.blockId)
             {
                 scope = scope.parent;
@@ -61,8 +61,8 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             while (refblockid != scope.blockId)
             {
                 scope = scope.parent;

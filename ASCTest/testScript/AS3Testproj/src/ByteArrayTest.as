@@ -4,16 +4,23 @@ package
 	import flash.errors.EOFError;
 	import flash.utils.ByteArray;
 	
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 
 	 */
 	public class ByteArrayTest extends Sprite 
 	{
+		private function heaptest( m:int)
+		{
+			return function(){var i = m; trace(i); };
+			
+		}
+		
 		
 		public function ByteArrayTest() 
 		{
+			
 			var f=function(){
 				yield return 1;
 				

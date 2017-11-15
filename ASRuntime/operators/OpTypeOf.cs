@@ -17,7 +17,7 @@ namespace ASRuntime.operators
 
         public static void exec_TypeOf(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v1 = step.arg1.getValue(scope, frame);
+            var v1 = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (v1.rtType > RunTimeDataType.unknown)
             {
                 RunTimeDataType ot;
@@ -35,31 +35,31 @@ namespace ASRuntime.operators
                 v1.rtType > RunTimeDataType.unknown
                 )
             {
-                step.reg.getSlot(scope, frame).directSet(OBJECT);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(OBJECT);
             }
             else if (v1.rtType == RunTimeDataType.rt_boolean)
             {
-                step.reg.getSlot(scope, frame).directSet(BOOLEAN);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(BOOLEAN);
             }
             else if (v1.rtType == RunTimeDataType.rt_int ||
                     v1.rtType == RunTimeDataType.rt_uint ||
                     v1.rtType == RunTimeDataType.rt_number
                 )
             {
-                step.reg.getSlot(scope, frame).directSet(NUMBER);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(NUMBER);
             }
             else if (v1.rtType == RunTimeDataType.rt_string
                 )
             {
-                step.reg.getSlot(scope, frame).directSet(STRING);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(STRING);
             }
             else if (v1.rtType == RunTimeDataType.rt_function)
             {
-                step.reg.getSlot(scope, frame).directSet(FUNCTION);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(FUNCTION);
             }
             else if (v1.rtType == RunTimeDataType.rt_void)
             {
-                step.reg.getSlot(scope, frame).directSet(UNDEFINED);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(UNDEFINED);
             }
             else if (v1.rtType == RunTimeDataType.unknown
                 ||

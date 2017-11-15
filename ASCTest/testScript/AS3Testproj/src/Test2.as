@@ -17,7 +17,18 @@ package
 			t.m ++;
 			t.getfunc()();
 			
+			
+			
+			function ttttabc(a:int=6,b:int=7)
+			{
+				trace("a", a, "b", b);
+				
+			}
+			ttttabc();
+			
 		}
+		
+		
 		
 	}
 

@@ -15,12 +15,12 @@ namespace ASRuntime.operators
 
             var player = frame.player;
 
-            SLOT slot = step.reg.getSlot(scope, frame);
+            SLOT slot = step.reg.getSlot(scope, frame.stack, frame.offset);
             ASBinCode.rtti.HostedDynamicObject saveObj = new HostedDynamicObject(player.swc.ObjectClass);
             rtObject save = new rtObject(saveObj, null);
             slot.directSet(save);
 
-            var obj = step.arg1.getValue(scope, frame);
+            var obj = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (obj.rtType > RunTimeDataType.unknown)
             {
                 rtObject rtObj = (rtObject)obj;
@@ -86,7 +86,7 @@ namespace ASRuntime.operators
         private static void _getEnumerator_callbacker(BlockCallBackBase sender, object args)
         {
             StackFrame frame = (StackFrame)sender.args;
-            rtObject save = (rtObject)sender.step.reg.getValue(sender.scope, frame);
+            rtObject save = (rtObject)sender.step.reg.getValue(sender.scope, frame.stack, frame.offset);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
             saveObj.hosted_object = frame._tempSlot1.getValue();
 
@@ -98,13 +98,13 @@ namespace ASRuntime.operators
         {
             var player = frame.player;
 
-            SLOT slot= step.reg.getSlot(scope, frame);
+            SLOT slot= step.reg.getSlot(scope, frame.stack, frame.offset);
             ASBinCode.rtti.HostedDynamicObject saveObj = new ASBinCode.rtti.HostedDynamicObject(player.swc.ObjectClass);
             rtObject save = new rtObject(saveObj, null);
             slot.directSet(save);
 
 
-            var obj = step.arg1.getValue(scope, frame);
+            var obj = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (obj.rtType > RunTimeDataType.unknown)
             {
                 rtObject rtObj = (rtObject)obj;
@@ -174,7 +174,7 @@ namespace ASRuntime.operators
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
             
-            rtObject save = (rtObject)(step.arg1).getValue(scope,frame);
+            rtObject save = (rtObject)(step.arg1).getValue(scope, frame.stack, frame.offset);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
@@ -182,7 +182,7 @@ namespace ASRuntime.operators
 
             if ( enumerator !=null && enumerator.MoveNext() )//slot.cache_enumerator !=null && slot.cache_enumerator.MoveNext())
             {
-                step.reg.getSlot(scope, frame).setValue(rtBoolean.True);
+                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(rtBoolean.True);
             }
             else
             {
@@ -199,8 +199,8 @@ namespace ASRuntime.operators
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
-                    funCaller._tempSlot = step.reg.getSlot(scope, frame);
-                    funCaller.returnSlot = step.reg.getSlot(scope, frame);
+                    funCaller._tempSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
+                    funCaller.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_enumerator_operator_callbacker);
@@ -215,7 +215,7 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    step.reg.getSlot(scope, frame).setValue(rtBoolean.False);
+                    step.reg.getSlot(scope, frame.stack, frame.offset).setValue(rtBoolean.False);
                 }
             }
 
@@ -231,7 +231,7 @@ namespace ASRuntime.operators
         {
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            rtObject save = (rtObject)(step.arg1).getValue(scope,frame);
+            rtObject save = (rtObject)(step.arg1).getValue(scope, frame.stack, frame.offset);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
@@ -240,7 +240,7 @@ namespace ASRuntime.operators
             //IEnumerator<RunTimeValueBase> enumerator = scope.cache_enumerator as  IEnumerator<RunTimeValueBase>;
             if (enumerator != null)
             {
-                step.reg.getSlot(scope, frame).directSet(enumerator.Current);
+                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(enumerator.Current);
             }
             else
             {
@@ -257,8 +257,8 @@ namespace ASRuntime.operators
                     funCaller.loadDefineFromFunction();
                     if (!funCaller.createParaScope()) { return; }
 
-                    funCaller._tempSlot = step.reg.getSlot(scope, frame);
-                    funCaller.returnSlot = step.reg.getSlot(scope, frame);
+                    funCaller._tempSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
+                    funCaller.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                     cb.setCallBacker(_enumerator_operator_callbacker);
@@ -280,7 +280,7 @@ namespace ASRuntime.operators
         {
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            rtObject save = (rtObject)(step.arg1).getValue(scope,frame);
+            rtObject save = (rtObject)(step.arg1).getValue(scope, frame.stack, frame.offset);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             //if (scope.cache_enumerator != null)

@@ -274,10 +274,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ASBinCode\ASBinCode.csproj">
-      <Project>{42a041bf-f7b9-47c4-8147-1a7987ee8416}</Project>
-      <Name>ASBinCode</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ASCR\ASCompiler.csproj">
       <Project>{883162bb-0596-4abc-baa8-b3a1f04cc388}</Project>
       <Name>ASCompiler</Name>

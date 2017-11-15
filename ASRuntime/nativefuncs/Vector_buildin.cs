@@ -128,7 +128,7 @@ namespace ASRuntime.nativefuncs
 
 			while (data.innnerList.Count < length)
 			{
-				data.innnerList.Add(TypeConverter.getDefaultValue(vector_type).getValue(null, null));
+				data.innnerList.Add(TypeConverter.getDefaultValue(vector_type).getValue(null, null,0));
 			}
 
 			rtObj.hosted_object = data;
@@ -479,7 +479,7 @@ namespace ASRuntime.nativefuncs
 
 					while (list.Count < newlen)
 					{
-						list.Add(TypeConverter.getDefaultValue(t).getValue(null, null));
+						list.Add(TypeConverter.getDefaultValue(t).getValue(null, null,0));
 					}
 				}
 				else if (newlen < list.Count)

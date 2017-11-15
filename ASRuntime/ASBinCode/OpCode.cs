@@ -460,30 +460,39 @@ namespace ASBinCode
 		call_function_notcheck = 114,
 		call_function_notcheck_notreturnobject = 115,
 		call_function_notcheck_notreturnobject_notnative = 116,
+		call_function_notcheck_notreturnobject_notnative_method =117,
 
-		cast_int_number =117,
-		cast_number_int = 118,
-		cast_uint_number = 119,
-		cast_number_uint = 120,
-		cast_int_uint =121,
-		cast_uint_int=122,
+		cast_int_number =118,
+		cast_number_int = 119,
+		cast_uint_number = 120,
+		cast_number_uint = 121,
+		cast_int_uint =122,
+		cast_uint_int=123,
 
-		push_parameter_skipcheck=123,
-		push_parameter_skipcheck_testnative = 124,
-		push_parameter_nativeconstpara_skipcheck =125,
+		push_parameter_skipcheck_storetostack=124,
+		push_parameter_skipcheck_storetoheap =125,
+		push_parameter_skipcheck_testnative = 126,
+		push_parameter_nativeconstpara =127,
 
-		push_parameter_para=126,
-		make_para_scope_method=127,
-		make_para_scope_withsignature=128,
+		push_parameter_para=128,
+		make_para_scope_method=129,
+		make_para_scope_withsignature=130,
+		make_para_scope_method_notnativeconstpara_allparaonstack =131,
+		make_para_scope_withsignature_allparaonstack=132,
 
-		function_return_funvoid=129,
-		function_return_nofunction=130,
+		make_para_scope_method_noparameters=133,
+		make_para_scope_withsignature_noparameters=134,
 
-		if_jmp_notry=131,
-		jmp_notry=132,
+		function_return_funvoid =135,
+		function_return_nofunction=136,
 
-		function_return_funvoid_notry=133,
-		function_return_nofunction_notry=134
+		if_jmp_notry=137,
+		jmp_notry=138,
+
+		function_return_funvoid_notry=139,
+		function_return_nofunction_notry=140,
+
+		sub_number_number=141
 		
 	}
 }

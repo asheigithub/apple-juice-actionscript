@@ -16,8 +16,11 @@ namespace ASRuntime
 		/// </summary>
 		internal const int COMMREFTYPEOBJ = RunTimeDataType._OBJECT;
 
-        public StackSlot(CSWC classfinder)
+		internal Player player;
+
+        public StackSlot(CSWC classfinder,Player player)
         {
+			this.player = player;
             store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
             index = (int)RunTimeDataType.unknown;
 
@@ -32,7 +35,7 @@ namespace ASRuntime
                 RunTimeDataType t = (RunTimeDataType)i;
                 if(t != RunTimeDataType.unknown)
                 {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null);
+                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null,0);
                 }
             }
 
@@ -489,39 +492,28 @@ namespace ASRuntime
         public sealed override void clear()
         {
 			stackObjects = StackObjects.EMPTY;
-			linktarget = null;
-			//propGetSet = null;
-			//propBindObj = null;
-			//superPropBindClass = null;
-			//_temp_try_write_setthisitem = null;
+			
+
 			if (needclear)
 			{
+				linktarget = null;
 				_cache_arraySlot.clear();
 				_cache_vectorSlot.clear();
 				_cache_prototypeSlot.clear();
 				_cache_setthisslot.clear();
 				_linkObjCache.clearRefObj();
-				//_linkObjCache.srcObject = null;
 				_functionValue.Clear();
 				needclear = false;
 			}
 
-			//var nullptr = rtNull.nullptr;
-			//store[RunTimeDataType.rt_string] = nullptr;
-			//store[RunTimeDataType.rt_function] = nullptr;
-			//store[RunTimeDataType.rt_array] = nullptr;
-			//store[RunTimeDataType._OBJECT] = nullptr;
+
 
 			store[COMMREFTYPEOBJ] = rtNull.nullptr;
 			index = (int)RunTimeDataType.unknown;
         }
 
 		
-		//public void resetSlot()
-		//{
-		//	clear();
-		//}
-
+		
 
 		public struct StackObjects
 		{

@@ -164,7 +164,7 @@ namespace ASBinCode
 
         
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots,int offset)
         {
             throw new NotImplementedException();
         }

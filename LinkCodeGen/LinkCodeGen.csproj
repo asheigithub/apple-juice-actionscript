@@ -74,11 +74,5 @@
   <ItemGroup>
     <Content Include="templates\EnumItemBitOr.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ASBinCode\ASBinCode.csproj">
-      <Project>{42a041bf-f7b9-47c4-8147-1a7987ee8416}</Project>
-      <Name>ASBinCode</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

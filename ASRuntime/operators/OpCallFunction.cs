@@ -11,7 +11,7 @@ namespace ASRuntime.operators
     {
         public static void bind(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            var rv = step.arg1.getValue(frame.scope, frame);
+            var rv = step.arg1.getValue(frame.scope, frame.stack,frame.offset);
             if (rv.rtType != RunTimeDataType.rt_function)
             {
                 frame.throwError(
@@ -98,7 +98,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                rv= step.arg1.getValue(frame.scope, frame);
+                rv= step.arg1.getValue(frame.scope, frame.stack,frame.offset);
             }
 
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
@@ -110,24 +110,24 @@ namespace ASRuntime.operators
                 {
 
                     var member = (MethodGetterBase)cls.explicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope,null);
+                    var func = member.getValue(((rtObject)rv).objScope,null,0);
 
-                    step.reg.getSlot(scope, frame).directSet(func);
+                    step.reg.getSlot(scope, frame.stack,frame.offset).directSet(func);
 
                 }
                 else if (cls.implicit_from != null)
                 {
                     var member = (MethodGetterBase)cls.implicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope,null);
+                    var func = member.getValue(((rtObject)rv).objScope,null,0);
 
-                    step.reg.getSlot(scope, frame).directSet(func);
+                    step.reg.getSlot(scope, frame.stack,frame.offset).directSet(func);
                 }
                 else
                 {
                     frame.typeconvertoperator = new typeConvertOperator();
                     frame.typeconvertoperator.targettype = cls;
 
-                    step.reg.getSlot(scope, frame).directSet(rv);
+                    step.reg.getSlot(scope, frame.stack,frame.offset).directSet(rv);
                 }
 
 				if (toclear != null)
@@ -157,15 +157,15 @@ namespace ASRuntime.operators
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)rv;
 
-                step.reg.getSlot(scope, frame).directSet(rv);
+                step.reg.getSlot(scope, frame.stack,frame.offset).directSet(rv);
 
                 if (!function.ismethod)
                 {
-                    int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope, frame)).value;
+                    int classid = ((ASBinCode.rtData.rtInt)step.arg2.getValue(scope, frame.stack,frame.offset)).value;
 					RunTimeScope o;
 					if (frame.player.outpackage_runtimescope.TryGetValue(classid, out o))
 					{
-						_do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope, frame), frame, o.this_pointer);
+						_do_clear_thispointer(frame.player, (ASBinCode.rtData.rtFunction)step.reg.getValue(scope, frame.stack,frame.offset), frame, o.this_pointer);
 					}
                 }
 
@@ -180,10 +180,74 @@ namespace ASRuntime.operators
 			
         }
 
+		public static void create_paraScope_WithSignature_NoParameters(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+				= (rtFunction)step.arg1.getValue(frame.scope, frame.stack, frame.offset);
+
+			var functionDefine = frame.player.swc.functions[function.functionId];
+
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); function.Clear();
+			funcCaller.toCallFunc = functionDefine;
+			frame.funCaller = funcCaller;
+			funcCaller.CallFuncHeap = Player.emptyMembers;
+
+			frame.endStepNoError();
+
+		}
+
+		public static void create_paraScope_WithSignature_AllParaOnStack(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+				= (rtFunction)step.arg1.getValue(frame.scope, frame.stack, frame.offset);
+
+			var functionDefine = frame.player.swc.functions[function.functionId];
+
+			if (frame.baseBottomSlotIndex + frame.call_parameter_slotCount + functionDefine.signature.onStackParameters >= Player.STACKSLOTLENGTH)
+			{
+				frame.throwError(new error.InternalError(frame.player.swc, step.token, "stack overflow"));
+				frame.endStep();
+				return;
+			}
+
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); function.Clear();
+			funcCaller.toCallFunc = functionDefine;
+			frame.funCaller = funcCaller;
+
+			frame.call_parameter_slotCount += functionDefine.signature.onStackParameters;
+			funcCaller.onstackparametercount = functionDefine.signature.onStackParameters;
+			funcCaller.CallFuncHeap = Player.emptyMembers;
+
+			var parameters = functionDefine.signature.parameters; int len = parameters.Count; int parast = frame.baseBottomSlotIndex + frame.call_parameter_slotCount;
+			for (int i = step.jumoffset; i < len; i++)
+			{
+				var parameter = parameters[i];
+				if (parameter.defaultValue != null)
+				{
+					var dv = FunctionCaller.getDefaultParameterValue(parameter.type, parameter.defaultValue.getValue(null, null, 0));
+
+					frame.stack[parast - i - 1].directSet(dv);
+					//_storeArgementToSlot(i, dv);
+				}
+				else if (parameter.isPara)
+				{
+					frame.stack[parast - i - 1].directSet(new ASBinCode.rtData.rtArray());
+					//_storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
+				}
+			}
+
+
+
+			frame.endStepNoError();
+
+		}
+
 		public static void create_paraScope_WithSignature(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
 			rtFunction function
-				= (rtFunction)step.arg1.getValue(frame.scope, frame);
+				= (rtFunction)step.arg1.getValue(frame.scope, frame.stack,frame.offset);
 			
 			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
 			funcCaller.SetFunction(function); 
@@ -197,14 +261,76 @@ namespace ASRuntime.operators
 			frame.endStepNoError();
 		}
 
+
+		public static void create_paraScope_Method_NoParameters(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+				= (rtFunction)((MethodGetterBase)step.arg1).getMethod(frame.scope);
+
+			var functionDefine = frame.player.swc.functions[function.functionId];
+
+
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); function.Clear();
+			funcCaller.toCallFunc = functionDefine;
+			frame.funCaller = funcCaller;
+			funcCaller.CallFuncHeap = Player.emptyMembers;
+			frame.endStepNoError();
+
+		}
+
+		public static void create_paraScope_Method_NotNativeConstPara_AllParaOnStack(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			rtFunction function
+				= (rtFunction)((MethodGetterBase)step.arg1).getMethod(frame.scope);
+
+			var functionDefine = frame.player.swc.functions[function.functionId];
+
+			if (frame.baseBottomSlotIndex + frame.call_parameter_slotCount + functionDefine.signature.onStackParameters >= Player.STACKSLOTLENGTH)
+			{
+				frame.throwError(new error.InternalError(frame.player.swc, step.token, "stack overflow"));
+				frame.endStep();
+				return;
+			}
+
+			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
+			funcCaller.SetFunction(function); function.Clear();
+			funcCaller.toCallFunc = functionDefine;
+			frame.funCaller = funcCaller;
+
+			frame.call_parameter_slotCount += functionDefine.signature.onStackParameters;
+			funcCaller.onstackparametercount = functionDefine.signature.onStackParameters;
+			funcCaller.CallFuncHeap = Player.emptyMembers;
+
+			var parameters = functionDefine.signature.parameters; int len = parameters.Count;int parast = frame.baseBottomSlotIndex + frame.call_parameter_slotCount;
+			for (int i = step.jumoffset; i < len; i++)
+			{
+				var parameter = parameters[i];
+				if (parameter.defaultValue != null)
+				{
+					var dv = FunctionCaller.getDefaultParameterValue(parameter.type,parameter.defaultValue.getValue(null,null,0));
+
+					frame.stack[parast-i-1].directSet(dv);
+					//_storeArgementToSlot(i, dv);
+				}
+				else if (parameter.isPara)
+				{
+					frame.stack[parast -i-1].directSet(new ASBinCode.rtData.rtArray());
+					//_storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
+				}
+			}
+
+
+
+			frame.endStepNoError();
+		}
+
+
 		public static void create_paraScope_Method(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
 			rtFunction function
-
 				= (rtFunction)((MethodGetterBase)step.arg1).getMethod(frame.scope); 
-			
-			
-				
+	
 			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
 			funcCaller.SetFunction(function); function.Clear(); 
 			funcCaller._tempSlot = frame._tempSlot1;
@@ -227,7 +353,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                rv = step.arg1.getValue(frame.scope, frame);
+                rv = step.arg1.getValue(frame.scope, frame.stack,frame.offset);
             }
 
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
@@ -278,10 +404,10 @@ namespace ASRuntime.operators
         }
 
 
-		public static void push_parameter_nativeconstpara_skipcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		public static void push_parameter_nativeconstpara(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
-			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
-			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame.stack,frame.offset)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack,frame.offset);
 
 #if DEBUG 
 			if (frame.typeconvertoperator != null)
@@ -303,26 +429,67 @@ namespace ASRuntime.operators
 		}
 
 
-		public static void push_parameter_skipcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+
+
+
+
+		public static void push_parameter_skipcheck_stroetoheap(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
-			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
-			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+			
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack, frame.offset);
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
 				throw new ASRunTimeException();
 #endif
+
+			int index = step.jumoffset;
+			frame.funCaller.pushParameterToHeap(arg, index);
+			frame.endStepNoError();
 			
-			bool success;
-			frame.funCaller.pushParameter_noCheck(arg, id, out success);
+		}
+
+
+		public static void push_parameter_skipcheck_stroetostack(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		{
+			
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack, frame.offset);
+
+#if DEBUG
+			if (frame.typeconvertoperator != null)
+				throw new ASRunTimeException();
+#endif
+			int _index = step.jumoffset;
+			//frame.funCaller.pushParameterToStack(arg, index);
+			int index = frame.baseBottomSlotIndex + frame.call_parameter_slotCount + _index;
+			frame.stack[index].directSet(arg);
+			frame.funCaller.pushedArgs++;
 
 			frame.endStepNoError();
 			//frame.endStep(step);
 		}
+
+
+		//		public static void push_parameter_skipcheck(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		//		{
+		//			int id = ((rtInt)step.arg2.getValue(frame.scope, frame.stack,frame.offset)).value;
+		//			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack,frame.offset);
+
+		//#if DEBUG
+		//			if (frame.typeconvertoperator != null)
+		//				throw new ASRunTimeException();
+		//#endif
+
+		//			bool success;
+		//			frame.funCaller.pushParameter_noCheck(arg, id, out success);
+
+		//			frame.endStepNoError();
+		//			//frame.endStep(step);
+		//		}
 		public static void push_parameter_skipcheck_testnative(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
-			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
-			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame.stack,frame.offset)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack,frame.offset);
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
@@ -338,8 +505,8 @@ namespace ASRuntime.operators
 
 		public static void push_parameter_para(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
-			int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
-			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+			int id = ((rtInt)step.arg2.getValue(frame.scope, frame.stack,frame.offset)).value;
+			RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack, frame.offset);
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
@@ -356,8 +523,8 @@ namespace ASRuntime.operators
 
 		public static void push_parameter(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            int id = ((rtInt)step.arg2.getValue(frame.scope, frame)).value;
-            RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame);
+            int id = ((rtInt)step.arg2.getValue(frame.scope, frame.stack, frame.offset)).value;
+            RunTimeValueBase arg = step.arg1.getValue(frame.scope, frame.stack, frame.offset);
 
             //**当function作为参数被传入时，重新绑定scope
             {
@@ -410,7 +577,7 @@ namespace ASRuntime.operators
 		{
 			var funCaller = frame.funCaller;
 			funCaller.callbacker = funCaller;
-			funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
+			funCaller.returnSlot = step.reg.getSlot(frame.scope, frame.stack, frame.offset);
 			funCaller.call_nocheck();
 
 			frame.funCaller = null;
@@ -487,7 +654,7 @@ namespace ASRuntime.operators
             {
 				var funCaller = frame.funCaller;
                 funCaller.callbacker = funCaller;
-                funCaller.returnSlot = step.reg.getSlot(frame.scope, frame);
+                funCaller.returnSlot = step.reg.getSlot(frame.scope, frame.stack, frame.offset);
                 funCaller.call();
 
                 frame.funCaller = null;
@@ -513,7 +680,7 @@ namespace ASRuntime.operators
 
                     OpCast.CastValue(frame.typeconvertoperator.inputvalue,
                         frame.typeconvertoperator.targettype.instanceClass.getRtType(),
-                        frame, step.token, frame.scope, step.reg.getSlot(frame.scope, frame),
+                        frame, step.token, frame.scope, step.reg.getSlot(frame.scope, frame.stack, frame.offset),
                         cb,
                         false);
                     frame.typeconvertoperator = null;
@@ -548,7 +715,7 @@ namespace ASRuntime.operators
 
         public static void exec_return(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
-            RunTimeValueBase result = step.arg1.getValue(frame.scope, frame);
+            RunTimeValueBase result = step.arg1.getValue(frame.scope, frame.stack, frame.offset);
             if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;
@@ -564,7 +731,7 @@ namespace ASRuntime.operators
 
         public static void exec_yieldreturn(StackFrame frame,OpStep step,RunTimeScope scope)
         {
-            RunTimeValueBase result = step.arg1.getValue(scope, frame);
+            RunTimeValueBase result = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (result.rtType == RunTimeDataType.rt_function)
             {
                 ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)result;

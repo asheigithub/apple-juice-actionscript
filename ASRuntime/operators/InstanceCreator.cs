@@ -683,7 +683,7 @@ namespace ASRuntime.operators
 
                     if (cls.fields[i].defaultValue == null)
                     {
-                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null,null));
+                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null,null,0));
                     }
 
                     ((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;

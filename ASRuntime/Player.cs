@@ -177,7 +177,7 @@ namespace ASRuntime
 				stackSlots = new StackSlot[STACKSLOTLENGTH];
 				for (int i = 0; i < STACKSLOTLENGTH; i++)
 				{
-					stackSlots[i] = new StackSlot(swc);
+					stackSlots[i] = new StackSlot(swc,this);
 				}
 				StackLinkObjectCache lobjcache = new StackLinkObjectCache(swc, this);
 				stackSlots[0]._linkObjCache = lobjcache;
@@ -194,7 +194,7 @@ namespace ASRuntime
 					//***先执行必要代码初始化****
 					var block = swc.blocks[swc.ErrorClass.outscopeblockid];
 					HeapSlot[] initdata = genHeapFromCodeBlock(block);
-					callBlock(block, initdata, new StackSlot(swc), null,
+					callBlock(block, initdata, new StackSlot(swc,this), null,
 						new SourceToken(0, 0, ""), null,
 						null, RunTimeScopeType.startup
 						);
@@ -270,7 +270,7 @@ namespace ASRuntime
         private RunTimeValueBase run2(CodeBlock runblock,HeapSlot[] blockMemberHeap, RightValueBase result)
         {
            
-            var topscope = callBlock(runblock, blockMemberHeap, new StackSlot(swc), null, 
+            var topscope = callBlock(runblock, blockMemberHeap, new StackSlot(swc,this), null, 
                 new SourceToken(0, 0, ""),null,
                 null, RunTimeScopeType.startup
                 );
@@ -613,9 +613,9 @@ namespace ASRuntime
 										break;
 									case OpCode.if_jmp:
 										{
-											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack,currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
 											{
-												if (currentRunFrame.trystateCount != 0)
+												if (currentRunFrame.tryCatchState.Count != 0)
 												{
 													currentRunFrame.hasCallJump = true;
 													currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
@@ -637,7 +637,7 @@ namespace ASRuntime
 										break;
 									case OpCode.if_jmp_notry:
 										{
-											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset;
 											}
@@ -648,7 +648,7 @@ namespace ASRuntime
 										}
 										break;
 									case OpCode.jmp:
-										if (currentRunFrame.trystateCount != 0)
+										if (currentRunFrame.tryCatchState.Count != 0)
 										{
 											currentRunFrame.hasCallJump = true;
 											currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
@@ -671,7 +671,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_try:
 										{
-											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.enter_try(tryid);
 
 											currentRunFrame.endStep(step);
@@ -679,7 +679,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_try:
 										{
-											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.quit_try(tryid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -687,7 +687,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_catch:
 										{
-											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.enter_catch(catchid);
 
 											currentRunFrame.endStep(step);
@@ -695,7 +695,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_catch:
 										{
-											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.quit_catch(catchid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -703,7 +703,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_finally:
 										{
-											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.enter_finally(finallyid);
 
 											currentRunFrame.endStep(step);
@@ -711,7 +711,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_finally:
 										{
-											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 											currentRunFrame.quit_finally(finallyid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -848,13 +848,13 @@ namespace ASRuntime
 										break;
 									case OpCode.function_create:
 										{
-											rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame);
+											rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
 											int funcid = ((rtInt)arr.innerArray[0]).value;
 											bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
 											rtFunction function = new rtFunction(funcid, ismethod);
 											function.bind(scope);
-											step.reg.getSlot(scope, currentRunFrame).directSet(function);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).directSet(function);
 
 											currentRunFrame.endStepNoError();
 										}
@@ -881,54 +881,57 @@ namespace ASRuntime
 										break;
 									case OpCode.cast_int_number:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((double)((rtInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_int:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_number:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((double)((rtUInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_uint:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_int_uint:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((uint)((rtInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_int:
 										{
-											var v1 = step.arg1.getValue(scope, currentRunFrame);
-											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((int)((rtUInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
-									case OpCode.push_parameter_skipcheck:
-										operators.OpCallFunction.push_parameter_skipcheck(currentRunFrame, step, scope);
+									case OpCode.push_parameter_skipcheck_storetoheap:
+										operators.OpCallFunction.push_parameter_skipcheck_stroetoheap(currentRunFrame, step, scope);
+										break;
+									case OpCode.push_parameter_skipcheck_storetostack:
+										operators.OpCallFunction.push_parameter_skipcheck_stroetostack(currentRunFrame, step, scope);
 										break;
 									case OpCode.push_parameter_skipcheck_testnative:
 										operators.OpCallFunction.push_parameter_skipcheck_testnative(currentRunFrame, step, scope);
 										break;
-									case OpCode.push_parameter_nativeconstpara_skipcheck:
-										operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(currentRunFrame, step, scope);
+									case OpCode.push_parameter_nativeconstpara:
+										operators.OpCallFunction.push_parameter_nativeconstpara(currentRunFrame, step, scope);
 										break;
 									case OpCode.push_parameter_para:
 										operators.OpCallFunction.push_parameter_para(currentRunFrame, step, scope);
@@ -938,6 +941,18 @@ namespace ASRuntime
 										break;
 									case OpCode.make_para_scope_withsignature:
 										operators.OpCallFunction.create_paraScope_WithSignature(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_method_notnativeconstpara_allparaonstack:
+										operators.OpCallFunction.create_paraScope_Method_NotNativeConstPara_AllParaOnStack(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_withsignature_allparaonstack:
+										operators.OpCallFunction.create_paraScope_WithSignature_AllParaOnStack(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_method_noparameters:
+										operators.OpCallFunction.create_paraScope_Method_NoParameters(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_withsignature_noparameters:
+										operators.OpCallFunction.create_paraScope_WithSignature_NoParameters(currentRunFrame, step, scope);
 										break;
 									case OpCode.function_return_funvoid:
 										{
@@ -949,7 +964,7 @@ namespace ASRuntime
 									case OpCode.function_return_nofunction:
 										{
 											currentRunFrame.hasCallReturn = true;
-											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
 											currentRunFrame.endStep(step);
 										}
 										break;
@@ -961,7 +976,7 @@ namespace ASRuntime
 										break;
 									case OpCode.function_return_nofunction_notry:
 										{
-											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
 											currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
 										}
 										break;
@@ -969,7 +984,7 @@ namespace ASRuntime
 										{
 
 											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
 											currentRunFrame.funCaller.doCall_allcheckpass();
 											currentRunFrame.funCaller = null;
 
@@ -977,11 +992,37 @@ namespace ASRuntime
 										}
 									case OpCode.call_function_notcheck_notreturnobject_notnative:
 										{
-											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
-											currentRunFrame.funCaller.doCall_allcheckpass_nonative();
+											var funCaller = currentRunFrame.funCaller;
+											funCaller.callbacker = funCaller;
+											funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
+											funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+											funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
 											currentRunFrame.funCaller = null;
 
+											break;
+										}
+									case OpCode.call_function_notcheck_notreturnobject_notnative_method:
+										{
+											var funCaller = currentRunFrame.funCaller;
+
+											funCaller.callbacker = funCaller;
+											funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
+											funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+											//currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault_method();
+											callBlock_Method_NoHeap(swc.blocks[funCaller.toCallFunc.blockid],
+												funCaller.returnSlot, step.token, funCaller.callbacker, funCaller.functionThisPointer);
+
+											currentRunFrame.funCaller = null;
+
+											break;
+										}
+									case OpCode.sub_number_number:
+										{
+											double a1 = ((rtNumber)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
+											double a2 = ((rtNumber)step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
+
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+											currentRunFrame.endStepNoError();
 											break;
 										}
 									default:
@@ -1099,7 +1140,8 @@ namespace ASRuntime
 				//#endif
 				if (result != null && runtimeError == null)
 				{
-					return result.getValue(topscope, displayStackFrame);
+					
+					return result.getValue(topscope,stackSlots,displayStackFrame.offset);
 				}
 				else
 				{
@@ -1118,7 +1160,7 @@ namespace ASRuntime
 
 
 
-        private static readonly HeapSlot[] emptyMembers = new HeapSlot[0];
+        internal static readonly HeapSlot[] emptyMembers = new HeapSlot[0];
         internal HeapSlot[] genHeapFromCodeBlock(ASBinCode.CodeBlock calledblock)
         {
             if (calledblock.scope.members.Count == 0)
@@ -1133,7 +1175,7 @@ namespace ASRuntime
                 var vt = ((VariableBase)calledblock.scope.members[i]).valueType;
                 memberDataList[i].setDefaultType(
                     vt,
-                    TypeConverter.getDefaultValue(vt).getValue(null,null)
+                    TypeConverter.getDefaultValue(vt).getValue(null,null,0)
                     );
             }
             return memberDataList;
@@ -1166,6 +1208,64 @@ namespace ASRuntime
         {
             return operators.InstanceCreator.init_static_class(cls, this, token);
         }
+
+
+
+		internal void callBlock_Method_NoHeap(CodeBlock calledblock,
+			SLOT returnSlot,
+			SourceToken token,
+			IBlockCallBack callbacker,
+			RunTimeValueBase this_pointer)
+		{
+			int startOffset = 0;
+			var rs = runtimeStack.Peek();
+			startOffset = rs.baseBottomSlotIndex + rs.call_parameter_slotCount;
+
+			StackFrame frame = null;
+
+			if (startOffset + calledblock.totalRegisters + 1 + 1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
+			{
+				if (callbacker != null)
+				{
+					callbacker.noticeRunFailed();
+				}
+				currentRunFrame.receiveErrorFromStackFrame(new error.InternalError(swc, token, "stack overflow"));
+				return;
+			}
+			else
+			{
+				frame = stackframePool.create(calledblock);
+				frame.codeLinePtr = 0;
+				frame.player = this;
+				frame.returnSlot = returnSlot;
+				frame.callbacker = callbacker;
+
+
+				frame.offset = startOffset;
+				frame.baseBottomSlotIndex = startOffset + frame.baseUseSlots;
+				frame.stack = stackSlots;
+
+				frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex - 2];
+				frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex - 1];
+				runtimeStack.Push(frame);
+				currentRunFrame = frame;
+
+				var block = calledblock;
+				for (int i = 0; i < block.regConvFromVar.Count; i++)
+				{
+					Register regvar = block.regConvFromVar[i];
+					var slot = (StackSlot)regvar.getSlot(null, frame.stack, frame.offset);
+					TypeConverter.setDefaultValueToStackSlot(
+						regvar.valueType, slot
+						);
+				}
+			}
+
+			frame.scope = ((rtObject)this_pointer).objScope;
+
+			
+
+		}
 
 
         internal RunTimeScope callBlock(ASBinCode.CodeBlock calledblock,
@@ -1213,7 +1313,7 @@ namespace ASRuntime
                 frame.player = this;
                 frame.returnSlot = returnSlot;
                 frame.callbacker = callbacker;
-                frame.static_objects = static_instance;
+                
 
                 frame.offset = startOffset;
 				frame.baseBottomSlotIndex = startOffset + frame.baseUseSlots;
@@ -1228,7 +1328,7 @@ namespace ASRuntime
                 for (int i = 0; i < block.regConvFromVar.Count; i++)
                 {
                     Register regvar = block.regConvFromVar[i];
-                    var slot = (StackSlot)regvar.getSlot(null, frame);
+                    var slot = (StackSlot)regvar.getSlot(null, frame.stack,frame.offset);
                     TypeConverter.setDefaultValueToStackSlot(
                         regvar.valueType,slot
                         ); 
@@ -1253,7 +1353,7 @@ namespace ASRuntime
 			{
 				if (this_pointer is rtObject)
 				{
-					if (callerScope.scopeType != RunTimeScopeType.function || callerScope == null)
+					if (callerScope.scopeType != RunTimeScopeType.function)
 					{
 						frame.scope = ((rtObject)this_pointer).objScope;
 					}
@@ -1829,9 +1929,9 @@ namespace ASRuntime
 						break;
 					case OpCode.if_jmp:
 						{
-							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
 							{
-								if (currentRunFrame.trystateCount != 0)
+								if (currentRunFrame.tryCatchState.Count != 0)
 								{
 									currentRunFrame.hasCallJump = true;
 									currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
@@ -1853,7 +1953,7 @@ namespace ASRuntime
 						break;
 					case OpCode.if_jmp_notry:
 						{
-							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)
+							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)
 							{
 								currentRunFrame.codeLinePtr += step.jumoffset;				
 							}
@@ -1864,7 +1964,7 @@ namespace ASRuntime
 						}
 						break;
 					case OpCode.jmp:
-						if (currentRunFrame.trystateCount != 0)
+						if (currentRunFrame.tryCatchState.Count != 0)
 						{
 							currentRunFrame.hasCallJump = true;
 							currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
@@ -1887,7 +1987,7 @@ namespace ASRuntime
 						break;
 					case OpCode.enter_try:
 						{
-							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.enter_try(tryid);
 
 							currentRunFrame.endStep(step);
@@ -1895,7 +1995,7 @@ namespace ASRuntime
 						break;
 					case OpCode.quit_try:
 						{
-							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.quit_try(tryid, step.token);
 
 							currentRunFrame.endStep(step);
@@ -1903,7 +2003,7 @@ namespace ASRuntime
 						break;
 					case OpCode.enter_catch:
 						{
-							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.enter_catch(catchid);
 
 							currentRunFrame.endStep(step);
@@ -1911,7 +2011,7 @@ namespace ASRuntime
 						break;
 					case OpCode.quit_catch:
 						{
-							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.quit_catch(catchid, step.token);
 
 							currentRunFrame.endStep(step);
@@ -1919,7 +2019,7 @@ namespace ASRuntime
 						break;
 					case OpCode.enter_finally:
 						{
-							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.enter_finally(finallyid);
 
 							currentRunFrame.endStep(step);
@@ -1927,7 +2027,7 @@ namespace ASRuntime
 						break;
 					case OpCode.quit_finally:
 						{
-							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
+							int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
 							currentRunFrame.quit_finally(finallyid, step.token);
 
 							currentRunFrame.endStep(step);
@@ -2064,13 +2164,13 @@ namespace ASRuntime
 						break;
 					case OpCode.function_create:
 						{
-							rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame);
+							rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
 							int funcid = ((rtInt)arr.innerArray[0]).value;
 							bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
 							rtFunction function = new rtFunction(funcid, ismethod);
 							function.bind(scope);
-							step.reg.getSlot(scope, currentRunFrame).directSet(function);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).directSet(function);
 
 							currentRunFrame.endStepNoError();
 						}
@@ -2097,54 +2197,57 @@ namespace ASRuntime
 						break;
 					case OpCode.cast_int_number:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((double)((rtInt)v1).value);
 							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_number_int:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
 							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_uint_number:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((double)((rtUInt)v1).value);
 							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_number_uint:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
 							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_int_uint:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((uint)((rtInt)v1).value);
 							currentRunFrame.endStepNoError();
 							break;
 						}
 					case OpCode.cast_uint_int:
 						{
-							var v1 = step.arg1.getValue(scope, currentRunFrame);
-							step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
+							var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue((int)((rtUInt)v1).value);
 							currentRunFrame.endStepNoError();
 							break;
 						}
-					case OpCode.push_parameter_skipcheck:
-						operators.OpCallFunction.push_parameter_skipcheck(currentRunFrame, step, scope);
+					case OpCode.push_parameter_skipcheck_storetoheap:
+						operators.OpCallFunction.push_parameter_skipcheck_stroetoheap(currentRunFrame, step, scope);
+						break;
+					case OpCode.push_parameter_skipcheck_storetostack:
+						operators.OpCallFunction.push_parameter_skipcheck_stroetostack(currentRunFrame, step, scope);
 						break;
 					case OpCode.push_parameter_skipcheck_testnative:
 						operators.OpCallFunction.push_parameter_skipcheck_testnative(currentRunFrame, step, scope);
 						break;
-					case OpCode.push_parameter_nativeconstpara_skipcheck:
-						operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(currentRunFrame, step, scope);
+					case OpCode.push_parameter_nativeconstpara:
+						operators.OpCallFunction.push_parameter_nativeconstpara(currentRunFrame, step, scope);
 						break;
 					case OpCode.push_parameter_para:
 						operators.OpCallFunction.push_parameter_para(currentRunFrame, step, scope);
@@ -2154,6 +2257,18 @@ namespace ASRuntime
 						break;
 					case OpCode.make_para_scope_withsignature:
 						operators.OpCallFunction.create_paraScope_WithSignature(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_method_notnativeconstpara_allparaonstack:
+						operators.OpCallFunction.create_paraScope_Method_NotNativeConstPara_AllParaOnStack(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_withsignature_allparaonstack:
+						operators.OpCallFunction.create_paraScope_WithSignature_AllParaOnStack(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_method_noparameters:
+						operators.OpCallFunction.create_paraScope_Method_NoParameters(currentRunFrame, step, scope);
+						break;
+					case OpCode.make_para_scope_withsignature_noparameters:
+						operators.OpCallFunction.create_paraScope_WithSignature_NoParameters(currentRunFrame, step, scope);
 						break;
 					case OpCode.function_return_funvoid:
 						{
@@ -2165,7 +2280,7 @@ namespace ASRuntime
 					case OpCode.function_return_nofunction:
 						{
 							currentRunFrame.hasCallReturn = true;
-							RunTimeValueBase result = step.arg1.getValue(scope, currentRunFrame);
+							RunTimeValueBase result = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
 							currentRunFrame.returnSlot.directSet(result);
 							currentRunFrame.endStep(step);
 						}
@@ -2178,7 +2293,7 @@ namespace ASRuntime
 						break;
 					case OpCode.function_return_nofunction_notry:
 						{
-							currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
+							currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
 							currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
 						}
 						break;
@@ -2186,7 +2301,7 @@ namespace ASRuntime
 						{
 
 							currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
 							currentRunFrame.funCaller.doCall_allcheckpass();
 							currentRunFrame.funCaller = null;
 
@@ -2195,10 +2310,35 @@ namespace ASRuntime
 					case OpCode.call_function_notcheck_notreturnobject_notnative:
 						{
 							currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
-							currentRunFrame.funCaller.doCall_allcheckpass_nonative();
+							currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
+							currentRunFrame.funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+							currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
 							currentRunFrame.funCaller = null;
 
+							break;
+						}
+					case OpCode.call_function_notcheck_notreturnobject_notnative_method:
+						{
+							var funCaller = currentRunFrame.funCaller;
+
+							funCaller.callbacker = funCaller;
+							funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
+							funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+							//currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault_method();
+							callBlock_Method_NoHeap(swc.blocks[ funCaller.toCallFunc.blockid], 
+								funCaller.returnSlot, step.token, funCaller.callbacker, funCaller.functionThisPointer );
+
+							currentRunFrame.funCaller = null;
+
+							break;
+						}
+					case OpCode.sub_number_number:
+						{
+							double a1 = ((rtNumber)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
+							double a2 = ((rtNumber)step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
+
+							step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+							currentRunFrame.endStepNoError();
 							break;
 						}
 					default:

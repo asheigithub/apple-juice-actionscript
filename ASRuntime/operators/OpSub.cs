@@ -11,18 +11,18 @@ namespace ASRuntime.operators
         {
             //ASBinCode.rtData.rtNumber a1 = (ASBinCode.rtData.rtNumber)step.arg1.getValue(scope);
             //ASBinCode.rtData.rtNumber a2 = (ASBinCode.rtData.rtNumber)step.arg2.getValue(scope);
-            double a1 = step.arg1.getValue(scope, frame).toNumber();
-            double a2 = step.arg2.getValue(scope, frame).toNumber();
+            double a1 = step.arg1.getValue(scope, frame.stack, frame.offset).toNumber();
+            double a2 = step.arg2.getValue(scope, frame.stack, frame.offset).toNumber();
 
-            step.reg.getSlot(scope, frame).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+            step.reg.getSlot(scope, frame.stack, frame.offset).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
 			frame.endStepNoError();
 			//frame.endStep(step);
         }
 
         public static void execSub(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope, frame);
-            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope, frame);
+            ASBinCode.RunTimeValueBase v1 = step.arg1.getValue(scope, frame.stack, frame.offset);
+            ASBinCode.RunTimeValueBase v2 = step.arg2.getValue(scope, frame.stack, frame.offset);
 
             var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.subtraction,
                 v1.rtType, v2.rtType);
@@ -35,7 +35,7 @@ namespace ASRuntime.operators
 				bool success;
                 fc.pushParameter(v1, 0, out success);
                 fc.pushParameter(v2, 1, out success);
-                fc.returnSlot = step.reg.getSlot(scope, frame);
+                fc.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
                 fc.callbacker = fc;
                 fc.call();
 
@@ -57,7 +57,7 @@ namespace ASRuntime.operators
             double n2 = TypeConverter.ConvertToNumber(v2);
 
             {
-                step.reg.getSlot(scope, frame).setValue(n1 - n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
+                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n1 - n2);// ((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value);//new ASBinCode.rtData.rtNumber(((ASBinCode.rtData.rtNumber)v1).value - ((ASBinCode.rtData.rtNumber)v2).value));
             }
 			//frame.endStep(step);
 			frame.endStepNoError();

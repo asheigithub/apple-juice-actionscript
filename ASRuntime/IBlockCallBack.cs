@@ -168,18 +168,19 @@ namespace ASRuntime
 				isSuccess = false;
 				_intArg = 0; _intArg2 = 0;
 
-				cacheObjects[0] = null;
-                cacheObjects[1] = null;
-                cacheObjects[2] = null;
-                cacheObjects[3] = null;
-                cacheObjects[4] = null;
-                cacheObjects[5] = null;
-                cacheObjects[6] = null;
-                cacheObjects[7] = null;
-                cacheObjects[8] = null;
-                cacheObjects[9] = null;
 
-                player.blockCallBackPool.ret(this);
+				cacheObjects[0] = null;
+				cacheObjects[1] = null;
+				cacheObjects[2] = null;
+				cacheObjects[3] = null;
+				cacheObjects[4] = null;
+				cacheObjects[5] = null;
+				cacheObjects[6] = null;
+				cacheObjects[7] = null;
+				cacheObjects[8] = null;
+				cacheObjects[9] = null;
+
+				player.blockCallBackPool.ret(this);
 
             }
         }

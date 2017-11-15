@@ -22,7 +22,7 @@ namespace ASRuntime.nativefuncs
             else
             {
                 frame.throwError(new error.InternalError(frame.player.swc,step.token,
-                                step.arg1.getValue(scope,frame)
+                                step.arg1.getValue(scope, frame.stack, frame.offset)
                                 ));
             }
 

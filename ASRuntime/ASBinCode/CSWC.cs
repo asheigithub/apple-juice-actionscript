@@ -87,6 +87,8 @@ namespace ASBinCode
 
         public OperatorFunctions operatorOverrides;
 
+
+		
         public CSWC()
         {
 			nativefunctions = new List<NativeFunctionBase>();

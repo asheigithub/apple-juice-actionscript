@@ -7,10 +7,12 @@ package
 		//{
 			//var t:Number = (new Date()).getTime();
 			//
-//
+			//
 			//for (var i:int = 0;  i<500000 ; i++) 
 			//{
-				//blank();
+				//
+					//b += i;
+				////blank(i);
 			//}
 			//trace("action script: it", (new Date()).getTime() - t );
 //
@@ -18,11 +20,13 @@ package
 						//
 		//}
 		//var b:int;
-		//function blank():void
+		//function blank(p:int):void
 		//{
-			//++b; 
-			//
+			//++b;
 		//}
+		
+		
+		
 	}
 }
 
@@ -30,14 +34,14 @@ package
 
 class fib
 {
-
+	
 function fibonacci_recursion( n:Number ):Number
 {
 	
     if( n <= 2 )
         return 1;
-
-    return fibonacci_recursion(n-1) + fibonacci_recursion(n-2);
+	
+    return fibonacci_recursion(n - 1) +fibonacci_recursion(n-2);
 }
 
 function fib()
@@ -52,9 +56,11 @@ var f:int = fibonacci_recursion(30);
 
 trace("actionscript3:", ((new Date()).getTime() - t ));
 trace(f);
+
 }
 }
 
 var f = new fib();
 var ff = fib(f);
 trace(ff);
+

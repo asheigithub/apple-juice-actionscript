@@ -32,8 +32,8 @@ namespace ASBinCode
         //    }
         //}
 
-        public sealed override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             return scope.this_pointer;
         }
 

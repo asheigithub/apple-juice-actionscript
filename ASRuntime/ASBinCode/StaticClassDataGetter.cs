@@ -14,10 +14,10 @@ namespace ASBinCode
             this._class = _class;
             valueType = _class.getRtType();
         }
-        
-        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
-        {
-            return holder.static_objects[_class.classid];
+
+		public sealed override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
+            return slots[0].player.static_instance[_class.classid];
 
         }
 

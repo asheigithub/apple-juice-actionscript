@@ -10,7 +10,7 @@ namespace ASRuntime
     /// <summary>
     /// 调用堆栈栈帧
     /// </summary>
-    public sealed class StackFrame :RunTimeDataHolder
+    public sealed class StackFrame
     {
 		internal class StackFramePool : PoolBase<StackFrame>
 		{
@@ -34,6 +34,44 @@ namespace ASRuntime
 
 		}
 
+
+		internal class MyTryStack
+		{
+			private TryState[] state;
+			public MyTryStack()
+			{
+				state = new TryState[16];
+				Count = 0;
+			}
+
+			public int Count;
+
+			public TryState Peek()
+			{
+				return state[Count - 1];
+			}
+
+			public void Push(TryState trystate)
+			{
+				state[Count++] = trystate;
+			}
+
+			public TryState Pop()
+			{
+				--Count;
+				return state[Count];
+			}
+
+			public void Clear()
+			{
+				Count = 0;
+			}
+		}
+
+
+		public int offset;
+		public StackSlot[] stack;
+
 		/// <summary>
 		/// 代码段基本使用长度
 		/// </summary>
@@ -51,7 +89,7 @@ namespace ASRuntime
             //stepCount = block.opSteps.Count;
 
             
-            tryCatchState = new Stack<TryState>();
+            tryCatchState = new MyTryStack();
 			_instanceCreator = operators.InstanceCreator.Create(this);
 
         }
@@ -60,7 +98,7 @@ namespace ASRuntime
         {
             return new FrameInfo(block, codeLinePtr,scope,
                 //scope_thispointer,
-                static_objects,offset,stack);
+                offset,stack);
         }
 
 
@@ -137,7 +175,7 @@ namespace ASRuntime
 #else
 		internal
 #endif
-		Stack<TryState> tryCatchState;
+		MyTryStack tryCatchState;
 
 		/// <summary>
 		/// 暂存已发生的错误
@@ -402,9 +440,9 @@ namespace ASRuntime
                     break;
                 case OpCode.if_jmp:
                     {
-                        if (((rtBoolean)step.arg1.getValue(scope, this)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+                        if (((rtBoolean)step.arg1.getValue(scope, this.stack,offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
                         {
-                            if (trystateCount != 0)
+                            if (tryCatchState.Count != 0)
                             {
                                 hasCallJump = true;
                                 jumptoline = codeLinePtr + step.jumoffset - 1;
@@ -426,7 +464,7 @@ namespace ASRuntime
                     break;
 				case OpCode.if_jmp_notry:
 					{
-						if (((rtBoolean)step.arg1.getValue(scope, this)).value)
+						if (((rtBoolean)step.arg1.getValue(scope, this.stack,offset)).value)
 						{
 							codeLinePtr += step.jumoffset-1 ;
 							endStepNoError();
@@ -438,7 +476,7 @@ namespace ASRuntime
 					}
 					break;
 				case OpCode.jmp:
-                    if (trystateCount != 0)
+                    if (tryCatchState.Count != 0)
                     {
                         hasCallJump = true;
                         jumptoline = codeLinePtr + step.jumoffset - 1;
@@ -462,7 +500,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_try:
                     {
-                        int tryid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int tryid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         enter_try(tryid);
 
                         endStep(step);
@@ -470,7 +508,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_try:
                     {
-                        int tryid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int tryid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         quit_try(tryid, step.token);
 
                         endStep(step);
@@ -478,7 +516,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_catch:
                     {
-                        int catchid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int catchid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         enter_catch(catchid);
 
                         endStep(step);
@@ -486,7 +524,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_catch:
                     {
-                        int catchid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int catchid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         quit_catch(catchid, step.token);
 
                         endStep(step);
@@ -494,7 +532,7 @@ namespace ASRuntime
                     break;
                 case OpCode.enter_finally:
                     {
-                        int finallyid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int finallyid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         enter_finally(finallyid);
 
                         endStep(step);
@@ -502,7 +540,7 @@ namespace ASRuntime
                     break;
                 case OpCode.quit_finally:
                     {
-                        int finallyid = ((rtInt)step.arg1.getValue(scope,this)).value;
+                        int finallyid = ((rtInt)step.arg1.getValue(scope,this.stack,offset)).value;
                         quit_finally(finallyid, step.token);
 
                         endStep(step);
@@ -639,13 +677,13 @@ namespace ASRuntime
                     break;
                 case OpCode.function_create:
                     {
-                        rtArray arr = (rtArray)step.arg1.getValue(scope,this);
+                        rtArray arr = (rtArray)step.arg1.getValue(scope,this.stack,offset);
                         int funcid = ((rtInt)arr.innerArray[0]).value;
                         bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
                         rtFunction function = new rtFunction(funcid, ismethod);
                         function.bind(scope);
-                        step.reg.getSlot(scope,this).directSet(function);
+                        step.reg.getSlot(scope,this.stack,offset).directSet(function);
 
 						endStepNoError();
 					}
@@ -678,54 +716,57 @@ namespace ASRuntime
 					break;
 				case OpCode.cast_int_number:
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((double)((rtInt)v1).value);
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue((double)((rtInt)v1).value);
 						endStepNoError();
 						break;
 					}
 				case OpCode.cast_number_int:
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue( TypeConverter.ConvertToInt(v1,this,null) );
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue( TypeConverter.ConvertToInt(v1,this,null) );
 						endStepNoError();
 						break;
 					}
 				case OpCode.cast_uint_number :
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((double)((rtUInt)v1).value);
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue((double)((rtUInt)v1).value);
 						endStepNoError();
 						break;
 					}
 				case OpCode.cast_number_uint:
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue(TypeConverter.ConvertToUInt(v1,this,null));
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue(TypeConverter.ConvertToUInt(v1,this,null));
 						endStepNoError();
 						break;
 					}
 				case OpCode.cast_int_uint:
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((uint)((rtInt)v1).value);
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue((uint)((rtInt)v1).value);
 						endStepNoError();
 						break;
 					}
 				case OpCode.cast_uint_int:
 					{
-						var v1 = step.arg1.getValue(scope, this);
-						step.reg.getSlot(scope, this).setValue((int)((rtUInt)v1).value);
+						var v1 = step.arg1.getValue(scope, this.stack,offset);
+						step.reg.getSlot(scope, this.stack,offset).setValue((int)((rtUInt)v1).value);
 						endStepNoError();
 						break;
 					}
-				case OpCode.push_parameter_skipcheck:
-					operators.OpCallFunction.push_parameter_skipcheck(this, step, scope);
+				case OpCode.push_parameter_skipcheck_storetostack:
+					operators.OpCallFunction.push_parameter_skipcheck_stroetostack(this, step, scope);
+					break;
+				case OpCode.push_parameter_skipcheck_storetoheap:
+					operators.OpCallFunction.push_parameter_skipcheck_stroetoheap(this, step, scope);
 					break;
 				case OpCode.push_parameter_skipcheck_testnative:
 					operators.OpCallFunction.push_parameter_skipcheck_testnative(this, step, scope);
 					break;
-				case OpCode.push_parameter_nativeconstpara_skipcheck:
-					operators.OpCallFunction.push_parameter_nativeconstpara_skipcheck(this, step, scope);
+				case OpCode.push_parameter_nativeconstpara:
+					operators.OpCallFunction.push_parameter_nativeconstpara(this, step, scope);
 					break;
 				case OpCode.push_parameter_para:
 					operators.OpCallFunction.push_parameter_para(this, step, scope);
@@ -735,6 +776,18 @@ namespace ASRuntime
 					break;
 				case OpCode.make_para_scope_withsignature:
 					operators.OpCallFunction.create_paraScope_WithSignature(this, step, scope);
+					break;
+				case OpCode.make_para_scope_method_notnativeconstpara_allparaonstack:
+					operators.OpCallFunction.create_paraScope_Method_NotNativeConstPara_AllParaOnStack(this, step, scope);
+					break;
+				case OpCode.make_para_scope_withsignature_allparaonstack:
+					operators.OpCallFunction.create_paraScope_WithSignature_AllParaOnStack(this, step, scope);
+					break;
+				case OpCode.make_para_scope_method_noparameters:
+					operators.OpCallFunction.create_paraScope_Method_NoParameters(this,step,scope);
+					break;
+				case OpCode.make_para_scope_withsignature_noparameters:
+					operators.OpCallFunction.create_paraScope_WithSignature_NoParameters(this, step, scope);
 					break;
 				case OpCode.function_return_funvoid:
 					{
@@ -746,7 +799,7 @@ namespace ASRuntime
 				case OpCode.function_return_nofunction:
 					{
 						hasCallReturn = true;
-						RunTimeValueBase result = step.arg1.getValue(scope, this);
+						RunTimeValueBase result = step.arg1.getValue(scope, this.stack,offset);
 						returnSlot.directSet(result);
 						endStep(step);
 					}
@@ -759,7 +812,7 @@ namespace ASRuntime
 					break;
 				case OpCode.function_return_nofunction_notry:
 					{
-						RunTimeValueBase result = step.arg1.getValue(scope, this);
+						RunTimeValueBase result = step.arg1.getValue(scope, this.stack,offset);
 						returnSlot.directSet(result);
 						codeLinePtr = stepCount;
 					}
@@ -768,7 +821,7 @@ namespace ASRuntime
 					{
 						
 						funCaller.callbacker = funCaller;
-						funCaller.returnSlot = step.reg.getSlot(scope, this);
+						funCaller.returnSlot = step.reg.getSlot(scope, this.stack,offset);
 						funCaller.doCall_allcheckpass();
 						funCaller = null;
 
@@ -777,12 +830,34 @@ namespace ASRuntime
 				case OpCode.call_function_notcheck_notreturnobject_notnative:
 					{
 						funCaller.callbacker = funCaller;
-						funCaller.returnSlot = step.reg.getSlot(scope, this);
-						funCaller.doCall_allcheckpass_nonative();
+						funCaller.returnSlot = step.reg.getSlot(scope, this.stack,offset);
+						funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+						funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
+
 						funCaller = null;
 
 						break;
 					}
+				case OpCode.call_function_notcheck_notreturnobject_notnative_method:
+					{
+						funCaller.callbacker = funCaller;
+						funCaller.returnSlot = step.reg.getSlot(scope, this.stack, offset);
+						funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+						funCaller.doCall_allcheckpass_nonative_hassetreturndefault_method();
+
+						funCaller = null;
+
+						break;
+					}
+				case OpCode.sub_number_number:
+					{
+						double a1 = ((rtNumber)step.arg1.getValue(scope, stack, offset)).value;
+						double a2 = ((rtNumber)step.arg2.getValue(scope, stack, offset)).value;
+
+						step.reg.getSlot(scope, stack, offset).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+						endStepNoError();
+						break;
+					}				
 				default:
 
 					//runtimeError = (new error.InternalError(player.swc,step.token,
@@ -870,7 +945,7 @@ namespace ASRuntime
 
                     if (runtimeError.catchable
                             &&
-                        trystateCount>0
+                        tryCatchState.Count>0
                             &&
                         tryCatchState.Peek().state == Try_catch_finally.Try
                         )
@@ -893,7 +968,7 @@ namespace ASRuntime
                             {
                                 if (nativefuncs.Catch.isCatchError(tryid, errorValue, op, scope,this))
                                 {
-                                    op.reg.getSlot(scope,this).directSet(errorValue);
+                                    op.reg.getSlot(scope,this.stack,offset).directSet(errorValue);
                                     //引导到catch块
                                     codeLinePtr = j;
                                     foundcatch = true;
@@ -911,7 +986,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -924,7 +999,7 @@ namespace ASRuntime
                     }
                     else if (runtimeError.catchable
                         &&
-                        trystateCount>0
+                        tryCatchState.Count>0
                             &&
                         tryCatchState.Peek().state == Try_catch_finally.Catch
                         )
@@ -942,7 +1017,7 @@ namespace ASRuntime
                             if (op.opCode == OpCode.enter_finally)
                             {
                                 int id = ((ASBinCode.rtData.rtInt)
-                                    ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                    ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                 if (id == tryid)
                                 {
                                     codeLinePtr = j - 1;
@@ -979,7 +1054,7 @@ namespace ASRuntime
                 else if (hasCallReturn) //已经调用了Return
                 {                       //将进入finally块
                     if (
-                        trystateCount>0
+                        tryCatchState.Count>0
                             &&
                         tryCatchState.Peek().state == Try_catch_finally.Try
                         )
@@ -996,7 +1071,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -1006,7 +1081,7 @@ namespace ASRuntime
                             }
                         }
                     }
-                    else if (trystateCount > 0
+                    else if (tryCatchState.Count > 0
                             &&
                         tryCatchState.Peek().state == Try_catch_finally.Catch)
                     {
@@ -1022,7 +1097,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -1032,7 +1107,7 @@ namespace ASRuntime
                             }
                         }
                     }
-                    else if (trystateCount > 0
+                    else if (tryCatchState.Count > 0
                             &&
                         tryCatchState.Peek().state == Try_catch_finally.Finally)
                     {
@@ -1048,7 +1123,7 @@ namespace ASRuntime
                                 if (op.opCode == OpCode.quit_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
-                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                        ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                     if (id == tryid)
                                     {
                                         codeLinePtr = j - 1;
@@ -1060,13 +1135,14 @@ namespace ASRuntime
                     }
                     else
                     {
-                        codeLinePtr = block.opSteps.Count;
+						hasCallReturn = false;
+						codeLinePtr = block.opSteps.Count;
                     }
 
                 }
                 else if (hasCallJump)
                 {
-                    if (trystateCount>0)
+                    if (tryCatchState.Count>0)
                     {
 
                         //Stack<int> jumptolinetrys = block.opSteps[jumptoline + 1].trys;
@@ -1102,7 +1178,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -1131,7 +1207,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -1159,7 +1235,7 @@ namespace ASRuntime
                                         if (op.opCode == OpCode.quit_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
-                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null)).value;
+                                                ((ASBinCode.rtData.RightValue)op.arg1).getValue(null,null,0)).value;
                                             if (id == tryid)
                                             {
                                                 codeLinePtr = j - 1;
@@ -1217,13 +1293,13 @@ namespace ASRuntime
         internal void enter_try( int tryid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Try, tryid));
-            ++trystateCount;
+            //++trystateCount;
         }
 
         internal int quit_try( int tryid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-            --trystateCount;
+            //--trystateCount;
             if (s.state != Try_catch_finally.Try || s.tryid != tryid)
             {
                 //player.runtimeError = (new error.InternalError(token,
@@ -1238,12 +1314,12 @@ namespace ASRuntime
         internal void enter_catch( int catchid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Catch, catchid));
-            ++trystateCount;
+            //++trystateCount;
         }
         internal int quit_catch( int catchid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-            --trystateCount;
+            //--trystateCount;
             if (s.state != Try_catch_finally.Catch || s.tryid != catchid)
             {
                 //player.runtimeError = (new error.InternalError(token,
@@ -1255,16 +1331,16 @@ namespace ASRuntime
             return s.tryid;
         }
 
-        internal int trystateCount;
+        //internal int trystateCount;
         internal void enter_finally( int finallyid)
         {
             tryCatchState.Push(new TryState(Try_catch_finally.Finally, finallyid));
-            ++trystateCount;
+            //++trystateCount;
         }
         internal int quit_finally( int finallyid, SourceToken token)
         {
             var s = tryCatchState.Pop();
-            --trystateCount;
+            //--trystateCount;
             if (s.state != Try_catch_finally.Finally || s.tryid != finallyid)
             {
                 //player.runtimeError = (new error.InternalError(token,
@@ -1283,6 +1359,7 @@ namespace ASRuntime
             }
 
             hasCallReturn = holdHasCallReturn;
+			holdHasCallReturn = false;
 
             if (holdhasjumpto)
             {
@@ -1388,7 +1465,7 @@ namespace ASRuntime
             runtimeError = err;
         }
 
-        public override  void throwError(SourceToken token,int code,string errormessage)
+        public  void throwError(SourceToken token,int code,string errormessage)
         {
             if (player.swc.ErrorClass != null)
             {
@@ -1475,13 +1552,8 @@ namespace ASRuntime
 			}
 		}
 
-#if DEBUG
-		private 
-#else
-		internal
-#endif
-		bool isclosed;
 
+		private bool isclosed;
 		/// <summary>
 		/// 退出程序栈时
 		/// </summary>
@@ -1492,13 +1564,21 @@ namespace ASRuntime
             {
                 throw new ASRunTimeException();
             }
+
 #endif
             isclosed = true;
 
             typeconvertoperator = null;
             funCaller = null;
-			
+#if DEBUG
 			deActiveInstanceCreator();
+#else
+			if (_instanceCreatorIsActive)
+			{
+				_instanceCreator.clear();
+				_instanceCreatorIsActive = false;
+			}
+#endif
 
 #if DEBUG
 			if (call_parameter_slotCount != 0)
@@ -1508,23 +1588,23 @@ namespace ASRuntime
 #endif
 			//int end = offset + block.totalRegisters + 1 + 1 + call_parameter_slotCount;
 			//清除执行栈
-			for (int i = offset; i < baseBottomSlotIndex+call_parameter_slotCount; i++)
+			for (int i = offset; i < baseBottomSlotIndex; i++)
             {
-#if DEBUG 
-				((StackSlot)stack[i]).clear();
+#if DEBUG
+				stack[i].clear();
 #else
-				StackSlot slot = (StackSlot)stack[i];
+				StackSlot slot = stack[i];
 				slot.stackObjects = StackSlot.StackObjects.EMPTY;
-				slot.linktarget = null;
 				
+
 				if (slot.needclear)
 				{
+					slot.linktarget = null;
 					slot._cache_arraySlot.clear();
 					slot._cache_vectorSlot.clear();
 					slot._cache_prototypeSlot.clear();
 					slot._cache_setthisslot.clear();
 					slot._linkObjCache.clearRefObj();
-					//slot._linkObjCache.srcObject = null;
 					slot._functionValue.Clear();
 					slot.needclear = false;
 				}
@@ -1538,29 +1618,34 @@ namespace ASRuntime
 
 			}
 
-			
 
-            tryCatchState.Clear();
-            block = null;
-            scope = null;
-            static_objects = null;
-            offset = 0;
-            call_parameter_slotCount = 0;
-            stack = null;
-            player = null;
+
+
+			//block = null;
+			//stack = null;
+			//player = null;
+			//call_parameter_slotCount = 0;
+			//offset = 0;
+			//codeLinePtr = 0;
+			//holdhasjumpto = false;
+			//holdjumptoline = 0;
+			//holdHasCallReturn = false;
+			//hasCallJump = false;
+			//hasCallReturn = false;
+			//jumptoline = 0;
+
+			scope = null;            
+            
             returnSlot = null;
-            callbacker = null;
-            codeLinePtr = 0;
+            callbacker = null;      
             holdedError = null;
-            hasCallJump = false;
-            hasCallReturn = false;
-            holdHasCallReturn = false;
-            holdhasjumpto = false;
-            holdjumptoline = 0;
-            jumptoline = 0;
-            trystateCount = 0;
+
+
+			tryCatchState.Clear();
+			
+            //trystateCount = 0;
 			runtimeError = null;
-            typeconvertoperator = null;
+            
 
 			hascallstep = false;
 

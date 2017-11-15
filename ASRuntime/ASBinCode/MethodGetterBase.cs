@@ -85,13 +85,13 @@ namespace ASBinCode
 		
         private static MethodSlot _temp= MethodSlot.instance;
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             return _temp;
         }
 
-        public sealed override  SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override  SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             throw new NotImplementedException();
 
 

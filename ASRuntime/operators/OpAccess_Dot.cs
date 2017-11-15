@@ -11,7 +11,7 @@ namespace ASRuntime.operators
     {
         public static void exec_dot(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            RunTimeValueBase obj = step.arg1.getValue(scope,frame);
+            RunTimeValueBase obj = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -26,11 +26,11 @@ namespace ASRuntime.operators
                 rtObject rtObj =
                     (rtObject)obj;
                 
-                StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
+                StackSlot slot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                 if (slot != null)
                 {
                     
-                    SLOT lintoslot = ((LeftValueBase)step.arg2).getSlot(rtObj.objScope,null);
+                    SLOT lintoslot = ((LeftValueBase)step.arg2).getSlot(rtObj.objScope,null,0);
                     if (lintoslot == null)
                     {
                         if (step.arg2 is VariableBase)
@@ -85,7 +85,7 @@ namespace ASRuntime.operators
 
         public static void exec_method(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            RunTimeValueBase obj = step.arg1.getValue(scope,frame);
+            RunTimeValueBase obj = step.arg1.getValue(scope, frame.stack, frame.offset);
 
             if (rtNull.nullptr.Equals(obj))
             {
@@ -101,7 +101,7 @@ namespace ASRuntime.operators
                 rtObject rtObj =
                     (rtObject)obj;
 
-                StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
+                StackSlot slot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                 if (slot != null)
                 {
                     SLOT lintoslot;// = ((ClassMethodGetter)step.arg2).getISlot(rtObj.objScope);
@@ -128,11 +128,11 @@ namespace ASRuntime.operators
 						{
 							if (step.arg1 is SuperPointer)
 							{
-								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null,0);
 							}
 							else
 							{
-								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+								lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null,0);
 							}
 
 							slot.linkTo(lintoslot);
@@ -142,11 +142,11 @@ namespace ASRuntime.operators
 					{
 						if (step.arg1 is SuperPointer)
 						{
-							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null,0);
 						}
 						else
 						{
-							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null);
+							lintoslot = ((MethodGetterBase)step.arg2).getSlotForAssign(rtObj.objScope, null,0);
 						}
 
 						slot.linkTo(lintoslot);
@@ -185,7 +185,7 @@ namespace ASRuntime.operators
 
         public static void exec_dot_byname(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            RunTimeValueBase obj = step.arg1.getValue(scope, frame);
+            RunTimeValueBase obj = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -229,7 +229,7 @@ namespace ASRuntime.operators
 
         private static void _loadname_dot(rtObject rtObj,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
         {
-            var v2 = step.arg2.getValue(scope, frame);
+            var v2 = step.arg2.getValue(scope, frame.stack, frame.offset);
             
             //**先转换为基础类型***
             if (v2.rtType > RunTimeDataType.unknown)
@@ -275,7 +275,7 @@ namespace ASRuntime.operators
                         }
 
                         funCaller._tempSlot = frame._tempSlot1;
-                        funCaller.returnSlot = register.getSlot(scope, frame);
+                        funCaller.returnSlot = register.getSlot(scope, frame.stack, frame.offset);
 
                         BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                         cb.setCallBacker(_get_this_item_callbacker);
@@ -303,7 +303,7 @@ namespace ASRuntime.operators
                         }
 
                         //***使用设置器***
-                        StackSlot dslot = (StackSlot)register.getSlot(scope, frame);
+                        StackSlot dslot = (StackSlot)register.getSlot(scope, frame.stack, frame.offset);
                         dslot.linkTo(dslot._cache_setthisslot);
 
                         dslot._cache_setthisslot.bindObj = rtObj;
@@ -355,14 +355,14 @@ namespace ASRuntime.operators
                         }
                         else
                         {
-                            step.reg.getSlot(scope, frame).directSet(rtUndefined.undefined);
+                            step.reg.getSlot(scope, frame.stack, frame.offset).directSet(rtUndefined.undefined);
                             frame.endStep(step);
                             return;
                         }
                     }
 
                     var slot = dict.getValue(key);
-                    StackSlot dslot = step.reg.getSlot(scope, frame) as StackSlot;
+                    StackSlot dslot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                     if (dslot != null)
                     {
                         if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
@@ -400,7 +400,7 @@ namespace ASRuntime.operators
                     cb.args = args;
 
                     //**获取name
-                    OpCast.CastValue(step.arg2.getValue(scope, frame), RunTimeDataType.rt_string, frame, step.token, scope
+                    OpCast.CastValue(step.arg2.getValue(scope, frame.stack, frame.offset), RunTimeDataType.rt_string, frame, step.token, scope
                         ,
                         frame._tempSlot1, cb, false
                         );
@@ -516,7 +516,7 @@ namespace ASRuntime.operators
                         //break;
 
                         Register register = (Register)step.reg;
-                        StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
+                        StackSlot slot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                         if (slot != null)
                         {
                             if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
@@ -544,7 +544,7 @@ namespace ASRuntime.operators
                     {
                         SLOT propSlot = gobj[name];
                         Register register = (Register)step.reg;
-                        StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
+                        StackSlot slot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                         if (slot != null)
                         {
                             if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
@@ -621,7 +621,7 @@ namespace ASRuntime.operators
                                 break;
                             }
 
-                            StackSlot dslot = step.reg.getSlot(scope, frame) as StackSlot;
+                            StackSlot dslot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                             if (dslot != null)
                             {
                                 if (dobj == null || !dobj.hasproperty(name))
@@ -679,7 +679,7 @@ namespace ASRuntime.operators
                             
                             if (dobj != null)
                             {
-                                StackSlot dslot = step.reg.getSlot(scope, frame) as StackSlot;
+                                StackSlot dslot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                                 if (dslot != null)
                                 {
                                     linkProtoTypeMember(dobj, rtObj, player, dslot, name, (Register)step.reg);
@@ -717,7 +717,7 @@ namespace ASRuntime.operators
                     }
 
                     {
-                        StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
+                        StackSlot slot = step.reg.getSlot(scope, frame.stack, frame.offset) as StackSlot;
                         if (slot != null)
                         {
                             SLOT linkto;// = ((ILeftValue)member.bindField).getISlot(rtObj.objScope);
@@ -731,7 +731,7 @@ namespace ASRuntime.operators
                                     if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
                                     {
                                         //method赋值必失败
-                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope,null);
+                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope,null,0);
                                     }
                                     else
                                     {
@@ -743,7 +743,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope,null);
+                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope,null,0);
                                 }
                             }
                             else
@@ -753,7 +753,7 @@ namespace ASRuntime.operators
                                     if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
                                     {
                                         //method赋值必失败
-                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope,null);
+                                        linkto = ((MethodGetterBase)member.bindField).getSlotForAssign(rtObj.objScope,null,0);
                                     }
                                     else
                                     {
@@ -765,7 +765,7 @@ namespace ASRuntime.operators
                                 }
                                 else
                                 {
-                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope,null);
+                                    linkto = ((LeftValueBase)member.bindField).getSlot(rtObj.objScope,null,0);
                                 }
                             }
 
@@ -881,7 +881,7 @@ namespace ASRuntime.operators
         /// <param name="scope"></param>
         public static void exec_bracket_access(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            RunTimeValueBase obj = step.arg1.getValue(scope, frame);
+            RunTimeValueBase obj = step.arg1.getValue(scope, frame.stack, frame.offset);
             if (rtNull.nullptr.Equals(obj))
             {
                 frame.throwError(
@@ -985,7 +985,7 @@ namespace ASRuntime.operators
 
         private static bool _assess_array( RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var idx = step.arg2.getValue(scope, frame);
+            var idx = step.arg2.getValue(scope, frame.stack, frame.offset);
             var number = TypeConverter.ConvertToNumber(idx);
             if (!(double.IsNaN(number) || double.IsInfinity(number)))
             {
@@ -993,7 +993,7 @@ namespace ASRuntime.operators
                 {
 					//***访问数组的内容***
 					Register register = (Register)step.reg;
-					StackSlot stackSlot= (StackSlot)register.getSlot(scope,frame);
+					StackSlot stackSlot= (StackSlot)register.getSlot(scope, frame.stack, frame.offset);
 
 					if (register._isdeletetarget)
 					{

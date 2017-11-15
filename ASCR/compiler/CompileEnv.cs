@@ -645,11 +645,11 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.if_jmp
 					)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null,0)).value;
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null,0)).value;
 				}
 
 				if (findflag != null)
@@ -682,12 +682,12 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.enter_try)
 				{
 					block.hasTryStmt = true;
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					trys.Push(new trystate(0, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_try)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 0)
 					{
@@ -696,12 +696,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					trys.Push(new trystate(1, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 1)
 					{
@@ -710,12 +710,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					trys.Push(new trystate(2, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null,0)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 2)
 					{
@@ -756,6 +756,29 @@ namespace ASCompiler.compiler
 				}
 
 			}
+			//***优化跳转目标调用
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.jmp)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						step.opCode = OpCode.jmp_notry;
+					}
+				}
+				else if (step.opCode == OpCode.if_jmp)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						step.opCode = OpCode.if_jmp_notry;
+					}
+				}
+			}
+
+
 		}
 
 

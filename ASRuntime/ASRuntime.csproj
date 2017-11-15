@@ -36,6 +36,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASBinCode\ASRunTimeException.cs" />
+    <Compile Include="ASBinCode\ClassMemberFinder.cs" />
+    <Compile Include="ASBinCode\ClassMethodGetter.cs" />
+    <Compile Include="ASBinCode\ClassPropertyGetter.cs" />
+    <Compile Include="ASBinCode\CodeBlock.cs" />
+    <Compile Include="ASBinCode\CSWC.cs" />
+    <Compile Include="ASBinCode\CSWCSerizlizer.cs" />
+    <Compile Include="ASBinCode\Field.cs" />
+    <Compile Include="ASBinCode\FieldMeta.cs" />
+    <Compile Include="ASBinCode\HeapSlot.cs" />
+    <Compile Include="ASBinCode\IClassFinder.cs" />
+    <Compile Include="ASBinCode\ILinkSlot.cs" />
+    <Compile Include="ASBinCode\ILRValue.cs" />
+    <Compile Include="ASBinCode\IMember.cs" />
+    <Compile Include="ASBinCode\INativeFunctionRegister.cs" />
+    <Compile Include="ASBinCode\InterfaceMethodGetter.cs" />
+    <Compile Include="ASBinCode\IRunTimeScope.cs" />
+    <Compile Include="ASBinCode\IScope.cs" />
+    <Compile Include="ASBinCode\LinkTypeMapper.cs" />
+    <Compile Include="ASBinCode\MethodGetterBase.cs" />
+    <Compile Include="ASBinCode\nativefunctions\NativeFunctionBase.cs" />
+    <Compile Include="ASBinCode\OpCode.cs" />
+    <Compile Include="ASBinCode\OperatorOverride.cs" />
+    <Compile Include="ASBinCode\OpStep.cs" />
+    <Compile Include="ASBinCode\PackagePathGetter.cs" />
+    <Compile Include="ASBinCode\Register.cs" />
+    <Compile Include="ASBinCode\rtData\RightValue.cs" />
+    <Compile Include="ASBinCode\rtData\rtArray.cs" />
+    <Compile Include="ASBinCode\rtData\rtBoolean.cs" />
+    <Compile Include="ASBinCode\rtData\rtFunction.cs" />
+    <Compile Include="ASBinCode\rtData\rtInt.cs" />
+    <Compile Include="ASBinCode\rtData\rtNull.cs" />
+    <Compile Include="ASBinCode\rtData\rtNumber.cs" />
+    <Compile Include="ASBinCode\rtData\rtObject.cs" />
+    <Compile Include="ASBinCode\rtData\rtString.cs" />
+    <Compile Include="ASBinCode\rtData\rtUInt.cs" />
+    <Compile Include="ASBinCode\rtData\rtUndefined.cs" />
+    <Compile Include="ASBinCode\rtti\Class.cs" />
+    <Compile Include="ASBinCode\rtti\ClassMember.cs" />
+    <Compile Include="ASBinCode\rtti\ClassMemberList.cs" />
+    <Compile Include="ASBinCode\rtti\DictionaryObject.cs" />
+    <Compile Include="ASBinCode\rtti\DynamicObject.cs" />
+    <Compile Include="ASBinCode\rtti\FunctionDefine.cs" />
+    <Compile Include="ASBinCode\rtti\FunctionParameter.cs" />
+    <Compile Include="ASBinCode\rtti\FunctionSignature.cs" />
+    <Compile Include="ASBinCode\rtti\Global_Object.cs" />
+    <Compile Include="ASBinCode\rtti\HostedDynamicObject.cs" />
+    <Compile Include="ASBinCode\rtti\HostedObject.cs" />
+    <Compile Include="ASBinCode\rtti\IHostedObject.cs" />
+    <Compile Include="ASBinCode\rtti\IImportable.cs" />
+    <Compile Include="ASBinCode\rtti\ILinkSystemObjCreator.cs" />
+    <Compile Include="ASBinCode\rtti\LinkSystemObject.cs" />
+    <Compile Include="ASBinCode\rtti\Object.cs" />
+    <Compile Include="ASBinCode\rtti\Vector_Data.cs" />
+    <Compile Include="ASBinCode\rtti\YieldObject.cs" />
+    <Compile Include="ASBinCode\RunTimeDataType.cs" />
+    <Compile Include="ASBinCode\RunTimeScope.cs" />
+    <Compile Include="ASBinCode\RunTimeValueBase.cs" />
+    <Compile Include="ASBinCode\scopes\FunctionScope.cs" />
+    <Compile Include="ASBinCode\scopes\ObjectInstanceScope.cs" />
+    <Compile Include="ASBinCode\scopes\OutPackageMemberScope.cs" />
+    <Compile Include="ASBinCode\scopes\ScopeBase.cs" />
+    <Compile Include="ASBinCode\scopes\StartUpBlockScope.cs" />
+    <Compile Include="ASBinCode\SetThisItemSlot.cs" />
+    <Compile Include="ASBinCode\SLOT.cs" />
+    <Compile Include="ASBinCode\SourceToken.cs" />
+    <Compile Include="ASBinCode\StaticClassDataGetter.cs" />
+    <Compile Include="ASBinCode\SuperPointer.cs" />
+    <Compile Include="ASBinCode\ThisPointer.cs" />
+    <Compile Include="ASBinCode\Variable.cs" />
+    <Compile Include="ASBinCode\VariableBase.cs" />
     <Compile Include="ConsoleOutput.cs" />
     <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
@@ -100,12 +171,6 @@
     <Compile Include="StackSlot.cs" />
     <Compile Include="TypeConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ASBinCode\ASBinCode.csproj">
-      <Project>{42a041bf-f7b9-47c4-8147-1a7987ee8416}</Project>
-      <Name>ASBinCode</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

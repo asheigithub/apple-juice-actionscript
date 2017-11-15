@@ -79,10 +79,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ASBinCode\ASBinCode.csproj">
-      <Project>{42a041bf-f7b9-47c4-8147-1a7987ee8416}</Project>
-      <Name>ASBinCode</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ASRuntime\ASRuntime.csproj">
       <Project>{8c0a5542-f8c6-470c-b194-5a5c50c5a695}</Project>
       <Name>ASRuntime</Name>

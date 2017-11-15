@@ -33,7 +33,7 @@ namespace ASRuntime.operators
 		}
 		
 
-		private HeapSlot[] CallFuncHeap;
+		internal HeapSlot[] CallFuncHeap;
 
         private ASBinCode.rtData.rtFunction function;
 
@@ -61,10 +61,17 @@ namespace ASRuntime.operators
 			return this.function.Equals(function);
 		}
 
+		public RunTimeValueBase functionThisPointer
+		{
+			get
+			{
+				return function.this_pointer;
+			}
+		}
 
         public ASBinCode.rtti.FunctionDefine toCallFunc;
 
-        private int pushedArgs;
+        internal int pushedArgs;
 
         public SLOT returnSlot;
 
@@ -81,7 +88,7 @@ namespace ASRuntime.operators
 
 		public object tag;
 
-		private int onstackparametercount;
+		internal int onstackparametercount;
 
 		public FunctionCaller():this(null,null,null)
 		{
@@ -107,11 +114,14 @@ namespace ASRuntime.operators
         {
             if (!hasReleased)
             {
-                hasReleased = true;
+				//check_para_id = 0;
+				//pushedArgs = 0;
+				//onstackparametercount = 0;
+
+				hasReleased = true;
                 CallFuncHeap = null;
                 
                 toCallFunc = null;
-                pushedArgs = 0;
                 returnSlot = null;
                 _tempSlot = null;
                 callbacker = null;
@@ -119,14 +129,14 @@ namespace ASRuntime.operators
                 
                 invokerFrame = null;
                 token = null;
-                check_para_id = 0;
 
 				tag = null;
-				onstackparametercount = 0;
+				function.Clear();
+
                 player.funcCallerPool.ret(this);
 				player = null;
 
-				function.Clear();
+				
             }
             
         }
@@ -142,11 +152,8 @@ namespace ASRuntime.operators
 		private static ASBinCode.rtData.rtUInt _cachertuint = new ASBinCode.rtData.rtUInt(0);
 		private static ASBinCode.rtData.rtNumber _cachertnumber = new ASBinCode.rtData.rtNumber(0);
 
-		public static RunTimeValueBase getDefaultParameterValue(ASBinCode.rtti.FunctionSignature signature,int i)
+		public static RunTimeValueBase getDefaultParameterValue(RunTimeDataType dt,RunTimeValueBase dv)
 		{
-			var dt = signature.parameters[i].type;
-			var dv = signature.parameters[i].defaultValue.getValue(null, null);
-
 			if (dv.rtType != dt && dt != RunTimeDataType.rt_void)
 			{
 				if (dt == RunTimeDataType.rt_int)
@@ -178,6 +185,15 @@ namespace ASRuntime.operators
 			}
 
 			return dv;
+		}
+
+
+		public static RunTimeValueBase getDefaultParameterValue(ASBinCode.rtti.FunctionSignature signature,int i)
+		{
+			var dt = signature.parameters[i].type;
+			var dv = signature.parameters[i].defaultValue.getValue(null, null,0);
+
+			return getDefaultParameterValue(dt, dv);
 		}
 
 		
@@ -246,11 +262,11 @@ namespace ASRuntime.operators
 			CallFuncHeap =
                 player.genHeapFromCodeBlock(player.swc.blocks[toCallFunc.blockid]);
 
-			int len = signature.parameters.Count;
+			var parameters = signature.parameters;int len = parameters.Count;
 
 			for (int i = 0; i < len; i++)
             {
-				var parameter = signature.parameters[i];
+				var parameter = parameters[i];
                 if (parameter.defaultValue != null)
                 {
 					
@@ -263,10 +279,10 @@ namespace ASRuntime.operators
                     
                     _storeArgementToSlot(i, new ASBinCode.rtData.rtArray());
                 }
-                else
-                {
-                    _storeArgementToSlot(i, ASBinCode.rtData.rtUndefined.undefined);
-                }
+                //else
+                //{
+                //    _storeArgementToSlot(i, ASBinCode.rtData.rtUndefined.undefined);
+                //}
             }
 
             return true;
@@ -481,9 +497,24 @@ namespace ASRuntime.operators
             }
         }
 
+
+		public void pushParameterToStack(RunTimeValueBase argement,int _index)
+		{
+			int index = invokerFrame.baseBottomSlotIndex + invokerFrame.call_parameter_slotCount + _index;
+			invokerFrame.stack[index].directSet(argement);
+			pushedArgs++;
+		}
+
+		public void pushParameterToHeap(RunTimeValueBase argement,int _index)
+		{
+			CallFuncHeap[_index].directSet(
+						argement);
+		}
+
+
+
 		public void pushParameter_noCheck(RunTimeValueBase argement, int id, out bool success)
 		{
-			
 			_storeArgementToSlot(id, argement);
 
 			pushedArgs++;
@@ -737,7 +768,7 @@ namespace ASRuntime.operators
                 {
 
 					returnSlot.directSet(
-						TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null, null));
+						TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null, null,0));
 
 				}
                 if (!ReferenceEquals(callbacker, this))
@@ -923,25 +954,21 @@ namespace ASRuntime.operators
             }
         }
 
-		internal void doCall_allcheckpass_nonative()
+
+		internal void doCall_allcheckpass_nonative_hassetreturndefault_method()
+		{
+			player.callBlock_Method_NoHeap(player.swc.blocks[toCallFunc.blockid], returnSlot, token, callbacker, function.this_pointer);
+		}
+
+		internal void doCall_allcheckpass_nonative_hassetreturndefault()
 		{
 			
-			{
-
-				TypeConverter.setDefaultValueToStackSlot(
-						toCallFunc.signature.returnType,
-						(StackSlot)returnSlot);
-
-
-				player.callBlock(
-					player.swc.blocks[toCallFunc.blockid],
-					CallFuncHeap,
-					returnSlot,
-					function.bindScope,
-					token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
-				
-
-			}
+			player.callBlock(
+				player.swc.blocks[toCallFunc.blockid],
+				CallFuncHeap,
+				returnSlot,
+				function.bindScope,
+				token, callbacker, function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer, RunTimeScopeType.function);
 			
 		}
 
@@ -972,12 +999,36 @@ namespace ASRuntime.operators
         {
 			while (count>0)
 			{
+#if DEBUG
 				int i = invokerFrame.baseBottomSlotIndex + invokerFrame.call_parameter_slotCount; //invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount;
 				--invokerFrame.call_parameter_slotCount;
 				--i;
 				--count;
 				invokerFrame.stack[i].clear();
-				
+
+#else
+				--count;
+
+				StackSlot slot = invokerFrame.stack[invokerFrame.baseBottomSlotIndex + (--invokerFrame.call_parameter_slotCount)];
+				slot.stackObjects = StackSlot.StackObjects.EMPTY;
+
+				if (slot.needclear)
+				{
+					slot.linktarget = null;
+					slot._cache_arraySlot.clear();
+					slot._cache_vectorSlot.clear();
+					slot._cache_prototypeSlot.clear();
+					slot._cache_setthisslot.clear();
+					slot._linkObjCache.clearRefObj();
+					slot._functionValue.Clear();
+					slot.needclear = false;
+				}
+
+
+				slot.store[StackSlot.COMMREFTYPEOBJ] = ASBinCode.rtData.rtNull.nullptr;
+				slot.index = (int)RunTimeDataType.unknown;
+
+#endif
 			}
 			
 
@@ -1055,7 +1106,8 @@ namespace ASRuntime.operators
             
             clear_para_slot(invokerFrame,onstackparametercount);
 			onstackparametercount = 0;
-            invokerFrame.endStep();
+			//invokerFrame.endStep();
+			invokerFrame.endStepNoError();
             release();
             
         }

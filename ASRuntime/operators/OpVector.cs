@@ -11,9 +11,9 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
 
-            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame), frame, step.token);
+            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame.stack, frame.offset), frame, step.token);
 
             if (idx < 0 || idx > vector.innnerList.Count )
             {
@@ -35,13 +35,13 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null));
+                    vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null,0));
                 }
             }
 
             
 
-            StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame);
+            StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame.stack, frame.offset);
             if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
             {
                 slot._cache_vectorSlot.idx = idx;
@@ -61,10 +61,10 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
 
 
-            var idxvalue = step.arg2.getValue(scope, frame);
+            var idxvalue = step.arg2.getValue(scope, frame.stack, frame.offset);
 
             double idx = double.NaN;
 
@@ -119,12 +119,12 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null));
+                        vector.innnerList.Add(TypeConverter.getDefaultValue(vector.vector_type).getValue(null,null,0));
                     }
                 }
 
 
-                StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame);
+                StackSlot slot = (StackSlot)step.reg.getSlot(scope, frame.stack, frame.offset);
 
                 if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete)
                 {
@@ -146,9 +146,9 @@ namespace ASRuntime.operators
 
         public static void exec_push(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
 
-            o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope, frame).Clone());//直接对容器赋值，必须Clone
+            o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope, frame.stack, frame.offset).Clone());//直接对容器赋值，必须Clone
 
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -158,13 +158,13 @@ namespace ASRuntime.operators
         public static void exec_initfromdata(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var player = frame.player;
-            RunTimeValueBase initdata = step.arg2.getValue(scope, frame);
-            int classrttype = ((rtInt)step.arg1.getValue(scope, frame)).value;
+            RunTimeValueBase initdata = step.arg2.getValue(scope, frame.stack, frame.offset);
+            int classrttype = ((rtInt)step.arg1.getValue(scope, frame.stack, frame.offset)).value;
             while (true)
             {
                 if (initdata.rtType == classrttype)
                 {
-                    step.reg.getSlot(scope, frame).directSet(initdata);
+                    step.reg.getSlot(scope, frame.stack, frame.offset).directSet(initdata);
                     frame.endStep(step);
                     return;
                 }
@@ -224,14 +224,14 @@ namespace ASRuntime.operators
             var vector = ((StackFrame)sender.args).instanceCreator.objectResult;
 
             StackFrame frame = (StackFrame)sender.args;
-            sender.step.reg.getSlot(sender.scope, frame).directSet(
+            sender.step.reg.getSlot(sender.scope, frame.stack, frame.offset).directSet(
                 vector);
 
             var step = sender.step;
             
             RunTimeScope scope = sender.scope;
 
-            RunTimeValueBase initdata = step.arg2.getValue(scope, frame);
+            RunTimeValueBase initdata = step.arg2.getValue(scope, frame.stack, frame.offset);
 
             if (initdata.rtType == RunTimeDataType.rt_array)
             {
@@ -251,24 +251,24 @@ namespace ASRuntime.operators
 
         public static void exec_pushVector(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
 
             _pushVector(o, frame, step, scope);
         }
 
         public static void _pushVector(ASBinCode.rtti.Vector_Data o,  StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var arr = step.arg2.getValue(scope, frame);
+            var arr = step.arg2.getValue(scope, frame.stack, frame.offset);
             if (arr.rtType == RunTimeDataType.rt_null)
             {
                 frame.throwCastException(step.token, RunTimeDataType.rt_null,
-                    step.arg1.getValue(scope, frame).rtType
+                    step.arg1.getValue(scope, frame.stack, frame.offset).rtType
                     );
                 frame.endStep(step);
             }
             else
             {
-                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg2.getValue(scope, frame)).value).hosted_object;
+                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg2.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
                 if (array.innnerList.Count == 0)
                 {
                     frame.endStep(step);
@@ -289,18 +289,18 @@ namespace ASRuntime.operators
 
         public static void exec_pusharray(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
             _pusharray(o, frame, step, scope);
         }
 
         public static void _pusharray( ASBinCode.rtti.Vector_Data o , StackFrame frame, OpStep step, RunTimeScope scope)
         {
 
-            var arr = step.arg2.getValue(scope, frame);
+            var arr = step.arg2.getValue(scope, frame.stack, frame.offset);
             if (arr.rtType == RunTimeDataType.rt_null)
             {
                 frame.throwCastException(step.token, RunTimeDataType.rt_null,
-                    step.arg1.getValue(scope, frame).rtType
+                    step.arg1.getValue(scope, frame.stack, frame.offset).rtType
                     );
                 frame.endStep(step);
             }

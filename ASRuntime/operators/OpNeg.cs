@@ -9,7 +9,7 @@ namespace ASRuntime.operators
     {
         public static void execNeg(StackFrame frame, ASBinCode.OpStep step,ASBinCode.RunTimeScope scope)
         {
-            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
+            ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame.stack, frame.offset);
 
             if (v.rtType != ASBinCode.RunTimeDataType.rt_number)
             {
@@ -23,7 +23,7 @@ namespace ASRuntime.operators
 					if (!fc.createParaScope()) { return; }
 					bool success;
                     fc.pushParameter(v, 0, out success);
-                    fc.returnSlot = step.reg.getSlot(scope, frame);
+                    fc.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
                     fc.callbacker = fc;
                     fc.call();
 
@@ -36,7 +36,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                step.reg.getSlot(scope, frame).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
+                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(-((ASBinCode.rtData.rtNumber)v).value);//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));
 																							   //frame.endStep(step);
 				frame.endStepNoError();
             }
@@ -53,7 +53,7 @@ namespace ASRuntime.operators
             else
             {
 
-                step.reg.getSlot(scope, frame).setValue(
+                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(
                     -TypeConverter.ConvertToNumber(v1)  
                     );
 				//frame.endStep(step);
@@ -64,7 +64,7 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope
             )
         {
-            step.reg.getSlot(scope, frame).setValue(
+            step.reg.getSlot(scope, frame.stack, frame.offset).setValue(
                     -TypeConverter.ConvertToNumber(v1)
                     //-((ASBinCode.rtData.rtNumber)v1).value
                     );//new ASBinCode.rtData.rtNumber( -((ASBinCode.rtData.rtNumber)v).value));

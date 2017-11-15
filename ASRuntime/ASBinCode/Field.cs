@@ -25,8 +25,8 @@ namespace ASBinCode
 			metas = new List<FieldMeta>();
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
                 scope = scope.parent;
@@ -50,8 +50,8 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public sealed override SLOT getSlot(RunTimeScope scope, RunTimeDataHolder holder)
-        {
+        public sealed override SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
             while (scope.scopeType != RunTimeScopeType.objectinstance)
             {
                 scope = scope.parent;
@@ -75,9 +75,9 @@ namespace ASBinCode
             return scope.memberData[indexOfMembers];
         }
 
-        public override RunTimeValueBase getValue(RunTimeScope scope, RunTimeDataHolder holder)
-        {
-            var slot = getSlot(scope, holder);
+        public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+		{
+            var slot = getSlot(scope, slots,stoffset);
             if (slot == null)   //**匿名函数引用了类的成员，但是又在闭包环境下在别的地方被调用，就有可能出现找不到的情况
             {
                 return ASBinCode.rtData.rtUndefined.undefined;

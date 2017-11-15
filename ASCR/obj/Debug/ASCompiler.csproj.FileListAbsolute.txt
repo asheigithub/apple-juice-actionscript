@@ -80,10 +80,8 @@ F:\ASTool\ASCR\obj\Debug\ASCompiler.csproj.CoreCompileInputs.cache
 F:\ASTool\ASCR\bin\Debug\ASCompiler.dll.config
 F:\ASTool\ASCR\bin\Debug\ASCompiler.dll
 F:\ASTool\ASCR\bin\Debug\ASCompiler.pdb
-F:\ASTool\ASCR\bin\Debug\ASBinCode.dll
 F:\ASTool\ASCR\bin\Debug\ASRuntime.dll
 F:\ASTool\ASCR\bin\Debug\ASTool.dll
-F:\ASTool\ASCR\bin\Debug\ASBinCode.pdb
 F:\ASTool\ASCR\bin\Debug\ASRuntime.pdb
 F:\ASTool\ASCR\bin\Debug\ASTool.pdb
 F:\ASTool\ASCR\bin\Debug\ASTool.xml
