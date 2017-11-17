@@ -53,9 +53,9 @@ namespace ASCTest.regNativeFunctions
         public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
             errormessage = null; errorno = 0;
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue(),null,null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue(), null, null);
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
 
             ((LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value).value =
                  new TimeSpan(hours, minutes, seconds);
@@ -590,7 +590,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.Milliseconds);
+            (returnSlot).setValue(lobj.value.Milliseconds);
 
 
             success = true;
@@ -661,7 +661,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.Minutes);
+            returnSlot.setValue(lobj.value.Minutes);
 
 
             success = true;
@@ -732,7 +732,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.Seconds);
+            (returnSlot).setValue(lobj.value.Seconds);
 
 
             success = true;
@@ -882,7 +882,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.TotalDays);
+            (returnSlot).setValue(lobj.value.TotalDays);
 
 
             success = true;
@@ -953,7 +953,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.TotalHours);
+            (returnSlot).setValue(lobj.value.TotalHours);
 
 
             success = true;
@@ -1024,7 +1024,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.TotalMilliseconds);
+            (returnSlot).setValue(lobj.value.TotalMilliseconds);
 
 
             success = true;
@@ -1095,7 +1095,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.TotalMinutes);
+            (returnSlot).setValue(lobj.value.TotalMinutes);
 
 
             success = true;
@@ -1166,7 +1166,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
 
 
-            ((StackSlot)returnSlot).setValue(lobj.value.TotalSeconds);
+            (returnSlot).setValue(lobj.value.TotalSeconds);
 
 
             success = true;
@@ -1328,10 +1328,10 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
         {
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue(), null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue(), null, null);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue());
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
             StackFrame frame = (StackFrame)stackframe;
@@ -1402,11 +1402,11 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
         {
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue(), null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue(), null, null);
-            int milliseconds = ASRuntime.TypeConverter.ConvertToInt(argements[4].getValue(), null, null);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue());
+            int milliseconds = ASRuntime.TypeConverter.ConvertToInt(argements[4].getValue());
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
             StackFrame frame = (StackFrame)stackframe;

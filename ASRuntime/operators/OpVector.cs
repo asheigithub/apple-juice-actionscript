@@ -13,7 +13,7 @@ namespace ASRuntime.operators
             ASBinCode.rtti.Vector_Data vector =
                 (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame.stack, frame.offset)).value).hosted_object;
 
-            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame.stack, frame.offset), frame, step.token);
+            int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame.stack, frame.offset));
 
             if (idx < 0 || idx > vector.innnerList.Count )
             {
@@ -21,7 +21,7 @@ namespace ASRuntime.operators
                     "The index "+idx+" is out of range "+ vector.innnerList.Count +".");
             }
 
-            Register reg = (Register)step.reg;
+            StackSlotAccessor reg = (StackSlotAccessor)step.reg;
 
             if (idx == vector.innnerList.Count)
             {
@@ -105,7 +105,7 @@ namespace ASRuntime.operators
                         "The index " + index + " is out of range " + vector.innnerList.Count + ".");
                 }
 
-                Register reg = (Register)step.reg;
+                StackSlotAccessor reg = (StackSlotAccessor)step.reg;
 
                 if (idx == vector.innnerList.Count)
                 {

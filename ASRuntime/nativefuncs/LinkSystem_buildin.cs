@@ -593,12 +593,12 @@ namespace ASRuntime.nativefuncs
             var arg = argements[0];
             if (arg.rtType == RunTimeDataType.rt_null)
             {
-                ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(null));
+                (returnSlot).setValue(lobj.value.CompareTo(null));
             }
             else
             {
                 LinkSystemObject argObj = (LinkSystemObject)((ASBinCode.rtData.rtObject)arg).value;
-                ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(argObj.GetLinkData()));
+                (returnSlot).setValue(lobj.value.CompareTo(argObj.GetLinkData()));
 
             }
             success = true;
@@ -697,12 +697,12 @@ namespace ASRuntime.nativefuncs
             var arg = argements[0];
             if (arg.rtType == RunTimeDataType.rt_null)
             {
-                ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(default(T)));
+                (returnSlot).setValue(lobj.value.CompareTo(default(T)));
             }
             else
             {
                 LinkObj<T> argObj = (LinkObj<T>)((ASBinCode.rtData.rtObject)arg).value;
-                ((StackSlot)returnSlot).setValue(lobj.value.CompareTo(argObj.value));
+                (returnSlot).setValue(lobj.value.CompareTo(argObj.value));
 
             }
             success = true;
@@ -741,7 +741,7 @@ namespace ASRuntime.nativefuncs
 
             LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value;
 
-            ((StackSlot)returnSlot).setValue((int)lo.GetLinkData());
+            (returnSlot).setValue((int)lo.GetLinkData());
 
 
 

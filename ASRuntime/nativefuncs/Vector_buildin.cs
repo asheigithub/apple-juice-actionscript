@@ -1917,7 +1917,7 @@ namespace ASRuntime.nativefuncs
 							}
 							else
 							{
-								return TypeConverter.ConvertToInt(stackframe._tempSlot2.getValue(), stackframe, token);
+								return TypeConverter.ConvertToInt(stackframe._tempSlot2.getValue());
 							}
 
 						}

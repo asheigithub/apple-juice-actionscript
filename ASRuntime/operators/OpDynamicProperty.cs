@@ -14,7 +14,7 @@ namespace ASRuntime.operators
         public static void exec_delete(StackFrame frame,OpStep step, RunTimeScope scope)
         {
             {
-                StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope, frame.stack, frame.offset);
+                StackSlot slot = (StackSlot)((StackSlotAccessor)step.arg1).getSlot(scope, frame.stack, frame.offset);
 
 				var ls = slot.getLinkSlot();
 

@@ -81,7 +81,7 @@ namespace ASRuntime
                             OpStep step = new OpStep(OpCode.new_instance, new SourceToken(0, 0, ""));
                             step.arg1 = new RightValue(new rtInt(swc.classes[i].classid));
                             step.arg1Type = swc.classes[i].getRtType();
-                            step.reg = new Register(0,ushort.MaxValue);
+                            step.reg = new StackSlotAccessor(0,ushort.MaxValue);
                             step.regType = swc.classes[i].getRtType();
 
                             defaultblock.opSteps.Add(step);
@@ -332,75 +332,58 @@ namespace ASRuntime
 									currentRunFrame.callbacker = null;
 
 								}
-
+#if DEBUG
 								currentRunFrame.close();
+								
+#else
 								//人肉内联close代码
-								//{
-								//	currentRunFrame.isclosed = true;
+								{
+									currentRunFrame.isclosed = true;
+									int bottomidx = currentRunFrame.baseBottomSlotIndex;
+									for (int i = currentRunFrame.offset; i < bottomidx; i++)
+									{
+										StackSlot slot = stackSlots[i];
+										if (slot.refPropChanged)
+										{
+											slot.refPropChanged = false;
+											slot.stackObjects = StackSlot.StackObjects.EMPTY;
 
-								//	currentRunFrame.typeconvertoperator = null;
-								//	currentRunFrame.funCaller = null;
-
-								//	currentRunFrame.deActiveInstanceCreator();
-
-									
-								//	int end = currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1 + currentRunFrame.call_parameter_slotCount;
-								//	//清除执行栈
-								//	for (int i = currentRunFrame.offset; i < end; i++)
-								//	{
-								//		StackSlot slot = (StackSlot)currentRunFrame.stack[i];
-								//		slot.linktarget = null;
-								//		slot.propGetSet = null;
-								//		slot.propBindObj = null;
-								//		slot.superPropBindClass = null;
-
-								//		slot._temp_try_write_setthisitem = null;
-
-								//		slot._cache_arraySlot.clear();
-								//		slot._cache_vectorSlot.clear();
-								//		slot._cache_prototypeSlot.clear();
-								//		slot._cache_setthisslot.clear();
-								//		slot._linkObjCache.clearRefObj();
-								//		slot._linkObjCache.srcObject = null;
-
-								//		slot._functionValue.Clear();
-
-								//		var store = slot.store;
-								//		store[RunTimeDataType.rt_string] = rtNull.nullptr;
-								//		store[RunTimeDataType.rt_function] = rtNull.nullptr;
-								//		store[RunTimeDataType.rt_array] = rtNull.nullptr;
-								//		store[RunTimeDataType._OBJECT] = rtNull.nullptr;
-
-								//		slot.index = (int)RunTimeDataType.unknown;
-								//	}
+											if (slot.needclear)
+											{
+												slot.linktarget = null;
+												slot._cache_arraySlot.clear();
+												slot._cache_vectorSlot.clear();
+												slot._cache_prototypeSlot.clear();
+												slot._cache_setthisslot.clear();
+												slot._linkObjCache.clearRefObj();
+												slot._functionValue.Clear();
+												slot.needclear = false;
+											}
 
 
+											slot.store[StackSlot.COMMREFTYPEOBJ] = rtNull.nullptr;
+											
+										}
+										slot.index = (int)RunTimeDataType.unknown;
+									}
 
-								//	currentRunFrame.tryCatchState.Clear();
-								//	currentRunFrame.block = null;
-								//	currentRunFrame.scope = null;
-								//	currentRunFrame.static_objects = null;
-								//	currentRunFrame.offset = 0;
-								//	currentRunFrame.call_parameter_slotCount = 0;
-								//	currentRunFrame.stack = null;
-								//	currentRunFrame.player = null;
-								//	currentRunFrame.returnSlot = null;
-								//	currentRunFrame.callbacker = null;
-								//	currentRunFrame.codeLinePtr = 0;
-								//	currentRunFrame.holdedError = null;
-								//	currentRunFrame.hasCallJump = false;
-								//	currentRunFrame.hasCallReturn = false;
-								//	currentRunFrame.holdHasCallReturn = false;
-								//	currentRunFrame.holdhasjumpto = false;
-								//	currentRunFrame.holdjumptoline = 0;
-								//	currentRunFrame.jumptoline = 0;
-								//	currentRunFrame.trystateCount = 0;
-								//	currentRunFrame.runtimeError = null;
-								//	currentRunFrame.typeconvertoperator = null;
 
-								//	currentRunFrame.hascallstep = false;
+									currentRunFrame.scope = null;
+									currentRunFrame.typeconvertoperator = null;
+									currentRunFrame.funCaller = null;
+									currentRunFrame.deActiveInstanceCreator();
+									currentRunFrame.returnSlot = null;
+									currentRunFrame.callbacker = null;
+									currentRunFrame.holdedError = null;
 
-								//}
+
+									currentRunFrame.tryCatchState.Clear();
+									currentRunFrame.runtimeError = null;
+									currentRunFrame.hascallstep = false;
+
+								}
+
+#endif
 
 
 
@@ -420,7 +403,7 @@ namespace ASRuntime
 							}
 							else
 							{
-
+								//currentRunFrame.step();
 								#region 人肉内联
 
 								var block = currentRunFrame.block;
@@ -491,9 +474,6 @@ namespace ASRuntime
 									case OpCode.lt_num:
 										operators.OpLogic.execLT_NUM(currentRunFrame, step, scope);
 										break;
-									//case OpCode.lt_int_int:
-									//    operators.OpLogic.execLT_IntInt(this, step, scope);
-									//    break;
 									case OpCode.lt_void:
 										operators.OpLogic.execLT_VOID(currentRunFrame, step, scope);
 										break;
@@ -613,25 +593,16 @@ namespace ASRuntime
 										break;
 									case OpCode.if_jmp:
 										{
-											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack,currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
 											{
-												if (currentRunFrame.tryCatchState.Count != 0)
-												{
-													currentRunFrame.hasCallJump = true;
-													currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
-													currentRunFrame.endStep(step);
-													break;
-												}
-												else
-												{
-													currentRunFrame.codeLinePtr += step.jumoffset - 1;
-													currentRunFrame.endStep(step);
-													break;
-												}
+												currentRunFrame.hasCallJump = true;
+												currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset;
+												currentRunFrame.endStep(step);
+												break;
 											}
 											else
 											{
-												currentRunFrame.endStep(step);
+												++currentRunFrame.codeLinePtr; //currentRunFrame.endStepNoError(); //.endStep(step);
 											}
 										}
 										break;
@@ -639,7 +610,7 @@ namespace ASRuntime
 										{
 											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)
 											{
-												currentRunFrame.codeLinePtr += step.jumoffset;
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 											}
 											else
 											{
@@ -648,22 +619,13 @@ namespace ASRuntime
 										}
 										break;
 									case OpCode.jmp:
-										if (currentRunFrame.tryCatchState.Count != 0)
-										{
-											currentRunFrame.hasCallJump = true;
-											currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
-											currentRunFrame.endStep(step);
-											break;
-										}
-										else
-										{
-											currentRunFrame.codeLinePtr += step.jumoffset - 1;
-											currentRunFrame.endStep(step);
-											break;
-										}
+										currentRunFrame.hasCallJump = true;
+										currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset;
+										currentRunFrame.endStep(step);
+										break;
 									case OpCode.jmp_notry:
 										{
-											currentRunFrame.codeLinePtr += step.jumoffset;
+											currentRunFrame.codeLinePtr += step.jumoffset + 1;
 											break;
 										}
 									case OpCode.raise_error:
@@ -889,7 +851,7 @@ namespace ASRuntime
 									case OpCode.cast_number_int:
 										{
 											var v1 = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
-											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToInt(v1, currentRunFrame, null));
+											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(TypeConverter.ConvertToInt(v1));
 											currentRunFrame.endStepNoError();
 											break;
 										}
@@ -964,7 +926,8 @@ namespace ASRuntime
 									case OpCode.function_return_nofunction:
 										{
 											currentRunFrame.hasCallReturn = true;
-											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+											RunTimeValueBase rv = step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset);
+											currentRunFrame.returnSlot.directSet(rv);
 											currentRunFrame.endStep(step);
 										}
 										break;
@@ -992,11 +955,10 @@ namespace ASRuntime
 										}
 									case OpCode.call_function_notcheck_notreturnobject_notnative:
 										{
-											var funCaller = currentRunFrame.funCaller;
-											funCaller.callbacker = funCaller;
-											funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
-											funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
-											funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
+											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset);
+											currentRunFrame.funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+											currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
 											currentRunFrame.funCaller = null;
 
 											break;
@@ -1016,19 +978,228 @@ namespace ASRuntime
 
 											break;
 										}
-									case OpCode.sub_number_number:
+									
+									case OpCode.if_equality_num_num_jmp_notry:
 										{
-											double a1 = ((rtNumber)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
-											double a2 = ((rtNumber)step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value;
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 == n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1; //jumtooffset位置为label,因此直接可以再跳过一层
 
-											step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(a1 - a2);//new ASBinCode.rtData.rtNumber(a1.value - a2.value));
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_equality_num_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 == n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1; //jumtooffset位置为label,因此直接可以再跳过一层
+
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_not_equality_num_num_jmp_notry:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 != n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_not_equality_num_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 != n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_le_num_jmp_notry:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 <= n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_le_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 <= n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_lt_num_jmp_notry:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 < n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_lt_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 < n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_ge_num_jmp_notry:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 >= n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_ge_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 >= n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_gt_num_jmp_notry:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 > n2)
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_gt_num_jmp_notry_noreference:
+										{
+											var n1 = (step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).toNumber();
+											if (n1 > n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.afterIncDes_clear_v1_link:
+										{
+											((StackSlot)((StackSlotAccessor)step.arg1).getSlotForAssign(scope, currentRunFrame.stack, currentRunFrame.offset)).linkTo(null);
 											currentRunFrame.endStepNoError();
 											break;
 										}
+									case OpCode.access_dot_memregister:
+										operators.OpAccess_Dot.exec_dot_register(currentRunFrame, step, scope);
+										break;
+									case OpCode.sub_number_memnumber_memnumber:
+										((MemRegister_Number)step.reg).value.value =
+											((MemRegister_Number)step.arg1).value.value -
+											((MemRegister_Number)step.arg2).value.value;
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.div_number_memnumber_memnumber:
+										((MemRegister_Number)step.reg).value.value =
+											((MemRegister_Number)step.arg1).value.value /
+											((MemRegister_Number)step.arg2).value.value;
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.multi_number_memnumber_memnumber:
+										((MemRegister_Number)step.reg).value.value =
+											((MemRegister_Number)step.arg1).value.value *
+											((MemRegister_Number)step.arg2).value.value;
+										++currentRunFrame.codeLinePtr;
+										break;
 									default:
 										throw new Exception(step.opCode + "操作未实现");
 								}
-
 
 								#endregion
 
@@ -1253,7 +1424,7 @@ namespace ASRuntime
 				var block = calledblock;
 				for (int i = 0; i < block.regConvFromVar.Count; i++)
 				{
-					Register regvar = block.regConvFromVar[i];
+					StackSlotAccessor regvar = block.regConvFromVar[i];
 					var slot = (StackSlot)regvar.getSlot(null, frame.stack, frame.offset);
 					TypeConverter.setDefaultValueToStackSlot(
 						regvar.valueType, slot
@@ -1327,7 +1498,7 @@ namespace ASRuntime
                 var block = calledblock;
                 for (int i = 0; i < block.regConvFromVar.Count; i++)
                 {
-                    Register regvar = block.regConvFromVar[i];
+                    StackSlotAccessor regvar = block.regConvFromVar[i];
                     var slot = (StackSlot)regvar.getSlot(null, frame.stack,frame.offset);
                     TypeConverter.setDefaultValueToStackSlot(
                         regvar.valueType,slot
@@ -1733,7 +1904,7 @@ namespace ASRuntime
             }
             else
             {
-#if DEBUG
+#if DEBUG || true
 				currentRunFrame.step();
 #else
 
@@ -1807,9 +1978,6 @@ namespace ASRuntime
 					case OpCode.lt_num:
 						operators.OpLogic.execLT_NUM(currentRunFrame, step, scope);
 						break;
-					//case OpCode.lt_int_int:
-					//    operators.OpLogic.execLT_IntInt(this, step, scope);
-					//    break;
 					case OpCode.lt_void:
 						operators.OpLogic.execLT_VOID(currentRunFrame, step, scope);
 						break;
@@ -1931,23 +2099,14 @@ namespace ASRuntime
 						{
 							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
 							{
-								if (currentRunFrame.tryCatchState.Count != 0)
-								{
-									currentRunFrame.hasCallJump = true;
-									currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
-									currentRunFrame.endStep(step);
-									break;
-								}
-								else
-								{
-									currentRunFrame.codeLinePtr += step.jumoffset - 1;
-									currentRunFrame.endStep(step);
-									break;
-								}
+								currentRunFrame.hasCallJump = true;
+								currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset;
+								currentRunFrame.endStep(step);
+								break;
 							}
 							else
 							{
-								currentRunFrame.endStep(step);
+								++currentRunFrame.codeLinePtr; //currentRunFrame.endStepNoError(); //.endStep(step);
 							}
 						}
 						break;
@@ -1955,7 +2114,7 @@ namespace ASRuntime
 						{
 							if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset)).value)
 							{
-								currentRunFrame.codeLinePtr += step.jumoffset;				
+								currentRunFrame.codeLinePtr += step.jumoffset+1;				
 							}
 							else
 							{
@@ -1964,22 +2123,13 @@ namespace ASRuntime
 						}
 						break;
 					case OpCode.jmp:
-						if (currentRunFrame.tryCatchState.Count != 0)
-						{
-							currentRunFrame.hasCallJump = true;
-							currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset - 1;
-							currentRunFrame.endStep(step);
-							break;
-						}
-						else
-						{
-							currentRunFrame.codeLinePtr += step.jumoffset - 1;
-							currentRunFrame.endStep(step);
-							break;
-						}
+						currentRunFrame.hasCallJump = true;
+						currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset;
+						currentRunFrame.endStep(step);
+						break;
 					case OpCode.jmp_notry:
 						{
-							currentRunFrame.codeLinePtr += step.jumoffset ;
+							currentRunFrame.codeLinePtr += step.jumoffset+1 ;
 							break;
 						}
 					case OpCode.raise_error:
@@ -2341,6 +2491,197 @@ namespace ASRuntime
 							currentRunFrame.endStepNoError();
 							break;
 						}
+					case OpCode.if_equality_num_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 == n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1; //jumtooffset位置为label,因此直接可以再跳过一层
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_equality_num_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 == n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1; //jumtooffset位置为label,因此直接可以再跳过一层
+								
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_not_equality_num_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 != n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_not_equality_num_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 != n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_le_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 <= n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_le_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 <= n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_lt_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 < n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_lt_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 < n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_ge_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 >= n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_ge_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 >= n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_gt_num_jmp_notry:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 > n2)
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								step.reg.getSlot(scope, currentRunFrame.stack, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
+					case OpCode.if_gt_num_jmp_notry_noreference:
+						{
+							var n1 = TypeConverter.ConvertToNumber(step.arg1.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							var n2 = TypeConverter.ConvertToNumber(step.arg2.getValue(scope, currentRunFrame.stack, currentRunFrame.offset));
+							if (n1 > n2)
+							{
+								currentRunFrame.codeLinePtr += step.jumoffset+1;
+								
+							}
+							else
+							{
+								++currentRunFrame.codeLinePtr;
+							}
+						}
+						break;
 					default:
 						throw new Exception(step.opCode + "操作未实现");
 				}
@@ -2527,7 +2868,7 @@ namespace ASRuntime
 					case RunTimeDataType.rt_boolean:
 						return (((rtBoolean)rv).value);
 					case RunTimeDataType.rt_int:
-						return TypeConverter.ConvertToInt(rv, null, null);
+						return TypeConverter.ConvertToInt(rv);
 					case RunTimeDataType.rt_uint:
 						return TypeConverter.ConvertToUInt(rv, null, null);
 					case RunTimeDataType.rt_number:

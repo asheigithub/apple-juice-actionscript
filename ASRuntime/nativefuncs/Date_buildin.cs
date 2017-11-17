@@ -291,7 +291,7 @@ namespace ASRuntime.nativefuncs
 				{
 					try
 					{
-						int year = TypeConverter.ConvertToInt(argements[0], null, null);
+						int year = TypeConverter.ConvertToInt(argements[0]);
 
 						if (year < 100) { year = 1900 + year; }
 

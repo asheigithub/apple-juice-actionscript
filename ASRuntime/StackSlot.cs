@@ -89,7 +89,7 @@ namespace ASRuntime
 
 		public void linkTo(SLOT linktarget)
         {
-			needclear = true;
+			needclear = true;refPropChanged = true;
             this.linktarget = linktarget;
         }
 
@@ -212,8 +212,8 @@ namespace ASRuntime
 							_functionValue.CopyFrom((rtFunction)value);
 							//store[index] = _functionValue;
 							store[COMMREFTYPEOBJ] = _functionValue;
-							needclear = true;
-                        }
+							needclear = true; refPropChanged = true;
+						}
                         break;
                     case RunTimeDataType.fun_void:
                         store[index] = value;
@@ -221,20 +221,20 @@ namespace ASRuntime
                     case RunTimeDataType.rt_array:
                         {
 							//store[index] = value;
-							store[COMMREFTYPEOBJ] = value;
-                        }
+							store[COMMREFTYPEOBJ] = value; refPropChanged = true;
+						}
                         break;
                     case RunTimeDataType.unknown:
                         store[index] = null;
                         break;
                     default:
                         {
-                            rtObject obj = (rtObject)value;
+                            rtObject obj = (rtObject)value;refPropChanged = true;
                             if (obj.value._class.isLink_System)
                             {
 								if (obj is StackLinkObjectCache.StackCacheObject)
 								{
-									needclear = true;
+									needclear = true; 
 									//链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
 									//要重新创建rtObject,而是直接更新缓存的rtObject.
 									var cacheobj = _linkObjCache.getCacheObj(obj.value._class);
@@ -297,8 +297,8 @@ namespace ASRuntime
         //仅用于链接对象的赋值更新
         public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player ,T value)
         {
-			needclear = true;
-            index = RunTimeDataType._OBJECT;
+			needclear = true; refPropChanged = true;
+			index = RunTimeDataType._OBJECT;
 
             var cacheobj = _linkObjCache.getCacheObj(clsType);
 			
@@ -487,28 +487,32 @@ namespace ASRuntime
 #endif 
 		bool needclear;
 
-
+		internal bool refPropChanged;
 
         public sealed override void clear()
         {
-			stackObjects = StackObjects.EMPTY;
-			
-
-			if (needclear)
+			if (refPropChanged)
 			{
-				linktarget = null;
-				_cache_arraySlot.clear();
-				_cache_vectorSlot.clear();
-				_cache_prototypeSlot.clear();
-				_cache_setthisslot.clear();
-				_linkObjCache.clearRefObj();
-				_functionValue.Clear();
-				needclear = false;
+				refPropChanged = false;
+				stackObjects = StackObjects.EMPTY;
+
+
+				if (needclear)
+				{
+					linktarget = null;
+					_cache_arraySlot.clear();
+					_cache_vectorSlot.clear();
+					_cache_prototypeSlot.clear();
+					_cache_setthisslot.clear();
+					_linkObjCache.clearRefObj();
+					_functionValue.Clear();
+					needclear = false;
+				}
+
+
+
+				store[COMMREFTYPEOBJ] = rtNull.nullptr;
 			}
-
-
-
-			store[COMMREFTYPEOBJ] = rtNull.nullptr;
 			index = (int)RunTimeDataType.unknown;
         }
 

@@ -202,7 +202,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_int_number, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -219,7 +219,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_number_int, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -235,7 +235,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_uint_number, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -251,7 +251,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_number_uint, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -267,7 +267,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_int_uint, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -283,7 +283,7 @@ namespace ASCompiler.compiler.builds
 					OpStep op =
 					new OpStep(OpCode.cast_uint_int, token);
 
-					Register tempreg = env.getAdditionalRegister();
+					StackSlotAccessor tempreg = env.getAdditionalRegister();
 					tempreg.setEAXTypeWhenCompile(dstType);
 					op.reg = tempreg; tempreg.isFuncResult = true;
 					op.regType = dstType;
@@ -303,7 +303,7 @@ namespace ASCompiler.compiler.builds
                 OpStep op =
                     new OpStep(OpCode.cast, token);
 
-                Register tempreg = env.getAdditionalRegister();
+                StackSlotAccessor tempreg = env.getAdditionalRegister();
                 tempreg.setEAXTypeWhenCompile(dstType);
                 op.reg = tempreg;tempreg.isFuncResult = true;
                 op.regType = dstType;
@@ -328,7 +328,7 @@ namespace ASCompiler.compiler.builds
                 OpStep op =
                     new OpStep(OpCode.cast_primitive, token);
 
-                Register tempreg = env.getAdditionalRegister();
+                StackSlotAccessor tempreg = env.getAdditionalRegister();
                 tempreg.setEAXTypeWhenCompile(dstType);
                 op.reg = tempreg;
                 op.regType = dstType;
@@ -376,7 +376,7 @@ namespace ASCompiler.compiler.builds
                         && signature.returnType != RunTimeDataType.fun_void
                     )
                 {
-                    Register dot_eax = null;
+                    StackSlotAccessor dot_eax = null;
                     {
                         OpStep op = new OpStep(OpCode.access_method, token);
                         var eax = env.getAdditionalRegister();
@@ -492,7 +492,7 @@ namespace ASCompiler.compiler.builds
         private void buildPropSet(ClassPropertyGetter prop,
             ASTool.AS3.Expr.AS3ExprStep step,string name,CompileEnv env,
             ASBinCode.rtti.Class refClass,RightValueBase rv, RightValueBase setterbindobj
-            ,Register eax
+            ,StackSlotAccessor eax
             )
         {
             var member = refClass.classMembers[prop.indexOfMembers];
@@ -614,7 +614,7 @@ namespace ASCompiler.compiler.builds
 							"Package cannot be used as a value: '"+ ((PackagePathGetter)rv).path +"'."));
 					}
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
 
                     if (eax._hasUnaryOrShuffixOrDelete)
                     {
@@ -708,13 +708,13 @@ namespace ASCompiler.compiler.builds
                         if (
                             memberLeftValue is MethodGetterBase
                             ||
-                            ((Register)memberLeftValue)._regMember.bindField is MethodGetterBase
+                            ((StackSlotAccessor)memberLeftValue)._regMember.bindField is MethodGetterBase
                             //||
                             //((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
                             ||
-                            (((Register)memberLeftValue)._regMember.bindField is VariableBase
+                            (((StackSlotAccessor)memberLeftValue)._regMember.bindField is VariableBase
                                 &&
-                                ((VariableBase)((Register)memberLeftValue)._regMember.bindField).isConst
+                                ((VariableBase)((StackSlotAccessor)memberLeftValue)._regMember.bindField).isConst
                             )
                             )
                         {
@@ -722,21 +722,21 @@ namespace ASCompiler.compiler.builds
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                                 "Illegal assignment to " + step.Arg1.Data.Value));
                         }
-                        else if (((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter)
+                        else if (((StackSlotAccessor)memberLeftValue)._regMember.bindField is ClassPropertyGetter)
                         {
                             var eaxsp = env.getAdditionalRegister();
 
-                            AccessBuilder.make_dotStep(env, ((Register)memberLeftValue)._regMember, 
+                            AccessBuilder.make_dotStep(env, ((StackSlotAccessor)memberLeftValue)._regMember, 
                                 step.token, eaxsp,
                                 ((FindStaticMember)member).static_class
                                 );
 
                             ClassPropertyGetter prop = (ClassPropertyGetter)
-                                ((Register)memberLeftValue)._regMember.bindField;
+                                ((StackSlotAccessor)memberLeftValue)._regMember.bindField;
                             buildPropSet(prop, step, prop.name, env,
-                                ((Register)memberLeftValue)._regMember.refClass, 
+                                ((StackSlotAccessor)memberLeftValue)._regMember.refClass, 
                                 getRightValue(env,step.Arg2 ,step.token,builder) ,
-                                ((Register)memberLeftValue)._regMemberSrcObj, eaxsp);
+                                ((StackSlotAccessor)memberLeftValue)._regMemberSrcObj, eaxsp);
 
                             return;
 
@@ -780,7 +780,7 @@ namespace ASCompiler.compiler.builds
 
 
                         memberLeftValue = ((FindOutPackageScopeMember)member).buildAccessThisMember(step.token, env);
-                        ((Register)memberLeftValue)._isassigntarget = true;
+                        ((StackSlotAccessor)memberLeftValue)._isassigntarget = true;
                     }
 
                     if (memberLeftValue is ClassPropertyGetter)
@@ -868,7 +868,7 @@ namespace ASCompiler.compiler.builds
                 if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
                     (OverrideableOperator.addition, v1.valueType, v2.valueType) != null)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(
                         builder.bin.operatorOverrides.getOperatorDefine
                                 (OverrideableOperator.addition, v1.valueType, v2.valueType).signature.returnType);
@@ -923,7 +923,7 @@ namespace ASCompiler.compiler.builds
                             v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                         }
                     }
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(rt);
 
                     ASBinCode.OpStep op;// = new ASBinCode.OpStep(ASBinCode.OpCode.add,new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -972,7 +972,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v2.valueType == RunTimeDataType.rt_void)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         
                         ASBinCode.OpStep op;
@@ -995,7 +995,7 @@ namespace ASCompiler.compiler.builds
                         ASBinCode.rtti.FunctionDefine f = null; if(!env.isEval) f= builder.bin.operatorOverrides.getOperatorDefine(OverrideableOperator.subtraction, v1.valueType, v2.valueType);
                         if (f != null)
                         {
-                            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                            ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                             eax.setEAXTypeWhenCompile(f.signature.returnType);
 
                             ASBinCode.OpStep op;
@@ -1051,7 +1051,7 @@ namespace ASCompiler.compiler.builds
                                 v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                             }
                         }
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(rt);
 
                         //ASBinCode.OpStep op = new ASBinCode.OpStep(ASBinCode.OpCode.sub,
@@ -1059,13 +1059,7 @@ namespace ASCompiler.compiler.builds
                         //    );
                         ASBinCode.OpStep op;
 
-						if (v1.valueType == RunTimeDataType.rt_number && v2.valueType == RunTimeDataType.rt_number)
-						{
-							op = new ASBinCode.OpStep(ASBinCode.OpCode.sub_number_number,
-								new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
-								);
-						}
-                        else if (
+						if (
                             (v1.valueType == RunTimeDataType.rt_number || v1.valueType == RunTimeDataType.rt_int || v1.valueType == RunTimeDataType.rt_uint)
                             &&
                             (v2.valueType == RunTimeDataType.rt_number || v2.valueType == RunTimeDataType.rt_int || v2.valueType == RunTimeDataType.rt_uint)
@@ -1173,7 +1167,7 @@ namespace ASCompiler.compiler.builds
                         v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
                     }
                 }
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(rt);
 
                 
@@ -1266,7 +1260,7 @@ namespace ASCompiler.compiler.builds
             }
 
             //***再访问***
-            Register gv = env.getAdditionalRegister();
+            StackSlotAccessor gv = env.getAdditionalRegister();
             gv.setEAXTypeWhenCompile(signature.returnType);
 
             OpStep opInvokeGetter = new OpStep(OpCode.call_function,
@@ -1306,7 +1300,7 @@ namespace ASCompiler.compiler.builds
             {
                 //if (env.tempEaxList.Count <= data.Reg.ID)
 
-                Register reg = env.loadRegisterByAST(data.Reg.ID);
+                StackSlotAccessor reg = env.loadRegisterByAST(data.Reg.ID);
                 
                 if (reg == null )
                 {
@@ -1410,7 +1404,7 @@ namespace ASCompiler.compiler.builds
 					string pattern = (string)data.Data.Value;
 
 					//**创建一个RegExp***
-					Register eax = env.getAdditionalRegister();
+					StackSlotAccessor eax = env.getAdditionalRegister();
 					//***创建对象实例
 					{
 						var found = TypeReader.findClassFromImports("RegExp", builder, matchtoken);
@@ -1695,7 +1689,7 @@ namespace ASCompiler.compiler.builds
                     OpStep opcreatefunc = new OpStep(OpCode.function_create, 
                         new SourceToken(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile)
                         );
-                    Register eax = env.getAdditionalRegister();
+                    StackSlotAccessor eax = env.getAdditionalRegister();
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_function);
                     opcreatefunc.reg = eax;
                     opcreatefunc.regType = eax.valueType;
@@ -1713,7 +1707,7 @@ namespace ASCompiler.compiler.builds
                 {
                     //***创建一个Object***//
 
-                    Register eax = env.getAdditionalRegister();
+                    StackSlotAccessor eax = env.getAdditionalRegister();
                     //***创建对象实例
                     {
                         var found = TypeReader.findClassFromImports("Object", builder, matchtoken);
@@ -1758,7 +1752,7 @@ namespace ASCompiler.compiler.builds
                 }
                 else if (data.Data.FF1Type == ASTool.AS3.Expr.FF1DataValueType.as3_array && !env.isEval)
                 {
-                    Register eax = env.getAdditionalRegister();
+                    StackSlotAccessor eax = env.getAdditionalRegister();
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_array);
 
                     //***创建原始数组对象***
@@ -1851,7 +1845,7 @@ namespace ASCompiler.compiler.builds
                             if (init_data.valueType == RunTimeDataType.rt_void)//ASRuntime.TypeConverter.testImplicitConvert(init_data.valueType, _class.getRtType(), builder))
                             {
                                 //准备转换数据到Vector.或者是从Vector转成Vector,或者是从数组中拷贝元素过去
-                                Register eax = env.getAdditionalRegister();
+                                StackSlotAccessor eax = env.getAdditionalRegister();
                                 eax.setEAXTypeWhenCompile(_class.getRtType());
 
                                 OpStep op = new OpStep(OpCode.vector_initfrmdata, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
@@ -1885,7 +1879,7 @@ namespace ASCompiler.compiler.builds
 
                                         if (ASRuntime.TypeConverter.testImplicitConvert(type, totype, builder))
                                         {
-                                            Register eax = env.getAdditionalRegister();
+                                            StackSlotAccessor eax = env.getAdditionalRegister();
                                             eax.setEAXTypeWhenCompile(_class.getRtType());
                                             ConstructorBuilder cb = new ConstructorBuilder();
                                             cb.build_class(env, _class, matchtoken, builder, eax, new List<ASTool.AS3.Expr.AS3DataStackElement>());
@@ -1920,7 +1914,7 @@ namespace ASCompiler.compiler.builds
                         }
                         else
                         {
-                            Register eax = env.getAdditionalRegister();
+                            StackSlotAccessor eax = env.getAdditionalRegister();
                             eax.setEAXTypeWhenCompile(_class.getRtType());
                             //stepinit_vector.reg = eax;
                             //stepinit_vector.regType = eax.valueType;
@@ -2037,9 +2031,9 @@ namespace ASCompiler.compiler.builds
                         step.OpCode + "后缀操作应该是个变量."));
                 }
 
-                if ((v1 is Register && ((Register)v1)._regMember != null))
+                if ((v1 is StackSlotAccessor && ((StackSlotAccessor)v1)._regMember != null))
                 {
-                    var m = ((Register)v1)._regMember;
+                    var m = ((StackSlotAccessor)v1)._regMember;
                     if (m.isConst)
                     {
                         throw new BuildException(
@@ -2048,15 +2042,15 @@ namespace ASCompiler.compiler.builds
                     }
                 }
 
-                if (v1 is Register)
+                if (v1 is StackSlotAccessor)
                 {
-                    if (((Register)v1).isFuncResult && !(((Register)v1)._regMember !=null && ((Register)v1)._regMember.bindField is ClassPropertyGetter))
+                    if (((StackSlotAccessor)v1).isFuncResult && !(((StackSlotAccessor)v1)._regMember !=null && ((StackSlotAccessor)v1)._regMember.bindField is ClassPropertyGetter))
                     {
                         throw new BuildException(
                             new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                             "Operand of " + step.OpCode + " must be a reference."));
                     }
-                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+                    ((StackSlotAccessor)v1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)v1)._hasUnaryOrShuffix = true;
 				}
 
                 if (
@@ -2072,7 +2066,7 @@ namespace ASCompiler.compiler.builds
                         "类型[" + v1.valueType + "]不能进行后缀操作[" + step.OpCode + "]");
                 }
 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(v1.valueType);
                 eax._hasUnaryOrShuffixOrDelete = true;eax._hasUnaryOrShuffix=true;
 
@@ -2134,26 +2128,31 @@ namespace ASCompiler.compiler.builds
 
                 env.block.opSteps.Add(op);
 
-
+				if (v1 is StackSlotAccessor && op.opCode != OpCode.suffix_dec && op.opCode != OpCode.suffix_inc)
+				{
+					OpStep clearStep = new OpStep(OpCode.afterIncDes_clear_v1_link, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+					clearStep.arg1 = v1;
+					env.block.opSteps.Add(clearStep);
+				}
 
                 //***检查是否是动态属性
                 if (builder._propLines.ContainsKey(v1))
                 {
-                    ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+                    ((StackSlotAccessor)v1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)v1)._hasUnaryOrShuffix = true;
 					var addlines = builder._propLines[v1];
                     foreach (var line in addlines)
                     {
-                        if (line.reg is Register)
+                        if (line.reg is StackSlotAccessor)
                         {
-                            ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true; ((Register)line.reg)._hasUnaryOrShuffix = true;
+                            ((StackSlotAccessor)line.reg)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.reg)._hasUnaryOrShuffix = true;
 						}
-                        if (line.arg1 is Register)
+                        if (line.arg1 is StackSlotAccessor)
                         {
-                            ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg1)._hasUnaryOrShuffix = true;
+                            ((StackSlotAccessor)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.arg1)._hasUnaryOrShuffix = true;
 						}
-                        if (line.arg2 is Register)
+                        if (line.arg2 is StackSlotAccessor)
                         {
-                            ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg2)._hasUnaryOrShuffix  = true;
+                            ((StackSlotAccessor)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.arg2)._hasUnaryOrShuffix  = true;
 						}
                     }
 
@@ -2174,9 +2173,9 @@ namespace ASCompiler.compiler.builds
                     }
                     else
                     {
-                        Register addeax = env.getAdditionalRegister();
+                        StackSlotAccessor addeax = env.getAdditionalRegister();
 
-                        Register t=(Register)v1;
+                        StackSlotAccessor t=(StackSlotAccessor)v1;
                         ClassPropertyGetter prop = (ClassPropertyGetter)t._regMember.bindField;
                         //****将值赋值回去****
                         buildPropSet(prop,
@@ -2216,7 +2215,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v1.valueType > RunTimeDataType.unknown)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         if (!env.isEval && v1.valueType > RunTimeDataType.unknown)
                         {
@@ -2254,7 +2253,7 @@ namespace ASCompiler.compiler.builds
                                 "类型[" + v1.valueType + "]不能进行一元操作[+]");
                         }
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_number);
 
                         if (v1.valueType != RunTimeDataType.rt_number)
@@ -2299,7 +2298,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (v1.valueType == RunTimeDataType.rt_void || v1.valueType > RunTimeDataType.unknown)
                     {
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
                         if (!env.isEval && v1.valueType > RunTimeDataType.unknown)
                         {
@@ -2338,7 +2337,7 @@ namespace ASCompiler.compiler.builds
                                 "类型[" + v1.valueType + "]不能进行一元操作[-]");
                         }
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_number);
 
                         ASBinCode.OpStep op
@@ -2381,7 +2380,7 @@ namespace ASCompiler.compiler.builds
                             "类型[" + v1.valueType + "]不能进行一元操作[~]");
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
 
@@ -2425,7 +2424,7 @@ namespace ASCompiler.compiler.builds
                             "类型[" + v1.valueType + "]不能进行一元操作[!]");
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
 
@@ -2466,7 +2465,7 @@ namespace ASCompiler.compiler.builds
                             v1.valueType > RunTimeDataType.unknown  
                         )
                         &&
-                        !(v1 is Register)
+                        !(v1 is StackSlotAccessor)
                         )
                     {
                         throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
@@ -2486,20 +2485,20 @@ namespace ASCompiler.compiler.builds
 
 
 
-                    if (v1 is Register)
+                    if (v1 is StackSlotAccessor)
                     {
-                        Register r = (Register)v1;
+                        StackSlotAccessor r = (StackSlotAccessor)v1;
                         if (r._regMember != null)
                         {
                             throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile,
                             "Attempt to delete the fixed property prototype.  Only dynamically defined properties can be deleted.");
                         }
-                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true;
-						((Register)v1)._isdeletetarget = true;
+                        ((StackSlotAccessor)v1)._hasUnaryOrShuffixOrDelete = true;
+						((StackSlotAccessor)v1)._isdeletetarget = true;
 
 					}
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.OpStep op
@@ -2541,7 +2540,7 @@ namespace ASCompiler.compiler.builds
                     {
                         
 
-                        ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                        ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                         eax.setEAXTypeWhenCompile(RunTimeDataType.rt_string);
 
                         ASBinCode.OpStep op
@@ -2570,7 +2569,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.OpStep op
@@ -2598,7 +2597,7 @@ namespace ASCompiler.compiler.builds
             {
                 ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder,true);
                 if (step.Arg1.IsReg 
-                    || (v1 is Register && ((Register)v1)._regMember != null)
+                    || (v1 is StackSlotAccessor && ((StackSlotAccessor)v1)._regMember != null)
                     ||
                     builder._propLines.ContainsKey(v1)
                     )
@@ -2610,9 +2609,9 @@ namespace ASCompiler.compiler.builds
                             step.OpCode + "操作应该是个变量."));
                     }
 
-                    if ((v1 is Register && ((Register)v1)._regMember != null))
+                    if ((v1 is StackSlotAccessor && ((StackSlotAccessor)v1)._regMember != null))
                     {
-                        var m = ((Register)v1)._regMember;
+                        var m = ((StackSlotAccessor)v1)._regMember;
                         if (m.isConst)
                         {
                             throw new BuildException(
@@ -2621,15 +2620,15 @@ namespace ASCompiler.compiler.builds
                         }
                     }
 
-                    if (v1 is Register)
+                    if (v1 is StackSlotAccessor)
                     {
-                        if (((Register)v1).isFuncResult && !(((Register)v1)._regMember != null && ((Register)v1)._regMember.bindField is ClassPropertyGetter))
+                        if (((StackSlotAccessor)v1).isFuncResult && !(((StackSlotAccessor)v1)._regMember != null && ((StackSlotAccessor)v1)._regMember.bindField is ClassPropertyGetter))
                         {
                             throw new BuildException(
                                 new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
                                 "Operand of " + step.OpCode + " must be a reference."));
                         }
-                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+                        ((StackSlotAccessor)v1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)v1)._hasUnaryOrShuffix = true;
 					}
                     
                     if (
@@ -2698,7 +2697,7 @@ namespace ASCompiler.compiler.builds
                     op.arg2 = null;
                     op.arg2Type = RunTimeDataType.unknown;
 
-                    Register eax = env.createASTRegister(step.Arg1.Reg);
+                    StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(v1.valueType);
                     eax._hasUnaryOrShuffixOrDelete = true; eax._hasUnaryOrShuffix = true;
 
@@ -2707,24 +2706,31 @@ namespace ASCompiler.compiler.builds
 
                     env.block.opSteps.Add(op);
 
-                    //***检查是否是动态属性
-                    if (builder._propLines.ContainsKey(v1))
+					if (v1 is StackSlotAccessor && op.opCode != OpCode.increment && op.opCode != OpCode.decrement)
+					{
+						OpStep clearStep = new OpStep(OpCode.afterIncDes_clear_v1_link, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+						clearStep.arg1 = v1;
+						env.block.opSteps.Add(clearStep);
+					}
+
+					//***检查是否是动态属性
+					if (builder._propLines.ContainsKey(v1))
                     {
                         var addlines = builder._propLines[v1];
-                        ((Register)v1)._hasUnaryOrShuffixOrDelete = true; ((Register)v1)._hasUnaryOrShuffix = true;
+                        ((StackSlotAccessor)v1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)v1)._hasUnaryOrShuffix = true;
 						foreach (var line in addlines)
                         {
-                            if (line.reg is Register)
+                            if (line.reg is StackSlotAccessor)
                             {
-                                ((Register)line.reg)._hasUnaryOrShuffixOrDelete = true; ((Register)line.reg)._hasUnaryOrShuffix = true;
+                                ((StackSlotAccessor)line.reg)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.reg)._hasUnaryOrShuffix = true;
 							}
-                            if (line.arg1 is Register)
+                            if (line.arg1 is StackSlotAccessor)
                             {
-                                ((Register)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg1)._hasUnaryOrShuffix = true;
+                                ((StackSlotAccessor)line.arg1)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.arg1)._hasUnaryOrShuffix = true;
 							}
-                            if (line.arg2 is Register)
+                            if (line.arg2 is StackSlotAccessor)
                             {
-                                ((Register)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((Register)line.arg2)._hasUnaryOrShuffix = true;
+                                ((StackSlotAccessor)line.arg2)._hasUnaryOrShuffixOrDelete = true; ((StackSlotAccessor)line.arg2)._hasUnaryOrShuffix = true;
 							}
                         }
 
@@ -2744,9 +2750,9 @@ namespace ASCompiler.compiler.builds
                         }
                         else
                         {
-                            Register addeax = env.getAdditionalRegister();
+                            StackSlotAccessor addeax = env.getAdditionalRegister();
 
-                            Register t = (Register)v1;
+                            StackSlotAccessor t = (StackSlotAccessor)v1;
                             ClassPropertyGetter prop = (ClassPropertyGetter)t._regMember.bindField;
                             //****将值赋值回去****
                             buildPropSet(prop,
@@ -2788,7 +2794,7 @@ namespace ASCompiler.compiler.builds
                 ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token, builder);
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode opcode = OpCode.gt_void;
@@ -2918,7 +2924,7 @@ namespace ASCompiler.compiler.builds
                         opcode = OpCode.logic_instanceof;
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -2963,7 +2969,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -3000,7 +3006,7 @@ namespace ASCompiler.compiler.builds
             {
                 if (step.Arg1.IsReg)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token, builder);
@@ -3045,7 +3051,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode code = step.OpCode=="==" ? OpCode.equality: OpCode.not_equality ;
@@ -3100,7 +3106,7 @@ namespace ASCompiler.compiler.builds
                 if (step.Arg1.IsReg)
                 {
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
 
                     OpCode code = step.OpCode == "===" ? OpCode.strict_equality : OpCode.not_strict_equality ;
@@ -3160,7 +3166,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                 ASBinCode.OpStep op
@@ -3195,7 +3201,7 @@ namespace ASCompiler.compiler.builds
                 if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
                    (OverrideableOperator.bitOr, v1.valueType, v2.valueType) != null)
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(
                         builder.bin.operatorOverrides.getOperatorDefine
                                 (OverrideableOperator.bitOr, v1.valueType, v2.valueType).signature.returnType);
@@ -3234,7 +3240,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 {
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3285,7 +3291,7 @@ namespace ASCompiler.compiler.builds
                 }
 
 
-                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                 eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                 ASBinCode.OpStep op
@@ -3339,7 +3345,7 @@ namespace ASCompiler.compiler.builds
                     }
 
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3388,7 +3394,7 @@ namespace ASCompiler.compiler.builds
                             v2.valueType + "不能执行移位操作"));
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_int);
 
                     ASBinCode.OpStep op
@@ -3438,7 +3444,7 @@ namespace ASCompiler.compiler.builds
                             v2.valueType + "不能执行移位操作"));
                     }
 
-                    ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                    ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                     eax.setEAXTypeWhenCompile(RunTimeDataType.rt_uint);
 
                     ASBinCode.OpStep op

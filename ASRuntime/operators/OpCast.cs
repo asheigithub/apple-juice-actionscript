@@ -93,7 +93,7 @@ namespace ASRuntime.operators
                     {
                         storeto.setValue(
                          TypeConverter.ConvertToInt(
-                            srcValue, frame, token
+                            srcValue
                         )
                         );
                         //callbacker.isSuccess = true;

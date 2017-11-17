@@ -238,7 +238,7 @@ namespace ASCTest.regNativeFunctions
 
                 try
                 {
-                    int capacity = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+                    int capacity = TypeConverter.ConvertToInt(argements[0]);
 
                     linkobj.SetLinkData(new ArrayList(capacity));
 
@@ -591,9 +591,9 @@ namespace ASCTest.regNativeFunctions
 
                 try
                 {
-                    int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
-                    int arrayIndex = TypeConverter.ConvertToInt(argements[2], stackframe, token);
-                    int count = TypeConverter.ConvertToInt(argements[3], stackframe, token);
+                    int index = TypeConverter.ConvertToInt(argements[0]);
+                    int arrayIndex = TypeConverter.ConvertToInt(argements[2]);
+                    int count = TypeConverter.ConvertToInt(argements[3]);
 
 
                     object lo;

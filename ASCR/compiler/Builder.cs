@@ -1358,7 +1358,9 @@ namespace ASCompiler.compiler
                 var fb = bin.blocks[f.blockid];
                 if (blockEnv.ContainsKey(fb))
                 {
+					
                     blockEnv[fb].convertVarToReg(this, f);
+					
                 }
             }
 
@@ -2614,7 +2616,7 @@ namespace ASCompiler.compiler
             {
                 RightValueBase rv = new ASBinCode.rtData.RightValue(value);
 
-                ASBinCode.Register eax = env.createASTRegister(testexpr.Value.Reg);
+                ASBinCode.StackSlotAccessor eax = env.createASTRegister(testexpr.Value.Reg);
                 eax.setEAXTypeWhenCompile(rv.valueType);
 
                 OpStep op = new OpStep(OpCode.assigning, new SourceToken(testexpr.token.line, testexpr.token.ptr, testexpr.token.sourceFile));

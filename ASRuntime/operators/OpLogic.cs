@@ -83,7 +83,7 @@ namespace ASRuntime.operators
                         }
                         else if (v1.rtType == ASBinCode.RunTimeDataType.rt_int)
                         {
-                            int v = TypeConverter.ConvertToInt(v1, null, null);
+                            int v = TypeConverter.ConvertToInt(v1);
                             if (v >= 0)
                             {
                                 return true;
@@ -1257,7 +1257,6 @@ namespace ASRuntime.operators
                 return;
             }
 
-
             OpCast.InvokeTwoValueOf(v1, v2, frame, step.token, scope, frame._tempSlot1, frame._tempSlot2, step, _EQ_ValueOf_Callbacker);
         }
         private static void _EQ_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
@@ -1759,14 +1758,14 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_boolean:
                         if (v2.Equals(ASBinCode.rtData.rtBoolean.True))
                         {
-                            return TypeConverter.ConvertToInt(v1, frame, step.token) == 1;
+                            return TypeConverter.ConvertToInt(v1) == 1;
                         }
                         else
                         {
-                            return TypeConverter.ConvertToInt(v1, frame, step.token) != 1;
+                            return TypeConverter.ConvertToInt(v1) != 1;
                         }
                     case ASBinCode.RunTimeDataType.rt_int:
-                        return TypeConverter.ConvertToInt(v1, frame, step.token) == TypeConverter.ConvertToInt(v2, frame, step.token);
+                        return TypeConverter.ConvertToInt(v1) == TypeConverter.ConvertToInt(v2);
                     case ASBinCode.RunTimeDataType.rt_uint:
                         return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
@@ -1794,16 +1793,16 @@ namespace ASRuntime.operators
                     case ASBinCode.RunTimeDataType.rt_boolean:
                         if (v1.Equals(ASBinCode.rtData.rtBoolean.True))
                         {
-                            return TypeConverter.ConvertToInt(v2, frame, step.token) == 1;
+                            return TypeConverter.ConvertToInt(v2) == 1;
                         }
                         else
                         {
-                            return TypeConverter.ConvertToInt(v2, frame, step.token) != 1;
+                            return TypeConverter.ConvertToInt(v2) != 1;
                         }
                     case ASBinCode.RunTimeDataType.rt_int:
-                        return TypeConverter.ConvertToInt(v1, frame, step.token) == TypeConverter.ConvertToInt(v2, frame, step.token);
+                        return TypeConverter.ConvertToInt(v1) == TypeConverter.ConvertToInt(v2);
                     case ASBinCode.RunTimeDataType.rt_uint:
-                        return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2, frame, step.token);
+                        return TypeConverter.ConvertToUInt(v1, frame, step.token) == TypeConverter.ConvertToUInt(v2,frame,step.token);
                     case ASBinCode.RunTimeDataType.rt_number:
                         return TypeConverter.ConvertToNumber(v1) == TypeConverter.ConvertToNumber(v2);
                     case ASBinCode.RunTimeDataType.rt_string:

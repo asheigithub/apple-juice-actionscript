@@ -31,8 +31,8 @@ namespace ASCTest
                 string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
-									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-				path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
+									   path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+				//path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
 
 				if (path.EndsWith(".as"))
                 {
@@ -188,8 +188,8 @@ namespace ASCTest
 				//(new extFunctions()).registrationFunction(swc);
 
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
-				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
-				System.IO.File.WriteAllBytes("as3test.cswc", swc.toBytes());
+				System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
+				//System.IO.File.WriteAllBytes("as3test.cswc", swc.toBytes());
 
 				if (swc != null)
                 {
@@ -261,13 +261,13 @@ namespace ASCTest
 
 
 						Console.WriteLine();
-                        Console.WriteLine("====程序输出====");
+						Console.WriteLine("====程序输出====");
 
-                        player.run(null);
+						player.run(null);
 
 
 
-                    }
+					}
                     Console.WriteLine();
                 }
 

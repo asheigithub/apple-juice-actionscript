@@ -55,13 +55,14 @@
     <Compile Include="ASBinCode\IRunTimeScope.cs" />
     <Compile Include="ASBinCode\IScope.cs" />
     <Compile Include="ASBinCode\LinkTypeMapper.cs" />
+    <Compile Include="ASBinCode\MemRegister.cs" />
     <Compile Include="ASBinCode\MethodGetterBase.cs" />
     <Compile Include="ASBinCode\nativefunctions\NativeFunctionBase.cs" />
     <Compile Include="ASBinCode\OpCode.cs" />
     <Compile Include="ASBinCode\OperatorOverride.cs" />
     <Compile Include="ASBinCode\OpStep.cs" />
     <Compile Include="ASBinCode\PackagePathGetter.cs" />
-    <Compile Include="ASBinCode\Register.cs" />
+    <Compile Include="ASBinCode\StackSlotAccessor.cs" />
     <Compile Include="ASBinCode\rtData\RightValue.cs" />
     <Compile Include="ASBinCode\rtData\rtArray.cs" />
     <Compile Include="ASBinCode\rtData\rtBoolean.cs" />

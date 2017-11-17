@@ -1786,7 +1786,7 @@ namespace ASRuntime.nativefuncs
 			ByteArray ms =
 					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
-			int v = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+			int v = TypeConverter.ConvertToInt(argements[0]);
 
 			ms.writeByte(v);
 
@@ -2066,7 +2066,7 @@ namespace ASRuntime.nativefuncs
 			ByteArray ms =
 					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
-			int v = TypeConverter.ConvertToInt(argements[0],stackframe,token);
+			int v = TypeConverter.ConvertToInt(argements[0]);
 
 			ms.writeInt(v);
 
@@ -2202,7 +2202,7 @@ namespace ASRuntime.nativefuncs
 			ByteArray ms =
 					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
-			int v = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+			int v = TypeConverter.ConvertToInt(argements[0]);
 
 			ms.writeShort(v);
 
@@ -2485,7 +2485,7 @@ namespace ASRuntime.nativefuncs
 			ByteArray ms =
 					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
-			int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+			int index = TypeConverter.ConvertToInt(argements[0]);
 
 			if (index<0)
 			{
@@ -2574,7 +2574,7 @@ namespace ASRuntime.nativefuncs
 					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			double value = TypeConverter.ConvertToNumber(argements[0]);
-			int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+			int index = TypeConverter.ConvertToInt(argements[1]);
 
 			if (index <0)
 			{

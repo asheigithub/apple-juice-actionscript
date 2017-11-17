@@ -516,7 +516,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+            int index = TypeConverter.ConvertToInt(argements[1]);
 
             System.Collections.ICollection collection =
                 (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
@@ -607,7 +607,7 @@ namespace ASCTest.regNativeFunctions
         {
 
 
-            int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            int index = TypeConverter.ConvertToInt(argements[0]);
 
             System.Collections.IList ilist =
                 (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
@@ -685,7 +685,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int index = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+            int index = TypeConverter.ConvertToInt(argements[1]);
 
             System.Collections.IList ilist =
                 (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
@@ -1335,7 +1335,7 @@ namespace ASCTest.regNativeFunctions
 
             try
             {
-                int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+                int index = TypeConverter.ConvertToInt(argements[0]);
 
                 object lo;
                 if (stackframe.player.linktypemapper.rtValueToLinkObject(
@@ -1530,7 +1530,7 @@ namespace ASCTest.regNativeFunctions
 
             try
             {
-                int index = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+                int index = TypeConverter.ConvertToInt(argements[0]);
                 ilist.RemoveAt(index);
                 success = true;
             }

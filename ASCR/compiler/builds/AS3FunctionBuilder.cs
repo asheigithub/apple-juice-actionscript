@@ -217,6 +217,62 @@ namespace ASCompiler.compiler.builds
         {
             return findReturn(block.opSteps,0,new int[] { },operatorCodes);
         }
+
+		public static bool isIfJmp(OpCode code)
+		{
+			if (code == OpCode.if_jmp
+				||
+				code == OpCode.if_equality_num_num_jmp_notry
+				||
+				code == OpCode.if_equality_num_num_jmp_notry_noreference
+				||
+				code == OpCode.if_ge_num_jmp_notry
+				||
+				code == OpCode.if_ge_num_jmp_notry_noreference
+				||
+				code == OpCode.if_gt_num_jmp_notry
+				||
+				code == OpCode.if_gt_num_jmp_notry_noreference
+				||
+				code == OpCode.if_jmp_notry
+				||
+				code == OpCode.if_le_num_jmp_notry
+				||
+				code == OpCode.if_le_num_jmp_notry_noreference
+				||
+				code == OpCode.if_lt_num_jmp_notry
+				||
+				code == OpCode.if_lt_num_jmp_notry_noreference
+				||
+				code == OpCode.if_not_equality_num_num_jmp_notry
+				||
+				code == OpCode.if_not_equality_num_num_jmp_notry_noreference
+				)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public static bool isJMP(OpCode code)
+		{
+			if (code == OpCode.jmp
+				||
+				code== OpCode.jmp_notry
+				)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+
         private bool findReturn(List<OpStep> commands,int st,int[] hasvisited, OpCode[] operatorCodes)
         {
             Dictionary<int, object> visited = new Dictionary<int, object>();
@@ -246,11 +302,11 @@ namespace ASCompiler.compiler.builds
 					}
 				}
 
-                if (op.opCode == OpCode.jmp)
+                if ( isJMP(op.opCode) )//op.opCode == OpCode.jmp)
                 {
                     i += op.jumoffset - 1;
                 }
-                else if (op.opCode == OpCode.if_jmp)
+                else if (isIfJmp(op.opCode))//op.opCode == OpCode.if_jmp)
                 {
                     int line = i + op.jumoffset ;
 

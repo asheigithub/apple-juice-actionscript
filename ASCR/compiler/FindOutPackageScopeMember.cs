@@ -11,7 +11,7 @@ namespace ASCompiler.compiler
         public ASBinCode.rtti.Class outscopeclass;
         public IMember member;
 
-        public Register buildAccessThisMember(ASTool.Token matchtoken, CompileEnv env)
+        public StackSlotAccessor buildAccessThisMember(ASTool.Token matchtoken, CompileEnv env)
         {
             if (!(member is VariableBase))
             {

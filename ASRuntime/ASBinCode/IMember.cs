@@ -43,7 +43,7 @@ namespace ASBinCode
 			}
 			else if (membertype == 5)
 			{
-				return Register.LoadRegister(reader, serizlizer, serizlized, key);
+				return StackSlotAccessor.LoadRegister(reader, serizlizer, serizlized, key);
 			}
 			else if (membertype == 6)
 			{
@@ -60,6 +60,22 @@ namespace ASBinCode
 			else if (membertype == 9)
 			{
 				return SuperPointer.LoadSuperPointer(reader, serizlizer, serizlized, key);
+			}
+			else if (membertype == 10)
+			{
+				return MemRegister_Number.LoadRegister(reader, serizlizer, serizlized, key);
+			}
+			else if (membertype == 11)
+			{
+				return MemRegister_Boolean.LoadRegister(reader, serizlizer, serizlized, key);
+			}
+			else if (membertype == 12)
+			{
+				return MemRegister_Int.LoadRegister(reader, serizlizer, serizlized, key);
+			}
+			else if (membertype == 13)
+			{
+				return MemRegister_UInt.LoadRegister(reader, serizlizer, serizlized, key);
 			}
 			else
 			{

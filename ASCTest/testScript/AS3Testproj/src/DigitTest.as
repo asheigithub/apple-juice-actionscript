@@ -57,3 +57,24 @@ var f:int = fibonacci_recursion(30);
 
 trace("actionscript3:", ((new Date()).getTime() - t ));
 trace(f);
+//var array:Vector.<int> = new Vector.<int>();
+//
+			//for (var i:int = 0; i < 1024; i++) 
+			//{
+				//array[i] = i;
+			//}
+//
+//
+			//var total:int = 0;
+			//var t:Number = (new Date()).getTime();
+			//for (var j:int = 0; j < 1000	; j++) 
+			//{
+				//for (var k:int = 0; k < 1024; k++) 
+				//{
+					//total = total + array[k];
+				//}
+			//}
+			//trace("action script:", (new Date()).getTime() - t );
+			//trace(total);
+			
+		

@@ -52,7 +52,7 @@ namespace ASCompiler.compiler.builds
 							{
 								build_class(env, _class, step, builder);
 							}
-							else if ( cls is Register && ((Register)cls).isFindByPath && _class.staticClass==null )
+							else if ( cls is StackSlotAccessor && ((StackSlotAccessor)cls).isFindByPath && _class.staticClass==null )
 							{
 								build_class(env, _class.instanceClass, step, builder);
 							}
@@ -156,7 +156,7 @@ namespace ASCompiler.compiler.builds
         public void build_class(CompileEnv env,
             ASBinCode.rtti.Class _class,
             ASTool.Token token, Builder builder,
-            Register outeax,
+            StackSlotAccessor outeax,
             List<ASTool.AS3.Expr.AS3DataStackElement> args
             )
         {
@@ -238,7 +238,7 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
-            Register insEax = env.createASTRegister(step.Arg1.Reg);
+            StackSlotAccessor insEax = env.createASTRegister(step.Arg1.Reg);
 
             build_class(env, _class, step.token, builder,
                 insEax,
@@ -342,7 +342,7 @@ namespace ASCompiler.compiler.builds
                                 new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
             opnewclass.arg1 = cls;
             opnewclass.arg1Type = RunTimeDataType.rt_void;
-            Register _eax = env.createASTRegister(step.Arg1.Reg);
+            StackSlotAccessor _eax = env.createASTRegister(step.Arg1.Reg);
             _eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
             opnewclass.reg = _eax;
             opnewclass.regType = RunTimeDataType.rt_void;

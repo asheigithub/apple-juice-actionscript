@@ -94,7 +94,7 @@ namespace ASRuntime.nativefuncs
 			success = true;
 			{
 				var v = argements[0];
-				int r = TypeConverter.ConvertToInt(v, null, null);
+				int r = TypeConverter.ConvertToInt(v);
 
 				if (r < 1 || r > 21)
 				{
@@ -217,7 +217,7 @@ namespace ASRuntime.nativefuncs
 
 			{
 				var v = argements[0];
-				int r = TypeConverter.ConvertToInt(v, null, null);
+				int r = TypeConverter.ConvertToInt(v);
 
 				if (r < 0 || r > 20)
 				{
@@ -342,7 +342,7 @@ namespace ASRuntime.nativefuncs
 
 			{
 				var v = argements[0];
-				int r = TypeConverter.ConvertToInt(v, null, null);
+				int r = TypeConverter.ConvertToInt(v);
 
 				if (r < 0 || r > 20)
 				{
@@ -487,7 +487,7 @@ namespace ASRuntime.nativefuncs
 
 			{
 				var v = argements[0];
-				int r = TypeConverter.ConvertToInt(v, null, null);
+				int r = TypeConverter.ConvertToInt(v);
 
 				if (r < 2 || r > 36)
 				{

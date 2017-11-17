@@ -119,23 +119,22 @@ namespace ASRuntime.operators
 				//onstackparametercount = 0;
 
 				hasReleased = true;
-                CallFuncHeap = null;
-                
-                toCallFunc = null;
-                returnSlot = null;
-                _tempSlot = null;
-                callbacker = null;
-                
-                
-                invokerFrame = null;
-                token = null;
+				callbacker = null;
 
+
+				CallFuncHeap = null;
+				toCallFunc = null;
+				returnSlot = null;
+				_tempSlot = null;
+				invokerFrame = null;
+				token = null;
 				tag = null;
 				function.Clear();
 
-                player.funcCallerPool.ret(this);
-				player = null;
 
+
+				player.funcCallerPool.ret(this);
+				
 				
             }
             
@@ -158,7 +157,7 @@ namespace ASRuntime.operators
 			{
 				if (dt == RunTimeDataType.rt_int)
 				{
-					_cachertint.value = TypeConverter.ConvertToInt(dv, null, null);
+					_cachertint.value = TypeConverter.ConvertToInt(dv);
 					dv = _cachertint;
 					//dv = new ASBinCode.rtData.rtInt(TypeConverter.ConvertToInt(dv, null, null));
 				}
@@ -299,7 +298,7 @@ namespace ASRuntime.operators
 
                 if (fp.isOnStack)
                 {
-                    Register r = (Register)fp.varorreg;
+                    StackSlotAccessor r = (StackSlotAccessor)fp.varorreg;
 					//int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1 + invokerFrame.call_parameter_slotCount + r._index;
 					int index = invokerFrame.baseBottomSlotIndex + invokerFrame.call_parameter_slotCount+r._index;
 					return invokerFrame.stack[index];
@@ -325,7 +324,7 @@ namespace ASRuntime.operators
 
                 if (fp.isOnStack)
                 {
-                    Register r = (Register)fp.varorreg;
+                    StackSlotAccessor r = (StackSlotAccessor)fp.varorreg;
 					//int index = invokerFrame.offset + invokerFrame.block.totalRegisters + 1 + 1+ invokerFrame.call_parameter_slotCount + r._index;
 					int index = invokerFrame.baseBottomSlotIndex + invokerFrame.call_parameter_slotCount + r._index;
 					invokerFrame.stack[index].directSet(v);
@@ -1010,22 +1009,26 @@ namespace ASRuntime.operators
 				--count;
 
 				StackSlot slot = invokerFrame.stack[invokerFrame.baseBottomSlotIndex + (--invokerFrame.call_parameter_slotCount)];
-				slot.stackObjects = StackSlot.StackObjects.EMPTY;
-
-				if (slot.needclear)
+				if (slot.refPropChanged)
 				{
-					slot.linktarget = null;
-					slot._cache_arraySlot.clear();
-					slot._cache_vectorSlot.clear();
-					slot._cache_prototypeSlot.clear();
-					slot._cache_setthisslot.clear();
-					slot._linkObjCache.clearRefObj();
-					slot._functionValue.Clear();
-					slot.needclear = false;
+					slot.refPropChanged = false;
+					slot.stackObjects = StackSlot.StackObjects.EMPTY;
+
+					if (slot.needclear)
+					{
+						slot.linktarget = null;
+						slot._cache_arraySlot.clear();
+						slot._cache_vectorSlot.clear();
+						slot._cache_prototypeSlot.clear();
+						slot._cache_setthisslot.clear();
+						slot._linkObjCache.clearRefObj();
+						slot._functionValue.Clear();
+						slot.needclear = false;
+					}
+
+
+					slot.store[StackSlot.COMMREFTYPEOBJ] = ASBinCode.rtData.rtNull.nullptr;
 				}
-
-
-				slot.store[StackSlot.COMMREFTYPEOBJ] = ASBinCode.rtData.rtNull.nullptr;
 				slot.index = (int)RunTimeDataType.unknown;
 
 #endif
@@ -1103,14 +1106,66 @@ namespace ASRuntime.operators
 
         void IBlockCallBack.call(object args)
         {
-            
-            clear_para_slot(invokerFrame,onstackparametercount);
+#if DEBUG
+			clear_para_slot(invokerFrame,onstackparametercount);
+#else
+			{
+				int count = onstackparametercount;
+				while (count > 0)
+				{
+					--count;
+					StackSlot slot = invokerFrame.stack[invokerFrame.baseBottomSlotIndex + (--invokerFrame.call_parameter_slotCount)];
+					if (slot.refPropChanged)
+					{
+						slot.refPropChanged = false;
+						slot.stackObjects = StackSlot.StackObjects.EMPTY;
+
+						if (slot.needclear)
+						{
+							slot.linktarget = null;
+							slot._cache_arraySlot.clear();
+							slot._cache_vectorSlot.clear();
+							slot._cache_prototypeSlot.clear();
+							slot._cache_setthisslot.clear();
+							slot._linkObjCache.clearRefObj();
+							slot._functionValue.Clear();
+							slot.needclear = false;
+						}
+
+
+						slot.store[StackSlot.COMMREFTYPEOBJ] = ASBinCode.rtData.rtNull.nullptr;
+					}
+					slot.index = (int)RunTimeDataType.unknown;
+				}
+			}
+#endif
+
+
 			onstackparametercount = 0;
-			//invokerFrame.endStep();
 			invokerFrame.endStepNoError();
-            release();
-            
-        }
+			//release();
+			//人肉内联release
+
+			if (!hasReleased)
+			{
+				hasReleased = true;
+				callbacker = null;
+
+				CallFuncHeap = null;
+				toCallFunc = null;
+				returnSlot = null;
+				_tempSlot = null;
+				invokerFrame = null;
+				token = null;
+				tag = null;
+				function.Clear();
+
+				player.funcCallerPool.ret(this);
+
+
+			}
+
+		}
 
         public void noticeRunFailed()
         {

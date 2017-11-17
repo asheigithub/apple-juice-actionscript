@@ -120,9 +120,9 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
         {
-            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue(), null, null);
-            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue(), null, null);
-            int day = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue(), null, null);
+            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
+            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
+            int day = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
             
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
             StackFrame frame = (StackFrame)stackframe;
@@ -191,12 +191,12 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0], null, null);
-            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1], null, null);
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2], null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3], null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4], null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5], null, null);
+            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0]);
+            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1]);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2]);
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3]);
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4]);
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5]);
 
             try
             {
@@ -265,12 +265,12 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0], null, null);
-            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1], null, null);
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2], null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3], null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4], null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5], null, null);
+            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0]);
+            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1]);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2]);
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3]);
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4]);
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5]);
 
             DateTimeKind kind;
             if (argements[6].rtType > RunTimeDataType.unknown)
@@ -348,13 +348,13 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0], null, null);
-            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1], null, null);
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2], null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3], null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4], null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5], null, null);
-            int millseconds = ASRuntime.TypeConverter.ConvertToInt(argements[6], null, null);
+            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0]);
+            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1]);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2]);
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3]);
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4]);
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5]);
+            int millseconds = ASRuntime.TypeConverter.ConvertToInt(argements[6]);
 
             try
             {
@@ -424,13 +424,13 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0], null, null);
-            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1], null, null);
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2], null, null);
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3], null, null);
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4], null, null);
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5], null, null);
-            int millsecond = ASRuntime.TypeConverter.ConvertToInt(argements[6], null, null);
+            int year = ASRuntime.TypeConverter.ConvertToInt(argements[0]);
+            int month = ASRuntime.TypeConverter.ConvertToInt(argements[1]);
+            int days = ASRuntime.TypeConverter.ConvertToInt(argements[2]);
+            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[3]);
+            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[4]);
+            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[5]);
+            int millsecond = ASRuntime.TypeConverter.ConvertToInt(argements[6]);
 
             DateTimeKind kind;
             if (argements[7].rtType > RunTimeDataType.unknown)
@@ -781,7 +781,7 @@ namespace ASCTest.regNativeFunctions
             
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Day);
+            (returnSlot).setValue(dt.value.Day);
 
 
         }
@@ -898,7 +898,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.DayOfYear);
+            (returnSlot).setValue(dt.value.DayOfYear);
 
 
         }
@@ -952,7 +952,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Hour);
+            (returnSlot).setValue(dt.value.Hour);
 
 
         }
@@ -1006,7 +1006,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Millisecond);
+            (returnSlot).setValue(dt.value.Millisecond);
 
 
         }
@@ -1061,7 +1061,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Minute);
+            (returnSlot).setValue(dt.value.Minute);
 
 
         }
@@ -1114,7 +1114,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Month);
+            (returnSlot).setValue(dt.value.Month);
 
 
         }
@@ -1225,7 +1225,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Second);
+            (returnSlot).setValue(dt.value.Second);
 
 
         }
@@ -1402,7 +1402,7 @@ namespace ASCTest.regNativeFunctions
 
             success = true;
 
-            ((StackSlot)returnSlot).setValue(dt.value.Year);
+            (returnSlot).setValue(dt.value.Year);
 
 
         }
@@ -1860,7 +1860,7 @@ namespace ASCTest.regNativeFunctions
         {
             LinkObj<DateTime> lobj =
                 (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
-            int arg = TypeConverter.ConvertToInt( argements[0],stackframe,token);
+            int arg = TypeConverter.ConvertToInt( argements[0]);
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -2040,7 +2040,7 @@ namespace ASCTest.regNativeFunctions
         {
             LinkObj<DateTime> lobj =
                 (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
-            int arg = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            int arg = TypeConverter.ConvertToInt(argements[0]);
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -2173,8 +2173,8 @@ namespace ASCTest.regNativeFunctions
         {
             StackFrame frame = stackframe;
 
-            int a1 = TypeConverter.ConvertToInt(argements[0], frame, token);
-            int a2 = TypeConverter.ConvertToInt(argements[1], frame, token);
+            int a1 = TypeConverter.ConvertToInt(argements[0]);
+            int a2 = TypeConverter.ConvertToInt(argements[1]);
 
             int v = DateTime.DaysInMonth(a1, a2);
 

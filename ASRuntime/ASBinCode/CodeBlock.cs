@@ -34,7 +34,7 @@ namespace ASBinCode
         /// </summary>
         public int totalRegisters;
 
-        public List<Register> regConvFromVar;
+        public List<StackSlotAccessor> regConvFromVar;
 
         public CodeBlock(int id,string name,int define_class_id,bool isoutclass)
         {
@@ -44,7 +44,7 @@ namespace ASBinCode
             this.isoutclass = isoutclass;
 
             opSteps = new List<OpStep>();
-            regConvFromVar = new List<Register>();
+            regConvFromVar = new List<StackSlotAccessor>();
         }
 
 		public override string ToString()
@@ -93,7 +93,7 @@ namespace ASBinCode
 			int regconvcount = reader.ReadInt32();
 			for (int i = 0; i < regconvcount; i++)
 			{
-				Register register = (Register)serizlizer.DeserializeObject<ISWCSerializable>(reader, ISWCSerializableLoader.LoadIMember);
+				StackSlotAccessor register = (StackSlotAccessor)serizlizer.DeserializeObject<ISWCSerializable>(reader, ISWCSerializableLoader.LoadIMember);
 				block.regConvFromVar.Add(register);
 			}
 
@@ -125,7 +125,7 @@ namespace ASBinCode
 			writer.Write(regConvFromVar.Count);
 			for (int i = 0; i < regConvFromVar.Count; i++)
 			{
-				Register conv = regConvFromVar[i];
+				StackSlotAccessor conv = regConvFromVar[i];
 				//conv.Serialize(writer, serizlizer);
 				serizlizer.SerializeObject(writer, conv);
 			}

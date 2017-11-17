@@ -180,9 +180,9 @@ namespace ASCompiler.compiler.builds
                 op.arg1 = rValue;
                 op.arg1Type = RunTimeDataType.rt_function;
 
-                if (rValue is Register)
+                if (rValue is StackSlotAccessor)
                 {
-                    Register reg = (Register)rValue;
+                    StackSlotAccessor reg = (StackSlotAccessor)rValue;
                     if (reg._regMember != null)
                     {
                         if (reg._regMember.isConstructor)   //不能直接调用构造函数
@@ -556,8 +556,8 @@ namespace ASCompiler.compiler.builds
 
 
                                 eaxfunc = env.getAdditionalRegister();
-                                ((Register)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
-                                clear.reg = (Register)eaxfunc;
+                                ((StackSlotAccessor)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                                clear.reg = (StackSlotAccessor)eaxfunc;
                                 clear.regType = eaxfunc.valueType;
 
                                 env.block.opSteps.Add(clear);
@@ -755,8 +755,8 @@ namespace ASCompiler.compiler.builds
                 clear.arg2Type = RunTimeDataType.rt_int;
 
                 var eaxfunc = env.getAdditionalRegister();
-                ((Register)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
-                clear.reg = (Register)eaxfunc;
+                ((StackSlotAccessor)eaxfunc).setEAXTypeWhenCompile(RunTimeDataType.rt_function);
+                clear.reg = (StackSlotAccessor)eaxfunc;
                 clear.regType = eaxfunc.valueType;
 
                 
@@ -828,7 +828,7 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        private void build_member_parameterSteps(RightValueBase rFunc,Builder builder,Register eax,OpStep op,
+        private void build_member_parameterSteps(RightValueBase rFunc,Builder builder,StackSlotAccessor eax,OpStep op,
             ASTool.AS3.Expr.AS3ExprStep step,CompileEnv env,ASBinCode.rtti.Class _cls,
             RightValueBase makeParaArg1 ,IMember funcOriginMember,out bool findsignature,out ASBinCode.rtti.FunctionSignature sig
             )
@@ -1215,7 +1215,7 @@ namespace ASCompiler.compiler.builds
 												if (parameter.isOnStack)
 												{
 													opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
-													opPushArgs.jumoffset = ((Register)parameter.varorreg)._index;
+													opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
 												}
 												else
 												{
@@ -1245,7 +1245,7 @@ namespace ASCompiler.compiler.builds
 													if (parameter.isOnStack)
 													{
 														opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
-														opPushArgs.jumoffset = ((Register)parameter.varorreg)._index;
+														opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
 													}
 													else
 													{

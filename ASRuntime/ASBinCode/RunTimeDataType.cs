@@ -98,7 +98,25 @@ namespace ASBinCode
             RTTI = rtti;
         }
 
-        public static bool operator ==(RunTimeDataType v1, RunTimeDataType v2)
+		public static bool operator ==(RunTimeDataType v1, int v2)
+		{
+			return v1.RTTI == v2;
+		}
+		public static bool operator !=(RunTimeDataType v1, int v2)
+		{
+			return v1.RTTI != v2;
+		}
+
+		public static bool operator ==(int v1, RunTimeDataType v2)
+		{
+			return v1 == v2.RTTI;
+		}
+		public static bool operator !=(int v1, RunTimeDataType v2)
+		{
+			return v1 != v2.RTTI;
+		}
+
+		public static bool operator ==(RunTimeDataType v1, RunTimeDataType v2)
         {
             return v1.RTTI == v2.RTTI;
         }

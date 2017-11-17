@@ -237,7 +237,7 @@ namespace ASCTest.regNativeFunctions
 
                 try
                 {
-                    int initCapacity = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+                    int initCapacity = TypeConverter.ConvertToInt(argements[0]);
 
                     linkobj.SetLinkData(new Stack(initCapacity));
 

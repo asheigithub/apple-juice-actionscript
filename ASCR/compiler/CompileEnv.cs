@@ -11,7 +11,7 @@ namespace ASCompiler.compiler
 
         internal List<ASTool.AS3.AS3Function> tobuildNamedfunction = new List<ASTool.AS3.AS3Function>();
 
-        private Dictionary<string, ASBinCode.Register> dictCompileRegisters;
+        private Dictionary<string, ASBinCode.StackSlotAccessor> dictCompileRegisters;
 
 		private int lastStmtId = short.MaxValue;
 
@@ -26,14 +26,14 @@ namespace ASCompiler.compiler
             return ++labelIdx;
         }
 
-        public ASBinCode.Register getAdditionalRegister()
+        public ASBinCode.StackSlotAccessor getAdditionalRegister()
         {
             //ASBinCode.Register reg = new ASBinCode.Register(additionalEaxList.Count);
             //additionalEaxList.Add(reg);
 
             //return reg;
 
-            ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count, lastStmtId);
+            ASBinCode.StackSlotAccessor reg = new ASBinCode.StackSlotAccessor(dictCompileRegisters.Count, lastStmtId);
             dictCompileRegisters.Add("ADDITIONAL" + reg.Id, reg);
 
             return reg;
@@ -44,7 +44,7 @@ namespace ASCompiler.compiler
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ASBinCode.Register createASTRegister(ASTool.AS3.Expr.AS3Reg as3reg)
+        public ASBinCode.StackSlotAccessor createASTRegister(ASTool.AS3.Expr.AS3Reg as3reg)
         {
             if (dictCompileRegisters.ContainsKey("V" + as3reg.ID))
             {
@@ -52,7 +52,7 @@ namespace ASCompiler.compiler
             }
             else
             {
-                ASBinCode.Register reg = new ASBinCode.Register(dictCompileRegisters.Count,as3reg.StmtID);
+                ASBinCode.StackSlotAccessor reg = new ASBinCode.StackSlotAccessor(dictCompileRegisters.Count,as3reg.StmtID);
                 dictCompileRegisters.Add("V" + as3reg.ID, reg);
 				lastStmtId = as3reg.StmtID;
                 return reg;
@@ -64,7 +64,7 @@ namespace ASCompiler.compiler
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ASBinCode.Register loadRegisterByAST(int id)
+        public ASBinCode.StackSlotAccessor loadRegisterByAST(int id)
         {
             if (dictCompileRegisters.ContainsKey("V" + id))
             {
@@ -116,7 +116,7 @@ namespace ASCompiler.compiler
                 }
             }
 
-            Dictionary<Variable, Register> toReplace = new Dictionary<Variable, Register>();
+            Dictionary<Variable, StackSlotAccessor> toReplace = new Dictionary<Variable, StackSlotAccessor>();
 
             for (int i = 0/* f.signature.parameters.Count*/; i < block.scope.members.Count; i++)
             {
@@ -173,7 +173,7 @@ namespace ASCompiler.compiler
                     if (!found)
                     {
                         
-                        Register varReg = getAdditionalRegister();
+                        StackSlotAccessor varReg = getAdditionalRegister();
                         varReg.isConvertFromVariable = true;
                         //***将Variable替换为Reg***
                         toReplace.Add(vm, varReg);
@@ -262,27 +262,354 @@ namespace ASCompiler.compiler
                 }
                 
             }
-            
 
-
+			optimizeReg();
         }
+
+		private void optimizeReg()
+		{
+			
+			Dictionary<StackSlotAccessor, LeftValueBase> dictToOptimizeRegister = new Dictionary<StackSlotAccessor, LeftValueBase>();
+			Dictionary<StackSlotAccessor, object> dictCanNotOptimizeRegister = new Dictionary<StackSlotAccessor, object>();
+
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.reg is StackSlotAccessor && !dictToOptimizeRegister.ContainsKey((StackSlotAccessor)step.reg) && ! dictCanNotOptimizeRegister.ContainsKey( (StackSlotAccessor)step.reg ))
+				{
+					StackSlotAccessor register = (StackSlotAccessor)step.reg;
+					if (canOptimize(step,register))
+					{
+						
+						int lastline = findLastRefLine(register);
+
+						if (isAllSafeOperator(i+1, lastline, register))
+						{
+							if (register.valueType == RunTimeDataType.rt_number)
+							{
+								dictToOptimizeRegister.Add(register, new MemRegister_Number(register.Id));
+								if (step.opCode == OpCode.access_dot)
+									step.opCode = OpCode.access_dot_memregister;
+							}
+							else if (register.valueType == RunTimeDataType.rt_boolean)
+							{
+								dictToOptimizeRegister.Add(register, new MemRegister_Boolean(register.Id));
+								if (step.opCode == OpCode.access_dot)
+									step.opCode = OpCode.access_dot_memregister;
+							}
+							else if (register.valueType == RunTimeDataType.rt_int)
+							{
+								dictToOptimizeRegister.Add(register, new MemRegister_Int(register.Id));
+								if (step.opCode == OpCode.access_dot)
+									step.opCode = OpCode.access_dot_memregister;
+							}
+							else if (register.valueType == RunTimeDataType.rt_uint)
+							{
+								dictToOptimizeRegister.Add(register, new MemRegister_UInt(register.Id));
+								if (step.opCode == OpCode.access_dot)
+									step.opCode = OpCode.access_dot_memregister;
+							}
+						}
+						else
+						{
+							dictCanNotOptimizeRegister.Add(register, null);
+						}
+						
+					}
+					else
+					{
+						dictCanNotOptimizeRegister.Add(register, null);
+					}
+				}
+			}
+
+			foreach (var item in dictToOptimizeRegister)
+			{
+				for (int i = 0; i < block.opSteps.Count; i++)
+				{
+					var opstep = block.opSteps[i];
+
+					if (ReferenceEquals(opstep.reg, item.Key))
+					{
+						opstep.reg = item.Value;
+					}
+					if (ReferenceEquals(opstep.arg1, item.Key))
+					{
+						opstep.arg1 = item.Value;
+					}
+					if (ReferenceEquals(opstep.arg2, item.Key))
+					{
+						opstep.arg2 = item.Value;
+					}
+				}
+			}
+
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.afterIncDes_clear_v1_link)
+				{
+					if (!(step.arg1 is StackSlotAccessor))
+					{
+						step.opCode = OpCode.flag;
+					}
+				}
+				else if (step.opCode == OpCode.sub_number)
+				{
+					if (step.arg1 is MemRegister_Number && step.arg2 is MemRegister_Number)
+					{
+						step.opCode = OpCode.sub_number_memnumber_memnumber;
+					}
+				}
+				else if (step.opCode == OpCode.div_number)
+				{
+					if (step.arg1 is MemRegister_Number && step.arg2 is MemRegister_Number)
+					{
+						step.opCode = OpCode.div_number_memnumber_memnumber;
+					}
+				}
+				else if (step.opCode == OpCode.multi_number)
+				{
+					if (step.arg1 is MemRegister_Number && step.arg2 is MemRegister_Number)
+					{
+						step.opCode = OpCode.multi_number_memnumber_memnumber;
+					}
+				}
+			}
+
+		}
+
+		private bool isAllSafeOperator(int st,int ed,StackSlotAccessor accessor)
+		{
+			for (int i = st; i < ed; i++)
+			{
+				var opcode = block.opSteps[i].opCode;
+				if (builds.AS3FunctionBuilder.isIfJmp(opcode) || builds.AS3FunctionBuilder.isJMP(opcode))
+				{
+					if (block.opSteps[i].jumoffset >= 0)
+					{
+
+					}
+					else
+					{
+						if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, st - 1, accessor))
+						{
+							return false;
+						}
+					}
+
+				}
+				else if (
+					opcode == OpCode.call_function ||
+					opcode == OpCode.call_function_notcheck ||
+					opcode == OpCode.call_function_notcheck_notreturnobject ||
+					opcode == OpCode.call_function_notcheck_notreturnobject_notnative ||
+					opcode == OpCode.call_function_notcheck_notreturnobject_notnative_method
+					)
+				{
+					return false;
+				}
+				else if (opcode == OpCode.assigning)
+				{
+
+				}
+				else if (opcode == OpCode.access_method)
+				{
+					//必然不会涉及方法调用，因此是安全的
+				}
+				else if (opcode == OpCode.make_para_scope ||
+						opcode== OpCode.make_para_scope_method||
+						opcode== OpCode.make_para_scope_method_noparameters||
+						opcode== OpCode.make_para_scope_method_notnativeconstpara_allparaonstack||
+						opcode== OpCode.make_para_scope_withsignature||
+						opcode== OpCode.make_para_scope_withsignature_allparaonstack||
+						opcode== OpCode.make_para_scope_withsignature_noparameters ||
+						opcode== OpCode.push_parameter ||
+						opcode == OpCode.push_parameter_class||
+						opcode == OpCode.push_parameter_nativeconstpara||
+						opcode == OpCode.push_parameter_para||
+						opcode == OpCode.push_parameter_skipcheck_storetoheap||
+						opcode == OpCode.push_parameter_skipcheck_storetostack||
+						opcode == OpCode.push_parameter_skipcheck_testnative ||
+						opcode == OpCode.prepare_constructor_argement 
+					)
+				{
+
+				}
+
+				else if (!safeStep(block.opSteps[i].opCode))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private bool canOptimize(OpStep step, StackSlotAccessor register)
+		{
+			if (register.valueType == RunTimeDataType.rt_number
+				||
+				register.valueType == RunTimeDataType.rt_int
+				||
+				register.valueType == RunTimeDataType.rt_uint
+				||
+				register.valueType == RunTimeDataType.rt_boolean
+				)
+			{
+				if (step.opCode == OpCode.access_dot)
+				{
+					if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget || 
+						(
+						register._regMember !=null &&
+						register._regMember.bindField is ClassPropertyGetter))
+					{
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+
+
+				return safeStep(step.opCode);
+			}
+			return false;
+		}
+
+		private bool safeStep(OpCode code)
+		{
+			switch (code)
+			{
+				case OpCode.flag:
+				case OpCode.flag_call_super_constructor:
+				case OpCode.cast:
+				case OpCode.assigning:
+				case OpCode.add:
+				case OpCode.add_number:
+				case OpCode.sub:
+				case OpCode.sub_number:
+				case OpCode.multi:
+				case OpCode.div:
+				case OpCode.mod:
+				case OpCode.neg:
+				case OpCode.gt_num:
+				case OpCode.gt_void:
+				case OpCode.lt_num:
+				case OpCode.lt_void:
+				case OpCode.ge_num:
+				case OpCode.ge_void:
+				case OpCode.le_num:
+				case OpCode.le_void:
+				case OpCode.equality:
+				case OpCode.equality_num_num:
+				case OpCode.equality_str_str:
+				case OpCode.not_equality:
+				case OpCode.not_equality_num_num:
+				case OpCode.not_equality_str_str:
+				case OpCode.strict_equality:
+				case OpCode.not_strict_equality:
+				case OpCode.logic_not:
+				case OpCode.bitAnd:
+				case OpCode.bitOr:
+				case OpCode.bitNot:
+				case OpCode.bitXOR:
+				case OpCode.bitLeftShift:
+				case OpCode.bitRightShift:
+				case OpCode.bitUnsignedRightShift:
+				case OpCode.increment:
+				case OpCode.decrement:
+				case OpCode.increment_int:
+				case OpCode.increment_uint:
+				case OpCode.increment_number:
+				case OpCode.decrement_int:
+				case OpCode.decrement_uint:
+				case OpCode.decrement_number:
+				case OpCode.suffix_inc:
+				case OpCode.suffix_inc_int:
+				case OpCode.suffix_inc_uint:
+				case OpCode.suffix_inc_number:
+				case OpCode.suffix_dec:
+				case OpCode.suffix_dec_int:
+				case OpCode.suffix_dec_uint:
+				case OpCode.suffix_dec_number:
+				case OpCode.cast_primitive:
+				case OpCode.logic_is:
+				case OpCode.logic_instanceof:
+				case OpCode.logic_in:
+				case OpCode.multi_number:
+				case OpCode.div_number:
+				case OpCode.mod_number:
+				case OpCode.unary_plus:
+				case OpCode.cast_int_number:
+				case OpCode.cast_number_int:
+				case OpCode.cast_uint_number:
+				case OpCode.cast_number_uint:
+				case OpCode.cast_int_uint:
+				case OpCode.cast_uint_int:
+				case OpCode.function_return_funvoid_notry:
+				case OpCode.if_equality_num_num_jmp_notry:
+				case OpCode.if_not_equality_num_num_jmp_notry:
+				case OpCode.if_le_num_jmp_notry:
+				case OpCode.if_lt_num_jmp_notry:
+				case OpCode.if_ge_num_jmp_notry:
+				case OpCode.if_gt_num_jmp_notry:
+				case OpCode.call_function:
+				case OpCode.call_function_notcheck:
+				case OpCode.call_function_notcheck_notreturnobject:
+				case OpCode.call_function_notcheck_notreturnobject_notnative:
+				case OpCode.call_function_notcheck_notreturnobject_notnative_method:
+				case OpCode.multi_number_memnumber_memnumber:
+				case OpCode.div_number_memnumber_memnumber:
+				case OpCode.sub_number_memnumber_memnumber:
+					return true;
+				default:
+					return false;
+
+			}
+		}
+
+		private int findLastRefLine(StackSlotAccessor register)
+		{
+			//查找这个寄存器最后一次出现的行
+			var steps = block.opSteps;
+			for (int j = steps.Count - 1; j >= 0; j--)
+			{
+				var sl = steps[j];
+
+				if (ReferenceEquals(sl.reg, register) ||
+					ReferenceEquals(sl.arg1, register) ||
+					ReferenceEquals(sl.arg2, register)
+					)
+				{
+					return j;					
+				}
+			}
+			return -1;
+		}
+
+
+
 
 
 		class sslot
 		{
-			public Register register;
+			public StackSlotAccessor register;
 			public int index;
 		}
 
+		/// <summary>
+		/// 合并寄存器
+		/// </summary>
 		private void combieRegs()
 		{
 			var steps = block.opSteps;
 			//槽位池
 			Queue<sslot> slotpool = new Queue<sslot>();
 			//寄存器分配的槽位
-			Dictionary<Register, sslot> regisetSlot = new Dictionary<Register, sslot>();
+			Dictionary<StackSlotAccessor, sslot> regisetSlot = new Dictionary<StackSlotAccessor, sslot>();
 			//最后访问寄存器的操作行
-			Dictionary<Register, OpStep> regLastStep = new Dictionary<Register, OpStep>();
+			Dictionary<StackSlotAccessor, OpStep> regLastStep = new Dictionary<StackSlotAccessor, OpStep>();
 			//某个操作行前要插入对寄存器的初始化
 			//Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
 
@@ -292,18 +619,18 @@ namespace ASCompiler.compiler
 			{
 				OpStep step = steps[i];
 
-				List<Register> testregisters = new List<Register>();
-				if (step.reg is Register)
+				List<StackSlotAccessor> testregisters = new List<StackSlotAccessor>();
+				if (step.reg is StackSlotAccessor)
 				{
-					testregisters.Add((Register)step.reg);
+					testregisters.Add((StackSlotAccessor)step.reg);
 				}
-				if (step.arg1 is Register)
+				if (step.arg1 is StackSlotAccessor)
 				{
-					testregisters.Add((Register)step.arg1);
+					testregisters.Add((StackSlotAccessor)step.arg1);
 				}
-				if (step.arg2 is Register)
+				if (step.arg2 is StackSlotAccessor)
 				{
-					testregisters.Add((Register)step.arg2);
+					testregisters.Add((StackSlotAccessor)step.arg2);
 				}
 
 				foreach (var reg in testregisters)
@@ -351,7 +678,7 @@ namespace ASCompiler.compiler
 								{
 									var sl = steps[j];
 									{
-										Register r = sl.reg as Register;
+										StackSlotAccessor r = sl.reg as StackSlotAccessor;
 										if (r !=null && r.stmtid == stmtid)
 										{
 											regLastStep.Add(reg, sl);
@@ -359,7 +686,7 @@ namespace ASCompiler.compiler
 										}
 									}
 									{
-										Register r = sl.arg1 as Register;
+										StackSlotAccessor r = sl.arg1 as StackSlotAccessor;
 										if (r != null && r.stmtid == stmtid)
 										{
 											regLastStep.Add(reg, sl);
@@ -367,7 +694,7 @@ namespace ASCompiler.compiler
 										}
 									}
 									{
-										Register r = sl.arg2 as Register;
+										StackSlotAccessor r = sl.arg2 as StackSlotAccessor;
 										if (r != null && r.stmtid == stmtid)
 										{
 											regLastStep.Add(reg, sl);
@@ -446,7 +773,7 @@ namespace ASCompiler.compiler
 			//}
 
 			
-			List<Register> reglist = new List<Register>();
+			List<StackSlotAccessor> reglist = new List<StackSlotAccessor>();
 			foreach (var item in dictCompileRegisters.Values)
 			{
 				reglist.Add(item);
@@ -491,8 +818,56 @@ namespace ASCompiler.compiler
         /// </summary>
         public void completSteps(Builder builder)
         {
-            //****先查找yield return,如果有，则在开头插入跳转步骤**
-            for (int i = 0; i < block.opSteps.Count; i++)
+			{   //***查找所有的InitStaticClass并提前***
+				Dictionary<int, int> initstatics = new Dictionary<int, int>();
+				OpStep toinsert = null;
+				int st = 0;
+				do
+				{
+					toinsert = null; int insertto = 0;					
+					for (int i = st; i < block.opSteps.Count; i++)
+					{
+						var step = block.opSteps[i];
+						if (step.opCode == OpCode.init_staticclass)
+						{
+							if (step.arg1 is ASBinCode.rtData.RightValue)
+							{
+
+								if (i > insertto)
+								{
+									if (!initstatics.ContainsKey(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value))
+									{
+										initstatics.Add(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value, 0);
+										block.opSteps.RemoveAt(i);
+										toinsert = step;
+									}
+									else
+									{
+										block.opSteps.RemoveAt(i);
+									}
+									
+									break;
+								}
+
+							}
+						}
+					}
+
+					if (toinsert != null)
+					{
+						block.opSteps.Insert(insertto, toinsert);
+						st++;
+					}
+
+
+				} while (toinsert != null);
+			}
+
+
+
+
+			//****先查找yield return,如果有，则在开头插入跳转步骤**
+			for (int i = 0; i < block.opSteps.Count; i++)
             {
                 OpStep step = block.opSteps[i];
                 if (step.opCode == OpCode.yield_return)
@@ -504,176 +879,132 @@ namespace ASCompiler.compiler
                 }
             }
 
-			//////***合并寄存器***
-			////List<Register> reglist = new List<Register>();
-			////var steps = block.opSteps;
-			////foreach (var item in dictCompileRegisters.Values)
-			////{
-			////	reglist.Add(item);
-			////}
-
-			////Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
-
-
-			////for (int i = 0; i < reglist.Count; i++)
-			////{
-			////	bool found = false;
-
-			////	var reg = reglist[i];
-			////	//if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
-			////	//{
-			////	//	continue;
-			////	//}
-
-
-			////	int firstline = reglist.Count;
-			////	int lastline = -1;
-
-			////	for (int j = 0; j < steps.Count; j++)
-			////	{
-			////		var step = steps[j];
-			////		if (ReferenceEquals(step.reg, reg) ||
-			////			ReferenceEquals(step.arg1, reg) ||
-			////			ReferenceEquals(step.arg2, reg)
-			////			)
-			////		{
-			////			if (j < firstline)
-			////			{
-			////				firstline = j;
-			////			}
-			////			if (j > lastline)
-			////			{
-			////				lastline = j;
-			////			}
-			////		}
-			////	}
-
-
-			////	//***查找刚才寄存器最后一次出现后，才出现的新寄存器,公用一个槽****
-			////	for (int j = 0; j < reglist.Count; j++)
-			////	{
-			////		var r2 = reglist[j];
-			////		if (ReferenceEquals(r2, reg)
-			////			||
-			////			//r2._isassigntarget || r2._hasUnaryOrShuffixOrDelete
-			////			//||
-			////			r2._index != r2.Id
-			////			)
-			////		{
-			////			continue;
-			////		}
-
-			////		for (int k = 0; k < steps.Count; k++)
-			////		{
-			////			var step = steps[k];
-			////			if (ReferenceEquals(step.reg, r2) ||
-			////				ReferenceEquals(step.arg1, r2) ||
-			////				ReferenceEquals(step.arg2, r2)
-			////				)
-			////			{
-			////				if (k <= lastline)
-			////				{
-			////					break;
-			////				}
-			////				else
-			////				{
-			////					if (reg._isassigntarget || reg._hasUnaryOrShuffixOrDelete || reg.isFuncResult)
-			////					{
-			////						dictAddResetStackOp.Add(r2, step);
-			////					}
-
-
-			////					r2._index = reg._index;
-			////					found = true;
-			////					break;
-			////				}
-			////			}
-			////		}
-			////		if (found)
-			////		{
-
-			////			break;
-			////		}
-			////	}
-			////}
-
-			//////插入需要追加Reset的操作
-			////foreach (var item in dictAddResetStackOp)
-			////{
-			////	OpStep step = item.Value;
-
-			////	for (int i = 0; i < steps.Count; i++)
-			////	{
-			////		if (steps[i] == step)
-			////		{
-			////			OpStep insetStep = new OpStep(OpCode.reset_stackslot, step.token);
-			////			insetStep.arg1 = item.Key;
-			////			steps.Insert(i, insetStep);
-			////			break;
-			////		}
-			////	}
-
-			////}
-
-
-			////Dictionary<int, int> dictnumber = new Dictionary<int, int>();
-			////for (int i = 0; i < reglist.Count; i++)
-			////{
-			////	var idx = reglist[i]._index;
-			////	if (!dictnumber.ContainsKey(idx))
-			////	{
-			////		dictnumber.Add(idx, dictnumber.Count);
-			////	}
-
-			////	reglist[i]._index = dictnumber[idx];
-
-			////}
-			combieRegs();
-
 			completJump();
 
+			if (!isEval)
+			{
+				optimizeReg();
+				combieRegs();
+				
+			}
         }
 
 		private void completJump()
 		{
+			Dictionary<OpStep, string> dictJumpSteps = new Dictionary<OpStep, string>();
+
 			for (int i = 0; i < block.opSteps.Count; i++)
 			{
-				ASBinCode.OpStep step = block.opSteps[i];
+				OpStep step = block.opSteps[i];
 
-				string findflag = null;
-
+				string findflag = null;bool isif_jmp = false;
 				if (step.opCode == ASBinCode.OpCode.if_jmp
 					)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null,0)).value;
+					isif_jmp = true;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null,0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					dictJumpSteps.Add(step, findflag);
 				}
-
-				if (findflag != null)
+				if (isif_jmp)
 				{
-
-					bool isfound = false;
-					for (int j = 0; j < block.opSteps.Count; j++)
+					if (i > 0 && step.arg1 is StackSlotAccessor)
 					{
-						if (block.opSteps[j].flag == findflag)
+						var check = block.opSteps[i - 1];
+						if (ReferenceEquals(step.arg1, check.reg))
 						{
-							step.jumoffset = j - i;
-							isfound = true;
-							break;
+							if (check.opCode == OpCode.equality_num_num)
+							{
+								check.opCode = OpCode.if_equality_num_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.not_equality_num_num)
+							{
+								check.opCode = OpCode.if_not_equality_num_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.le_num)
+							{
+								check.opCode = OpCode.if_le_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.lt_num)
+							{
+								check.opCode = OpCode.if_lt_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.ge_num)
+							{
+								check.opCode = OpCode.if_ge_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.gt_num)
+							{
+								check.opCode = OpCode.if_gt_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
 						}
 					}
-
-					if (!isfound)
-					{
-						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
-					}
-
 				}
 			}
 
+			foreach (var item in dictJumpSteps)
+			{
+				OpStep step = item.Key;
+				string findflag = item.Value;
+
+				for (int i = 0; i < block.opSteps.Count; i++)
+				{
+					if (ReferenceEquals(block.opSteps[i], step))
+					{
+						bool isfound = false;
+						for (int j = 0; j < block.opSteps.Count; j++)
+						{
+							if (block.opSteps[j].flag == findflag)
+							{
+								step.jumoffset = j - i;
+								isfound = true;
+								break;
+							}
+						}
+
+						if (!isfound)
+						{
+							throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
+						}
+
+						break;
+					}
+				}
+			}
 
 			Stack<trystate> trys = new Stack<trystate>();
 			for (int i = 0; i < block.opSteps.Count; i++)
@@ -736,23 +1067,6 @@ namespace ASCompiler.compiler
 				else
 				{
 					step.tryid = -1;
-
-					if (step.opCode == OpCode.jmp)
-					{
-						step.opCode = OpCode.jmp_notry;
-					}
-					else if (step.opCode == OpCode.if_jmp)
-					{
-						step.opCode = OpCode.if_jmp_notry;
-					}
-					else if (step.opCode == OpCode.function_return_funvoid)
-					{
-						step.opCode = OpCode.function_return_funvoid_notry;
-					}
-					else if (step.opCode == OpCode.function_return_nofunction)
-					{
-						step.opCode = OpCode.function_return_nofunction_notry;
-					}
 				}
 
 			}
@@ -775,12 +1089,125 @@ namespace ASCompiler.compiler
 					{
 						step.opCode = OpCode.if_jmp_notry;
 					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_equality_num_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_equality_num_num_jmp_notry_noreference;
+							step.reg = null;step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_not_equality_num_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))     
+						{
+							step.opCode = OpCode.if_not_equality_num_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+
+				}
+				else if (step.opCode == OpCode.if_le_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_le_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+
+				}
+				else if (step.opCode == OpCode.if_lt_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_lt_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_ge_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_ge_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_gt_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece((StackSlotAccessor)step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_gt_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
 				}
 			}
 
 
 		}
-
+		private bool searchRefrece(StackSlotAccessor register,int stoffset)
+		{
+			for (int i = stoffset; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (ReferenceEquals(register, step.arg1) || ReferenceEquals(register, step.arg2) )
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 
 
         public readonly bool isEval;
@@ -789,7 +1216,7 @@ namespace ASCompiler.compiler
         {
             this.block = block;
 
-            dictCompileRegisters = new Dictionary<string, ASBinCode.Register>();
+            dictCompileRegisters = new Dictionary<string, ASBinCode.StackSlotAccessor>();
 
             this.isEval = isEval;
 

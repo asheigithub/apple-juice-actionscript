@@ -17,7 +17,7 @@ namespace ASRuntime.operators
 
             SLOT outpackagescopeslot= ((VariableBase)step.arg1).getSlot(outscope,null,0);
 
-            Register register = (Register)step.reg;
+            StackSlotAccessor register = (StackSlotAccessor)step.reg;
             if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
             {
                 l.linkTo(outpackagescopeslot);

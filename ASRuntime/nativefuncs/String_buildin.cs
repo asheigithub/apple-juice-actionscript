@@ -193,7 +193,7 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				int idx = TypeConverter.ConvertToInt(argements[0], null, null);
+				int idx = TypeConverter.ConvertToInt(argements[0]);
 				if (idx < 0 || idx >= b.Length)
 				{
 					//return new rtString(string.Empty);
@@ -280,7 +280,7 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				int idx = TypeConverter.ConvertToInt(argements[0], null, null);
+				int idx = TypeConverter.ConvertToInt(argements[0]);
 				if (idx < 0 || idx >= b.Length)
 				{
 					returnSlot.setValue(double.NaN);
@@ -360,7 +360,7 @@ namespace ASRuntime.nativefuncs
 
                 }
 
-                int charcode = TypeConverter.ConvertToInt(v, null, null);
+                int charcode = TypeConverter.ConvertToInt(v);
                 sb.Append((char)charcode);
             }
 
@@ -465,7 +465,7 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				string search = TypeConverter.ConvertToString(argements[0], null, null);
-				int st = TypeConverter.ConvertToInt(argements[1], null, null);
+				int st = TypeConverter.ConvertToInt(argements[1]);
 
 				//return new rtInt(b.IndexOf(search, st));
 				success = true;
@@ -698,8 +698,8 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				int st = TypeConverter.ConvertToInt(argements[0], null, null);
-				int ed = TypeConverter.ConvertToInt(argements[1], null, null);
+				int st = TypeConverter.ConvertToInt(argements[0]);
+				int ed = TypeConverter.ConvertToInt(argements[1]);
 
 				if (st > b.Length)
 				{
@@ -842,8 +842,8 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				string delimiter = TypeConverter.ConvertToString(argements[0], null, null);
-				int maxcount = TypeConverter.ConvertToInt(argements[1], null, null);
+				string delimiter = TypeConverter.ConvertToString(argements[0],stackframe,token);
+				int maxcount = TypeConverter.ConvertToInt(argements[1]);
 
 				if (maxcount < 0) //{ return new rtArray(); }
 				{
@@ -980,8 +980,8 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				int st = TypeConverter.ConvertToInt(argements[0], null, null);
-				int len = TypeConverter.ConvertToInt(argements[1], null, null);
+				int st = TypeConverter.ConvertToInt(argements[0]);
+				int len = TypeConverter.ConvertToInt(argements[1]);
 
 				if (st > b.Length)
 				{
@@ -1131,8 +1131,8 @@ namespace ASRuntime.nativefuncs
 			else
 			{
 				success = true;
-				int st = TypeConverter.ConvertToInt(argements[0], null, null);
-				int ed = TypeConverter.ConvertToInt(argements[1], null, null);
+				int st = TypeConverter.ConvertToInt(argements[0]);
+				int ed = TypeConverter.ConvertToInt(argements[1]);
 
 				if (st > ed)
 				{

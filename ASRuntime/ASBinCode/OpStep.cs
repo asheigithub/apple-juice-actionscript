@@ -129,7 +129,7 @@ namespace ASBinCode
 
             if (reg == null)
             {
-                return opCode.ToString() + "\t" + (arg1==null?"":arg1.ToString());
+                return opCode.ToString() + "\t" + (arg1==null?"":arg1.ToString()) + (arg2 == null ? "" : "\t"+arg2.ToString());
             }
 
             string result = reg.ToString() + "\t" + opCode.ToString();

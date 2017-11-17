@@ -48,6 +48,13 @@ namespace ASRuntime.operators
 							slot = lt;
 						}
 
+						if (step.arg1 is IMemReg)
+						{
+							//将其暂存到临时槽内
+							frame._tempSlot2.directSet(v);
+							v = frame._tempSlot2.getValue();
+						}
+
 						if (slot is SetThisItemSlot)
 						{
 							_doSetThisItem(((SetThisItemSlot)slot).bindObj, v, ((SetThisItemSlot)slot).setindex, oslot, frame, step);

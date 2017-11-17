@@ -87,7 +87,7 @@ namespace ASCTest.regNativeFunctions
             }
 
             Class cls = bin.getClassByRunTimeDataType( argements[0].rtType).instanceClass;
-            int length = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+            int length = TypeConverter.ConvertToInt(argements[1]);
 
             Class _array_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
 
@@ -186,8 +186,8 @@ namespace ASCTest.regNativeFunctions
             }
 
             Class cls = bin.getClassByRunTimeDataType(argements[0].rtType).instanceClass;
-            int length1 = TypeConverter.ConvertToInt(argements[1], stackframe, token);
-            int length2 = TypeConverter.ConvertToInt(argements[2], stackframe, token);
+            int length1 = TypeConverter.ConvertToInt(argements[1]);
+            int length2 = TypeConverter.ConvertToInt(argements[2]);
 
             Class _array_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
 
@@ -473,7 +473,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             success = true;
-            int dimension = TypeConverter.ConvertToInt( argements[0],stackframe,token);
+            int dimension = TypeConverter.ConvertToInt( argements[0]);
 
             var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
 
@@ -526,7 +526,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             success = true;
-            int dimension = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            int dimension = TypeConverter.ConvertToInt(argements[0]);
 
             var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
 
@@ -579,7 +579,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             success = true;
-            int dimension = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            int dimension = TypeConverter.ConvertToInt(argements[0]);
 
             var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
 
@@ -804,8 +804,8 @@ namespace ASCTest.regNativeFunctions
         {
 
 
-            int index1 = TypeConverter.ConvertToInt(argements[0], stackframe, token);
-            int index2 = TypeConverter.ConvertToInt(argements[1], stackframe, token);
+            int index1 = TypeConverter.ConvertToInt(argements[0]);
+            int index2 = TypeConverter.ConvertToInt(argements[1]);
 
             Array array =
                 (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
@@ -883,8 +883,8 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int index1 = TypeConverter.ConvertToInt(argements[1], stackframe, token);
-            int index2 = TypeConverter.ConvertToInt(argements[2], stackframe, token);
+            int index1 = TypeConverter.ConvertToInt(argements[1]);
+            int index2 = TypeConverter.ConvertToInt(argements[2]);
             Array array =
                 (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
 
@@ -1201,7 +1201,7 @@ namespace ASCTest.regNativeFunctions
         {
             success = true;
 
-            int length = TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            int length = TypeConverter.ConvertToInt(argements[0]);
             ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value =
                  new T[length];
 

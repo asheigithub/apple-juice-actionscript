@@ -492,7 +492,62 @@ namespace ASBinCode
 		function_return_funvoid_notry=139,
 		function_return_nofunction_notry=140,
 
-		sub_number_number=141
+		//sub_number_number=141,
+
+
 		
+		if_equality_num_num_jmp_notry = 142,
+		if_equality_num_num_jmp_notry_noreference = 143,
+
+		
+		if_not_equality_num_num_jmp_notry = 144,
+		if_not_equality_num_num_jmp_notry_noreference=145,
+
+		/// <summary>
+		/// 如果 &lt;= 则跳转
+		/// </summary>
+		if_le_num_jmp_notry = 146,
+		if_le_num_jmp_notry_noreference = 147,
+
+		/// <summary>
+		/// 如果 &lt; 则跳转
+		/// </summary>
+		if_lt_num_jmp_notry = 148,
+		if_lt_num_jmp_notry_noreference = 149,
+
+		/// <summary>
+		/// 如果 >= 则跳转
+		/// </summary>
+		if_ge_num_jmp_notry=150,
+		if_ge_num_jmp_notry_noreference = 151,
+
+		/// <summary>
+		/// 如果 > 则跳转
+		/// </summary>
+		if_gt_num_jmp_notry = 152,
+		if_gt_num_jmp_notry_noreference = 153,
+
+		/// <summary>
+		/// 当做完前缀后缀++ --后，如果arg1是个Register,则清理链接对象
+		/// </summary>
+		afterIncDes_clear_v1_link =154,
+
+		/// <summary>
+		/// 访问成员并且赋值给临时对象
+		/// </summary>
+		access_dot_memregister = 155,
+
+		/// <summary>
+		/// 两个MemNumber相减
+		/// </summary>
+		sub_number_memnumber_memnumber=156,
+		/// <summary>
+		/// 两个MemNumber相除
+		/// </summary>
+		div_number_memnumber_memnumber = 157,
+		/// <summary>
+		/// 两个MemNumber相乘
+		/// </summary>
+		multi_number_memnumber_memnumber = 158
 	}
 }

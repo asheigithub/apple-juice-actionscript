@@ -76,7 +76,7 @@ namespace ASRuntime.nativefuncs
 
 					if (a1.rtType == RunTimeDataType.rt_int || a1.rtType == RunTimeDataType.rt_uint || a1.rtType == RunTimeDataType.rt_number)
 					{
-						int c = TypeConverter.ConvertToInt(a1, null, null);
+						int c = TypeConverter.ConvertToInt(a1);
 
 						if (c < 0)
 						{

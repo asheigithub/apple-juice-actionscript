@@ -64,7 +64,7 @@ namespace ASCompiler.compiler.builds
                                 stepInitClass.arg1Type = item.staticClass.getRtType();
                                 env.block.opSteps.Add(stepInitClass);
 
-                                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                                 eax.setEAXTypeWhenCompile(item.staticClass.getRtType());
 								eax.isFindByPath = true;
 								//eax._pathGetter = new PackagePathGetter(path);
@@ -86,7 +86,7 @@ namespace ASCompiler.compiler.builds
                             {
                                 //没找到
                                 PackagePathGetter g = new PackagePathGetter(path);
-                                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                                 eax.setEAXTypeWhenCompile(RunTimeDataType.unknown);
                                 eax._pathGetter = g;
                             }
@@ -215,7 +215,7 @@ namespace ASCompiler.compiler.builds
                                 stepInitClass.arg1Type = item.staticClass.getRtType();
                                 env.block.opSteps.Add(stepInitClass);
 
-                                ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+                                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
                                 eax.setEAXTypeWhenCompile(item.getRtType());
 
                                 OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -406,7 +406,7 @@ namespace ASCompiler.compiler.builds
         }
 
         public static void make_dotStep(CompileEnv env, ASBinCode.rtti.ClassMember member, ASTool.Token token,
-            Register eax, RightValueBase rvObj
+            StackSlotAccessor eax, RightValueBase rvObj
             )
         {
             OpStep op = new OpStep(
@@ -434,7 +434,7 @@ namespace ASCompiler.compiler.builds
 
         private static void build_dot(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1, ASBinCode.rtti.ClassMember member)
         {
-            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+            ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
             eax._regMember = member;
             eax._regMemberSrcObj = v1;
 
@@ -462,7 +462,7 @@ namespace ASCompiler.compiler.builds
 
         private static void build_dot_name(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1)
         {
-            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+            ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
             eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
             OpStep op = new OpStep(OpCode.access_dot_byname, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
@@ -478,7 +478,7 @@ namespace ASCompiler.compiler.builds
 
         private static void build_bracket_access(CompileEnv env, ASTool.AS3.Expr.AS3ExprStep step, RightValueBase v1, Builder builder)
         {
-            ASBinCode.Register eax = env.createASTRegister(step.Arg1.Reg);
+            ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
             eax.setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
             var v2 = ExpressionBuilder.getRightValue(env, step.Arg3, step.token, builder);

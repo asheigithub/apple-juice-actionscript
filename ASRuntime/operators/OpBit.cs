@@ -105,7 +105,7 @@ namespace ASRuntime.operators
         private static void _BitNot_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2,
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
+            int n1 = TypeConverter.ConvertToInt(v1);
 
             int r = ~n1;
             step.reg.getSlot(scope, frame.stack, frame.offset).setValue(r);
@@ -123,8 +123,8 @@ namespace ASRuntime.operators
         }
         private static void _BitLeftShift_ValueOf_Callbacker(ASBinCode.RunTimeValueBase v1, ASBinCode.RunTimeValueBase v2, StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
-            int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
+            int n1 = TypeConverter.ConvertToInt(v1);
+            int n2 = TypeConverter.ConvertToInt(v2);
 
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 
@@ -145,8 +145,8 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            int n1 = TypeConverter.ConvertToInt(v1, frame, step.token);
-            int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
+            int n1 = TypeConverter.ConvertToInt(v1);
+            int n2 = TypeConverter.ConvertToInt(v2);
 
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 
@@ -167,8 +167,8 @@ namespace ASRuntime.operators
             StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            uint n1 = TypeConverter.ConvertToUInt(v1, frame, step.token);
-            int n2 = TypeConverter.ConvertToInt(v2, frame, step.token);
+            uint n1 = TypeConverter.ConvertToUInt(v1,frame,step.token);
+            int n2 = TypeConverter.ConvertToInt(v2);
 
             if (n2 < 0) { n2 = 0; } else if (n2 > 31) { n2 = 31; }
 

@@ -337,7 +337,7 @@ namespace ASRuntime
 
             if (at == RunTimeDataType.rt_int)
             {
-                linkobject = (TypeConverter.ConvertToInt(value, null, null));
+                linkobject = (TypeConverter.ConvertToInt(value));
             }
             else if (at == RunTimeDataType.rt_uint)
             {
@@ -412,7 +412,7 @@ namespace ASRuntime
                 {
                     if (vt == RunTimeDataType.rt_int)
                     {
-                        linkobject = (TypeConverter.ConvertToInt(value, null, null));
+                        linkobject = (TypeConverter.ConvertToInt(value));
                     }
                     else if (vt == RunTimeDataType.rt_uint)
                     {

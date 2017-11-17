@@ -144,7 +144,7 @@ namespace ASRuntime
         }
 
 
-        public static int ConvertToInt(ASBinCode.RunTimeValueBase src,StackFrame frame, ASBinCode.SourceToken token )
+        public static int ConvertToInt(ASBinCode.RunTimeValueBase src )
         {
             switch (src.rtType)
             {

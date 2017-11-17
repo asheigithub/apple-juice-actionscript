@@ -80,7 +80,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            int value = TypeConverter.ConvertToInt(argements[0],stackframe,token);
+            int value = TypeConverter.ConvertToInt(argements[0]);
 
             ((LinkObj<Byte>)((ASBinCode.rtData.rtObject)thisObj).value).value = (Byte)value;
             returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -138,7 +138,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<byte> obj =
                 (LinkObj<byte>)(v.value);
 
-            obj.value = (byte)TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            obj.value = (byte)TypeConverter.ConvertToInt(argements[0]);
 
             ((StackSlot)returnSlot).setLinkObjectValue(obj._class, stackframe.player, obj.value);
 
@@ -196,7 +196,7 @@ namespace ASCTest.regNativeFunctions
             LinkObj<byte> obj =
                 (LinkObj<byte>)(v.value);
 
-            obj.value = (byte)TypeConverter.ConvertToInt(argements[0], stackframe, token);
+            obj.value = (byte)TypeConverter.ConvertToInt(argements[0]);
 
             ((StackSlot)returnSlot).setLinkObjectValue(obj._class, stackframe.player, obj.value);
 

@@ -244,7 +244,7 @@ namespace ASCompiler.compiler.builds
                     env.block.opSteps.Add(lbl_loopstart);
                 }
 
-                Register eaxismovenext = env.getAdditionalRegister();
+                StackSlotAccessor eaxismovenext = env.getAdditionalRegister();
                 eaxismovenext.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
                 {
                     //**IEnumerator MoveNext()
@@ -298,7 +298,7 @@ namespace ASCompiler.compiler.builds
 
                 {
                     RightValueBase loadValue = env.getAdditionalRegister();
-                    ((Register)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                    ((StackSlotAccessor)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     //**IEnumerator Current()
                     OpStep opCurrent = new OpStep(OpCode.enumerator_current,
@@ -307,7 +307,7 @@ namespace ASCompiler.compiler.builds
                           as3forin.Token.sourceFile)
                         );
 
-                    opCurrent.reg = (Register)loadValue;
+                    opCurrent.reg = (StackSlotAccessor)loadValue;
                     opCurrent.regType = RunTimeDataType.rt_void;
                     opCurrent.arg1 = varSaveEnumerator;
                     opCurrent.arg1Type = varSaveEnumerator.valueType;
@@ -484,7 +484,7 @@ namespace ASCompiler.compiler.builds
                     env.block.opSteps.Add(lbl_loopstart);
                 }
 
-                Register eaxismovenext = env.getAdditionalRegister();
+                StackSlotAccessor eaxismovenext = env.getAdditionalRegister();
                 eaxismovenext.setEAXTypeWhenCompile(RunTimeDataType.rt_boolean);
                 {
                     //**IEnumerator MoveNext()
@@ -538,7 +538,7 @@ namespace ASCompiler.compiler.builds
 
                 {
                     RightValueBase loadValue = env.getAdditionalRegister();
-                    ((Register)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
+                    ((StackSlotAccessor)loadValue).setEAXTypeWhenCompile(RunTimeDataType.rt_void);
 
                     //**IEnumerator Current()
                     OpStep opCurrent = new OpStep(OpCode.enumerator_current,
@@ -547,7 +547,7 @@ namespace ASCompiler.compiler.builds
                           as3foreach.Token.sourceFile)
                         );
 
-                    opCurrent.reg = (Register)loadValue;
+                    opCurrent.reg = (StackSlotAccessor)loadValue;
                     opCurrent.regType = RunTimeDataType.rt_void;
                     opCurrent.arg1 = varSaveEnumerator;
                     opCurrent.arg1Type = varSaveEnumerator.valueType;
