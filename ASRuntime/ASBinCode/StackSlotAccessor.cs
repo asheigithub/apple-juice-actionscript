@@ -60,7 +60,7 @@ namespace ASBinCode
 
         public int _index;
 
-		public readonly int stmtid;
+		public  int stmtid;
 
         public StackSlotAccessor(int id,int stmtid)
         {

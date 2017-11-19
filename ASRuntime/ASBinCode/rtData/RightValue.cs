@@ -16,14 +16,19 @@ namespace ASBinCode.rtData
             valueType = value.rtType;
         }
 
-        //public override sealed RunTimeDataType valueType
-        //{
-        //    get
-        //    {
-        //        return value.rtType;
-        //    }
-        //}
+		//public override sealed RunTimeDataType valueType
+		//{
+		//    get
+		//    {
+		//        return value.rtType;
+		//    }
+		//}
 
+		public RunTimeValueBase LoadValue()
+		{
+			return value;
+		}
+		
         public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots,int offset)
         {
             return value;

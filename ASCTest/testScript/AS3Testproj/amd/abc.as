@@ -49,16 +49,16 @@ package
 			//return os.clock() - t   
 			
 			
-			var t:Number = (new Date()).getTime();
-			var total:Number = 0;
-			for (var i:Number = 0; i < 1000000; i++) 
-			{
-				total = total + i - (i / 2) * (i + 3) / (i + 5);
-			}
+			//var t:Number = (new Date()).getTime();
+			//var total:Number = 0;
+			//for (var i:Number = 0; i < 1000000; i++) 
+			//{
+				//total = total + i - (i / 2) * (i + 3) / (i + 5);
+			//}
+			//
+			//trace("action script:", (new Date()).getTime() - t );
+			//trace(total);
 			
-			
-			trace(total);
-			trace("action script:", (new Date()).getTime() - t );
 			
 			
 			//var array:Vector.<int> = new Vector.<int>();
@@ -80,11 +80,35 @@ package
 			//trace("action script:", (new Date()).getTime() - t );
 			//trace(total);
 			
-
+			kkk(1);
+			kkk(2);
+			kkk(4);
+			kkk(5);
 			
 			
 		}
 		
+		private function kkk(i:int):void
+		{
+			
+			switch (i) 
+			{
+				case 1:
+				case 2:
+					kkk(i + 2);
+				case 3:
+					trace("case",i);
+				break;
+			case 4:
+				trace(i + 2);
+			default:
+				
+				trace("default", i);
+				i++;
+				trace("d2", i);
+			}
+			
+		}
 		
 	}
 }
@@ -122,3 +146,5 @@ package
 //var f = new fib();
 //var ff = fib(f);
 //trace(ff);
+
+

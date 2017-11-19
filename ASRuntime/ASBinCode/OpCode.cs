@@ -548,6 +548,25 @@ namespace ASBinCode
 		/// <summary>
 		/// 两个MemNumber相乘
 		/// </summary>
-		multi_number_memnumber_memnumber = 158
+		multi_number_memnumber_memnumber = 158,
+		/// <summary>
+		/// 两个MemNumber相加
+		/// </summary>
+		add_number_memnumber_memnumber=159,
+
+		add_number_memnumber_constnumber=160,
+
+		div_number_memnumber_constnumber = 161,
+
+		/// <summary>
+		/// MemNumber ++后缀
+		/// </summary>
+		suffix_inc_number_memnumber=162,
+
+		/// <summary>
+		/// 赋值到MemNumber
+		/// </summary>
+		assign_tomemnumber =163
+
 	}
 }

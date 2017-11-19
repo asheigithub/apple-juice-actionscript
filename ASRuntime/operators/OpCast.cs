@@ -65,7 +65,7 @@ namespace ASRuntime.operators
             else
             {
                 StackFrame frame = (StackFrame)sender.args;
-                OpStep step = frame.block.opSteps[frame.codeLinePtr];
+                OpStep step = frame.block.instructions[frame.codeLinePtr];
                 frame.throwCastException(step.token, step.arg1.getValue(sender.scope, frame.stack, frame.offset).rtType, step.regType);
 
                 frame.endStep();

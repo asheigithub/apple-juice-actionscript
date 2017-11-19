@@ -748,7 +748,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
 
             //退出当前调用 *** yield语句不可能包含在try中，所以直接移动到最后一行退出即可
-            frame.codeLinePtr = frame.block.opSteps.Count;
+            frame.codeLinePtr = frame.block.instructions.Length;
         }
 
 

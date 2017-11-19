@@ -67,7 +67,8 @@ namespace ASCompiler.compiler
 					step.reg = variableResult;
 					step.arg1 = value;
 					tempEnv.block.opSteps.Add(step);
-
+					tempEnv.block.instructions = tempEnv.block.opSteps.ToArray();
+					tempEnv.block.opSteps = null;
                     player.loadCode(tempswc,tempEnv.block);
 
                     RunTimeValueBase result=  player.run(variableResult);

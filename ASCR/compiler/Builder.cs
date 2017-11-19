@@ -273,6 +273,35 @@ namespace ASCompiler.compiler
 
 				if (buildErrors.Count == 0)
 				{
+					//先查找函数私有变量，不考虑参数。如果这个私有变量只在函数体内使用，则转化为1个Register.
+					#region 变量查找
+					foreach (var f in bin.functions)
+					{
+						if (f == null || f.isYield || f.isNative)
+						{
+							continue;
+						}
+						var fb = bin.blocks[f.blockid];
+						if (blockEnv.ContainsKey(fb))
+						{
+
+							blockEnv[fb].optimizeFunctoinBlock(this, f);
+							blockEnv[fb].block.totalRegisters = blockEnv[fb].combieNeedStackSlots();
+						}
+					}
+
+					#endregion
+
+
+					foreach (var item in bin.blocks)
+					{
+						if (item.opSteps != null)
+						{
+							item.instructions = item.opSteps.ToArray();
+							item.opSteps = null;
+						}
+					}
+
 					//***回调需要检查函数类型
 					foreach (var item in _toOptimizeCallFunctionOpSteps)
 					{
@@ -1345,27 +1374,7 @@ namespace ASCompiler.compiler
                 }
             }
 
-            //先查找函数私有变量，不考虑参数。如果这个私有变量只在函数体内使用，则转化为1个Register.
-            #region 变量查找
-
             
-            foreach (var f in bin.functions)
-            {
-                if (f == null || f.isYield || f.isNative)
-                {
-                    continue;
-                }
-                var fb = bin.blocks[f.blockid];
-                if (blockEnv.ContainsKey(fb))
-                {
-					
-                    blockEnv[fb].convertVarToReg(this, f);
-					
-                }
-            }
-
-            #endregion
-
         }
         
         private bool check_expl_impl(ASBinCode.rtti.ClassMember clsmember,

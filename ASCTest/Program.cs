@@ -28,12 +28,12 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
-									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+                string path = args[0]; //path = @"D:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+									   //path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
-									   path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-				//path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
-
+									   //path = @"D:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+									   path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\amd";
+				//path = @"D:\Manju-pc\as3protobuf\protobuf\as3output";
 				if (path.EndsWith(".as"))
                 {
                     path = System.IO.Path.GetDirectoryName(path);
@@ -127,9 +127,10 @@ namespace ASCTest
                 {
                     continue;
                 }
-
 				
-                var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
+
+
+				var tree = grammar.ParseTree(teststring, ASTool.AS3LexKeywords.LEXKEYWORDS , 
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS  , srcFileProjFile[files[i]]);
 
                 //System.IO.File.WriteAllText("d:\\" + System.IO.Path.GetFileName(files[i]), tree.GetTreeString());
@@ -188,7 +189,7 @@ namespace ASCTest
 				//(new extFunctions()).registrationFunction(swc);
 
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
-				System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
+				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
 				//System.IO.File.WriteAllBytes("as3test.cswc", swc.toBytes());
 
 				if (swc != null)
@@ -205,7 +206,7 @@ namespace ASCTest
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
                             Console.WriteLine();
                             Console.WriteLine("total registers:" + block.totalRegisters);
-                            Console.WriteLine(block.ToString());
+                            Console.WriteLine(block.GetInstruction());
                         }
                     }
 
@@ -215,7 +216,6 @@ namespace ASCTest
                     {
                         ASRuntime.Player player = new ASRuntime.Player();
                         player.loadCode(swc);
-
 
 
 						//var d = player.createInstance("SProtoSpace.group_area_info");

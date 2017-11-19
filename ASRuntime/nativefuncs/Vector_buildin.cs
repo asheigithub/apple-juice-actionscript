@@ -1506,6 +1506,10 @@ namespace ASRuntime.nativefuncs
 					{
 						returnSlot.setValue(0);
 					}
+					else if (vd.vector_type == RunTimeDataType.rt_boolean)
+					{
+						returnSlot.directSet(rtBoolean.False);
+					}
 					else
 					{
 						returnSlot.directSet(rtUndefined.undefined);

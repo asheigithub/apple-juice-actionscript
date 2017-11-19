@@ -23,11 +23,11 @@ namespace ASBinCode
         public IScope scope;
         
         public List<OpStep> opSteps;
-
-        /// <summary>
-        /// 本段代码是否包含TryCatch
-        /// </summary>
-        public bool hasTryStmt;
+		public OpStep[] instructions;
+		/// <summary>
+		/// 本段代码是否包含TryCatch
+		/// </summary>
+		public bool hasTryStmt;
 
         /// <summary>
         /// 本段代码共用了多少个寄存器
@@ -50,16 +50,30 @@ namespace ASBinCode
 		public override string ToString()
         {
             string r = string.Empty;
-
-            for (int i = 0; i < opSteps.Count; i++)
-            {
-                r = r + opSteps[i].ToString() + "\n";
-            }
-
+			r += name + "\n";
+			if (opSteps != null)
+			{
+				for (int i = 0; i < opSteps.Count; i++)
+				{
+					r = r + opSteps[i].ToString() + "\n";
+				}
+			}
+			
             return r;
         }
 
-
+		public string GetInstruction()
+		{
+			string r = string.Empty;
+			if (instructions != null)
+			{
+				for (int i = 0; i < instructions.Length; i++)
+				{
+					r = r + instructions[i].ToString() + "\n";
+				}
+			}
+			return r;
+		}
 
 
 
@@ -84,10 +98,12 @@ namespace ASBinCode
 			block.scope = serizlizer.DeserializeObject<scopes.ScopeBase>(reader, scopes.ScopeBase.Deserialize);
 
 			int stepscount = reader.ReadInt32();
+			block.instructions = new OpStep[stepscount];block.opSteps = null;
 			for (int i = 0; i < stepscount; i++)
 			{
 				OpStep step = serizlizer.DeserializeObject<OpStep>(reader, OpStep.Deserialize);
-				block.opSteps.Add(step);
+				//block.opSteps.Add(step);
+				block.instructions[i] = step;
 			}
 
 			int regconvcount = reader.ReadInt32();
@@ -113,12 +129,18 @@ namespace ASBinCode
 			writer.Write(totalRegisters);
 
 			serizlizer.SerializeObject(writer, (scopes.ScopeBase)scope);
-				
-			writer.Write(opSteps.Count);
-			for (int i = 0; i < opSteps.Count; i++)
+
+			//writer.Write(opSteps.Count);
+			//for (int i = 0; i < opSteps.Count; i++)
+			//{
+			//	var step = opSteps[i];
+			//	serizlizer.SerializeObject(writer, step);
+			//}
+
+			writer.Write(instructions.Length);
+			for (int i = 0; i < instructions.Length; i++)
 			{
-				var step = opSteps[i];
-				//((ISWCSerializable)step).Serialize(writer, serizlizer);
+				var step = instructions[i];
 				serizlizer.SerializeObject(writer, step);
 			}
 

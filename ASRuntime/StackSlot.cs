@@ -174,16 +174,16 @@ namespace ASRuntime
             {
 
                 index = (int)value.rtType;
-                if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
-                {
-                    index = RunTimeDataType._OBJECT;
-                }               
+                //if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
+                //{
+                //    index = RunTimeDataType._OBJECT;
+                //}               
                 //值类型必须拷贝!!否则值可能被其他引用而导致错误
                 //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
                 switch (value.rtType)
                 {
                     case RunTimeDataType.rt_boolean:
-                        store[index] = value;
+                        store[0] = value;
                         break;
                     case RunTimeDataType.rt_int:
                         //setValue(((rtInt)value).value);
@@ -205,7 +205,7 @@ namespace ASRuntime
                         store[index] = value;
                         break;
                     case RunTimeDataType.rt_null:
-                        store[index] = value;
+                        store[6] = value;
                         break;
                     case RunTimeDataType.rt_function:
                         {//Function需要保存上下文环境。因此需要像值类型那样进行拷贝
@@ -216,7 +216,7 @@ namespace ASRuntime
 						}
                         break;
                     case RunTimeDataType.fun_void:
-                        store[index] = value;
+                        store[8] = value;
                         break;
                     case RunTimeDataType.rt_array:
                         {
@@ -225,11 +225,12 @@ namespace ASRuntime
 						}
                         break;
                     case RunTimeDataType.unknown:
-                        store[index] = null;
+                        store[10] = null;
                         break;
                     default:
                         {
-                            rtObject obj = (rtObject)value;refPropChanged = true;
+							index = RunTimeDataType._OBJECT;
+							rtObject obj = (rtObject)value;refPropChanged = true;
                             if (obj.value._class.isLink_System)
                             {
 								if (obj is StackLinkObjectCache.StackCacheObject)

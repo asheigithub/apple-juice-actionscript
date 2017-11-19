@@ -22,7 +22,7 @@ namespace ASRuntime
 			{
 				StackFrame frame = base.create();
 				frame.block = block;
-				frame.stepCount = block.opSteps.Count;
+				frame.stepCount = block.instructions.Length;
 
 				frame.isclosed = false;
 
@@ -247,7 +247,7 @@ namespace ASRuntime
         {
 			hascallstep = true;
 
-            OpStep step = block.opSteps[codeLinePtr];
+            OpStep step = block.instructions[codeLinePtr];
             //exec(step);
 #if DEBUG
             if (execing)
@@ -1053,6 +1053,38 @@ namespace ASRuntime
 						((MemRegister_Number)step.arg2).value.value;
 					endStepNoError();
 					break;
+				case OpCode.add_number_memnumber_memnumber:
+					((MemRegister_Number)step.reg).value.value =
+						((MemRegister_Number)step.arg1).value.value +
+						((MemRegister_Number)step.arg2).value.value;
+					endStepNoError();
+					break;
+				case OpCode.add_number_memnumber_constnumber:
+					((MemRegister_Number)step.reg).value.value =
+						((MemRegister_Number)step.arg1).value.value +
+						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+					endStepNoError();
+					break;
+				case OpCode.div_number_memnumber_constnumber:
+					((MemRegister_Number)step.reg).value.value =
+						((MemRegister_Number)step.arg1).value.value /
+						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+					endStepNoError();
+					break;
+				case OpCode.suffix_inc_number_memnumber:
+					{
+						var v = (MemRegister_Number)step.arg1;
+						((MemRegister_Number)step.reg).value.value =
+							v.value.value++;
+
+						endStepNoError();
+					}
+					break;
+				case OpCode.assign_tomemnumber:
+					((MemRegister_Number)step.reg).value.value =
+						step.arg1.getValue(scope, stack, offset).toNumber();
+					endStepNoError();
+					break;
 				default:
 
 					//runtimeError = (new error.InternalError(player.swc,step.token,
@@ -1090,7 +1122,7 @@ namespace ASRuntime
 
 		internal void endStep()
         {
-            endStep(block.opSteps[codeLinePtr]);
+            endStep(block.instructions[codeLinePtr]);
         }
 
 		
@@ -1155,9 +1187,9 @@ namespace ASRuntime
 
                         RunTimeValueBase errorValue = err.errorValue;
                         //***查找匹配catch找到后给捕获异常变量赋值.**
-                        for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                        for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                         {
-                            var op = block.opSteps[j];
+                            var op = block.instructions[j];
                             if (op.opCode == OpCode.catch_error
                                 )
                             {
@@ -1175,9 +1207,9 @@ namespace ASRuntime
                         if (!foundcatch)
                         {
                             holdedError = err;
-                            for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                            for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                             {
-                                var op = block.opSteps[j];
+                                var op = block.instructions[j];
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
@@ -1206,9 +1238,9 @@ namespace ASRuntime
                         runtimeError = null;
 
                         holdedError = err;
-                        for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                        for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                         {
-                            var op = block.opSteps[j];
+                            var op = block.instructions[j];
                             if (op.opCode == OpCode.enter_finally)
                             {
                                 int id = ((ASBinCode.rtData.rtInt)
@@ -1260,9 +1292,9 @@ namespace ASRuntime
                         hasCallReturn = false;
                         holdHasCallReturn = true;
                         {
-                            for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                            for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                             {
-                                var op = block.opSteps[j];
+                                var op = block.instructions[j];
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
@@ -1286,9 +1318,9 @@ namespace ASRuntime
                         hasCallReturn = false;
                         holdHasCallReturn = true;
                         {
-                            for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                            for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                             {
-                                var op = block.opSteps[j];
+                                var op = block.instructions[j];
                                 if (op.opCode == OpCode.enter_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
@@ -1312,9 +1344,9 @@ namespace ASRuntime
                         hasCallReturn = false;
                         holdHasCallReturn = true;
                         {
-                            for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                            for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                             {
-                                var op = block.opSteps[j];
+                                var op = block.instructions[j];
                                 if (op.opCode == OpCode.quit_finally)
                                 {
                                     int id = ((ASBinCode.rtData.rtInt)
@@ -1331,7 +1363,7 @@ namespace ASRuntime
                     else
                     {
 						hasCallReturn = false;
-						codeLinePtr = block.opSteps.Count;
+						codeLinePtr = block.instructions.Length;
                     }
 
                 }
@@ -1346,8 +1378,8 @@ namespace ASRuntime
                         //    ||
                         //    jumptolinetrys == null
                         //    )
-                        int jumptolinetry = block.opSteps[jumptoline + 1].tryid;
-                        int jumptolinetrytype = block.opSteps[jumptoline + 1].trytype;
+                        int jumptolinetry = block.instructions[jumptoline + 1].tryid;
+                        int jumptolinetrytype = block.instructions[jumptoline + 1].trytype;
                         if (//jumptolinetry==-1
                             //||
                             jumptolinetry != step.tryid || jumptolinetrytype !=step.trytype //tryCatchState.Peek().tryid
@@ -1367,9 +1399,9 @@ namespace ASRuntime
                                 holdjumptoline = jumptoline;
                                 jumptoline = 0;
                                 {
-                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                    for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                                     {
-                                        var op = block.opSteps[j];
+                                        var op = block.instructions[j];
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
@@ -1396,9 +1428,9 @@ namespace ASRuntime
                                 jumptoline = 0;
 
                                 {
-                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                    for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                                     {
-                                        var op = block.opSteps[j];
+                                        var op = block.instructions[j];
                                         if (op.opCode == OpCode.enter_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
@@ -1424,9 +1456,9 @@ namespace ASRuntime
                                 holdjumptoline = jumptoline;
                                 jumptoline = 0;
                                 {
-                                    for (int j = codeLinePtr + 1; j < block.opSteps.Count; j++)
+                                    for (int j = codeLinePtr + 1; j < block.instructions.Length; j++)
                                     {
-                                        var op = block.opSteps[j];
+                                        var op = block.instructions[j];
                                         if (op.opCode == OpCode.quit_finally)
                                         {
                                             int id = ((ASBinCode.rtData.rtInt)
@@ -1481,7 +1513,7 @@ namespace ASRuntime
 				return;
 			}
 
-			endStep(block.opSteps[codeLinePtr]);
+			endStep(block.instructions[codeLinePtr]);
             
         }
 
@@ -1565,11 +1597,11 @@ namespace ASRuntime
             }
             if (hasCallReturn)
             {
-                doTryCatchReturn(block.opSteps[codeLinePtr]);
+                doTryCatchReturn(block.instructions[codeLinePtr]);
             }
             else if (hasCallJump)
             {
-                doTryCatchReturn(block.opSteps[codeLinePtr]);
+                doTryCatchReturn(block.instructions[codeLinePtr]);
             }
 
             return s.tryid;

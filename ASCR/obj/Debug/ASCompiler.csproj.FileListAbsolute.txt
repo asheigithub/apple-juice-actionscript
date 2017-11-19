@@ -12,9 +12,7 @@ D:\ASTool\ASCompiler\obj\Debug\ASCompiler.pdb
 D:\ASTool\ASCR\bin\Debug\ASCompiler.dll.config
 D:\ASTool\ASCR\bin\Debug\ASCompiler.dll
 D:\ASTool\ASCR\bin\Debug\ASCompiler.pdb
-D:\ASTool\ASCR\bin\Debug\ASBinCode.dll
 D:\ASTool\ASCR\bin\Debug\ASRuntime.dll
-D:\ASTool\ASCR\bin\Debug\ASBinCode.pdb
 D:\ASTool\ASCR\bin\Debug\ASRuntime.pdb
 D:\ASTool\ASCR\bin\Debug\ASTool.pdb
 D:\ASTool\ASCR\bin\Debug\ASTool.xml
