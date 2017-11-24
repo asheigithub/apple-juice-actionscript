@@ -28,12 +28,12 @@ namespace ASCTest
             
             if (args.Length > 0)
             {
-                string path = args[0]; //path = @"D:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
-									   //path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\src\";
+                string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
+									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
-									   //path = @"D:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-									   path = @"D:\ASTool\ASCTest\testScript\AS3Testproj\amd";
-				//path = @"D:\Manju-pc\as3protobuf\protobuf\as3output";
+									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+								path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
+				
 				if (path.EndsWith(".as"))
                 {
                     path = System.IO.Path.GetDirectoryName(path);
@@ -205,7 +205,7 @@ namespace ASCTest
                             Console.WriteLine();
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
                             Console.WriteLine();
-                            Console.WriteLine("total registers:" + block.totalRegisters);
+                            Console.WriteLine("total registers:" + block.totalStackSlots);
                             Console.WriteLine(block.GetInstruction());
                         }
                     }
@@ -214,8 +214,8 @@ namespace ASCTest
 
                     if (swc.blocks.Count > 0)
                     {
-                        ASRuntime.Player player = new ASRuntime.Player();
-                        player.loadCode(swc);
+						ASRuntime.Player player = new ASRuntime.Player();
+						player.loadCode(swc);
 
 
 						//var d = player.createInstance("SProtoSpace.group_area_info");

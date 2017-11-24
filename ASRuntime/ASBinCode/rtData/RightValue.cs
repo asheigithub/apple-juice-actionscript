@@ -8,7 +8,7 @@ namespace ASBinCode.rtData
 	
     public sealed class RightValue : RightValueBase
     {
-        private readonly RunTimeValueBase value;
+        internal readonly RunTimeValueBase value;
 
         public RightValue(RunTimeValueBase value)
         {
@@ -24,10 +24,10 @@ namespace ASBinCode.rtData
 		//    }
 		//}
 
-		public RunTimeValueBase LoadValue()
-		{
-			return value;
-		}
+		//public RunTimeValueBase LoadValue()
+		//{
+		//	return value;
+		//}
 		
         public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots,int offset)
         {

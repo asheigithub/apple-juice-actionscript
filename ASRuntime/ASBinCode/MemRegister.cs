@@ -10,6 +10,8 @@ namespace ASBinCode
 {
 	public interface IMemReg: ISWCSerializable
 	{
+		int getId();
+		void setId(int newid);
 	}
 
 	public sealed class MemRegister_Number : LeftValueBase,IMemReg
@@ -83,7 +85,11 @@ namespace ASBinCode
 			}
 		}
 
-		public readonly int Id;
+		public int Id;
+
+		public int getId() { return Id; }
+
+		public void setId(int newid) { Id = newid; }
 
 		public readonly rtData.rtNumber value;
 
@@ -215,7 +221,10 @@ namespace ASBinCode
 			}
 		}
 
-		public readonly int Id;
+		public int Id;
+
+		public int getId() { return Id; }
+		public void setId(int newid) { Id = newid; }
 
 		private MemSlot_Boolean memSlot_;
 
@@ -345,7 +354,10 @@ namespace ASBinCode
 		}
 
 
-		public readonly int Id;
+		public int Id;
+
+		public int getId() { return Id; }
+		public void setId(int newid) { Id = newid; }
 
 		public readonly rtData.rtInt value;
 
@@ -411,7 +423,7 @@ namespace ASBinCode
 	{
 		sealed class MemSlot_UInt : SLOT
 		{
-			private rtUInt number;
+			private readonly rtUInt number;
 
 			public MemSlot_UInt(rtUInt value)
 			{
@@ -479,7 +491,10 @@ namespace ASBinCode
 		}
 
 
-		public readonly int Id;
+		public int Id;
+
+		public int getId() { return Id; }
+		public void setId(int newid) { Id = newid; }
 
 		public readonly rtData.rtUInt value;
 
@@ -488,7 +503,7 @@ namespace ASBinCode
 		public MemRegister_UInt(int id)
 		{
 			this.Id = id;
-			valueType = RunTimeDataType.rt_int;
+			valueType = RunTimeDataType.rt_uint;
 			value = new rtUInt(0);
 
 			MemSlot_ = new MemSlot_UInt(value);

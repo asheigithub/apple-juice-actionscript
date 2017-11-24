@@ -30,11 +30,18 @@ namespace ASBinCode
 		public bool hasTryStmt;
 
         /// <summary>
-        /// 本段代码共用了多少个寄存器
+        /// 本段代码共占用了几个StackSlot
         /// </summary>
-        public int totalRegisters;
+        public int totalStackSlots;
 
         public List<StackSlotAccessor> regConvFromVar;
+
+
+
+		/// <summary>
+		/// 无需序列化，只在编译过程中记录
+		/// </summary>
+		public Dictionary<RunTimeDataType, int> dictMemCacheCount;
 
         public CodeBlock(int id,string name,int define_class_id,bool isoutclass)
         {
@@ -94,7 +101,7 @@ namespace ASBinCode
 			block.hasTryStmt = hasTryStmt;
 			serizlized.Add(key,block);	
 
-			block.totalRegisters = reader.ReadInt32();
+			block.totalStackSlots = reader.ReadInt32();
 			block.scope = serizlizer.DeserializeObject<scopes.ScopeBase>(reader, scopes.ScopeBase.Deserialize);
 
 			int stepscount = reader.ReadInt32();
@@ -126,7 +133,7 @@ namespace ASBinCode
 			writer.Write(define_class_id);
 			writer.Write(isoutclass);
 			writer.Write(hasTryStmt);
-			writer.Write(totalRegisters);
+			writer.Write(totalStackSlots);
 
 			serizlizer.SerializeObject(writer, (scopes.ScopeBase)scope);
 

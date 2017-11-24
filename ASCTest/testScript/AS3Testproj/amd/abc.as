@@ -49,15 +49,15 @@ package
 			//return os.clock() - t   
 			
 			
-			//var t:Number = (new Date()).getTime();
-			//var total:Number = 0;
-			//for (var i:Number = 0; i < 1000000; i++) 
-			//{
-				//total = total + i - (i / 2) * (i + 3) / (i + 5);
-			//}
-			//
-			//trace("action script:", (new Date()).getTime() - t );
-			//trace(total);
+			var t:Number = (new Date()).getTime();
+			var total:Number = 0;
+			for (var i:Number = 0; i < 1000000; i++) 
+			{
+				total = total + i - (i / 2) * (i + 3) / (i + 5);
+			}
+			
+			trace("action script:", (new Date()).getTime() - t );
+			trace(total);
 			
 			
 			
@@ -80,35 +80,35 @@ package
 			//trace("action script:", (new Date()).getTime() - t );
 			//trace(total);
 			
-			kkk(1);
-			kkk(2);
-			kkk(4);
-			kkk(5);
+			//kkk(1);
+			//kkk(2);
+			//kkk(4);
+			//kkk(5);
 			
 			
 		}
 		
-		private function kkk(i:int):void
-		{
-			
-			switch (i) 
-			{
-				case 1:
-				case 2:
-					kkk(i + 2);
-				case 3:
-					trace("case",i);
-				break;
-			case 4:
-				trace(i + 2);
-			default:
-				
-				trace("default", i);
-				i++;
-				trace("d2", i);
-			}
-			
-		}
+		//private function kkk(i:int):void
+		//{
+			//
+			//switch (i) 
+			//{
+				//case 1:
+				//case 2:
+					//kkk(i + 2);
+				//case 3:
+					//trace("case",i);
+				//break;
+			//case 4:
+				//trace(i + 2);
+			//default:
+				//
+				//trace("default", i);
+				//i++;
+				//trace("d2", i);
+			//}
+			//
+		//}
 		
 	}
 }

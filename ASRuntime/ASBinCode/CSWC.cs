@@ -87,7 +87,10 @@ namespace ASBinCode
 
         public OperatorFunctions operatorOverrides;
 
-
+		public int MaxMemNumberCount;
+		public int MaxMemIntCount;
+		public int MaxMemUIntCount;
+		public int MaxMemBooleanCount;
 		
         public CSWC()
         {

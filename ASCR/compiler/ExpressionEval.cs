@@ -41,7 +41,7 @@ namespace ASCompiler.compiler
                 builder.buildExpressNotEval(tempEnv, expression);
 
                 tempEnv.completSteps(builder);
-                tempEnv.block.totalRegisters = tempEnv.combieNeedStackSlots();
+                tempEnv.block.totalStackSlots = tempEnv.combieNeedStackSlots();
 
                 if (builder.buildErrors.Count == 0)
                 {

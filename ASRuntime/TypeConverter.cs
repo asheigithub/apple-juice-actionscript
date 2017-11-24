@@ -406,7 +406,58 @@ namespace ASRuntime
 
             }
         }
-        #endregion
+		#endregion
+
+
+		/// <summary>
+		/// 测试索引器类型是否匹配
+		/// </summary>
+		/// <returns></returns>
+		public static bool testIndexGetSetMatch(ASBinCode.RunTimeValueBase src,rt dsttype,ASBinCode.CSWC swc)
+		{
+			if (src.rtType > rt.unknown && dsttype > rt.unknown)
+			{
+				return ASBinCode.ClassMemberFinder.check_isinherits(src.rtType, dsttype, swc);
+			}
+
+			if (dsttype == rt.rt_void || dsttype == swc.ObjectClass.getRtType()
+				  || src.rtType == dsttype)
+				return true;
+
+			if (swc.LinkObjectClass != null)
+			{
+				if (dsttype == swc.LinkObjectClass.getRtType())
+				{
+					if (src.rtType == rt.rt_boolean || src.rtType == rt.rt_int || src.rtType == rt.rt_null || src.rtType == rt.rt_number || src.rtType == rt.rt_string || src.rtType == rt.rt_uint)
+						return true;
+				}
+			}
+			if (src.rtType == rt.rt_number && dsttype == rt.rt_int)
+			{
+				double v = ((ASBinCode.rtData.rtNumber)src).value;
+				if (v == (int)(long)v)
+				{
+					return true;
+				}
+			}
+			if (src.rtType == rt.rt_number && dsttype == rt.rt_uint)
+			{
+				double v = ((ASBinCode.rtData.rtNumber)src).value;
+				if (v == (uint)(long)v)
+				{
+					return true;
+				}
+			}
+			if (src.rtType == rt.rt_int || src.rtType == rt.rt_uint)
+			{
+				return dsttype == rt.rt_number;
+			}
+
+
+			return false;
+		}
+
+
 
         /// <summary>
         /// 比较值src是否和值dst类型匹配

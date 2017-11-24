@@ -304,42 +304,46 @@ namespace ASRuntime.operators
                 {
                     if (rtObj.value._class.get_this_item != null)
                     {
+						var function = player.swc.functions[((MethodGetterBase)rtObj.value._class.get_this_item.bindField).functionId];
 
-                        //***调用索引器get***
-                        RunTimeValueBase func;
+						if (TypeConverter.testIndexGetSetMatch(v2, function.signature.parameters[0].type, player.swc))
+						{
 
-                        func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
-                            rtObj
-                            );
+							//***调用索引器get***
+							RunTimeValueBase func;
 
-                        var funCaller = player.funcCallerPool.create(frame, step.token);
-                        funCaller.SetFunction((ASBinCode.rtData.rtFunction)func);((ASBinCode.rtData.rtFunction)func).Clear();
-                        funCaller.loadDefineFromFunction();
-                        if (!funCaller.createParaScope()) { return; }
+							func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
+								rtObj
+								);
 
-                        //funCaller.releaseAfterCall = true;
+							var funCaller = player.funcCallerPool.create(frame, step.token);
+							funCaller.SetFunction((ASBinCode.rtData.rtFunction)func); ((ASBinCode.rtData.rtFunction)func).Clear();
+							funCaller.loadDefineFromFunction();
+							if (!funCaller.createParaScope()) { return; }
 
-                        bool success;
-                        funCaller.pushParameter(v2, 0, out success);
-                        if (!success)
-                        {
-                            frame.endStep(step);
-                            return;
-                        }
+							//funCaller.releaseAfterCall = true;
 
-                        funCaller._tempSlot = frame._tempSlot1;
-                        funCaller.returnSlot = register.getSlot(scope, frame.stack, frame.offset);
+							bool success;
+							funCaller.pushParameter(v2, 0, out success);
+							if (!success)
+							{
+								frame.endStep(step);
+								return;
+							}
 
-                        BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                        cb.setCallBacker(_get_this_item_callbacker);
-                        cb.step = step;
-                        cb.args = frame;
+							funCaller._tempSlot = frame._tempSlot1;
+							funCaller.returnSlot = register.getSlot(scope, frame.stack, frame.offset);
 
-                        funCaller.callbacker = cb;
-                        funCaller.call();
+							BlockCallBackBase cb = frame.player.blockCallBackPool.create();
+							cb.setCallBacker(_get_this_item_callbacker);
+							cb.step = step;
+							cb.args = frame;
 
-                        return;
+							funCaller.callbacker = cb;
+							funCaller.call();
 
+							return;
+						}
                     }
                 }
                 else
@@ -355,17 +359,25 @@ namespace ASRuntime.operators
                             return;
                         }
 
-                        //***使用设置器***
-                        StackSlot dslot = (StackSlot)register.getSlot(scope, frame.stack, frame.offset);
-                        dslot.linkTo(dslot._cache_setthisslot);
+						ClassMethodGetter methodGetter = rtObj.value._class.set_this_item.bindField as ClassMethodGetter;
+						if (methodGetter != null)
+						{
+							var function = frame.player.swc.functions[((ClassMethodGetter)rtObj.value._class.set_this_item.bindField).functionId];
 
-                        dslot._cache_setthisslot.bindObj = rtObj;
-                        dslot._cache_setthisslot.setindex = v2;
+							if (TypeConverter.testIndexGetSetMatch(v2, function.signature.parameters[1].type,player.swc))
+							{
+								//***使用设置器***
+								StackSlot dslot = (StackSlot)register.getSlot(scope, frame.stack, frame.offset);
+								dslot.linkTo(dslot._cache_setthisslot);
 
-                        frame.endStep(step);
+								dslot._cache_setthisslot.bindObj = rtObj;
+								dslot._cache_setthisslot.setindex = v2;
 
-                        return;
+								frame.endStep(step);
 
+								return;
+							}
+						}
                     }
                 }
             }

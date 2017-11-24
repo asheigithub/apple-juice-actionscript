@@ -62,6 +62,7 @@
     <Compile Include="compiler\builds\ExpressionBuilder.cs" />
     <Compile Include="compiler\builds\FuncCallBuilder.cs" />
     <Compile Include="compiler\BuildTypeError.cs" />
+    <None Include="compiler\CompileEnv_.bak" />
     <Compile Include="compiler\CompileEnv.cs" />
     <Compile Include="compiler\ExpressionEval.cs" />
     <Compile Include="compiler\FindOutPackageScopeMember.cs" />

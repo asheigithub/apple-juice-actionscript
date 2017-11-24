@@ -566,7 +566,12 @@ namespace ASBinCode
 		/// <summary>
 		/// 赋值到MemNumber
 		/// </summary>
-		assign_tomemnumber =163
+		assign_tomemnumber =163,
+
+		/// <summary>
+		/// 从MemNumber赋值到MemNumber
+		/// </summary>
+		assign_memnumber_tomemnumber=164
 
 	}
 }

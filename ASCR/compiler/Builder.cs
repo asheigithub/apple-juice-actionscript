@@ -274,7 +274,7 @@ namespace ASCompiler.compiler
 				if (buildErrors.Count == 0)
 				{
 					//先查找函数私有变量，不考虑参数。如果这个私有变量只在函数体内使用，则转化为1个Register.
-					#region 变量查找
+					#region 函数优化
 					foreach (var f in bin.functions)
 					{
 						if (f == null || f.isYield || f.isNative)
@@ -284,14 +284,13 @@ namespace ASCompiler.compiler
 						var fb = bin.blocks[f.blockid];
 						if (blockEnv.ContainsKey(fb))
 						{
-
+							//blockEnv[fb].convertVarToReg(this, f);
 							blockEnv[fb].optimizeFunctoinBlock(this, f);
-							blockEnv[fb].block.totalRegisters = blockEnv[fb].combieNeedStackSlots();
+							blockEnv[fb].block.totalStackSlots = blockEnv[fb].combieNeedStackSlots();
 						}
 					}
 
 					#endregion
-
 
 					foreach (var item in bin.blocks)
 					{
@@ -300,9 +299,32 @@ namespace ASCompiler.compiler
 							item.instructions = item.opSteps.ToArray();
 							item.opSteps = null;
 						}
+
+						if (item.dictMemCacheCount != null)
+						{
+							foreach (var c in item.dictMemCacheCount)
+							{
+								if (c.Key == RunTimeDataType.rt_number)
+								{
+									bin.MaxMemNumberCount = Math.Max(bin.MaxMemNumberCount, c.Value);
+								}
+								else if (c.Key == RunTimeDataType.rt_int)
+								{
+									bin.MaxMemIntCount = Math.Max(bin.MaxMemIntCount, c.Value);
+								}
+								else if (c.Key == RunTimeDataType.rt_uint)
+								{
+									bin.MaxMemUIntCount = Math.Max(bin.MaxMemUIntCount, c.Value);
+								}
+								else if (c.Key == RunTimeDataType.rt_boolean)
+								{
+									bin.MaxMemBooleanCount = Math.Max(bin.MaxMemBooleanCount, c.Value);
+								}
+							}
+						}
 					}
 
-					//***回调需要检查函数类型
+					//***回调需要检查函数类型 必须在函数优化后做，这时可判断传参方式.这些回调中不能再修改指令数量
 					foreach (var item in _toOptimizeCallFunctionOpSteps)
 					{
 						item(this);
@@ -857,7 +879,7 @@ namespace ASCompiler.compiler
                 //block必须有收尾工作
                 {
                     env.completSteps(this);
-                    env.block.totalRegisters = env.combieNeedStackSlots();
+                    env.block.totalStackSlots = env.combieNeedStackSlots();
                 }
 
                 _currentImports.Pop();
@@ -1253,7 +1275,7 @@ namespace ASCompiler.compiler
                 //block必须有收尾工作
                 {
                     env.completSteps(this);
-                    env.block.totalRegisters = env.combieNeedStackSlots();
+                    env.block.totalStackSlots = env.combieNeedStackSlots();
                     
                 }
                 _currentImports.Pop();
@@ -1507,7 +1529,7 @@ namespace ASCompiler.compiler
                 buildStmt(env, statements[i]);
             }
             env.completSteps(this);
-            block.totalRegisters = env.combieNeedStackSlots();
+            block.totalStackSlots = env.combieNeedStackSlots();
         }
 
         internal void buildNamedFunctionSignature(CompileEnv env, ASTool.AS3.AS3Function as3function)

@@ -77,11 +77,24 @@ namespace ASBinCode
 			{
 				return arg1.ToString() + "\t" + opCode.ToString() + "\t";
 			}
-			else if (opCode == OpCode.if_jmp)
+			else if (opCode == OpCode.if_jmp 
+				|| opCode== OpCode.if_equality_num_num_jmp_notry 
+				|| opCode== OpCode.if_equality_num_num_jmp_notry_noreference 
+				|| opCode == OpCode.if_ge_num_jmp_notry
+				|| opCode== OpCode.if_ge_num_jmp_notry_noreference
+				|| opCode== OpCode.if_gt_num_jmp_notry
+				|| opCode== OpCode.if_gt_num_jmp_notry_noreference
+				|| opCode== OpCode.if_jmp_notry
+				|| opCode== OpCode.if_le_num_jmp_notry
+				|| opCode == OpCode.if_le_num_jmp_notry_noreference
+				|| opCode== OpCode.if_lt_num_jmp_notry
+				|| opCode== OpCode.if_lt_num_jmp_notry_noreference
+				|| opCode== OpCode.if_not_equality_num_num_jmp_notry
+				|| opCode== OpCode.if_not_equality_num_num_jmp_notry_noreference)
 			{
-				return opCode.ToString() + "\t" + arg1.ToString() + "\t" + arg2.ToString();
+				return opCode.ToString() + "\t" + arg1.ToString() + "\t" + arg2.ToString() + "\tjumpoffset:" + jumoffset;
 			}
-			else if (opCode == OpCode.jmp)
+			else if (opCode == OpCode.jmp || opCode== OpCode.jmp_notry)
 			{
 				return opCode.ToString() + "\t" + arg1.ToString();
 			}

@@ -68,7 +68,7 @@ namespace ASRuntime
                     {
                         defaultblock = new CodeBlock(int.MaxValue, "_player_run",-65535,true);
                         defaultblock.scope = new ASBinCode.scopes.StartUpBlockScope();
-                        defaultblock.totalRegisters = 1;
+                        defaultblock.totalStackSlots = 1;
 
                         {
                             OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(0, 0, ""));
@@ -1210,13 +1210,13 @@ namespace ASRuntime
 									case OpCode.add_number_memnumber_constnumber:
 										((MemRegister_Number)step.reg).value.value =
 											((MemRegister_Number)step.arg1).value.value +
-											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.div_number_memnumber_constnumber:
 										((MemRegister_Number)step.reg).value.value =
 											((MemRegister_Number)step.arg1).value.value /
-											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.suffix_inc_number_memnumber:
@@ -1231,6 +1231,11 @@ namespace ASRuntime
 									case OpCode.assign_tomemnumber:
 										((MemRegister_Number)step.reg).value.value =
 											step.arg1.getValue(scope, stackSlots, currentRunFrame.offset).toNumber();
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.assign_memnumber_tomemnumber:
+										((MemRegister_Number)step.reg).value.value =
+											((MemRegister_Number)step.arg1).value.value;
 										++currentRunFrame.codeLinePtr;
 										break;
 									default:
@@ -1430,7 +1435,7 @@ namespace ASRuntime
 
 			StackFrame frame = null;
 
-			if (startOffset + calledblock.totalRegisters + 1 + 1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
+			if (startOffset + calledblock.totalStackSlots + 1 + 1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
 			{
 				if (callbacker != null)
 				{
@@ -1498,7 +1503,7 @@ namespace ASRuntime
 
             StackFrame frame = null;
 
-            if (startOffset + calledblock.totalRegisters+1+1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
+            if (startOffset + calledblock.totalStackSlots+1+1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
             {
                 //runtimeError = new error.InternalError(token, "stack overflow");
                 if (callbacker != null)

@@ -57,7 +57,7 @@ namespace ASRuntime
 
 		public IEnumerator<StackFrame> GetEnumerator()
 		{
-			for (int i = 0; i < pos; i++)
+			for (int i = pos-1; i >0; i--)
 			{
 				yield return inner[i];
 			}

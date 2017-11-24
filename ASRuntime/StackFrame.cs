@@ -26,7 +26,7 @@ namespace ASRuntime
 
 				frame.isclosed = false;
 
-				frame.baseUseSlots = block.totalRegisters + 2;
+				frame.baseUseSlots = block.totalStackSlots + 2;
 				frame.baseBottomSlotIndex = 0;
 
 				return frame;
@@ -1062,13 +1062,13 @@ namespace ASRuntime
 				case OpCode.add_number_memnumber_constnumber:
 					((MemRegister_Number)step.reg).value.value =
 						((MemRegister_Number)step.arg1).value.value +
-						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 					endStepNoError();
 					break;
 				case OpCode.div_number_memnumber_constnumber:
 					((MemRegister_Number)step.reg).value.value =
 						((MemRegister_Number)step.arg1).value.value /
-						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).LoadValue()).value;
+						((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 					endStepNoError();
 					break;
 				case OpCode.suffix_inc_number_memnumber:
@@ -1083,6 +1083,11 @@ namespace ASRuntime
 				case OpCode.assign_tomemnumber:
 					((MemRegister_Number)step.reg).value.value =
 						step.arg1.getValue(scope, stack, offset).toNumber();
+					endStepNoError();
+					break;
+				case OpCode.assign_memnumber_tomemnumber:
+					((MemRegister_Number)step.reg).value.value =
+						((MemRegister_Number)step.arg1).value.value;
 					endStepNoError();
 					break;
 				default:

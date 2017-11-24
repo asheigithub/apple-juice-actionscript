@@ -392,7 +392,10 @@ namespace ASBinCode
 					SerializeObject<rtti.Class>(bw, swc.RegExpClass);
 
 
-
+					bw.Write(swc.MaxMemNumberCount);
+					bw.Write(swc.MaxMemIntCount);
+					bw.Write(swc.MaxMemUIntCount);
+					bw.Write(swc.MaxMemBooleanCount);
 
 
 				}
@@ -521,6 +524,13 @@ namespace ASBinCode
 					////public Class RegExpClass;
 					//SerializeObject<rtti.Class>(bw, swc.RegExpClass);
 					swc.RegExpClass = DeserializeObject<rtti.Class>(br, rtti.Class.LoadClass);
+
+
+
+					swc.MaxMemNumberCount = br.ReadInt32();
+					swc.MaxMemIntCount = br.ReadInt32();
+					swc.MaxMemUIntCount = br.ReadInt32();
+					swc.MaxMemBooleanCount = br.ReadInt32();
 
 				}
 			}
