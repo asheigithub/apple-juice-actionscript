@@ -42,6 +42,10 @@ namespace ASBinCode
 		/// 无需序列化，只在编译过程中记录
 		/// </summary>
 		public Dictionary<RunTimeDataType, int> dictMemCacheCount;
+		/// <summary>
+		/// 无需序列化，只在编译过程中记录
+		/// </summary>
+		public List<IMemReg> memCacheList;
 
         public CodeBlock(int id,string name,int define_class_id,bool isoutclass)
         {

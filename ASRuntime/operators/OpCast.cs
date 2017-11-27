@@ -12,17 +12,17 @@ namespace ASRuntime.operators
 
         public static void execCast(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v1 = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v1 = step.arg1.getValue(scope, frame);
 
             if (step.regType == RunTimeDataType.rt_void)
             {
-                step.reg.getSlot(scope, frame.stack, frame.offset).directSet(v1);
+                step.reg.getSlot(scope, frame).directSet(v1);
 				//frame.endStep(step);
 				frame.endStepNoError();
             }
             else if (step.regType < RunTimeDataType.unknown && v1.rtType < RunTimeDataType.unknown)
             {
-				if (!CastPrimitive_to_Primitive(step.regType, v1, step.reg.getSlot(scope, frame.stack, frame.offset), frame, step.token))
+				if (!CastPrimitive_to_Primitive(step.regType, v1, step.reg.getSlot(scope, frame), frame, step.token))
 				{
 					frame.throwCastException(step.token, v1.rtType, step.regType);
 					frame.endStep(step);
@@ -46,7 +46,7 @@ namespace ASRuntime.operators
                     frame,
                     step.token,
                     scope,
-                    step.reg.getSlot(scope, frame.stack, frame.offset)
+                    step.reg.getSlot(scope, frame)
                     ,
                     cb
                     ,
@@ -66,7 +66,7 @@ namespace ASRuntime.operators
             {
                 StackFrame frame = (StackFrame)sender.args;
                 OpStep step = frame.block.instructions[frame.codeLinePtr];
-                frame.throwCastException(step.token, step.arg1.getValue(sender.scope, frame.stack, frame.offset).rtType, step.regType);
+                frame.throwCastException(step.token, step.arg1.getValue(sender.scope, frame).rtType, step.regType);
 
                 frame.endStep();
 
@@ -1357,9 +1357,9 @@ namespace ASRuntime.operators
 
         public static void exec_CastPrimitive(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            step.reg.getSlot(scope, frame.stack, frame.offset).directSet
+            step.reg.getSlot(scope, frame).directSet
                 ( 
-                TypeConverter.ObjectImplicit_ToPrimitive( (rtObject)step.arg1.getValue(scope, frame.stack, frame.offset) )
+                TypeConverter.ObjectImplicit_ToPrimitive( (rtObject)step.arg1.getValue(scope, frame) )
                 );
 			frame.endStepNoError();
             //frame.endStep(step);

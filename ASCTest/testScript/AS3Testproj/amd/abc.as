@@ -54,6 +54,7 @@ package
 			for (var i:Number = 0; i < 1000000; i++) 
 			{
 				total = total + i - (i / 2) * (i + 3) / (i + 5);
+				
 			}
 			
 			trace("action script:", (new Date()).getTime() - t );

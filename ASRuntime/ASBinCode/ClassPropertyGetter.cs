@@ -50,7 +50,7 @@ namespace ASBinCode
             throw new NotImplementedException();
         }
 
-        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
             throw new NotImplementedException();
         }
@@ -58,12 +58,12 @@ namespace ASBinCode
 
         private PropertySlot _tempSlot;
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
             return _tempSlot;
         }
 
-        public sealed override  SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override  SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 
             return _tempSlot;

@@ -22,12 +22,26 @@ namespace ASRuntime
 		private rtFunction _setMemberValue;
 
 		public LinkTypeMapper linktypemapper;
-        
+
+
+		/// <summary>
+		/// 内存缓存number
+		/// </summary>
+		private double[] memnumber;
+
         internal CSWC swc;
         private CodeBlock defaultblock;
         public void loadCode(CSWC swc, CodeBlock block=null)
         {
             this.swc = swc;
+
+			memnumber = new double[swc.MaxMemNumberCount];
+
+			foreach (var m in swc.MemRegList)
+			{
+				m.setMemCache_Number(memnumber);
+			}
+
 
 			if (swc.nativefunctions.Count == 0)
 			{
@@ -48,8 +62,6 @@ namespace ASRuntime
             linktypemapper.init(swc);
 
 			//****************
-			
-
 
             if (block != null)
             {
@@ -172,7 +184,7 @@ namespace ASRuntime
 		{
 			if (!_hasInitStack)
 			{
-				stackframePool = new StackFrame.StackFramePool();
+				stackframePool = new StackFrame.StackFramePool(memnumber);
 				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool(this);
 				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
 				runFuncresultPool = new runFuncResult.ResultPool();
@@ -597,7 +609,7 @@ namespace ASRuntime
 										break;
 									case OpCode.if_jmp:
 										{
-											if (((rtBoolean)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)//ReferenceEquals(ASBinCode.rtData.rtBoolean.True, step.arg1.getValue(scope)))
 											{
 												currentRunFrame.hasCallJump = true;
 												currentRunFrame.jumptoline = currentRunFrame.codeLinePtr + step.jumoffset;
@@ -612,7 +624,7 @@ namespace ASRuntime
 										break;
 									case OpCode.if_jmp_notry:
 										{
-											if (((rtBoolean)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value)
+											if (((rtBoolean)step.arg1.getValue(scope, currentRunFrame)).value)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 											}
@@ -637,7 +649,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_try:
 										{
-											int tryid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int tryid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
 											currentRunFrame.enter_try(tryid);
 
 											currentRunFrame.endStep(step);
@@ -645,7 +657,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_try:
 										{
-											int tryid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int tryid = ((rtInt)step.arg1.getValue(scope,currentRunFrame)).value;
 											currentRunFrame.quit_try(tryid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -653,7 +665,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_catch:
 										{
-											int catchid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
 											currentRunFrame.enter_catch(catchid);
 
 											currentRunFrame.endStep(step);
@@ -661,7 +673,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_catch:
 										{
-											int catchid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int catchid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
 											currentRunFrame.quit_catch(catchid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -669,7 +681,7 @@ namespace ASRuntime
 										break;
 									case OpCode.enter_finally:
 										{
-											int finallyid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int finallyid = ((rtInt)step.arg1.getValue(scope, currentRunFrame)).value;
 											currentRunFrame.enter_finally(finallyid);
 
 											currentRunFrame.endStep(step);
@@ -677,7 +689,7 @@ namespace ASRuntime
 										break;
 									case OpCode.quit_finally:
 										{
-											int finallyid = ((rtInt)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).value;
+											int finallyid = ((rtInt)step.arg1.getValue(scope,  currentRunFrame)).value;
 											currentRunFrame.quit_finally(finallyid, step.token);
 
 											currentRunFrame.endStep(step);
@@ -814,13 +826,13 @@ namespace ASRuntime
 										break;
 									case OpCode.function_create:
 										{
-											rtArray arr = (rtArray)step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
+											rtArray arr = (rtArray)step.arg1.getValue(scope, currentRunFrame);
 											int funcid = ((rtInt)arr.innerArray[0]).value;
 											bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
 											rtFunction function = new rtFunction(funcid, ismethod);
 											function.bind(scope);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).directSet(function);
+											step.reg.getSlot(scope, currentRunFrame).directSet(function);
 
 											currentRunFrame.endStepNoError();
 										}
@@ -847,43 +859,43 @@ namespace ASRuntime
 										break;
 									case OpCode.cast_int_number:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue((double)((rtInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_int:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(TypeConverter.ConvertToInt(v1));
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToInt(v1));
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_number:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue((double)((rtUInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((double)((rtUInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_number_uint:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue(TypeConverter.ConvertToUInt(v1, currentRunFrame, null));
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_int_uint:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue((uint)((rtInt)v1).value);
+											var v1 = step.arg1.getValue(scope,  currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((uint)((rtInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
 									case OpCode.cast_uint_int:
 										{
-											var v1 = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
-											step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue((int)((rtUInt)v1).value);
+											var v1 = step.arg1.getValue(scope, currentRunFrame);
+											step.reg.getSlot(scope, currentRunFrame).setValue((int)((rtUInt)v1).value);
 											currentRunFrame.endStepNoError();
 											break;
 										}
@@ -930,7 +942,7 @@ namespace ASRuntime
 									case OpCode.function_return_nofunction:
 										{
 											currentRunFrame.hasCallReturn = true;
-											RunTimeValueBase rv = step.arg1.getValue(scope, stackSlots, currentRunFrame.offset);
+											RunTimeValueBase rv = step.arg1.getValue(scope, currentRunFrame);
 											currentRunFrame.returnSlot.directSet(rv);
 											currentRunFrame.endStep(step);
 										}
@@ -943,7 +955,7 @@ namespace ASRuntime
 										break;
 									case OpCode.function_return_nofunction_notry:
 										{
-											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, stackSlots, currentRunFrame.offset));
+											currentRunFrame.returnSlot.directSet(step.arg1.getValue(scope, currentRunFrame));
 											currentRunFrame.codeLinePtr = currentRunFrame.stepCount;
 										}
 										break;
@@ -951,7 +963,7 @@ namespace ASRuntime
 										{
 
 											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, stackSlots, currentRunFrame.offset);
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
 											currentRunFrame.funCaller.doCall_allcheckpass();
 											currentRunFrame.funCaller = null;
 
@@ -960,8 +972,8 @@ namespace ASRuntime
 									case OpCode.call_function_notcheck_notreturnobject_notnative:
 										{
 											currentRunFrame.funCaller.callbacker = currentRunFrame.funCaller;
-											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, stackSlots, currentRunFrame.offset);
-											currentRunFrame.funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+											currentRunFrame.funCaller.returnSlot = step.reg.getSlot(scope, currentRunFrame);
+											currentRunFrame.funCaller.returnSlot.directSet(step.arg2.getValue(null, null));
 											currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault();
 											currentRunFrame.funCaller = null;
 
@@ -972,8 +984,8 @@ namespace ASRuntime
 											var funCaller = currentRunFrame.funCaller;
 
 											funCaller.callbacker = funCaller;
-											funCaller.returnSlot = step.reg.getSlot(scope, stackSlots, currentRunFrame.offset);
-											funCaller.returnSlot.directSet(step.arg2.getValue(null, null, 0));
+											funCaller.returnSlot = step.reg.getSlot(scope,  currentRunFrame);
+											funCaller.returnSlot.directSet(step.arg2.getValue(null, null));
 											//currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault_method();
 											callBlock_Method_NoHeap(swc.blocks[funCaller.toCallFunc.blockid],
 												funCaller.returnSlot, step.token, funCaller.callbacker, funCaller.functionThisPointer);
@@ -985,25 +997,25 @@ namespace ASRuntime
 									
 									case OpCode.if_equality_num_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope,currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope,currentRunFrame)).toNumber();
 											if (n1 == n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope,  currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1; //jumtooffset位置为label,因此直接可以再跳过一层
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_equality_num_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 == n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1; //jumtooffset位置为label,因此直接可以再跳过一层
@@ -1017,25 +1029,25 @@ namespace ASRuntime
 										break;
 									case OpCode.if_not_equality_num_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 != n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_not_equality_num_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 != n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
@@ -1048,25 +1060,25 @@ namespace ASRuntime
 										break;
 									case OpCode.if_le_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope,  currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope,  currentRunFrame)).toNumber();
 											if (n1 <= n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_le_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 <= n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
@@ -1080,25 +1092,25 @@ namespace ASRuntime
 										break;
 									case OpCode.if_lt_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 < n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope,currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_lt_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 < n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
@@ -1112,25 +1124,25 @@ namespace ASRuntime
 										break;
 									case OpCode.if_ge_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 >= n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_ge_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 >= n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
@@ -1144,25 +1156,25 @@ namespace ASRuntime
 										break;
 									case OpCode.if_gt_num_jmp_notry:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope,currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope,currentRunFrame)).toNumber();
 											if (n1 > n2)
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.True);
+												step.reg.getSlot(scope,currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.True);
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
 
 											}
 											else
 											{
-												step.reg.getSlot(scope, stackSlots, currentRunFrame.offset).setValue(ASBinCode.rtData.rtBoolean.False);
+												step.reg.getSlot(scope, currentRunFrame).setValue(ASBinCode.rtData.rtBoolean.False);
 												++currentRunFrame.codeLinePtr;
 											}
 										}
 										break;
 									case OpCode.if_gt_num_jmp_notry_noreference:
 										{
-											var n1 = (step.arg1.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
-											var n2 = (step.arg2.getValue(scope, stackSlots, currentRunFrame.offset)).toNumber();
+											var n1 = (step.arg1.getValue(scope, currentRunFrame)).toNumber();
+											var n2 = (step.arg2.getValue(scope, currentRunFrame)).toNumber();
 											if (n1 > n2)
 											{
 												currentRunFrame.codeLinePtr += step.jumoffset + 1;
@@ -1176,7 +1188,7 @@ namespace ASRuntime
 										break;
 									case OpCode.afterIncDes_clear_v1_link:
 										{
-											((StackSlot)((StackSlotAccessor)step.arg1).getSlotForAssign(scope, stackSlots, currentRunFrame.offset)).linkTo(null);
+											((StackSlot)((StackSlotAccessor)step.arg1).getSlotForAssign(scope, currentRunFrame)).linkTo(null);
 											currentRunFrame.endStepNoError();
 											break;
 										}
@@ -1184,58 +1196,57 @@ namespace ASRuntime
 										operators.OpAccess_Dot.exec_dot_register(currentRunFrame, step, scope);
 										break;
 									case OpCode.sub_number_memnumber_memnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value -
-											((MemRegister_Number)step.arg2).value.value;
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] - memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.div_number_memnumber_memnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value /
-											((MemRegister_Number)step.arg2).value.value;
+										
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] / memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.multi_number_memnumber_memnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value *
-											((MemRegister_Number)step.arg2).value.value;
+										
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] * memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.add_number_memnumber_memnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value +
-											((MemRegister_Number)step.arg2).value.value;
+										
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] + memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.add_number_memnumber_constnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value +
-											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+										
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] + ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.div_number_memnumber_constnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value /
-											((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+										
+										memnumber[step.memregid1] =
+											memnumber[step.memregid2] / ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.suffix_inc_number_memnumber:
 										{
-											var v = (MemRegister_Number)step.arg1;
-											((MemRegister_Number)step.reg).value.value =
-												v.value.value++;
+											
+											memnumber[step.memregid1] = memnumber[step.memregid2]++;
 
 											++currentRunFrame.codeLinePtr;
 										}
 										break;
 									case OpCode.assign_tomemnumber:
-										((MemRegister_Number)step.reg).value.value =
-											step.arg1.getValue(scope, stackSlots, currentRunFrame.offset).toNumber();
+										
+										memnumber[step.memregid1] = step.arg1.getValue(scope, currentRunFrame).toNumber();
+
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.assign_memnumber_tomemnumber:
-										((MemRegister_Number)step.reg).value.value =
-											((MemRegister_Number)step.arg1).value.value;
+										
+										memnumber[step.memregid1] = memnumber[step.memregid2];
 										++currentRunFrame.codeLinePtr;
 										break;
 									default:
@@ -1353,7 +1364,7 @@ namespace ASRuntime
 				if (result != null && runtimeError == null)
 				{
 					
-					return result.getValue(topscope,stackSlots,displayStackFrame.offset);
+					return result.getValue(topscope,displayStackFrame.getTempFrame());
 				}
 				else
 				{
@@ -1387,7 +1398,7 @@ namespace ASRuntime
                 var vt = ((VariableBase)calledblock.scope.members[i]).valueType;
                 memberDataList[i].setDefaultType(
                     vt,
-                    TypeConverter.getDefaultValue(vt).getValue(null,null,0)
+                    TypeConverter.getDefaultValue(vt).getValue(null,null)
                     );
             }
             return memberDataList;
@@ -1466,7 +1477,7 @@ namespace ASRuntime
 				for (int i = 0; i < block.regConvFromVar.Count; i++)
 				{
 					StackSlotAccessor regvar = block.regConvFromVar[i];
-					var slot = (StackSlot)regvar.getSlot(null, frame.stack, frame.offset);
+					var slot = (StackSlot)regvar.getSlot(null, frame);
 					TypeConverter.setDefaultValueToStackSlot(
 						regvar.valueType, slot
 						);
@@ -1540,7 +1551,7 @@ namespace ASRuntime
                 for (int i = 0; i < block.regConvFromVar.Count; i++)
                 {
                     StackSlotAccessor regvar = block.regConvFromVar[i];
-                    var slot = (StackSlot)regvar.getSlot(null, frame.stack,frame.offset);
+                    var slot = (StackSlot)regvar.getSlot(null, frame);
                     TypeConverter.setDefaultValueToStackSlot(
                         regvar.valueType,slot
                         ); 

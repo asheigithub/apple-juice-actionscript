@@ -11,9 +11,9 @@ namespace ASRuntime.operators
         public static void execAssigning(StackFrame frame, ASBinCode.OpStep step,  ASBinCode.RunTimeScope scope)
         {
             
-            ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope, frame.stack, frame.offset);
+            ASBinCode.SLOT slot = step.reg.getSlotForAssign(scope, frame);
 
-			ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame.stack, frame.offset);
+			ASBinCode.RunTimeValueBase v = step.arg1.getValue(scope, frame);
 			bool success;
 
 			var lt= slot.assign(v, out success);
@@ -136,7 +136,7 @@ namespace ASRuntime.operators
 			if (!success)
 			{
 				frame.throwCastException(step.token,
-					   step.arg1.getValue(sender.scope, frame.stack, frame.offset).rtType,
+					   step.arg1.getValue(sender.scope, frame).rtType,
 					   slot.vector_data.vector_type
 						);
 				frame.endStep(step);

@@ -91,7 +91,9 @@ namespace ASBinCode
 		public int MaxMemIntCount;
 		public int MaxMemUIntCount;
 		public int MaxMemBooleanCount;
-		
+
+		public List<IMemReg> MemRegList;
+
         public CSWC()
         {
 			nativefunctions = new List<NativeFunctionBase>();
@@ -106,6 +108,9 @@ namespace ASBinCode
             }
             
             operatorOverrides = new OperatorFunctions();
+
+			MemRegList = new List<IMemReg>();
+
         }
 
 		public void unLoadNativeFunctions()

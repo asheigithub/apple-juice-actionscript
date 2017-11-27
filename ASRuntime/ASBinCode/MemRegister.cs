@@ -12,6 +12,9 @@ namespace ASBinCode
 	{
 		int getId();
 		void setId(int newid);
+
+		void setMemCache_Number(double[] memnumber);
+
 	}
 
 	public sealed class MemRegister_Number : LeftValueBase,IMemReg
@@ -20,15 +23,23 @@ namespace ASBinCode
 		{
 			private rtNumber number;
 
+			internal int id;
+
+			internal double[] cache;
+
+
 			public MemSlot_Number(rtNumber value)
 			{
 				number = value;
+				
 			}
 
 
 			public override SLOT assign(RunTimeValueBase value, out bool success)
 			{
-				number.value = value.toNumber();
+				double v = value.toNumber();
+				cache[id] = v;
+				number.value = v;
 				success = true;
 				return this;
 			}
@@ -40,12 +51,15 @@ namespace ASBinCode
 
 			public override bool directSet(RunTimeValueBase value)
 			{
-				number.value = value.toNumber();
+				double v = value.toNumber();
+				cache[id] = v;
+				number.value = v; 
 				return true;
 			}
 
 			public override RunTimeValueBase getValue()
 			{
+				number.value = cache[id];
 				return number;
 			}
 
@@ -56,6 +70,7 @@ namespace ASBinCode
 
 			public override void setValue(double value)
 			{
+				cache[id] = value;
 				number.value = value;
 			}
 
@@ -89,11 +104,13 @@ namespace ASBinCode
 
 		public int getId() { return Id; }
 
-		public void setId(int newid) { Id = newid; }
+		public void setId(int newid) { Id = newid; MemSlot_.id = newid; }
 
-		public readonly rtData.rtNumber value;
+		private readonly rtData.rtNumber value;
 
 		MemSlot_Number MemSlot_;
+
+		private double[] cache;
 
 		public MemRegister_Number(int id)
 		{
@@ -102,6 +119,7 @@ namespace ASBinCode
 			value = new rtNumber(0);
 
 			MemSlot_ = new MemSlot_Number(value);
+			MemSlot_.id = Id;
 
 		}
 
@@ -111,24 +129,29 @@ namespace ASBinCode
 		}
 
 
-		public override SLOT getSlot(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override SLOT getSlotForAssign(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override RunTimeValueBase getValue(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
+			value.value = cache[Id];
 			return value;
 		}
 
 
 
-
+		public void setMemCache_Number(double[] memnumber)
+		{
+			cache = memnumber;
+			MemSlot_.cache = memnumber;
+		}
 
 
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
@@ -146,9 +169,12 @@ namespace ASBinCode
 			MemRegister_Number register = new MemRegister_Number(id);
 			serizlized.Add(key, register);
 
+			serizlizer.loadingSwc.MemRegList.Add(register);
+
 			return register;
 		}
 
+		
 	}
 
 	public sealed class MemRegister_Boolean : LeftValueBase, IMemReg
@@ -238,17 +264,17 @@ namespace ASBinCode
 		}
 
 
-		public override SLOT getSlot(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return memSlot_;
 		}
 
-		public override SLOT getSlotForAssign(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return memSlot_;
 		}
 
-		public override RunTimeValueBase getValue(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return value;
 		}
@@ -259,7 +285,10 @@ namespace ASBinCode
 		}
 
 
-
+		public void setMemCache_Number(double[] memnumber)
+		{
+			
+		}
 
 
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
@@ -276,6 +305,8 @@ namespace ASBinCode
 
 			MemRegister_Boolean register = new MemRegister_Boolean(id);
 			serizlized.Add(key, register);
+
+			serizlizer.loadingSwc.MemRegList.Add(register);
 
 			return register;
 		}
@@ -382,22 +413,25 @@ namespace ASBinCode
 
 
 
-		public override SLOT getSlot(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override SLOT getSlotForAssign(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override RunTimeValueBase getValue(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return value;
 		}
 
-
+		public void setMemCache_Number(double[] memnumber)
+		{
+			
+		}
 
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
@@ -413,6 +447,8 @@ namespace ASBinCode
 
 			MemRegister_Int register = new MemRegister_Int(id);
 			serizlized.Add(key, register);
+
+			serizlizer.loadingSwc.MemRegList.Add(register);
 
 			return register;
 		}
@@ -519,22 +555,25 @@ namespace ASBinCode
 
 
 
-		public override SLOT getSlot(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override SLOT getSlotForAssign(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return MemSlot_;
 		}
 
-		public override RunTimeValueBase getValue(RunTimeScope scope, StackSlot[] slots, int stoffset)
+		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return value;
 		}
 
-
+		public void setMemCache_Number(double[] memnumber)
+		{
+			
+		}
 
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
@@ -550,6 +589,8 @@ namespace ASBinCode
 
 			MemRegister_UInt register = new MemRegister_UInt(id);
 			serizlized.Add(key, register);
+
+			serizlizer.loadingSwc.MemRegList.Add(register);
 
 			return register;
 		}

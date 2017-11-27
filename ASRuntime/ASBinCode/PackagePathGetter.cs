@@ -23,15 +23,15 @@ namespace ASBinCode
         //    }
         //}
 
-        public override sealed SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public override sealed SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
             throw new NotImplementedException();
         }
-        public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
             throw new NotImplementedException();
         }
-        public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
             //***不可能在运行时运行***
             throw new NotImplementedException();

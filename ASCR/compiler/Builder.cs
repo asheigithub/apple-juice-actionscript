@@ -322,6 +322,14 @@ namespace ASCompiler.compiler
 								}
 							}
 						}
+						if(item.memCacheList !=null)
+						{
+							foreach (var m in item.memCacheList)
+							{
+								bin.MemRegList.Add(m);
+							}
+
+						}
 					}
 
 					//***回调需要检查函数类型 必须在函数优化后做，这时可判断传参方式.这些回调中不能再修改指令数量

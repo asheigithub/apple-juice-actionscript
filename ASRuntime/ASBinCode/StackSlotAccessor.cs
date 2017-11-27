@@ -73,9 +73,9 @@ namespace ASBinCode
         }
 
         
-        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
-            return slots[stoffset + _index].getValue();
+            return frame.stack[frame.offset + _index].getValue();
 
         }
 
@@ -85,14 +85,14 @@ namespace ASBinCode
             return "EAX(" + Id + "("+_index+")(S:"+stmtid+")\t" +valueType+ ")";
         }
 
-        public sealed override  SLOT getSlot(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override  SLOT getSlot(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
-			return slots[stoffset + _index];
+			return frame.stack[frame.offset + _index];
         }
 
-        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed override SLOT getSlotForAssign(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
-            return slots[stoffset + _index];
+            return frame.stack[frame.offset + _index];
             
         }
 

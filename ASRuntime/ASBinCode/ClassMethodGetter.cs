@@ -23,7 +23,7 @@ namespace ASBinCode
             get { return functionid; }
         }
 
-        public sealed  override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots, int stoffset)
+        public sealed  override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
 			return (RunTimeValueBase)getMethod(scope).Clone();
 			//throw new NotImplementedException();

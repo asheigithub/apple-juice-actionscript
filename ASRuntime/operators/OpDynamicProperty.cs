@@ -14,7 +14,7 @@ namespace ASRuntime.operators
         public static void exec_delete(StackFrame frame,OpStep step, RunTimeScope scope)
         {
             {
-                StackSlot slot = (StackSlot)((StackSlotAccessor)step.arg1).getSlot(scope, frame.stack, frame.offset);
+                StackSlot slot = (StackSlot)((StackSlotAccessor)step.arg1).getSlot(scope, frame);
 
 				var ls = slot.getLinkSlot();
 
@@ -80,11 +80,11 @@ namespace ASRuntime.operators
 
         public static void exec_set_dynamic_prop(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)step.reg.getValue(scope, frame.stack, frame.offset);
+            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)step.reg.getValue(scope, frame);
             ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
 
             DynamicPropertySlot heapslot = new DynamicPropertySlot(obj, true,frame.player.swc.FunctionClass.getRtType());
-            heapslot._propname = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope, frame.stack, frame.offset)).value;
+            heapslot._propname = ((ASBinCode.rtData.rtString)step.arg1.getValue(scope, frame)).value;
 
             if (step.arg2 is MethodGetterBase)
             {
@@ -93,7 +93,7 @@ namespace ASRuntime.operators
 			}
             else
             {
-                heapslot.directSet(step.arg2.getValue(scope, frame.stack, frame.offset));
+                heapslot.directSet(step.arg2.getValue(scope, frame));
             }
 
             //dobj.createOrReplaceproperty(heapslot._propname,heapslot);

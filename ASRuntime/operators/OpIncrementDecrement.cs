@@ -9,12 +9,12 @@ namespace ASRuntime.operators
     {
         public static void execIncrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+				((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 			}
 
 			switch (v.rtType)
@@ -24,14 +24,14 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value++;
-						step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+						step.reg.getSlot(scope, frame).setValue(iv.value);
 					}
                     break;
                 case ASBinCode.RunTimeDataType.rt_uint:
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value++;
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 						
 					}
                     break;
@@ -39,7 +39,7 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value++;
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 						
 					}
                     break;
@@ -54,7 +54,7 @@ namespace ASRuntime.operators
                         }
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        step.reg.getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        step.reg.getSlot(scope, frame).directSet(num);
 
 					}
                     break;
@@ -65,7 +65,7 @@ namespace ASRuntime.operators
                     {
                         double n = TypeConverter.ConvertToNumber(v);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
 
 						
 					}
@@ -96,7 +96,7 @@ namespace ASRuntime.operators
             {
                 double n = TypeConverter.ConvertToNumber(v1);
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
                 frame.endStep(step);
             }
             
@@ -107,7 +107,7 @@ namespace ASRuntime.operators
         {
             double n = TypeConverter.ConvertToNumber(v1);
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
             frame.endStep(step);
         }
 
@@ -115,12 +115,12 @@ namespace ASRuntime.operators
 
         public static void execIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			
 			{
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
 			//frame.endStep(step);
@@ -129,12 +129,12 @@ namespace ASRuntime.operators
 
         public static void execIncUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
 			//frame.endStep(step);
@@ -143,12 +143,12 @@ namespace ASRuntime.operators
 
         public static void execIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 			}
 
@@ -162,11 +162,11 @@ namespace ASRuntime.operators
 
         public static void execDecrement(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+				((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 			}
 			switch (v.rtType)
             {
@@ -175,7 +175,7 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -184,7 +184,7 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -193,7 +193,7 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -209,7 +209,7 @@ namespace ASRuntime.operators
                         }
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
 
 						
 					}
@@ -221,7 +221,7 @@ namespace ASRuntime.operators
                     {
                         double n = TypeConverter.ConvertToNumber(v);
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
 
 						
 					}
@@ -253,7 +253,7 @@ namespace ASRuntime.operators
             {
                 double n = TypeConverter.ConvertToNumber(v1);
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
                 frame.endStep(step);
             }
         }
@@ -263,7 +263,7 @@ namespace ASRuntime.operators
         {
             double n = TypeConverter.ConvertToNumber(v1);
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).directSet(num);
+            ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).directSet(num);
             frame.endStep(step);
         }
 
@@ -271,16 +271,16 @@ namespace ASRuntime.operators
 
         public static void execDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+				((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 			}
 			{
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -288,17 +288,17 @@ namespace ASRuntime.operators
 
         public static void execDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+				((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 			}
 
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 			}
 			//frame.endStep(step);
@@ -307,18 +307,18 @@ namespace ASRuntime.operators
 
         public static void execDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+				((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 			}
 
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -329,7 +329,7 @@ namespace ASRuntime.operators
         public static void execSuffixInc(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			switch (v.rtType)
             {
 
@@ -338,12 +338,12 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value );
+                        step.reg.getSlot(scope, frame).setValue(iv.value );
 
                         iv.value++;
                     }
@@ -353,12 +353,12 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value++;
                     }
@@ -368,12 +368,12 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value++;
                     }
@@ -385,7 +385,7 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						double n = TypeConverter.ConvertToNumber(v);
@@ -394,10 +394,10 @@ namespace ASRuntime.operators
                             n = 0;
                         }
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                        step.reg.getSlot(scope, frame).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
                     }
                     break;
 
@@ -408,15 +408,15 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						double n = TypeConverter.ConvertToNumber(v);
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                        step.reg.getSlot(scope, frame).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
-                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -446,7 +446,7 @@ namespace ASRuntime.operators
             {
                 double n = TypeConverter.ConvertToNumber(v1);
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                step.reg.getSlot(scope, frame).setValue(n);
 
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
 				
@@ -454,7 +454,7 @@ namespace ASRuntime.operators
 				if (register != null)
 				{
 					bool issuccess;
-					((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).assign(num, out issuccess);
+					((StackSlot)register.getSlotForAssign(scope, frame)).assign(num, out issuccess);
 					if (!issuccess)
 					{
 						frame.throwError(step.token, 0, "操作失败");
@@ -463,7 +463,7 @@ namespace ASRuntime.operators
 				}
 				else
 				{
-					((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+					((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
 				}
 
 				frame.endStep(step);
@@ -475,7 +475,7 @@ namespace ASRuntime.operators
         {
             double n = TypeConverter.ConvertToNumber(v1);
 
-            step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+            step.reg.getSlot(scope, frame).setValue(n);
 
             ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(++n);
 			
@@ -484,7 +484,7 @@ namespace ASRuntime.operators
 			if (register != null)
 			{
 				bool issuccess;
-				((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).assign(num, out issuccess);
+				((StackSlot)register.getSlotForAssign(scope, frame)).assign(num, out issuccess);
 				if (!issuccess)
 				{
 					frame.throwError(step.token, 0, "操作失败");
@@ -493,7 +493,7 @@ namespace ASRuntime.operators
 			}
 			else
 			{
-				((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+				((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
 			}
 
 			frame.endStep(step);
@@ -502,11 +502,11 @@ namespace ASRuntime.operators
         public static void execSuffixIncInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
 
-            step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+            step.reg.getSlot(scope, frame).setValue(iv.value);
 
             iv.value++;
 
@@ -518,12 +518,12 @@ namespace ASRuntime.operators
         public static void execSuffixIncUint(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value++;
             }
@@ -535,12 +535,12 @@ namespace ASRuntime.operators
         public static void execSuffixIncNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value++;
             }
@@ -554,7 +554,7 @@ namespace ASRuntime.operators
         public static void execSuffixDec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
             switch (v.rtType)
             {
@@ -564,13 +564,13 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 
 						ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
                     }
@@ -580,12 +580,12 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
                     }
@@ -595,12 +595,12 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                        step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
                     }
@@ -612,7 +612,7 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						double n = TypeConverter.ConvertToNumber(v);
@@ -621,10 +621,10 @@ namespace ASRuntime.operators
                             n = 0;
                         }
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                        step.reg.getSlot(scope, frame).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
                     }
                     break;
 
@@ -635,15 +635,15 @@ namespace ASRuntime.operators
 						StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 						if (register != null)
 						{
-							((StackSlot)register.getSlotForAssign(scope, frame.stack, frame.offset)).linkTo(null);
+							((StackSlot)register.getSlotForAssign(scope, frame)).linkTo(null);
 						}
 
 						double n = TypeConverter.ConvertToNumber(v);
 
-                        step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                        step.reg.getSlot(scope, frame).setValue(n);
 
                         ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
-                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+                        ((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
                     }
                     break;
                 case ASBinCode.RunTimeDataType.unknown:
@@ -673,7 +673,7 @@ namespace ASRuntime.operators
             {
                 double n = TypeConverter.ConvertToNumber(v1);
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+                step.reg.getSlot(scope, frame).setValue(n);
 
                 ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
 				
@@ -682,7 +682,7 @@ namespace ASRuntime.operators
 				if (register != null)
 				{
 					bool issuccess;
-					register.getSlotForAssign(scope, frame.stack, frame.offset).assign(num, out issuccess);
+					register.getSlotForAssign(scope, frame).assign(num, out issuccess);
 					if (!issuccess)
 					{
 						frame.throwError(step.token,0, "操作失败");
@@ -690,7 +690,7 @@ namespace ASRuntime.operators
 				}
 				else
 				{
-					((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+					((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
 				}
 
 
@@ -704,14 +704,14 @@ namespace ASRuntime.operators
         {
             double n = TypeConverter.ConvertToNumber(v1);
 
-            step.reg.getSlot(scope, frame.stack, frame.offset).setValue(n);
+            step.reg.getSlot(scope, frame).setValue(n);
 
 			ASBinCode.rtData.rtNumber num = new ASBinCode.rtData.rtNumber(--n);
 			StackSlotAccessor register = step.arg1 as StackSlotAccessor;
 			if (register != null)
 			{
 				bool issuccess;
-				register.getSlotForAssign(scope, frame.stack, frame.offset).assign(num, out issuccess);
+				register.getSlotForAssign(scope, frame).assign(num, out issuccess);
 				if (!issuccess)
 				{
 					frame.throwError(step.token, 0, "操作失败");
@@ -719,7 +719,7 @@ namespace ASRuntime.operators
 			}
 			else
 			{
-				((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame.stack, frame.offset).directSet(num);
+				((ASBinCode.LeftValueBase)step.arg1).getSlot(scope, frame).directSet(num);
 			}
 
 
@@ -729,12 +729,12 @@ namespace ASRuntime.operators
         public static void execSuffixDecInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			{
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value--;
             }
@@ -744,12 +744,12 @@ namespace ASRuntime.operators
         public static void execSuffixDecUInt(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                step.reg.getSlot(scope, frame).setValue(iv.value);
 
 				iv.value--;
             }
@@ -759,12 +759,12 @@ namespace ASRuntime.operators
         public static void execSuffixDecNumber(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
 
-            var v = step.arg1.getValue(scope, frame.stack, frame.offset);
+            var v = step.arg1.getValue(scope, frame);
 			
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
 
-                step.reg.getSlot(scope, frame.stack, frame.offset).setValue(iv.value);
+                step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value--;
             }

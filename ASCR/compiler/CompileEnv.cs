@@ -821,6 +821,9 @@ namespace ASCompiler.compiler
 							((IMemReg)step.reg).setId(no.Count);
 							no.Add((IMemReg)step.reg, null);
 						}
+
+						step.memregid1 = (short)((IMemReg)step.reg).getId();
+
 					}
 					if (step.arg1 is IMemReg)
 					{
@@ -834,6 +837,8 @@ namespace ASCompiler.compiler
 							((IMemReg)step.arg1).setId(no.Count);
 							no.Add((IMemReg)step.arg1, null);
 						}
+
+						step.memregid2 = (short)((IMemReg)step.arg1).getId();
 					}
 					if (step.arg2 is IMemReg)
 					{
@@ -847,13 +852,22 @@ namespace ASCompiler.compiler
 							((IMemReg)step.arg2).setId(no.Count);
 							no.Add((IMemReg)step.arg2, null);
 						}
+
+						step.memregid3 = (short)((IMemReg)step.arg2).getId();
 					}
 				}
 
 				block.dictMemCacheCount = new Dictionary<RunTimeDataType, int>();
+				block.memCacheList = new List<IMemReg>();
 				foreach (var item in dict_no)
 				{
 					block.dictMemCacheCount.Add(item.Key, item.Value.Count);
+
+					foreach (var memreg in item.Value.Keys)
+					{
+						block.memCacheList.Add(memreg);
+					}
+
 				}
 
 				#endregion
@@ -1502,9 +1516,9 @@ namespace ASCompiler.compiler
 
 								if (i > insertto)
 								{
-									if (!initstatics.ContainsKey(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value))
+									if (!initstatics.ContainsKey(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value))
 									{
-										initstatics.Add(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value, 0);
+										initstatics.Add(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value, 0);
 										block.opSteps.RemoveAt(i);
 										toinsert = step;
 										break;
@@ -1567,12 +1581,12 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.enter_try)
 				{
 					block.hasTryStmt = true;
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(0, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_try)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 0)
 					{
@@ -1581,12 +1595,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(1, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 1)
 					{
@@ -1595,12 +1609,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(2, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 2)
 					{
@@ -1641,12 +1655,12 @@ namespace ASCompiler.compiler
 					)
 				{
 
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 			}
@@ -1698,12 +1712,12 @@ namespace ASCompiler.compiler
 					)
 				{
 					isif_jmp = true;
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				if (isif_jmp)
@@ -1809,12 +1823,12 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.enter_try)
 				{
 					block.hasTryStmt = true;
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(0, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_try)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 0)
 					{
@@ -1823,12 +1837,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(1, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 1)
 					{
@@ -1837,12 +1851,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(2, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 2)
 					{
@@ -2009,12 +2023,12 @@ namespace ASCompiler.compiler
 					)
 				{
 					isif_jmp = true;
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				if (isif_jmp)

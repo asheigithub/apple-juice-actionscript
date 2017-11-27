@@ -8,7 +8,7 @@ namespace ASRuntime
 	class PoolBase <T> where T:new()
 	{
 
-		T[] pool;
+		protected T[] pool;
 
 		int posGet;
 		int posRet;

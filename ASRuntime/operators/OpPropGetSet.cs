@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         public static void exec_try_read_prop( StackFrame frame, OpStep step, RunTimeScope scope)
         {
             
-            ASBinCode.SLOT slot = ((StackSlotAccessor)step.arg1).getSlot(scope, frame.stack, frame.offset);
+            ASBinCode.SLOT slot = ((StackSlotAccessor)step.arg1).getSlot(scope, frame);
 
             if (slot.isPropGetterSetter)
             {
@@ -53,7 +53,7 @@ namespace ASRuntime.operators
                 }
 
                 funCaller._tempSlot = frame._tempSlot1;
-                funCaller.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
+                funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                 StackSlot ret = (StackSlot)funCaller.returnSlot;
                 ret.stackObjects._temp_try_write_setthisitem = ret._cache_setthisslot;ret.refPropChanged = true;
@@ -75,7 +75,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                SLOT regslot = step.reg.getSlot(scope, frame.stack, frame.offset);
+                SLOT regslot = step.reg.getSlot(scope, frame);
 
                 StackSlot d = regslot as StackSlot;
                 StackSlot s = slot as StackSlot;
@@ -182,7 +182,7 @@ namespace ASRuntime.operators
                 if (!funCaller.createParaScope()) { return; }
 
                 funCaller._tempSlot = frame._tempSlot1;
-                funCaller.returnSlot = step.reg.getSlot(scope, frame.stack, frame.offset);
+                funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                 ((StackSlot)funCaller.returnSlot).stackObjects.propGetSet = prop; ((StackSlot)funCaller.returnSlot).refPropChanged = true;
 				((StackSlot)funCaller.returnSlot).stackObjects.propBindObj = propBindObj; 
@@ -213,7 +213,7 @@ namespace ASRuntime.operators
 
         public static void exec_try_write_prop(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            StackSlot slot = (StackSlot)((StackSlotAccessor)step.arg1).getSlot(scope, frame.stack, frame.offset);
+            StackSlot slot = (StackSlot)((StackSlotAccessor)step.arg1).getSlot(scope, frame);
             if (slot.stackObjects.propGetSet != null)
             {
 

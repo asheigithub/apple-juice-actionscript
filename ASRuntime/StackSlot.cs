@@ -35,7 +35,7 @@ namespace ASRuntime
                 RunTimeDataType t = (RunTimeDataType)i;
                 if(t != RunTimeDataType.unknown)
                 {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null,0);
+                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null);
                 }
             }
 

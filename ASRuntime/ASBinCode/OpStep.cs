@@ -64,6 +64,12 @@ namespace ASBinCode
         public RunTimeDataType arg2Type;
 
 
+
+		public short memregid1;
+		public short memregid2;
+		public short memregid3;
+
+
         public override string ToString()
         {
 			if (opCode == OpCode.increment || opCode == OpCode.decrement
@@ -248,6 +254,12 @@ namespace ASBinCode
 			///// </summary>
 			//public RunTimeDataType arg2Type;
 			writer.Write(arg2Type);
+
+
+			writer.Write(memregid1);
+			writer.Write(memregid2);
+			writer.Write(memregid3);
+
 		}
 
 		public static OpStep Deserialize(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
@@ -334,6 +346,11 @@ namespace ASBinCode
 			///// </summary>
 			//public RunTimeDataType arg2Type;
 			step.arg2Type = reader.ReadInt32();
+
+
+			step.memregid1 = reader.ReadInt16();
+			step.memregid2 = reader.ReadInt16();
+			step.memregid3 = reader.ReadInt16();
 
 			return step;
 		}

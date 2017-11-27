@@ -190,7 +190,7 @@ namespace ASRuntime.operators
 		public static RunTimeValueBase getDefaultParameterValue(ASBinCode.rtti.FunctionSignature signature,int i)
 		{
 			var dt = signature.parameters[i].type;
-			var dv = signature.parameters[i].defaultValue.getValue(null, null,0);
+			var dv = signature.parameters[i].defaultValue.getValue(null, null);
 
 			return getDefaultParameterValue(dt, dv);
 		}
@@ -767,7 +767,7 @@ namespace ASRuntime.operators
                 {
 
 					returnSlot.directSet(
-						TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null, null,0));
+						TypeConverter.getDefaultValue(toCallFunc.signature.returnType).getValue(null, null));
 
 				}
                 if (!ReferenceEquals(callbacker, this))

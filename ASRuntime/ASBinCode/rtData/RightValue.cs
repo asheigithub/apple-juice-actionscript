@@ -29,7 +29,7 @@ namespace ASBinCode.rtData
 		//	return value;
 		//}
 		
-        public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackSlot[] slots,int offset)
+        public override sealed RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
         {
             return value;
         }

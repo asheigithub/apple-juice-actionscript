@@ -1208,7 +1208,7 @@ namespace ASCompiler.compiler.builds
 									{
 										if (findsuccess)
 										{
-											int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null, 0)).value;
+											int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
 											var parameter = signature.parameters[idx];
 											if (signature.onStackParameters > 0)
 											{
@@ -1237,7 +1237,7 @@ namespace ASCompiler.compiler.builds
 										{
 											if (checkisnotnative)
 											{
-												int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null, 0)).value;
+												int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
 												var parameter = signature.parameters[idx];
 
 												if (signature.onStackParameters > 0)
