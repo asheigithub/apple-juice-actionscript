@@ -492,7 +492,10 @@ namespace ASBinCode
 		function_return_funvoid_notry=139,
 		function_return_nofunction_notry=140,
 
-		//sub_number_number=141,
+		/// <summary>
+		/// 直接从Vector取值
+		/// </summary>
+		vector_getvalue =141,
 
 
 		
@@ -562,16 +565,61 @@ namespace ASBinCode
 		/// MemNumber ++后缀
 		/// </summary>
 		suffix_inc_number_memnumber=162,
+		
+		/// <summary>
+		/// MemInt ++后缀
+		/// </summary>
+		suffix_inc_int_memint=163,
+
+		/// <summary>
+		/// 两个MemInt相加
+		/// </summary>
+		add_number_memint_memint = 164,
+
+		add_number_memint_constnumber = 165,
+
+		div_number_memint_constnumber = 166,
+
 
 		/// <summary>
 		/// 赋值到MemNumber
 		/// </summary>
-		assign_tomemnumber =163,
+		assign_tomemnumber =170,
+		/// <summary>
+		/// 赋值到MemInt
+		/// </summary>
+		assign_tomemint =171,
 
 		/// <summary>
 		/// 从MemNumber赋值到MemNumber
 		/// </summary>
-		assign_memnumber_tomemnumber=164
+		assign_memnumber_tomemnumber=172,
+
+		/// <summary>
+		/// 从MemInt赋值到MemInt
+		/// </summary>
+		assign_memint_tomemint = 173,
+
+
+		/// <summary>
+		/// MemNumber和常量比较 &lt;
+		/// </summary>
+		if_lt_memnumber_constnum_jmp_notry_noreference = 174,
+
+		/// <summary>
+		/// MemInt和常量比较 &lt;
+		/// </summary>
+		if_lt_memint_constnum_jmp_notry_noreference = 175,
+
+
+		/// <summary>
+		/// MemNumber转换为MemInt
+		/// </summary>
+		cast_number_int_memnumber_memint=180,
+		/// <summary>
+		/// 常数(非NaN,Inf)转int
+		/// </summary>
+		cast_number_int_constnum_memint=181,
 
 	}
 }

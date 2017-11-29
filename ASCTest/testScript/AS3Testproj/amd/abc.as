@@ -48,17 +48,16 @@ package
 //
 			//return os.clock() - t   
 			
-			
-			var t:Number = (new Date()).getTime();
-			var total:Number = 0;
-			for (var i:Number = 0; i < 1000000; i++) 
-			{
-				total = total + i - (i / 2) * (i + 3) / (i + 5);
-				
-			}
-			
-			trace("action script:", (new Date()).getTime() - t );
-			trace(total);
+			//var t:Number = (new Date()).getTime();
+			//var total:int = 0;
+			//for (var i:int = 0; i < 1000000; i++) 
+			//{
+				//total = total + i - (i / 2) * (i + 3) / (i + 5);
+				//
+			//}
+			//
+			//trace("action script:", (new Date()).getTime() - t );
+			//trace(total);
 			
 			
 			
@@ -116,36 +115,36 @@ package
 
 
 
-//class fib
-//{
-	//
-//function fibonacci_recursion( n:int ):int
-//{
-	//
-    //if( n <= 2 )
-        //return 1;
-	//
-    //return fibonacci_recursion(n - 1) +fibonacci_recursion(n-2);
-//}
-//
-//function fib()
-//{
-//
-//var t:Number = (new Date()).getTime();
-//
-//
-//var f:int = fibonacci_recursion(30);
-//
-//
-//
-//trace("actionscript3:", ((new Date()).getTime() - t ));
-//trace(f);
-//
-//}
-//}
-//
-//var f = new fib();
-//var ff = fib(f);
-//trace(ff);
+class fib
+{
+	
+function fibonacci_recursion( n:int ):int
+{
+	
+    if( n <= 2 )
+        return 1;
+	
+    return fibonacci_recursion(n - 1) +fibonacci_recursion(n-2);
+}
+
+function fib()
+{
+
+var t:Number = (new Date()).getTime();
+
+
+var f:int = fibonacci_recursion(30);
+
+
+
+trace("actionscript3:", ((new Date()).getTime() - t ));
+trace(f);
+
+}
+}
+
+var f = new fib();
+var ff = fib(f);
+trace(ff);
 
 

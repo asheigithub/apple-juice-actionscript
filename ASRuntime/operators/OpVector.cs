@@ -58,6 +58,27 @@ namespace ASRuntime.operators
         }
 
 
+		public static void exec_GetValue(StackFrame frame, OpStep step, RunTimeScope scope)
+		{
+			ASBinCode.rtti.Vector_Data vector =
+			   (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+
+			int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame));
+
+			if (idx < 0 || idx >= vector.innnerList.Count)
+			{
+				frame.throwError(step.token, 1125,
+					"The index " + idx + " is out of range " + vector.innnerList.Count + ".");
+				frame.endStep(step);
+			}
+			else
+			{
+				step.reg.getSlot(scope, frame).directSet(vector.innnerList[idx]);
+				frame.endStepNoError();
+			}
+		}
+
+
         public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =

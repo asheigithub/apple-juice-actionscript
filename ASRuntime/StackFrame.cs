@@ -14,11 +14,12 @@ namespace ASRuntime
     {
 		internal class StackFramePool : PoolBase<StackFrame>
 		{
-			public StackFramePool(double[] memnumber) : base(256)
+			public StackFramePool(double[] memnumber,int[] memint) : base(256)
 			{
 				foreach (var f in pool)
 				{
 					f.memnumber = memnumber;
+					f.memint = memint;
 				}
 			}
 
@@ -93,7 +94,10 @@ namespace ASRuntime
 		/// double内存缓存
 		/// </summary>
 		private double[] memnumber;
-
+		/// <summary>
+		/// int内存缓存
+		/// </summary>
+		private int[] memint;
 
         public StackFrame()
         {
@@ -846,6 +850,11 @@ namespace ASRuntime
 
 						break;
 					}
+				case OpCode.vector_getvalue:
+					{
+						operators.OpVector.exec_GetValue(this, step, scope);
+						break;
+					}
 				case OpCode.if_equality_num_num_jmp_notry:
 					{
 						var n1 = (step.arg1.getValue(scope, this)).toNumber();
@@ -1079,13 +1088,24 @@ namespace ASRuntime
 						memnumber[step.memregid2] + memnumber[step.memregid3];
 					endStepNoError();
 					break;
+				case OpCode.add_number_memint_memint:
+					
+					memnumber[step.memregid1] =
+						memint[step.memregid2] + (double)memint[step.memregid3];
+					endStepNoError();
+					break;
 				case OpCode.add_number_memnumber_constnumber:
 					//((MemRegister_Number)step.reg).value.value =
 					//	((MemRegister_Number)step.arg1).value.value +
 					//	((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 
 					memnumber[step.memregid1] =
-						memnumber[step.memregid2] + ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+						memnumber[step.memregid2] + step.constnumber2;
+					endStepNoError();
+					break;
+				case OpCode.add_number_memint_constnumber:
+					memnumber[step.memregid1] =
+						memint[step.memregid2] + step.constnumber2;
 					endStepNoError();
 					break;
 				case OpCode.div_number_memnumber_constnumber:
@@ -1093,7 +1113,12 @@ namespace ASRuntime
 					//	((MemRegister_Number)step.arg1).value.value /
 					//	((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
 					memnumber[step.memregid1] =
-						memnumber[step.memregid2] / ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+						memnumber[step.memregid2] / step.constnumber2;
+					endStepNoError();
+					break;
+				case OpCode.div_number_memint_constnumber:					
+					memnumber[step.memregid1] =
+						memint[step.memregid2] / step.constnumber2;
 					endStepNoError();
 					break;
 				case OpCode.suffix_inc_number_memnumber:
@@ -1107,11 +1132,25 @@ namespace ASRuntime
 						endStepNoError();
 					}
 					break;
+				case OpCode.suffix_inc_int_memint:
+					{
+						memint[step.memregid1] = memint[step.memregid2]++;
+						endStepNoError();
+					}
+					break;
 				case OpCode.assign_tomemnumber:
 					//((MemRegister_Number)step.reg).value.value =
 					//	step.arg1.getValue(scope, this).toNumber();
 
 					memnumber[step.memregid1] = step.arg1.getValue(scope, this).toNumber();
+
+					endStepNoError();
+					break;
+				case OpCode.assign_tomemint:
+					//((MemRegister_Number)step.reg).value.value =
+					//	step.arg1.getValue(scope, this).toNumber();
+
+					memint[step.memregid1] = (int)step.arg1.getValue(scope, this).toNumber();
 
 					endStepNoError();
 					break;
@@ -1121,6 +1160,60 @@ namespace ASRuntime
 
 					memnumber[step.memregid1] = memnumber[step.memregid2];
 					endStepNoError();
+					break;
+				case OpCode.assign_memint_tomemint:					
+					memint[step.memregid1] = memint[step.memregid2];
+					endStepNoError();
+					break;
+				case OpCode.if_lt_memnumber_constnum_jmp_notry_noreference:
+					{
+						var n1 = memnumber[step.memregid2];
+						var n2 = step.constnumber2;
+						if (n1 < n2)
+						{
+							codeLinePtr += step.jumoffset;
+							endStepNoError();
+						}
+						else
+						{
+							endStepNoError();
+						}
+					}
+					break;
+				case OpCode.if_lt_memint_constnum_jmp_notry_noreference:
+					{
+						var n1 = memint[step.memregid2];
+						var n2 = step.constnumber2;
+						if (n1 < n2)
+						{
+							codeLinePtr += step.jumoffset;
+							endStepNoError();
+						}
+						else
+						{
+							endStepNoError();
+						}
+					}
+					break;
+				case OpCode.cast_number_int_memnumber_memint:
+					{
+						double r = memnumber[step.memregid2];
+						if (double.IsNaN(r) || double.IsInfinity(r))
+						{
+							memint[step.memregid1] = 0;
+						}
+						else
+						{
+							memint[step.memregid1] = (int)((long)r);
+						}
+						endStepNoError();
+					}
+					break;
+				case OpCode.cast_number_int_constnum_memint:
+					{
+						memint[step.memregid1] = (int)((long)step.constnumber1);
+						endStepNoError();
+					}
 					break;
 				default:
 

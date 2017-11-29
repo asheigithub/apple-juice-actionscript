@@ -24,6 +24,7 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value++;
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
 						step.reg.getSlot(scope, frame).setValue(iv.value);
 					}
                     break;
@@ -31,7 +32,8 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value++;
-                        step.reg.getSlot(scope, frame).setValue(iv.value);
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+						step.reg.getSlot(scope, frame).setValue(iv.value);
 						
 					}
                     break;
@@ -39,7 +41,8 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value++;
-                        step.reg.getSlot(scope, frame).setValue(iv.value);
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+						step.reg.getSlot(scope, frame).setValue(iv.value);
 						
 					}
                     break;
@@ -120,7 +123,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
 			//frame.endStep(step);
@@ -134,7 +138,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 				
 			}
 			//frame.endStep(step);
@@ -148,7 +153,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value++;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 			}
 
@@ -175,7 +181,8 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+						((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -184,7 +191,8 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+						((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -193,7 +201,8 @@ namespace ASRuntime.operators
                     {
                         ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                         iv.value--;
-                        ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+						((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 						
 					}
@@ -280,7 +289,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtInt iv = (ASBinCode.rtData.rtInt)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -298,7 +308,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
 
 			}
 			//frame.endStep(step);
@@ -318,7 +329,8 @@ namespace ASRuntime.operators
 			{
                 ASBinCode.rtData.rtNumber iv = (ASBinCode.rtData.rtNumber)v;
                 iv.value--;
-                ((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
             }
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -346,7 +358,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value );
 
                         iv.value++;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
                 case ASBinCode.RunTimeDataType.rt_uint:
                     {
@@ -361,7 +374,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value++;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
                 case ASBinCode.RunTimeDataType.rt_number:
                     {
@@ -376,7 +390,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value++;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
 
                 case ASBinCode.RunTimeDataType.rt_string:
@@ -509,7 +524,7 @@ namespace ASRuntime.operators
             step.reg.getSlot(scope, frame).setValue(iv.value);
 
             iv.value++;
-
+			((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
 
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -526,7 +541,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value++;
-            }
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+			}
 
 			//frame.endStep(step);
 			frame.endStepNoError();
@@ -543,7 +559,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value++;
-            }
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+			}
 			//frame.endStep(step);
 			frame.endStepNoError();
         }
@@ -573,7 +590,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
                 case ASBinCode.RunTimeDataType.rt_uint:
                     {
@@ -588,7 +606,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
                 case ASBinCode.RunTimeDataType.rt_number:
                     {
@@ -603,7 +622,8 @@ namespace ASRuntime.operators
                         step.reg.getSlot(scope, frame).setValue(iv.value);
 
                         iv.value--;
-                    }
+						((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+					}
                     break;
 
                 case ASBinCode.RunTimeDataType.rt_string:
@@ -737,7 +757,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value--;
-            }
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+			}
             frame.endStep(step);
         }
 
@@ -752,7 +773,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(iv.value);
 
 				iv.value--;
-            }
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+			}
             frame.endStep(step);
         }
 
@@ -767,7 +789,8 @@ namespace ASRuntime.operators
                 step.reg.getSlot(scope, frame).setValue(iv.value);
 
                 iv.value--;
-            }
+				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
+			}
             frame.endStep(step);
         }
 

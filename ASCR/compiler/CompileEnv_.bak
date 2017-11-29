@@ -93,6 +93,7 @@ namespace ASCompiler.compiler
 			return maxindex + 1;
 		}
 
+
 		/// <summary>
 		/// 重排序StackSlotAccessor的Index
 		/// </summary>
@@ -107,11 +108,11 @@ namespace ASCompiler.compiler
 					StackSlotAccessor sa = step.reg as StackSlotAccessor;
 					if (sa != null && sa._index >= 0)
 					{
-						if(!slots.ContainsKey(sa))
-							slots.Add(sa,null);
+						if (!slots.ContainsKey(sa))
+							slots.Add(sa, null);
 						if (!dictSlotIndex.ContainsKey(sa._index))
 						{
-							dictSlotIndex.Add(sa._index, dictSlotIndex.Count);							
+							dictSlotIndex.Add(sa._index, dictSlotIndex.Count);
 						}
 					}
 				}
@@ -164,182 +165,207 @@ namespace ASCompiler.compiler
 
 		}
 
-		
 		public void optimizeFunctoinBlock(Builder builder, ASBinCode.rtti.FunctionDefine f)
 		{
+			optimizeOtherStep();
+
 			convertVarToReg(builder, f);
 
 			optimizeReg();
 
 			combieRegs();
-		
+
 			optimizeJump();
 
 			resortStackSlotAccessorIndex();
-			
+
+		}
+
+		private void optimizeOtherStep()
+		{
+			//查找所有vectorAccessor_bind,如果是取值，则优化为直接赋值操作
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.vectorAccessor_bind)
+				{
+					StackSlotAccessor accessor = (StackSlotAccessor)step.reg;
+					if(!(accessor._isassigntarget || accessor._hasUnaryOrShuffixOrDelete))
+					{
+						//***改为直接取值指令***
+						step.opCode = OpCode.vector_getvalue;
+					}
+				}
+
+
+			}
 		}
 
 
-		#region 尝试私有变量和参数转换到栈上
-		private void convertVarToReg(Builder builder,ASBinCode.rtti.FunctionDefine f)
-        {
-			
-            List<CodeBlock> blocks = new List<CodeBlock>();
-            foreach (var b in builder.bin.blocks)
-            {
-                if (b != null && b.define_class_id == block.define_class_id && b != block)
-                {
-                    blocks.Add(b);
-                }
-            }
+		private void convertVarToReg(Builder builder, ASBinCode.rtti.FunctionDefine f)
+		{
 
-            Dictionary<Variable, StackSlotAccessor> toReplace = new Dictionary<Variable, StackSlotAccessor>();
+			List<CodeBlock> blocks = new List<CodeBlock>();
+			foreach (var b in builder.bin.blocks)
+			{
+				if (b != null && b.define_class_id == block.define_class_id && b != block)
+				{
+					blocks.Add(b);
+				}
+			}
 
-            for (int i = 0/* f.signature.parameters.Count*/; i < block.scope.members.Count; i++)
-            {
-                var m = block.scope.members[i];
-                
-                {
-                    Variable vm = (Variable)m;
-                    if (i < f.signature.parameters.Count)
-                    {
-                        f.signature.parameters[i].varorreg = vm;
-                    }
+			Dictionary<Variable, StackSlotAccessor> toReplace = new Dictionary<Variable, StackSlotAccessor>();
 
-                    bool found = false;
-                    //***查找是否被其他块引用***
-                    foreach (var tofindblock in blocks)
-                    {
-                        var steps = tofindblock.opSteps;
-                        foreach (var op in steps)
-                        {
-                            Variable v = op.reg as Variable;
-                            if (v !=null && v.name==vm.name && v.indexOfMembers==vm.indexOfMembers && v.refdefinedinblockid==vm.refdefinedinblockid)
-                            {
-                                found = true;
-                                break;
-                            }
-                            v = op.arg1 as Variable;
-                            if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
-                            {
-                                found = true;
-                                break;
-                            }
-                            v = op.arg2 as Variable;
-                            if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!found)
-                    {
-                        
-                        StackSlotAccessor varReg = getAdditionalRegister();
-                        varReg.isConvertFromVariable = true;
-                        //***将Variable替换为Reg***
-                        toReplace.Add(vm, varReg);
+			for (int i = 0/* f.signature.parameters.Count*/; i < block.scope.members.Count; i++)
+			{
+				var m = block.scope.members[i];
 
-                        if (i >= f.signature.parameters.Count)
-                        {
-                            varReg._index = block.totalRegisters;
-                            block.totalRegisters++;
-                            varReg.valueType = vm.valueType;
-                            block.regConvFromVar.Add(varReg);
+				{
+					Variable vm = (Variable)m;
+					if (i < f.signature.parameters.Count)
+					{
+						f.signature.parameters[i].varorreg = vm;
+					}
 
-                        }
-                        else
-                        {
-                            //是参数修改
+					//if (vm.valueType == RunTimeDataType.rt_void)
+					//{
+					//    continue;
+					//}
+					//if (vm.valueType > RunTimeDataType.unknown)
+					//{
+					//    var c = builder.bin.getClassByRunTimeDataType(vm.valueType);
+					//    if(c==null || c.isLink_System)
+					//    {
+					//        continue;
+					//    }
+					//}
 
-                            f.signature.onStackParameters++;
-                            varReg._index = -f.signature.onStackParameters;
-                            f.signature.parameters[i].varorreg = varReg;
-                            f.signature.parameters[i].isOnStack = true;
-							varReg.valueType = f.signature.parameters[i].type;
-                        }
+					bool found = false;
+					//***查找是否被其他块引用***
+					foreach (var tofindblock in blocks)
+					{
+						var steps = tofindblock.opSteps;
+						foreach (var op in steps)
+						{
+							Variable v = op.reg as Variable;
+							if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
+							{
+								found = true;
+								break;
+							}
+							v = op.arg1 as Variable;
+							if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
+							{
+								found = true;
+								break;
+							}
+							v = op.arg2 as Variable;
+							if (v != null && v.name == vm.name && v.indexOfMembers == vm.indexOfMembers && v.refdefinedinblockid == vm.refdefinedinblockid)
+							{
+								found = true;
+								break;
+							}
+						}
+					}
 
-                    }
-                }
-            }
+					if (!found)
+					{
 
-            if (toReplace.Count > 0)
-            {
-                foreach (var item in toReplace)
-                {
-					int replacecount = 0;
-                    block.scope.members.Remove(item.Key);
-                    foreach (var op in block.opSteps)
-                    {
-                        //***将所有引用到的Variable替换***
-                        if (Object.Equals(op.reg, item.Key))
-                        {
-                            op.reg = item.Value; ++replacecount;
-                        }
+						StackSlotAccessor varReg = getAdditionalRegister();
+						varReg.isConvertFromVariable = true;
+						//***将Variable替换为Reg***
+						toReplace.Add(vm, varReg);
 
-                        if (Object.Equals(op.arg1, item.Key))
-                        {
-                            op.arg1 = item.Value; ++replacecount;
+						if (i >= f.signature.parameters.Count)
+						{
+							varReg._index = block.totalStackSlots;
+							block.totalStackSlots++;
+							varReg.valueType = vm.valueType;
+							block.regConvFromVar.Add(varReg);
+
+						}
+						else
+						{
+							//是参数修改
+
+							f.signature.onStackParameters++;
+							varReg._index = -f.signature.onStackParameters;varReg.valueType = f.signature.parameters[i].type;
+							f.signature.parameters[i].varorreg = varReg;
+							f.signature.parameters[i].isOnStack = true;
 						}
 
-                        if (Object.Equals(op.arg2, item.Key))
-                        {
-                            op.arg2 = item.Value; ++replacecount;
-						}
-                    }
+					}
+				}
+			}
 
-					
+			if (toReplace.Count > 0)
+			{
+				foreach (var item in toReplace)
+				{
+					block.scope.members.Remove(item.Key);
+					foreach (var op in block.opSteps)
+					{
+						//***将所有引用到的Variable替换***
+						if (Object.Equals(op.reg, item.Key))
+						{
+							op.reg = item.Value;
+						}
+
+						if (Object.Equals(op.arg1, item.Key))
+						{
+							op.arg1 = item.Value;
+						}
+
+						if (Object.Equals(op.arg2, item.Key))
+						{
+							op.arg2 = item.Value;
+						}
+					}
 				}
 
-                for (int i = 0; i < block.scope.members.Count; i++)
-                {
-                    Variable var = (Variable)block.scope.members[i];
-                    if (var.indexOfMembers != i)
-                    {
-                        var tosearchblocks = new List<CodeBlock>();
-                        tosearchblocks.Add(block);
-                        tosearchblocks.AddRange(blocks);
-                        //***更新所有引用的新索引
-                        foreach (var tofindblock in tosearchblocks)
-                        {
-                            var steps = tofindblock.opSteps;
-                            foreach (var op in steps)
-                            {
-                                
-                                if ( Equals(op.reg,var) )
-                                {
-                                    ((Variable)op.reg).setIndexMemberWhenCompile(i);
-                                }
+				for (int i = 0; i < block.scope.members.Count; i++)
+				{
+					Variable var = (Variable)block.scope.members[i];
+					if (var.indexOfMembers != i)
+					{
+						var tosearchblocks = new List<CodeBlock>();
+						tosearchblocks.Add(block);
+						tosearchblocks.AddRange(blocks);
+						//***更新所有引用的新索引
+						foreach (var tofindblock in tosearchblocks)
+						{
+							var steps = tofindblock.opSteps;
+							foreach (var op in steps)
+							{
 
-                                if (Equals(op.arg1, var))
-                                {
-                                    ((Variable)op.arg1).setIndexMemberWhenCompile(i);
-                                }
+								if (Equals(op.reg, var))
+								{
+									((Variable)op.reg).setIndexMemberWhenCompile(i);
+								}
 
-                                if (Equals(op.arg2, var))
-                                {
-                                    ((Variable)op.arg2).setIndexMemberWhenCompile(i);
-                                }
-                            }
-                        }
-                        var.setIndexMemberWhenCompile(i);
+								if (Equals(op.arg1, var))
+								{
+									((Variable)op.arg1).setIndexMemberWhenCompile(i);
+								}
 
-                    }
-                }
-                
-            }
+								if (Equals(op.arg2, var))
+								{
+									((Variable)op.arg2).setIndexMemberWhenCompile(i);
+								}
+							}
+						}
+						var.setIndexMemberWhenCompile(i);
+
+					}
+				}
+
+			}
+
 			
-        }
-		#endregion
-
-
-
-
+		}
 		private void optimizeReg()
 		{
-#region 尝试优化参数是否优化后更好
+			#region 尝试优化参数是否优化后更好
 			StackSlotAccessor[] slist = new StackSlotAccessor[dictCompileRegisters.Count];
 			dictCompileRegisters.Values.CopyTo(slist, 0);
 			foreach (var r in slist)
@@ -347,14 +373,14 @@ namespace ASCompiler.compiler
 				if (r._index < 0)
 				{
 					int insertinto = 0;
-					int maxccount = 0;int breaks = 0;int csegs = 0;
+					int maxccount = 0; int breaks = 0; int csegs = 0;
 					for (int k = 0; k < block.opSteps.Count; k++)
 					{
 						if ((block.opSteps[k].opCode == OpCode.init_staticclass
 							||
 							block.opSteps[k].opCode == OpCode.yield_continuetoline
 							)
-							&& !isReference(r,block.opSteps[k])
+							&& !isReference(r, block.opSteps[k])
 							)
 						{
 							insertinto++;
@@ -366,7 +392,7 @@ namespace ASCompiler.compiler
 							int lastline = findLastRefLine(r);
 							int failedline; List<int> continuelines = new List<int>();
 
-							if (isAllSafeOperator(k, lastline,lastline, r, out failedline, continuelines))
+							if (isAllSafeOperator(k, lastline, lastline, r, out failedline, continuelines))
 							{
 								for (int i = k + 1; i < lastline; i++)
 								{
@@ -382,7 +408,7 @@ namespace ASCompiler.compiler
 							{
 								int ccount = 0;
 								breaks++;
-								for (int i = k+1; i < lastline; i++)
+								for (int i = k + 1; i < lastline; i++)
 								{
 									if (isReference(r, block.opSteps[i]))
 									{
@@ -402,12 +428,12 @@ namespace ASCompiler.compiler
 									}
 								}
 							}
-							
+
 						}
 
 					}
 
-					if ( ( csegs *maxccount >breaks *2 ) )
+					if ((csegs * maxccount > breaks * 2))
 					//if(maxccount>0)
 					{
 						var load = getAdditionalRegister();
@@ -427,11 +453,13 @@ namespace ASCompiler.compiler
 
 				}
 			}
-#endregion
+			#endregion
 
 
-			Dictionary<StackSlotAccessor, LeftValueBase> dictToOptimizeRegister = new Dictionary<StackSlotAccessor, LeftValueBase>();
-			Dictionary<StackSlotAccessor, object> dictCanNotOptimizeRegister = new Dictionary<StackSlotAccessor, object>();
+			Dictionary<StackSlotAccessor, IMemReg> dictToOptimizeRegister = new Dictionary<StackSlotAccessor, IMemReg>();
+			Dictionary<StackSlotAccessor, IMemReg> dictCanNotOptimizeRegister = new Dictionary<StackSlotAccessor, IMemReg>();
+
+			Dictionary<IMemReg, StackSlotAccessor> dictMem_StackSlotAccessor = new Dictionary<IMemReg, StackSlotAccessor>();
 
 			for (int i = 0; i < block.opSteps.Count; i++)
 			{
@@ -464,37 +492,38 @@ namespace ASCompiler.compiler
 				}
 				#endregion
 
-				if (step.reg is StackSlotAccessor && !dictToOptimizeRegister.ContainsKey((StackSlotAccessor)step.reg) && ! dictCanNotOptimizeRegister.ContainsKey( (StackSlotAccessor)step.reg ))
+				if (step.reg is StackSlotAccessor && !dictToOptimizeRegister.ContainsKey((StackSlotAccessor)step.reg) && !dictCanNotOptimizeRegister.ContainsKey((StackSlotAccessor)step.reg))
 				{
 					StackSlotAccessor register = (StackSlotAccessor)step.reg;
-					if (canOptimize(step,register))
+					if (canOptimize(step, register) && register._index>=0)
 					{
-						
+
 						int lastline = findLastRefLine(register);
-						int failedline;List<int> continuelines = new List<int>();
-						if (isAllSafeOperator(i+1, lastline,lastline, register,out failedline,continuelines))
+						int failedline; List<int> continuelines = new List<int>();
+						if (isAllSafeOperator(i + 1, lastline, lastline, register, out failedline, continuelines))
 						{
 							if (register.valueType == RunTimeDataType.rt_number)
 							{
-								dictToOptimizeRegister.Add(register, new MemRegister_Number(register.Id));
+								
+								dictToOptimizeRegister.Add(register, new MemRegister_Number(register.Id));dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
 								if (step.opCode == OpCode.access_dot)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_boolean)
 							{
-								dictToOptimizeRegister.Add(register, new MemRegister_Boolean(register.Id));
+								dictToOptimizeRegister.Add(register, new MemRegister_Boolean(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
 								if (step.opCode == OpCode.access_dot)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_int)
 							{
-								dictToOptimizeRegister.Add(register, new MemRegister_Int(register.Id));
+								dictToOptimizeRegister.Add(register, new MemRegister_Int(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
 								if (step.opCode == OpCode.access_dot)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_uint)
 							{
-								dictToOptimizeRegister.Add(register, new MemRegister_UInt(register.Id));
+								dictToOptimizeRegister.Add(register, new MemRegister_UInt(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
 								if (step.opCode == OpCode.access_dot)
 									step.opCode = OpCode.access_dot_memregister;
 							}
@@ -504,7 +533,7 @@ namespace ASCompiler.compiler
 							if (failedline > i)
 							{
 								bool caninsert = true;
-								
+
 								{
 									//**如果后面还有对其修改值的操作,比如赋值和自增，说明为从变量转化而来。
 									//会导致有可能递归操作时意外修改值。所以检查到就跳过。***
@@ -540,7 +569,7 @@ namespace ASCompiler.compiler
 											det1++;
 										}
 									}
-									List<int> dets = new List<int>();int maxdet2 = 0;
+									List<int> dets = new List<int>(); int maxdet2 = 0;
 									for (int j = 0; j < continuelines.Count; j++)
 									{
 										int d = 0;
@@ -557,68 +586,56 @@ namespace ASCompiler.compiler
 											maxdet2 = d;
 										}
 									}
-									
+
 									if (det1 > 1 || maxdet2 > 1)
 									{
 										//在失败行前后加入读写
 										var store = getAdditionalRegister();
 										store.valueType = register.valueType;
+										store.stmtid = register.stmtid;
 										OpStep savestep = new OpStep(OpCode.assigning, block.opSteps[failedline].token);
 										savestep.reg = store;
 										savestep.regType = register.valueType;
 										savestep.arg1 = register;
 										savestep.arg1Type = register.valueType;
-										store.stmtid = register.stmtid;
+
 										{
 											//***在各个分支之间插入相应代码***
-											for (int k = continuelines.Count-1; k>=0; k--)
+											for (int k = continuelines.Count - 1; k >= 0; k--)
 											{
-												if (dets[k] <= 1)
+												//if (dets[k] <= 1)
 												{
 													for (int m = continuelines[k] + 1; m < lastline + 1; m++)
 													{
 														refreshStackSlotAccessor(register, store, block.opSteps[m]);
 													}
 												}
-												else
-												{
-													int continueline = continuelines[k];
-
-													var load = getAdditionalRegister();
-													load.valueType = register.valueType;
-													OpStep loadstep = new OpStep(OpCode.assigning, block.opSteps[continueline].token);
-													loadstep.reg = load;
-													loadstep.regType = register.valueType;
-													loadstep.arg1 = store;
-													loadstep.arg1Type = register.valueType;
+												//else
+												//{
+												//	int continueline = continuelines[k];
 
 
+												//	int insertline = -1; int addline = 0;
+												//	for (int j = continueline + 1; j < lastline + 1 + addline; j++)
+												//	{
+												//		if (refreshStackSlotAccessor(register, store, block.opSteps[j]))
+												//		{
+												//			if (insertline == -1)
+												//			{
+												//				insertline = j;
+												//			}
+												//		}
+												//	}
 
-													int insertline = -1;int addline = 0;
-													for (int j = continueline + 1; j < lastline + 1 +addline; j++)
-													{
-														if (refreshStackSlotAccessor(register, store, block.opSteps[j]))
-														{
-															if (insertline == -1)
-															{
-																insertline = j;
-															}
-														}
-													}
-
-													load.stmtid = register.stmtid;
-
-													block.opSteps.Insert(insertline, loadstep);
-													addline++;
-
-													dictCanNotOptimizeRegister.Add(load, null);
-												}
+													
+												//}
 											}
-											
-											
-										}
 
+
+										}
+										
 										block.opSteps.Insert(failedline, savestep);
+										
 
 										dictCanNotOptimizeRegister.Add(store, null);
 										//dictCanNotOptimizeRegister.Add(load, null);
@@ -632,7 +649,7 @@ namespace ASCompiler.compiler
 
 							dictCanNotOptimizeRegister.Add(register, null);
 						}
-						
+
 					}
 					else
 					{
@@ -649,18 +666,225 @@ namespace ASCompiler.compiler
 
 					if (ReferenceEquals(opstep.reg, item.Key))
 					{
-						opstep.reg = item.Value;
+						opstep.reg = (LeftValueBase)item.Value;
 					}
 					if (ReferenceEquals(opstep.arg1, item.Key))
 					{
-						opstep.arg1 = item.Value;
+						opstep.arg1 = (LeftValueBase)item.Value;
 					}
 					if (ReferenceEquals(opstep.arg2, item.Key))
 					{
-						opstep.arg2 = item.Value;
+						opstep.arg2 = (LeftValueBase)item.Value;
 					}
 				}
 			}
+
+			{
+				//****重分配*****
+				Dictionary<RunTimeDataType, Dictionary<IMemReg, memregSlot>> dict_MemReg_Slot = new Dictionary<RunTimeDataType, Dictionary<IMemReg, memregSlot>>();
+				Dictionary<RunTimeDataType, Queue<memregSlot>> dict_SlotPool = new Dictionary<RunTimeDataType, Queue<memregSlot>>();
+				Dictionary<RunTimeDataType, List<memregSlot>> dict_allocedSlots = new Dictionary<RunTimeDataType, List<memregSlot>>();
+				Dictionary<IMemReg, OpStep> regLastStep = new Dictionary<IMemReg, OpStep>();
+
+				for (int i = 0; i < block.opSteps.Count; i++)
+				{
+					var opstep = block.opSteps[i];
+					if (opstep.reg is IMemReg)
+					{
+						if (dictMem_StackSlotAccessor[(IMemReg)opstep.reg].isConvertFromVariable)
+						{
+							continue;
+						}
+
+						LeftValueBase mem = (LeftValueBase)opstep.reg;
+						if (!dict_MemReg_Slot.ContainsKey(mem.valueType))
+						{
+							dict_MemReg_Slot.Add(mem.valueType, new Dictionary<IMemReg, memregSlot>());
+						}
+						if (!dict_SlotPool.ContainsKey(mem.valueType))
+						{
+							dict_SlotPool.Add(mem.valueType, new Queue<memregSlot>());
+						}
+						if (!dict_allocedSlots.ContainsKey(mem.valueType))
+						{
+							dict_allocedSlots.Add(mem.valueType, new List<memregSlot>());
+						}
+						Dictionary<IMemReg, memregSlot> m_s = dict_MemReg_Slot[mem.valueType];
+						if (!m_s.ContainsKey((IMemReg)mem))
+						{
+							Queue<memregSlot> slotpool = dict_SlotPool[mem.valueType];
+							if (slotpool.Count > 0)
+							{
+								var s = slotpool.Dequeue(); //复用
+								s.memReg = (IMemReg)mem;
+								m_s.Add((IMemReg)mem, s);
+							}
+							else
+							{
+								var allocedslots = dict_allocedSlots[mem.valueType];
+								memregSlot s = new memregSlot();
+								s.memReg = (IMemReg)mem;
+								s.index = allocedslots.Count;
+
+								allocedslots.Add(s);
+
+								m_s.Add((IMemReg)mem, s);
+							}
+
+
+							{
+								//查找这个MemReg最后一次出现的行
+								for (int j = block.opSteps.Count - 1; j >= 0; j--)
+								{
+									var sl = block.opSteps[j];
+									if (ReferenceEquals(sl.reg, mem) ||
+										ReferenceEquals(sl.arg1, mem) ||
+										ReferenceEquals(sl.arg2, mem)
+										)
+									{
+										regLastStep.Add((IMemReg)mem, sl);
+										break;
+									}
+								}
+
+							}
+
+
+
+						}
+					}
+
+
+					//***查找这一行释放的槽***
+
+					bool found = true;
+					while (found)
+					{
+						found = false;
+						foreach (var item in regLastStep)
+						{
+							if (item.Value == block.opSteps[i])
+							{
+								var slotpool = dict_SlotPool[((LeftValueBase)item.Key).valueType];
+								var regisetSlot = dict_MemReg_Slot[((LeftValueBase)item.Key).valueType];
+
+								if (slotpool.Contains(regisetSlot[item.Key]))
+								{
+									throw new Exception("重复的寄存器池");
+								}
+
+								slotpool.Enqueue(regisetSlot[item.Key]);
+
+								regLastStep.Remove(item.Key);
+
+								found = true;
+								break;
+							}
+						}
+					}
+
+
+				}
+
+				
+				foreach (var item in dict_allocedSlots)
+				{
+					var totoalmems = dict_MemReg_Slot[item.Key];
+					foreach (var mem in totoalmems)
+					{
+						for (int i = 0; i < block.opSteps.Count; i++)
+						{
+							var step = block.opSteps[i];
+
+							if (ReferenceEquals(step.reg, mem.Key))
+							{
+								step.reg =(LeftValueBase) mem.Value.memReg;
+							}
+
+							if (ReferenceEquals(step.arg1, mem.Key))
+							{
+								step.arg1 = (LeftValueBase)mem.Value.memReg;
+							}
+
+							if (ReferenceEquals(step.arg2, mem.Key))
+							{
+								step.arg2 = (LeftValueBase)mem.Value.memReg;
+							}
+						}
+					}					
+				}
+				
+				#region 重编号
+				//***重新编号
+				Dictionary<RunTimeDataType, Dictionary<IMemReg, object>> dict_no = new Dictionary<RunTimeDataType, Dictionary<IMemReg, object>>();
+				for (int i = 0; i < block.opSteps.Count; i++)
+				{
+					var step = block.opSteps[i];
+					if (step.reg is IMemReg)
+					{
+						if (!dict_no.ContainsKey(((LeftValueBase)step.reg).valueType))
+						{
+							dict_no.Add(((LeftValueBase)step.reg).valueType,new Dictionary<IMemReg, object>());
+						}
+						var no = dict_no[((LeftValueBase)step.reg).valueType];
+						if (!no.ContainsKey((IMemReg)step.reg))
+						{
+							((IMemReg)step.reg).setId(no.Count);
+							no.Add((IMemReg)step.reg, null);
+						}
+
+						step.memregid1 = (short)((IMemReg)step.reg).getId();
+
+					}
+					if (step.arg1 is IMemReg)
+					{
+						if (!dict_no.ContainsKey(((LeftValueBase)step.arg1).valueType))
+						{
+							dict_no.Add(((LeftValueBase)step.arg1).valueType, new Dictionary<IMemReg, object>());
+						}
+						var no = dict_no[((LeftValueBase)step.arg1).valueType];
+						if (!no.ContainsKey((IMemReg)step.arg1))
+						{
+							((IMemReg)step.arg1).setId(no.Count);
+							no.Add((IMemReg)step.arg1, null);
+						}
+
+						step.memregid2 = (short)((IMemReg)step.arg1).getId();
+					}
+					if (step.arg2 is IMemReg)
+					{
+						if (!dict_no.ContainsKey(((LeftValueBase)step.arg2).valueType))
+						{
+							dict_no.Add(((LeftValueBase)step.arg2).valueType, new Dictionary<IMemReg, object>());
+						}
+						var no = dict_no[((LeftValueBase)step.arg2).valueType];
+						if (!no.ContainsKey((IMemReg)step.arg2))
+						{
+							((IMemReg)step.arg2).setId(no.Count);
+							no.Add((IMemReg)step.arg2, null);
+						}
+
+						step.memregid3 = (short)((IMemReg)step.arg2).getId();
+					}
+				}
+
+				block.dictMemCacheCount = new Dictionary<RunTimeDataType, int>();
+				block.memCacheList = new List<IMemReg>();
+				foreach (var item in dict_no)
+				{
+					block.dictMemCacheCount.Add(item.Key, item.Value.Count);
+
+					foreach (var memreg in item.Value.Keys)
+					{
+						block.memCacheList.Add(memreg);
+					}
+
+				}
+
+				#endregion
+			}
+
+
 
 			//调整指令
 			for (int i = 0; i < block.opSteps.Count; i++)
@@ -683,6 +907,7 @@ namespace ASCompiler.compiler
 					else if (step.arg1 is MemRegister_Number && step.arg2 is ASBinCode.rtData.RightValue && step.arg2.valueType == RunTimeDataType.rt_number)
 					{
 						step.opCode = OpCode.add_number_memnumber_constnumber;
+						step.constnumber2 = step.arg2.getValue(null, null).toNumber();
 					}
 				}
 				else if (step.opCode == OpCode.sub_number)
@@ -701,6 +926,7 @@ namespace ASCompiler.compiler
 					else if (step.arg1 is MemRegister_Number && step.arg2 is ASBinCode.rtData.RightValue && step.arg2.valueType == RunTimeDataType.rt_number)
 					{
 						step.opCode = OpCode.div_number_memnumber_constnumber;
+						step.constnumber2 = step.arg2.getValue(null, null).toNumber();
 					}
 				}
 				else if (step.opCode == OpCode.multi_number)
@@ -722,26 +948,52 @@ namespace ASCompiler.compiler
 					if (step.reg is MemRegister_Number)
 					{
 						step.opCode = OpCode.assign_tomemnumber;
+
+						if (step.arg1 is MemRegister_Number)
+						{
+							step.opCode = OpCode.assign_memnumber_tomemnumber;
+						}
+
 					}
 				}
 			}
 
 		}
-
-		private bool isSafeOperator(StackSlotAccessor accessor,int line)
+		private bool isSafeOperator(StackSlotAccessor accessor, int line)
 		{
-			int fline;List<int> cline = new List<int>();
-			return isAllSafeOperator(line, line + 1,line+1, accessor, out fline,cline);
+			int fline; List<int> cline = new List<int>();
+			return isAllSafeOperator(line, line + 1, line + 1, accessor, out fline, cline);
 		}
 
-		private bool isAllSafeOperator(int st,int ed,int realend, StackSlotAccessor accessor,out int failedline,List<int> continues)
+		private bool isAllSafeOperator(int st, int ed, int realend, StackSlotAccessor accessor, out int failedline, List<int> continues)
 		{
 			for (int i = st; i < ed; i++)
 			{
 				var opcode = block.opSteps[i].opCode;
 				if (builds.AS3FunctionBuilder.isJMP(opcode))
 				{
-					
+					if (block.opSteps[i].jumoffset > 0)
+					{
+						if (i + block.opSteps[i].jumoffset < realend)
+						{
+							List<int> c = new List<int>();							
+							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, realend, realend, accessor, out failedline, c)
+								)
+							{
+								
+								foreach (var item in c)
+								{									
+									if (!continues.Contains(item))
+									{
+										continues.Add(item);
+									}									
+								}
+								
+								return false;
+							}
+						}
+					}
+
 				}
 				else if (builds.AS3FunctionBuilder.isIfJmp(opcode))
 				{
@@ -749,13 +1001,33 @@ namespace ASCompiler.compiler
 					{
 						if (i + block.opSteps[i].jumoffset < realend)
 						{
+							//***查找是否有无条件往回跳转***
+							//***如果有，则只需查找到无条件回跳为止***
+							for (int m = i + block.opSteps[i].jumoffset; m < realend; m++)
+							{
+								var test = block.opSteps[m].opCode;
+								if (builds.AS3FunctionBuilder.isIfJmp(test))
+								{
+									break;
+								}
+								if (builds.AS3FunctionBuilder.isJMP(test))
+								{
+									if (block.opSteps[m].jumoffset < 0)
+									{
+										realend = m;
+									}
+									break;
+								}
+							}
+
+
+
 							List<int> c = new List<int>();
-							if (!isAllSafeOperator(i + 1, i + block.opSteps[i].jumoffset, realend ,accessor, out failedline, c)								
+							if (!isAllSafeOperator(i + 1, i + block.opSteps[i].jumoffset, realend, accessor, out failedline, c)
 							)
 							{
 								failedline = i;
-								//failedline = i;
-								//continues.Add(i);
+								
 								foreach (var item in c)
 								{
 									if (!continues.Contains(item))
@@ -763,13 +1035,14 @@ namespace ASCompiler.compiler
 										continues.Add(item);
 									}
 								}
-								//continues.Add(i + block.opSteps[i].jumoffset);
+
 								return false;
+								
 							}
-							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, ed,realend,  accessor, out failedline, c)								
+							
+							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, ed, realend, accessor, out failedline, c)
 								)
 							{
-								
 								//continues.Add(i + block.opSteps[i].jumoffset);
 								foreach (var item in c)
 								{
@@ -779,9 +1052,13 @@ namespace ASCompiler.compiler
 									}
 								}
 								return false;
+								
 							}
+
+							
+
 						}
-					}	
+					}
 				}
 				else if (opcode == OpCode.assigning)
 				{
@@ -814,6 +1091,23 @@ namespace ASCompiler.compiler
 
 		private bool canOptimize(OpStep step, StackSlotAccessor register)
 		{
+			//***Vector<Boolean>的特殊情况
+			if (register.valueType == RunTimeDataType.rt_boolean)
+			{
+				StackSlotAccessor test = step.arg1 as StackSlotAccessor;
+				if (test != null && test._regMember != null && test._regMember.bindField is ClassMethodGetter)
+				{
+					if (step.opCode == OpCode.call_function || step.opCode == OpCode.call_function_notcheck || step.opCode == OpCode.call_function_notcheck_notreturnobject)
+					{
+						ClassMethodGetter methodGetter = test._regMember.bindField as ClassMethodGetter;
+						if (methodGetter.name == "shift" && methodGetter.classmember.refClass.name == "Vector.<Boolean>")
+						{
+							return false;
+						}
+
+					}
+				}
+			}
 			if (register.valueType == RunTimeDataType.rt_number
 				||
 				register.valueType == RunTimeDataType.rt_int
@@ -825,9 +1119,9 @@ namespace ASCompiler.compiler
 			{
 				if (step.opCode == OpCode.access_dot)
 				{
-					if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget || 
+					if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget ||
 						(
-						register._regMember !=null &&
+						register._regMember != null &&
 						register._regMember.bindField is ClassPropertyGetter))
 					{
 						return false;
@@ -914,6 +1208,7 @@ namespace ASCompiler.compiler
 				case OpCode.cast_number_uint:
 				case OpCode.cast_int_uint:
 				case OpCode.cast_uint_int:
+				case OpCode.vector_getvalue:
 				case OpCode.function_return_funvoid_notry:
 				case OpCode.if_equality_num_num_jmp_notry:
 				case OpCode.if_not_equality_num_num_jmp_notry:
@@ -943,28 +1238,9 @@ namespace ASCompiler.compiler
 			}
 		}
 
-		private int findLastRefLine(StackSlotAccessor register)
-		{
-			//查找这个寄存器最后一次出现的行
-			var steps = block.opSteps;
-			for (int j = steps.Count - 1; j >= 0; j--)
-			{
-				var sl = steps[j];
-
-				if (ReferenceEquals(sl.reg, register) ||
-					ReferenceEquals(sl.arg1, register) ||
-					ReferenceEquals(sl.arg2, register)
-					)
-				{
-					return j;					
-				}
-			}
-			return -1;
-		}
-
 		private bool mabeCallfunction(OpCode code)
 		{
-			
+
 			switch (code)
 			{
 				case OpCode.cast:
@@ -1016,17 +1292,17 @@ namespace ASCompiler.compiler
 				case OpCode.new_instance:
 				case OpCode.new_instance_class:
 				case OpCode.init_staticclass:
-				
+
 					return true;
 				default:
-					
+
 					return false;
 			}
 		}
 
-		private bool isReference(StackSlotAccessor sa,OpStep step)
+		private bool isReference(StackSlotAccessor sa, OpStep step)
 		{
-			if (ReferenceEquals(sa, step.arg1) || ReferenceEquals(sa, step.arg2) || ReferenceEquals(sa,step.reg)
+			if (ReferenceEquals(sa, step.arg1) || ReferenceEquals(sa, step.arg2) || ReferenceEquals(sa, step.reg)
 				)
 			{
 				return true;
@@ -1040,9 +1316,9 @@ namespace ASCompiler.compiler
 		private bool refreshStackSlotAccessor(StackSlotAccessor old, StackSlotAccessor replaceto, OpStep step)
 		{
 			bool result = false;
-			if (ReferenceEquals(step.reg,old))
+			if (ReferenceEquals(step.reg, old))
 			{
-				step.reg = replaceto;result = true;
+				step.reg = replaceto; result = true;
 			}
 			if (ReferenceEquals(step.arg1, old))
 			{
@@ -1054,6 +1330,30 @@ namespace ASCompiler.compiler
 			}
 			return result;
 		}
+
+		private int findLastRefLine(StackSlotAccessor register)
+		{
+			//查找这个寄存器最后一次出现的行
+			var steps = block.opSteps;
+			for (int j = steps.Count - 1; j >= 0; j--)
+			{
+				var sl = steps[j];
+
+				if (ReferenceEquals(sl.reg, register) ||
+					ReferenceEquals(sl.arg1, register) ||
+					ReferenceEquals(sl.arg2, register)
+					)
+				{
+					return j;
+				}
+			}
+			return -1;
+		}
+
+
+
+
+
 		
 
 		/// <summary>
@@ -1068,9 +1368,7 @@ namespace ASCompiler.compiler
 			Dictionary<StackSlotAccessor, sslot> regisetSlot = new Dictionary<StackSlotAccessor, sslot>();
 			//最后访问寄存器的操作行
 			Dictionary<StackSlotAccessor, OpStep> regLastStep = new Dictionary<StackSlotAccessor, OpStep>();
-			//某个操作行前要插入对寄存器的初始化
-			//Dictionary<Register, OpStep> dictAddResetStackOp = new Dictionary<Register, OpStep>();
-
+			
 			List<sslot> allocedslots = new List<sslot>();
 
 			for (int i = 0; i < steps.Count; i++)
@@ -1093,15 +1391,13 @@ namespace ASCompiler.compiler
 
 				foreach (var reg in testregisters)
 				{
-					//跳过从参数转换来的
-					if (reg.isConvertFromVariable && reg._index < 0)
+					if (reg.isConvertFromVariable)
 					{
-						continue;
+						
 					}
-
-					if (!regisetSlot.ContainsKey(reg))
+					else if (!regisetSlot.ContainsKey(reg))
 					{
-						if (slotpool.Count > 0 )
+						if (slotpool.Count > 0)
 						{
 							sslot s = slotpool.Dequeue(); //复用
 
@@ -1121,13 +1417,13 @@ namespace ASCompiler.compiler
 							s.register = reg;
 							s.index = allocedslots.Count;
 
-							
+
 							allocedslots.Add(s);
-							
-							
+
+
 							regisetSlot.Add(reg, s);
-							
-						
+
+
 						}
 
 
@@ -1142,7 +1438,7 @@ namespace ASCompiler.compiler
 									var sl = steps[j];
 									{
 										StackSlotAccessor r = sl.reg as StackSlotAccessor;
-										if (r !=null && r.stmtid == stmtid)
+										if (r != null && r.stmtid == stmtid)
 										{
 											regLastStep.Add(reg, sl);
 											break;
@@ -1186,7 +1482,7 @@ namespace ASCompiler.compiler
 						}
 					}
 
-					
+
 
 				}
 
@@ -1207,7 +1503,7 @@ namespace ASCompiler.compiler
 							}
 
 							slotpool.Enqueue(regisetSlot[item.Key]);
-							
+
 							regLastStep.Remove(item.Key);
 
 							found = true;
@@ -1217,23 +1513,13 @@ namespace ASCompiler.compiler
 				}
 			}
 
+
 			List<StackSlotAccessor> reglist = new List<StackSlotAccessor>();
 			foreach (var item in dictCompileRegisters.Values)
 			{
-				//跳过从参数转换来的
-				if (item.isConvertFromVariable && item._index < 0)
-				{
-					continue;
-				}
 				reglist.Add(item);
 			}
 
-			
-
-
-			Dictionary<int, int> dictnumber = new Dictionary<int, int>();
-
-			Dictionary<sslot, int> dictslot = new Dictionary<sslot, int>();
 
 			for (int i = 0; i < reglist.Count; i++)
 			{
@@ -1248,19 +1534,18 @@ namespace ASCompiler.compiler
 				{
 					if (reg.isConvertFromVariable)
 					{
-						//无用寄存器
-						reg._index = int.MinValue;
-						block.regConvFromVar.Remove(reg);
+
 					}
 					else
 					{
+						//无用寄存器
 						reg._index = -1;
 					}
-					
+
 
 				}
 
-				
+
 
 			}
 
@@ -1268,12 +1553,11 @@ namespace ASCompiler.compiler
 
 		}
 
-        /// <summary>
-        /// 刷新条件跳转语句等的目标行
-        /// </summary>
-        public void completSteps(Builder builder)
-        {
-
+		/// <summary>
+		/// 刷新条件跳转语句等的目标行
+		/// </summary>
+		public void completSteps(Builder builder)
+		{
 			#region 查找所有的InitStaticClass并提前
 			{
 				Dictionary<int, int> initstatics = new Dictionary<int, int>();
@@ -1281,7 +1565,7 @@ namespace ASCompiler.compiler
 				int st = 0;
 				do
 				{
-					toinsert = null; int insertto = 0;					
+					toinsert = null; int insertto = 0;
 					for (int i = st; i < block.opSteps.Count; i++)
 					{
 						var step = block.opSteps[i];
@@ -1292,9 +1576,9 @@ namespace ASCompiler.compiler
 
 								if (i > insertto)
 								{
-									if (!initstatics.ContainsKey(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value))
+									if (!initstatics.ContainsKey(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value))
 									{
-										initstatics.Add(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value, 0);
+										initstatics.Add(((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value, 0);
 										block.opSteps.RemoveAt(i);
 										toinsert = step;
 										break;
@@ -1324,27 +1608,27 @@ namespace ASCompiler.compiler
 
 			#region 先查找yield return,如果有，则在开头插入跳转步骤
 			for (int i = 0; i < block.opSteps.Count; i++)
-            {
-                OpStep step = block.opSteps[i];
-                if (step.opCode == OpCode.yield_return)
-                {
-                    OpStep yieldline = new OpStep(OpCode.yield_continuetoline, new SourceToken(0,0,string.Empty));
-                    block.opSteps.Insert(0, yieldline);
+			{
+				OpStep step = block.opSteps[i];
+				if (step.opCode == OpCode.yield_return)
+				{
+					OpStep yieldline = new OpStep(OpCode.yield_continuetoline, new SourceToken(0, 0, string.Empty));
+					block.opSteps.Insert(0, yieldline);
 
-                    break;
-                }
-            }
+					break;
+				}
+			}
 			#endregion
 
 			setJumpOffSet();
 			setTryState();
-			
+
 			if (!isEval && !(block.scope is ASBinCode.scopes.FunctionScope))
 			{
 				combieRegs();
 			}
-        }
-		
+		}
+
 		/// <summary>
 		/// 设置tryid
 		/// </summary>
@@ -1357,12 +1641,12 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.enter_try)
 				{
 					block.hasTryStmt = true;
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(0, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_try)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 0)
 					{
@@ -1371,12 +1655,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(1, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_catch)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 1)
 					{
@@ -1385,12 +1669,12 @@ namespace ASCompiler.compiler
 				}
 				else if (step.opCode == OpCode.enter_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					trys.Push(new trystate(2, tryid));
 				}
 				else if (step.opCode == ASBinCode.OpCode.quit_finally)
 				{
-					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null, 0)).value;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
 					var s = trys.Pop();
 					if (s.tryid != tryid || s.type != 2)
 					{
@@ -1430,13 +1714,13 @@ namespace ASCompiler.compiler
 				if (step.opCode == ASBinCode.OpCode.if_jmp
 					)
 				{
-					
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 			}
@@ -1473,6 +1757,330 @@ namespace ASCompiler.compiler
 
 		}
 
+
+
+		private void completJump()
+		{
+			Dictionary<OpStep, string> dictJumpSteps = new Dictionary<OpStep, string>();
+
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				OpStep step = block.opSteps[i];
+
+				string findflag = null; bool isif_jmp = false;
+				if (step.opCode == ASBinCode.OpCode.if_jmp
+					)
+				{
+					isif_jmp = true;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
+					dictJumpSteps.Add(step, findflag);
+				}
+				else if (step.opCode == ASBinCode.OpCode.jmp)
+				{
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
+					dictJumpSteps.Add(step, findflag);
+				}
+				if (isif_jmp)
+				{
+					if (i > 0 && step.arg1 is StackSlotAccessor)
+					{
+						var check = block.opSteps[i - 1];
+						if (ReferenceEquals(step.arg1, check.reg))
+						{
+							if (check.opCode == OpCode.equality_num_num)
+							{
+								check.opCode = OpCode.if_equality_num_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.not_equality_num_num)
+							{
+								check.opCode = OpCode.if_not_equality_num_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.le_num)
+							{
+								check.opCode = OpCode.if_le_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.lt_num)
+							{
+								check.opCode = OpCode.if_lt_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.ge_num)
+							{
+								check.opCode = OpCode.if_ge_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+							else if (check.opCode == OpCode.gt_num)
+							{
+								check.opCode = OpCode.if_gt_num_jmp_notry;
+								block.opSteps.RemoveAt(i);
+								i--;
+								dictJumpSteps.Add(check, findflag);
+
+								dictJumpSteps.Remove(step);
+							}
+						}
+					}
+				}
+			}
+
+			foreach (var item in dictJumpSteps)
+			{
+				OpStep step = item.Key;
+				string findflag = item.Value;
+
+				for (int i = 0; i < block.opSteps.Count; i++)
+				{
+					if (ReferenceEquals(block.opSteps[i], step))
+					{
+						bool isfound = false;
+						for (int j = 0; j < block.opSteps.Count; j++)
+						{
+							if (block.opSteps[j].flag == findflag)
+							{
+								step.jumoffset = j - i;
+								isfound = true;
+								break;
+							}
+						}
+
+						if (!isfound)
+						{
+							throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "跳转标记没有找到");
+						}
+
+						break;
+					}
+				}
+			}
+
+			Stack<trystate> trys = new Stack<trystate>();
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				ASBinCode.OpStep step = block.opSteps[i];
+				if (step.opCode == ASBinCode.OpCode.enter_try)
+				{
+					block.hasTryStmt = true;
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(0, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_try)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 0)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "try块不匹配");
+					}
+				}
+				else if (step.opCode == OpCode.enter_catch)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(1, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_catch)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 1)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "catch块不匹配");
+					}
+				}
+				else if (step.opCode == OpCode.enter_finally)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					trys.Push(new trystate(2, tryid));
+				}
+				else if (step.opCode == ASBinCode.OpCode.quit_finally)
+				{
+					int tryid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(null, null)).value;
+					var s = trys.Pop();
+					if (s.tryid != tryid || s.type != 2)
+					{
+						throw new BuildException(step.token.line, step.token.ptr, step.token.sourceFile, "finally块不匹配");
+					}
+				}
+				else if (trys.Count > 0)
+				{
+					//step.trys = new Stack<int>();
+					trystate[] toadd = trys.ToArray();
+					for (int j = 0; j < toadd.Length; j++)
+					{
+						//step.trys.Push(toadd[j]);
+						step.tryid = toadd[j].tryid;
+						step.trytype = toadd[j].type;
+					}
+				}
+				else
+				{
+					step.tryid = -1;
+				}
+
+			}
+
+			setJumpInstructions();
+		}
+
+		private void setJumpInstructions()
+		{
+			//***优化跳转目标调用
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.jmp)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						step.opCode = OpCode.jmp_notry;
+					}
+				}
+				else if (step.opCode == OpCode.if_jmp)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						step.opCode = OpCode.if_jmp_notry;
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_equality_num_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_equality_num_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_not_equality_num_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_not_equality_num_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+
+				}
+				else if (step.opCode == OpCode.if_le_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_le_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+
+				}
+				else if (step.opCode == OpCode.if_lt_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_lt_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+
+							if (step.arg2 is ASBinCode.rtData.RightValue && step.arg1 is MemRegister_Number)
+							{
+								step.opCode = OpCode.if_lt_memnumber_constnum_jmp_notry_noreference;
+								step.constnumber2 = step.arg2.getValue(null, null).toNumber();
+							}
+
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_ge_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_ge_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+				else if (step.opCode == OpCode.if_gt_num_jmp_notry)
+				{
+					var newline = block.opSteps[step.jumoffset + i];
+					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
+					{
+						if (!searchRefrece(step.reg, i + 1))
+						{
+							step.opCode = OpCode.if_gt_num_jmp_notry_noreference;
+							step.reg = null; step.regType = RunTimeDataType.unknown;
+						}
+					}
+					else
+					{
+						throw new Exception("if_jmp 跳转到了不同的block,不可能");
+					}
+				}
+			}
+
+
+		}
+
+
 		/// <summary>
 		/// 优化跳转代码并重算trystate
 		/// </summary>
@@ -1484,22 +2092,22 @@ namespace ASCompiler.compiler
 			{
 				OpStep step = block.opSteps[i];
 
-				string findflag = null;bool isif_jmp = false;
+				string findflag = null; bool isif_jmp = false;
 				if (step.opCode == ASBinCode.OpCode.if_jmp
 					)
 				{
 					isif_jmp = true;
-					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg2.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				else if (step.opCode == ASBinCode.OpCode.jmp)
 				{
-					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null, 0)).value;
+					findflag = ((ASBinCode.rtData.rtString)step.arg1.getValue(null, null)).value;
 					dictJumpSteps.Add(step, findflag);
 				}
 				if (isif_jmp)
 				{
-					if (i > 0 && (step.arg1 is StackSlotAccessor || step.arg1 is MemRegister_Boolean) )
+					if (i > 0 && (step.arg1 is StackSlotAccessor || step.arg1 is MemRegister_Boolean))
 					{
 						var check = block.opSteps[i - 1];
 						if (ReferenceEquals(step.arg1, check.reg))
@@ -1594,138 +2202,16 @@ namespace ASCompiler.compiler
 			}
 
 			setTryState();
-			//***优化跳转目标调用
-			for (int i = 0; i < block.opSteps.Count; i++)
-			{
-				var step = block.opSteps[i];
-				if (step.opCode == OpCode.jmp)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						step.opCode = OpCode.jmp_notry;
-					}
-				}
-				else if (step.opCode == OpCode.if_jmp)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						step.opCode = OpCode.if_jmp_notry;
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-				}
-				else if (step.opCode == OpCode.if_equality_num_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))
-						{
-							step.opCode = OpCode.if_equality_num_num_jmp_notry_noreference;
-							step.reg = null;step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-				}
-				else if (step.opCode == OpCode.if_not_equality_num_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))     
-						{
-							step.opCode = OpCode.if_not_equality_num_num_jmp_notry_noreference;
-							step.reg = null; step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
 
-				}
-				else if (step.opCode == OpCode.if_le_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))
-						{
-							step.opCode = OpCode.if_le_num_jmp_notry_noreference;
-							step.reg = null; step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-
-				}
-				else if (step.opCode == OpCode.if_lt_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))
-						{
-							step.opCode = OpCode.if_lt_num_jmp_notry_noreference;
-							step.reg = null; step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-				}
-				else if (step.opCode == OpCode.if_ge_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))
-						{
-							step.opCode = OpCode.if_ge_num_jmp_notry_noreference;
-							step.reg = null; step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-				}
-				else if (step.opCode == OpCode.if_gt_num_jmp_notry)
-				{
-					var newline = block.opSteps[step.jumoffset + i];
-					if (newline.tryid == step.tryid && newline.trytype == step.trytype)
-					{
-						if (!searchRefrece(step.reg, i + 1))
-						{
-							step.opCode = OpCode.if_gt_num_jmp_notry_noreference;
-							step.reg = null; step.regType = RunTimeDataType.unknown;
-						}
-					}
-					else
-					{
-						throw new Exception("if_jmp 跳转到了不同的block,不可能");
-					}
-				}
-			}
-
-
+			setJumpInstructions();
 		}
-		private bool searchRefrece(LeftValueBase register,int stoffset)
+
+		private bool searchRefrece(LeftValueBase register, int stoffset)
 		{
 			for (int i = stoffset; i < block.opSteps.Count; i++)
 			{
 				var step = block.opSteps[i];
-				if (ReferenceEquals(register, step.arg1) || ReferenceEquals(register, step.arg2) )
+				if (ReferenceEquals(register, step.arg1) || ReferenceEquals(register, step.arg2))
 				{
 					return true;
 				}
@@ -1734,17 +2220,19 @@ namespace ASCompiler.compiler
 		}
 
 
-        public readonly bool isEval;
+		public readonly bool isEval;
 
-        public CompileEnv(ASBinCode.CodeBlock block,bool isEval)
-        {
-            this.block = block;
+		public CompileEnv(ASBinCode.CodeBlock block, bool isEval)
+		{
+			this.block = block;
 
-            dictCompileRegisters = new Dictionary<string, ASBinCode.StackSlotAccessor>();
+			dictCompileRegisters = new Dictionary<string, ASBinCode.StackSlotAccessor>();
 
-            this.isEval = isEval;
+			this.isEval = isEval;
 
-        }
+		}
+
+
 
 
 
@@ -1765,10 +2253,19 @@ namespace ASCompiler.compiler
 				this.tryid = tryid;
 			}
 		}
+
 		class sslot
 		{
 			public StackSlotAccessor register;
 			public int index;
 		}
+
+
+		class memregSlot
+		{
+			public IMemReg memReg;
+			public int index;
+		}
+
 	}
 }

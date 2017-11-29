@@ -530,6 +530,10 @@ namespace ASCompiler.compiler.builds
                         op.arg2 = v2;
                         op.arg2Type = v2.valueType;
                         env.block.opSteps.Add(op);
+
+						
+
+
                     }
                 }
                 else

@@ -28,6 +28,10 @@ namespace ASRuntime
 		/// 内存缓存number
 		/// </summary>
 		private double[] memnumber;
+		/// <summary>
+		/// 内存缓存int
+		/// </summary>
+		private int[] memint;
 
         internal CSWC swc;
         private CodeBlock defaultblock;
@@ -36,10 +40,12 @@ namespace ASRuntime
             this.swc = swc;
 
 			memnumber = new double[swc.MaxMemNumberCount];
+			memint = new int[swc.MaxMemIntCount];
 
 			foreach (var m in swc.MemRegList)
 			{
 				m.setMemCache_Number(memnumber);
+				m.setMemCache_Int(memint);
 			}
 
 
@@ -184,7 +190,7 @@ namespace ASRuntime
 		{
 			if (!_hasInitStack)
 			{
-				stackframePool = new StackFrame.StackFramePool(memnumber);
+				stackframePool = new StackFrame.StackFramePool(memnumber,memint);
 				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool(this);
 				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
 				runFuncresultPool = new runFuncResult.ResultPool();
@@ -994,7 +1000,11 @@ namespace ASRuntime
 
 											break;
 										}
-									
+									case OpCode.vector_getvalue:
+										{
+											operators.OpVector.exec_GetValue(currentRunFrame, step, scope);
+											break;
+										}
 									case OpCode.if_equality_num_num_jmp_notry:
 										{
 											var n1 = (step.arg1.getValue(scope,currentRunFrame)).toNumber();
@@ -1218,16 +1228,33 @@ namespace ASRuntime
 											memnumber[step.memregid2] + memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
+									case OpCode.add_number_memint_memint:
+
+										memnumber[step.memregid1] =
+											memint[step.memregid2] + (double)memint[step.memregid3];
+										++currentRunFrame.codeLinePtr;
+										break;
 									case OpCode.add_number_memnumber_constnumber:
 										
 										memnumber[step.memregid1] =
-											memnumber[step.memregid2] + ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+											memnumber[step.memregid2] + step.constnumber2;
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.add_number_memint_constnumber:
+
+										memnumber[step.memregid1] =
+											memint[step.memregid2] + step.constnumber2;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.div_number_memnumber_constnumber:
 										
 										memnumber[step.memregid1] =
-											memnumber[step.memregid2] / ((rtNumber)((ASBinCode.rtData.RightValue)step.arg2).value).value;
+											memnumber[step.memregid2] / step.constnumber2;
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.div_number_memint_constnumber:
+										memnumber[step.memregid1] =
+											memint[step.memregid2] / step.constnumber2;
 										++currentRunFrame.codeLinePtr;
 										break;
 									case OpCode.suffix_inc_number_memnumber:
@@ -1238,16 +1265,79 @@ namespace ASRuntime
 											++currentRunFrame.codeLinePtr;
 										}
 										break;
+									case OpCode.suffix_inc_int_memint:
+										{
+											memint[step.memregid1] = memint[step.memregid2]++;
+											++currentRunFrame.codeLinePtr;
+										}
+										break;
 									case OpCode.assign_tomemnumber:
 										
 										memnumber[step.memregid1] = step.arg1.getValue(scope, currentRunFrame).toNumber();
 
 										++currentRunFrame.codeLinePtr;
 										break;
+									case OpCode.assign_tomemint:
+										
+										memint[step.memregid1] = (int)step.arg1.getValue(scope, currentRunFrame).toNumber();
+										++currentRunFrame.codeLinePtr;
+										break;
 									case OpCode.assign_memnumber_tomemnumber:
 										
 										memnumber[step.memregid1] = memnumber[step.memregid2];
 										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.assign_memint_tomemint:
+										memint[step.memregid1] = memint[step.memregid2];
+										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.if_lt_memnumber_constnum_jmp_notry_noreference:
+										{
+											var n1 = memnumber[step.memregid2];
+											var n2 = step.constnumber2;
+											if (n1 < n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.if_lt_memint_constnum_jmp_notry_noreference:
+										{
+											var n1 = memint[step.memregid2];
+											var n2 = step.constnumber2;
+											if (n1 < n2)
+											{
+												currentRunFrame.codeLinePtr += step.jumoffset + 1;
+											}
+											else
+											{
+												++currentRunFrame.codeLinePtr;
+											}
+										}
+										break;
+									case OpCode.cast_number_int_memnumber_memint:
+										{
+											double r = memnumber[step.memregid2];
+											if (double.IsNaN(r) || double.IsInfinity(r))
+											{
+												memint[step.memregid1] = 0;
+											}
+											else
+											{
+												memint[step.memregid1] = (int)((long)r);
+											}
+											++currentRunFrame.codeLinePtr;
+										}
+										break;
+									case OpCode.cast_number_int_constnum_memint:
+										{
+											memint[step.memregid1] = (int)((long)step.constnumber1);
+											++currentRunFrame.codeLinePtr;
+										}
 										break;
 									default:
 										throw new Exception(step.opCode + "操作未实现");

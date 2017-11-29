@@ -69,6 +69,8 @@ namespace ASBinCode
 		public short memregid2;
 		public short memregid3;
 
+		public double constnumber1;
+		public double constnumber2;
 
         public override string ToString()
         {
@@ -260,6 +262,8 @@ namespace ASBinCode
 			writer.Write(memregid2);
 			writer.Write(memregid3);
 
+			writer.Write(constnumber1);
+			writer.Write(constnumber2);
 		}
 
 		public static OpStep Deserialize(BinaryReader reader, CSWCSerizlizer serizlizer, IDictionary<int,object> serizlized,int key)
@@ -351,6 +355,9 @@ namespace ASBinCode
 			step.memregid1 = reader.ReadInt16();
 			step.memregid2 = reader.ReadInt16();
 			step.memregid3 = reader.ReadInt16();
+
+			step.constnumber1 = reader.ReadDouble();
+			step.constnumber2 = reader.ReadDouble();
 
 			return step;
 		}

@@ -14,6 +14,7 @@ namespace ASBinCode
 		void setId(int newid);
 
 		void setMemCache_Number(double[] memnumber);
+		void setMemCache_Int(int[] memint);
 
 	}
 
@@ -153,6 +154,10 @@ namespace ASBinCode
 			MemSlot_.cache = memnumber;
 		}
 
+		public void setMemCache_Int(int[] memint)
+		{
+			
+		}
 
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
@@ -290,7 +295,10 @@ namespace ASBinCode
 			
 		}
 
-
+		public void setMemCache_Int(int[] memint)
+		{
+			
+		}
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
 			writer.Write(11);
@@ -311,6 +319,7 @@ namespace ASBinCode
 			return register;
 		}
 
+		
 	}
 
 	public sealed class MemRegister_Int : LeftValueBase, IMemReg
@@ -318,6 +327,10 @@ namespace ASBinCode
 		sealed class MemSlot_Int : SLOT
 		{
 			private rtInt number;
+
+			internal int id;
+
+			internal int[] cache;
 
 			public MemSlot_Int(rtInt value)
 			{
@@ -327,7 +340,9 @@ namespace ASBinCode
 
 			public override SLOT assign(RunTimeValueBase value, out bool success)
 			{
-				number.value = ((rtInt)value).value;
+				int v= ((rtInt)value).value;
+				cache[id] = v;
+				number.value = v;
 				success = true;
 				return this;
 			}
@@ -339,12 +354,16 @@ namespace ASBinCode
 
 			public override bool directSet(RunTimeValueBase value)
 			{
-				number.value = ((rtInt)value).value;
+				int v = ((rtInt)value).value;
+				cache[id] = v;	
+				number.value = v;
+							
 				return true;
 			}
 
 			public override RunTimeValueBase getValue()
 			{
+				number.value = cache[id];
 				return number;
 			}
 
@@ -360,6 +379,7 @@ namespace ASBinCode
 
 			public override void setValue(int value)
 			{
+				cache[id] = value;
 				number.value = value;
 			}
 
@@ -388,11 +408,13 @@ namespace ASBinCode
 		public int Id;
 
 		public int getId() { return Id; }
-		public void setId(int newid) { Id = newid; }
+		public void setId(int newid) { Id = newid; MemSlot_.id = newid; }
 
 		public readonly rtData.rtInt value;
 
 		MemSlot_Int MemSlot_;
+
+		private int[] cache;
 
 		public MemRegister_Int(int id)
 		{
@@ -401,7 +423,7 @@ namespace ASBinCode
 			value = new rtInt(0);
 
 			MemSlot_ = new MemSlot_Int(value);
-
+			MemSlot_.id = id;
 		}
 
 		public override string ToString()
@@ -425,6 +447,7 @@ namespace ASBinCode
 
 		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
+			value.value = cache[Id];
 			return value;
 		}
 
@@ -432,7 +455,11 @@ namespace ASBinCode
 		{
 			
 		}
-
+		public void setMemCache_Int(int[] memint)
+		{
+			cache = memint;
+			MemSlot_.cache = memint;
+		}
 		public override void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
 			writer.Write(12);
@@ -453,6 +480,7 @@ namespace ASBinCode
 			return register;
 		}
 
+		
 	}
 
 	public sealed class MemRegister_UInt : LeftValueBase, IMemReg
@@ -566,11 +594,16 @@ namespace ASBinCode
 		}
 
 		public override RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
-		{
+		{			
 			return value;
 		}
 
 		public void setMemCache_Number(double[] memnumber)
+		{
+			
+		}
+
+		public void setMemCache_Int(int[] memint)
 		{
 			
 		}
@@ -595,6 +628,7 @@ namespace ASBinCode
 			return register;
 		}
 
+		
 	}
 
 }
