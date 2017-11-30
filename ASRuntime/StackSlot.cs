@@ -76,10 +76,7 @@ namespace ASRuntime
         
 
         internal StackLinkObjectCache _linkObjCache;
-
-
-		const int LINKMODEINDEX = -1;
-
+		
 #if DEBUG
 		private
 #else
@@ -90,7 +87,7 @@ namespace ASRuntime
 		public void linkTo(SLOT linktarget)
         {
 			needclear = true;refPropChanged = true;
-            this.linktarget = linktarget;
+            this.linktarget = linktarget;index = -1;
         }
 
 		public SLOT getLinkSlot()
@@ -326,14 +323,16 @@ namespace ASRuntime
         public sealed override RunTimeValueBase getValue()
         {
 			
-			if (linktarget != null)
-            {
-                return linktarget.getValue();
-            }
-            else
+			//if (linktarget != null)
+   //         {
+   //             return linktarget.getValue();
+   //         }
+   //         else
             {
 				switch (index)
 				{
+					case -1:
+						return linktarget.getValue();
 					case RunTimeDataType.rt_function:
 					case RunTimeDataType.rt_string:
 					case RunTimeDataType.rt_array:

@@ -580,6 +580,20 @@ namespace ASBinCode
 
 		div_number_memint_constnumber = 166,
 
+		/// <summary>
+		/// 栈上的数字和MemInt相加
+		/// </summary>
+		add_number_memnumber_slt_memint = 167,
+		/// <summary>
+		/// 栈上的数字减去常数
+		/// </summary>
+		sub_number_memnumber_slt_constnumber=168,
+
+		/// <summary>
+		/// 栈上的数字和MemNumber相加
+		/// </summary>
+		add_number_memnumber_slt_memnumber = 169,
+
 
 		/// <summary>
 		/// 赋值到MemNumber
@@ -621,5 +635,11 @@ namespace ASBinCode
 		/// </summary>
 		cast_number_int_constnum_memint=181,
 
+
+		/// <summary>
+		/// 从vector中取值并保存到memint中,索引为memint
+		/// </summary>
+		vector_getvalue_memint_memintidx=190
+		
 	}
 }

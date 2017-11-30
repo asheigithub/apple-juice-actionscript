@@ -669,13 +669,32 @@ Public Class Grammar
                         fidx = fidx - 1
                         Dim test = words(fidx)
 
-                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
-                            Continue While
-                        ElseIf test.Type = Token.TokenType.other And (test.StringValue = "." Or test.StringValue = "?" Or test.StringValue = ":" Or findinkeywords(definekeywords, test.StringValue)) Then
+						If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+							Continue While
+						ElseIf test.Type = Token.TokenType.other And (test.StringValue = "." Or test.StringValue = "?" Or findinkeywords(definekeywords, test.StringValue)) Then
+							Continue For
+						ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
+							'再向前查看一个token,如果不是label则取消
 
-
-                            Continue For
-                        ElseIf test.Type = Token.TokenType.identifier And (
+							Dim pass As Boolean = False
+							Dim t = fidx
+							While t > 0
+								t = t - 1
+								Dim tt = words(t)
+								If tt.Type = Token.TokenType.whitespace Or tt.Type = Token.TokenType.comments Then
+									Continue While
+								ElseIf tt.Type = Token.TokenType.label Then
+									pass = True
+								Else
+									Exit While
+								End If
+							End While
+							If pass Then
+								Exit While
+							Else
+								Continue For
+							End If
+						ElseIf test.Type = Token.TokenType.identifier And (
                             test.StringValue = "case") Then
                             Continue For
                         Else

@@ -2182,9 +2182,11 @@ namespace ASCompiler.compiler
 
                     if (!string.IsNullOrEmpty(lbl))
                     {
+						env.labelblocks++;
+
                         //***插入Label开始**
                         OpStep opLblSt = new OpStep(OpCode.flag, new SourceToken(b.Token.line, b.Token.ptr, b.Token.sourceFile));
-                        opLblSt.flag = "Label_Start_" + b.label;
+                        opLblSt.flag = "Label" + env.labelblocks + "_Start_" + b.label;
                         env.block.opSteps.Add(opLblSt);
                     }
 
@@ -2197,7 +2199,7 @@ namespace ASCompiler.compiler
                     {
                         //***插入Label结束**
                         OpStep opLblSt = new OpStep(OpCode.flag, new SourceToken(b.Token.line, b.Token.ptr, b.Token.sourceFile));
-                        opLblSt.flag = "Label_End_" + b.label;
+                        opLblSt.flag = "Label" + env.labelblocks + "_End_" + b.label;
                         env.block.opSteps.Add(opLblSt);
 
                         for (int i = stlen; i < env.block.opSteps.Count; i++)

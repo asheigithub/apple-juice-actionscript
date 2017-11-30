@@ -14,12 +14,14 @@ namespace ASRuntime
     {
 		internal class StackFramePool : PoolBase<StackFrame>
 		{
-			public StackFramePool(double[] memnumber,int[] memint) : base(256)
+			public StackFramePool(Player player,StackSlot[] stackSlot, double[] memnumber,int[] memint) : base(256)
 			{
 				foreach (var f in pool)
 				{
 					f.memnumber = memnumber;
 					f.memint = memint;
+					f.player = player;
+					f.stack = stackSlot;
 				}
 			}
 
@@ -180,8 +182,20 @@ namespace ASRuntime
 
         internal operators.FunctionCaller funCaller;
         internal operators.OpCallFunction.typeConvertOperator typeconvertoperator;
-        internal StackSlot _tempSlot1;
-        internal StackSlot _tempSlot2;
+        internal StackSlot _tempSlot1
+		{
+			get
+			{
+				return stack[baseBottomSlotIndex - 2];
+			}
+		}
+        internal StackSlot _tempSlot2
+		{
+			get
+			{
+				return stack[baseBottomSlotIndex - 1];
+			}
+		}
 
         internal int call_parameter_slotCount;
 
@@ -855,6 +869,26 @@ namespace ASRuntime
 						operators.OpVector.exec_GetValue(this, step, scope);
 						break;
 					}
+				case OpCode.vector_getvalue_memint_memintidx:
+					{
+						ASBinCode.rtti.Vector_Data vector =
+							(ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, this)).value).hosted_object;
+
+						int idx = memint[step.memregid3];
+
+						if (idx < 0 || idx >= vector.innnerList.Count)
+						{
+							throwError(step.token, 1125,
+								"The index " + idx + " is out of range " + vector.innnerList.Count + ".");
+							endStep(step);
+						}
+						else
+						{
+							memint[step.memregid1] = ((rtInt)vector.innnerList[idx]).value;							
+							endStepNoError();
+						}
+						break;
+					}
 				case OpCode.if_equality_num_num_jmp_notry:
 					{
 						var n1 = (step.arg1.getValue(scope, this)).toNumber();
@@ -1064,6 +1098,14 @@ namespace ASRuntime
 						memnumber[step.memregid2] - memnumber[step.memregid3];
 					endStepNoError();
 					break;
+				case OpCode.sub_number_memnumber_slt_constnumber:
+
+					memnumber[step.memregid1] =
+						step.arg1.getValue(scope,this).toNumber()
+						- step.constnumber2;
+					endStepNoError();
+
+					break;
 				case OpCode.div_number_memnumber_memnumber:
 					//((MemRegister_Number)step.reg).value.value =
 					//	((MemRegister_Number)step.arg1).value.value /
@@ -1107,6 +1149,22 @@ namespace ASRuntime
 					memnumber[step.memregid1] =
 						memint[step.memregid2] + step.constnumber2;
 					endStepNoError();
+					break;
+				case OpCode.add_number_memnumber_slt_memint:
+					memnumber[step.memregid1] =
+						step.arg1.getValue(scope,this).toNumber()
+						
+						+ memint[step.memregid3];
+					endStepNoError();
+
+					break;
+				case OpCode.add_number_memnumber_slt_memnumber:
+					memnumber[step.memregid1] =
+						step.arg1.getValue(scope, this).toNumber()
+
+						+ memnumber[step.memregid3];
+					endStepNoError();
+
 					break;
 				case OpCode.div_number_memnumber_constnumber:
 					//((MemRegister_Number)step.reg).value.value =

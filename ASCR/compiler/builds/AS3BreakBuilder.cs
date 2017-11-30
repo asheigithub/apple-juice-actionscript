@@ -90,11 +90,11 @@ namespace ASCompiler.compiler.builds
                     var s = env.block.opSteps[i];
                     if (s.opCode == OpCode.flag)
                     {
-                        if (s.flag == "Label_End_" + as3break.breakFlag)
+                        if (s.flag == "Label" + env.labelblocks + "_End_" + as3break.breakFlag)
                         {
                             l--;
                         }
-                        else if (s.flag == "Label_Start_" + as3break.breakFlag)
+                        else if (s.flag == "Label" + env.labelblocks + "_Start_" + as3break.breakFlag)
                         {
                             l++;
                         }
@@ -111,12 +111,16 @@ namespace ASCompiler.compiler.builds
                 op.reg = null;
                 op.regType = RunTimeDataType.unknown;
                 op.arg1 = new ASBinCode.rtData.RightValue(
-                    new ASBinCode.rtData.rtString("Label_End_"+as3break.breakFlag));
+                    new ASBinCode.rtData.rtString("Label" + env.labelblocks + "_End_" + as3break.breakFlag));
                 op.arg1Type = RunTimeDataType.rt_string;
                 op.arg2 = null;
                 op.arg2Type = RunTimeDataType.unknown;
 
                 env.block.opSteps.Add(op);
+
+
+				
+
             }
 
         }

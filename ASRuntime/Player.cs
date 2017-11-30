@@ -190,12 +190,8 @@ namespace ASRuntime
 		{
 			if (!_hasInitStack)
 			{
-				stackframePool = new StackFrame.StackFramePool(memnumber,memint);
-				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool(this);
-				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
-				runFuncresultPool = new runFuncResult.ResultPool();
 
-				runtimeStack = new MyStack(stackframePool.maxcount);
+				
 				stackSlots = new StackSlot[STACKSLOTLENGTH];
 				for (int i = 0; i < STACKSLOTLENGTH; i++)
 				{
@@ -207,6 +203,13 @@ namespace ASRuntime
 				{
 					stackSlots[i]._linkObjCache = lobjcache.Clone();
 				}
+
+				stackframePool = new StackFrame.StackFramePool(this, stackSlots, memnumber, memint);
+				funcCallerPool = new operators.FunctionCaller.FunctionCallerPool(this);
+				blockCallBackPool = new BlockCallBackBase.BlockCallBackBasePool(this);
+				runFuncresultPool = new runFuncResult.ResultPool();
+				runtimeStack = new MyStack(stackframePool.maxcount);
+
 				_hasInitStack = true;
 			}
 			if (!_hasInitBaseCode)
@@ -992,7 +995,7 @@ namespace ASRuntime
 											funCaller.callbacker = funCaller;
 											funCaller.returnSlot = step.reg.getSlot(scope,  currentRunFrame);
 											funCaller.returnSlot.directSet(step.arg2.getValue(null, null));
-											//currentRunFrame.funCaller.doCall_allcheckpass_nonative_hassetreturndefault_method();
+											
 											callBlock_Method_NoHeap(swc.blocks[funCaller.toCallFunc.blockid],
 												funCaller.returnSlot, step.token, funCaller.callbacker, funCaller.functionThisPointer);
 
@@ -1003,6 +1006,26 @@ namespace ASRuntime
 									case OpCode.vector_getvalue:
 										{
 											operators.OpVector.exec_GetValue(currentRunFrame, step, scope);
+											break;
+										}
+									case OpCode.vector_getvalue_memint_memintidx:
+										{
+											ASBinCode.rtti.Vector_Data vector =
+												(ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, currentRunFrame)).value).hosted_object;
+
+											int idx = memint[step.memregid3];
+
+											if (idx < 0 || idx >= vector.innnerList.Count)
+											{
+												currentRunFrame.throwError(step.token, 1125,
+													"The index " + idx + " is out of range " + vector.innnerList.Count + ".");
+												currentRunFrame.endStep(step);
+											}
+											else
+											{
+												memint[step.memregid1] = ((rtInt)vector.innnerList[idx]).value;
+												++currentRunFrame.codeLinePtr;
+											}
 											break;
 										}
 									case OpCode.if_equality_num_num_jmp_notry:
@@ -1210,6 +1233,13 @@ namespace ASRuntime
 											memnumber[step.memregid2] - memnumber[step.memregid3];
 										++currentRunFrame.codeLinePtr;
 										break;
+									case OpCode.sub_number_memnumber_slt_constnumber:
+
+										memnumber[step.memregid1] =
+											step.arg1.getValue(scope, currentRunFrame).toNumber()
+											- step.constnumber2;
+										++currentRunFrame.codeLinePtr;
+										break;
 									case OpCode.div_number_memnumber_memnumber:
 										
 										memnumber[step.memregid1] =
@@ -1245,6 +1275,22 @@ namespace ASRuntime
 										memnumber[step.memregid1] =
 											memint[step.memregid2] + step.constnumber2;
 										++currentRunFrame.codeLinePtr;
+										break;
+									case OpCode.add_number_memnumber_slt_memint:
+										memnumber[step.memregid1] =
+											(step.arg1.getValue(scope, currentRunFrame)).toNumber()
+
+											+ (double)memint[step.memregid3];
+										++currentRunFrame.codeLinePtr;
+
+										break;
+									case OpCode.add_number_memnumber_slt_memnumber:
+										memnumber[step.memregid1] =
+											step.arg1.getValue(scope, currentRunFrame).toNumber()
+
+											+ memnumber[step.memregid3];
+										++currentRunFrame.codeLinePtr;
+
 										break;
 									case OpCode.div_number_memnumber_constnumber:
 										
@@ -1549,22 +1595,20 @@ namespace ASRuntime
 			{
 				frame = stackframePool.create(calledblock);
 				frame.codeLinePtr = 0;
-				frame.player = this;
+				
 				frame.returnSlot = returnSlot;
 				frame.callbacker = callbacker;
 
-
 				frame.offset = startOffset;
 				frame.baseBottomSlotIndex = startOffset + frame.baseUseSlots;
-				frame.stack = stackSlots;
-
-				frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex - 2];
-				frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex - 1];
+				
+				//frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex - 2];
+				//frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex - 1];
 				runtimeStack.Push(frame);
 				currentRunFrame = frame;
 
-				var block = calledblock;
-				for (int i = 0; i < block.regConvFromVar.Count; i++)
+				var block = calledblock;int len = block.regConvFromVar.Length;
+				for (int i = 0; i < len; i++)
 				{
 					StackSlotAccessor regvar = block.regConvFromVar[i];
 					var slot = (StackSlot)regvar.getSlot(null, frame);
@@ -1623,24 +1667,22 @@ namespace ASRuntime
             {
                 frame = stackframePool.create(calledblock);
                 frame.codeLinePtr = 0;
-                frame.player = this;
+                
                 frame.returnSlot = returnSlot;
                 frame.callbacker = callbacker;
                 
-
                 frame.offset = startOffset;
 				frame.baseBottomSlotIndex = startOffset + frame.baseUseSlots;
-                frame.stack = stackSlots;
-
-                frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex-2];
-                frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex-1];
+                
+                //frame._tempSlot1 = stackSlots[frame.baseBottomSlotIndex-2];
+                //frame._tempSlot2 = stackSlots[frame.baseBottomSlotIndex-1];
                 runtimeStack.Push(frame);
                 currentRunFrame = frame;
 
-                var block = calledblock;
-                for (int i = 0; i < block.regConvFromVar.Count; i++)
+                var regConvFromVar = calledblock.regConvFromVar;
+                for (int i = 0; i < regConvFromVar.Length; i++)
                 {
-                    StackSlotAccessor regvar = block.regConvFromVar[i];
+                    StackSlotAccessor regvar = regConvFromVar[i];
                     var slot = (StackSlot)regvar.getSlot(null, frame);
                     TypeConverter.setDefaultValueToStackSlot(
                         regvar.valueType,slot

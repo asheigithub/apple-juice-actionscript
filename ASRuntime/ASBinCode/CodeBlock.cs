@@ -34,7 +34,7 @@ namespace ASBinCode
         /// </summary>
         public int totalStackSlots;
 
-        public List<StackSlotAccessor> regConvFromVar;
+        public StackSlotAccessor[] regConvFromVar;
 
 
 
@@ -55,7 +55,7 @@ namespace ASBinCode
             this.isoutclass = isoutclass;
 
             opSteps = new List<OpStep>();
-            regConvFromVar = new List<StackSlotAccessor>();
+            regConvFromVar = new StackSlotAccessor[0];
         }
 
 		public override string ToString()
@@ -118,10 +118,11 @@ namespace ASBinCode
 			}
 
 			int regconvcount = reader.ReadInt32();
+			block.regConvFromVar = new StackSlotAccessor[regconvcount];
 			for (int i = 0; i < regconvcount; i++)
 			{
 				StackSlotAccessor register = (StackSlotAccessor)serizlizer.DeserializeObject<ISWCSerializable>(reader, ISWCSerializableLoader.LoadIMember);
-				block.regConvFromVar.Add(register);
+				block.regConvFromVar[i] = register;
 			}
 
 			return block;
@@ -155,8 +156,8 @@ namespace ASBinCode
 				serizlizer.SerializeObject(writer, step);
 			}
 
-			writer.Write(regConvFromVar.Count);
-			for (int i = 0; i < regConvFromVar.Count; i++)
+			writer.Write(regConvFromVar.Length);
+			for (int i = 0; i < regConvFromVar.Length; i++)
 			{
 				StackSlotAccessor conv = regConvFromVar[i];
 				//conv.Serialize(writer, serizlizer);

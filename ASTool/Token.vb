@@ -96,4 +96,11 @@
     ''' <remarks></remarks>
     Public sourceFile As String
 
+
+	Public Overrides Function ToString() As String
+		Return Type.ToString() & " " & StringValue
+
+	End Function
+
+
 End Class
