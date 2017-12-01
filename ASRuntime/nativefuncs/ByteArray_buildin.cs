@@ -68,7 +68,7 @@ namespace ASRuntime.nativefuncs
 
 			var newvalue = new ASBinCode.rtData.rtObject(rtobj,null);
 			
-			((rtObject)thisObj).value.memberData[0].directSet(newvalue);
+			((rtObjectBase)thisObj).value.memberData[0].directSet(newvalue);
 			
 			return ASBinCode.rtData.rtUndefined.undefined;
 		}
@@ -120,7 +120,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-				(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+				(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			ms.clear();
 
@@ -188,9 +188,9 @@ namespace ASRuntime.nativefuncs
 				success = true;
 				
 				ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 				ms.isbig = (newvalue == "bigEndian");
-				((rtObject)thisObj).value.memberData[1].directSet(ms.isbig ? Endian.bigEndian : Endian.littleEndian);
+				((rtObjectBase)thisObj).value.memberData[1].directSet(ms.isbig ? Endian.bigEndian : Endian.littleEndian);
 
 			}
 
@@ -247,7 +247,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			success = true;
 
@@ -302,7 +302,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			success = true;
 
@@ -358,7 +358,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			
 
@@ -429,7 +429,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			success = true;
 
@@ -485,7 +485,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 
 
@@ -545,7 +545,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 
 
@@ -605,7 +605,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 
 
@@ -664,7 +664,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			success = true;
 			ms.compress();
@@ -720,7 +720,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 
 
@@ -779,7 +779,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -844,7 +844,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -912,7 +912,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			if (argements[0].rtType == RunTimeDataType.rt_null)
 			{
@@ -923,7 +923,7 @@ namespace ASRuntime.nativefuncs
 
 
 
-			var target = (ByteArray)((HostedObject) (((rtObject)(((rtObject)argements[0]).value.memberData[0].getValue())).value)).hosted_object;
+			var target = (ByteArray)((HostedObject) (((rtObjectBase)(((rtObjectBase)argements[0]).value.memberData[0].getValue())).value)).hosted_object;
 
 			uint offset = TypeConverter.ConvertToUInt(argements[1], stackframe, token);
 			uint length = TypeConverter.ConvertToUInt(argements[2], stackframe, token);
@@ -991,7 +991,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1056,7 +1056,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1121,7 +1121,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1188,7 +1188,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			uint length = TypeConverter.ConvertToUInt(argements[0], stackframe, token);
 			string charset = TypeConverter.ConvertToString(argements[1], stackframe, token);
@@ -1264,7 +1264,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1330,7 +1330,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1394,7 +1394,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1458,7 +1458,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1522,7 +1522,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1587,7 +1587,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			uint len = TypeConverter.ConvertToUInt(argements[0], stackframe, token);
 
@@ -1653,7 +1653,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			try
 			{
@@ -1719,7 +1719,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			bool v = TypeConverter.ConvertToBoolean(argements[0],stackframe,token).value;
 
@@ -1784,7 +1784,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			int v = TypeConverter.ConvertToInt(argements[0]);
 
@@ -1851,7 +1851,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			if (argements[0].rtType == RunTimeDataType.rt_null)
 			{
@@ -1860,7 +1860,7 @@ namespace ASRuntime.nativefuncs
 				return;
 			}
 
-			var target = (ByteArray)((HostedObject)(((rtObject)(((rtObject)argements[0]).value.memberData[0].getValue())).value)).hosted_object;
+			var target = (ByteArray)((HostedObject)(((rtObjectBase)(((rtObjectBase)argements[0]).value.memberData[0].getValue())).value)).hosted_object;
 
 			uint offset = TypeConverter.ConvertToUInt(argements[1], stackframe, token);
 			uint length = TypeConverter.ConvertToUInt(argements[2], stackframe, token);
@@ -1934,7 +1934,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			double v = TypeConverter.ConvertToNumber(argements[0]);
 
@@ -1999,7 +1999,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			double v = TypeConverter.ConvertToNumber(argements[0]);
 
@@ -2064,7 +2064,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			int v = TypeConverter.ConvertToInt(argements[0]);
 
@@ -2130,7 +2130,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			string value = TypeConverter.ConvertToString(argements[0], stackframe, token);
 			string charset = TypeConverter.ConvertToString(argements[1], stackframe, token);
@@ -2200,7 +2200,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			int v = TypeConverter.ConvertToInt(argements[0]);
 
@@ -2265,7 +2265,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			uint v = TypeConverter.ConvertToUInt(argements[0], stackframe, token);
 
@@ -2331,7 +2331,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			string v = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
@@ -2407,7 +2407,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			string v = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
@@ -2483,7 +2483,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			int index = TypeConverter.ConvertToInt(argements[0]);
 
@@ -2571,7 +2571,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			ByteArray ms =
-					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			double value = TypeConverter.ConvertToNumber(argements[0]);
 			int index = TypeConverter.ConvertToInt(argements[1]);

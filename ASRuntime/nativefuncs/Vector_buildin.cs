@@ -11,7 +11,7 @@ namespace ASRuntime.nativefuncs
     {
         public static RunTimeDataType getVectorType(RunTimeValueBase thisObj, IClassFinder bin)
         {
-            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObjectBase)thisObj).value;
 
             var t = rtObj.memberData[0].getValue();
 
@@ -117,7 +117,7 @@ namespace ASRuntime.nativefuncs
 
 			//throw new NotImplementedException();
 
-			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObjectBase)thisObj).value;
 
 			RunTimeDataType vector_type = Vector_Util.getVectorType(thisObj, bin);
 
@@ -207,7 +207,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			success = true;
-			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObjectBase)thisObj).value;
 
 
 			if (((Vector_Data)rtObj.hosted_object).isFixed)
@@ -284,7 +284,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedObject rtObj = (ASBinCode.rtti.HostedObject)((rtObjectBase)thisObj).value;
 
 			((Vector_Data)rtObj.hosted_object).isFixed = ((rtBoolean)argements[0]).value;
 
@@ -354,7 +354,7 @@ namespace ASRuntime.nativefuncs
 			success = true;
 
 			returnSlot.setValue((uint)((Vector_Data)
-					((HostedObject)(((rtObject)thisObj).value)).hosted_object).innnerList.Count);
+					((HostedObject)(((rtObjectBase)thisObj).value)).hosted_object).innnerList.Count);
 
 			//return
 			//	new rtUInt(
@@ -452,7 +452,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				success = false;
@@ -569,7 +569,7 @@ namespace ASRuntime.nativefuncs
 
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
 			var list = vd.innnerList;
 
@@ -667,7 +667,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)argements[0]).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)argements[0]).value).hosted_object);
 
 			if (argements[1].rtType == RunTimeDataType.rt_null)
 			{
@@ -682,9 +682,12 @@ namespace ASRuntime.nativefuncs
 			}
 			else
 			{
-				var vs = ((Vector_Data)((HostedObject)((rtObject)argements[1]).value).hosted_object);
-
-				vd.innnerList.AddRange(vs.innnerList);
+				var vs = ((Vector_Data)((HostedObject)((rtObjectBase)argements[1]).value).hosted_object);
+				for (int i = 0; i < vs.innnerList.Count; i++)
+				{
+					vd.innnerList.Add((RunTimeValueBase)vs.innnerList[i].Clone());
+				}
+				
 				success = true;
 				returnSlot.directSet(rtUndefined.undefined);
 			}
@@ -775,7 +778,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				//errorno = 1126;
@@ -873,7 +876,7 @@ namespace ASRuntime.nativefuncs
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
 
-            var arr = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object).innnerList;
+            var arr = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object).innnerList;
 
             if (arr.Count == 0)
             {
@@ -1093,7 +1096,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				//errorno = 1126;
@@ -1191,7 +1194,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				success = false;
@@ -1293,7 +1296,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				success = false;
@@ -1392,7 +1395,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
 
 			var arr = vd.innnerList;
@@ -1478,7 +1481,7 @@ namespace ASRuntime.nativefuncs
 
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 			if (vd.isFixed)
 			{
 				success = false;
@@ -1614,9 +1617,9 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			success = true;
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
-			var source = ((Vector_Data)((HostedObject)((rtObject)argements[2]).value).hosted_object).innnerList;
+			var source = ((Vector_Data)((HostedObject)((rtObjectBase)argements[2]).value).hosted_object).innnerList;
 
 			var arr = source;
 
@@ -1652,7 +1655,7 @@ namespace ASRuntime.nativefuncs
 
 			for (int i = startindex; i < endindex; i++)
 			{
-				vd.innnerList.Add(arr[i]);
+				vd.innnerList.Add((RunTimeValueBase)arr[i].Clone());
 			}
 			returnSlot.directSet(thisObj);
 			//return thisObj;
@@ -1763,20 +1766,16 @@ namespace ASRuntime.nativefuncs
 		{
 			
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
-			var source = ((Vector_Data)((HostedObject)((rtObject)argements[2]).value).hosted_object);
+			var source = ((Vector_Data)((HostedObject)((rtObjectBase)argements[2]).value).hosted_object);
 
 			var arr = source.innnerList;
 
 			int startindex = ((rtInt)argements[0]).value;
 			uint deleteCount = ((rtUInt)argements[1]).value;
 
-			List<RunTimeValueBase> insert = null;
-			if (argements[2].rtType == RunTimeDataType.rt_array)
-			{
-				insert = ((rtArray)argements[2]).innerArray;
-			}
+			
 
 			if (startindex < 0)
 			{
@@ -1873,9 +1872,9 @@ namespace ASRuntime.nativefuncs
 		{
 
 
-			var vd = ((Vector_Data)((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var vd = ((Vector_Data)((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
-			var source = (Vector_Data)(((HostedObject)((rtObject)thisObj).value).hosted_object);
+			var source = (Vector_Data)(((HostedObject)((rtObjectBase)thisObj).value).hosted_object);
 
 			var arr = source.innnerList;
 

@@ -72,9 +72,9 @@ namespace ASRuntime.error
 					if (ClassMemberFinder.check_isinherits(errorValue, swc.ErrorClass.getRtType(), swc))
 					{
 						errinfo =
-							((rtObject)errorValue).value.memberData[1].getValue().ToString() + " #" +
-							((rtObject)errorValue).value.memberData[2].getValue().ToString() + " " +
-							((rtObject)errorValue).value.memberData[0].getValue().ToString();
+							((rtObjectBase)errorValue).value.memberData[1].getValue().ToString() + " #" +
+							((rtObjectBase)errorValue).value.memberData[2].getValue().ToString() + " " +
+							((rtObjectBase)errorValue).value.memberData[0].getValue().ToString();
 					}
 				}
 
@@ -97,7 +97,7 @@ namespace ASRuntime.error
 					if (ClassMemberFinder.check_isinherits(errorValue, swc.ErrorClass.getRtType(), swc))
 					{
 						errinfo =
-							((rtObject)errorValue).value.memberData[3].getValue().ToString();
+							((rtObjectBase)errorValue).value.memberData[3].getValue().ToString();
 					}
 				}
 

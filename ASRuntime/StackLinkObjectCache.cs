@@ -15,7 +15,7 @@ namespace ASRuntime
     {
 		//public rtObject srcObject;
 
-		public class StackCacheObject : rtObject
+		public sealed class StackCacheObject : rtObjectBase
 		{
 			private StackLinkObjectCache cache;
 			public StackCacheObject(StackLinkObjectCache cache, ASBinCode.rtti.Object v,RunTimeScope s):base(v,s)
@@ -23,37 +23,24 @@ namespace ASRuntime
 				this.cache = cache;
 			}
 
-			
-			//public  rtObject getSrcObject()
-			//{
-			//	if (cache.srcObject == null
-			//		||
-			//		cache.srcObject.rtType != rtType 
-			//		||
-			//		!(ReferenceEquals(((LinkSystemObject)cache.srcObject.value).GetLinkData(), ((LinkSystemObject)value).GetLinkData()))
-			//		)
-			//	{
-					
-			//		//return this;
-			//		//if (srcObject == null)
-			//		//{
+			public sealed override object Clone()
+			{				
+				LinkSystemObject lobj = (LinkSystemObject)value;
 
-			//		//}
+				rtObject clone = new rtObject((lobj).Clone(),
+					null
+					);
 
-			//		//出现此种情况，说明时链接对象的中间计算步骤。这时因为不是从变量赋值来的，所以没有srcObject
+				RunTimeScope scope =
+					new RunTimeScope(null, objScope.blockId, null,
+					clone, RunTimeScopeType.objectinstance);
+				clone.objScope = scope;
+
+				return clone;
+			}
 
 
-
-			//		return this;
-			//	}
-			//	else
-			//	{
-			//		return cache.srcObject;
-			//	}
-			//	//throw new Exception();
-			//}
-
-			public static StackCacheObject createFrom(StackLinkObjectCache cache,rtObject src)
+			public static StackCacheObject createFrom(StackLinkObjectCache cache,rtObjectBase src)
 			{
 				LinkSystemObject lobj = (LinkSystemObject)src.value;
 

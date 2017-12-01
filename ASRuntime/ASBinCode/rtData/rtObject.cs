@@ -6,13 +6,13 @@ using System.Text;
 namespace ASBinCode.rtData
 {
 	
-    public  class rtObject :RunTimeValueBase
+    public abstract class rtObjectBase :RunTimeValueBase
     {
 
         public RunTimeScope objScope;
         public rtti.Object value;
 
-        public rtObject(rtti.Object v, RunTimeScope scope):base(v._class.classid + RunTimeDataType._OBJECT)
+        public rtObjectBase(rtti.Object v, RunTimeScope scope):base(v._class.classid + RunTimeDataType._OBJECT)
         {
             value = v;
             objScope = scope;
@@ -29,37 +29,9 @@ namespace ASBinCode.rtData
 		//	return this;
 		//}
 
-       
-        public sealed override  object Clone()
-        {
-            if (value._class.isLink_System)
-            {
-                rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
-                
-                rtObject clone = new rtObject((lobj).Clone(),
-                    null
-                    );
-
-                RunTimeScope scope =
-                    new RunTimeScope(null, objScope.blockId, null, 
-                    clone, RunTimeScopeType.objectinstance);
-                clone.objScope = scope;
-
-                return clone;
-
-            }
-            else
-            {
-                return this;
-            }
-            //var result= new rtObject(value,objScope);
-            //return result;
-        }
-
-
         public sealed override bool Equals(object obj)
         {
-            rtObject o = obj as rtObject;
+            rtObjectBase o = obj as rtObjectBase;
             if (o == null)
             {
                 return false;
@@ -93,4 +65,40 @@ namespace ASBinCode.rtData
 
 
 	}
+
+	public sealed class rtObject : rtObjectBase
+	{
+		public rtObject(rtti.Object v, RunTimeScope scope):base(v,scope)
+        {
+			
+		}
+
+		public sealed override object Clone()
+		{
+			if (value._class.isLink_System && value._class.isStruct)
+			{
+				rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
+
+				rtObject clone = new rtObject((lobj).Clone(),
+					null
+					);
+
+				RunTimeScope scope =
+					new RunTimeScope(null, objScope.blockId, null,
+					clone, RunTimeScopeType.objectinstance);
+				clone.objScope = scope;
+
+				return clone;
+
+			}
+			else
+			{
+				return this;
+			}
+			//var result= new rtObject(value,objScope);
+			//return result;
+		}
+
+	}
+
 }

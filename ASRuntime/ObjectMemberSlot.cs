@@ -7,13 +7,13 @@ namespace ASRuntime
 {
     class ObjectMemberSlot : HeapSlot
     {
-        internal readonly ASBinCode.rtData.rtObject obj;
+        internal readonly ASBinCode.rtData.rtObjectBase obj;
 
         internal bool isConstMember;
 
         private RunTimeDataType FunctionClassRtType;
 
-        public ObjectMemberSlot(ASBinCode.rtData.rtObject obj ,RunTimeDataType FunctionClassRtType)
+        public ObjectMemberSlot(ASBinCode.rtData.rtObjectBase obj ,RunTimeDataType FunctionClassRtType)
         {
             this.obj = obj;
             this.isConstMember = false;
@@ -48,7 +48,7 @@ namespace ASRuntime
             else if (obj.objScope !=null && value.rtType == FunctionClassRtType)
             {
                 ASBinCode.rtData.rtFunction function =(ASBinCode.rtData.rtFunction)
-                    TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)value);
+                    TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)value);
 
                 if (function.this_pointer == null || !function.ismethod)
                 {

@@ -60,7 +60,7 @@ namespace ASCTest.regNativeFunctions
 			{
 
 				System.ICloneable _this =
-					(System.ICloneable)((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value).GetLinkData();
+					(System.ICloneable)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
 
 				try
 				{

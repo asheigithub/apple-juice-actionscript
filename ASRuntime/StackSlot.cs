@@ -227,7 +227,7 @@ namespace ASRuntime
                     default:
                         {
 							index = RunTimeDataType._OBJECT;
-							rtObject obj = (rtObject)value;refPropChanged = true;
+							rtObjectBase obj = (rtObjectBase)value;refPropChanged = true;
                             if (obj.value._class.isLink_System)
                             {
 								if (obj is StackLinkObjectCache.StackCacheObject)
@@ -525,7 +525,7 @@ namespace ASRuntime
 
 			
 			public ASBinCode.ClassPropertyGetter propGetSet;
-			public ASBinCode.rtData.rtObject propBindObj;
+			public ASBinCode.rtData.rtObjectBase propBindObj;
 			public ASBinCode.rtti.Class superPropBindClass;
 			public SetThisItemSlot _temp_try_write_setthisitem;
 		}

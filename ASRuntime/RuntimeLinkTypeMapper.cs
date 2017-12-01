@@ -274,10 +274,10 @@ namespace ASRuntime
                 else if (rt > RunTimeDataType.unknown)
                 {
                     Class rtCls;// = ((ASBinCode.rtData.rtObject)obj).value._class; //bin.getClassByRunTimeDataType(rt);
-                    ASBinCode.rtData.rtObject testObj = obj as ASBinCode.rtData.rtObject;
+                    ASBinCode.rtData.rtObjectBase testObj = obj as ASBinCode.rtData.rtObjectBase;
                     if (testObj != null)
                     {
-                        rtCls = ((ASBinCode.rtData.rtObject)obj).value._class;
+                        rtCls = ((ASBinCode.rtData.rtObjectBase)obj).value._class;
 
                         if (rtCls.isLink_System)
                         {
@@ -287,7 +287,7 @@ namespace ASRuntime
                         }
                         else
                         {
-                            returnSlot.directSet((ASBinCode.rtData.rtObject)obj);
+                            returnSlot.directSet((ASBinCode.rtData.rtObjectBase)obj);
                         }
 
                     }
@@ -328,7 +328,7 @@ namespace ASRuntime
                     ))
                 {
                     vt = ot;
-                    value = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)value);
+                    value = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)value);
                 }
             }
             RunTimeDataType at =
@@ -376,7 +376,14 @@ namespace ASRuntime
             {
                 if (vt > RunTimeDataType.unknown)
                 {
-                    linkobject = ((ASBinCode.rtData.rtObject)value).Clone();
+					if (needclone)
+					{
+						linkobject = ((ASBinCode.rtData.rtObjectBase)value).Clone();
+					}
+					else
+					{
+						linkobject = (ASBinCode.rtData.rtObjectBase)value;
+					}
                 }
                 else
                 {
@@ -398,7 +405,7 @@ namespace ASRuntime
                     Class c = bin.getClassByRunTimeDataType(vt);
                     if (c.isLink_System)
                     {
-                        LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObject)value).value;
+                        LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)value).value;
                         linkobject = lo.GetLinkData();
 
                     }

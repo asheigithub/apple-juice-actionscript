@@ -92,7 +92,7 @@ namespace ASBinCode
 
         //WeakReference cache;
 
-        public override RunTimeValueBase getMethod(rtObject rtObj)
+        public override RunTimeValueBase getMethod(rtObjectBase rtObj)
         {
             //if (cache.IsAlive)
             //{
@@ -157,7 +157,7 @@ namespace ASBinCode
             if (!isNotReadVirtual)
             {
 
-                var vmember = (ClassMethodGetter)((rtObject)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
+                var vmember = (ClassMethodGetter)((rtObjectBase)scope.this_pointer).value._class.classMembers[indexofMember].bindField;
 
 				//rtData.rtFunction method = new rtData.rtFunction(vmember.functionid, true);
 				//method.bind(scope);
@@ -201,7 +201,7 @@ namespace ASBinCode
             }
 
 
-            var m = ((rtObject)scope.this_pointer).value._class.classMembers[indexofMember];
+            var m = ((rtObjectBase)scope.this_pointer).value._class.classMembers[indexofMember];
             while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
             {
                 m = m.virtualLink;

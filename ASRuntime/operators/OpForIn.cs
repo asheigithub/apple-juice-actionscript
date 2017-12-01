@@ -86,7 +86,7 @@ namespace ASRuntime.operators
         private static void _getEnumerator_callbacker(BlockCallBackBase sender, object args)
         {
             StackFrame frame = (StackFrame)sender.args;
-            rtObject save = (rtObject)sender.step.reg.getValue(sender.scope, frame);
+            rtObjectBase save = (rtObjectBase)sender.step.reg.getValue(sender.scope, frame);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
             saveObj.hosted_object = frame._tempSlot1.getValue();
 
@@ -107,7 +107,7 @@ namespace ASRuntime.operators
             var obj = step.arg1.getValue(scope, frame);
             if (obj.rtType > RunTimeDataType.unknown)
             {
-                rtObject rtObj = (rtObject)obj;
+                rtObjectBase rtObj = (rtObjectBase)obj;
 
                 if (ClassMemberFinder.isInherits(rtObj.value._class,
                     player.swc.primitive_to_class_table[RunTimeDataType.rt_array]))
@@ -174,7 +174,7 @@ namespace ASRuntime.operators
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
             
-            rtObject save = (rtObject)(step.arg1).getValue(scope, frame);
+            rtObjectBase save = (rtObjectBase)(step.arg1).getValue(scope, frame);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
@@ -186,11 +186,11 @@ namespace ASRuntime.operators
             }
             else
             {
-                if (saveObj.hosted_object is rtObject)  //是否是接口
+                if (saveObj.hosted_object is rtObjectBase)  //是否是接口
                 {
                     var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "moveNext", frame.player.swc.IEnumeratorInterface);
                     var method=((InterfaceMethodGetter)movenext.bindField).getMethod(
-                        (((rtObject)saveObj.hosted_object)) );
+                        (((rtObjectBase)saveObj.hosted_object)) );
 
                     //***调用方法***
                     var funCaller = frame.player.funcCallerPool.create(frame, step.token);
@@ -231,7 +231,7 @@ namespace ASRuntime.operators
         {
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            rtObject save = (rtObject)(step.arg1).getValue(scope, frame);
+            rtObjectBase save = (rtObjectBase)(step.arg1).getValue(scope, frame);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
@@ -244,11 +244,11 @@ namespace ASRuntime.operators
             }
             else
             {
-                if (saveObj.hosted_object is rtObject)  //是否是接口
+                if (saveObj.hosted_object is rtObjectBase)  //是否是接口
                 {
                     var movenext = ClassMemberFinder.find(frame.player.swc.IEnumeratorInterface, "current", frame.player.swc.IEnumeratorInterface);
                     var method = 
-                        ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObject)saveObj.hosted_object));
+                        ((ClassPropertyGetter)movenext.bindField).getter.getMethod(((rtObjectBase)saveObj.hosted_object));
 
                     //***调用方法***
                     var funCaller = frame.player.funcCallerPool.create(frame, step.token);
@@ -280,7 +280,7 @@ namespace ASRuntime.operators
         {
             //StackSlot slot = (StackSlot)((Register)step.arg1).getSlot(scope);
 
-            rtObject save = (rtObject)(step.arg1).getValue(scope, frame);
+            rtObjectBase save = (rtObjectBase)(step.arg1).getValue(scope, frame);
             HostedDynamicObject saveObj = (HostedDynamicObject)save.value;
 
             //if (scope.cache_enumerator != null)
@@ -359,7 +359,7 @@ namespace ASRuntime.operators
                     //****_prototype_的类型，只可能是Function对象或Class对象
                     if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[1].getValue()).value;
                         if (visited.ContainsKey(dobj))
                         {
                             yield break;
@@ -375,7 +375,7 @@ namespace ASRuntime.operators
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         {
                             var k = dobj.eachSlot();
                             while (k.MoveNext())
@@ -392,7 +392,7 @@ namespace ASRuntime.operators
                     }
                     else if (protoObj._class.staticClass == null)
                     {
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         var res = getForinIEnumerator(player, dobj, frame, step, scope);
                         while (res.MoveNext())
                         {
@@ -414,7 +414,7 @@ namespace ASRuntime.operators
                 var dobj = ((ASBinCode.rtti.DynamicObject)
                     frame.player.static_instance[obj._class.staticClass.classid].value);
 
-                dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                 var res = getForinIEnumerator(player, dobj, frame, step, scope);
                 while (res.MoveNext())
                 {
@@ -472,7 +472,7 @@ namespace ASRuntime.operators
                     //****_prototype_的类型，只可能是Function对象或Class对象
                     if (protoObj._class.classid == player.swc.FunctionClass.classid) //Function 
                     {
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[1].getValue()).value;
 
                         if (visited.ContainsKey(dobj))
                         {
@@ -489,7 +489,7 @@ namespace ASRuntime.operators
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         {
                             var k = dobj.eachSlot();
                             while (k.MoveNext())
@@ -506,7 +506,7 @@ namespace ASRuntime.operators
                     }
                     else if (protoObj._class.staticClass == null)
                     {
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         var res = getForEach_IEnumerator(player, dobj, frame, step, scope);
                         while (res.MoveNext())
                         {
@@ -528,7 +528,7 @@ namespace ASRuntime.operators
                 var dobj = ((ASBinCode.rtti.DynamicObject)
                     frame.player.static_instance[obj._class.staticClass.classid].value);
 
-                dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                 var res = getForEach_IEnumerator(player, dobj, frame, step, scope);
                 while (res.MoveNext())
                 {

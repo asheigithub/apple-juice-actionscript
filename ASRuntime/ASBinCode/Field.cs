@@ -38,7 +38,7 @@ namespace ASBinCode
 
 #if DEBUG
             //***检查类的继承关系***
-            rtData.rtObject obj = (rtData.rtObject)scope.this_pointer;
+            rtData.rtObjectBase obj = (rtData.rtObjectBase)scope.this_pointer;
             var cls = obj.value._class;
 
             while (cls.blockid != refblockid)
@@ -63,7 +63,7 @@ namespace ASBinCode
 
 #if DEBUG
             //***检查类的继承关系***
-            rtData.rtObject obj = (rtData.rtObject)scope.this_pointer;
+            rtData.rtObjectBase obj = (rtData.rtObjectBase)scope.this_pointer;
             var cls = obj.value._class;
 
             while (cls.blockid != refblockid)

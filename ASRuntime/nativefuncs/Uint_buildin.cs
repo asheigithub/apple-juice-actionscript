@@ -107,7 +107,7 @@ namespace ASRuntime.nativefuncs
 				{
 					
 					success = true;
-					returnSlot.setValue(((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("g" + (r)));
+					returnSlot.setValue(((rtUInt)((rtObjectBase)thisObj).value.memberData[0].getValue()).value.ToString("g" + (r)));
 				}
 
 
@@ -217,7 +217,7 @@ namespace ASRuntime.nativefuncs
 				{
 					
 					success = true;
-					returnSlot.setValue(((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("e" + (r)));
+					returnSlot.setValue(((rtUInt)((rtObjectBase)thisObj).value.memberData[0].getValue()).value.ToString("e" + (r)));
 				}
 
 
@@ -329,7 +329,7 @@ namespace ASRuntime.nativefuncs
 
 					success = true;
 
-					returnSlot.setValue(((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value.ToString("f" + (r)));
+					returnSlot.setValue(((rtUInt)((rtObjectBase)thisObj).value.memberData[0].getValue()).value.ToString("f" + (r)));
 
 				}
 
@@ -464,7 +464,7 @@ namespace ASRuntime.nativefuncs
 				{
 					success = true;
 
-					var toCast = ((rtUInt)((rtObject)thisObj).value.memberData[0].getValue()).value;
+					var toCast = ((rtUInt)((rtObjectBase)thisObj).value.memberData[0].getValue()).value;
 
 					if (r == 10)
 					{

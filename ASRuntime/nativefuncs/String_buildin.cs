@@ -76,7 +76,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -177,7 +177,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -265,7 +265,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -353,9 +353,9 @@ namespace ASRuntime.nativefuncs
                 if (v.rtType > RunTimeDataType.unknown)
                 {
                     RunTimeDataType ot;
-                    if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)v).value._class, out ot))
+                    if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObjectBase)v).value._class, out ot))
                     {
-                        v = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)v);
+                        v = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)v);
                     }
 
                 }
@@ -447,7 +447,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -526,7 +526,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
             string b = TypeConverter.ConvertToString(
-                ((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+                ((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
             if (b == null)
             {
@@ -683,7 +683,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -829,7 +829,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -968,7 +968,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -1119,7 +1119,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -1238,7 +1238,7 @@ namespace ASRuntime.nativefuncs
 		{
 			
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -1323,7 +1323,7 @@ namespace ASRuntime.nativefuncs
 		{
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{
@@ -1424,7 +1424,7 @@ namespace ASRuntime.nativefuncs
 			
 
 			string b = TypeConverter.ConvertToString(
-				((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue(), null, null);
+				((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue(), null, null);
 
 			if (b == null)
 			{

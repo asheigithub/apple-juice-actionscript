@@ -114,13 +114,13 @@ namespace ASBinCode
         public static bool check_isinherits(RunTimeValueBase value,RunTimeDataType type,IClassFinder classfinder)
         {
             var cls = classfinder.getClassByRunTimeDataType(type);
-            return isInherits(((rtData.rtObject)value).value._class, cls);
+            return isInherits(((rtData.rtObjectBase)value).value._class, cls);
         }
 
         public static bool check_isImplements(RunTimeValueBase value, RunTimeDataType type, IClassFinder classfinder)
         {
             var cls = classfinder.getClassByRunTimeDataType(type);
-            return isImplements(((rtData.rtObject)value).value._class, cls);
+            return isImplements(((rtData.rtObjectBase)value).value._class, cls);
         }
 
         public static bool check_isinherits(RunTimeDataType srcType, RunTimeDataType type, IClassFinder classfinder)

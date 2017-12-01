@@ -312,7 +312,7 @@ namespace ASRuntime.flash.utils
 
 		#endregion
 
-		public rtObject bindAS3Object;
+		public rtObjectBase bindAS3Object;
 
 		private System.IO.MemoryStream ms;
 		private BigEndianBinaryReader br;

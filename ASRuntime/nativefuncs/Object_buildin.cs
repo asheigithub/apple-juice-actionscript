@@ -172,7 +172,7 @@ namespace ASRuntime.nativefuncs
 
             //return new ASBinCode.rtData.rtString(TypeConverter.ConvertToString(thisObj, null, null));
 
-            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)thisObj;
+            ASBinCode.rtData.rtObjectBase obj = (ASBinCode.rtData.rtObjectBase)thisObj;
 
             if (ClassMemberFinder.find(obj.value._class, name, null) !=null)
             {
@@ -250,7 +250,7 @@ namespace ASRuntime.nativefuncs
             }
 
             //***检查原型链***
-            ASBinCode.rtti.Object obj = ((ASBinCode.rtData.rtObject)theObj).value;
+            ASBinCode.rtti.Object obj = ((ASBinCode.rtData.rtObjectBase)theObj).value;
 
             ASBinCode.rtti.DynamicObject _proto = null;
 
@@ -265,7 +265,7 @@ namespace ASRuntime.nativefuncs
                     ((StackFrame)stackframe).player.static_instance[obj._class.staticClass.classid].value;
             }
 
-            var v2obj = ((ASBinCode.rtData.rtObject)thisObj).value;
+            var v2obj = ((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             bool found = false;
             while (_proto != null)
@@ -280,7 +280,7 @@ namespace ASRuntime.nativefuncs
                 {
                     var o =
                         (ASBinCode.rtti.DynamicObject)
-                        ((ASBinCode.rtData.rtObject)_proto.memberData[1].getValue()).value;
+                        ((ASBinCode.rtData.rtObjectBase)_proto.memberData[1].getValue()).value;
 
                     _proto = o;
 
@@ -362,7 +362,7 @@ namespace ASRuntime.nativefuncs
                 return ASBinCode.rtData.rtBoolean.False;
             }
 
-            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)thisObj;
+            ASBinCode.rtData.rtObjectBase obj = (ASBinCode.rtData.rtObjectBase)thisObj;
             if (!(obj.value is ASBinCode.rtti.DynamicObject))
             {
                 return (ASBinCode.rtData.rtBoolean.False);
@@ -446,7 +446,7 @@ namespace ASRuntime.nativefuncs
                 return ASBinCode.rtData.rtUndefined.undefined;
             }
 
-            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)thisObj;
+            ASBinCode.rtData.rtObjectBase obj = (ASBinCode.rtData.rtObjectBase)thisObj;
             if (!(obj.value is ASBinCode.rtti.DynamicObject))
             {
                 return ASBinCode.rtData.rtUndefined.undefined;

@@ -9,9 +9,12 @@ namespace ASRuntime
     public struct DictionaryKey:DictionaryObject.IDictionaryKey,IEquatable<DictionaryKey>
     {
         public readonly RunTimeValueBase key;
-        public DictionaryKey(RunTimeValueBase key)
+        public DictionaryKey(RunTimeValueBase key,bool needclone)
         {
-            key = (RunTimeValueBase)key.Clone();
+			if (needclone)
+			{
+				key = (RunTimeValueBase)key.Clone();
+			}
             this.key = key;
         }
 
@@ -61,7 +64,7 @@ namespace ASRuntime
                 case RunTimeDataType.unknown:
                     return 0;
                 default:
-                    return ((ASBinCode.rtData.rtObject)key).GetHashCode();
+                    return ((ASBinCode.rtData.rtObjectBase)key).GetHashCode();
                     
             }
 
@@ -76,7 +79,7 @@ namespace ASRuntime
     class DictionarySlot : ObjectMemberSlot,ILinkSlot
     {
         
-        public DictionarySlot(ASBinCode.rtData.rtObject obj,RunTimeDataType functionClassRtType) : base(obj,functionClassRtType)
+        public DictionarySlot(ASBinCode.rtData.rtObjectBase obj,RunTimeDataType functionClassRtType) : base(obj,functionClassRtType)
         {
             propertyIsEnumerable = false;
         }

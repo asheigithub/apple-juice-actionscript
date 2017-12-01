@@ -21,9 +21,9 @@ namespace ASRuntime.operators
             if (v1.rtType > RunTimeDataType.unknown)
             {
                 RunTimeDataType ot;
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)v1).value._class, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObjectBase)v1).value._class, out ot))
                 {
-                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)v1);
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)v1);
                 }
             }
 

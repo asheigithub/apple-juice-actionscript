@@ -57,7 +57,7 @@ namespace ASCTest.regNativeFunctions
             int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
             int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
 
-            ((LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value).value =
+            ((LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value =
                  new TimeSpan(hours, minutes, seconds);
 
             return ASBinCode.rtData.rtUndefined.undefined;
@@ -127,7 +127,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = (StackFrame)stackframe;
 
@@ -139,7 +139,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg).value;
+            LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg).value;
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -212,7 +212,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = (StackFrame)stackframe;
 
@@ -224,7 +224,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg).value;
+            LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg).value;
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -296,7 +296,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = (StackFrame)stackframe;
 
@@ -370,7 +370,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = (StackFrame)stackframe;
 
@@ -445,7 +445,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             ((StackSlot)returnSlot).setValue(lobj.value.Days);
@@ -516,7 +516,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             ((StackSlot)returnSlot).setValue(lobj.value.Hours);
@@ -587,7 +587,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.Milliseconds);
@@ -658,7 +658,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             returnSlot.setValue(lobj.value.Minutes);
@@ -729,7 +729,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.Seconds);
@@ -801,7 +801,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
             StackFrame frame = (StackFrame)stackframe;
@@ -879,7 +879,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.TotalDays);
@@ -950,7 +950,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.TotalHours);
@@ -1021,7 +1021,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.TotalMilliseconds);
@@ -1092,7 +1092,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.TotalMinutes);
@@ -1163,7 +1163,7 @@ namespace ASCTest.regNativeFunctions
             SourceToken token,
             object stackframe, out bool success)
         {
-            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<TimeSpan> lobj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             (returnSlot).setValue(lobj.value.TotalSeconds);
@@ -1255,8 +1255,8 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkObj<TimeSpan> a1 = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg1).value;
-            LinkObj<TimeSpan> a2 = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg2).value;
+            LinkObj<TimeSpan> a1 = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg1).value;
+            LinkObj<TimeSpan> a2 = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg2).value;
 
             int v=TimeSpan.Compare(a1.value, a2.value);
 
@@ -1482,7 +1482,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObject)arg).value).value;
+                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)arg).value).value;
             }
 
 
@@ -1944,7 +1944,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -1956,7 +1956,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 > ts2)
@@ -2023,7 +2023,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2035,7 +2035,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 < ts2)
@@ -2102,7 +2102,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2114,7 +2114,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 == ts2)
@@ -2181,7 +2181,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2193,7 +2193,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 != ts2)
@@ -2260,7 +2260,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2272,7 +2272,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 >= ts2)
@@ -2339,7 +2339,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2351,7 +2351,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
             if (ts1 <= ts2)
@@ -2418,7 +2418,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2480,7 +2480,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2544,7 +2544,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2556,7 +2556,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
 
@@ -2619,7 +2619,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[0]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
                 ts1 = argObj.value;
             }
 
@@ -2631,7 +2631,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)argements[1]).value;
+                LinkObj<TimeSpan> argObj = (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
                 ts2 = argObj.value;
             }
 

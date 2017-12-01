@@ -124,7 +124,7 @@ namespace ASBinCode
         public abstract RunTimeValueBase getConstructor(RunTimeScope scope);
 
 
-        public abstract RunTimeValueBase getMethod(rtObject rtObj);
+        public abstract RunTimeValueBase getMethod(rtObjectBase rtObj);
 
         public abstract RunTimeValueBase getMethod(RunTimeScope scope);
 

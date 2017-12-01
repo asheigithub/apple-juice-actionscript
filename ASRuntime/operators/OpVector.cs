@@ -11,7 +11,7 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
 
             int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame));
 
@@ -61,7 +61,7 @@ namespace ASRuntime.operators
 		public static void exec_GetValue(StackFrame frame, OpStep step, RunTimeScope scope)
 		{
 			ASBinCode.rtti.Vector_Data vector =
-			   (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+			   (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
 
 			int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame));
 
@@ -82,7 +82,7 @@ namespace ASRuntime.operators
         public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
             ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
 
 
             var idxvalue = step.arg2.getValue(scope, frame);
@@ -94,7 +94,7 @@ namespace ASRuntime.operators
                 RunTimeDataType ot;
                 if (TypeConverter.Object_CanImplicit_ToPrimitive(idxvalue.rtType, frame.player.swc, out ot))
                 {
-                    var v = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)idxvalue);
+                    var v = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)idxvalue);
                     idx = TypeConverter.ConvertToNumber(v);
                 }
             }
@@ -167,7 +167,7 @@ namespace ASRuntime.operators
 
         public static void exec_push(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
 
             o.innnerList.Add((RunTimeValueBase)step.arg2.getValue(scope, frame).Clone());//直接对容器赋值，必须Clone
 
@@ -197,7 +197,7 @@ namespace ASRuntime.operators
                     initdata.rtType > RunTimeDataType.unknown
                     )
                 {
-                    var cls = ((rtObject)initdata).value._class;
+                    var cls = ((rtObjectBase)initdata).value._class;
                     if (player.swc.dict_Vector_type.ContainsKey(cls))
                     {
                         break;
@@ -257,14 +257,14 @@ namespace ASRuntime.operators
             if (initdata.rtType == RunTimeDataType.rt_array)
             {
                 _pusharray(
-                    (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)vector).value).hosted_object,
+                    (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)vector).value).hosted_object,
                      frame, step, scope
                     );
             }
             else
             {
                 _pushVector(   
-                    (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)vector).value).hosted_object
+                    (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)vector).value).hosted_object
                     , frame, step, scope);
             }
 
@@ -272,7 +272,7 @@ namespace ASRuntime.operators
 
         public static void exec_pushVector(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
 
             _pushVector(o, frame, step, scope);
         }
@@ -289,7 +289,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg2.getValue(scope, frame)).value).hosted_object;
+                ASBinCode.rtti.Vector_Data array = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg2.getValue(scope, frame)).value).hosted_object;
                 if (array.innnerList.Count == 0)
                 {
                     frame.endStep(step);
@@ -310,7 +310,7 @@ namespace ASRuntime.operators
 
         public static void exec_pusharray(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, frame)).value).hosted_object;
+            var o = (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
             _pusharray(o, frame, step, scope);
         }
 
@@ -463,8 +463,43 @@ namespace ASRuntime.operators
 				}
 				else
 				{
-					vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
-																				   //return true;
+					switch (value.rtType)
+					{
+						case RunTimeDataType.rt_int:
+							{
+								((rtInt)vector_data.innnerList[idx]).value = ((rtInt)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_uint:
+							{
+								((rtUInt)vector_data.innnerList[idx]).value = ((rtUInt)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_number:
+							{
+								((rtNumber)vector_data.innnerList[idx]).value = ((rtNumber)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_string:
+							{
+								((rtString)vector_data.innnerList[idx]).value = ((rtString)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_function:
+							{
+								((rtFunction)vector_data.innnerList[idx]).CopyFrom((rtFunction)value);
+								success = true;
+								return this;
+							}
+						default:
+							break;
+					}
+
+					vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone																				   //return true;
 					success = true;
 					return this;
 				}
@@ -473,34 +508,9 @@ namespace ASRuntime.operators
 
 			public sealed override bool directSet(RunTimeValueBase value)
             {
-                //if (vector_data.vector_type != value.rtType
-                //    &&
-                //    !
-                //    (
-                //        //***检查子类关系****
-                //        (vector_data.vector_type > RunTimeDataType.unknown &&
-                //        value.rtType > RunTimeDataType.unknown &&
-                //        (
-                //        ClassMemberFinder.check_isinherits(value,vector_data.vector_type, classfinder)
-                //        ||
-                //        ClassMemberFinder.check_isImplements(value, vector_data.vector_type, classfinder)
-                //        )
-                //        )
-                //        ||
-                //        (
-                //            vector_data.vector_type > RunTimeDataType.unknown &&
-                //            value.rtType == RunTimeDataType.rt_null
-                //        )
-
-                //    )
-                //    )
-                //{
-                //    return false;
-                //}
-
-                //vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone
-                //return true;
-                throw new NotImplementedException();
+				//如果是++,--等可能会调用到这个,直接返回false即可
+				return false;
+                //throw new NotImplementedException();
             }
 
             public sealed override RunTimeValueBase getValue()

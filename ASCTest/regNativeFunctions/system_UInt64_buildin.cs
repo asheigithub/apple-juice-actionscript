@@ -80,7 +80,7 @@ namespace ASCTest.regNativeFunctions
         {
             double value = TypeConverter.ConvertToNumber(argements[0]);
 
-            ((LinkObj<UInt64>)((ASBinCode.rtData.rtObject)thisObj).value).value = (UInt64)value;
+            ((LinkObj<UInt64>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = (UInt64)value;
             returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
             success = true;
         }
@@ -130,7 +130,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObject)thisObj).value._class.instanceClass));
+            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 
             LinkObj<UInt64> obj =
                 (LinkObj<UInt64>)(v.value);
@@ -187,7 +187,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObject)thisObj).value._class.instanceClass));
+            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 
             LinkObj<UInt64> obj =
                 (LinkObj<UInt64>)(v.value);
@@ -303,7 +303,7 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            LinkObj<UInt64> obj = ((LinkObj<UInt64>)((ASBinCode.rtData.rtObject)thisObj).value);
+            LinkObj<UInt64> obj = ((LinkObj<UInt64>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
             returnSlot.setValue((double)obj.value);
             success = true;
@@ -356,7 +356,7 @@ namespace ASCTest.regNativeFunctions
             string format = TypeConverter.ConvertToString(argements[0], stackframe, token);
            
 
-            LinkObj<UInt64> obj = ((LinkObj<UInt64>)((ASBinCode.rtData.rtObject)thisObj).value);
+            LinkObj<UInt64> obj = ((LinkObj<UInt64>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
             returnSlot.setValue(obj.value.ToString(format));
             success = true;

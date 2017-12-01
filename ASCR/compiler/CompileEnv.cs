@@ -1499,12 +1499,13 @@ namespace ASCompiler.compiler
 				}
 			}
 
-
-
-
+			//从局部变量转换来的StackSlot如果被优化成MemReg,则可以移除
+			List<StackSlotAccessor> regConvList = new List<StackSlotAccessor>(block.regConvFromVar);
 
 			foreach (var item in dictToOptimizeRegister)
 			{
+				regConvList.Remove(item.Key);
+
 				for (int i = 0; i < block.opSteps.Count; i++)
 				{
 					var opstep = block.opSteps[i];
@@ -1523,6 +1524,8 @@ namespace ASCompiler.compiler
 					}
 				}
 			}
+
+			block.regConvFromVar = regConvList.ToArray();
 
 			setMemReg(dictMem_StackSlotAccessor);
 

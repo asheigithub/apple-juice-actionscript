@@ -89,7 +89,7 @@ namespace ASCTest.regNativeFunctions
             Class cls = bin.getClassByRunTimeDataType( argements[0].rtType).instanceClass;
             int length = TypeConverter.ConvertToInt(argements[1]);
 
-            Class _array_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+            Class _array_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
             var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_array_.instanceClass);
 
@@ -189,7 +189,7 @@ namespace ASCTest.regNativeFunctions
             int length1 = TypeConverter.ConvertToInt(argements[1]);
             int length2 = TypeConverter.ConvertToInt(argements[2]);
 
-            Class _array_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+            Class _array_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
             var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_array_.instanceClass);
 
@@ -302,7 +302,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkSystemObject lengthsObj = ((ASBinCode.rtData.rtObject)argements[1]).value as LinkSystemObject;
+            LinkSystemObject lengthsObj = ((ASBinCode.rtData.rtObjectBase)argements[1]).value as LinkSystemObject;
             if (lengthsObj == null)
             {
                 success = false;
@@ -321,7 +321,7 @@ namespace ASCTest.regNativeFunctions
 
             //int length = TypeConverter.ConvertToInt(argements[1], stackframe, token);
 
-            Class _array_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+            Class _array_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
             var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_array_.instanceClass);
 
@@ -409,7 +409,7 @@ namespace ASCTest.regNativeFunctions
             success = true;
 
 
-            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             returnSlot.setValue(array.Rank);
 
@@ -475,7 +475,7 @@ namespace ASCTest.regNativeFunctions
             success = true;
             int dimension = TypeConverter.ConvertToInt( argements[0]);
 
-            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             returnSlot.setValue(array.GetLength(dimension));
 
@@ -528,7 +528,7 @@ namespace ASCTest.regNativeFunctions
             success = true;
             int dimension = TypeConverter.ConvertToInt(argements[0]);
 
-            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             returnSlot.setValue(array.GetLowerBound(dimension));
 
@@ -581,7 +581,7 @@ namespace ASCTest.regNativeFunctions
             success = true;
             int dimension = TypeConverter.ConvertToInt(argements[0]);
 
-            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+            var array = (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             returnSlot.setValue(array.GetUpperBound(dimension));
 
@@ -808,7 +808,7 @@ namespace ASCTest.regNativeFunctions
             int index2 = TypeConverter.ConvertToInt(argements[1]);
 
             Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -886,7 +886,7 @@ namespace ASCTest.regNativeFunctions
             int index1 = TypeConverter.ConvertToInt(argements[1]);
             int index2 = TypeConverter.ConvertToInt(argements[2]);
             Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -989,7 +989,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkSystemObject indicesObj = ((ASBinCode.rtData.rtObject)argements[0]).value as LinkSystemObject;
+            LinkSystemObject indicesObj = ((ASBinCode.rtData.rtObjectBase)argements[0]).value as LinkSystemObject;
             if (indicesObj == null)
             {
                 success = false;
@@ -1007,7 +1007,7 @@ namespace ASCTest.regNativeFunctions
             }
 
             Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1096,7 +1096,7 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkSystemObject indicesObj = ((ASBinCode.rtData.rtObject)argements[1]).value as LinkSystemObject;
+            LinkSystemObject indicesObj = ((ASBinCode.rtData.rtObjectBase)argements[1]).value as LinkSystemObject;
             if (indicesObj == null)
             {
                 success = false;
@@ -1115,7 +1115,7 @@ namespace ASCTest.regNativeFunctions
 
 
             Array array =
-                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (Array)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1202,7 +1202,7 @@ namespace ASCTest.regNativeFunctions
             success = true;
 
             int length = TypeConverter.ConvertToInt(argements[0]);
-            ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value =
+            ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value =
                  new T[length];
 
             returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);

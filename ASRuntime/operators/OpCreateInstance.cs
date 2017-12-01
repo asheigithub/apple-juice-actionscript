@@ -18,7 +18,7 @@ namespace ASRuntime.operators
 
             if (rv.rtType > RunTimeDataType.unknown)
             {
-                var _class = ((ASBinCode.rtData.rtObject)rv).value._class;
+                var _class = ((ASBinCode.rtData.rtObjectBase)rv).value._class;
 
                 if (_class.instanceClass == null)
                 {
@@ -127,7 +127,7 @@ namespace ASRuntime.operators
             var _class = frame.player.swc.classes[0];
 			//frame.instanceCreator = new InstanceCreator(frame.player, frame, step.token, _class);
 			frame.activeInstanceCreator(step.token, _class);
-            frame.instanceCreator.constructor = (ASBinCode.rtData.rtObject)v1;
+            frame.instanceCreator.constructor = (ASBinCode.rtData.rtObjectBase)v1;
             if (!frame.instanceCreator.prepareConstructorArgements())
             {
                 return;

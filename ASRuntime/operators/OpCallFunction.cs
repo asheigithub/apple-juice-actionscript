@@ -36,9 +36,9 @@ namespace ASRuntime.operators
                     if (function.this_pointer == null)
                     {
                         var s = frame.scope;
-                        if (s.this_pointer != null && s.this_pointer is rtObject)
+                        if (s.this_pointer != null && s.this_pointer is rtObjectBase)
                         {
-                            rtObject obj = (rtObject)s.this_pointer;
+                            rtObjectBase obj = (rtObjectBase)s.this_pointer;
 
                             if (obj.value is Global_Object)
                             {
@@ -104,13 +104,13 @@ namespace ASRuntime.operators
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
-                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+                ASBinCode.rtti.Class cls = ((rtObjectBase)rv).value._class;
 
                 if (cls.explicit_from != null)
                 {
 
                     var member = (MethodGetterBase)cls.explicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope,null);
+                    var func = member.getValue(((rtObjectBase)rv).objScope,null);
 
                     step.reg.getSlot(scope, frame).directSet(func);
 
@@ -118,7 +118,7 @@ namespace ASRuntime.operators
                 else if (cls.implicit_from != null)
                 {
                     var member = (MethodGetterBase)cls.implicit_from.bindField;
-                    var func = member.getValue(((rtObject)rv).objScope,null);
+                    var func = member.getValue(((rtObjectBase)rv).objScope,null);
 
                     step.reg.getSlot(scope, frame).directSet(func);
                 }
@@ -359,7 +359,7 @@ namespace ASRuntime.operators
             if (rv.rtType > RunTimeDataType.unknown && ClassMemberFinder.check_isinherits(rv, RunTimeDataType._OBJECT + 2, frame.player.swc))
             {
                 //***说明要调用强制类型转换***
-                ASBinCode.rtti.Class cls = ((rtObject)rv).value._class;
+                ASBinCode.rtti.Class cls = ((rtObjectBase)rv).value._class;
                 if (frame.typeconvertoperator != null)
                 {
 					frame.endStepNoError();
@@ -380,7 +380,7 @@ namespace ASRuntime.operators
 
             if (rv.rtType == frame.player.swc.FunctionClass.getRtType())
             {
-                rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)rv);
+                rv = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)rv);
             }
 
             if (rv.rtType != RunTimeDataType.rt_function)
@@ -530,7 +530,7 @@ namespace ASRuntime.operators
             {
                 if (arg.rtType == frame.player.swc.FunctionClass.getRtType())
                 {
-                    var function = (rtFunction)TypeConverter.ObjectImplicit_ToPrimitive((rtObject)arg);
+                    var function = (rtFunction)TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)arg);
                     if (!function.ismethod && (function.bindScope == null
                         ||
                         function.bindScope.blockId == frame.scope.blockId

@@ -52,7 +52,7 @@ namespace ASCTest.regNativeFunctions
         {
             errormessage = null; errorno = 0;
             
-            ((LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value).value =
+            ((LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value =
                  new DateTime();
 
             return ASBinCode.rtData.rtUndefined.undefined;
@@ -275,7 +275,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[6].rtType > RunTimeDataType.unknown)
             {
-                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[6]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)argements[6]).value).value;
             }
             else
             {
@@ -435,7 +435,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[7].rtType > RunTimeDataType.unknown)
             {
-                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[7]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)argements[7]).value).value;
             }
             else
             {
@@ -506,7 +506,7 @@ namespace ASCTest.regNativeFunctions
             long ticks;
             if (argements[0].rtType > RunTimeDataType.unknown)
             {
-                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)argements[0]).value).value;
             }
             else
             {
@@ -578,7 +578,7 @@ namespace ASCTest.regNativeFunctions
             long ticks;
             if (argements[0].rtType > RunTimeDataType.unknown)
             {
-                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+                ticks = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)argements[0]).value).value;
             }
             else
             {
@@ -588,7 +588,7 @@ namespace ASCTest.regNativeFunctions
             DateTimeKind kind;
             if (argements[1].rtType > RunTimeDataType.unknown)
             {
-                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value).value;
+                kind = (DateTimeKind)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)argements[1]).value).value;
             }
             else
             {
@@ -657,7 +657,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             
-            LinkObj<DateTime> dt= (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt= (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -719,7 +719,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -776,7 +776,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             
             success = true;
@@ -830,7 +830,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -893,7 +893,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -947,7 +947,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1001,7 +1001,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1056,7 +1056,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1109,7 +1109,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1220,7 +1220,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1274,7 +1274,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -1336,7 +1336,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -1397,7 +1397,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
             success = true;
@@ -1562,7 +1562,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj = 
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             var arg = argements[0];
             TimeSpan ts;
             if (arg.rtType == RunTimeDataType.rt_null)
@@ -1572,7 +1572,7 @@ namespace ASCTest.regNativeFunctions
             else
             {
                 LinkObj<TimeSpan> argObj = 
-                    (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg).value;
+                    (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg).value;
                 ts = argObj.value;
             }
 
@@ -1631,7 +1631,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             double arg = argements[0].toNumber();
             
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1688,7 +1688,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             double arg = argements[0].toNumber();
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1745,7 +1745,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             double arg = argements[0].toNumber();
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1802,7 +1802,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             double arg = argements[0].toNumber();
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1859,7 +1859,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             int arg = TypeConverter.ConvertToInt( argements[0]);
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1916,7 +1916,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             double arg = argements[0].toNumber();
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -1973,7 +1973,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             //double arg = argements[0].toNumber();
             long arg;
             if (argements[0].rtType == RunTimeDataType.rt_null)
@@ -1982,7 +1982,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                arg = ((LinkObj<long>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+                arg = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)argements[0]).value).value;
             }
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -2039,7 +2039,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             int arg = TypeConverter.ConvertToInt(argements[0]);
 
             var typeClass = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -2113,8 +2113,8 @@ namespace ASCTest.regNativeFunctions
                 return;
             }
 
-            LinkObj<DateTime> a1 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)arg1).value;
-            LinkObj<DateTime> a2 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)arg2).value;
+            LinkObj<DateTime> a1 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)arg1).value;
+            LinkObj<DateTime> a2 = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)arg2).value;
 
             int v = DateTime.Compare(a1.value, a2.value);
 
@@ -2230,7 +2230,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
@@ -2292,7 +2292,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
 
-            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<DateTime> dt = (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             DateTime value;
             if (argements[0].rtType == RunTimeDataType.rt_null)
@@ -2301,7 +2301,7 @@ namespace ASCTest.regNativeFunctions
             }
             else
             {
-                value = ((LinkObj<DateTime>)((ASBinCode.rtData.rtObject)argements[0]).value).value;
+                value = ((LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)argements[0]).value).value;
             }
 
             var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
@@ -2364,7 +2364,7 @@ namespace ASCTest.regNativeFunctions
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
             LinkObj<DateTime> lobj =
-                (LinkObj<DateTime>)((ASBinCode.rtData.rtObject)thisObj).value;
+                (LinkObj<DateTime>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
             var arg = argements[0];
             TimeSpan ts;
             if (arg.rtType == RunTimeDataType.rt_null)
@@ -2374,7 +2374,7 @@ namespace ASCTest.regNativeFunctions
             else
             {
                 LinkObj<TimeSpan> argObj =
-                    (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObject)arg).value;
+                    (LinkObj<TimeSpan>)((ASBinCode.rtData.rtObjectBase)arg).value;
                 ts = argObj.value;
             }
 

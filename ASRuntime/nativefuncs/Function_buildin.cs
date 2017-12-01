@@ -60,8 +60,8 @@ namespace ASRuntime.nativefuncs
 
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
-			((rtObject)argements[0]).value.memberData[0].directSet(argements[1]);
-			((rtFunction)argements[1]).objHandle = ((rtObject)argements[0]);
+			((rtObjectBase)argements[0]).value.memberData[0].directSet(argements[1]);
+			((rtFunction)argements[1]).objHandle = ((rtObjectBase)argements[0]);
 
 			success = true;
 			returnSlot.setValue(rtUndefined.undefined);
@@ -185,7 +185,7 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                ((rtObject)thisObj).value.memberData[1].directSet(argements[0].getValue());
+                ((rtObjectBase)thisObj).value.memberData[1].directSet(argements[0].getValue());
             }
             return rtUndefined.undefined;
         }
@@ -258,13 +258,13 @@ namespace ASRuntime.nativefuncs
             var thisArg = argements[0].getValue();
             
 
-            rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
+            rtFunction func = (rtFunction)((rtObjectBase)thisObj).value.memberData[0].getValue();
 			rtFunction toApply = (rtFunction)func;//.Clone();
 
 
 			if (!func.ismethod) //方法无法更改this
 			{
-				if (!(thisArg is rtObject))
+				if (!(thisArg is rtObjectBase))
 				{
 					var player = ((StackFrame)stackframe).player;
 					var objtype = thisArg.rtType;
@@ -312,7 +312,7 @@ namespace ASRuntime.nativefuncs
 				}
 				else
 				{
-					toApply.setThis((rtObject)thisArg);
+					toApply.setThis((rtObjectBase)thisArg);
 				}
 			}
 
@@ -357,7 +357,7 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                rtObject rtObj = (rtObject)v1;
+                rtObjectBase rtObj = (rtObjectBase)v1;
                 c.SetFunctionThis(rtObj);
             }
 
@@ -445,13 +445,13 @@ namespace ASRuntime.nativefuncs
             var thisArg = argements[0].getValue();
 
 
-            rtFunction func = (rtFunction)((rtObject)thisObj).value.memberData[0].getValue();
+            rtFunction func = (rtFunction)((rtObjectBase)thisObj).value.memberData[0].getValue();
 			rtFunction toApply = (rtFunction)func;//.Clone();
 
 
 			if (!func.ismethod) //方法无法更改this
 			{
-				if (!(thisArg is rtObject))
+				if (!(thisArg is rtObjectBase))
 				{
 					var player = ((StackFrame)stackframe).player;
 					var objtype = thisArg.rtType;
@@ -497,7 +497,7 @@ namespace ASRuntime.nativefuncs
 				}
 				else
 				{
-					toApply.setThis((rtObject)thisArg);
+					toApply.setThis((rtObjectBase)thisArg);
 				}
 			}
 
@@ -542,7 +542,7 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                rtObject rtObj = (rtObject)v1;
+                rtObjectBase rtObj = (rtObjectBase)v1;
 				//c.function.setThis(rtObj);
 				c.SetFunctionThis(rtObj);
             }

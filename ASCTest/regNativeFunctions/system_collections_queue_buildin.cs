@@ -70,7 +70,7 @@ namespace ASCTest.regNativeFunctions
 
             public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
             {
-                ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value
+                ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value
                     = new Queue();
                 returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
                 success = true;
@@ -131,7 +131,7 @@ namespace ASCTest.regNativeFunctions
                 }
 
 
-                Class _arraylist_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+                Class _arraylist_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
                 var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_arraylist_.instanceClass);
 
@@ -231,7 +231,7 @@ namespace ASCTest.regNativeFunctions
             {
 
 
-                Class _arraylist_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+                Class _arraylist_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
                 var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_arraylist_.instanceClass);
 
@@ -317,7 +317,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -391,7 +391,7 @@ namespace ASCTest.regNativeFunctions
             {
 
                 Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -401,7 +401,7 @@ namespace ASCTest.regNativeFunctions
 
                         stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
                         ,
-                        bin, true, out lo
+                        bin, false, out lo
                         ))
                     {
                         if (queue.Contains(lo))
@@ -493,7 +493,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -573,7 +573,7 @@ namespace ASCTest.regNativeFunctions
             {
 
                 Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -671,7 +671,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -753,7 +753,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -835,7 +835,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.Queue queue =
-                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.Queue)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {

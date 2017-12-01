@@ -65,7 +65,7 @@ namespace ASRuntime.nativefuncs
         {
             
             ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)
-                ((ASBinCode.rtData.rtObject)thisObj).value;
+                ((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             yieldObj.returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 
@@ -171,7 +171,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 			ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)
-				((ASBinCode.rtData.rtObject)thisObj).value;
+				((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
 
 			var result = yieldObj.returnSlot.getValue();

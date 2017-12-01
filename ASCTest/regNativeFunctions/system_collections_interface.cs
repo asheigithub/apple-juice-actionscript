@@ -115,7 +115,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IEnumerable array =
-                (System.Collections.IEnumerable)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IEnumerable)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -194,7 +194,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -272,7 +272,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -357,7 +357,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -440,7 +440,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.ICollection enumerator =
-                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -519,7 +519,7 @@ namespace ASCTest.regNativeFunctions
             int index = TypeConverter.ConvertToInt(argements[1]);
 
             System.Collections.ICollection collection =
-                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -610,7 +610,7 @@ namespace ASCTest.regNativeFunctions
             int index = TypeConverter.ConvertToInt(argements[0]);
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -688,7 +688,7 @@ namespace ASCTest.regNativeFunctions
             int index = TypeConverter.ConvertToInt(argements[1]);
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -789,7 +789,7 @@ namespace ASCTest.regNativeFunctions
             
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -874,7 +874,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -957,7 +957,7 @@ namespace ASCTest.regNativeFunctions
         {
             
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1054,7 +1054,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1131,7 +1131,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1141,7 +1141,7 @@ namespace ASCTest.regNativeFunctions
                      (ilist is Array) ? ilist.GetType().GetElementType() :
                     stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
                     ,
-                    bin, true, out lo
+                    bin, false, out lo
                     ))
                 {
                     if (ilist.Contains(lo))
@@ -1234,7 +1234,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1244,7 +1244,7 @@ namespace ASCTest.regNativeFunctions
                      (ilist is Array) ? ilist.GetType().GetElementType() :
                     stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
                     ,
-                    bin, true, out lo
+                    bin, false, out lo
                     ))
                 {
                     returnSlot.setValue(ilist.IndexOf(lo));
@@ -1331,7 +1331,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1429,7 +1429,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1439,7 +1439,7 @@ namespace ASCTest.regNativeFunctions
                      (ilist is Array) ? ilist.GetType().GetElementType() :
                     stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
                     ,
-                    bin, true, out lo
+                    bin, false, out lo
                     ))
                 {
                     ilist.Remove(lo);
@@ -1526,7 +1526,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IList ilist =
-                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1605,7 +1605,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1690,7 +1690,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1775,7 +1775,7 @@ namespace ASCTest.regNativeFunctions
 
             
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             RunTimeValueBase kv = argements[0];
             if (kv.rtType > RunTimeDataType.unknown)
@@ -1785,10 +1785,10 @@ namespace ASCTest.regNativeFunctions
                     bin.getClassByRunTimeDataType(kv.rtType), out ot
                     ))
                 {
-                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                 }
             }
-            DictionaryKey key = new DictionaryKey(kv);
+            DictionaryKey key = new DictionaryKey(kv,false);
 
             try
             {
@@ -1877,13 +1877,13 @@ namespace ASCTest.regNativeFunctions
                     bin.getClassByRunTimeDataType(kv.rtType), out ot
                     ))
                 {
-                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                 }
             }
-            DictionaryKey key = new DictionaryKey(kv);
+            DictionaryKey key = new DictionaryKey(kv,false);
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -1977,7 +1977,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2058,7 +2058,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2144,13 +2144,13 @@ namespace ASCTest.regNativeFunctions
                     bin.getClassByRunTimeDataType(kv.rtType), out ot
                     ))
                 {
-                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                    kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                 }
             }
-            DictionaryKey key = new DictionaryKey(kv);
+            DictionaryKey key = new DictionaryKey(kv,true);
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2241,7 +2241,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2318,7 +2318,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2330,10 +2330,10 @@ namespace ASCTest.regNativeFunctions
                         bin.getClassByRunTimeDataType(kv.rtType), out ot
                         ))
                     {
-                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                     }
                 }
-                DictionaryKey key = new DictionaryKey(kv);
+                DictionaryKey key = new DictionaryKey(kv,false);
 
                 if (idictionary.Contains(key))
                 {
@@ -2414,7 +2414,7 @@ namespace ASCTest.regNativeFunctions
         {
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {
@@ -2426,10 +2426,10 @@ namespace ASCTest.regNativeFunctions
                         bin.getClassByRunTimeDataType(kv.rtType), out ot
                         ))
                     {
-                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                     }
                 }
-                DictionaryKey key = new DictionaryKey(kv);
+                DictionaryKey key = new DictionaryKey(kv,false);
                 idictionary.Remove(key);
 
                 returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -2506,7 +2506,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionary idictionary =
-                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionary)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             
             try
@@ -2596,7 +2596,7 @@ namespace ASCTest.regNativeFunctions
 
 
             System.Collections.IDictionaryEnumerator enumerator =
-                (System.Collections.IDictionaryEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                (System.Collections.IDictionaryEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
             try
             {

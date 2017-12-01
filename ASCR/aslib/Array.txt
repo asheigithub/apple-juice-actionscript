@@ -303,7 +303,7 @@
 		 * @playerversion	Lite 4
 		 */
 		[native,_array_splice]
-		public final function splice (startIndex:int=0, deleteCount:uint=0, ... values) : Array;
+		public final function splice (startIndex:int=0, deleteCount:uint= 4294967295, ... values) : Array;
 
 
 		/**

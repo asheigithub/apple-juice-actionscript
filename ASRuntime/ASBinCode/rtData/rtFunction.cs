@@ -27,7 +27,7 @@ namespace ASBinCode.rtData
         }
 
 		
-		public rtObject objHandle;
+		public rtObjectBase objHandle;
 
 
         private int _functionid;

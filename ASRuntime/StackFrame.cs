@@ -872,7 +872,7 @@ namespace ASRuntime
 				case OpCode.vector_getvalue_memint_memintidx:
 					{
 						ASBinCode.rtti.Vector_Data vector =
-							(ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObject)step.arg1.getValue(scope, this)).value).hosted_object;
+							(ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, this)).value).hosted_object;
 
 						int idx = memint[step.memregid3];
 
@@ -1817,7 +1817,7 @@ namespace ASRuntime
             {
                 //***直接开上帝视角从对象里取值赋值***
                 var errorinstance =
-                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[1].getValue());
+                    ((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[1].getValue());
 
                 errorinstance.value.memberData[0].directSet(new rtString(message));
                 errorinstance.value.memberData[1].directSet(new rtString("TypeError"));
@@ -1838,7 +1838,7 @@ namespace ASRuntime
             {
                 //***直接开上帝视角从对象里取值赋值***
                 var errorinstance =
-                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[2].getValue());
+                    ((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[2].getValue());
 
                 errorinstance.value.memberData[0].directSet(new rtString(errormessage));
                 errorinstance.value.memberData[1].directSet(new rtString("ArgumentError"));
@@ -1859,7 +1859,7 @@ namespace ASRuntime
             {
                 //***直接开上帝视角从对象里取值赋值***
                 var errorinstance =
-                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
+                    ((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
 
                 errorinstance.value.memberData[0].directSet(new rtString("无法执行操作" + opcode));
                 errorinstance.value.memberData[1].directSet(new rtString("Error"));
@@ -1886,7 +1886,7 @@ namespace ASRuntime
             {
                 //***直接开上帝视角从对象里取值赋值***
                 var errorinstance =
-                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
+                    ((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[0].getValue());
 
                 errorinstance.value.memberData[0].directSet(new rtString(errormessage));
                 errorinstance.value.memberData[1].directSet(new rtString("Error"));
@@ -1910,7 +1910,7 @@ namespace ASRuntime
             {
                 //***直接开上帝视角从对象里取值赋值***
                 var errorinstance =
-                    ((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[3].getValue());
+                    ((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[3].getValue());
 
                 errorinstance.value.memberData[0].directSet(new rtString(errormessage));
                 errorinstance.value.memberData[1].directSet(new rtString("AneError"));
@@ -1931,7 +1931,7 @@ namespace ASRuntime
 			{
 				//***直接开上帝视角从对象里取值赋值***
 				var errorinstance =
-					((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[4].getValue());
+					((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[4].getValue());
 
 				errorinstance.value.memberData[0].directSet(new rtString(errormessage));
 				errorinstance.value.memberData[1].directSet(new rtString("IOError"));
@@ -1952,7 +1952,7 @@ namespace ASRuntime
 			{
 				//***直接开上帝视角从对象里取值赋值***
 				var errorinstance =
-					((rtObject)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[5].getValue());
+					((rtObjectBase)player.outpackage_runtimescope[player.swc.ErrorClass.classid].memberData[5].getValue());
 
 				errorinstance.value.memberData[0].directSet(new rtString(errormessage));
 				errorinstance.value.memberData[1].directSet(new rtString("Error"));

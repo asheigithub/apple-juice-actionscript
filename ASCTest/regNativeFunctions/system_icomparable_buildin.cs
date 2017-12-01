@@ -61,7 +61,7 @@ namespace ASCTest.regNativeFunctions
             {
 
                 IComparable icomp =
-                    (IComparable)((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value).GetLinkData();
+                    (IComparable)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
 
 				
                 try
@@ -72,7 +72,7 @@ namespace ASCTest.regNativeFunctions
 
                         stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
                         ,
-                        bin, true, out lo
+                        bin, false, out lo
                         ))
                     {
 						stackframe.throwCastException(token, argements[0].rtType,

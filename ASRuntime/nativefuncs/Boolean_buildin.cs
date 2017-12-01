@@ -73,7 +73,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			ASBinCode.rtData.rtBoolean b = (ASBinCode.rtData.rtBoolean)((ASBinCode.rtData.rtObject)thisObj).value.memberData[0].getValue();
+			ASBinCode.rtData.rtBoolean b = (ASBinCode.rtData.rtBoolean)((ASBinCode.rtData.rtObjectBase)thisObj).value.memberData[0].getValue();
 
 
 			if (b.value == true)

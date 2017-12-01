@@ -25,7 +25,7 @@ package
 	import system.collections.Stack;
 	import system.collections._IEnumerable_;
 	import system.collections._IEnumerator_;
-	
+	[Doc]
 	/**
 	 * ...
 	 * @author ...
@@ -198,7 +198,7 @@ package
 			var q:Queue = Queue.createInstance(myTargetArray);
 			
 			q.enqueue("queue enqueue");
-			
+			trace("q.contains", q.contains("queue enqueue"));
 			var qe = q.getEnumerator();
 			qe.reset();
 			while (qe.moveNext()) 

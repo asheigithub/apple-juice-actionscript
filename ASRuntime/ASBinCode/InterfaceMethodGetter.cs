@@ -56,7 +56,7 @@ namespace ASBinCode
             throw new NotImplementedException();
         }
 
-        public override RunTimeValueBase getMethod(rtObject rtObj)
+        public override RunTimeValueBase getMethod(rtObjectBase rtObj)
         {
             //if (cache.IsAlive)
             //{
@@ -137,7 +137,7 @@ namespace ASBinCode
             }
 
 
-            var instance_class = ((rtObject)scope.this_pointer).value._class;
+            var instance_class = ((rtObjectBase)scope.this_pointer).value._class;
             var vmember = (ClassMethodGetter)instance_class.classMembers[instance_class.implements[_class][indexofMember]].bindField;
 
 			//rtData.rtFunction method = new rtData.rtFunction(vmember.functionId, true);

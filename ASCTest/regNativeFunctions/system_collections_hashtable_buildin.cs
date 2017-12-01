@@ -71,7 +71,7 @@ namespace ASCTest.regNativeFunctions
 
             public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
             {
-                ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value
+                ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value
                     = new Hashtable();
                 returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
                 success = true;
@@ -134,11 +134,10 @@ namespace ASCTest.regNativeFunctions
                         bin.getClassByRunTimeDataType(kv.rtType), out ot
                         ))
                     {
-                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                     }
                 }
-                DictionaryKey key = new DictionaryKey(kv);
-
+                
                 try
                 {
 
@@ -151,7 +150,7 @@ namespace ASCTest.regNativeFunctions
                         bin, true, out lo
                         ))
                     {
-                        ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value
+                        ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value
                             = new DictionaryEntry(kv,lo);
 
                         returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
@@ -231,7 +230,7 @@ namespace ASCTest.regNativeFunctions
             public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
             {
                 DictionaryEntry dictionaryEntry =
-                ((LinkObj<DictionaryEntry>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                ((LinkObj<DictionaryEntry>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
 
                 try
@@ -317,17 +316,17 @@ namespace ASCTest.regNativeFunctions
                         bin.getClassByRunTimeDataType(kv.rtType), out ot
                         ))
                     {
-                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)kv);
+                        kv = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)kv);
                     }
                 }
-                DictionaryKey key = new DictionaryKey(kv);
+                DictionaryKey key = new DictionaryKey(kv,true);
 
                 try
                 {
 
                   //链接结构体，不能缓存到变量，必须直接对其赋值....
                     (((LinkObj<DictionaryEntry>)
-                        ((ASBinCode.rtData.rtObject)thisObj).value).value).Key=key;
+                        ((ASBinCode.rtData.rtObjectBase)thisObj).value).value).Key=key;
 
 
                     returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -399,7 +398,7 @@ namespace ASCTest.regNativeFunctions
             public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
             {
                 DictionaryEntry dictionaryEntry =
-                ((LinkObj<DictionaryEntry>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                ((LinkObj<DictionaryEntry>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
 
                 try
@@ -491,7 +490,7 @@ namespace ASCTest.regNativeFunctions
 
                         //链接结构体，不能缓存到变量，必须直接对其赋值....
                         (((LinkObj<DictionaryEntry>)
-                            ((ASBinCode.rtData.rtObject)thisObj).value).value).Value = lo;
+                            ((ASBinCode.rtData.rtObjectBase)thisObj).value).value).Value = lo;
 
 
                         returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);

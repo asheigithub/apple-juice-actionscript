@@ -12,7 +12,7 @@ namespace ASBinCode.rtData
         public class arrayObjHandle
         {
 			
-            public rtObject bindArrayObject;
+            public rtObjectBase bindArrayObject;
             //public override int GetHashCode()
             //{
             //    if (bindArrayObject == null)

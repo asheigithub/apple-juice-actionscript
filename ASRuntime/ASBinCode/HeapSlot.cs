@@ -94,7 +94,7 @@ namespace ASBinCode
                     default:
                         if (!ReferenceEquals(this.value, value))
                         {
-                            rtObject ro = (rtObject)value;
+                            rtObjectBase ro = (rtObjectBase)value;
                             var _class = ro.value._class;
 
                             //if (this.value.rtType == value.rtType)//前面已有判断这里肯定相同
@@ -104,12 +104,12 @@ namespace ASBinCode
                                 {
                                     if (_class.isStruct)
                                     {
-                                        ((rtti.LinkSystemObject)((rtObject)this.value).value)
+                                        ((rtti.LinkSystemObject)((rtObjectBase)this.value).value)
                                             .CopyStructData((rtti.LinkSystemObject)ro.value);
                                     }
                                     else
                                     {
-										((rtObject)this.value).value = ro.value; 
+										((rtObjectBase)this.value).value = ro.value; 
                                         //ro.value = ((rtObject)value).value;
                                     }
                                 }

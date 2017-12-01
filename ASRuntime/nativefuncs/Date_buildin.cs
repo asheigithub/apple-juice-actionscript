@@ -199,7 +199,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			
-			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
 			Date_link datelink = new Date_link();
 
@@ -226,9 +226,9 @@ namespace ASRuntime.nativefuncs
 					if (yearOrTimevalue.rtType > RunTimeDataType.unknown)
 					{
 						RunTimeDataType ot;
-						if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObject)yearOrTimevalue).value._class, out ot))
+						if (TypeConverter.Object_CanImplicit_ToPrimitive(((rtObjectBase)yearOrTimevalue).value._class, out ot))
 						{
-							yearOrTimevalue = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)yearOrTimevalue);
+							yearOrTimevalue = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)yearOrTimevalue);
 						}
 					}
 
@@ -395,7 +395,7 @@ namespace ASRuntime.nativefuncs
 			success = true;
 
 
-			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
 			Date_link datelink = (Date_link)rtObj.hosted_object;
 			if (datelink.isvalid)
@@ -460,7 +460,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -523,7 +523,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -588,7 +588,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -653,7 +653,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -718,7 +718,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -802,7 +802,7 @@ namespace ASRuntime.nativefuncs
 			success = true;
 
 
-			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+			ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
 			Date_link datelink = (Date_link)rtObj.hosted_object;
 			if (datelink.isvalid)
@@ -866,7 +866,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -929,7 +929,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -992,7 +992,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1055,7 +1055,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1118,7 +1118,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1182,7 +1182,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1245,7 +1245,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1308,7 +1308,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1371,7 +1371,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1438,7 +1438,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1502,7 +1502,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1566,7 +1566,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1631,7 +1631,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1695,7 +1695,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1759,7 +1759,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1823,7 +1823,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1887,7 +1887,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -1952,7 +1952,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2028,7 +2028,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2123,7 +2123,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2222,7 +2222,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2302,7 +2302,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2402,7 +2402,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2494,7 +2494,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2586,7 +2586,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             
@@ -2670,7 +2670,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2746,7 +2746,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2841,7 +2841,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -2940,7 +2940,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -3020,7 +3020,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -3120,7 +3120,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)
@@ -3212,7 +3212,7 @@ namespace ASRuntime.nativefuncs
             errorno = 0;
 
 
-            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObject)thisObj).value;
+            ASBinCode.rtti.HostedDynamicObject rtObj = (ASBinCode.rtti.HostedDynamicObject)((rtObjectBase)thisObj).value;
 
             Date_link datelink = (Date_link)rtObj.hosted_object;
             if (datelink.isvalid)

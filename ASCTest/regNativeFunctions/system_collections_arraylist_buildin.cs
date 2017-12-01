@@ -68,7 +68,7 @@ namespace ASCTest.regNativeFunctions
 
             public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
             {
-                ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value
+                ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value
                     = new ArrayList();
                 returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
                 success = true;
@@ -129,7 +129,7 @@ namespace ASCTest.regNativeFunctions
                 }
 
                 
-                Class _arraylist_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+                Class _arraylist_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
                 var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_arraylist_.instanceClass);
 
@@ -229,7 +229,7 @@ namespace ASCTest.regNativeFunctions
             {
 
 
-                Class _arraylist_ = ((ASBinCode.rtData.rtObject)thisObj).value._class;
+                Class _arraylist_ = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
 
                 var arr = stackframe.player.alloc_pureHostedOrLinkedObject(_arraylist_.instanceClass);
 
@@ -315,7 +315,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.ArrayList arraylist =
-                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -390,7 +390,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.ArrayList arraylist =
-                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -487,7 +487,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.ArrayList arraylist =
-                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -587,7 +587,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 ArrayList arraylist =
-                    (ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -689,7 +689,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.ArrayList arraylist =
-                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {
@@ -765,7 +765,7 @@ namespace ASCTest.regNativeFunctions
 
 
                 System.Collections.ArrayList arraylist =
-                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value;
+                    (System.Collections.ArrayList)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
 
                 try
                 {

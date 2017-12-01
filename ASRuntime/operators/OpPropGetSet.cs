@@ -103,7 +103,7 @@ namespace ASRuntime.operators
 
         public static void _do_prop_read( 
             ClassPropertyGetter prop,StackFrame frame, OpStep step ,Player player ,RunTimeScope scope ,
-            ASBinCode.rtData.rtObject propBindObj,Class superPropBindClass
+            ASBinCode.rtData.rtObjectBase propBindObj,Class superPropBindClass
             )
         {
             do

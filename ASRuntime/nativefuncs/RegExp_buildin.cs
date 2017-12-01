@@ -82,46 +82,46 @@ namespace ASRuntime.nativefuncs
 
 				if (options.IndexOf('s') >= 0)
 				{
-					((rtObject)thisObj).value.memberData[1].directSet(rtBoolean.True);
+					((rtObjectBase)thisObj).value.memberData[1].directSet(rtBoolean.True);
 					Options |= System.Text.RegularExpressions.RegexOptions.Singleline;
 				}
 
 				if (options.IndexOf('x') >= 0)
 				{
-					((rtObject)thisObj).value.memberData[2].directSet(rtBoolean.True);
+					((rtObjectBase)thisObj).value.memberData[2].directSet(rtBoolean.True);
 					Options |= System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace;
 				}
 
 				if (options.IndexOf('g') >= 0)
 				{
-					((rtObject)thisObj).value.memberData[3].directSet(rtBoolean.True);
+					((rtObjectBase)thisObj).value.memberData[3].directSet(rtBoolean.True);
 				}
 
 				if (options.IndexOf('i') >= 0)
 				{
-					((rtObject)thisObj).value.memberData[4].directSet(rtBoolean.True);
+					((rtObjectBase)thisObj).value.memberData[4].directSet(rtBoolean.True);
 					Options |= System.Text.RegularExpressions.RegexOptions.IgnoreCase;
 				}
 
 				if (options.IndexOf('m') >= 0)
 				{
-					((rtObject)thisObj).value.memberData[5].directSet(rtBoolean.True);
+					((rtObjectBase)thisObj).value.memberData[5].directSet(rtBoolean.True);
 					Options |= System.Text.RegularExpressions.RegexOptions.Multiline;
 				}
 			}
 
-			((rtObject)thisObj).value.memberData[0].directSet( new rtString( pv));
+			((rtObjectBase)thisObj).value.memberData[0].directSet( new rtString( pv));
 
 			if (pattern != null)
 			{
-				((rtObject)thisObj).value.memberData[6].directSet(new rtString(pattern));
+				((rtObjectBase)thisObj).value.memberData[6].directSet(new rtString(pattern));
 			}
 			else
 			{
-				((rtObject)thisObj).value.memberData[6].directSet(rtNull.nullptr);
+				((rtObjectBase)thisObj).value.memberData[6].directSet(rtNull.nullptr);
 			}
 
-			((rtObject)thisObj).value.memberData[7].directSet(new rtNumber(0));
+			((rtObjectBase)thisObj).value.memberData[7].directSet(new rtNumber(0));
 
 			try
 			{
@@ -130,7 +130,7 @@ namespace ASRuntime.nativefuncs
 				hobj.hosted_object = regex;
 				rtObject rtobj = new rtObject(hobj, null);
 
-				((rtObject)thisObj).value.memberData[8].directSet(rtobj);
+				((rtObjectBase)thisObj).value.memberData[8].directSet(rtobj);
 
 				
 				success = true;
@@ -201,14 +201,14 @@ namespace ASRuntime.nativefuncs
 			string str = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
 			
-			bool global = TypeConverter.ConvertToBoolean(((rtObject)thisObj).value.memberData[3].getValue(), stackframe, token).value;
-			string source = TypeConverter.ConvertToString(((rtObject)thisObj).value.memberData[6].getValue(), stackframe, token);
-			double lastIndex = TypeConverter.ConvertToNumber(((rtObject)thisObj).value.memberData[7].getValue());
+			bool global = TypeConverter.ConvertToBoolean(((rtObjectBase)thisObj).value.memberData[3].getValue(), stackframe, token).value;
+			string source = TypeConverter.ConvertToString(((rtObjectBase)thisObj).value.memberData[6].getValue(), stackframe, token);
+			double lastIndex = TypeConverter.ConvertToNumber(((rtObjectBase)thisObj).value.memberData[7].getValue());
 
 
 			if (source != null)
 			{
-				System.Text.RegularExpressions.Regex regex = (System.Text.RegularExpressions.Regex)((HostedObject)((rtObject)((rtObject)thisObj).value.memberData[8].getValue()).value).hosted_object;
+				System.Text.RegularExpressions.Regex regex = (System.Text.RegularExpressions.Regex)((HostedObject)((rtObjectBase)((rtObjectBase)thisObj).value.memberData[8].getValue()).value).hosted_object;
 
 				bool issuccess;
 				var match = regex.Match(str, global ? (int)lastIndex : 0);
@@ -218,7 +218,7 @@ namespace ASRuntime.nativefuncs
 
 					if (global)
 					{
-						((rtNumber)((rtObject)thisObj).value.memberData[7].getValue()).value = match.Index+match.Length;
+						((rtNumber)((rtObjectBase)thisObj).value.memberData[7].getValue()).value = match.Index+match.Length;
 					}
 				}
 				else
@@ -290,13 +290,13 @@ namespace ASRuntime.nativefuncs
 		{
 			string str = TypeConverter.ConvertToString(argements[0], stackframe, token);
 
-			DynamicObject result = (DynamicObject)((rtObject)argements[1]).value;
+			DynamicObject result = (DynamicObject)((rtObjectBase)argements[1]).value;
 
 			bool noglobal = TypeConverter.ConvertToBoolean(argements[2], stackframe, token).value;
 
-			bool global = TypeConverter.ConvertToBoolean(((rtObject)thisObj).value.memberData[3].getValue(), stackframe, token).value;
-			string source = TypeConverter.ConvertToString(((rtObject)thisObj).value.memberData[6].getValue(), stackframe, token);
-			double lastIndex = TypeConverter.ConvertToNumber(((rtObject)thisObj).value.memberData[7].getValue());
+			bool global = TypeConverter.ConvertToBoolean(((rtObjectBase)thisObj).value.memberData[3].getValue(), stackframe, token).value;
+			string source = TypeConverter.ConvertToString(((rtObjectBase)thisObj).value.memberData[6].getValue(), stackframe, token);
+			double lastIndex = TypeConverter.ConvertToNumber(((rtObjectBase)thisObj).value.memberData[7].getValue());
 
 			if (noglobal)
 				global = false;
@@ -304,7 +304,7 @@ namespace ASRuntime.nativefuncs
 
 			if (source != null)
 			{
-				System.Text.RegularExpressions.Regex regex = (System.Text.RegularExpressions.Regex)((HostedObject)((rtObject)((rtObject)thisObj).value.memberData[8].getValue()).value).hosted_object;
+				System.Text.RegularExpressions.Regex regex = (System.Text.RegularExpressions.Regex)((HostedObject)((rtObjectBase)((rtObjectBase)thisObj).value.memberData[8].getValue()).value).hosted_object;
 
 				
 				var match = regex.Match(str, global ? (int)lastIndex : 0);
@@ -312,7 +312,7 @@ namespace ASRuntime.nativefuncs
 				if (match.Success)
 				{
 
-					var index = new DynamicPropertySlot((rtObject)argements[1], true, stackframe.player.swc.FunctionClass.getRtType());
+					var index = new DynamicPropertySlot((rtObjectBase)argements[1], true, stackframe.player.swc.FunctionClass.getRtType());
 					index.directSet(new rtInt( match.Index));
 					result.createproperty("index", index);
 
@@ -326,7 +326,7 @@ namespace ASRuntime.nativefuncs
 
 					if (global)
 					{
-						((rtNumber)((rtObject)thisObj).value.memberData[7].getValue()).value = match.Index + match.Length;
+						((rtNumber)((rtObjectBase)thisObj).value.memberData[7].getValue()).value = match.Index + match.Length;
 					}
 					
 					returnSlot.directSet(argements[1]);

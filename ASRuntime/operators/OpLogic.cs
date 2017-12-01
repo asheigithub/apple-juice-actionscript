@@ -122,14 +122,14 @@ namespace ASRuntime.operators
         {
             var v2 = step.arg2.getValue(scope, frame);
             if (v2.rtType < ASBinCode.RunTimeDataType.unknown ||
-                ((ASBinCode.rtData.rtObject)v2).value._class.staticClass != null
+                ((ASBinCode.rtData.rtObjectBase)v2).value._class.staticClass != null
                 )
             {
                 frame.throwError(step.token, 1041, "The right-hand side of operator must be a class.");
             }
             else
             {
-                var cls = ((ASBinCode.rtData.rtObject)v2).value._class;
+                var cls = ((ASBinCode.rtData.rtObjectBase)v2).value._class;
 
                 var v1 = step.arg1.getValue(scope, frame);
 
@@ -137,9 +137,9 @@ namespace ASRuntime.operators
                     )
                 {
                     ASBinCode.RunTimeDataType ot;
-                    if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                    if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v1).value._class, out ot))
                     {
-                        v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                        v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v1);
                     }
                 }
 
@@ -157,11 +157,11 @@ namespace ASRuntime.operators
                 else
                 {
                     if (ASBinCode.ClassMemberFinder.isInherits
-                        (((ASBinCode.rtData.rtObject)v1).value._class,
+                        (((ASBinCode.rtData.rtObjectBase)v1).value._class,
                         cls.instanceClass)
                         ||
                         ASBinCode.ClassMemberFinder.isImplements(
-                        ((ASBinCode.rtData.rtObject)v1).value._class,
+                        ((ASBinCode.rtData.rtObjectBase)v1).value._class,
                         cls.instanceClass
                         ))
                     {
@@ -214,9 +214,9 @@ namespace ASRuntime.operators
 
             if (v2.rtType < ASBinCode.RunTimeDataType.unknown ||
                 (
-                    ((ASBinCode.rtData.rtObject)v2).value._class.staticClass != null
+                    ((ASBinCode.rtData.rtObjectBase)v2).value._class.staticClass != null
                     &&
-                    !ReferenceEquals(((ASBinCode.rtData.rtObject)v2).value._class, frame.player.swc.FunctionClass)
+                    !ReferenceEquals(((ASBinCode.rtData.rtObjectBase)v2).value._class, frame.player.swc.FunctionClass)
                 )
                 )
             {
@@ -224,7 +224,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                var cls = ((ASBinCode.rtData.rtObject)v2).value._class;
+                var cls = ((ASBinCode.rtData.rtObjectBase)v2).value._class;
                 if (cls.isInterface)
                 {
                     step.reg.getSlot(scope, frame).directSet(ASBinCode.rtData.rtBoolean.False);
@@ -235,9 +235,9 @@ namespace ASRuntime.operators
                     if (v1.rtType > RunTimeDataType.unknown)
                     {
                         ASBinCode.RunTimeDataType ot;
-                        if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                        if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v1).value._class, out ot))
                         {
-                            v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                            v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v1);
                         }
                     }
 
@@ -259,10 +259,10 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        if (!ReferenceEquals(((ASBinCode.rtData.rtObject)v2).value._class, frame.player.swc.FunctionClass))
+                        if (!ReferenceEquals(((ASBinCode.rtData.rtObjectBase)v2).value._class, frame.player.swc.FunctionClass))
                         {
                             if (ASBinCode.ClassMemberFinder.isInherits(
-                                ((ASBinCode.rtData.rtObject)v1).value._class,
+                                ((ASBinCode.rtData.rtObjectBase)v1).value._class,
                                 cls.instanceClass)
                                 )
                             {
@@ -277,7 +277,7 @@ namespace ASRuntime.operators
                         else
                         {
                             //***检查原型链***
-                            ASBinCode.rtti.Object obj = ((ASBinCode.rtData.rtObject)v1).value;
+                            ASBinCode.rtti.Object obj = ((ASBinCode.rtData.rtObjectBase)v1).value;
 
                             ASBinCode.rtti.DynamicObject _proto = null;
 
@@ -292,7 +292,7 @@ namespace ASRuntime.operators
                             }
 
                             ASBinCode.rtti.DynamicObject v2obj = (ASBinCode.rtti.DynamicObject)
-                                ((ASBinCode.rtData.rtObject)v2).value;
+                                ((ASBinCode.rtData.rtObjectBase)v2).value;
 
                             bool found = false;
                             while (_proto != null)
@@ -308,7 +308,7 @@ namespace ASRuntime.operators
                                 {
                                     var o =
                                         (ASBinCode.rtti.DynamicObject)
-                                        ((ASBinCode.rtData.rtObject)_proto.memberData[1].getValue()).value;
+                                        ((ASBinCode.rtData.rtObjectBase)_proto.memberData[1].getValue()).value;
                                     _proto = o._prototype_;
 
                                 }
@@ -387,9 +387,9 @@ namespace ASRuntime.operators
             if (v1.rtType > RunTimeDataType.unknown)
             {
                 RunTimeDataType it;
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out it))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v1).value._class, out it))
                 {
-                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v1);
                 }
             }
 
@@ -465,35 +465,35 @@ namespace ASRuntime.operators
             var v1 = step.arg1.getValue(scope, frame);
 
             RunTimeDataType ot;
-            if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+            if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v2).value._class, out ot))
             {
                 if (ot == RunTimeDataType.rt_array)
                 {
                     ASBinCode.rtData.rtArray arr = 
-                        (ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                        (ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v2);
 
                     _check_inrange(v1, step, frame, scope, arr.innerArray);
                     return;
                 }
             }
 
-            if (frame.player.swc.dict_Vector_type.ContainsKey(((ASBinCode.rtData.rtObject)v2).value._class))
+            if (frame.player.swc.dict_Vector_type.ContainsKey(((ASBinCode.rtData.rtObjectBase)v2).value._class))
             {
                 //和数组同样处理
-                var list=((Vector_Data)((HostedObject)((ASBinCode.rtData.rtObject)v2).value).hosted_object).innnerList;
+                var list=((Vector_Data)((HostedObject)((ASBinCode.rtData.rtObjectBase)v2).value).hosted_object).innnerList;
                 _check_inrange(v1, step, frame, scope, list);
 
                 return;
             }
             
 
-            if (((ASBinCode.rtData.rtObject)v2).value is ASBinCode.rtti.DictionaryObject)
+            if (((ASBinCode.rtData.rtObjectBase)v2).value is ASBinCode.rtti.DictionaryObject)
             {
                 if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
                 {
                     //***字典对象，允许用Object做Key***
-                    DictionaryObject dict = (DictionaryObject)(((ASBinCode.rtData.rtObject)v2).value);
-                    var key = new DictionaryKey(v1);
+                    DictionaryObject dict = (DictionaryObject)(((ASBinCode.rtData.rtObjectBase)v2).value);
+                    var key = new DictionaryKey(v1,false);
                     if (!dict.isContainsKey(key))
                     {
                         step.reg.getSlot(scope, frame).directSet(ASBinCode.rtData.rtBoolean.False);
@@ -528,7 +528,7 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
             StackFrame frame = (StackFrame)a[0];
-            ASBinCode.rtData.rtObject v2 = (ASBinCode.rtData.rtObject)a[1];
+            ASBinCode.rtData.rtObjectBase v2 = (ASBinCode.rtData.rtObjectBase)a[1];
             RunTimeValueBase vidx = frame._tempSlot1.getValue();
             string name = TypeConverter.ConvertToString(vidx,null,null);
             var step = sender.step;
@@ -589,7 +589,7 @@ namespace ASRuntime.operators
                         var dobj = (DynamicObject)
                                 frame.player.static_instance[v2.value._class.staticClass.classid].value;
 
-                        dobj = (DynamicObject)((ASBinCode.rtData.rtObject)dobj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((ASBinCode.rtData.rtObjectBase)dobj.memberData[0].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
 
@@ -1495,16 +1495,16 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeDataType ot;
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v1).value._class, out ot))
                 {
-                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v1);
                 }
             }
             if (v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v2).value._class, out ot))
                 {
-                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v2);
                 }
             }
             if ((
@@ -1569,8 +1569,8 @@ namespace ASRuntime.operators
                 v2.rtType > ASBinCode.RunTimeDataType.unknown
                 )
             {
-                ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
-                ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
+                ASBinCode.rtData.rtObjectBase obj1 = (ASBinCode.rtData.rtObjectBase)v1;
+                ASBinCode.rtData.rtObjectBase obj2 = (ASBinCode.rtData.rtObjectBase)v2;
 
                 return System.Object.Equals(obj1, obj2);
 
@@ -1703,16 +1703,16 @@ namespace ASRuntime.operators
             ASBinCode.RunTimeDataType ot;
             if (v1.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v1).value._class, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v1).value._class, out ot))
                 {
-                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v1);
+                    v1 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v1);
                 }
             }
             if (v2.rtType > ASBinCode.RunTimeDataType.unknown)
             {
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObject)v2).value._class, out ot))
+                if (TypeConverter.Object_CanImplicit_ToPrimitive(((ASBinCode.rtData.rtObjectBase)v2).value._class, out ot))
                 {
-                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)v2);
                 }
             }
 
@@ -1842,8 +1842,8 @@ namespace ASRuntime.operators
                 v2.rtType > ASBinCode.RunTimeDataType.unknown
                 )
             {
-                ASBinCode.rtData.rtObject obj1 = (ASBinCode.rtData.rtObject)v1;
-                ASBinCode.rtData.rtObject obj2 = (ASBinCode.rtData.rtObject)v2;
+                ASBinCode.rtData.rtObjectBase obj1 = (ASBinCode.rtData.rtObjectBase)v1;
+                ASBinCode.rtData.rtObjectBase obj2 = (ASBinCode.rtData.rtObjectBase)v2;
 
                 return System.Object.Equals(obj1, obj2);
 

@@ -195,7 +195,7 @@ namespace ASRuntime.nativefuncs
             //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
             success = true;
             
-            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
+            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
             string tostr = iv.ToString();
 
@@ -272,7 +272,7 @@ namespace ASRuntime.nativefuncs
             //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
             success = true;
 
-            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
+            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
             int hashcode = iv.GetHashCode();
 
@@ -384,7 +384,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			ASBinCode.rtData.rtObject obj = argements[0] as ASBinCode.rtData.rtObject;
+			ASBinCode.rtData.rtObjectBase obj = argements[0] as ASBinCode.rtData.rtObjectBase;
 			if (obj == null)
 			{
 				returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
@@ -399,7 +399,7 @@ namespace ASRuntime.nativefuncs
 			}
 
 
-			LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value);
+			LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
 			if (System.Object.Equals(iv, other))
 			{
@@ -586,7 +586,7 @@ namespace ASRuntime.nativefuncs
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = stackframe;
 
@@ -597,7 +597,7 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                LinkSystemObject argObj = (LinkSystemObject)((ASBinCode.rtData.rtObject)arg).value;
+                LinkSystemObject argObj = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)arg).value;
                 (returnSlot).setValue(lobj.value.CompareTo(argObj.GetLinkData()));
 
             }
@@ -690,7 +690,7 @@ namespace ASRuntime.nativefuncs
         //}
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkObj<T> lobj = (LinkObj<T>)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             StackFrame frame = stackframe;
 
@@ -701,7 +701,7 @@ namespace ASRuntime.nativefuncs
             }
             else
             {
-                LinkObj<T> argObj = (LinkObj<T>)((ASBinCode.rtData.rtObject)arg).value;
+                LinkObj<T> argObj = (LinkObj<T>)((ASBinCode.rtData.rtObjectBase)arg).value;
                 (returnSlot).setValue(lobj.value.CompareTo(argObj.value));
 
             }
@@ -739,7 +739,7 @@ namespace ASRuntime.nativefuncs
         {
             success = true;
 
-            LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value;
+            LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value;
 
             (returnSlot).setValue((int)lo.GetLinkData());
 

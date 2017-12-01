@@ -26,7 +26,7 @@ namespace ASRuntime.operators
         /// <summary>
         /// 是否是通过Function对象创建
         /// </summary>
-        public ASBinCode.rtData.rtObject constructor;
+        public ASBinCode.rtData.rtObjectBase constructor;
         private FunctionCaller _function_constructor;
 
 		private HeapSlot tempSlot;
@@ -151,7 +151,7 @@ namespace ASRuntime.operators
 
                         if (cls.classid != 2)
                         {
-                            ((DynamicObject)((ASBinCode.rtData.rtObject)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
+                            ((DynamicObject)((ASBinCode.rtData.rtObjectBase)obj.memberData[0].getValue()).value)["constructor"].directSet(player.static_instance[cls.staticClass.classid]);
 
                         }
 
@@ -256,7 +256,7 @@ namespace ASRuntime.operators
                 var obj = player.static_instance[_class.staticClass.classid];
 
                 ((DynamicObject)
-                    ((ASBinCode.rtData.rtObject)obj.value.memberData[0].getValue()).value)
+                    ((ASBinCode.rtData.rtObjectBase)obj.value.memberData[0].getValue()).value)
                     ["constructor"].directSet(player.static_instance[_class.staticClass.classid]);
 
             }
@@ -405,7 +405,7 @@ namespace ASRuntime.operators
 			
 			ASBinCode.rtti.Object obj = (ASBinCode.rtti.Object)sender.cacheObjects[0];
 			RunTimeScope objScope = (RunTimeScope)sender.cacheObjects[2];
-			ASBinCode.rtData.rtObject rtObject = (ASBinCode.rtData.rtObject)sender.cacheObjects[1];
+			ASBinCode.rtData.rtObjectBase rtObject = (ASBinCode.rtData.rtObjectBase)sender.cacheObjects[1];
 
 			
 			ic.exec_step2(  obj, objScope, rtObject);
@@ -414,7 +414,7 @@ namespace ASRuntime.operators
 
 		private void exec_step2(
             ASBinCode.rtti.Object obj,
-            RunTimeScope objScope, ASBinCode.rtData.rtObject _object)
+            RunTimeScope objScope, ASBinCode.rtData.rtObjectBase _object)
         {
             //***添加Object的动态对象****
             if (
@@ -476,11 +476,11 @@ namespace ASRuntime.operators
 			((InstanceCreator)sender.args).
 			   exec_step3(
 					  //rtObject
-					  (ASBinCode.rtData.rtObject)sender.cacheObjects[0]
+					  (ASBinCode.rtData.rtObjectBase)sender.cacheObjects[0]
 				   );
 		}
 
-		private void exec_step3(ASBinCode.rtData.rtObject rtobject)
+		private void exec_step3(ASBinCode.rtData.rtObjectBase rtobject)
         {
             if (constructor == null)
             {
@@ -517,7 +517,7 @@ namespace ASRuntime.operators
         {
             object[] a = (object[])sender.args;
 
-            objectResult = (ASBinCode.rtData.rtObject)a[0];
+            objectResult = (ASBinCode.rtData.rtObjectBase)a[0];
 
             //***如果有返回值****
             var returnvalue = ((SLOT)a[1]).getValue(); ((SLOT)a[1]).directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -559,7 +559,7 @@ namespace ASRuntime.operators
             }
         }
 
-        internal static ASBinCode.rtData.rtObject createPureHostdOrLinkObject(Player player, Class cls)
+        internal static ASBinCode.rtData.rtObjectBase createPureHostdOrLinkObject(Player player, Class cls)
         {
             if (cls.isLink_System)
             {
@@ -619,8 +619,8 @@ namespace ASRuntime.operators
                 
 
                 string err;int no;
-                ASBinCode.rtData.rtObject rtObj= 
-                    func.execute(null, null, cls, out err,out no) as ASBinCode.rtData.rtObject ;
+                ASBinCode.rtData.rtObjectBase rtObj= 
+                    func.execute(null, null, cls, out err,out no) as ASBinCode.rtData.rtObjectBase ;
                 if (rtObj == null)
                 {
                     return null;
@@ -664,7 +664,7 @@ namespace ASRuntime.operators
 
 
         private static readonly ObjectMemberSlot[] blankFields = new ObjectMemberSlot[0];
-        private static ASBinCode.rtData.rtObject makeObj(
+        private static ASBinCode.rtData.rtObjectBase makeObj(
             Player player,
             SourceToken token,
             ASBinCode.rtti.Class cls,

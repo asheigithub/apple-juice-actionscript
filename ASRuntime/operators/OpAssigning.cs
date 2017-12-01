@@ -151,7 +151,7 @@ namespace ASRuntime.operators
 
         public static void _doPropAssigning(ClassPropertyGetter prop,StackFrame frame,
             OpStep step,Player player, RunTimeScope scope,
-            ASBinCode.rtData.rtObject bindobj,RunTimeValueBase v , StackSlot sslot )
+            ASBinCode.rtData.rtObjectBase bindobj,RunTimeValueBase v , StackSlot sslot )
         {
             do
             {
@@ -255,7 +255,7 @@ namespace ASRuntime.operators
         }
 
 
-        public static void _doSetThisItem(ASBinCode.rtData.rtObject thisObj,
+        public static void _doSetThisItem(ASBinCode.rtData.rtObjectBase thisObj,
             RunTimeValueBase v,RunTimeValueBase index,StackSlot slot,StackFrame frame,OpStep step
             )
         {

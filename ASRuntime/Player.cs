@@ -12,10 +12,10 @@ namespace ASRuntime
 
 		internal IRuntimeOutput infoOutput;
 
-        internal Dictionary<int, rtObject> static_instance;
+        internal Dictionary<int, rtObjectBase> static_instance;
         internal Dictionary<int, RunTimeScope> outpackage_runtimescope;
 
-		private rtObject _buildin_class_;
+		private rtObjectBase _buildin_class_;
 		private rtFunction _getMethod;
 		private rtFunction _createinstance;
 		private rtFunction _getMemberValue;
@@ -54,7 +54,7 @@ namespace ASRuntime
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
 			}
 			
-            static_instance = new Dictionary<int, rtObject>();
+            static_instance = new Dictionary<int, rtObjectBase>();
             outpackage_runtimescope = new Dictionary<int, RunTimeScope>();
 			_buildin_class_ = null;
 			_getMethod = null;
@@ -1553,7 +1553,7 @@ namespace ASRuntime
 
         }
 
-        public rtObject alloc_pureHostedOrLinkedObject(ASBinCode.rtti.Class cls)
+        public rtObjectBase alloc_pureHostedOrLinkedObject(ASBinCode.rtti.Class cls)
         {
             return operators.InstanceCreator.createPureHostdOrLinkObject(this, cls);
         }
@@ -1618,7 +1618,7 @@ namespace ASRuntime
 				}
 			}
 
-			frame.scope = ((rtObject)this_pointer).objScope;
+			frame.scope = ((rtObjectBase)this_pointer).objScope;
 
 			
 
@@ -1706,11 +1706,11 @@ namespace ASRuntime
 			//}
 			if (ReferenceEquals(membersHeap, emptyMembers) && type == RunTimeScopeType.function)
 			{
-				if (this_pointer is rtObject)
+				if (this_pointer is rtObjectBase)
 				{
 					if (callerScope.scopeType != RunTimeScopeType.function)
 					{
-						frame.scope = ((rtObject)this_pointer).objScope;
+						frame.scope = ((rtObjectBase)this_pointer).objScope;
 					}
 					else
 					{
@@ -3135,22 +3135,22 @@ namespace ASRuntime
 
 #region createInstance
 
-		public ASBinCode.rtData.rtObject createInstance(string classname)
+		public ASBinCode.rtData.rtObjectBase createInstance(string classname)
 		{
 			return createInstance(classname, 0, null, null, null, null);
 		}
 
-		public ASBinCode.rtData.rtObject createInstance(string classname, object v1)
+		public ASBinCode.rtData.rtObjectBase createInstance(string classname, object v1)
 		{
 			return createInstance(classname, 1, v1, null, null, null);
 		}
 
-		public ASBinCode.rtData.rtObject createInstance(string classname, object v1, object v2)
+		public ASBinCode.rtData.rtObjectBase createInstance(string classname, object v1, object v2)
 		{
 			return createInstance(classname, 2, v1, v2, null, null);
 		}
 
-		public ASBinCode.rtData.rtObject createInstance(string classname, int argcount, object v1, object v2, object v3, params object[] args)
+		public ASBinCode.rtData.rtObjectBase createInstance(string classname, int argcount, object v1, object v2, object v3, params object[] args)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3248,7 +3248,7 @@ namespace ASRuntime
 						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 
-					return v as rtObject;
+					return v as rtObjectBase;
 				}
 
 			}
@@ -3262,7 +3262,7 @@ namespace ASRuntime
 
 #region getMethod
 
-		private rtFunction getMethod(rtObject thisObj, string name)
+		private rtFunction getMethod(rtObjectBase thisObj, string name)
 		{
 			//if (currentRunFrame != null)
 			//	throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3369,32 +3369,32 @@ namespace ASRuntime
 		}
 
 
-		public object invokeMethod(rtObject thisObj, string methodname)
+		public object invokeMethod(rtObjectBase thisObj, string methodname)
 		{
 			return invokeMethod(thisObj, methodname, 0, null, null, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, string methodname, object v1)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, object v1)
 		{
 			return invokeMethod(thisObj, methodname, 1, v1, null, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, string methodname, object v1, object v2)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, object v1, object v2)
 		{
 			return invokeMethod(thisObj, methodname, 2, v1, v2, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, string methodname, object v1, object v2, object v3)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, object v1, object v2, object v3)
 		{
 			return invokeMethod(thisObj, methodname, 3, v1, v2, v3, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, string methodname, object v1, object v2, object v3, object v4)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, object v1, object v2, object v3, object v4)
 		{
 			return invokeMethod(thisObj, methodname, 4, v1, v2, v3, v4, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, string methodname, object v1, object v2, object v3, object v4, object v5)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, object v1, object v2, object v3, object v4, object v5)
 		{
 			return invokeMethod(thisObj, methodname, 5, v1, v2, v3, v4, v5, null);
 		}
 
-		public object invokeMethod(rtObject thisObj, string methodname, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
+		public object invokeMethod(rtObjectBase thisObj, string methodname, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
 		{
 			var method = getMethod(thisObj, methodname);
 			if (method == null)
@@ -3404,31 +3404,31 @@ namespace ASRuntime
 		}
 
 
-		public object invokeMethod(rtObject thisObj, rtFunction method)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method)
 		{
 			return invokeMethod(thisObj, method, 0, null, null, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, object v1)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, object v1)
 		{
 			return invokeMethod(thisObj, method, 1, v1, null, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, object v1, object v2)
 		{
 			return invokeMethod(thisObj, method, 2, v1, v2, null, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2, object v3)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, object v1, object v2, object v3)
 		{
 			return invokeMethod(thisObj, method, 3, v1, v2, v3, null, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2, object v3, object v4)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, object v1, object v2, object v3, object v4)
 		{
 			return invokeMethod(thisObj, method, 4, v1, v2, v3, v4, null, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, object v1, object v2, object v3, object v4, object v5)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, object v1, object v2, object v3, object v4, object v5)
 		{
 			return invokeMethod(thisObj, method, 5, v1, v2, v3, v4, v5, null);
 		}
-		public object invokeMethod(rtObject thisObj, rtFunction method, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
+		public object invokeMethod(rtObjectBase thisObj, rtFunction method, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3553,7 +3553,7 @@ namespace ASRuntime
 #endregion
 
 #region getClassStaticInstance
-		private rtObject getClassStaticInstance(string type)
+		private rtObjectBase getClassStaticInstance(string type)
 		{
 			
 			if (currentRunFrame != null)
@@ -3589,7 +3589,7 @@ namespace ASRuntime
 
 #region get_set_member
 
-		public object getMemberValue(rtObject thisObj, string memberPath)
+		public object getMemberValue(rtObjectBase thisObj, string memberPath)
 		{
 			return getMemberValue(thisObj, memberPath,null);
 		}
@@ -3600,7 +3600,7 @@ namespace ASRuntime
 		/// <param name="memberPath"></param>
 		/// <param name="indexArgs">如果是需要用方括号访问的成员，则输入方括号内的参数</param>
 		/// <returns></returns>
-		public object getMemberValue(rtObject thisObj,string memberPath,object indexArgs)
+		public object getMemberValue(rtObjectBase thisObj,string memberPath,object indexArgs)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3694,7 +3694,7 @@ namespace ASRuntime
 
 		}
 
-		public void setMemberValue(rtObject thisObj, string memberPath, object value)
+		public void setMemberValue(rtObjectBase thisObj, string memberPath, object value)
 		{
 			setMemberValue(thisObj, memberPath, value, null);
 		}
@@ -3706,7 +3706,7 @@ namespace ASRuntime
 		/// <param name="value"></param>
 		/// <param name="indexArgs">如果是需要用方括号访问的成员，则输入方括号内的参数</param>
 		/// <returns></returns>
-		public void setMemberValue(rtObject thisObj, string memberPath, object value, object indexArgs)
+		public void setMemberValue(rtObjectBase thisObj, string memberPath, object value, object indexArgs)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3838,11 +3838,11 @@ namespace ASRuntime
 		/// </summary>
 		/// <param name="byteArray"></param>
 		/// <returns></returns>
-		public rtObject createByteArrayObject(out flash.utils.ByteArray byteArray)
+		public rtObjectBase createByteArrayObject(out flash.utils.ByteArray byteArray)
 		{
 			var thisObj = createInstance("flash.utils.ByteArray");
 			byteArray =
-					(flash.utils.ByteArray)((ASBinCode.rtti.HostedObject)((rtObject)(((rtObject)thisObj).value.memberData[0].getValue())).value).hosted_object;
+					(flash.utils.ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
 
 			byteArray.bindAS3Object = thisObj;
 

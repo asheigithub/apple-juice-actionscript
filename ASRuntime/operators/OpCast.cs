@@ -256,7 +256,7 @@ namespace ASRuntime.operators
                 {
                     #region toString
                     //***调用toString()
-                    ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)srcValue;
+                    ASBinCode.rtData.rtObjectBase obj = (ASBinCode.rtData.rtObjectBase)srcValue;
                     var toStr = (ASBinCode.ClassMemberFinder.find(obj.value._class, "toString", obj.value._class));
 
                     rtFunction function = null;
@@ -314,7 +314,7 @@ namespace ASRuntime.operators
                             var dobj = (ASBinCode.rtti.DynamicObject)
                                 frame.player.static_instance[obj.value._class.staticClass.classid].value;
 
-                            dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                            dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                             if (!dobj.hasproperty("toString"))
                             {
 
@@ -381,7 +381,7 @@ namespace ASRuntime.operators
                     }
                     else
                     {
-                        storeto.setValue(((rtObject)srcValue).value.ToString());
+                        storeto.setValue(((rtObjectBase)srcValue).value.ToString());
                         callbacker.isSuccess = true;
                         callbacker.call(null);
                     }
@@ -505,7 +505,7 @@ namespace ASRuntime.operators
                     if (TypeConverter.Object_CanImplicit_ToPrimitive(srcValue.rtType, frame.player.swc, out ot))
                     {
                         CastValue(
-                            TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue),
+                            TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)srcValue),
                             targetType, frame, token, scope, storeto, callbacker, false
 
                             );
@@ -530,7 +530,7 @@ namespace ASRuntime.operators
 
 
                         //取ValueOf
-                        InvokeValueOf((rtObject)srcValue, frame, token, scope, storeto, valueofCB);
+                        InvokeValueOf((rtObjectBase)srcValue, frame, token, scope, storeto, valueofCB);
 
                         return;
                     }
@@ -802,14 +802,14 @@ namespace ASRuntime.operators
             RunTimeDataType ot;
             if (TypeConverter.Object_CanImplicit_ToPrimitive(srcValue1.rtType, frame.player.swc, out ot))
             {
-                srcValue1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue1);
+                srcValue1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)srcValue1);
             }
             if (TypeConverter.Object_CanImplicit_ToPrimitive(srcValue2.rtType, frame.player.swc, out ot))
             {
-                srcValue2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)srcValue2);
+                srcValue2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)srcValue2);
             }
 
-            if (srcValue1 is rtObject)
+            if (srcValue1 is rtObjectBase)
             {
                 BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                 {
@@ -836,12 +836,12 @@ namespace ASRuntime.operators
                 cb.setCallBacker(_AfterGetOneValueOf);
 				cb.setWhenFailed(_GetOneValueOfFailed);
 
-                InvokeValueOf((rtObject)srcValue1, frame, token, scope, _tempstoreto1, cb);
+                InvokeValueOf((rtObjectBase)srcValue1, frame, token, scope, _tempstoreto1, cb);
             }
             else
             {
                 _tempstoreto1.directSet(srcValue1);
-                if (srcValue2 is rtObject)
+                if (srcValue2 is rtObjectBase)
                 {
 					BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
 					{
@@ -860,7 +860,7 @@ namespace ASRuntime.operators
                     cb.setCallBacker(_AfterGetTwoValueOf);
 					cb.setWhenFailed(_GetTwoValueOfFailed);
                     cb.args = callbacker;
-                    InvokeValueOf((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
+                    InvokeValueOf((rtObjectBase)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
                 else
                 {
@@ -896,12 +896,12 @@ namespace ASRuntime.operators
             BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
 
 
-            if (srcValue2 is rtObject)
+            if (srcValue2 is rtObjectBase)
             {
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_AfterGetTwoValueOf);
                 cb.args = callbacker;
-                InvokeValueOf((rtObject)srcValue2, frame, token, scope, storeto, cb);
+                InvokeValueOf((rtObjectBase)srcValue2, frame, token, scope, storeto, cb);
             }
             else
             {
@@ -916,7 +916,7 @@ namespace ASRuntime.operators
         }
 
         private static void InvokeValueOf(
-            rtObject obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
+            rtObjectBase obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
             BlockCallBackBase callbacker
             )
         {
@@ -983,7 +983,7 @@ namespace ASRuntime.operators
                     var dobj = (ASBinCode.rtti.DynamicObject)
                         frame.player.static_instance[obj.value._class.staticClass.classid].value;
 
-                    dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                    dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                     if (!dobj.hasproperty("valueOf"))
                     {
 
@@ -1079,7 +1079,7 @@ namespace ASRuntime.operators
 
             if (returnValue.getValue().rtType > RunTimeDataType.unknown)
             {
-                returnValue.directSet((rtObject)a[0]); //valueOf取值不正确，返回原始对象
+                returnValue.directSet((rtObjectBase)a[0]); //valueOf取值不正确，返回原始对象
                 
             }
 
@@ -1119,7 +1119,7 @@ namespace ASRuntime.operators
             )
         {
 
-            if (srcValue1 is rtObject)
+            if (srcValue1 is rtObjectBase)
             {
                 BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                 {
@@ -1145,12 +1145,12 @@ namespace ASRuntime.operators
                 cb.args = tosend;
                 cb.setCallBacker(_AfterGetOneToString);
 
-                InvokeToString((rtObject)srcValue1, frame, token, scope, _tempstoreto1, cb);
+                InvokeToString((rtObjectBase)srcValue1, frame, token, scope, _tempstoreto1, cb);
             }
             else
             {
                 _tempstoreto1.directSet(srcValue1);
-                if (srcValue2 is rtObject)
+                if (srcValue2 is rtObjectBase)
                 {
                     BlockCallBackBase callbacker = frame.player.blockCallBackPool.create();
                     {
@@ -1169,7 +1169,7 @@ namespace ASRuntime.operators
                     cb.setCallBacker(_AfterGetTwoToString);
 					cb.setWhenFailed(_GetTwoStringFailed);
                     cb.args = callbacker;
-                    InvokeToString((rtObject)srcValue2, frame, token, scope, _tempstoreto2, cb);
+                    InvokeToString((rtObjectBase)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
                 else
                 {
@@ -1198,12 +1198,12 @@ namespace ASRuntime.operators
             BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
 
 
-            if (srcValue2 is rtObject)
+            if (srcValue2 is rtObjectBase)
             {
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_AfterGetTwoToString);
                 cb.args = callbacker;
-                InvokeToString((rtObject)srcValue2, frame, token, scope, storeto, cb);
+                InvokeToString((rtObjectBase)srcValue2, frame, token, scope, storeto, cb);
             }
             else
             {
@@ -1218,7 +1218,7 @@ namespace ASRuntime.operators
         }
 
         private static void InvokeToString(
-            rtObject obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
+            rtObjectBase obj, StackFrame frame, SourceToken token, RunTimeScope scope, SLOT storeto,
             BlockCallBackBase callbacker
             )
         {
@@ -1276,7 +1276,7 @@ namespace ASRuntime.operators
                     var dobj = (ASBinCode.rtti.DynamicObject)
                         frame.player.static_instance[obj.value._class.staticClass.classid].value;
 
-                    dobj = (ASBinCode.rtti.DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                    dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                     if (!dobj.hasproperty("toString"))
                     {
 
@@ -1359,7 +1359,7 @@ namespace ASRuntime.operators
         {
             step.reg.getSlot(scope, frame).directSet
                 ( 
-                TypeConverter.ObjectImplicit_ToPrimitive( (rtObject)step.arg1.getValue(scope, frame) )
+                TypeConverter.ObjectImplicit_ToPrimitive( (rtObjectBase)step.arg1.getValue(scope, frame) )
                 );
 			frame.endStepNoError();
             //frame.endStep(step);

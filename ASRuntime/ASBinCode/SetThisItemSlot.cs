@@ -7,7 +7,7 @@ namespace ASBinCode
 {
     public sealed class SetThisItemSlot : SLOT
     {
-        public rtObject bindObj;
+        public rtObjectBase bindObj;
         public RunTimeValueBase setindex;
         
         public override void clear()

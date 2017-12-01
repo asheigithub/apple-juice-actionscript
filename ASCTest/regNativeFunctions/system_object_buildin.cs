@@ -50,7 +50,7 @@ namespace ASCTest.regNativeFunctions
         {
             errormessage = null; errorno = 0;
 
-            ((LinkObj<object>)((ASBinCode.rtData.rtObject)thisObj).value).value = new object(); 
+            ((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = new object(); 
 
             return ASBinCode.rtData.rtUndefined.undefined;
 
@@ -119,7 +119,7 @@ namespace ASCTest.regNativeFunctions
             //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
             success = true;
 
-            ASBinCode.rtData.rtObject obj = argements[0].getValue() as ASBinCode.rtData.rtObject;
+            ASBinCode.rtData.rtObjectBase obj = argements[0].getValue() as ASBinCode.rtData.rtObjectBase;
             if (obj == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
@@ -134,7 +134,7 @@ namespace ASCTest.regNativeFunctions
             }
 
 
-            ASBinCode.rtData.rtObject obj2 = argements[1].getValue() as ASBinCode.rtData.rtObject;
+            ASBinCode.rtData.rtObjectBase obj2 = argements[1].getValue() as ASBinCode.rtData.rtObjectBase;
             if (obj2 == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
@@ -235,7 +235,7 @@ namespace ASCTest.regNativeFunctions
             }
 
 
-            ASBinCode.rtData.rtObject obj = a1 as ASBinCode.rtData.rtObject;
+            ASBinCode.rtData.rtObjectBase obj = a1 as ASBinCode.rtData.rtObjectBase;
             if (obj == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
@@ -250,7 +250,7 @@ namespace ASCTest.regNativeFunctions
             }
 
 
-            ASBinCode.rtData.rtObject obj2 = a2 as ASBinCode.rtData.rtObject;
+            ASBinCode.rtData.rtObjectBase obj2 = a2 as ASBinCode.rtData.rtObjectBase;
             if (obj2 == null)
             {
                 returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);

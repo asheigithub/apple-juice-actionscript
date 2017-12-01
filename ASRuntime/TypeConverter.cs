@@ -397,7 +397,7 @@ namespace ASRuntime
                         //}
                         //else
                         {
-                            return ((ASBinCode.rtData.rtObject)src).value.ToString();
+                            return ((ASBinCode.rtData.rtObjectBase)src).value.ToString();
                         }
                     }
 
@@ -798,7 +798,7 @@ namespace ASRuntime
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static ASBinCode.RunTimeValueBase ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObject obj)
+        public static ASBinCode.RunTimeValueBase ObjectImplicit_ToPrimitive(ASBinCode.rtData.rtObjectBase obj)
         {
             //return ASBinCode.rtData.rtUndefined.undefined;
 

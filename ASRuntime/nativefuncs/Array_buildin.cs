@@ -55,9 +55,9 @@ namespace ASRuntime.nativefuncs
 			errorno = 0;
 
 			var newvalue = new ASBinCode.rtData.rtArray();
-			newvalue.objHandle.bindArrayObject = (rtObject)thisObj;
+			newvalue.objHandle.bindArrayObject = (rtObjectBase)thisObj;
 
-			((rtObject)thisObj).value.memberData[0].directSet(newvalue);
+			((rtObjectBase)thisObj).value.memberData[0].directSet(newvalue);
 
 
 			var args = argements[0].getValue();
@@ -71,7 +71,7 @@ namespace ASRuntime.nativefuncs
 					var a1 = arr.innerArray[0];
 					if (TypeConverter.ObjectImplicit_ToNumber(a1.rtType, bin))
 					{
-						a1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)a1);
+						a1 = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)a1);
 					}
 
 					if (a1.rtType == RunTimeDataType.rt_int || a1.rtType == RunTimeDataType.rt_uint || a1.rtType == RunTimeDataType.rt_number)
@@ -233,8 +233,8 @@ namespace ASRuntime.nativefuncs
 
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
-			((rtObject)argements[0]).value.memberData[0].directSet(argements[1]);
-			((rtArray)argements[1]).objHandle.bindArrayObject = ((rtObject)argements[0]);
+			((rtObjectBase)argements[0]).value.memberData[0].directSet(argements[1]);
+			((rtArray)argements[1]).objHandle.bindArrayObject = ((rtObjectBase)argements[0]);
 
 			success = true;
 			returnSlot.directSet(rtUndefined.undefined);
@@ -380,7 +380,7 @@ namespace ASRuntime.nativefuncs
 
 			success = true;
 			returnSlot.setValue((uint)
-					((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray.Count);
+					((rtArray)(((rtObjectBase)thisObj).value.memberData[0].getValue())).innerArray.Count);
 
 			//return
 			//	new rtUInt(
@@ -465,7 +465,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			var list = ((rtArray)(((rtObject)thisObj).value.memberData[0].getValue())).innerArray;
+			var list = ((rtArray)(((rtObjectBase)thisObj).value.memberData[0].getValue())).innerArray;
 
 			uint newlen = ((rtUInt)argements[0]).value;
 
@@ -560,7 +560,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			int idx = ((rtInt)argements[0]).value;
 			var toinsert = argements[1];
@@ -645,7 +645,7 @@ namespace ASRuntime.nativefuncs
             IBlockCallBack cb = (IBlockCallBack)callbacker;
             StackFrame frame = (StackFrame)stackframe;
 
-            rtArray array = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            rtArray array = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
             if (array.innerArray.Count == 0)
             {
@@ -856,7 +856,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			if (arr.innerArray.Count > 0)
 			{
@@ -921,7 +921,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
             var args = argements[0].getValue();
 
             if (args.rtType == RunTimeDataType.rt_array)
@@ -1005,7 +1005,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			success = true;
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			int idx = ((rtInt)argements[0]).value;
 			if (idx < 0)
@@ -1082,7 +1082,7 @@ namespace ASRuntime.nativefuncs
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			success = true;
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 			arr.innerArray.Reverse();
 			//return arr;
 			returnSlot.directSet(arr);
@@ -1156,7 +1156,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			if (arr.innerArray.Count > 0)
 			{
@@ -1268,7 +1268,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			int startindex = ((rtInt)argements[0]).value;
 			int endindex = ((rtInt)argements[1]).value;
@@ -1303,7 +1303,7 @@ namespace ASRuntime.nativefuncs
 			rtArray newArray = new rtArray();
 			for (int i = startindex; i < endindex; i++)
 			{
-				newArray.innerArray.Add(arr.innerArray[i]);
+				newArray.innerArray.Add((RunTimeValueBase)arr.innerArray[i].Clone());
 			}
 
 			returnSlot.directSet(newArray);
@@ -1360,7 +1360,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
             int startindex = ((rtInt)argements[0].getValue()).value;
             uint deleteCount = ((rtUInt)argements[1].getValue()).value;
@@ -1385,7 +1385,7 @@ namespace ASRuntime.nativefuncs
             int st = startindex;
             while (deleteCount>0 && st< arr.innerArray.Count)
             {
-                newArray.innerArray.Add(arr.innerArray[st]);
+                newArray.innerArray.Add(arr.innerArray[st]); //此处无需clone,因为会移除
                 st++;
                 deleteCount--;
             }
@@ -1397,7 +1397,11 @@ namespace ASRuntime.nativefuncs
 
             if (insert != null)
             {
-                arr.innerArray.InsertRange(startindex, insert);
+				for (int i = 0; i < insert.Count; i++)
+				{
+					arr.innerArray.Insert(startindex, (RunTimeValueBase)insert[i].Clone());
+					//arr.innerArray.InsertRange(startindex, insert);
+				}                
             }
 
             if (newArray.innerArray.Count > 0)
@@ -1459,7 +1463,7 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
             var args = argements[0].getValue();
 
             if (args.rtType == RunTimeDataType.rt_array)
@@ -1522,16 +1526,24 @@ namespace ASRuntime.nativefuncs
             errormessage = null;
             errorno = 0;
 
-            rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+            rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
             var args = argements[0].getValue();
 
             rtArray result = new rtArray();
-            result.innerArray.AddRange(arr.innerArray);
+			for (int i = 0; i < arr.innerArray.Count; i++)
+			{
+				result.innerArray.Add((RunTimeValueBase)arr.innerArray[i].Clone());
+			}
+            
 
             if (args.rtType == RunTimeDataType.rt_array)
             {
                 var arglist = ((rtArray)args).innerArray;
-                result.innerArray.AddRange(arglist);
+				for (int i = 0; i < arglist.Count; i++)
+				{
+					result.innerArray.Add((RunTimeValueBase)arglist[i].Clone());
+				}
+                
             }
 
             return result;
@@ -1598,7 +1610,7 @@ namespace ASRuntime.nativefuncs
 		{
 			success = true;
 
-			rtArray arr = (rtArray)((rtObject)thisObj).value.memberData[0].getValue();
+			rtArray arr = (rtArray)((rtObjectBase)thisObj).value.memberData[0].getValue();
 
 			//return new rtString(arr.ToString());
 			returnSlot.setValue(arr.ToString());

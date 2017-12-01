@@ -23,8 +23,8 @@ namespace ASRuntime.operators
 			}
             else
             {
-                rtObject rtObj =
-                    (rtObject)obj;
+                rtObjectBase rtObj =
+                    (rtObjectBase)obj;
                 
                 StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
                 if (slot != null)
@@ -97,8 +97,8 @@ namespace ASRuntime.operators
 			}
 			else
 			{
-				rtObject rtObj =
-					(rtObject)obj;
+				rtObjectBase rtObj =
+					(rtObjectBase)obj;
 
 
 				SLOT lintoslot = ((LeftValueBase)step.arg2).getSlot(rtObj.objScope, null);
@@ -151,8 +151,8 @@ namespace ASRuntime.operators
 			}
             else
             {
-                rtObject rtObj =
-                    (rtObject)obj;
+                rtObjectBase rtObj =
+                    (rtObjectBase)obj;
 
                 StackSlot slot = step.reg.getSlot(scope, frame) as StackSlot;
                 if (slot != null)
@@ -250,7 +250,7 @@ namespace ASRuntime.operators
             else
             {
                 var player = frame.player;
-                if (!(obj is rtObject))
+                if (!(obj is rtObjectBase))
                 {
                     var objtype = obj.rtType;
                     if (objtype < RunTimeDataType.unknown
@@ -273,25 +273,25 @@ namespace ASRuntime.operators
                     }
                 }
 
-                rtObject rtObj = (rtObject)obj;
+                rtObjectBase rtObj = (rtObjectBase)obj;
                 //string name = ((rtString)step.arg2.getValue(scope)).value;
                 _loadname_dot(rtObj, step, frame, scope, player);
             }
 
         }
 
-        private static void _loadname_dot(rtObject rtObj,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
+        private static void _loadname_dot(rtObjectBase rtObj,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
         {
             var v2 = step.arg2.getValue(scope, frame);
             
             //**先转换为基础类型***
             if (v2.rtType > RunTimeDataType.unknown)
             {
-                var cls = ((rtObject)v2).value._class;
+                var cls = ((rtObjectBase)v2).value._class;
                 RunTimeDataType ot;
                 if (TypeConverter.Object_CanImplicit_ToPrimitive(cls, out ot))
                 {
-                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObject)v2);
+                    v2 = TypeConverter.ObjectImplicit_ToPrimitive((rtObjectBase)v2);
                 }
             }
 
@@ -407,7 +407,7 @@ namespace ASRuntime.operators
 
                     //***访问动态类型
                     DictionaryObject dict = (DictionaryObject)rtObj.value;
-                    var key = new DictionaryKey(v2);
+                    var key = new DictionaryKey(v2,true);
                     if (!dict.isContainsKey(key))
                     {
                         if (register._isassigntarget)
@@ -487,7 +487,7 @@ namespace ASRuntime.operators
             StackFrame frame = (StackFrame)a[1];
             var nv = TypeConverter.ConvertToString( frame._tempSlot1.getValue(),frame,sender.step.token);
 
-            _exec_dot_name((rtObject)a[0], nv==null?"null":nv, sender.step, frame, sender.scope, (Player)a[2]);
+            _exec_dot_name((rtObjectBase)a[0], nv==null?"null":nv, sender.step, frame, sender.scope, (Player)a[2]);
 
         }
 
@@ -510,15 +510,15 @@ namespace ASRuntime.operators
                     //****_prototype_的类型，只可能是Function对象或Class对象 Class对象尚未实现
                     if (protoObj._class.classid == frame.player.swc.FunctionClass.classid) //Function 
                     {
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[1].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[1].getValue()).value;
                     }
                     else if (protoObj._class.classid == 1) //搜索到根Object
                     {
                         //***根Object有继承自Class的prototype,再没有就没有了
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
-                            dobj = (DynamicObject)((rtObject)protoObj.memberData[7].getValue()).value;
+                            dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[7].getValue()).value;
                             
                             if (!dobj.hasproperty(name))
                             {
@@ -530,7 +530,7 @@ namespace ASRuntime.operators
                     else if (protoObj._class.staticClass == null)
                     {
                         //**
-                        dobj = (DynamicObject)((rtObject)protoObj.memberData[0].getValue()).value;
+                        dobj = (DynamicObject)((rtObjectBase)protoObj.memberData[0].getValue()).value;
                         if (!dobj.hasproperty(name))
                         {
                             dobj = protoObj;
@@ -563,7 +563,7 @@ namespace ASRuntime.operators
         }
 
 
-        private static void _exec_dot_name(rtObject rtObj,string name,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
+        private static void _exec_dot_name(rtObjectBase rtObj,string name,OpStep step,StackFrame frame, RunTimeScope scope,Player player)
         {
             do
             {
@@ -727,7 +727,7 @@ namespace ASRuntime.operators
                             var dobj = (DynamicObject)
                                 player.static_instance[ rtObj.value._class.staticClass.classid].value ;
 
-                            dobj = (DynamicObject)((rtObject)dobj.memberData[0].getValue()).value;
+                            dobj = (DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
                             if (!dobj.hasproperty(name))
                             {
 
@@ -890,7 +890,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-        private static void linkProtoTypeMember(DynamicObject dobj,rtObject rtObj,Player player,StackSlot dslot,string name,StackSlotAccessor register)
+        private static void linkProtoTypeMember(DynamicObject dobj,rtObjectBase rtObj,Player player,StackSlot dslot,string name,StackSlotAccessor register)
         {
             SLOT v = dobj[name];
             if (!ReferenceEquals(dobj, rtObj.value))
@@ -912,7 +912,7 @@ namespace ASRuntime.operators
                             ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj,player.swc.FunctionClass.getRtType());
                             tempslot.directSet(
                                 TypeConverter.ObjectImplicit_ToPrimitive(
-                                (rtObject)v.getValue()));
+                                (rtObjectBase)v.getValue()));
 
                             v = tempslot;
                         }
@@ -968,9 +968,9 @@ namespace ASRuntime.operators
                         return;
                     }
                 }
-                else if (obj is rtObject)
+                else if (obj is rtObjectBase)
                 {
-                    if (player.swc.dict_Vector_type.ContainsKey(((rtObject)obj).value._class))
+                    if (player.swc.dict_Vector_type.ContainsKey(((rtObjectBase)obj).value._class))
                     {
                         //说明是Vector数组
                         OpVector.exec_AccessorBind_ConvertIdx( frame, step, scope);
@@ -979,7 +979,7 @@ namespace ASRuntime.operators
                 }
                 
 
-                if (!(obj is rtObject))
+                if (!(obj is rtObjectBase))
                 {
                     var objtype = obj.rtType;
 
@@ -1030,7 +1030,7 @@ namespace ASRuntime.operators
                 return;
             }
 
-            rtObject rtObj = (rtObject)v1;
+            rtObjectBase rtObj = (rtObjectBase)v1;
 
             if (true) //****检查如果不是数组
             {
@@ -1123,6 +1123,47 @@ namespace ASRuntime.operators
 
 			public override SLOT assign(RunTimeValueBase value, out bool success)
 			{
+				if (array.innerArray[idx].rtType == value.rtType)
+				{
+					switch (value.rtType)
+					{
+						case RunTimeDataType.rt_int:
+							{
+								((rtInt)array.innerArray[idx]).value = ((rtInt)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_uint:
+							{
+								((rtUInt)array.innerArray[idx]).value = ((rtUInt)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_number:
+							{
+								((rtNumber)array.innerArray[idx]).value = ((rtNumber)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_string:
+							{
+								((rtString)array.innerArray[idx]).value = ((rtString)value).value;
+								success = true;
+								return this;
+							}
+						case RunTimeDataType.rt_function:
+							{
+								((rtFunction)array.innerArray[idx]).CopyFrom((rtFunction)value);
+								success = true;
+								return this;
+							}
+						default:
+							break;
+					}
+
+
+				}
+
 				array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone
 				success = true;
 				return this;
@@ -1201,14 +1242,14 @@ namespace ASRuntime.operators
 
         internal sealed class prototypeSlot : SLOT
         {
-            internal rtObject _protoRootObj;
+            internal rtObjectBase _protoRootObj;
             internal string _protoname;
 
             internal SLOT findSlot;
 
             public RunTimeDataType functionClassRtType;
 
-            public prototypeSlot(rtObject _protoRootObj, string _protoname,
+            public prototypeSlot(rtObjectBase _protoRootObj, string _protoname,
                 SLOT findSlot
                 )
             {

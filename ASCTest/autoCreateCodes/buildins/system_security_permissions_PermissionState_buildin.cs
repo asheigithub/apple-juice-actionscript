@@ -118,7 +118,7 @@ namespace ASCTest.regNativeFunctions
 				}
 				else
 				{
-					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[0]).value;
+					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObjectBase)argements[0]).value;
 					ts1 = (System.Security.Permissions.PermissionState)argObj.value;
 				}
 
@@ -130,7 +130,7 @@ namespace ASCTest.regNativeFunctions
 				}
 				else
 				{
-					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObject)argements[1]).value;
+					LinkObj<object> argObj = (LinkObj<object>)((ASBinCode.rtData.rtObjectBase)argements[1]).value;
 					ts2 = (System.Security.Permissions.PermissionState)argObj.value;
 				}
 

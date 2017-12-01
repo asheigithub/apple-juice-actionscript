@@ -80,7 +80,7 @@ namespace ASRuntime.operators
 
         public static void exec_set_dynamic_prop(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            ASBinCode.rtData.rtObject obj = (ASBinCode.rtData.rtObject)step.reg.getValue(scope, frame);
+            ASBinCode.rtData.rtObjectBase obj = (ASBinCode.rtData.rtObjectBase)step.reg.getValue(scope, frame);
             ASBinCode.rtti.DynamicObject dobj = (ASBinCode.rtti.DynamicObject)obj.value;
 
             DynamicPropertySlot heapslot = new DynamicPropertySlot(obj, true,frame.player.swc.FunctionClass.getRtType());
