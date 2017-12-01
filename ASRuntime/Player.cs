@@ -3135,22 +3135,22 @@ namespace ASRuntime
 
 #region createInstance
 
-		public ASBinCode.rtData.rtObjectBase createInstance(string classname)
+		public ASBinCode.rtData.rtObject createInstance(string classname)
 		{
 			return createInstance(classname, 0, null, null, null, null);
 		}
 
-		public ASBinCode.rtData.rtObjectBase createInstance(string classname, object v1)
+		public ASBinCode.rtData.rtObject createInstance(string classname, object v1)
 		{
 			return createInstance(classname, 1, v1, null, null, null);
 		}
 
-		public ASBinCode.rtData.rtObjectBase createInstance(string classname, object v1, object v2)
+		public ASBinCode.rtData.rtObject createInstance(string classname, object v1, object v2)
 		{
 			return createInstance(classname, 2, v1, v2, null, null);
 		}
 
-		public ASBinCode.rtData.rtObjectBase createInstance(string classname, int argcount, object v1, object v2, object v3, params object[] args)
+		public ASBinCode.rtData.rtObject createInstance(string classname, int argcount, object v1, object v2, object v3, params object[] args)
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3248,7 +3248,7 @@ namespace ASRuntime
 						throw new ASRunTimeException(err.message,err.getStackTrace());
 					}
 
-					return v as rtObjectBase;
+					return v as rtObject;
 				}
 
 			}
