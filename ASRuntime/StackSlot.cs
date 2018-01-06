@@ -292,6 +292,34 @@ namespace ASRuntime
             
         }
 
+		//仅用于链接对象的new时，直接new到栈中,此时返回缓存对象再执行后续的构造函数操作
+		internal StackLinkObjectCache.StackCacheObject getStackCacheObject(ASBinCode.rtti.Class clsType)
+		{
+			needclear = true; refPropChanged = true;
+			index = RunTimeDataType._OBJECT;
+
+			var cacheobj = _linkObjCache.getCacheObj(clsType);
+
+			if (clsType.isStruct)
+			{
+			}
+			else
+			{
+				var link = (ASBinCode.rtti.LinkSystemObject)cacheobj.value;
+				link._class = clsType;
+				link.SetLinkData(null);
+				cacheobj.rtType = clsType.getRtType();
+				cacheobj.objScope.blockId = clsType.blockid;
+			}
+
+			//store[RunTimeDataType._OBJECT] = cacheobj;
+			store[COMMREFTYPEOBJ] = cacheobj;
+
+
+			return cacheobj;
+		}
+
+
         //仅用于链接对象的赋值更新
         public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player ,T value)
         {

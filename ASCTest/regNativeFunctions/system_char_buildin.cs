@@ -128,14 +128,16 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 
-            LinkObj<Char> obj =
-                (LinkObj<Char>)(v.value);
+			var cls=((ASBinCode.rtData.rtObjectBase) thisObj).value._class.instanceClass;
 
-            obj.value = (Char)TypeConverter.ConvertToInt(argements[0]);
+			 //LinkObj<Char> obj =
+    //            (LinkObj<Char>)(v.value);
 
-            ((StackSlot)returnSlot).setLinkObjectValue(obj._class, stackframe.player, obj.value);
+            var value = (Char)TypeConverter.ConvertToInt(argements[0]);
+
+            ((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, value);
 
             success = true;
         }

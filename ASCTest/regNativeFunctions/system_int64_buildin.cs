@@ -108,9 +108,9 @@ namespace ASCTest.regNativeFunctions
     //    }
     //}
 
-    class system_int64_explicit_from : NativeFunctionBase
-    {
-        public system_int64_explicit_from()
+    class system_int64_explicit_from : NativeConstParameterFunction
+	{
+        public system_int64_explicit_from():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_number);
@@ -149,29 +149,44 @@ namespace ASCTest.regNativeFunctions
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    errormessage = null;
+        //    errorno = 0;
 
-            ASRuntime.StackFrame frame = (ASRuntime.StackFrame)stackframe;
+        //    ASRuntime.StackFrame frame = (ASRuntime.StackFrame)stackframe;
 
-            var v = (frame.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+        //    var v = (frame.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 
-            LinkObj<long> obj =
-                (LinkObj<long>)(v.value);
-            obj.value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
-            //LinkObj_Int64 obj = new LinkObj_Int64( ((ASBinCode.rtData.rtObject)thisObj).value._class);
+        //    LinkObj<long> obj =
+        //        (LinkObj<long>)(v.value);
+        //    obj.value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
+        //    //LinkObj_Int64 obj = new LinkObj_Int64( ((ASBinCode.rtData.rtObject)thisObj).value._class);
 
-            //return new ASBinCode.rtData.rtObject(obj, new RunTimeScope());
-            return v;
-        }
-    }
+        //    //return new ASBinCode.rtData.rtObject(obj, new RunTimeScope());
+        //    return v;
+        //}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+			//LinkObj<long> obj =
+			//    (LinkObj<long>)(v.value);
+
+			var value = (Int64)TypeConverter.ConvertToNumber(argements[0]);
+
+			((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, value);
+
+			success = true;
+		}
+
+	}
 
 
-    class system_int64_implicit_from : NativeFunctionBase
+    class system_int64_implicit_from : NativeConstParameterFunction
     {
-        public system_int64_implicit_from()
+        public system_int64_implicit_from():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_number);
@@ -210,22 +225,35 @@ namespace ASCTest.regNativeFunctions
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            ASRuntime.StackFrame frame = (ASRuntime.StackFrame)stackframe;
+		//    ASRuntime.StackFrame frame = (ASRuntime.StackFrame)stackframe;
 
-            var v = (frame.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+		//    var v = (frame.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 
-            LinkObj<long> obj =
-                (LinkObj<long>)(v.value);
-            obj.value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
-            
-            return v;
-        }
-    }
+		//    LinkObj<long> obj =
+		//        (LinkObj<long>)(v.value);
+		//    obj.value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
+
+		//    return v;
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+			//LinkObj<long> obj =
+			//    (LinkObj<long>)(v.value);
+
+			var value = (Int64)TypeConverter.ConvertToNumber(argements[0]);
+
+			((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, value);
+
+			success = true;
+		}
+	}
 
 
     class system_int64_valueOf : NativeFunctionBase

@@ -1558,10 +1558,7 @@ namespace ASRuntime
             return operators.InstanceCreator.createPureHostdOrLinkObject(this, cls);
         }
 
-        public ASBinCode.rtti.LinkSystemObject alloc_LinkObjValue(ASBinCode.rtti.Class cls)
-        {
-            return operators.InstanceCreator.createLinkObjectValue(this, cls);
-        }
+        
 
         public bool init_static_class(ASBinCode.rtti.Class cls,SourceToken token)
         {

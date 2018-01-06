@@ -31,6 +31,8 @@ namespace ASRuntime.operators
 
 		private HeapSlot tempSlot;
 
+		public SLOT objectStoreToSlot;
+
         private InstanceCreator(StackFrame invokerFrame)//, SourceToken token, Class _class)
         {
             this.invokerFrame = invokerFrame;
@@ -67,6 +69,8 @@ namespace ASRuntime.operators
 
 			constructor = null;
 			_function_constructor = null;
+			objectStoreToSlot = null;
+
 			tempSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 		}
 
@@ -134,7 +138,7 @@ namespace ASRuntime.operators
                 ASBinCode.rtti.Object obj = makeObj(
                     player,token,
                     cls.staticClass,
-                    null, out objScope).value;
+                    null,null, out objScope).value;
 
                 player.static_instance.Add(cls.staticClass.classid,
                     new ASBinCode.rtData.rtObject(obj, objScope));
@@ -195,7 +199,7 @@ namespace ASRuntime.operators
 				callbacker.setWhenFailed(creatorFailed);
 
                 ASBinCode.RunTimeScope objScope;
-                var obj = makeObj(player,token, _class.staticClass, callbacker, out objScope);
+                var obj = makeObj(player,token, _class.staticClass, callbacker,this, out objScope);
 
                 player.static_instance.Add(_class.staticClass.classid,
                     obj);
@@ -396,7 +400,7 @@ namespace ASRuntime.operators
 
             ASBinCode.RunTimeScope objScope;
 
-            makeObj(player,token, _class, callbacker, out objScope);
+            makeObj(player,token, _class, callbacker,this, out objScope);
         }
 
 		private static void afterCreateInstanceDataCallBacker(BlockCallBackBase sender, object args)
@@ -550,7 +554,8 @@ namespace ASRuntime.operators
         {
             if (cls.isLink_System)
             {
-                ASBinCode.rtti.Object obj = createObject(player.swc, cls);
+				ASBinCode.rtData.rtObjectBase rb;
+                ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb);
                 return (LinkSystemObject)obj;
             }
             else
@@ -563,7 +568,8 @@ namespace ASRuntime.operators
         {
             if (cls.isLink_System)
             {
-                ASBinCode.rtti.Object obj = createObject(player.swc, cls);
+				ASBinCode.rtData.rtObjectBase rb;
+				ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb);
                 ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
 
                 RunTimeScope scope = new RunTimeScope(
@@ -603,20 +609,24 @@ namespace ASRuntime.operators
         }
 
         
-        private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls)
+        private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls,InstanceCreator creator,out ASBinCode.rtData.rtObjectBase rtObjectBase)
         {
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
-
+			rtObjectBase = null;
             if (cls.isLink_System)
             {
-                //var creator= swc.functions[((ClassMethodGetter)cls.staticClass.linkObjCreator.bindField).functionId];
-                //if (creator.native_index == -1)
-                //{
-                //    creator.native_index = swc.nativefunctionNameIndex[creator.native_name];
-                //}
-                //var func = swc.nativefunctions[creator.native_index];
+				if (creator != null)
+				{
+					StackSlot stackSlot = creator.objectStoreToSlot as StackSlot;
+					if (stackSlot != null)
+					{
+						rtObjectBase = stackSlot.getStackCacheObject(cls);
+						return rtObjectBase.value;
+					}
+				}
+
+
                 var func = (NativeFunctionBase)swc.class_Creator[cls];
-                
 
                 string err;int no;
                 ASBinCode.rtData.rtObjectBase rtObj= 
@@ -629,7 +639,6 @@ namespace ASRuntime.operators
                 {
                     return rtObj.value;
                 }
-                //obj = new LinkSystemObject(cls);
             }
             else if (
                 swc.DictionaryClass != null
@@ -668,79 +677,88 @@ namespace ASRuntime.operators
             Player player,
             SourceToken token,
             ASBinCode.rtti.Class cls,
-            BlockCallBackBase callbacker, out ASBinCode.RunTimeScope objScope)
+            BlockCallBackBase callbacker, InstanceCreator creator, out ASBinCode.RunTimeScope objScope)
         {
 
-            ASBinCode.rtti.Object obj = createObject(player.swc, cls);
+			ASBinCode.rtData.rtObjectBase result;
 
-            var result = new ASBinCode.rtData.rtObject(obj, null);
-            if (cls.fields.Count > 0)
-            {
-                obj.memberData = new ObjectMemberSlot[cls.fields.Count];
-                for (int i = 0; i < obj.memberData.Length; i++)
-                {
-                    obj.memberData[i] = new ObjectMemberSlot(result,player.swc.FunctionClass.getRtType());
+            ASBinCode.rtti.Object obj = createObject(player.swc, cls,creator,out result);
 
-                    if (cls.fields[i].defaultValue == null)
-                    {
-                        obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null,null));
-                    }
-
-                    ((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;
-                }
-            }
-            else
-            {
-                obj.memberData = blankFields;
-            }
-
-
-            ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.blockid];
-
-            objScope = player.callBlock(codeblock,
-                (ObjectMemberSlot[])obj.memberData, null,  
-                null
-                , token, callbacker
-                ,
-                result, RunTimeScopeType.objectinstance
-                );
-
-            result.objScope = objScope;
-
-			if (objScope == null)
+			if (result == null)
 			{
-				if (callbacker != null)
+				result = new ASBinCode.rtData.rtObject(obj, null);
+				if (cls.fields.Count > 0)
 				{
-					callbacker.noticeRunFailed();
+					obj.memberData = new ObjectMemberSlot[cls.fields.Count];
+					for (int i = 0; i < obj.memberData.Length; i++)
+					{
+						obj.memberData[i] = new ObjectMemberSlot(result, player.swc.FunctionClass.getRtType());
+
+						if (cls.fields[i].defaultValue == null)
+						{
+							obj.memberData[i].directSet(TypeConverter.getDefaultValue(cls.fields[i].valueType).getValue(null, null));
+						}
+
+						((ObjectMemberSlot)obj.memberData[i]).isConstMember = cls.fields[i].isConst;
+					}
+				}
+				else
+				{
+					obj.memberData = blankFields;
 				}
 
-				return null;
-			}
 
-			//***把父类的初始化函数推到栈上去***
-			var ss = cls.super;
-            while (ss != null)
-            {
-                var scope=player.callBlock(player.swc.blocks[ss.blockid],
-                    (ObjectMemberSlot[])obj.memberData,
-                    null, null, token, null, result, RunTimeScopeType.objectinstance
-                    );
+				ASBinCode.CodeBlock codeblock = player.swc.blocks[cls.blockid];
 
-                ss = ss.super;
+				objScope = player.callBlock(codeblock,
+					(ObjectMemberSlot[])obj.memberData, null,
+					null
+					, token, callbacker
+					,
+					result, RunTimeScopeType.objectinstance
+					);
 
-				if (scope == null)
+				result.objScope = objScope;
+
+				if (objScope == null)
 				{
 					if (callbacker != null)
 					{
 						callbacker.noticeRunFailed();
 					}
-					
+
 					return null;
 				}
 
-            }
+				//***把父类的初始化函数推到栈上去***
+				var ss = cls.super;
+				while (ss != null)
+				{
+					var scope = player.callBlock(player.swc.blocks[ss.blockid],
+						(ObjectMemberSlot[])obj.memberData,
+						null, null, token, null, result, RunTimeScopeType.objectinstance
+						);
 
+					ss = ss.super;
 
+					if (scope == null)
+					{
+						if (callbacker != null)
+						{
+							callbacker.noticeRunFailed();
+						}
+
+						return null;
+					}
+
+				}
+
+			}
+			else
+			{
+				objScope = result.objScope;
+				player.CallBlankBlock(callbacker);
+			}
 
             if (callbacker != null)
             {

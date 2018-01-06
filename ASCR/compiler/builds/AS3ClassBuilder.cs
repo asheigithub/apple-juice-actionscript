@@ -473,19 +473,6 @@ namespace ASCompiler.compiler.builds
                                                                    "[hosted]的类必须是final");
             }
 
-            //List<ASTool.AS3.IAS3Stmt> classstmts = as3class.StamentsStack.Peek();
-
-            //ASBinCode.CodeBlock block = new ASBinCode.CodeBlock(blockid, cls.name,cls.classid,false);
-            //block.scope = new ASBinCode.scopes.ObjectInstanceScope(cls);
-
-            //CompileEnv env = new CompileEnv(block, false);
-            //builder._classbuildingEnv.Add(cls, env);
-
-            //for (int i = 0; i < classstmts.Count; i++)
-            //{
-            //    buildClassMember(env, classstmts[i], cls, builder, false);
-            //}
-
 
             //****编译metaclass***
             int metaclassid = builder.getClassId();
@@ -503,17 +490,7 @@ namespace ASCompiler.compiler.builds
             metaclass.instanceClass = cls;
 			metaclass.isPackageFunction = cls.isPackageFunction;
 
-            //ASBinCode.CodeBlock metablock = new ASBinCode.CodeBlock(metablockid, metaclass.name,metaclass.classid,false);
-            //metablock.scope = new ASBinCode.scopes.ObjectInstanceScope(metaclass);
-
-            //CompileEnv envMeta = new CompileEnv(metablock, false);
-            //builder._classbuildingEnv.Add(metaclass, envMeta);
-
-            //for (int i = 0; i < classstmts.Count; i++)
-            //{
-            //    buildClassMember(envMeta, classstmts[i], metaclass, builder, true);
-            //}
-
+           
             return cls;
         }
 

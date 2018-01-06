@@ -57,6 +57,7 @@ var f:int = fibonacci_recursion(30);
 
 trace("actionscript3:", ((new Date()).getTime() - t ));
 trace(f);
+
 //var array:Vector.<int> = new Vector.<int>();
 //
 			//for (var i:int = 0; i < 1024; i++) 

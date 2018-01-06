@@ -266,9 +266,9 @@ namespace LinkCodeGen
 
             EndNativeFuncClass(nativefunc);
 
-            Console.WriteLine(as3api.ToString());
+            //Console.WriteLine(as3api.ToString());
 
-            Console.WriteLine(nativefunc.ToString());
+            //Console.WriteLine(nativefunc.ToString());
 
             string as3file = "as3api/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
             string nativefunfile = "buildins/" + GetNativeFunctionClassName(type) + ".cs";

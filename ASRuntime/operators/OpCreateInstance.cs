@@ -335,7 +335,7 @@ namespace ASRuntime.operators
             //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
-
+			frame.instanceCreator.objectStoreToSlot = step.reg.getSlot(scope, frame);
             
 
             BlockCallBackBase cb = frame.player.blockCallBackPool.create();
@@ -353,8 +353,9 @@ namespace ASRuntime.operators
             //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;
             frame.instanceCreator.token = step.token;
+			frame.instanceCreator.objectStoreToSlot = step.reg.getSlot(scope, frame);
 
-            BlockCallBackBase cb = frame.player.blockCallBackPool.create();
+			BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
             cb.scope = scope;
@@ -363,28 +364,13 @@ namespace ASRuntime.operators
             frame.instanceCreator.callbacker = cb;
             frame.instanceCreator.createInstance();
 
-
-            //var _class = getClass(player, frame, step, scope);
-            //if (_class != null)
-            //{
-            //    //exec_createinstance(_class, player, frame, step, scope);
-
-
-
-            //}
-            //else
-            //{
-            //    frame.endStep(step);
-            //}
         }
         private static void objcreated(BlockCallBackBase sender,object args)
         {
 			StackFrame frame = (StackFrame)sender.args;
             sender.step.reg.getSlot(sender.scope, frame).directSet(
                 frame.instanceCreator.objectResult );
-
-
-			//((StackFrame)sender.args).instanceCreator = null;
+			
 			frame.deActiveInstanceCreator();
 			frame.endStep();
         }

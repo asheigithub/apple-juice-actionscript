@@ -131,14 +131,14 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+			//LinkObj<sbyte> obj =
+   //             (LinkObj<sbyte>)(v.value);
 
-            LinkObj<sbyte> obj =
-                (LinkObj<sbyte>)(v.value);
+            var value = (sbyte)TypeConverter.ConvertToInt(argements[0]);
 
-            obj.value = (sbyte)TypeConverter.ConvertToInt(argements[0]);
-
-            ((StackSlot)returnSlot).setLinkObjectValue(obj._class, stackframe.player, obj.value);
+            ((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, value);
 
             success = true;
         }
@@ -189,17 +189,17 @@ namespace ASCTest.regNativeFunctions
 
         public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
         {
-            var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+			//LinkObj<sbyte> obj =
+			//             (LinkObj<sbyte>)(v.value);
 
-            LinkObj<sbyte> obj =
-                (LinkObj<sbyte>)(v.value);
+			var value = (sbyte)TypeConverter.ConvertToInt(argements[0]);
 
-            obj.value = (sbyte)TypeConverter.ConvertToInt(argements[0]);
+			((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, value);
 
-            ((StackSlot)returnSlot).setLinkObjectValue(obj._class, stackframe.player, obj.value);
-
-            success = true;
-        }
+			success = true;
+		}
 
 
     }
