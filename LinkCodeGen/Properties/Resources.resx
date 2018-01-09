@@ -118,16 +118,43 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="CtorFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\ctorfunc.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="EnumCtor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\EnumCtor.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="EnumItemBitOr" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\enumitembitor.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="FieldGetter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\fieldgetter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FieldSetter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\fieldsetter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="LoadArgement" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\loadargement.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="LoadStructArgement" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\loadstructargement.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="LoadStructThis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\loadstructthis.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="LoadThis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\loadthis.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="MethodFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\methodfunc.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="StaticFieldGetter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\staticfieldgetter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="StaticFieldSetter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\staticfieldsetter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="StaticMethodFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\staticmethodfunc.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

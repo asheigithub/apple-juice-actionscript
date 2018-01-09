@@ -1,0 +1,2 @@
+﻿				[thisObjtype] _this =
+					([thisObjtype])((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();

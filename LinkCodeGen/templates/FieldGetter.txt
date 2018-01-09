@@ -1,0 +1,74 @@
+﻿		class [classname] : NativeConstParameterFunction
+		{
+			public [classname]() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "[classname]";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return [returntype];
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+[loadthis]
+
+				try
+				{
+					[storeresult]
+
+					success = true;
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}

@@ -80,6 +80,7 @@
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
+    <hidden path="..\..\..\LinkCodeGen\bin\Debug\as3api\linkcodegen" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />
@@ -87,7 +88,7 @@
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
-    <option showHiddenPaths="False" />
+    <option showHiddenPaths="True" />
     <option testMovie="Custom" />
     <option testMovieCommand="bat\RunApp.bat" />
   </options>

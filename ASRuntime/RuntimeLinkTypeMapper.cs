@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ASRuntime
 {
-    class RuntimeLinkTypeMapper : LinkTypeMapper
+    public class RuntimeLinkTypeMapper
     {
         Type arrayType;
         Dictionary<Type, RunTimeDataType> link_type;
@@ -20,7 +20,7 @@ namespace ASRuntime
 		RunTimeDataType _SHORT = -996;
 		RunTimeDataType _USHORT = -995;
 
-        public sealed override void init(CSWC swc)
+        public  void init(CSWC swc)
         {
             arrayType = typeof(Array);
 
@@ -67,7 +67,7 @@ namespace ASRuntime
             }
         }
 
-        public sealed override Type getLinkType(RunTimeDataType rtType)
+        public  Type getLinkType(RunTimeDataType rtType)
         {
             if (rtType == RunTimeDataType._OBJECT)
             {
@@ -87,7 +87,7 @@ namespace ASRuntime
             }
         }
 
-        public sealed override RunTimeDataType getRuntimeDataType(Type linkType)
+        public  RunTimeDataType getRuntimeDataType(Type linkType)
         {
             if (linkType.IsArray)
             {
@@ -116,7 +116,7 @@ namespace ASRuntime
         }
 
 
-        public sealed override void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, object player)
+        public  void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, object player)
         {
             if (obj == null)
             {
@@ -294,9 +294,10 @@ namespace ASRuntime
                     else
                     {
                         rtCls = bin.getClassByRunTimeDataType(rt);
-                        var f = ((CSWC)bin).class_Creator[rtCls];
-                        f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
-                    }
+						var f = ((CSWC)bin).class_Creator[rtCls];
+						f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
+
+					}
 
 
                 }
@@ -309,7 +310,7 @@ namespace ASRuntime
 
 
 
-        public sealed override bool rtValueToLinkObject
+        public  bool rtValueToLinkObject
             (RunTimeValueBase value, Type linkType,IClassFinder bin,bool needclone, out object linkobject)
         {
             RunTimeDataType vt = value.rtType;

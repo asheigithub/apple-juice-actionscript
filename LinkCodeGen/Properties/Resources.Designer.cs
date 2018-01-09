@@ -19,7 +19,7 @@ namespace LinkCodeGen.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,48 @@ namespace LinkCodeGen.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string CtorFunc {
+            get {
+                return ResourceManager.GetString("CtorFunc", resourceCulture);
             }
         }
         
@@ -144,6 +186,89 @@ namespace LinkCodeGen.Properties {
         }
         
         /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(0)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public override RunTimeDataType re [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string FieldGetter {
+            get {
+                return ResourceManager.GetString("FieldGetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(1)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public override RunTi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string FieldSetter {
+            get {
+                return ResourceManager.GetString("FieldSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 					object arg{argindex};
         ///					if (!stackframe.player.linktypemapper.rtValueToLinkObject(
         ///						argements[{argindex}],
@@ -164,6 +289,45 @@ namespace LinkCodeGen.Properties {
         internal static string LoadArgement {
             get {
                 return ResourceManager.GetString("LoadArgement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 					{argType} arg{argindex};
+        ///
+        ///					if (argements[{argindex}].rtType == RunTimeDataType.rt_null)
+        ///					{
+        ///						arg{argindex} = default({argType});
+        ///					}
+        ///					else
+        ///					{
+        ///						LinkObj&lt;{argType}&gt; argObj = (LinkObj&lt;{argType}&gt;)((ASBinCode.rtData.rtObjectBase)argements[{argindex}]).value;
+        ///						arg{argindex} = argObj.value;
+        ///					} 的本地化字符串。
+        /// </summary>
+        internal static string LoadStructArgement {
+            get {
+                return ResourceManager.GetString("LoadStructArgement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 				[thisObjtype] _this =
+        ///					([thisObjtype])((LinkObj&lt;[thisObjtype]&gt;)((ASBinCode.rtData.rtObjectBase)thisObj).value).value; 的本地化字符串。
+        /// </summary>
+        internal static string LoadStructThis {
+            get {
+                return ResourceManager.GetString("LoadStructThis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 				[thisObjtype] _this =
+        ///					([thisObjtype])((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData(); 的本地化字符串。
+        /// </summary>
+        internal static string LoadThis {
+            get {
+                return ResourceManager.GetString("LoadThis", resourceCulture);
             }
         }
         
@@ -206,6 +370,131 @@ namespace LinkCodeGen.Properties {
         internal static string MethodFunc {
             get {
                 return ResourceManager.GetString("MethodFunc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(0)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public override RunTimeDataType re [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string StaticFieldGetter {
+            get {
+                return ResourceManager.GetString("StaticFieldGetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(1)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public override RunTi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string StaticFieldSetter {
+            get {
+                return ResourceManager.GetString("StaticFieldSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string StaticMethodFunc {
+            get {
+                return ResourceManager.GetString("StaticMethodFunc", resourceCulture);
             }
         }
     }

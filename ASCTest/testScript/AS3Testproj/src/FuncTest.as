@@ -8,7 +8,6 @@ package
 	import system.DayOfWeek;
 	import system.Int64;
 	import system.SByte;
-	import system.StringSplitOptions;
 	import system.TimeSpan;
 	import system.TypeCode;
 	import system.UInt64;
@@ -25,7 +24,7 @@ package
 	import system.collections.Stack;
 	import system.collections._IEnumerable_;
 	import system.collections._IEnumerator_;
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author ...
@@ -226,7 +225,7 @@ package
 			uq.queue.enqueue(4);
 			uq.queue.enqueue(6);
 			
-			uq.queue.enqueue(StringSplitOptions.RemoveEmptyEntries);
+			uq.queue.enqueue( DayOfWeek.Thursday );
 			
 			trace(uq.queue.toArray()[2]);
 			

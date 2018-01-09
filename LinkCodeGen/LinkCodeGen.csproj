@@ -47,8 +47,13 @@
     <Compile Include="ClassCreator.cs" />
     <Compile Include="CreatorBase.cs" />
     <Compile Include="EnumCreator.cs" />
+    <Compile Include="FieldGetterNativeCodeCreator.cs" />
+    <Compile Include="FieldSetterNativeCodeCreator.cs" />
     <Compile Include="InterfaceCreator.cs" />
     <Compile Include="MethodNativeCodeCreator.cs" />
+    <Compile Include="CtorNativeCodeCreator.cs" />
+    <Compile Include="MethodNativeCodeCreatorBase.cs" />
+    <Compile Include="NativeCodeCreatorBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -56,14 +61,26 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StaticFieldGetterNativeCodeCreator.cs" />
+    <Compile Include="StaticFieldSetterNativeCodeCreator.cs" />
+    <Compile Include="StaticMethodNativeCodeCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="templates\CtorFunc.txt" />
     <Content Include="templates\EnumCtor.txt" />
+    <Content Include="templates\FieldGetter.txt" />
+    <Content Include="templates\FieldSetter.txt" />
     <Content Include="templates\LoadArgement.txt" />
+    <Content Include="templates\LoadStructArgement.txt" />
+    <Content Include="templates\LoadStructThis.txt" />
+    <Content Include="templates\LoadThis.txt" />
     <Content Include="templates\MethodFunc.txt" />
+    <Content Include="templates\StaticFieldGetter.txt" />
+    <Content Include="templates\StaticFieldSetter.txt" />
+    <Content Include="templates\StaticMethodFunc.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -78,6 +95,10 @@
     <ProjectReference Include="..\ASRuntime\ASRuntime.csproj">
       <Project>{8c0a5542-f8c6-470c-b194-5a5c50c5a695}</Project>
       <Name>ASRuntime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoGenCodeLib\AutoGenCodeLib.csproj">
+      <Project>{a4c59558-40e6-44c3-84a0-ea5a8fcff05a}</Project>
+      <Name>AutoGenCodeLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

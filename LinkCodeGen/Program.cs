@@ -6,13 +6,22 @@ using System.Text;
 namespace LinkCodeGen
 {
 	
+
+
+
 	class Program
     {
         static void Main(string[] args)
         {
-			
-			var assembly = System.Reflection.Assembly.GetAssembly(typeof(object));
 
+			if (System.IO.File.Exists("skipcreatortypes.txt"))
+			{
+				var configs = System.IO.File.ReadAllLines("skipcreatortypes.txt");
+				CreatorBase.SkipCreateTypes.AddRange(configs);
+			}
+
+
+			var assembly = System.Reflection.Assembly.GetAssembly(typeof(object));
 			StringBuilder regclassSb = new StringBuilder();
 
 			//****Enum****
@@ -70,7 +79,7 @@ namespace LinkCodeGen
 
 			//*****类*******
 
-			var classtype = typeof(System.Data.SqlClient.SqlConnection);
+			var classtype = typeof(AutoGenCodeLib.Testobj);
 			if (!creators.ContainsKey(classtype))
 			{
 				creators.Add(classtype, null);
@@ -79,11 +88,12 @@ namespace LinkCodeGen
 			}
 			foreach (var item in creators.Values)
 			{
+				Console.WriteLine("building:" + item.BuildIngType);
 				item.Create();
 			}
 
 			//System.IO.File.WriteAllText("retNativeCode.txt", regclassSb.ToString());
-
+			Console.WriteLine("创建完成");
 			Console.Read();
         }
 

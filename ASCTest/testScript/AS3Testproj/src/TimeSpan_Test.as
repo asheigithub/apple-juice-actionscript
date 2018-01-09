@@ -42,7 +42,7 @@ package
 		{
 			
 			//var dk = DateTimeKind.Local;
-			//trace( int(DateTimeKind.Local));
+			//trace( int(DateTimeKind.Local | DateTimeKind.Unspecified));
 			
 			//var i:Int64 = new Int64(4);
 			//

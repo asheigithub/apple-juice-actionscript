@@ -26,10 +26,10 @@ namespace ASRuntime.nativefuncs
         }
 
         public static NativeFunctionBase getStruct_static_field_getter<T>
-            (string name,struct_static_field_getter<T>.DelegateGetStaticValue getter)
+            (string name,static_struct_field_getter<T>.DelegateGetStaticValue getter)
             where T : struct
         {
-            return new struct_static_field_getter<T>(name, getter);
+            return new static_struct_field_getter<T>(name, getter);
         }
 
         public static NativeFunctionBase getCompareTo<T>
@@ -418,15 +418,15 @@ namespace ASRuntime.nativefuncs
 
     #region static_field_getter
 
-    public sealed class struct_static_field_getter<T> : NativeFunctionBase
-        where T:struct
+    public sealed class static_struct_field_getter<T> : NativeConstParameterFunction
+		where T:struct
     {
         public delegate T DelegateGetStaticValue();
 
         DelegateGetStaticValue valueGetter;
 
         private string functionname;
-        public struct_static_field_getter(string functionname,DelegateGetStaticValue valueGetter)
+        public static_struct_field_getter(string functionname,DelegateGetStaticValue valueGetter):base(0)
         {
             this.functionname = functionname;
             this.valueGetter = valueGetter;
@@ -466,43 +466,36 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			var maxValue = valueGetter();
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+			((StackSlot)returnSlot)
+				.setLinkObjectValue<T>(
+				bin.getClassByRunTimeDataType(
+				functionDefine.signature.returnType
+				)
+				,
+				((StackFrame)stackframe).player
+				, maxValue);
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            var maxValue = valueGetter();
+			success = true;
+		}
 
-            ((StackSlot)returnSlot)
-                .setLinkObjectValue<T>(
-                bin.getClassByRunTimeDataType(
-                functionDefine.signature.returnType
-                )
-                ,
-                ((StackFrame)stackframe).player
-                , maxValue);
-
-            success = true;
-        }
-
-    }
+	}
 
 
-    #endregion
 
-    #region compareTo
 
-    class compareto<T> : NativeConstParameterFunction
+	#endregion
+
+	
+
+
+
+	#region compareTo
+
+	class compareto<T> : NativeConstParameterFunction
         where T :IComparable
     {
         private string funname;

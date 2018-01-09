@@ -15,6 +15,15 @@ namespace LinkCodeGen
 
 		public  string name;
 
+		public string BuildIngType
+		{
+			get
+			{
+				return type.FullName;
+			}
+		}
+
+
 		public CreatorBase(Type type, string as3apidocpath, string csharpnativecodepath)
 		{
 			this.type = type;
@@ -22,6 +31,41 @@ namespace LinkCodeGen
 			this.csharpnativecodepath = csharpnativecodepath;
 		}
 
+
+		public void MakeCreator(Type type,Dictionary<Type,CreatorBase> typeCreators)
+		{
+			if (type.IsInterface)
+			{
+				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				{
+					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators);
+				}
+			}
+			else if (type.IsEnum)
+			{
+				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				{
+					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath);
+				}
+			}
+			else if (type.IsArray)
+			{
+				var elementtype = type.GetElementType();
+				if (elementtype != null)
+				{
+					MakeCreator(elementtype, typeCreators);
+				}
+			}
+			else if (type.IsClass || type.IsValueType)
+			{
+				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				{
+					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators);
+				}
+			}
+		}
+
+		
 		/// <summary>
 		/// 返回如果在成员中涉及这种类型是否要跳过
 		/// </summary>
@@ -29,12 +73,85 @@ namespace LinkCodeGen
 		/// <returns></returns>
 		public static bool IsSkipType(Type type)
 		{
+			if (type == null)
+				return true;
+
+			if (type.IsByRef)
+				return true;
+
+			if (type.IsNotPublic)
+			{
+				return true;
+			}
+
+			if (type.IsGenericType)
+			{
+				return true;
+			}
+
+			if (type.IsArray)
+			{
+				return IsSkipType(type.GetElementType());
+			}
+
 			if (Equals(type, typeof(Type)))
 			{
 				return true;
 			}
 
+			if (Equals(type, typeof(Delegate)))
+			{
+				return true;
+			}
 
+			if (Equals(type, typeof(MulticastDelegate)))
+			{
+				return true;
+			}
+
+			if (type.BaseType != null)
+			{
+				return IsSkipType(type.BaseType);
+			}
+
+			return false;
+		}
+
+		public static List<string> SkipCreateTypes = new List<string>();
+		/// <summary>
+		/// 是否已经手工绑定。
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public static bool IsSkipCreator(Type type)
+		{
+			if (type == null)
+				return true;
+
+			if (type.IsArray)
+			{
+				return IsSkipCreator(type.GetElementType());
+			}
+
+			ASBinCode.RunTimeDataType rttype = MethodNativeCodeCreator.GetAS3Runtimetype(type);
+			if (rttype < ASBinCode.RunTimeDataType._OBJECT)
+			{
+				return true;
+			}
+
+			string fn = type.FullName;
+
+			if (fn == "System.ValueType")
+			{
+				return true;
+			}
+
+			if (SkipCreateTypes.Contains(fn))
+			{
+				return true;
+			}
+
+			
 
 			return false;
 		}
@@ -140,9 +257,8 @@ namespace LinkCodeGen
 			return GetAS3ClassOrInterfaceName(type);
 		}
 
-		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType)
+		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
 		{
-
 			var members = methodAtType.GetMember(dotName);
 
 			string ext = string.Empty;
@@ -171,13 +287,47 @@ namespace LinkCodeGen
 
 
 
-			return dotName.Substring(0, 1).ToLower() + dotName.Substring(1) + ext;
+			string v= dotName.Substring(0, 1).ToLower() + dotName.Substring(1) + ext;
 
-
+			if (method.IsStatic)
+			{
+				if (staticusenames != null)
+				{
+					while (staticusenames.ContainsKey(v))
+					{
+						v = v + "_";
+					}
+				}
+			}
+			else
+			{
+				if (usenames != null)
+				{
+					while (usenames.ContainsKey(v))
+					{
+						v = v + "_";
+					}
+				}
+			}
+			return v;
 
 		}
 
 		public abstract void Create();
+
+
+
+
+		protected void GenAS3FileHead(StringBuilder as3sb)
+		{
+			as3sb.AppendLine("package " + GetPackageName(type));
+			as3sb.AppendLine("{");
+		}
+
+		protected void EndAS3File(StringBuilder as3sb)
+		{
+			as3sb.AppendLine("}");
+		}
 
 	}
 }

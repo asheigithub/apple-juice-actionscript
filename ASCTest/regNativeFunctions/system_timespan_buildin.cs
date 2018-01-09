@@ -1269,9 +1269,9 @@ namespace ASCTest.regNativeFunctions
 
 
 
-    class system_timespan_static_constructor_ : NativeFunctionBase
-    {
-        public system_timespan_static_constructor_()
+    class system_timespan_static_constructor_ : ASRuntime.nativefuncs.NativeConstParameterFunction
+	{
+        public system_timespan_static_constructor_():base(4)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_int);
@@ -1313,34 +1313,50 @@ namespace ASCTest.regNativeFunctions
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+        //public override NativeFunctionMode mode
+        //{
+        //    get
+        //    {
+        //        return NativeFunctionMode.normal_1;
+        //    }
+        //}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+        //public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
-            int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
-            int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
-            int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue());
+        //public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+        //{
+        //    int days = ASRuntime.TypeConverter.ConvertToInt(argements[0].getValue());
+        //    int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1].getValue());
+        //    int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2].getValue());
+        //    int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3].getValue());
 
-            var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
-            StackFrame frame = (StackFrame)stackframe;
+        //    var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+        //    StackFrame frame = (StackFrame)stackframe;
 
-            ((StackSlot)returnSlot).setLinkObjectValue(cls, frame.player, new TimeSpan(days, hours, minutes, seconds));
+        //    ((StackSlot)returnSlot).setLinkObjectValue(cls, frame.player, new TimeSpan(days, hours, minutes, seconds));
 
-            success = true;
-        }
-    }
+        //    success = true;
+        //}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			int days = ASRuntime.TypeConverter.ConvertToInt(argements[0]);
+			int hours = ASRuntime.TypeConverter.ConvertToInt(argements[1]);
+			int minutes = ASRuntime.TypeConverter.ConvertToInt(argements[2]);
+			int seconds = ASRuntime.TypeConverter.ConvertToInt(argements[3]);
+
+			var cls = bin.getClassByRunTimeDataType(functionDefine.signature.returnType);
+			StackFrame frame = (StackFrame)stackframe;
+
+			((StackSlot)returnSlot).setLinkObjectValue(cls, frame.player, new TimeSpan(days, hours, minutes, seconds));
+
+			success = true;
+		}
+
+	}
 
     class system_timespan_static_constructor__ : NativeFunctionBase
     {

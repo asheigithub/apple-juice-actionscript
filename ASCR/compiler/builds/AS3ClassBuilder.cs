@@ -1386,11 +1386,11 @@ namespace ASCompiler.compiler.builds
 														throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
 															"本地函数 " + native_get + "不接受参数");
 													}
-													if (nf.returnType != RunTimeDataType.rt_void)
-													{
-														throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
-															"本地函数 " + native_get + "必须返回*");
-													}
+													//if (nf.returnType != RunTimeDataType.rt_void)
+													//{
+													//	throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+													//		"本地函数 " + native_get + "必须返回*");
+													//}
 
 												}
 												else
@@ -1417,11 +1417,11 @@ namespace ASCompiler.compiler.builds
 														throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
 															"本地函数 " + native_set + "必须只有1个参数");
 													}
-													if (nf.parameters[0] != RunTimeDataType.rt_void)
-													{
-														throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
-															"本地函数 " + native_set + "参数类型必须是*");
-													}
+													//if (nf.parameters[0] != RunTimeDataType.rt_void)
+													//{
+													//	throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
+													//		"本地函数 " + native_set + "参数类型必须是*");
+													//}
 													if (nf.returnType != RunTimeDataType.fun_void)
 													{
 														throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
@@ -1727,11 +1727,11 @@ namespace ASCompiler.compiler.builds
                                                         throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
                                                             "本地函数 " + native_get + "不接受参数");
                                                     }
-                                                    if (nf.returnType != RunTimeDataType.rt_void)
-                                                    {
-                                                        throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
-                                                            "本地函数 " + native_get + "必须返回*");
-                                                    }
+                                                    //if (nf.returnType != RunTimeDataType.rt_void)
+                                                    //{
+                                                    //    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+                                                    //        "本地函数 " + native_get + "必须返回*");
+                                                    //}
 
                                                 }
                                                 else

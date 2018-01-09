@@ -323,6 +323,7 @@ namespace ASRuntime
         //仅用于链接对象的赋值更新
         public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player ,T value)
         {
+			
 			needclear = true; refPropChanged = true;
 			index = RunTimeDataType._OBJECT;
 

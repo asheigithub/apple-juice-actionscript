@@ -21,7 +21,7 @@ namespace ASRuntime
 		private rtFunction _getMemberValue;
 		private rtFunction _setMemberValue;
 
-		public LinkTypeMapper linktypemapper;
+		public RuntimeLinkTypeMapper linktypemapper;
 
 
 		/// <summary>

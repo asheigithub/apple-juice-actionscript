@@ -1,0 +1,11 @@
+﻿					{argType} arg{argindex};
+
+					if (argements[{argindex}].rtType == RunTimeDataType.rt_null)
+					{
+						arg{argindex} = default({argType});
+					}
+					else
+					{
+						LinkObj<{argType}> argObj = (LinkObj<{argType}>)((ASBinCode.rtData.rtObjectBase)argements[{argindex}]).value;
+						arg{argindex} = argObj.value;
+					}

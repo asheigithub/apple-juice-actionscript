@@ -11,6 +11,7 @@ package
 		
 		public function DigitTest() 
 		{
+			
 			var num:int = 315003;
 			trace(num.toExponential(2)); 
 			trace(num.toPrecision(3)); 

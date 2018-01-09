@@ -54,7 +54,6 @@
     <Compile Include="ASBinCode\InterfaceMethodGetter.cs" />
     <Compile Include="ASBinCode\IRunTimeScope.cs" />
     <Compile Include="ASBinCode\IScope.cs" />
-    <Compile Include="ASBinCode\LinkTypeMapper.cs" />
     <Compile Include="ASBinCode\MemRegister.cs" />
     <Compile Include="ASBinCode\MethodGetterBase.cs" />
     <Compile Include="ASBinCode\nativefunctions\NativeFunctionBase.cs" />

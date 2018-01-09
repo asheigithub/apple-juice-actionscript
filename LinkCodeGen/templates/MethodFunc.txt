@@ -42,8 +42,7 @@
 			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 			{
 
-				[thisObjtype] _this =
-					([thisObjtype])((LinkSystemObject)((ASBinCode.rtData.rtObject)thisObj).value).GetLinkData();
+[loadthis]
 
 				try
 				{

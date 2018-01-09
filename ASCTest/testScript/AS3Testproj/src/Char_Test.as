@@ -3,6 +3,7 @@ package
 	import flash.display.Sprite;
 	import system.Byte;
 	import system.Char;
+	import system.IComparable;
 	import system.Int64;
 	import system.SByte;
 	import system.UInt64;
