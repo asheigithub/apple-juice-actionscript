@@ -978,11 +978,11 @@ namespace ASCompiler.compiler.builds
 										}
 
 									}
-									else if (isNotNative(signature, builder, out findsuccess))
+									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 									{
 										if (signature.onStackParameters == signature.parameters.Count)
 										{
-											if (signature.parameters.Count == 0)
+											if (signature.parameters.Count == 0 )
 											{
 												opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
 											}
@@ -1035,7 +1035,7 @@ namespace ASCompiler.compiler.builds
 										}
 
 									}
-									else if (isNotNative(signature, builder, out findsuccess))
+									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 									{
 										if (signature.onStackParameters == signature.parameters.Count)
 										{

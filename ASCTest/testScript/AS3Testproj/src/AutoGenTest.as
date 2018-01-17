@@ -2,6 +2,7 @@ package
 {
 	import autogencodelib.Testobj;
 	import flash.display.Sprite;
+	import system.Decimal;
 	import system.collections.generic.List_Of_Int32;
 	import system.collections.generic.List_Of_Int32_;
 	
@@ -18,28 +19,40 @@ package
 		{
 			
 			var g:Testobj = new Testobj();
-			trace(g.listtest);
-			
-			var i:List_Of_Int32 = new List_Of_Int32();
+			trace(g);
 			
 			
-			try 
+			genFunc()();
+		}
+		
+		
+		private function genFunc()
+		{
+			var action = null;
+			
+			var func = function()
 			{
-				i[5] = 9;
-			}
-			finally
-			{
-				trace("hahaha");
+				trace("func");
+				
+				if (action != null)
+				{
+					action();
+					
+				}
 				
 			}
 			
 			
-			
-			trace(g.geteList(i));
-			
+			action = function()
+			{
+				trace("action");
+			}
+	
+			return func;
 			
 		}
 		
 	}
+	
 
 }

@@ -111,6 +111,11 @@ namespace LinkCodeGen
 			var methods = interfacetype.GetMethods();
 			foreach (var item in methods)
 			{
+				if (IsObsolete(item))
+				{
+					continue;
+				}
+
 				if (item.IsGenericMethod)
 				{
 					continue;
@@ -246,6 +251,11 @@ namespace LinkCodeGen
 
 		public static bool isMethodSkip(System.Reflection.MethodInfo method)
 		{
+			if (IsObsolete(method))
+			{
+				return true;
+			}
+
 			if (method.IsGenericMethod)
 			{
 				return true;

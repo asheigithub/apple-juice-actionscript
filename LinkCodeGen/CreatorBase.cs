@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace LinkCodeGen
@@ -17,6 +18,52 @@ namespace LinkCodeGen
 			as3keywords.Add("delete", null);
 			as3keywords.Add("use", null);
 		}
+
+		/// <summary>
+		/// 检查是否标记为已过时
+		/// </summary>
+		/// <param name="member"></param>
+		/// <returns></returns>
+		public static bool IsObsolete(System.Reflection.MemberInfo member)
+		{
+			object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
+
+			if (objs.Length>0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+
+		public static bool IsDelegate(Type d)
+		{
+			if (d.BaseType != typeof(MulticastDelegate))
+				return false;
+
+			MethodInfo invoke = d.GetMethod("Invoke");
+			if (invoke == null)
+				return false;
+
+			return true;
+		}
+
+		public static MethodInfo GetDelegateMethodInfo(Type d)
+		{
+			if (d.BaseType != typeof(MulticastDelegate))
+				throw new ApplicationException("Not a delegate.");
+
+			MethodInfo invoke = d.GetMethod("Invoke");
+			if (invoke == null)
+				throw new ApplicationException("Not a delegate.");
+			return invoke;
+
+		}
+
+
 
 
 		protected Type type;
@@ -93,6 +140,11 @@ namespace LinkCodeGen
 			if (type == null)
 				return true;
 
+			if (Equals(type, typeof(Type))) //Type会转换为Class
+			{
+				return false;
+			}
+
 			if (type.IsByRef)
 				return true;
 
@@ -132,11 +184,14 @@ namespace LinkCodeGen
 					return true;
 			}
 
-
-			//if (Equals(type, typeof(Type)))
-			//{
-			//	return true;
-			//}
+			if (IsDelegate(type))
+			{
+				//var m = GetDelegateMethodInfo(type);
+				//var n=GetSharpTypeName(type);
+				//var k = NativeCodeCreatorBase.GetTypeFullName(type);
+				return true;
+			}
+			
 
 			if (Equals(type, typeof(TypedReference)))
 			{

@@ -89,18 +89,18 @@ namespace AutoGenCodeLib
 		//	this.x = 0;
 		//}
 
-		public  ulong x;
+		//public  ulong x;
 
-		public  double y;
+		//public  double y;
 
-		public List<string> listtest = new List<string>();
+		//public List<string> listtest = new List<string>();
 
-		public List<string> geteList(List<int> iii)
-		{
-			return listtest;
-		}
+		//public List<string> geteList(List<int> iii)
+		//{
+		//	return listtest;
+		//}
 
-
+		
 		//public override string ToString()
 		//{
 		//	return string.Format("x:{0} y:{1}", x, y);
@@ -114,16 +114,16 @@ namespace AutoGenCodeLib
 		public Type TestType(Type type)
 		{
 			Console.WriteLine("inputtype: " + type);
-
+			
 			return typeof(long);
 		}
 
 
 
-		public void TestArray(int[] arr)
-		{
-			Console.WriteLine(arr[0]);
-		}
+		//public void TestArray(int[] arr)
+		//{
+		//	Console.WriteLine(arr[0]);
+		//}
 
 
 		new public string ToString()

@@ -115,6 +115,7 @@
     <Compile Include="flash\utils\IDataInput.cs" />
     <Compile Include="flash\utils\IDataOutput.cs" />
     <Compile Include="FrameInfo.cs" />
+    <Compile Include="FunctionWapper.cs" />
     <Compile Include="IBlockCallBack.cs" />
     <Compile Include="IRuntimeOutput.cs" />
     <Compile Include="MyStack.cs" />

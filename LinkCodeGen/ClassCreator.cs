@@ -138,12 +138,13 @@ namespace LinkCodeGen
 
 			foreach (var method in type.GetMethods())
 			{
+				
 				if (!method.DeclaringType.Equals(type)
 					)
 				{
 					continue;
 				}
-
+				
 				if (!method.IsPublic)
 				{
 					continue;
@@ -165,6 +166,10 @@ namespace LinkCodeGen
 					continue;
 				}
 
+				if (IsObsolete(method))
+				{
+					continue;
+				}
 
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(method.ReturnType);
 				if (rt > ASBinCode.RunTimeDataType.unknown)
@@ -340,6 +345,11 @@ namespace LinkCodeGen
 				if (IsSkipType(field.FieldType))
 				{
 					Console.WriteLine(field.ToString() + " 字段被配置为需要跳过");
+					continue;
+				}
+
+				if (IsObsolete(field))
+				{
 					continue;
 				}
 
