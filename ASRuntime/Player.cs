@@ -66,7 +66,7 @@ namespace ASRuntime
 
 			linktypemapper = new RuntimeLinkTypeMapper();
             linktypemapper.init(swc);
-
+			
 			//****************
 
             if (block != null)
@@ -3110,6 +3110,10 @@ namespace ASRuntime
 					return vb1;
 				}
 			}
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException e)
+			{
+				throw new ASRunTimeException("构造函数参数转换失败", e);
+			}
 			catch (KeyNotFoundException e)
 			{
 				throw new ASRunTimeException("构造函数参数转换失败", e);
@@ -3567,7 +3571,7 @@ namespace ASRuntime
 				}
 
 				CallBlankBlock(null);
-
+				
 				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
 				{
 					throw new ASRunTimeException("初始化静态实例时失败",string.Empty);

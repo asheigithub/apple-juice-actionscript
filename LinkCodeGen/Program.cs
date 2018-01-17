@@ -20,6 +20,12 @@ namespace LinkCodeGen
 				CreatorBase.SkipCreateTypes.AddRange(configs);
 			}
 
+			if (System.IO.File.Exists("notcreatenamespace.txt"))
+			{
+				var configs = System.IO.File.ReadAllLines("notcreatenamespace.txt");
+				CreatorBase.NotCreateNameSpace.AddRange(configs);
+			}
+
 
 			var assembly = System.Reflection.Assembly.GetAssembly(typeof(object));
 			StringBuilder regclassSb = new StringBuilder();
@@ -79,20 +85,70 @@ namespace LinkCodeGen
 
 			//*****类*******
 
+			
 			var classtype = typeof(AutoGenCodeLib.Testobj);
 			if (!creators.ContainsKey(classtype))
 			{
 				creators.Add(classtype, null);
-				creators[classtype] = new ClassCreator(classtype, "", "", creators);
-
+				creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");				
 			}
-			foreach (var item in creators.Values)
+			
+
+			using (System.IO.FileStream fs=new System.IO.FileStream("codeoutput.cs", System.IO.FileMode.Create))
 			{
-				Console.WriteLine("building:" + item.BuildIngType);
-				item.Create();
+				using (System.IO.StreamWriter sw=new System.IO.StreamWriter(fs, System.Text.Encoding.UTF8))
+				{
+					StringBuilder usingcode = new StringBuilder();
+					CreatorBase.GenNativeFuncImport(usingcode);
+
+					sw.WriteLine(usingcode.ToString());
+
+					//string regCode = "partial class extFunctions : INativeFunctionRegister\n"
+					//+ "{\n"
+					//+ "\tprivate void regAutoCreateCodes(CSWC bin)"
+					//+"\t{"
+					//+"\t}"
+					//+ "}\n"
+					//+ "\n";
+
+					regclassSb.AppendLine("using System;");
+					regclassSb.AppendLine("using System.Collections.Generic;");
+					regclassSb.AppendLine("using System.Text;");
+					regclassSb.AppendLine("using ASBinCode;");
+					regclassSb.AppendLine("using ASCTest.regNativeFunctions;");
+					regclassSb.AppendLine("using ASRuntime.nativefuncs;");
+
+					regclassSb.AppendLine("namespace ASCTest");
+					regclassSb.AppendLine("{");
+
+					regclassSb.AppendLine("\tpartial class extFunctions : INativeFunctionRegister");
+					regclassSb.AppendLine("\t{");
+					regclassSb.AppendLine("\t\tprivate void regAutoCreateCodes(CSWC bin)");
+					regclassSb.AppendLine("\t\t{");
+
+					foreach (var item in creators.Values)
+					{
+						Console.WriteLine("building:" + item.BuildIngType);
+						string code = item.Create();
+
+
+						regclassSb.AppendLine("\t\t\t" + item.linkcodenamespace + "." + CreatorBase.GetNativeFunctionClassName(item.BuildIngType) + ".regNativeFunctions(bin);");
+						sw.WriteLine(code);
+
+					}
+
+					regclassSb.AppendLine("\t\t}");
+					regclassSb.AppendLine("\t}");
+					regclassSb.AppendLine("\t}");
+					regclassSb.AppendLine();
+				}
+
+				
 			}
 
-			//System.IO.File.WriteAllText("retNativeCode.txt", regclassSb.ToString());
+			
+
+			System.IO.File.WriteAllText("retNativeCode.cs", regclassSb.ToString());
 			Console.WriteLine("创建完成");
 			Console.Read();
         }

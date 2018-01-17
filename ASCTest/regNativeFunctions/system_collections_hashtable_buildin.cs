@@ -243,7 +243,12 @@ namespace ASCTest.regNativeFunctions
                     success = true;
 
                 }
-                catch (InvalidCastException ic)
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
                 {
                     success = false;
                     stackframe.throwAneException(token, ic.Message);
@@ -411,7 +416,12 @@ namespace ASCTest.regNativeFunctions
                     success = true;
 
                 }
-                catch (InvalidCastException ic)
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
                 {
                     success = false;
                     stackframe.throwAneException(token, ic.Message);

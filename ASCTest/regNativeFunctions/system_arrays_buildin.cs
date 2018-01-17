@@ -817,7 +817,12 @@ namespace ASCTest.regNativeFunctions
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, array.ToString() + "没有链接到脚本");
@@ -909,7 +914,12 @@ namespace ASCTest.regNativeFunctions
                 }
 
             }
-            catch (InvalidCastException ic)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (InvalidCastException ic)
             {
                 success = false;
                 stackframe.throwAneException(token, ic.Message);
@@ -1016,7 +1026,12 @@ namespace ASCTest.regNativeFunctions
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, array.ToString() + "没有链接到脚本");
@@ -1138,7 +1153,12 @@ namespace ASCTest.regNativeFunctions
                 }
 
             }
-            catch (InvalidCastException ic)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (InvalidCastException ic)
             {
                 success = false;
                 stackframe.throwAneException(token, ic.Message);

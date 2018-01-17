@@ -58,8 +58,9 @@ namespace LinkCodeGen
 
 		
 		public InterfaceCreator(Type interfacetype, string as3apidocpath, string csharpnativecodepath,
-			Dictionary<Type,CreatorBase> typeCreators 
-			):base(interfacetype,as3apidocpath,csharpnativecodepath)
+			Dictionary<Type,CreatorBase> typeCreators ,
+			string linkcodenamespace
+			):base(interfacetype,as3apidocpath,csharpnativecodepath,linkcodenamespace)
         {
 			if (!interfacetype.IsInterface)
 			{
@@ -75,16 +76,21 @@ namespace LinkCodeGen
 			{
 				throw new ArgumentException("接口已配置为跳过");
 			}
-			
+
+			if (IsSkipType(interfacetype))
+			{
+				throw new ArgumentException("接口已配置为不生成");
+			}
+
 			name = GetAS3ClassOrInterfaceName(interfacetype);
 
 			var exts = GetExtendInterfaces(interfacetype);
 
 			foreach (var item in exts)
 			{
-				if (!typeCreators.ContainsKey(item) && !IsSkipCreator(item))
+				if (!typeCreators.ContainsKey(item) && !IsSkipCreator(item) && !IsSkipType(item))
 				{
-					typeCreators.Add(item, null); typeCreators[item]= new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators);
+					typeCreators.Add(item, null); typeCreators[item]= new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 				}
 			}
 
@@ -121,11 +127,13 @@ namespace LinkCodeGen
 					MakeCreator(item.ReturnType,typeCreators);
 				}
 
+				bool parapass = true;
 				var paras = item.GetParameters();
 				foreach (var p in paras)
 				{
 					if (p.ParameterType.IsGenericType)
 					{
+						parapass = false;
 						break;
 					}
 					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
@@ -136,33 +144,28 @@ namespace LinkCodeGen
 
 				}
 
+				if (parapass)
+				{
+					methodlist.Add(item);
+				}
+
 			}
 
 
 		}
 
-		
 
-
-		
+		private List<System.Reflection.MethodInfo> methodlist = new List<System.Reflection.MethodInfo>();
 
 		
 
+		
 
-		private void GenNativeFuncImport(StringBuilder nativesb)
-		{
-			nativesb.AppendLine("using ASBinCode;");
-			nativesb.AppendLine("using ASBinCode.rtti;");
-			nativesb.AppendLine("using ASRuntime;");
-			nativesb.AppendLine("using ASRuntime.nativefuncs;");
-			nativesb.AppendLine("using System;");
-			nativesb.AppendLine("using System.Collections;");
-			nativesb.AppendLine("using System.Collections.Generic;");
-		}
+
 
 		private void GenNativeFuncNameSpaceAndClass(StringBuilder nativesb)
 		{
-			nativesb.AppendLine("namespace ASCAutoGen.regNativeFunctions");
+			nativesb.AppendLine("namespace " + linkcodenamespace);
 			nativesb.AppendLine("{");
 			nativesb.Append("\t");
 			nativesb.Append("class ");
@@ -199,8 +202,15 @@ namespace LinkCodeGen
 			System.Reflection.PropertyInfo pinfo;
 			if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo))
 			{
-				
-				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "getThisItem");
+				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
+				if (testname == method.Name)
+				{
+					testname = "getThisItem";
+				}
+
+
+
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), testname );// GetMethodName( "getThisItem" ,method,type,staticusenames,usenames ));
 				
 			}
 			else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
@@ -211,8 +221,13 @@ namespace LinkCodeGen
 			else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo))
 			{
 				//****索引器****
-				
-				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), "setThisItem");
+				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
+				if (testname == method.Name)
+				{
+					testname = "setThisItem";
+				}
+
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), testname );////GetMethodName( "setThisItem",method,type,staticusenames,usenames));
 				
 			}
 			else if (MethodNativeCodeCreator.CheckIsSetter(method, type, out pinfo))
@@ -281,12 +296,12 @@ namespace LinkCodeGen
 		}
 
 
-		public override void Create()
+		public override string Create()
 		{
 			Dictionary<Type, string> typeimports = new Dictionary<Type, string>();
 
 			StringBuilder nativefunc = new StringBuilder();
-			GenNativeFuncImport(nativefunc);
+			//GenNativeFuncImport(nativefunc);
 			GenNativeFuncNameSpaceAndClass(nativefunc);
 
 			BeginRegFunction(nativefunc);
@@ -310,12 +325,12 @@ namespace LinkCodeGen
 
 
 			regfunctions.Add(
-				"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\""+ GetCreatorNativeFuncName(type) + "\", default("+type.FullName+")));");
+				"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\""+ GetCreatorNativeFuncName(type) + "\", default("+ NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
 
 
 			if (super != null)
 			{
-				as3api.AppendFormat(" extends {0}",GetAS3TypeString(super,typeimports));
+				as3api.AppendFormat(" extends {0}",GetAS3TypeString(super,typeimports,null,null,null));
 			}
 
 			as3api.AppendLine();
@@ -324,7 +339,7 @@ namespace LinkCodeGen
 			bool existsindexgetter = false;
 			bool existsindexsetter = false;
 
-			foreach (var method in type.GetMethods())
+			foreach (var method in methodlist)
 			{
 				//if (method.IsGenericMethod)
 				//{
@@ -339,7 +354,7 @@ namespace LinkCodeGen
 				//	continue;
 				//}
 
-				string returntype = GetAS3TypeString(method.ReturnType,typeimports);
+				string returntype = GetAS3TypeString(method.ReturnType,typeimports,type,method,null);
 
 				var paras = method.GetParameters();
 
@@ -441,6 +456,11 @@ namespace LinkCodeGen
 
 					as3api.Append("\t\t");
 					as3api.Append("function setThisItem");
+
+					var temp = paras[0];
+					paras[0] = paras[1];
+					paras[1] = temp;
+
 				}
 				else if (MethodNativeCodeCreator.CheckIsSetter(method,type,out pinfo))
 				{
@@ -473,7 +493,7 @@ namespace LinkCodeGen
 					var para = paras[i];
 					as3api.Append(para.Name);
 					as3api.Append(":");
-					as3api.Append(GetAS3TypeString(para.ParameterType, typeimports));
+					as3api.Append(GetAS3TypeString(para.ParameterType, typeimports,null,method,para));
 
 					if (para.IsOptional)
 					{
@@ -559,9 +579,13 @@ namespace LinkCodeGen
 			System.IO.File.WriteAllText(as3file, as3api.ToString());
 
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(nativefunfile));
-			System.IO.File.WriteAllText(nativefunfile, nativefunc.ToString());
 
+			StringBuilder usingcode = new StringBuilder();
+			GenNativeFuncImport(usingcode);
 
+			System.IO.File.WriteAllText(nativefunfile, usingcode.ToString()+ nativefunc.ToString());
+
+			return nativefunc.ToString();
 
 		}
 

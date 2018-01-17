@@ -27,13 +27,13 @@ namespace LinkCodeGen
 			if (type.IsValueType)
 			{
 				string loadthis = Properties.Resources.LoadStructThis;
-				loadthis = loadthis.Replace("[thisObjtype]", type.FullName);
+				loadthis = loadthis.Replace("[thisObjtype]", NativeCodeCreatorBase.GetTypeFullName(type));
 				funccode = funccode.Replace("[loadthis]", loadthis);
 			}
 			else
 			{
 				string loadthis = Properties.Resources.LoadThis;
-				loadthis = loadthis.Replace("[thisObjtype]", type.FullName);
+				loadthis = loadthis.Replace("[thisObjtype]", NativeCodeCreatorBase.GetTypeFullName(type));
 				funccode = funccode.Replace("[loadthis]", loadthis);
 			}
 
@@ -115,7 +115,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = field.FieldType.FullName + " _result_ = _this." + field.Name;
+					storeresult = GetTypeFullName( field.FieldType) + " _result_ = _this." + field.Name;
 
 					storeresult += "\t\t\t\t\t;\n";
 					//storeresult += "\t\t\t\t\tstackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);";
@@ -144,5 +144,6 @@ namespace LinkCodeGen
 			return funccode;
 
 		}
+
 	}
 }

@@ -389,21 +389,55 @@ namespace ASRuntime.operators
                 }
                 else if (targetType > ASBinCode.RunTimeDataType.unknown && srcValue.rtType > RunTimeDataType.unknown)
                 {
-                    if (ClassMemberFinder.check_isinherits(srcValue, targetType, frame.player.swc)
-                        ||
-                        ClassMemberFinder.check_isImplements(srcValue,targetType,frame.player.swc)
-                        )
-                    {
-                        storeto.directSet(srcValue);
-                        callbacker.isSuccess = true;
-                        callbacker.call(null);
-                    }
-                    else
-                    {
-                        //**检查基类
-                        frame.throwCastException(token, srcValue.rtType, targetType);
-                        frame.endStep();
-                        callbacker.noticeRunFailed();
+					if (ClassMemberFinder.check_isinherits(srcValue, targetType, frame.player.swc)
+						||
+						ClassMemberFinder.check_isImplements(srcValue, targetType, frame.player.swc)
+						)
+					{
+						storeto.directSet(srcValue);
+						callbacker.isSuccess = true;
+						callbacker.call(null);
+					}
+					else
+					{
+						bool checkinstanceof = false;
+						//***检查是否链接对象是基类的情况***
+						if (((rtObjectBase)srcValue).value._class.isLink_System)
+						{
+							var cls = frame.player.swc.getClassByRunTimeDataType(targetType);
+							if (cls.isLink_System)
+							{
+								var f = ((CSWC)frame.player.swc).class_Creator[cls];
+								var obj = ((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)srcValue).value).GetLinkData();
+
+								bool isinstanceof= f.getLinkSystemObjType().IsInstanceOfType(obj);
+
+								if (isinstanceof)
+								{
+									//***更新类型信息***
+									srcValue.rtType = targetType;
+									((rtObjectBase)srcValue).value._class = cls;
+									((rtObjectBase)srcValue).objScope.blockId = cls.blockid;
+									//******************
+
+									storeto.directSet(srcValue);
+									callbacker.isSuccess = true;
+									callbacker.call(null);
+
+									checkinstanceof = true;
+
+								}
+
+							}
+						}
+
+						if (!checkinstanceof)
+						{
+							//**检查基类
+							frame.throwCastException(token, srcValue.rtType, targetType);
+							frame.endStep();
+							callbacker.noticeRunFailed();
+						}
                     }
                 }
                 else if (targetType > ASBinCode.RunTimeDataType.unknown)

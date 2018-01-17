@@ -1063,31 +1063,31 @@ namespace ASCompiler.compiler.builds
                                                      "操作符>参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符>参数不能是基本类型");
+                                                     "操作符>参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符>参数类型必须是final的并且不是Class");
+                                                         "操作符>参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符>参数类型必须是final的并且不是Class");
+                                                         "操作符>参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1140,31 +1140,31 @@ namespace ASCompiler.compiler.builds
                                                      "操作符<参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符<参数不能是基本类型");
+                                                     "操作符<参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符<参数类型必须是final的并且不是Class");
+                                                         "操作符<参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符<参数类型必须是final的并且不是Class");
+                                                         "操作符<参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1217,31 +1217,31 @@ namespace ASCompiler.compiler.builds
                                                      "操作符==参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符==参数不能是基本类型");
+                                                     "操作符==参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null) //|| !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符==参数类型必须是final的并且不是Class");
+                                                         "操作符==参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符==参数类型必须是final的并且不是Class");
+                                                         "操作符==参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1293,31 +1293,31 @@ namespace ASCompiler.compiler.builds
                                                      "操作符!=参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符!=参数不能是基本类型");
+                                                     "操作符!=参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符!=参数类型必须是final的并且不是Class");
+                                                         "操作符!=参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符!=参数类型必须是final的并且不是Class");
+                                                         "操作符!=参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1369,31 +1369,31 @@ namespace ASCompiler.compiler.builds
                                                      "操作符>=参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符>=参数不能是基本类型");
+                                                     "操作符>=参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符>=参数类型必须是final的并且不是Class");
+                                                         "操作符>=参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符>=参数类型必须是final的并且不是Class");
+                                                         "操作符>=参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1446,7 +1446,7 @@ namespace ASCompiler.compiler.builds
                                                      "操作符<=参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
@@ -1457,20 +1457,20 @@ namespace ASCompiler.compiler.builds
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符<=参数类型必须是final的并且不是Class");
+                                                         "操作符<=参数类型必须不是Class");
                                                 }
                                             }
                                             if (function.signature.parameters[1].type > RunTimeDataType.unknown
                                                 )
                                             {
                                                 var cls = builder.getClassByRunTimeDataType(function.signature.parameters[1].type);
-                                                if (cls.staticClass == null || !cls.final)
+                                                if (cls.staticClass == null)// || !cls.final)
                                                 {
                                                     throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                         "操作符<=参数类型必须是final的并且不是Class");
+                                                         "操作符<=参数类型必须不是Class");
                                                 }
                                             }
 
@@ -1571,7 +1571,7 @@ namespace ASCompiler.compiler.builds
                                                          "操作符+参数类型必须确定");
                                                 }
                                                 if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                    ||
+                                                    &&
                                                     function.signature.parameters[1].type < RunTimeDataType.unknown
                                                     )
                                                 {
@@ -1697,7 +1697,7 @@ namespace ASCompiler.compiler.builds
                                                          "操作符-参数类型必须确定");
                                                 }
                                                 if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                    ||
+                                                    &&
                                                     function.signature.parameters[1].type < RunTimeDataType.unknown
                                                     )
                                                 {
@@ -1769,12 +1769,12 @@ namespace ASCompiler.compiler.builds
                                                      "操作符|参数类型必须确定");
                                             }
                                             if (function.signature.parameters[0].type < RunTimeDataType.unknown
-                                                ||
+                                                &&
                                                 function.signature.parameters[1].type < RunTimeDataType.unknown
                                                 )
                                             {
                                                 throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
-                                                     "操作符|参数不能是基本类型");
+                                                     "操作符|参数不能都是基本类型");
                                             }
                                             if (function.signature.parameters[0].type > RunTimeDataType.unknown
                                                 )

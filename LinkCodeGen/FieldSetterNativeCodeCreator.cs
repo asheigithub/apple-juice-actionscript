@@ -30,13 +30,13 @@ namespace LinkCodeGen
 			if (type.IsValueType)
 			{
 				string loadthis = Properties.Resources.LoadStructThis;
-				loadthis = loadthis.Replace("[thisObjtype]", type.FullName);
+				loadthis = loadthis.Replace("[thisObjtype]", NativeCodeCreatorBase.GetTypeFullName(type));
 				funccode = funccode.Replace("[loadthis]", loadthis);
 			}
 			else
 			{
 				string loadthis = Properties.Resources.LoadThis;
-				loadthis = loadthis.Replace("[thisObjtype]", type.FullName);
+				loadthis = loadthis.Replace("[thisObjtype]", NativeCodeCreatorBase.GetTypeFullName(type));
 				funccode = funccode.Replace("[loadthis]", loadthis);
 			}
 
@@ -45,7 +45,7 @@ namespace LinkCodeGen
 			loadargs = loadargs + "\n";
 			funccode = funccode.Replace("[loadargement]", loadargs);
 
-			funccode = funccode.Replace("[setfield]",  "_this." + field.Name + " = " + "(" + field.FieldType.FullName + ")" + "arg0;");
+			funccode = funccode.Replace("[setfield]",  "_this." + field.Name + " = " + "(" + GetTypeFullName( field.FieldType) + ")" + "arg0;");
 
 			if (type.IsValueType) //结构体，需要重新赋值回去
 			{

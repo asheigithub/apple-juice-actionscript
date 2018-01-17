@@ -23,17 +23,31 @@ namespace LinkCodeGen
 		}
 
 
-		
+
+
 
 
 		
-
 
 		public string GetCode()
 		{
 			
 				var paras = method.GetParameters();
-				string funccode = Properties.Resources.MethodFunc;
+
+			if (method is MethodInfo)
+			{
+				PropertyInfo propertyInfo;
+				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				{
+					var temp = paras[0];
+					paras[0] = new myparainfo( paras[1],0);
+					paras[1] = new myparainfo( temp,1);
+
+				}
+			}
+
+
+			string funccode = Properties.Resources.MethodFunc;
 
 				funccode = funccode.Replace("[classname]", classname);
 				funccode = funccode.Replace("[paracount]", paras.Length.ToString());
@@ -54,13 +68,13 @@ namespace LinkCodeGen
 				if (methodAtType.IsValueType)
 				{
 					string loadthis = Properties.Resources.LoadStructThis;
-					loadthis = loadthis.Replace("[thisObjtype]",methodAtType.FullName);
+					loadthis = loadthis.Replace("[thisObjtype]",GetTypeFullName( methodAtType));
 					funccode = funccode.Replace("[loadthis]",loadthis);
 				}
 				else
 				{
 					string loadthis = Properties.Resources.LoadThis;
-					loadthis = loadthis.Replace("[thisObjtype]", methodAtType.FullName);
+					loadthis = loadthis.Replace("[thisObjtype]", GetTypeFullName(methodAtType));
 					funccode = funccode.Replace("[loadthis]", loadthis);
 				}
 
@@ -165,7 +179,7 @@ namespace LinkCodeGen
 					{
 						string storeresult = string.Empty;
 						//***调用方法****
-						storeresult = method.ReturnType.FullName + " _result_ = _this";
+						storeresult = GetTypeFullName( method.ReturnType) + " _result_ = _this";
 						storeresult = GetInvokeMethodString(storeresult, paras);
 
 						storeresult += "\t\t\t\t\t;\n";

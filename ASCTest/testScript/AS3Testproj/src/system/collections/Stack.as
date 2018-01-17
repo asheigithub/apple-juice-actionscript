@@ -20,13 +20,13 @@ package system.collections
 		[native, _system_collections_stack_ctor_]
 		public function Stack();
 		
-		[native,system_collections_icollection_count]
+		[native,system_collections_ICollection_get_Count]
 		public function get count():int;
 		
-		[native,system_collections_icollection_copyto]
+		[native,system_collections_ICollection_copyTo]
 		public function copyTo(array:_Array_, index:int):void;
 		
-		[native,system_collections_ienumerable_getenumerator_]
+		[native,system_collections_IEnumerable_getEnumerator]
 		public function getEnumerator():_IEnumerator_;
 		
 		[native,system_collections_stack_clear]
@@ -47,7 +47,12 @@ package system.collections
 		[native,system_collections_stack_toarray]
 		public function toArray():_Array_;
 		
+		[native,system_collections_ICollection_get_SyncRoot]
+		private function get syncRoot():_Object_;
 		
+		
+		[native,system_collections_ICollection_get_IsSynchronized]
+		private function get isSynchronized():Boolean;
 		
 	}
 

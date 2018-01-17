@@ -12,27 +12,27 @@ namespace ASCTest.regNativeFunctions
     {
         public static void regNativeFunctions(CSWC bin)
         {
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getCreator("_system_Byte_creator__", default(Byte)));
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getCreator("_system_Byte_creator__", default(Byte)));
 
             bin.regNativeFunction(new system_byte_ctor());
             bin.regNativeFunction(new system_byte_explicit_from());
             bin.regNativeFunction(new system_byte_implicit_from());
-            bin.regNativeFunction(new system_byte_static_Parse());
+            //bin.regNativeFunction(new system_byte_static_Parse());
             bin.regNativeFunction(new system_byte_valueOf());
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<byte>("_system_Byte_MaxValue_getter"
-                ,
-                () => { return byte.MaxValue; }
-                )
-                );
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<byte>("_system_Byte_MinValue_getter"
-                ,
-                () => { return byte.MinValue; }
-                )
-                );
-            bin.regNativeFunction(new system_byte_toString_());
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<byte>("_system_Byte_MaxValue_getter"
+            //    ,
+            //    () => { return byte.MaxValue; }
+            //    )
+            //    );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<byte>("_system_Byte_MinValue_getter"
+            //    ,
+            //    () => { return byte.MinValue; }
+            //    )
+            //    );
+            //bin.regNativeFunction(new system_byte_toString_());
 
         }
     }

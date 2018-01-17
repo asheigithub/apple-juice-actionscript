@@ -12,33 +12,25 @@ namespace ASCTest.regNativeFunctions
     {
         public static void regNativeFunctions(CSWC bin)
         {
-            bin.regNativeFunction(LinkSystem_Buildin.getCreator(
-                "system_collections_ienumerator_creator_", default(System.Collections.IEnumerator)));
+			system_collections_ICollection_buildin.regNativeFunctions(bin);
+			system_collections_IEnumerable_buildin.regNativeFunctions(bin);
+			system_collections_IEnumerator_buildin.regNativeFunctions(bin);
 
-            bin.regNativeFunction(LinkSystem_Buildin.getCreator(
-                "system_collections_ienumerable_creator_", default(System.Collections.IEnumerable)));
-            bin.regNativeFunction(LinkSystem_Buildin.getCreator(
-                "system_collections_icollectinos_creator_", default(System.Collections.ICollection)));
 
-            bin.regNativeFunction(LinkSystem_Buildin.getCreator(
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator(
                 "system_collections_ilist_creator_", default(System.Collections.IList)));
 
             bin.regNativeFunction(LinkSystem_Buildin.getCreator(
                 "system_collections_idictionary_creator_", default(System.Collections.IDictionary)));
 
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getCreator(
-                    "system_collections_idictionaryenumerator_creator_",
-                    default(System.Collections.IDictionaryEnumerator)
-                    )
-                );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getCreator(
+            //        "system_collections_idictionaryenumerator_creator_",
+            //        default(System.Collections.IDictionaryEnumerator)
+            //        )
+            //    );
 
-            bin.regNativeFunction(new system_collections_ienumerable_getenumerator_());
-            bin.regNativeFunction(new system_collections_ienumerator_reset());
-            bin.regNativeFunction(new system_collections_ienumerator_movenext());
-            bin.regNativeFunction(new system_collections_ienumerator_current());
-            bin.regNativeFunction(new system_collections_icollection_count());
-            bin.regNativeFunction(new system_collections_icollection_copyto());
+            
             bin.regNativeFunction(new system_collections_ilist_getthisitem());
             bin.regNativeFunction(new system_collections_ilist_setthisitem());
             bin.regNativeFunction(new system_collections_ilist_isfixedsize());
@@ -63,506 +55,762 @@ namespace ASCTest.regNativeFunctions
             bin.regNativeFunction(new system_collections_idictionary_remove());
             bin.regNativeFunction(new system_collections_idictionary_getienumerator());
 
-            bin.regNativeFunction(new system_collections_idictonaryenumerator_entry());
-
+			//bin.regNativeFunction(new system_collections_idictonaryenumerator_entry());
+			system_collections_IDictionaryEnumerator_buildin.regNativeFunctions(bin);
         }
     }
 
-    class system_collections_ienumerable_getenumerator_ : NativeConstParameterFunction
-    {
-        public system_collections_ienumerable_getenumerator_() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-            
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_ienumerable_getenumerator_";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.IEnumerable array =
-                (System.Collections.IEnumerable)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                object obj = array.GetEnumerator();
-
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj,functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
-                //returnSlot.setValue((int)array.GetValue(index));
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, array.ToString() + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-
-
-        }
-
-
-    }
-
-    class system_collections_ienumerator_reset : NativeConstParameterFunction
-    {
-        public system_collections_ienumerator_reset() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_ienumerator_reset";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.fun_void;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                enumerator.Reset();
-
-                returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, enumerator.ToString() + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-
-
-        }
-
-
-    }
-
-    class system_collections_ienumerator_movenext : NativeConstParameterFunction
-    {
-        public system_collections_ienumerator_movenext() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_ienumerator_movenext";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_boolean;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                bool b= enumerator.MoveNext();
-
-                if (b)
-                {
-                    returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
-                }
-                else
-                {
-                    returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
-                }
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, enumerator.ToString() + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-
-
-        }
-
-
-    }
-
-    class system_collections_ienumerator_current : NativeConstParameterFunction
-    {
-        public system_collections_ienumerator_current() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_ienumerator_current";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.IEnumerator enumerator =
-                (System.Collections.IEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                object obj = enumerator.Current;
-
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
-                //returnSlot.setValue((int)array.GetValue(index));
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, (enumerator.Current!=null?enumerator.Current.ToString():(enumerator.ToString()+".current的值")) + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-            catch (InvalidOperationException io)
-            {
-                success = false;
-                stackframe.throwAneException(token, io.Message);
-            }
-
-        }
-
-
-    }
-
-    class system_collections_icollection_count : NativeConstParameterFunction
-    {
-        public system_collections_icollection_count() : base(0)
-        {
-            para = new List<RunTimeDataType>();
-
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_icollection_count";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_int;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.ICollection enumerator =
-                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                object obj = enumerator.Count;
-
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
-                //returnSlot.setValue((int)array.GetValue(index));
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, enumerator.ToString() + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-
-
-        }
-
-
-    }
-
-    class system_collections_icollection_copyto : NativeConstParameterFunction
-    {
-        public system_collections_icollection_copyto() : base(2)
-        {
-            para = new List<RunTimeDataType>();
-            para.Add(RunTimeDataType.rt_void);
-            para.Add(RunTimeDataType.rt_int);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "system_collections_icollection_copyto";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.fun_void;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-            int index = TypeConverter.ConvertToInt(argements[1]);
-
-            System.Collections.ICollection collection =
-                (System.Collections.ICollection)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-
-                object lo;
-                if (stackframe.player.linktypemapper.rtValueToLinkObject(
-                    argements[0], stackframe.player.linktypemapper.getLinkType(functionDefine.signature.parameters[0].type), bin, true, out lo
-                    ))
-                {
-                    collection.CopyTo((Array)lo, index);
-                    returnSlot.setValue(ASBinCode.rtData.rtUndefined.undefined);
-                    success = true;
-                }
-                else
-                {
-                    stackframe.throwCastException(token, argements[0].rtType,
-                        functionDefine.signature.parameters[0].type
-                        );
-                    success = false;
-                }
-
-            }
-            catch (InvalidCastException ic)
-            {
-                success = false;
-                stackframe.throwAneException(token, ic.Message);
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-
-
-        }
-    }
-
-    class system_collections_ilist_getthisitem : NativeConstParameterFunction
+
+	class system_collections_ICollection_buildin
+	{
+		public static void regNativeFunctions(CSWC bin)
+		{
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator("system_collections_ICollection_creator", default(System.Collections.ICollection)));
+			bin.regNativeFunction(new system_collections_ICollection_copyTo());
+			bin.regNativeFunction(new system_collections_ICollection_get_Count());
+			bin.regNativeFunction(new system_collections_ICollection_get_SyncRoot());
+			bin.regNativeFunction(new system_collections_ICollection_get_IsSynchronized());
+		}
+
+		class system_collections_ICollection_copyTo : NativeConstParameterFunction
+		{
+			public system_collections_ICollection_copyTo() : base(2)
+			{
+				para = new List<RunTimeDataType>();
+				para.Add(RunTimeDataType.rt_void);
+				para.Add(RunTimeDataType.rt_int);
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_ICollection_copyTo";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.fun_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.ICollection _this =
+					(System.Collections.ICollection)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+					System.Array arg0;
+					{
+						object _temp;
+						if (!stackframe.player.linktypemapper.rtValueToLinkObject(
+							argements[0],
+
+							stackframe.player.linktypemapper.getLinkType(argements[0].rtType)
+							,
+							bin, true, out _temp
+							))
+						{
+							stackframe.throwCastException(token, argements[0].rtType,
+
+								functionDefine.signature.parameters[0].type
+								);
+							success = false;
+							return;
+						}
+						arg0 = (System.Array)_temp;
+					}
+					int arg1 = TypeConverter.ConvertToInt(argements[1]);
+
+					_this.CopyTo((System.Array)arg0, (System.Int32)arg1)
+					;
+					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_ICollection_get_Count : NativeConstParameterFunction
+		{
+			public system_collections_ICollection_get_Count() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_ICollection_get_Count";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_int;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.ICollection _this =
+					(System.Collections.ICollection)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					int _result_ = (int)(_this.Count
+					)
+					;
+					returnSlot.setValue(_result_);
+
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_ICollection_get_SyncRoot : NativeConstParameterFunction
+		{
+			public system_collections_ICollection_get_SyncRoot() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_ICollection_get_SyncRoot";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.ICollection _this =
+					(System.Collections.ICollection)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					object _result_ = _this.SyncRoot
+					;
+					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_ICollection_get_IsSynchronized : NativeConstParameterFunction
+		{
+			public system_collections_ICollection_get_IsSynchronized() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_ICollection_get_IsSynchronized";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_boolean;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.ICollection _this =
+					(System.Collections.ICollection)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					bool _result_ = _this.IsSynchronized
+					;
+					if (_result_)
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+					}
+					else
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+					}
+
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+	}
+
+	class system_collections_IEnumerable_buildin
+	{
+		public static void regNativeFunctions(CSWC bin)
+		{
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator("system_collections_IEnumerable_creator", default(System.Collections.IEnumerable)));
+			bin.regNativeFunction(new system_collections_IEnumerable_getEnumerator());
+		}
+
+		class system_collections_IEnumerable_getEnumerator : NativeConstParameterFunction
+		{
+			public system_collections_IEnumerable_getEnumerator() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IEnumerable_getEnumerator";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IEnumerable _this =
+					(System.Collections.IEnumerable)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					object _result_ = _this.GetEnumerator()
+					;
+					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+	}
+
+	class system_collections_IEnumerator_buildin
+	{
+		public static void regNativeFunctions(CSWC bin)
+		{
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator("system_collections_IEnumerator_creator", default(System.Collections.IEnumerator)));
+			bin.regNativeFunction(new system_collections_IEnumerator_moveNext());
+			bin.regNativeFunction(new system_collections_IEnumerator_get_Current());
+			bin.regNativeFunction(new system_collections_IEnumerator_reset());
+		}
+
+		class system_collections_IEnumerator_moveNext : NativeConstParameterFunction
+		{
+			public system_collections_IEnumerator_moveNext() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IEnumerator_moveNext";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_boolean;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IEnumerator _this =
+					(System.Collections.IEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					bool _result_ = _this.MoveNext()
+					;
+					if (_result_)
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+					}
+					else
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+					}
+
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_IEnumerator_get_Current : NativeConstParameterFunction
+		{
+			public system_collections_IEnumerator_get_Current() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IEnumerator_get_Current";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IEnumerator _this =
+					(System.Collections.IEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					object _result_ = _this.Current
+					;
+					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_IEnumerator_reset : NativeConstParameterFunction
+		{
+			public system_collections_IEnumerator_reset() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IEnumerator_reset";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.fun_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IEnumerator _this =
+					(System.Collections.IEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					_this.Reset()
+					;
+					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+	}
+
+
+	class system_collections_ilist_getthisitem : NativeConstParameterFunction
     {
         public system_collections_ilist_getthisitem() : base(1)
         {
@@ -582,7 +830,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_getThisItem_";
+                return "system_collections_IList_getThisItem";
             }
         }
 
@@ -619,7 +867,12 @@ namespace ASCTest.regNativeFunctions
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, ilist.ToString() + "没有链接到脚本");
@@ -662,7 +915,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_setThisItem_";
+                return "system_collections_IList_setThisItem";
             }
         }
 
@@ -762,7 +1015,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_isFixedSize_";
+                return "system_collections_IList_get_IsFixedSize";
             }
         }
 
@@ -847,7 +1100,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_isReadOnly_";
+                return "system_collections_IList_get_IsReadOnly";
             }
         }
 
@@ -932,7 +1185,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_add_";
+                return "system_collections_IList_add";
             }
         }
 
@@ -1029,7 +1282,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_clear_";
+                return "system_collections_IList_clear";
             }
         }
 
@@ -1106,7 +1359,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_contains_";
+                return "system_collections_IList_contains";
             }
         }
 
@@ -1209,7 +1462,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_indexOf_";
+                return "system_collections_IList_indexOf";
             }
         }
 
@@ -1306,7 +1559,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_insert_";
+                return "system_collections_IList_insert";
             }
         }
 
@@ -1404,7 +1657,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_remove_";
+                return "system_collections_IList_remove";
             }
         }
 
@@ -1501,7 +1754,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_ilist_removeAt_";
+                return "system_collections_IList_removeAt";
             }
         }
 
@@ -1578,7 +1831,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_isFixedSize_";
+                return "system_collections_IDictionary_get_IsFixedSize";
             }
         }
 
@@ -1663,7 +1916,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_isReadOnly_";
+                return "system_collections_IDictionary_get_IsReadOnly";
             }
         }
 
@@ -1748,7 +2001,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_getThisItem_";
+                return "system_collections_IDictionary_getThisItem";
             }
         }
 
@@ -1803,7 +2056,12 @@ namespace ASCTest.regNativeFunctions
                 
 
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, argements[0] + "没有链接到脚本");
@@ -1846,7 +2104,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_setThisItem_";
+                return "system_collections_IDictionary_setThisItem";
             }
         }
 
@@ -1950,7 +2208,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_keys_";
+                return "system_collections_IDictionary_get_Keys";
             }
         }
 
@@ -1989,7 +2247,12 @@ namespace ASCTest.regNativeFunctions
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, idictionary.ToString() + "没有链接到脚本");
@@ -2031,7 +2294,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_values_";
+                return "system_collections_IDictionary_get_Values";
             }
         }
 
@@ -2070,7 +2333,12 @@ namespace ASCTest.regNativeFunctions
                 //returnSlot.setValue((int)array.GetValue(index));
                 success = true;
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, idictionary.ToString() + "没有链接到脚本");
@@ -2113,7 +2381,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_add_";
+                return "system_collections_IDictionary_add";
             }
         }
 
@@ -2216,7 +2484,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_clear_";
+                return "system_collections_IDictionary_clear";
             }
         }
 
@@ -2293,7 +2561,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_contains_";
+                return "system_collections_IDictionary_contains";
             }
         }
 
@@ -2389,7 +2657,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "_system_collections_idictionary_remove_";
+                return "system_collections_IDictionary_remove";
             }
         }
 
@@ -2479,7 +2747,7 @@ namespace ASCTest.regNativeFunctions
         {
             get
             {
-                return "system_collections_idictionary_getenumerator_";
+                return "system_collections_IDictionary_getEnumerator_";
             }
         }
 
@@ -2525,7 +2793,12 @@ namespace ASCTest.regNativeFunctions
 
 
             }
-            catch (KeyNotFoundException)
+			catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+			{
+				success = false;
+				stackframe.throwAneException(token, tlc.Message);
+			}
+			catch (KeyNotFoundException)
             {
                 success = false;
                 stackframe.throwAneException(token, argements[0] + "没有链接到脚本");
@@ -2549,89 +2822,357 @@ namespace ASCTest.regNativeFunctions
 
 
 
-    class system_collections_idictonaryenumerator_entry : NativeConstParameterFunction
-    {
-        public system_collections_idictonaryenumerator_entry() : base(0)
-        {
-            para = new List<RunTimeDataType>();
+	// class system_collections_idictonaryenumerator_entry : NativeConstParameterFunction
+	// {
+	//     public system_collections_idictonaryenumerator_entry() : base(0)
+	//     {
+	//         para = new List<RunTimeDataType>();
 
-        }
+	//     }
 
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
+	//     public override bool isMethod
+	//     {
+	//         get
+	//         {
+	//             return true;
+	//         }
+	//     }
 
-        public override string name
-        {
-            get
-            {
-                return "system_collections_idictionaryenumerator_entry";
-            }
-        }
+	//     public override string name
+	//     {
+	//         get
+	//         {
+	//             return "system_collections_idictionaryenumerator_entry";
+	//         }
+	//     }
 
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
+	//     List<RunTimeDataType> para;
+	//     public override List<RunTimeDataType> parameters
+	//     {
+	//         get
+	//         {
+	//             return para;
+	//         }
+	//     }
 
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
+	//     public override RunTimeDataType returnType
+	//     {
+	//         get
+	//         {
+	//             return RunTimeDataType.rt_void;
+	//         }
+	//     }
 
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-
-
-
-            System.Collections.IDictionaryEnumerator enumerator =
-                (System.Collections.IDictionaryEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
-
-            try
-            {
-                object obj = enumerator.Entry;
-
-                stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
-                //returnSlot.setValue((int)array.GetValue(index));
-                success = true;
-            }
-            catch (KeyNotFoundException)
-            {
-                success = false;
-                stackframe.throwAneException(token, (enumerator.Current != null ? enumerator.Current.ToString() : (enumerator.ToString() + ".current的值")) + "没有链接到脚本");
-            }
-            catch (ArgumentException a)
-            {
-                success = false;
-                stackframe.throwAneException(token, a.Message);
-            }
-            catch (IndexOutOfRangeException i)
-            {
-                success = false;
-                stackframe.throwAneException(token, i.Message);
-            }
-            catch (InvalidOperationException io)
-            {
-                success = false;
-                stackframe.throwAneException(token, io.Message);
-            }
-
-        }
+	//     public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+	//     {
 
 
-    }
 
+	//         System.Collections.IDictionaryEnumerator enumerator =
+	//             (System.Collections.IDictionaryEnumerator)((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value;
+
+	//         try
+	//         {
+	//             object obj = enumerator.Entry;
+
+	//             stackframe.player.linktypemapper.storeLinkObject_ToSlot(obj, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+	//             //returnSlot.setValue((int)array.GetValue(index));
+	//             success = true;
+	//         }
+	//catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+	//{
+	//	success = false;
+	//	stackframe.throwAneException(token, tlc.Message);
+	//}
+	//catch (KeyNotFoundException)
+	//         {
+	//             success = false;
+	//             stackframe.throwAneException(token, (enumerator.Current != null ? enumerator.Current.ToString() : (enumerator.ToString() + ".current的值")) + "没有链接到脚本");
+	//         }
+	//         catch (ArgumentException a)
+	//         {
+	//             success = false;
+	//             stackframe.throwAneException(token, a.Message);
+	//         }
+	//         catch (IndexOutOfRangeException i)
+	//         {
+	//             success = false;
+	//             stackframe.throwAneException(token, i.Message);
+	//         }
+	//         catch (InvalidOperationException io)
+	//         {
+	//             success = false;
+	//             stackframe.throwAneException(token, io.Message);
+	//         }
+
+	//     }
+
+
+	// }
+
+	class system_collections_IDictionaryEnumerator_buildin
+	{
+		public static void regNativeFunctions(CSWC bin)
+		{
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator("system_collections_IDictionaryEnumerator_creator", default(System.Collections.IDictionaryEnumerator)));
+			bin.regNativeFunction(new system_collections_IDictionaryEnumerator_get_Key());
+			bin.regNativeFunction(new system_collections_IDictionaryEnumerator_get_Value());
+			bin.regNativeFunction(new system_collections_IDictionaryEnumerator_get_Entry());
+		}
+
+		class system_collections_IDictionaryEnumerator_get_Key : NativeConstParameterFunction
+		{
+			public system_collections_IDictionaryEnumerator_get_Key() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IDictionaryEnumerator_get_Key";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IDictionaryEnumerator _this =
+					(System.Collections.IDictionaryEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					object _result_ = _this.Key
+					;
+					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_IDictionaryEnumerator_get_Value : NativeConstParameterFunction
+		{
+			public system_collections_IDictionaryEnumerator_get_Value() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IDictionaryEnumerator_get_Value";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IDictionaryEnumerator _this =
+					(System.Collections.IDictionaryEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					object _result_ = _this.Value
+					;
+					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+		class system_collections_IDictionaryEnumerator_get_Entry : NativeConstParameterFunction
+		{
+			public system_collections_IDictionaryEnumerator_get_Entry() : base(0)
+			{
+				para = new List<RunTimeDataType>();
+
+			}
+
+			public override bool isMethod
+			{
+				get
+				{
+					return true;
+				}
+			}
+
+			public override string name
+			{
+				get
+				{
+					return "system_collections_IDictionaryEnumerator_get_Entry";
+				}
+			}
+
+			List<RunTimeDataType> para;
+			public override List<RunTimeDataType> parameters
+			{
+				get
+				{
+					return para;
+				}
+			}
+
+			public override RunTimeDataType returnType
+			{
+				get
+				{
+					return RunTimeDataType.rt_void;
+				}
+			}
+
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+			{
+
+				System.Collections.IDictionaryEnumerator _this =
+					(System.Collections.IDictionaryEnumerator)((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value).GetLinkData();
+
+				try
+				{
+
+					System.Collections.DictionaryEntry _result_ = _this.Entry
+					;
+					((StackSlot)returnSlot).setLinkObjectValue(bin.getClassByRunTimeDataType(functionDefine.signature.returnType), stackframe.player, _result_);
+					success = true;
+				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (InvalidCastException ic)
+				{
+					success = false;
+					stackframe.throwAneException(token, ic.Message);
+				}
+				catch (ArgumentException a)
+				{
+					success = false;
+					stackframe.throwAneException(token, a.Message);
+				}
+				catch (IndexOutOfRangeException i)
+				{
+					success = false;
+					stackframe.throwAneException(token, i.Message);
+				}
+				catch (NotSupportedException n)
+				{
+					success = false;
+					stackframe.throwAneException(token, n.Message);
+				}
+
+			}
+		}
+
+	}
 
 
 }

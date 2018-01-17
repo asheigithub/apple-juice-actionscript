@@ -3,6 +3,8 @@ using ASBinCode.rtti;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
+using System.Reflection;
 
 namespace ASRuntime
 {
@@ -20,11 +22,16 @@ namespace ASRuntime
 		RunTimeDataType _SHORT = -996;
 		RunTimeDataType _USHORT = -995;
 
+		private CSWC swc;
         public  void init(CSWC swc)
         {
+			this.swc = swc;
             arrayType = typeof(Array);
-
+			
             link_type = new Dictionary<Type, RunTimeDataType>();
+
+			
+
             link_type.Add(typeof(int), RunTimeDataType.rt_int);
             link_type.Add(typeof(string), RunTimeDataType.rt_string);
             link_type.Add(typeof(double), RunTimeDataType.rt_number);
@@ -38,9 +45,11 @@ namespace ASRuntime
 			link_type.Add(typeof(short), _SHORT);
 			link_type.Add(typeof(ushort), _USHORT);
 
-            foreach (var item in swc.creator_Class)
+			foreach (var item in swc.creator_Class)
             {
                 link_type.Add(item.Key.getLinkSystemObjType(), item.Value.getRtType());
+				link_type.Add(new AS3Class_Type( item.Value.staticClass.getRtType(), item.Key.getLinkSystemObjType()), item.Value.staticClass.getRtType());
+
                 if (item.Key.getLinkSystemObjType().Equals(typeof(object)))
                 {
                     _objectType_ = item.Value.getRtType();
@@ -64,8 +73,42 @@ namespace ASRuntime
             foreach (var item in swc.creator_Class)
             {
                 type_link.Add(item.Value.getRtType(), item.Key.getLinkSystemObjType());
+
+				type_link.Add(item.Value.staticClass.getRtType(), new AS3Class_Type(item.Value.staticClass.getRtType(),item.Key.getLinkSystemObjType()));
+
             }
-        }
+
+			if (swc.TypeClass == null)
+			{
+				return;
+			}
+
+			{
+				var clsint = swc.getClassDefinitionByName("int").staticClass.getRtType();
+				link_type.Add(new AS3Class_Type(clsint, typeof(int)), clsint);
+				type_link.Add(clsint, new AS3Class_Type(clsint, typeof(int)));
+			}
+			{
+				var clsuint = swc.getClassDefinitionByName("uint").staticClass.getRtType();
+				link_type.Add(new AS3Class_Type(clsuint, typeof(uint)), clsuint);
+				type_link.Add(clsuint, new AS3Class_Type(clsuint, typeof(uint)));
+			}
+			{
+				var clsstring = swc.getClassDefinitionByName("String").staticClass.getRtType();
+				link_type.Add(new AS3Class_Type(clsstring, typeof(string)), clsstring);
+				type_link.Add(clsstring, new AS3Class_Type(clsstring, typeof(string)));
+			}
+			{
+				var clsboolean = swc.getClassDefinitionByName("Boolean").staticClass.getRtType();
+				link_type.Add(new AS3Class_Type(clsboolean, typeof(bool)), clsboolean);
+				type_link.Add(clsboolean, new AS3Class_Type(clsboolean, typeof(bool)));
+			}
+			{
+				var clsnumber = swc.getClassDefinitionByName("Number").staticClass.getRtType();
+				link_type.Add(new AS3Class_Type(clsnumber, typeof(double)), clsnumber);
+				type_link.Add(clsnumber, new AS3Class_Type(clsnumber, typeof(double)));
+			}
+		}
 
         public  Type getLinkType(RunTimeDataType rtType)
         {
@@ -83,7 +126,16 @@ namespace ASRuntime
             }
             else
             {
-                return type_link[rtType];
+				Type outtype;
+				if (type_link.TryGetValue(rtType, out outtype))
+				{
+					return outtype;
+				}
+				else
+				{
+					throw new TypeLinkClassException(swc.getClassByRunTimeDataType(rtType) + " 不是一个链接到系统对象的类型");
+				}
+                
             }
         }
 
@@ -116,7 +168,7 @@ namespace ASRuntime
         }
 
 
-        public  void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, object player)
+        public  void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, Player player)
         {
             if (obj == null)
             {
@@ -294,9 +346,44 @@ namespace ASRuntime
                     else
                     {
                         rtCls = bin.getClassByRunTimeDataType(rt);
-						var f = ((CSWC)bin).class_Creator[rtCls];
-						f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
 
+						if (rtCls.classid == player.swc.TypeClass.classid)
+						{
+							Type type = obj as Type;
+							if (type != null)
+							{
+								try
+								{
+									var rtcls = bin.getClassByRunTimeDataType( getRuntimeDataType(type));
+
+									if (player.init_static_class(rtcls, SourceToken.Empty))
+									{
+										returnSlot.directSet(
+										 player.static_instance[rtcls.staticClass.classid]);
+									}
+									else
+									{
+										throw new ASRunTimeException("转换Class失败", String.Empty);
+									}
+								}
+								catch (KeyNotFoundException)
+								{
+									throw new TypeLinkClassException(type.FullName + " 没有链接到脚本");
+								}
+								
+
+							}
+							else
+							{
+								throw new ASRunTimeException("没有将Class链接到Type", String.Empty);
+							}
+						}
+						else
+						{
+							var f = ((CSWC)bin).class_Creator[rtCls];
+							f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
+						}
+						
 					}
 
 
@@ -323,14 +410,24 @@ namespace ASRuntime
 
             if (vt > RunTimeDataType.unknown)
             {
-                RunTimeDataType ot;
-                if (TypeConverter.Object_CanImplicit_ToPrimitive(
-                    bin.getClassByRunTimeDataType(vt), out ot
-                    ))
-                {
-                    vt = ot;
-                    value = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)value);
-                }
+				var cls = bin.getClassByRunTimeDataType(vt);
+
+				RunTimeDataType ot;
+				if (TypeConverter.Object_CanImplicit_ToPrimitive(
+					cls, out ot
+					))
+				{
+					vt = ot;
+					value = TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)value);
+				}
+				else if (linkType is AS3Class_Type && cls.staticClass == null)
+				{
+					if (cls.getRtType() == ((AS3Class_Type)linkType).rttype)
+					{
+						linkobject = ((AS3Class_Type)linkType).linktype;
+						return true;
+					}
+				}
             }
             RunTimeDataType at =
                 getRuntimeDataType(
@@ -464,5 +561,211 @@ namespace ASRuntime
 
             return true;
         }
-    }
+
+
+
+
+
+
+
+		/// <summary>
+		/// 定义AS3的Class到Type的链接
+		/// </summary>
+		public sealed class AS3Class_Type : Type
+		{
+			public readonly RunTimeDataType rttype;
+			public readonly Type linktype;
+
+			public AS3Class_Type(RunTimeDataType rttype,Type linktype )
+			{
+				this.rttype = rttype;
+				this.linktype = linktype;
+			}
+
+
+			public override Guid GUID => linktype.GUID;
+
+			public override Module Module => linktype.Module;
+
+			public override Assembly Assembly => linktype.Assembly;
+
+			public override string FullName => linktype.FullName;
+
+			public override string Namespace => linktype.Namespace;
+
+			public override string AssemblyQualifiedName => linktype.AssemblyQualifiedName;
+
+			public override Type BaseType => null;
+
+			public override Type UnderlyingSystemType => linktype.UnderlyingSystemType;
+
+			public override string Name =>linktype.Name;
+
+			public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override object[] GetCustomAttributes(bool inherit)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override Type GetElementType()
+			{
+				throw new NotImplementedException();
+			}
+
+			public override EventInfo GetEvent(string name, BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override EventInfo[] GetEvents(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override FieldInfo GetField(string name, BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override FieldInfo[] GetFields(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override Type GetInterface(string name, bool ignoreCase)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override Type[] GetInterfaces()
+			{
+				throw new NotImplementedException();
+			}
+
+			public override MemberInfo[] GetMembers(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override Type GetNestedType(string name, BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override Type[] GetNestedTypes(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters)
+			{
+				throw new NotImplementedException();
+			}
+
+			public override bool IsDefined(Type attributeType, bool inherit)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override TypeAttributes GetAttributeFlagsImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers)
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool HasElementTypeImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool IsArrayImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool IsByRefImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool IsCOMObjectImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool IsPointerImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+			protected override bool IsPrimitiveImpl()
+			{
+				throw new NotImplementedException();
+			}
+
+
+
+			public override int GetHashCode()
+			{
+				return rttype.GetHashCode() ^ linktype.GetHashCode();
+			}
+
+			public override bool Equals(object o)
+			{
+				AS3Class_Type other = o as AS3Class_Type;
+				if (other == null)
+					return false;
+
+				return rttype == other.rttype && Equals(linktype, other.linktype);
+
+			}
+
+		}
+
+
+		/// <summary>
+		/// 类型与Class链接失败
+		/// </summary>
+		public sealed class TypeLinkClassException : ASRunTimeException
+		{
+			public TypeLinkClassException(string msg):base(msg,string.Empty)
+			{
+
+			}
+		}
+
+	}
 }

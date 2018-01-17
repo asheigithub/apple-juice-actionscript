@@ -13,7 +13,7 @@ namespace LinkCodeGen
 
         
 
-        public EnumCreator(Type enumtype,string as3apidocpath,string csharpnativecodepath):base(enumtype,as3apidocpath,csharpnativecodepath)
+        public EnumCreator(Type enumtype,string as3apidocpath,string csharpnativecodepath,string linkcodenamespace):base(enumtype,as3apidocpath,csharpnativecodepath,linkcodenamespace)
         {
             if (!enumtype.IsEnum)
             {
@@ -26,18 +26,7 @@ namespace LinkCodeGen
             this.name = enumtype.Name;
         }
 
-        
 
-        private void GenAS3FileHead(StringBuilder as3sb)
-        {
-            as3sb.AppendLine("package " + GetPackageName(type));
-            as3sb.AppendLine("{");
-        }
-
-		private void EndAS3File(StringBuilder as3sb)
-        {
-            as3sb.AppendLine("}");
-        }
 
 		private void GenClassDefine(StringBuilder as3sb)
         {
@@ -74,20 +63,9 @@ namespace LinkCodeGen
         }
 
 
-        private void GenNativeFuncImport(StringBuilder nativesb)
-        {
-            nativesb.AppendLine("using ASBinCode;");
-            nativesb.AppendLine("using ASBinCode.rtti;");
-            nativesb.AppendLine("using ASRuntime;");
-            nativesb.AppendLine("using ASRuntime.nativefuncs;");
-            nativesb.AppendLine("using System;");
-            nativesb.AppendLine("using System.Collections;");
-            nativesb.AppendLine("using System.Collections.Generic;");
-        }
-
         private void GenNativeFuncNameSpaceAndClass(StringBuilder nativesb)
         {
-            nativesb.AppendLine("namespace ASCTest.regNativeFunctions");
+            nativesb.AppendLine("namespace " + linkcodenamespace);
             nativesb.AppendLine("{");
             nativesb.Append("\t");
             nativesb.Append("class ");
@@ -126,10 +104,10 @@ namespace LinkCodeGen
         }
 
 
-        public override void Create()
+        public override string Create()
         {
             StringBuilder nativefunc = new StringBuilder();
-            GenNativeFuncImport(nativefunc);
+            //GenNativeFuncImport(nativefunc);
             GenNativeFuncNameSpaceAndClass(nativefunc);
 
             BeginRegFunction(nativefunc);
@@ -167,8 +145,8 @@ namespace LinkCodeGen
             regfunctions.Add(
                 string.Format("\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\"{0}\", default({1})));"
                 ,GetCreatorNativeFuncName(type)
-                ,type.FullName
-                )
+                , NativeCodeCreatorBase.GetTypeFullName(type)
+				)
                 );
 
             //***枚举的构造函数***
@@ -212,7 +190,7 @@ namespace LinkCodeGen
                 string nf = "\t\t\tbin.regNativeFunction(";
                 nf += "LinkSystem_Buildin.getStruct_static_field_getter(\"" +GetEnumItemNativeFuncName(item)+ "\"";
                 nf += ",";
-                nf += "()=>{ return "+ type.FullName + "." + enumItemName + ";}";
+                nf += "()=>{ return "+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + item.Name + ";}";
                 nf += ")";
                 nf += ");";
 
@@ -242,7 +220,7 @@ namespace LinkCodeGen
 
             string bitorclass = Properties.Resources.EnumItemBitOr;
             bitorclass= bitorclass.Replace("{0}", GetEnumBitOrFuncName());
-            bitorclass= bitorclass.Replace("{1}", type.FullName);
+            bitorclass= bitorclass.Replace("{1}", NativeCodeCreatorBase.GetTypeFullName(type));
             nativefuncClasses.Add( bitorclass);
 
             regfunctions.Add("\t\t\tbin.regNativeFunction(new "+ GetEnumBitOrFuncName() +"());");
@@ -277,9 +255,13 @@ namespace LinkCodeGen
             System.IO.File.WriteAllText(as3file, as3api.ToString());
 
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(nativefunfile));
-            System.IO.File.WriteAllText(nativefunfile, nativefunc.ToString());
 
+			StringBuilder usingcode = new StringBuilder();
+			GenNativeFuncImport(usingcode);
 
+            System.IO.File.WriteAllText(nativefunfile,usingcode.ToString()+  nativefunc.ToString());
+
+			return nativefunc.ToString();
         }
 
 

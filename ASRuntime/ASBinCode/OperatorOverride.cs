@@ -99,18 +99,43 @@ namespace ASBinCode
         {
             for (int i = 0; i <= (int)OverrideableOperator.Inequality; i++)
             {
-                foreach (var key in operFunctions[i].Keys)
-                {
-                    //***查找其他操作符定义***
-                    for (int j = 0; j < (int)OverrideableOperator.Inequality; j++)
-                    {
-                        var dict = operFunctions[j];
-                        if (!dict.ContainsKey(key))
-                        {
-                            function = operFunctions[i][key].define;
-                            return false;
-                        }
-                    }
+				foreach (var key in operFunctions[i].Keys)
+				{
+					if (i == (int)OverrideableOperator.Equality)
+					{
+						var dict = operFunctions[(int)OverrideableOperator.Inequality];
+						if (!dict.ContainsKey(key))
+						{
+							function = operFunctions[i][key].define;
+							return false;
+						}
+					}
+					else if (i == (int)OverrideableOperator.Inequality)
+					{
+						var dict = operFunctions[(int)OverrideableOperator.Equality];
+						if (!dict.ContainsKey(key))
+						{
+							function = operFunctions[i][key].define;
+							return false;
+						}
+					}
+					else
+					{
+						//***查找其他操作符定义***
+						for (int j = 0; j < (int)OverrideableOperator.Inequality; j++)
+						{
+
+							var dict = operFunctions[j];
+							if (!dict.ContainsKey(key))
+							{
+								function = operFunctions[i][key].define;
+								return false;
+							}
+
+						}
+					}
+
+                    
                 }
             }
             function = null;

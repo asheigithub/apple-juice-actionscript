@@ -22,54 +22,54 @@ package system.collections
 		
 		
 		[get_this_item];
-		[native, _system_collections_ilist_getThisItem_];
+		[native, system_collections_IList_getThisItem];
 		public function getThisItem(index:int):*;
 		
 		[set_this_item];
-		[native, _system_collections_ilist_setThisItem_];
+		[native, system_collections_IList_setThisItem];
 		public function setThisItem(value:*, index:int):void;
 		
-		[native,_system_collections_ilist_isFixedSize_]
+		[native,system_collections_IList_get_IsFixedSize]
 		public function get isFixedSize():Boolean;
 		
-		[native,_system_collections_ilist_isReadOnly_]
+		[native,system_collections_IList_get_IsReadOnly]
 		public function get isReadOnly():Boolean;
 		
-		[native,_system_collections_ilist_add_]
+		[native,system_collections_IList_add]
 		public function add(value:*):int;
 		
-		[native,_system_collections_ilist_clear_]
+		[native,system_collections_IList_clear]
 		public function clear():void;
 		
-		[native,_system_collections_ilist_contains_]
+		[native,system_collections_IList_contains]
 		public function contains(value:*):Boolean;
 		
-		[native,_system_collections_ilist_indexOf_]
+		[native,system_collections_IList_indexOf]
 		public function indexOf(value:*):int;
 		
-		[native,_system_collections_ilist_insert_]
+		[native,system_collections_IList_insert]
 		public function insert(index:int, value:*):void;
 		
-		[native,_system_collections_ilist_remove_]
+		[native,system_collections_IList_remove]
 		public function remove(value:*):void;
 		
-		[native,_system_collections_ilist_removeAt_]
+		[native,system_collections_IList_removeAt]
 		public function removeAt(index:int):void;
 		
-		[native,system_collections_icollection_count]
+		[native,system_collections_ICollection_get_Count]
 		public function get count():int;
 		
 		[native,system_collections_arraylist_copyto]
 		public function copyTo_(array:_Array_):void;
 		
-		[native,system_collections_icollection_copyto]
+		[native,system_collections_ICollection_copyTo]
 		public function copyTo(array:_Array_, index:int):void;
 		
 		[native,system_collections_arraylist_copyto_]
 		public function copyTo__(index:int,array:_Array_,arrayIndex:int,count:int):void;
 		
 		
-		[native,system_collections_ienumerable_getenumerator_]
+		[native,system_collections_IEnumerable_getEnumerator]
 		public function getEnumerator():_IEnumerator_;
 		
 		[native,system_collections_arraylist_capcaity]
@@ -84,7 +84,12 @@ package system.collections
 		[native,system_collections_arraylist_sort]
 		public function sort():void;
 		
+		[native,system_collections_ICollection_get_SyncRoot]
+		private function get syncRoot():_Object_;
 		
+		
+		[native,system_collections_ICollection_get_IsSynchronized]
+		private function get isSynchronized():Boolean;
 	}
 
 }

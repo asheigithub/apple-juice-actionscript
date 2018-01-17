@@ -8,6 +8,8 @@ namespace ASBinCode
 	
 	public class SourceToken : ISWCSerializable
     {
+		public static readonly SourceToken Empty = new SourceToken(0,0,string.Empty);
+
         public int line;
         public int ptr;
         public string sourceFile;

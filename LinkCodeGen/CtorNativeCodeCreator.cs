@@ -20,7 +20,16 @@ namespace LinkCodeGen
 
 		public string GetCode()
 		{
-			var paras = constructor.GetParameters();
+			System.Reflection.ParameterInfo[] paras;
+			if (constructor != null)
+			{
+				paras = constructor.GetParameters();
+			}
+			else
+			{
+				paras = new System.Reflection.ParameterInfo[0];
+			}
+
 			string funccode = Properties.Resources.CtorFunc;
 
 			funccode = funccode.Replace("[classname]", classname);
@@ -58,7 +67,7 @@ namespace LinkCodeGen
 			if (type.IsValueType)
 			{
 				//((LinkObj<UInt64>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = (UInt64)value;
-				setnativeinstance = "((LinkObj<"+type.FullName+">)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = ";
+				setnativeinstance = "((LinkObj<"+ GetTypeFullName(type) + ">)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = ";
 			}
 			else
 			{
@@ -68,12 +77,12 @@ namespace LinkCodeGen
 
 
 			string newobj = "new ";
-			newobj += type.FullName;
+			newobj += NativeCodeCreatorBase.GetTypeFullName(type);
 			newobj += "(";
 
 			for (int i = 0; i < paras.Length; i++)
 			{
-				newobj += string.Format("({0})arg{1}", paras[i].ParameterType.FullName, i);
+				newobj += string.Format("({0})arg{1}", GetTypeFullName( paras[i].ParameterType), i);
 				if (i < paras.Length - 1)
 				{
 					newobj += ",";

@@ -1,16 +1,20 @@
-﻿					object arg{argindex};
-					if (!stackframe.player.linktypemapper.rtValueToLinkObject(
-						argements[{argindex}],
-
-						stackframe.player.linktypemapper.getLinkType(argements[{argindex}].rtType)
-						,
-						bin, true, out arg{argindex}
-						))
+﻿					{argtype} arg{argindex};
 					{
-						stackframe.throwCastException(token, argements[{argindex}].rtType,
+						object _temp;
+						if (!stackframe.player.linktypemapper.rtValueToLinkObject(
+							argements[{argindex}],
 
-							functionDefine.signature.parameters[{argindex}].type
-							);
-						success = false;
-						return;
+							stackframe.player.linktypemapper.getLinkType(argements[{argindex}].rtType)
+							,
+							bin, true, out _temp
+							))
+						{
+							stackframe.throwCastException(token, argements[{argindex}].rtType,
+
+								functionDefine.signature.parameters[{argindex}].type
+								);
+							success = false;
+							return;
+						}
+						arg{argindex} = ({argtype})_temp;
 					}

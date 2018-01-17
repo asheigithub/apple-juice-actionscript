@@ -12,26 +12,26 @@ namespace ASCTest.regNativeFunctions
     {
         public static void regNativeFunctions(CSWC bin)
         {
-            bin.regNativeFunction(
-               LinkSystem_Buildin.getCreator("_system_SByte_creator__", default(SByte)));
+            //bin.regNativeFunction(
+            //   LinkSystem_Buildin.getCreator("_system_SByte_creator__", default(SByte)));
             bin.regNativeFunction(new system_sbyte_ctor());
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<SByte>("_system_SByte_MaxValue_getter"
-                ,
-                () => { return SByte.MaxValue; }
-                )
-                );
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<SByte>("_system_SByte_MinValue_getter"
-                ,
-                () => { return SByte.MinValue; }
-                )
-                );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<SByte>("_system_SByte_MaxValue_getter"
+            //    ,
+            //    () => { return SByte.MaxValue; }
+            //    )
+            //    );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<SByte>("_system_SByte_MinValue_getter"
+            //    ,
+            //    () => { return SByte.MinValue; }
+            //    )
+            //    );
             bin.regNativeFunction(new system_sbyte_explicit_from());
             bin.regNativeFunction(new system_sbyte_implicit_from());
             bin.regNativeFunction(new system_sbyte_static_Parse());
             bin.regNativeFunction(new system_sbyte_valueOf());
-            bin.regNativeFunction(new system_sbyte_toString_());
+            //bin.regNativeFunction(new system_sbyte_toString_());
         }
     }
 

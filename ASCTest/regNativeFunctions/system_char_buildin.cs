@@ -12,21 +12,21 @@ namespace ASCTest.regNativeFunctions
     {
         public static void regNativeFunctions(CSWC bin)
         {
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getCreator("_system_Char_creator__", default(Char)));
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getCreator("_system_Char_creator__", default(Char)));
             bin.regNativeFunction(new system_char_ctor());
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<Char>("_system_Char_MaxValue_getter"
-                ,
-                () => { return char.MaxValue; }
-                )
-                );
-            bin.regNativeFunction(
-                LinkSystem_Buildin.getStruct_static_field_getter<Char>("_system_Char_MinValue_getter"
-                ,
-                () => { return char.MinValue; }
-                )
-                );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<Char>("_system_Char_MaxValue_getter"
+            //    ,
+            //    () => { return char.MaxValue; }
+            //    )
+            //    );
+            //bin.regNativeFunction(
+            //    LinkSystem_Buildin.getStruct_static_field_getter<Char>("_system_Char_MinValue_getter"
+            //    ,
+            //    () => { return char.MinValue; }
+            //    )
+            //    );
             bin.regNativeFunction(new system_char_explicit_from());
             bin.regNativeFunction(new system_char_valueOf());
         }

@@ -56,8 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\LinkCodeGen\bin\Debug\buildins\autogencodelib_Testobj_buildin.cs">
-      <Link>autoCreateCodes\buildins\autogencodelib_Testobj_buildin.cs</Link>
+    <Compile Include="..\LinkCodeGen\bin\Debug\codeoutput.cs">
+      <Link>autoCreateCodes\codeoutput.cs</Link>
+    </Compile>
+    <Compile Include="..\LinkCodeGen\bin\Debug\retNativeCode.cs">
+      <Link>autoCreateCodes\retNativeCode.cs</Link>
     </Compile>
     <Compile Include="extFunctions.cs" />
     <Compile Include="Program.cs" />

@@ -503,7 +503,12 @@ namespace ASCTest.regNativeFunctions
                     //returnSlot.setValue((int)array.GetValue(index));
                     success = true;
                 }
-                catch (KeyNotFoundException)
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (KeyNotFoundException)
                 {
                     success = false;
                     stackframe.throwAneException(token,  "Queue内的值没有链接到脚本");
@@ -681,7 +686,12 @@ namespace ASCTest.regNativeFunctions
                     //returnSlot.setValue((int)array.GetValue(index));
                     success = true;
                 }
-                catch (KeyNotFoundException)
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (KeyNotFoundException)
                 {
                     success = false;
                     stackframe.throwAneException(token,   "Queue内的值没有链接到脚本");
@@ -763,7 +773,12 @@ namespace ASCTest.regNativeFunctions
                     //returnSlot.setValue((int)array.GetValue(index));
                     success = true;
                 }
-                catch (KeyNotFoundException)
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
+				catch (KeyNotFoundException)
                 {
                     success = false;
                     stackframe.throwAneException(token,  "Queue.toArray()的结果没有链接到脚本");

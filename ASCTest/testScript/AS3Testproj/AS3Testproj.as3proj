@@ -80,7 +80,6 @@
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
-    <hidden path="..\..\..\LinkCodeGen\bin\Debug\as3api\linkcodegen" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />

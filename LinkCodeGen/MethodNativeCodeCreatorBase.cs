@@ -7,6 +7,26 @@ namespace LinkCodeGen
 {
 	abstract class MethodNativeCodeCreatorBase : NativeCodeCreatorBase
 	{
+		internal class myparainfo : ParameterInfo
+		{
+			ParameterInfo bp;
+			int pos;
+			public myparainfo(ParameterInfo bp, int pos)
+			{
+				this.bp = bp;
+				this.pos = pos;
+			}
+
+			public override int Position => pos;
+			public override string Name => bp.Name;
+			public override ParameterAttributes Attributes => bp.Attributes;
+			public override object DefaultValue => bp.DefaultValue;
+			public override MemberInfo Member => bp.Member;
+			public override Type ParameterType => bp.ParameterType;
+			public override object RawDefaultValue => bp.RawDefaultValue;
+
+		}
+
 		protected string classname;
 		protected System.Reflection.MethodInfo method;
 
@@ -112,6 +132,133 @@ namespace LinkCodeGen
 			return false;
 		}
 
+		public static string GetOperatorOverrideSummary(MethodInfo method,Type type, ParameterInfo[] paras,out string operatorcode)
+		{
+			if (method.IsSpecialName && method.Name.StartsWith("op_"))
+			{
+				string op = method.Name.Substring(3);
+				switch (op)
+				{
+					case "Equality":
+						operatorcode = "==";
+						//sb.AppendLine(string.Format("{0} == {1};", param[0].Name, param[1].Name));
+						return string.Format("计算 {0} == {1}", paras[0].Name, paras[1].Name);
+						
+					case "Inequality":
+						operatorcode = "!=";
+						//sb.AppendLine(string.Format("{0} != {1};", param[0].Name, param[1].Name));
+						return string.Format("计算 {0} != {1}", paras[0].Name, paras[1].Name);
+					case "Addition":
+						//sb.AppendLine(string.Format("{0} + {1};", param[0].Name, param[1].Name));
+						operatorcode = "+";
+						return string.Format("计算 {0} + {1}", paras[0].Name, paras[1].Name);
+					case "Subtraction":
+						//sb.AppendLine(string.Format("{0} - {1};", param[0].Name, param[1].Name));
+						operatorcode = "-";
+						return string.Format("计算 {0} - {1}", paras[0].Name, paras[1].Name);
+					case "Multiply":
+						//sb.AppendLine(string.Format("{0} * {1};", param[0].Name, param[1].Name));
+						operatorcode = "*";
+						return string.Format("计算 {0} * {1}", paras[0].Name, paras[1].Name);
+					case "Division":
+						//sb.AppendLine(string.Format("{0} / {1};", param[0].Name, param[1].Name));
+						operatorcode = "/";
+						return string.Format("计算 {0} / {1}", paras[0].Name, paras[1].Name);
+					case "Modulus":
+						//sb.AppendLine(string.Format("{0} % {1};", param[0].Name, param[1].Name));
+						operatorcode = "%";
+						return string.Format("计算 {0} % {1}", paras[0].Name, paras[1].Name);
+					case "GreaterThan":
+						//sb.AppendLine(string.Format("{0} > {1};", param[0].Name, param[1].Name));
+						operatorcode = ">";
+						return string.Format("计算 {0} > {1}", paras[0].Name, paras[1].Name);
+					case "GreaterThanOrEqual":
+						//sb.AppendLine(string.Format("{0} >= {1};", param[0].Name, param[1].Name));
+						operatorcode = ">=";
+						return string.Format("计算 {0} >= {1}", paras[0].Name, paras[1].Name);
+					case "LessThan":
+						//sb.AppendLine(string.Format("{0} < {1};", param[0].Name, param[1].Name));
+						operatorcode = "<";
+						return string.Format("计算 {0} < {1}", paras[0].Name, paras[1].Name);
+					case "LessThanOrEqual":
+						//sb.AppendLine(string.Format("{0} <= {1};", param[0].Name, param[1].Name));
+						operatorcode = "<=";
+						return string.Format("计算 {0} <= {1}", paras[0].Name, paras[1].Name);
+					case "LeftShift":
+						operatorcode = "<<";
+						return string.Format("计算 {0} << {1}", paras[0].Name, paras[1].Name);
+					case "RightShift":
+						operatorcode = ">>";
+						return string.Format("计算 {0} >> {1}", paras[0].Name, paras[1].Name);
+					case "UnaryPlus":
+						operatorcode = "+";
+						return string.Format("计算 +{0}", paras[0].Name);
+					case "UnaryNegation":
+						operatorcode = "-";
+						return string.Format("计算 -{0}", paras[0].Name);
+					case "Increment":
+						operatorcode = "++";
+						return string.Format("计算 ++{0}", paras[0].Name);
+					case "Decrement":
+						operatorcode = "--";
+						return string.Format("计算 --{0}", paras[0].Name);
+					case "OnesComplement":
+						operatorcode = "~";
+						return string.Format("计算 ~{0}", paras[0].Name);
+					case "ExclusiveOr":
+						operatorcode = "^";
+						return string.Format("计算 {0} ^ {1}", paras[0].Name, paras[1].Name);
+					case "BitwiseOr":
+						operatorcode = "|";
+						return string.Format("计算 {0} | {1}", paras[0].Name, paras[1].Name);
+					case "BitwiseAnd":
+						operatorcode = "&";
+						return string.Format("计算 {0} & {1}", paras[0].Name, paras[1].Name);
+					case "Implicit":
+						operatorcode = "Implicit";
+
+						if (method.ReturnType == type && paras[0].ParameterType != type)
+						{
+							return string.Format("Implicit From {0} ", GetTypeFullName( paras[0].ParameterType));
+						}
+						else if (method.ReturnType != type && paras[0].ParameterType == type)
+						{
+							return string.Format("Implicit To {0} ", GetTypeFullName( method.ReturnType));
+						}
+						else
+						{
+							return string.Format("Implicit Convert {0} to {1}", GetTypeFullName(paras[0].ParameterType), GetTypeFullName( method.ReturnType));
+
+						}
+					case "Explicit":
+						
+						operatorcode = "Explicit";
+						if (method.ReturnType == type && paras[0].ParameterType != type)
+						{
+							return string.Format("Explicit From {0} ", GetTypeFullName( paras[0].ParameterType));
+						}
+						else if (method.ReturnType != type && paras[0].ParameterType == type)
+						{
+							return string.Format("Explicit To {0} ",GetTypeFullName( method.ReturnType));
+						}
+						else
+						{
+							return string.Format("Explicit Convert {0} to {1}",GetTypeFullName( paras[0].ParameterType), GetTypeFullName( method.ReturnType));
+
+						}
+
+					default:
+						throw new NotImplementedException(op);
+				}
+			}
+			else
+			{
+				operatorcode = null;
+				return "不是操作符重载";
+			}
+		}
+
+
 		protected string GetInvokeMethodString(string storeresult, ParameterInfo[] paras)
 		{
 			if (method.IsSpecialName && method.Name.StartsWith("op_"))
@@ -205,7 +352,7 @@ namespace LinkCodeGen
 							//method.ReturnType.GetClassName(out tmp, out clsName, out isByRef);
 							//sb.AppendLine(string.Format("({1}){0};", param[0].Name, clsName));
 
-							storeresult += string.Format("({0})arg0\n", method.ReturnType.FullName );
+							storeresult += string.Format("({0})arg0\n", GetTypeFullName( method.ReturnType) );
 							
 						}
 						break;
@@ -228,21 +375,21 @@ namespace LinkCodeGen
 			{
 				//***索引器***
 
-				storeresult += "[" + string.Format("({0})arg{1}", paras[0].ParameterType.FullName, 0) + "]\n";
+				storeresult += "[" + string.Format("({0})arg{1}",GetTypeFullName( paras[0].ParameterType), 0) + "]\n";
 				return storeresult;
 			}
 			else if (CheckIsSetter(method, methodAtType, out pinfo))
 			{
 				//***访问器Setter
-				storeresult += "." + pinfo.Name + " = " + string.Format("({0})arg{1}", paras[0].ParameterType.FullName, 0) + "\n";
+				storeresult += "." + pinfo.Name + " = " + string.Format("({0})arg{1}", GetTypeFullName( paras[0].ParameterType), 0) + "\n";
 				return storeresult;
 			}
 			else if (CheckIsIndexerSetter(method, methodAtType, out pinfo))
 			{
 				//***索引器***
 
-				storeresult += "[" + string.Format("({0})arg{1}", paras[0].ParameterType.FullName, 0) + "] = "
-					+ string.Format("({0})arg{1}", paras[1].ParameterType.FullName, 1) + "\n";
+				storeresult += "[" + string.Format("({0})arg{1}",GetTypeFullName( paras[1].ParameterType), 1) + "] = "
+					+ string.Format("({0})arg{1}", GetTypeFullName( paras[0].ParameterType), 0) + "\n";
 				;
 				return storeresult;
 			}
@@ -255,7 +402,7 @@ namespace LinkCodeGen
 
 			for (int i = 0; i < paras.Length; i++)
 			{
-				storeresult += string.Format("({0})arg{1}", paras[i].ParameterType.FullName, i);
+				storeresult += string.Format("({0})arg{1}", GetTypeFullName( paras[i].ParameterType), i);
 				if (i < paras.Length - 1)
 				{
 					storeresult += ",";

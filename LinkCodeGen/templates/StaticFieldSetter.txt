@@ -49,6 +49,11 @@
 					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 					success = true;
 				}
+				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				{
+					success = false;
+					stackframe.throwAneException(token, tlc.Message);
+				}
 				catch (InvalidCastException ic)
 				{
 					success = false;

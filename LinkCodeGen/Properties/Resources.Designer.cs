@@ -96,6 +96,48 @@ namespace LinkCodeGen.Properties {
         ///
         ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
+        internal static string CreateInstance {
+            get {
+                return ResourceManager.GetString("CreateInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
         internal static string CtorFunc {
             get {
                 return ResourceManager.GetString("CtorFunc", resourceCulture);
@@ -269,22 +311,25 @@ namespace LinkCodeGen.Properties {
         }
         
         /// <summary>
-        ///   查找类似 					object arg{argindex};
-        ///					if (!stackframe.player.linktypemapper.rtValueToLinkObject(
-        ///						argements[{argindex}],
-        ///
-        ///						stackframe.player.linktypemapper.getLinkType(argements[{argindex}].rtType)
-        ///						,
-        ///						bin, true, out arg{argindex}
-        ///						))
+        ///   查找类似 					{argtype} arg{argindex};
         ///					{
-        ///						stackframe.throwCastException(token, argements[{argindex}].rtType,
+        ///						object _temp;
+        ///						if (!stackframe.player.linktypemapper.rtValueToLinkObject(
+        ///							argements[{argindex}],
         ///
-        ///							functionDefine.signature.parameters[{argindex}].type
-        ///							);
-        ///						success = false;
-        ///						return;
-        ///					} 的本地化字符串。
+        ///							stackframe.player.linktypemapper.getLinkType(argements[{argindex}].rtType)
+        ///							,
+        ///							bin, true, out _temp
+        ///							))
+        ///						{
+        ///							stackframe.throwCastException(token, argements[{argindex}].rtType,
+        ///
+        ///								functionDefine.signature.parameters[{argindex}].type
+        ///								);
+        ///							success = false;
+        ///							return;
+        ///						}
+        ///						arg{ [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string LoadArgement {
             get {
@@ -495,6 +540,47 @@ namespace LinkCodeGen.Properties {
         internal static string StaticMethodFunc {
             get {
                 return ResourceManager.GetString("StaticMethodFunc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(0)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public override RunTimeDataType re [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string ValueOf {
+            get {
+                return ResourceManager.GetString("ValueOf", resourceCulture);
             }
         }
     }

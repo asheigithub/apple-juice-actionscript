@@ -8,6 +8,12 @@ namespace ASRuntime.nativefuncs
 {
     public static class LinkSystem_Buildin
     {
+		public static NativeFunctionBase getStaticClassCreator(string name,Type t)
+		{
+			return new staticClassCreator(t, name);
+		}
+
+
         public static NativeFunctionBase getCreator<T>(string name, T v)
         {
             return new creator<T>(name, v);
@@ -45,11 +51,51 @@ namespace ASRuntime.nativefuncs
         {
             return new compareto_generic<T>(name);
         }
+
     }
 
-    #region creator
+	#region creator
 
-    class creator<T> : NativeFunctionBase,ILinkSystemObjCreator
+	class staticClassCreator : NativeFunctionBase, ILinkSystemObjCreator
+	{
+		private string fn;
+		private Type t;
+		List<RunTimeDataType> para;
+		public staticClassCreator(Type type,string name)
+		{
+			t = type;
+			fn = name;
+			para = new List<RunTimeDataType>();
+			para.Add(RunTimeDataType.rt_void);
+		}
+
+		public override string name => fn;
+
+		public override List<RunTimeDataType> parameters => para;
+
+		public override RunTimeDataType returnType => RunTimeDataType.rt_void;
+
+		public override bool isMethod => true;
+
+		public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Type getLinkSystemObjType()
+		{
+			return t;
+		}
+
+		public void setLinkObjectValueToSlot(SLOT slot, object player, object value, Class clsType)
+		{
+			throw new NotImplementedException();
+		}
+	}
+
+
+
+	class creator<T> : NativeFunctionBase,ILinkSystemObjCreator
     {
         private T defaultvalue;
         private string funname;
@@ -703,9 +749,9 @@ namespace ASRuntime.nativefuncs
     }
 
 
-    #endregion
+	#endregion
 
-    class system_enum_valueOf : NativeConstParameterFunction
+	class system_enum_valueOf : NativeConstParameterFunction
     {
         public system_enum_valueOf() : base(0)
         {

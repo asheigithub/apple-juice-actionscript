@@ -208,6 +208,8 @@ namespace ASRuntime.nativefuncs
 			bin.regNativeFunction(new RegExp_exec());
 
             bin.regNativeFunction(new system_enum_valueOf());
+			bin.regNativeFunction(new system_noctorclass_buildin());
+
         }
 
     }

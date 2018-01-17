@@ -133,6 +133,7 @@
     <Compile Include="nativefuncs\Object_buildin.cs" />
     <Compile Include="nativefuncs\RegExp_buildin.cs" />
     <Compile Include="nativefuncs\String_buildin.cs" />
+    <Compile Include="nativefuncs\system_noctorclass_buildin.cs" />
     <Compile Include="nativefuncs\Throw.cs" />
     <Compile Include="nativefuncs\Trace.cs" />
     <Compile Include="nativefuncs\Uint_buildin.cs" />

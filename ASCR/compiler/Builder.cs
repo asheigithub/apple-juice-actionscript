@@ -1131,96 +1131,104 @@ namespace ASCompiler.compiler
                             for (int j = 0; j < cls.classMembers.Count; j++)
                             {
                                 var clsmember = cls.classMembers[j];
-                                if (clsmember.name == implmember.name
-                                    ||
-                                    check_expl_impl(clsmember,implmember)
-                                    )
-                                {
-                                    found = true;
-                                    if (!clsmember.isPublic
-                                        &&
-                                        !check_expl_impl(clsmember, implmember)//显式接口实现可以是私有。。。
-                                        )
-                                    {
-                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                            "interface method "
-                                            + implmember.name + " in interface " + impls.name +
-                                            " not implemented by class " + cls.name 
-                                            + ". (实现接口的方法必须是public)");
-                                    }
 
-                                    if (clsmember.bindField is ClassPropertyGetter 
-                                        || 
-                                        implmember.bindField is ClassPropertyGetter)
-                                    {
-                                        if (!(clsmember.bindField is ClassPropertyGetter
-                                        && implmember.bindField is ClassPropertyGetter))
-                                        {
-                                            throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                            "interface method "
-                                            + implmember.name + " in interface " + impls.name +
-                                            " not implemented by class " + cls.name
-                                            + ". (一个是访问器一个不是)");
-                                        }
-                                        else
-                                        {
-                                            continue;
-                                        }
-                                    }
-                                    //***比较签名***
-                                    var clssig = 
-                                        buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]].signature;
-                                    ASBinCode.rtti.FunctionSignature interfacesig;
-                                    if (implmember.inheritFrom == null)
-                                    {
-                                        interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember]].signature;
-                                    }
-                                    else
-                                    {
-                                        interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember.inheritSrcMember]].signature;
-                                    }
+								//***先查找显式接口实现**
+								if (check_expl_impl(clsmember, implmember))
+								{
 
-                                    if (clssig.returnType != interfacesig.returnType)
-                                    {
-                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                            "interface method "
-                                            + implmember.name + " in interface " + impls.name +
-                                            " not implemented by class " + cls.name
-                                            + ". (返回类型不符)");
+									found = true;
 
-                                    }
-                                    else if (clssig.parameters.Count != interfacesig.parameters.Count)
-                                    {
-                                        throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                            "interface method "
-                                            + implmember.name + " in interface " + impls.name +
-                                            " not implemented by class " + cls.name
-                                            + ". (参数签名不符)");
-                                    }
-                                    else
-                                    {
 
-                                        //***比较所有参数***
-                                        for (int k = 0; k < clssig.parameters.Count; k++)
-                                        {
-                                            if (clssig.parameters[k].type != interfacesig.parameters[k].type
-                                                ||
-                                                clssig.parameters[k].isPara != interfacesig.parameters[k].isPara
-                                                )
-                                            {
-                                                throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                                     "interface method "
-                                                     + implmember.name + " in interface " + impls.name +
-                                                     " not implemented by class " + cls.name
-                                                     + ". (参数签名不符)");
-                                            }
-                                        }
-                                    }
+									if (clsmember.bindField is ClassPropertyGetter
+											||
+											implmember.bindField is ClassPropertyGetter)
+									{
+										if (!(clsmember.bindField is ClassPropertyGetter
+										&& implmember.bindField is ClassPropertyGetter))
+										{
 
-                                    idxlist[i] = j;
+											if (clsmember.name == implmember.name)
+											{
+												throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+												"interface method "
+												+ implmember.name + " in interface " + impls.name +
+												" not implemented by class " + cls.name
+												+ ". (一个是访问器一个不是)");
+											}
+											else
+											{
+												continue;
+											}
+										}
+										else
+										{
+											continue;
+										}
+									}
+									
 
-                                }
+
+									compare_signature(clsmember, implmember, item, impls, cls);
+
+									idxlist[i] = j;
+
+									break;
+								}
                             }
+
+							if (!found)
+							{
+								for (int j = 0; j < cls.classMembers.Count; j++)
+								{
+									var clsmember = cls.classMembers[j];
+									if (clsmember.name == implmember.name
+										)
+									{
+										
+										if (!clsmember.isPublic
+											//&&
+											//!check_expl_impl(clsmember, implmember)//显式接口实现可以是私有。。。
+											)
+										{
+											throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+												"interface method "
+												+ implmember.name + " in interface " + impls.name +
+												" not implemented by class " + cls.name
+												+ ". (实现接口的方法必须是public)");
+										}
+
+										found = true;
+
+										if (clsmember.bindField is ClassPropertyGetter
+											||
+											implmember.bindField is ClassPropertyGetter)
+										{
+											if (!(clsmember.bindField is ClassPropertyGetter
+											&& implmember.bindField is ClassPropertyGetter))
+											{
+												throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+												"interface method "
+												+ implmember.name + " in interface " + impls.name +
+												" not implemented by class " + cls.name
+												+ ". (一个是访问器一个不是)");
+											}
+											else
+											{
+												continue;
+											}
+										}
+										
+										compare_signature(clsmember, implmember, item, impls, cls);
+
+										idxlist[i] = j;
+
+										break;
+									}
+								}
+							}
+
+
+
                             if (!found)
                             {
                                 throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
@@ -1406,7 +1414,74 @@ namespace ASCompiler.compiler
 
             
         }
-        
+
+		private bool compare_signature(ClassMember clsmember,ClassMember implmember,KeyValuePair<ASTool.AS3.AS3ClassInterfaceBase,ASBinCode.rtti.Class> item,Class impls,Class cls)
+		{
+			//***比较签名***
+			ASBinCode.rtti.FunctionSignature clssig;
+
+			if (clsmember.inheritFrom == null)
+			{
+				clssig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]].signature;
+			}
+			else
+			{
+				clssig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember.inheritSrcMember]].signature;
+			}
+
+
+
+			ASBinCode.rtti.FunctionSignature interfacesig;
+			if (implmember.inheritFrom == null)
+			{
+				interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember]].signature;
+			}
+			else
+			{
+				interfacesig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[implmember.inheritSrcMember]].signature;
+			}
+
+			if (clssig.returnType != interfacesig.returnType)
+			{
+				throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+					"interface method "
+					+ implmember.name + " in interface " + impls.name +
+					" not implemented by class " + cls.name
+					+ ". (返回类型不符)");
+
+			}
+			else if (clssig.parameters.Count != interfacesig.parameters.Count)
+			{
+				throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+					"interface method "
+					+ implmember.name + " in interface " + impls.name +
+					" not implemented by class " + cls.name
+					+ ". (参数签名不符)");
+			}
+			else
+			{
+
+				//***比较所有参数***
+				for (int k = 0; k < clssig.parameters.Count; k++)
+				{
+					if (clssig.parameters[k].type != interfacesig.parameters[k].type
+						||
+						clssig.parameters[k].isPara != interfacesig.parameters[k].isPara
+						)
+					{
+						throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+							 "interface method "
+							 + implmember.name + " in interface " + impls.name +
+							 " not implemented by class " + cls.name
+							 + ". (参数签名不符)");
+					}
+				}
+			}
+
+			return true;
+		}
+
+
         private bool check_expl_impl(ASBinCode.rtti.ClassMember clsmember,
             ASBinCode.rtti.ClassMember interfacemember)
         {
@@ -1414,42 +1489,71 @@ namespace ASCompiler.compiler
             if (!interfacemember.refClass.isLink_System) return false;
 
 
-            if (clsmember.bindField is ClassPropertyGetter && interfacemember.bindField is ClassPropertyGetter)
-            {
-                ClassPropertyGetter cc = (ClassPropertyGetter)clsmember.bindField;
-                ClassPropertyGetter ic = (ClassPropertyGetter)interfacemember.bindField;
-
-                bool ok = true;
-
-                if (ic.getter != null)
-                {
-                    if (cc.getter == null)
-                    {
-                        ok = false;
-                    }
-                    else
-                    {
-                        ok =ok && check_expl_impl(cc.getter.classmember, ic.getter.classmember);
-                    }
-                }
-                if (ic.setter != null)
-                {
-                    if (cc.getter == null)
-                    {
-                        ok = false;
-                    }
-                    else
-                    {
-                        ok = ok && check_expl_impl(cc.setter.classmember, ic.setter.classmember);
-                    }
-                }
-
-                return ok;
-            }
+			if (interfacemember.bindField is ClassPropertyGetter && !(clsmember.bindField is ClassPropertyGetter) && clsmember.name != interfacemember.name)
+			{
+				//***显式接口实现
+				ClassPropertyGetter ic = (ClassPropertyGetter)interfacemember.bindField;
 
 
-            if (!_buildingmembers.ContainsKey(clsmember)) return false;
-            if (interfacemember.inheritFrom == null)
+				if (ic.getter != null)
+				{
+					if (check_expl_impl(clsmember, ic.getter.classmember))
+					{
+						return true;
+					}
+				}
+				if (ic.setter != null)
+				{
+					if (check_expl_impl(clsmember, ic.setter.classmember))
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+			else if (clsmember.bindField is ClassPropertyGetter && interfacemember.bindField is ClassPropertyGetter)
+			{
+				ClassPropertyGetter cc = (ClassPropertyGetter)clsmember.bindField;
+				ClassPropertyGetter ic = (ClassPropertyGetter)interfacemember.bindField;
+
+				bool ok = true;
+
+				if (ic.getter != null)
+				{
+					if (cc.getter == null)
+					{
+						ok = false;
+					}
+					else
+					{
+						ok = ok && check_expl_impl(cc.getter.classmember, ic.getter.classmember);
+					}
+				}
+				if (ic.setter != null)
+				{
+					if (cc.getter == null)
+					{
+						ok = false;
+					}
+					else
+					{
+						ok = ok && check_expl_impl(cc.setter.classmember, ic.setter.classmember);
+					}
+				}
+
+				return ok;
+			}
+			else if (clsmember.bindField is ClassPropertyGetter && !(interfacemember.bindField is ClassPropertyGetter))
+			{
+				return false;
+			}
+
+			if (clsmember.inheritFrom == null)
+			{
+				if (!_buildingmembers.ContainsKey(clsmember)) return false;
+			}
+
+			if (interfacemember.inheritFrom == null)
             {
                 if (!_buildingmembers.ContainsKey(interfacemember)) return false;
             }
@@ -1457,10 +1561,17 @@ namespace ASCompiler.compiler
             {
                 if (!_buildingmembers.ContainsKey(interfacemember.inheritSrcMember)) return false;
             }
-           
 
-            ASBinCode.rtti.FunctionDefine clssig =
-                  buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]];
+
+			ASBinCode.rtti.FunctionDefine clssig;
+			if (clsmember.inheritFrom == null)
+			{
+				clssig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember]];
+			}
+			else
+			{
+				clssig = buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[clsmember.inheritSrcMember]];
+			}
             ASBinCode.rtti.FunctionDefine interfacesig;
             if (interfacemember.inheritFrom == null)
             {

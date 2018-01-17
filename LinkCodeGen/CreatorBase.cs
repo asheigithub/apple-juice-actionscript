@@ -6,6 +6,19 @@ namespace LinkCodeGen
 {
 	abstract class CreatorBase
 	{
+		public static Dictionary<string, object> as3keywords;//= { "import","extend", "dynamic" };
+		static CreatorBase()
+		{
+			as3keywords = new Dictionary<string, object>();
+			as3keywords.Add("import", null);
+			as3keywords.Add("extend", null);
+			as3keywords.Add("dynamic", null);
+			as3keywords.Add("default", null);
+			as3keywords.Add("delete", null);
+			as3keywords.Add("use", null);
+		}
+
+
 		protected Type type;
 		protected string as3apidocpath;
 		protected string csharpnativecodepath;
@@ -15,20 +28,22 @@ namespace LinkCodeGen
 
 		public  string name;
 
-		public string BuildIngType
+		public Type BuildIngType
 		{
 			get
 			{
-				return type.FullName;
+				return type;
 			}
 		}
 
+		public readonly string linkcodenamespace;
 
-		public CreatorBase(Type type, string as3apidocpath, string csharpnativecodepath)
+		public CreatorBase(Type type, string as3apidocpath, string csharpnativecodepath,string linkcodenamespace)
 		{
 			this.type = type;
 			this.as3apidocpath = as3apidocpath;
 			this.csharpnativecodepath = csharpnativecodepath;
+			this.linkcodenamespace = linkcodenamespace;
 		}
 
 
@@ -38,14 +53,14 @@ namespace LinkCodeGen
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators);
+					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 				}
 			}
 			else if (type.IsEnum)
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath);
+					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath,linkcodenamespace);
 				}
 			}
 			else if (type.IsArray)
@@ -60,11 +75,13 @@ namespace LinkCodeGen
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators);
+					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 				}
 			}
 		}
 
+
+		public static List<string> NotCreateNameSpace = new List<string>();
 		
 		/// <summary>
 		/// 返回如果在成员中涉及这种类型是否要跳过
@@ -84,17 +101,44 @@ namespace LinkCodeGen
 				return true;
 			}
 
-			if (type.IsGenericType)
+			if (type.IsNested)
 			{
 				return true;
 			}
+
+			if (type.IsGenericTypeDefinition)
+			{
+				return true;
+			}
+			if (type.IsGenericType && type.IsInterface)
+			{
+				return true;
+			}
+			//if (type.IsGenericType)
+			//{
+			//	return true;
+			//}
 
 			if (type.IsArray)
 			{
 				return IsSkipType(type.GetElementType());
 			}
 
-			if (Equals(type, typeof(Type)))
+			foreach (var item in NotCreateNameSpace)
+			{
+				if (type.Namespace == item)
+					return true;
+				if (type.Namespace.StartsWith(item + "."))
+					return true;
+			}
+
+
+			//if (Equals(type, typeof(Type)))
+			//{
+			//	return true;
+			//}
+
+			if (Equals(type, typeof(TypedReference)))
 			{
 				return true;
 			}
@@ -127,6 +171,12 @@ namespace LinkCodeGen
 		{
 			if (type == null)
 				return true;
+
+			if (Equals(type, typeof(Type)))
+			{
+				return true;
+			}
+
 
 			if (type.IsArray)
 			{
@@ -165,7 +215,17 @@ namespace LinkCodeGen
 				return "_Object_";
 			}
 
+			if (type.Equals(typeof(Type)))
+			{
+				return "Class";
+			}
+
 			if (type.IsArray)
+			{
+				return "_Array_";
+			}
+
+			if (type == typeof(Array))
 			{
 				return "_Array_";
 			}
@@ -178,6 +238,25 @@ namespace LinkCodeGen
 			if (type.Equals(typeof(System.Collections.IEnumerator)))
 			{
 				return "_IEnumerator_";
+			}
+
+			if (type.Equals(typeof(System.Math)))
+			{
+				return "Math_";
+			}
+
+			if (type.IsGenericType)
+			{
+				var defparams = type.GetGenericArguments();
+
+				string ext = string.Empty;
+				foreach (var item in defparams)
+				{
+					ext +="_"+ GetAS3ClassOrInterfaceName(item);
+				}
+
+				int idx = type.Name.IndexOf("`");
+				return type.Name.Substring(0,idx) + "_Of" + ext;
 			}
 
 			return type.Name;
@@ -197,28 +276,204 @@ namespace LinkCodeGen
 			return ns.ToLower();
 		}
 
+		private static string GetSharpTypeName(Type csharptype)
+		{
+			if (csharptype.IsGenericType)
+			{
+				var defparams = csharptype.GetGenericArguments();
+
+				string ext = string.Empty;
+				foreach (var item in defparams)
+				{
+					ext += "_"+GetSharpTypeName(item) ;
+				}
+
+				int idx = csharptype.Name.IndexOf("`");
+				return csharptype.Name.Substring(0, idx) + "_Of" + ext;
+			}
+			else
+			{
+				return csharptype.Name;
+			}
+		}
+
 		public static string GetNativeFunctionPart1(Type csharptype)
 		{
-			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name;
+			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + GetSharpTypeName(csharptype);
 		}
 
 		public static string GetCreatorNativeFuncName(Type csharptype)
 		{
-			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name + "_creator";
+			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + GetSharpTypeName(csharptype) + "_creator";
 		}
 
 		public static string GetCtorNativeFuncName(Type csharptype)
 		{
-			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name + "_ctor";
+			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + GetSharpTypeName(csharptype) + "_ctor";
 		}
 
 		public static string GetNativeFunctionClassName(Type csharptype)
 		{
-			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + csharptype.Name + "_buildin";
+			return csharptype.Namespace.ToLower().Replace(".", "_") + "_" + GetSharpTypeName(csharptype) + "_buildin";
 		}
 
-		public string GetAS3TypeString(Type type, Dictionary<Type, string> typeimports)
+
+		private System.Reflection.MethodInfo isMapToInterface(System.Reflection.MethodBase method,System.Type checkinterface)
 		{
+			var intfs= method.DeclaringType.GetInterfaces();
+			foreach (var intf in intfs)
+			{
+				if (intf == checkinterface)
+				{
+					var map = method.DeclaringType.GetInterfaceMap(checkinterface);
+
+					for (int i = 0; i < map.TargetMethods.Length; i++)
+					{
+						if (map.TargetMethods[i] == method)
+						{
+							return map.InterfaceMethods[i];
+						}
+					}
+
+					
+				}
+
+			}
+
+			
+			return null;
+		}
+
+		public string GetAS3TypeString(Type type, Dictionary<Type, string> typeimports,Type checktype,System.Reflection.MethodBase checkmethod,System.Reflection.ParameterInfo checkparameter)
+		{
+			if (checkparameter != null)
+			{
+
+
+				if (checkmethod.DeclaringType == typeof(System.Collections.IList)
+					||
+					isMapToInterface(checkmethod, typeof(System.Collections.IList)) !=null
+					)
+				{
+					if (isMapToInterface(checkmethod, typeof(System.Collections.IList)) != null)
+						checkmethod = isMapToInterface(checkmethod, typeof(System.Collections.IList));
+
+
+					if (checkmethod.Name == "set_Item" && checkparameter.Name == "value")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "Add")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "Contains")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "IndexOf")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "Insert" && checkparameter.Name == "value")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "Remove")
+					{
+						return "*";
+					}
+				}
+
+				if (checkmethod.DeclaringType == typeof(System.Collections.IDictionary)
+					||
+					isMapToInterface(checkmethod,typeof(System.Collections.IDictionary)) !=null
+					)
+				{
+					if (isMapToInterface(checkmethod, typeof(System.Collections.IDictionary)) != null)
+						checkmethod = isMapToInterface(checkmethod, typeof(System.Collections.IDictionary));
+
+					if (checkmethod.Name == "get_Item" && checkparameter.Name == "key")
+					{
+						return "Object";
+					}
+					else if (checkmethod.Name == "set_Item" && checkparameter.Name == "value")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "set_Item" && checkparameter.Name == "key")
+					{
+						return "Object";
+					}
+					else if (checkmethod.Name == "Add" && checkparameter.Name == "key")
+					{
+						return "Object";
+					}
+					else if (checkmethod.Name == "Add" && checkparameter.Name == "value")
+					{
+						return "*";
+					}
+					else if (checkmethod.Name == "Contains")
+					{
+						return "Object";
+					}
+					else if (checkmethod.Name == "Remove")
+					{
+						return "Object";
+					}
+				}
+
+			}
+
+
+			if (checktype == typeof(System.Collections.IEnumerator))
+			{
+				if (checkmethod.Name == "System.Collections.IEnumerator.get_Current"
+					||
+					checkmethod.Name == "get_Current"
+					)
+				{
+					return "*";
+				}
+			}
+			else if (checktype == typeof(System.Collections.IList))
+			{
+				if (checkmethod.Name == "get_Item"
+					||
+					checkmethod.Name == "System.Collections.IList.get_Item"
+					)
+				{
+					return "*";
+				}
+			}
+			else if (checktype == typeof(System.Collections.IDictionary))
+			{
+				if (checkmethod.Name == "get_Item"
+					||
+					checkmethod.Name == "System.Collections.IDictionary.get_Item"
+					)
+				{
+					return "*";
+				}
+			}
+			else if (checktype == typeof(System.Collections.IDictionaryEnumerator))
+			{
+				if (checkmethod.Name == "get_Key"
+					||
+					isMapToInterface(checkmethod,typeof(System.Collections.IDictionaryEnumerator)) !=null
+					)
+				{
+					return "Object";
+				}
+				else if (checkmethod.Name == "get_Value"
+					||
+					isMapToInterface(checkmethod, typeof(System.Collections.IDictionaryEnumerator)) !=null
+					)
+				{
+					return "*";
+				}
+			}
+
 			ASBinCode.RunTimeDataType rttype = MethodNativeCodeCreator.GetAS3Runtimetype(type);
 			if (rttype == ASBinCode.RunTimeDataType.fun_void)
 			{
@@ -244,8 +499,13 @@ namespace LinkCodeGen
 			{
 				return "String";
 			}
-
-
+			if (type==typeof(Array) || type.IsArray)
+			{
+				if (!typeimports.ContainsKey(typeof(Array)))
+				{
+					typeimports.Add(typeof(Array), "import system._Array_;");
+				}
+			}
 			if (this.type.Namespace != type.Namespace)
 			{
 				if (!typeimports.ContainsKey(type))
@@ -254,12 +514,51 @@ namespace LinkCodeGen
 				}
 			}
 
+			
+
 			return GetAS3ClassOrInterfaceName(type);
 		}
 
 		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
 		{
 			var members = methodAtType.GetMember(dotName);
+
+			if (methodAtType.IsInterface)
+			{
+				var extinterface = methodAtType.GetInterfaces();
+
+				List<System.Reflection.MemberInfo> inheritmember = new List<System.Reflection.MemberInfo>();
+				foreach (var item in extinterface)
+				{
+					inheritmember.AddRange(item.GetMember(dotName));
+				}
+
+				if (inheritmember.Count > 0)
+				{
+					inheritmember.AddRange(members);
+
+					members = inheritmember.ToArray();
+
+				}
+			}
+			else
+			{
+				var basetype = methodAtType.BaseType;
+				List<System.Reflection.MemberInfo> inheritmember = new List<System.Reflection.MemberInfo>();
+				if (basetype != null)
+				{
+					var inherit =basetype.GetMember(dotName);	
+					inheritmember.AddRange(inherit);
+					basetype = basetype.BaseType;
+				}
+
+				if (inheritmember.Count > 0)
+				{
+					inheritmember.AddRange(members);
+					members = inheritmember.ToArray();
+				}
+			}
+
 
 			string ext = string.Empty;
 
@@ -288,6 +587,21 @@ namespace LinkCodeGen
 
 
 			string v= dotName.Substring(0, 1).ToLower() + dotName.Substring(1) + ext;
+			if (dotName.Length > 1)
+			{
+				if (Char.IsUpper(dotName.Substring(1, 1)[0]))
+				{
+					v = dotName + ext;
+				}
+			}
+
+
+
+			while (as3keywords.ContainsKey(v))
+			{
+				v = v + "_";
+			}
+
 
 			if (method.IsStatic)
 			{
@@ -313,9 +627,19 @@ namespace LinkCodeGen
 
 		}
 
-		public abstract void Create();
+		public abstract string  Create();
 
 
+		public static void GenNativeFuncImport(StringBuilder nativesb)
+		{
+			nativesb.AppendLine("using ASBinCode;");
+			nativesb.AppendLine("using ASBinCode.rtti;");
+			nativesb.AppendLine("using ASRuntime;");
+			nativesb.AppendLine("using ASRuntime.nativefuncs;");
+			nativesb.AppendLine("using System;");
+			nativesb.AppendLine("using System.Collections;");
+			nativesb.AppendLine("using System.Collections.Generic;");
+		}
 
 
 		protected void GenAS3FileHead(StringBuilder as3sb)

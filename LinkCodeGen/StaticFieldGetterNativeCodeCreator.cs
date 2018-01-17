@@ -41,7 +41,7 @@ namespace LinkCodeGen
 			{
 				string storeresult = string.Empty;
 				//***调用方法****
-				storeresult = "int _result_ = (int)("+ type.FullName + "." + field.Name + ")";
+				storeresult = "int _result_ = (int)("+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name ;
 				
 				storeresult += "\t\t\t\t\t)\n";
 				storeresult += "\t\t\t\t\t;\n";
@@ -52,7 +52,7 @@ namespace LinkCodeGen
 			{
 				string storeresult = string.Empty;
 				//***调用方法****
-				storeresult = "uint _result_ = (uint)("+type.FullName + "." + field.Name+")";
+				storeresult = "uint _result_ = (uint)("+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name;
 				
 				storeresult += "\t\t\t\t\t)\n";
 				storeresult += "\t\t\t\t\t;\n";
@@ -63,7 +63,7 @@ namespace LinkCodeGen
 			{
 				string storeresult = string.Empty;
 				//***调用方法****
-				storeresult = "double _result_ = (double)("+ type.FullName + "." + field.Name + ")";
+				storeresult = "double _result_ = (double)("+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name ;
 				
 				storeresult += "\t\t\t\t\t)\n";
 				storeresult += "\t\t\t\t\t;\n";
@@ -74,7 +74,7 @@ namespace LinkCodeGen
 			{
 				string storeresult = string.Empty;
 				//***调用方法****
-				storeresult = "string _result_ = (string)("+type.FullName + "." + field.Name+")";
+				storeresult = "string _result_ = (string)("+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name;
 				
 				storeresult += "\t\t\t\t\t)\n";
 				storeresult += "\t\t\t\t\t;\n";
@@ -85,7 +85,7 @@ namespace LinkCodeGen
 			{
 				string storeresult = string.Empty;
 				//***调用方法****
-				storeresult = "bool _result_ = (bool)"+ type.FullName + "." + field.Name;
+				storeresult = "bool _result_ = (bool)"+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name;
 				
 				storeresult += "\t\t\t\t\t;\n";
 				storeresult += "\t\t\t\t\tif(_result_)\n";
@@ -106,7 +106,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = field.FieldType.FullName + " _result_ = "+ type.FullName + "." + field.Name;
+					storeresult = GetTypeFullName( field.FieldType) + " _result_ = "+ NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name;
 					
 					storeresult += "\t\t\t\t\t;\n";
 					//storeresult += "\t\t\t\t\tstackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);";
@@ -118,7 +118,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "object _result_ = " + type.FullName + "." + field.Name;
+					storeresult = "object _result_ = " + NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name;
 					
 					storeresult += "\t\t\t\t\t;\n";
 					storeresult += "\t\t\t\t\tstackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);";

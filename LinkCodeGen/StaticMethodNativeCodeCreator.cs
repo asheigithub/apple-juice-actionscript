@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace LinkCodeGen
@@ -17,7 +18,18 @@ namespace LinkCodeGen
 		{
 			
 				var paras = method.GetParameters();
-				string funccode = Properties.Resources.StaticMethodFunc;
+
+			
+				PropertyInfo propertyInfo;
+				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				{
+				var temp = paras[0];
+				paras[0] = new myparainfo(paras[1], 0);
+				paras[1] = new myparainfo(temp, 1);
+			}
+			
+
+			string funccode = Properties.Resources.StaticMethodFunc;
 
 				funccode = funccode.Replace("[classname]", classname);
 				funccode = funccode.Replace("[paracount]", paras.Length.ToString());
@@ -54,7 +66,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = methodAtType.FullName;
+					storeresult = GetTypeFullName( methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t;\n";
@@ -65,7 +77,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "int _result_ = (int)("+ methodAtType.FullName;
+					storeresult = "int _result_ = (int)("+ GetTypeFullName(methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t)\n";
@@ -77,7 +89,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "uint _result_ = (uint)("+ methodAtType.FullName;
+					storeresult = "uint _result_ = (uint)("+ GetTypeFullName(methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t)\n";
@@ -89,7 +101,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "double _result_ = (double)("+ methodAtType.FullName;
+					storeresult = "double _result_ = (double)("+ GetTypeFullName(methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t)\n";
@@ -101,7 +113,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "string _result_ = (string)("+ methodAtType.FullName;
+					storeresult = "string _result_ = (string)("+ GetTypeFullName(methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t)\n";
@@ -113,7 +125,7 @@ namespace LinkCodeGen
 				{
 					string storeresult = string.Empty;
 					//***调用方法****
-					storeresult = "bool _result_ = "+ methodAtType.FullName;
+					storeresult = "bool _result_ = "+ GetTypeFullName(methodAtType);
 					storeresult = GetInvokeMethodString(storeresult, paras);
 
 					storeresult += "\t\t\t\t\t;\n";
@@ -135,7 +147,7 @@ namespace LinkCodeGen
 					{
 						string storeresult = string.Empty;
 						//***调用方法****
-						storeresult = method.ReturnType.FullName + " _result_ = "+ methodAtType.FullName;
+						storeresult = GetTypeFullName( method.ReturnType) + " _result_ = "+ GetTypeFullName(methodAtType);
 						storeresult = GetInvokeMethodString(storeresult, paras);
 
 						storeresult += "\t\t\t\t\t;\n";
@@ -148,7 +160,7 @@ namespace LinkCodeGen
 					{
 						string storeresult = string.Empty;
 						//***调用方法****
-						storeresult = "object _result_ = " + methodAtType.FullName;
+						storeresult = "object _result_ = " + GetTypeFullName(methodAtType);
 						storeresult = GetInvokeMethodString(storeresult, paras);
 
 						storeresult += "\t\t\t\t\t;\n";

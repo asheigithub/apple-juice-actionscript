@@ -40,7 +40,7 @@ namespace LinkCodeGen
 			funccode = funccode.Replace("[loadargement]", loadargs);
 
 
-			funccode = funccode.Replace("[setstaticfield]", type.FullName + "." + field.Name + " = " + "(" + field.FieldType.FullName + ")" + "arg0;");
+			funccode = funccode.Replace("[setstaticfield]", NativeCodeCreatorBase.GetTypeFullName(type) + "." + field.Name + " = " + "(" + GetTypeFullName( field.FieldType) + ")" + "arg0;");
 
 
 			return funccode;

@@ -123,7 +123,7 @@ namespace LinkCodeGen
 
 
 
-					loadstructargement = loadstructargement.Replace("{argType}", parameterType.FullName);
+					loadstructargement = loadstructargement.Replace("{argType}",GetTypeFullName( parameterType));
 
 					return loadstructargement;
 				}
@@ -132,7 +132,7 @@ namespace LinkCodeGen
 					string loadargement = Properties.Resources.LoadArgement;
 
 					loadargement = loadargement.Replace("{argindex}", position.ToString());
-
+					loadargement = loadargement.Replace("{argtype}", GetTypeFullName( parameterType));
 					return loadargement;
 				}
 			}
@@ -164,6 +164,46 @@ namespace LinkCodeGen
 		{
 			return GetLoadArgementString(paramenter.ParameterType, paramenter.Position);
 		}
+
+
+
+		public static string GetTypeFullName(Type type)
+		{
+			if (type.IsGenericType)
+			{
+				var param = type.GetGenericArguments();
+
+
+				string ns = type.Namespace;
+				if (!string.IsNullOrEmpty(ns))
+				{
+					ns = ns + ".";
+				}
+
+				int idx = type.Name.IndexOf("`");
+				string part1 = ns+ type.Name.Substring(0, idx);
+
+				part1 = part1 + "<";
+
+				for (int i = 0; i < param.Length; i++)
+				{
+					part1 += GetTypeFullName(param[i]);
+
+					if (i < param.Length - 1)
+					{
+						part1 += ",";
+					}
+				}
+
+				part1 += ">";
+				return part1;
+			}
+			else
+			{
+				return type.FullName;
+			}
+		}
+
 
 	}
 }

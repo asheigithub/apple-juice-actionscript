@@ -15,47 +15,57 @@ package system.collections
 		public function Hashtable();
 		
 		
-		[native,system_collections_icollection_count]
+		[native,system_collections_ICollection_get_Count]
 		public function get count():int;
 		
-		[native,system_collections_icollection_copyto]
+		[native,system_collections_ICollection_copyTo]
 		public function copyTo(array:_Array_, index:int):void;
 		
-		[native, system_collections_idictionary_getenumerator_]
-		public function getEnumerator():_IEnumerator_;
+		[native, system_collections_IDictionary_getEnumerator_]
+		public function getEnumerator():IDictionaryEnumerator;
 		
-		[native,_system_collections_idictionary_isFixedSize_]
+		[native,system_collections_IDictionary_get_IsFixedSize]
 		public function get isFixedSize():Boolean;
 		
-		[native,_system_collections_idictionary_isReadOnly_]
+		[native,system_collections_IDictionary_get_IsReadOnly]
 		public function get isReadOnly():Boolean;
 		
 		[get_this_item];
-		[native, _system_collections_idictionary_getThisItem_];
+		[native, system_collections_IDictionary_getThisItem];
 		public function getThisItem(key:Object):*;
 		
 		[set_this_item];
-		[native, _system_collections_idictionary_setThisItem_];
+		[native, system_collections_IDictionary_setThisItem];
 		public function setThisItem(value:*, key:Object):void;
 		
-		[native,_system_collections_idictionary_keys_]
+		[native,system_collections_IDictionary_get_Keys]
 		public function get keys():ICollection;
 		
-		[native,_system_collections_idictionary_values_]
+		[native,system_collections_IDictionary_get_Values]
 		public function get values():ICollection;
 		
-		[native,_system_collections_idictionary_add_]
+		[native,system_collections_IDictionary_add]
 		public function add(key:Object, value:*):void;
 		
-		[native,_system_collections_idictionary_clear_]
+		[native,system_collections_IDictionary_clear]
 		public function clear():void;
 		
-		[native,_system_collections_idictionary_contains_]
+		[native,system_collections_IDictionary_contains]
 		public function contains(key:Object):Boolean;
 		
-		[native,_system_collections_idictionary_remove_]
+		[native,system_collections_IDictionary_remove]
 		public function remove(key:Object):void;
 		
+		[native,system_collections_ICollection_get_SyncRoot]
+		private function get syncRoot():_Object_;
+		
+		
+		[native,system_collections_ICollection_get_IsSynchronized]
+		private function get isSynchronized():Boolean;
+		
+		
+		[native, system_collections_IEnumerable_getEnumerator]
+		private function getEnumerator_():_IEnumerator_;
 		
 	}
 

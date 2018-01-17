@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClassCreator.cs" />
+    <Compile Include="CreateInstanceNativeCodeCreator.cs" />
     <Compile Include="CreatorBase.cs" />
     <Compile Include="EnumCreator.cs" />
     <Compile Include="FieldGetterNativeCodeCreator.cs" />
@@ -64,11 +65,13 @@
     <Compile Include="StaticFieldGetterNativeCodeCreator.cs" />
     <Compile Include="StaticFieldSetterNativeCodeCreator.cs" />
     <Compile Include="StaticMethodNativeCodeCreator.cs" />
+    <Compile Include="ValueOfNativeCodeCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="templates\CreateInstance.txt" />
     <Content Include="templates\CtorFunc.txt" />
     <Content Include="templates\EnumCtor.txt" />
     <Content Include="templates\FieldGetter.txt" />
@@ -81,6 +84,7 @@
     <Content Include="templates\StaticFieldGetter.txt" />
     <Content Include="templates\StaticFieldSetter.txt" />
     <Content Include="templates\StaticMethodFunc.txt" />
+    <Content Include="templates\ValueOf.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

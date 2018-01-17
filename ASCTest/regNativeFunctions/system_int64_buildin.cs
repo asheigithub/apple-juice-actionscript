@@ -307,273 +307,273 @@ namespace ASCTest.regNativeFunctions
     }
 
 
-    sealed class system_int64_MaxValue_getter : NativeFunctionBase
-    {
-        public system_int64_MaxValue_getter()
-        {
-            para = new List<RunTimeDataType>();
-        }
+    //sealed class system_int64_MaxValue_getter : NativeFunctionBase
+    //{
+    //    public system_int64_MaxValue_getter()
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //    }
 
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
 
-        public override string name
-        {
-            get
-            {
-                return "_system_Int64_MaxValue_getter";
-            }
-        }
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Int64_MaxValue_getter";
+    //        }
+    //    }
 
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
 
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.rt_void;
+    //        }
+    //    }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+    //    public override NativeFunctionMode mode
+    //    {
+    //        get
+    //        {
+    //            return NativeFunctionMode.normal_1;
+    //        }
+    //    }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+    //    public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            var maxValue = Int64.MaxValue;
+    //    public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+    //    {
+    //        var maxValue = Int64.MaxValue;
 
-            ((ASRuntime.StackSlot)returnSlot)
-                .setLinkObjectValue<long>(
-                bin.getClassByRunTimeDataType(
-                functionDefine.signature.returnType
-                ) 
-                ,
-                ((ASRuntime.StackFrame)stackframe).player
-                ,maxValue);
+    //        ((ASRuntime.StackSlot)returnSlot)
+    //            .setLinkObjectValue<long>(
+    //            bin.getClassByRunTimeDataType(
+    //            functionDefine.signature.returnType
+    //            ) 
+    //            ,
+    //            ((ASRuntime.StackFrame)stackframe).player
+    //            ,maxValue);
 
-            success = true;
-        }
+    //        success = true;
+    //    }
 
-    }
+    //}
 
-    sealed class system_int64_MinValue_getter : NativeFunctionBase
-    {
-        public system_int64_MinValue_getter()
-        {
-            para = new List<RunTimeDataType>();
-        }
+    //sealed class system_int64_MinValue_getter : NativeFunctionBase
+    //{
+    //    public system_int64_MinValue_getter()
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //    }
 
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
 
-        public override string name
-        {
-            get
-            {
-                return "_system_Int64_MinValue_getter";
-            }
-        }
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Int64_MinValue_getter";
+    //        }
+    //    }
 
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
 
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.rt_void;
+    //        }
+    //    }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+    //    public override NativeFunctionMode mode
+    //    {
+    //        get
+    //        {
+    //            return NativeFunctionMode.normal_1;
+    //        }
+    //    }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
+    //    public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            var maxValue = Int64.MinValue;
+    //    public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+    //    {
+    //        var maxValue = Int64.MinValue;
 
-            ((ASRuntime.StackSlot)returnSlot)
-                .setLinkObjectValue<long>(
-                bin.getClassByRunTimeDataType(
-                functionDefine.signature.returnType
-                )
-                ,
-                ((ASRuntime.StackFrame)stackframe).player
-                , maxValue);
+    //        ((ASRuntime.StackSlot)returnSlot)
+    //            .setLinkObjectValue<long>(
+    //            bin.getClassByRunTimeDataType(
+    //            functionDefine.signature.returnType
+    //            )
+    //            ,
+    //            ((ASRuntime.StackFrame)stackframe).player
+    //            , maxValue);
 
-            success = true;
-        }
+    //        success = true;
+    //    }
 
-    }
-
-
-    sealed class system_int64_static_Parse : NativeFunctionBase
-    {
-        public system_int64_static_Parse()
-        {
-            para = new List<RunTimeDataType>();
-            para.Add(RunTimeDataType.rt_string);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_system_Int64_static_parse";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_void;
-            }
-        }
-
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
-
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            long v = long.Parse(ASRuntime.TypeConverter.ConvertToString(argements[0].getValue(), null, null));
-
-            ((ASRuntime.StackSlot)returnSlot)
-                .setLinkObjectValue<long>(
-                bin.getClassByRunTimeDataType(
-                functionDefine.signature.returnType
-                )
-                ,
-                ((ASRuntime.StackFrame)stackframe).player
-                , v);
-
-            success = true;
-        }
-
-    }
-
-    class system_int64_toString_ : NativeConstParameterFunction
-    {
-        public system_int64_toString_() : base(1)
-        {
-            para = new List<RunTimeDataType>();
-            para.Add(RunTimeDataType.rt_string);
-        }
-
-        public override bool isMethod
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override string name
-        {
-            get
-            {
-                return "_system_Int64_toString_";
-            }
-        }
-
-        List<RunTimeDataType> para;
-        public override List<RunTimeDataType> parameters
-        {
-            get
-            {
-                return para;
-            }
-        }
-
-        public override RunTimeDataType returnType
-        {
-            get
-            {
-                return RunTimeDataType.rt_string;
-            }
-        }
-
-        public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
-        {
-            string format = TypeConverter.ConvertToString(argements[0], stackframe, token);
+    //}
 
 
-            LinkObj<Int64> obj = ((LinkObj<Int64>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+    //sealed class system_int64_static_Parse : NativeFunctionBase
+    //{
+    //    public system_int64_static_Parse()
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //        para.Add(RunTimeDataType.rt_string);
+    //    }
 
-            returnSlot.setValue(obj.value.ToString(format));
-            success = true;
-        }
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
 
-    }
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Int64_static_parse";
+    //        }
+    //    }
+
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
+
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.rt_void;
+    //        }
+    //    }
+
+    //    public override NativeFunctionMode mode
+    //    {
+    //        get
+    //        {
+    //            return NativeFunctionMode.normal_1;
+    //        }
+    //    }
+
+    //    public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+    //    {
+    //        long v = long.Parse(ASRuntime.TypeConverter.ConvertToString(argements[0].getValue(), null, null));
+
+    //        ((ASRuntime.StackSlot)returnSlot)
+    //            .setLinkObjectValue<long>(
+    //            bin.getClassByRunTimeDataType(
+    //            functionDefine.signature.returnType
+    //            )
+    //            ,
+    //            ((ASRuntime.StackFrame)stackframe).player
+    //            , v);
+
+    //        success = true;
+    //    }
+
+    //}
+
+    //class system_int64_toString_ : NativeConstParameterFunction
+    //{
+    //    public system_int64_toString_() : base(1)
+    //    {
+    //        para = new List<RunTimeDataType>();
+    //        para.Add(RunTimeDataType.rt_string);
+    //    }
+
+    //    public override bool isMethod
+    //    {
+    //        get
+    //        {
+    //            return true;
+    //        }
+    //    }
+
+    //    public override string name
+    //    {
+    //        get
+    //        {
+    //            return "_system_Int64_toString_";
+    //        }
+    //    }
+
+    //    List<RunTimeDataType> para;
+    //    public override List<RunTimeDataType> parameters
+    //    {
+    //        get
+    //        {
+    //            return para;
+    //        }
+    //    }
+
+    //    public override RunTimeDataType returnType
+    //    {
+    //        get
+    //        {
+    //            return RunTimeDataType.rt_string;
+    //        }
+    //    }
+
+    //    public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+    //    {
+    //        string format = TypeConverter.ConvertToString(argements[0], stackframe, token);
+
+
+    //        LinkObj<Int64> obj = ((LinkObj<Int64>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+
+    //        returnSlot.setValue(obj.value.ToString(format));
+    //        success = true;
+    //    }
+
+    //}
 
 }
