@@ -1541,12 +1541,14 @@ namespace ASRuntime
 		}
 
 		private CodeBlock blankBlock;
+		private RunTimeScope blankScope;
 		internal void CallBlankBlock(IBlockCallBack callbacker)
 		{
 			if (blankBlock == null)
 			{
 				blankBlock = new CodeBlock(int.MaxValue - 1, "#blank", -65535, false);
 				blankBlock.opSteps.Add(new OpStep(OpCode.flag, new SourceToken(0, 0, string.Empty))); blankBlock.instructions = blankBlock.opSteps.ToArray(); blankBlock.opSteps = null;
+				blankScope = new RunTimeScope(emptyMembers, blankBlock.id, null, null, RunTimeScopeType.function);
 			}
 
 			callBlock(blankBlock, null, null, null, null, callbacker, null, RunTimeScopeType.function);
@@ -1746,6 +1748,7 @@ namespace ASRuntime
 			}
 			else if (ReferenceEquals(calledblock, blankBlock))
 			{
+				frame.scope = blankScope;
 				return null;
 			}
 			else

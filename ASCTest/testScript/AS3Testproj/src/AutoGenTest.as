@@ -21,8 +21,11 @@ package
 			var g:Testobj = new Testobj();
 			trace(g);
 			
+			g.FuncTest(genFunc());
 			
-			genFunc()();
+			
+			trace("hahaha");
+			
 		}
 		
 		
@@ -39,7 +42,7 @@ package
 					action();
 					
 				}
-				
+				return "bcd";
 			}
 			
 			
