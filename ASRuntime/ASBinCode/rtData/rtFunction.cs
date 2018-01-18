@@ -8,6 +8,11 @@ namespace ASBinCode.rtData
 	
     public sealed class rtFunction : RunTimeValueBase
     {
+		class WapperContainer
+		{
+			public Dictionary<RunTimeDataType, ASRuntime.FunctionWapper> dictWappers;
+		}
+
 
         private int _objid;
         private static int _seed;
@@ -29,8 +34,28 @@ namespace ASBinCode.rtData
 		
 		public rtObjectBase objHandle;
 
+		private WapperContainer wapperContainer;
 
-        private int _functionid;
+		public Dictionary<RunTimeDataType, ASRuntime.FunctionWapper> dictWappers
+		{
+			get
+			{
+				if (wapperContainer == null)
+					return null;
+				return wapperContainer.dictWappers;
+			}
+			set
+			{
+				if (wapperContainer == null)
+				{
+					wapperContainer = new WapperContainer();
+				}
+				wapperContainer.dictWappers = value;
+			}
+		}
+
+
+		private int _functionid;
 
         public int functionId
         {
@@ -49,7 +74,11 @@ namespace ASBinCode.rtData
             this._ismethod = ismethod;
             _objid = objid;
 
+			//需要保证所有函数对象一致,因此会被拷贝传下去
+			wapperContainer = new WapperContainer();
+
 			objHandle = null;
+			
         }
        
 
@@ -99,6 +128,7 @@ namespace ASBinCode.rtData
             _this_pointer = right._this_pointer;
 
             objHandle = right.objHandle;
+			wapperContainer = right.wapperContainer;
         }
 
 		public void SetValue(int functionid, bool ismethod)
@@ -114,10 +144,12 @@ namespace ASBinCode.rtData
 			//_functionid = -1;
 			//_ismethod = false; //值类型无需清理
 
+			wapperContainer = null;
 
 			_bindScope = null;
 			_this_pointer = null;
 			objHandle = null;
+			
 		}
 
         public override int GetHashCode()

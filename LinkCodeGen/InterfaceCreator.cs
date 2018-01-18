@@ -364,8 +364,7 @@ namespace LinkCodeGen
 				//	continue;
 				//}
 
-				string returntype = GetAS3TypeString(method.ReturnType,typeimports,type,method,null);
-
+				
 				var paras = method.GetParameters();
 
 				//bool parachecked = true;
@@ -423,6 +422,7 @@ namespace LinkCodeGen
 					Console.WriteLine(method.ToString() + "有参数或返回值被配置为需要跳过");
 					continue;
 				}
+				string returntype = GetAS3TypeString(method.ReturnType, typeimports, type, method, null);
 
 				string nativefunName = GetMethodNativeFunctionName(method,type,null,null);
 

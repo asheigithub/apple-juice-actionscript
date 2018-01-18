@@ -100,7 +100,7 @@ namespace AutoGenCodeLib
 		//	return listtest;
 		//}
 
-		
+
 		//public override string ToString()
 		//{
 		//	return string.Format("x:{0} y:{1}", x, y);
@@ -111,10 +111,22 @@ namespace AutoGenCodeLib
 		//	Console.WriteLine(type.)
 		//}
 
+		public class innerClass
+		{
+
+		}
+
+		public innerClass nc=new innerClass();
+
+
+		public delegate int TESTHandler<T>(string v1,int v2,T v3);
+
+		public TESTHandler<long> handler = (v1,v2,v3)=> { return 98765; };
+
 		public Type TestType(Type type)
 		{
 			Console.WriteLine("inputtype: " + type);
-			
+
 			return typeof(long);
 		}
 

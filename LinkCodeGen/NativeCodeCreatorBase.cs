@@ -169,17 +169,27 @@ namespace LinkCodeGen
 
 		public static string GetTypeFullName(Type type)
 		{
+			string pre = string.Empty;
+			if (type.IsNested)
+			{
+				pre = GetTypeFullName(type.DeclaringType) + "."; 
+			}
+
 			if (type.IsGenericType)
 			{
 				var param = type.GetGenericArguments();
 
 
-				string ns = type.Namespace;
-				if (!string.IsNullOrEmpty(ns))
-				{
-					ns = ns + ".";
-				}
+				string ns = string.Empty;
 
+				if (string.IsNullOrEmpty(pre))
+				{
+					ns = type.Namespace;
+					if (!string.IsNullOrEmpty(ns))
+					{
+						ns = ns + ".";
+					}
+				}
 				int idx = type.Name.IndexOf("`");
 				string part1 = ns+ type.Name.Substring(0, idx);
 
@@ -196,11 +206,19 @@ namespace LinkCodeGen
 				}
 
 				part1 += ">";
-				return part1;
+				return pre + part1;
 			}
 			else
 			{
-				return type.FullName;
+				if (string.IsNullOrEmpty(pre))
+				{
+					return type.FullName;
+				}
+				else
+				{
+					return pre + type.Name;
+				}
+				
 			}
 		}
 

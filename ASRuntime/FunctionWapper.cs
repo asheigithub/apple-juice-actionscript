@@ -13,30 +13,20 @@ namespace ASRuntime
 	{
 		public readonly rtFunction function;
 		public readonly Player player;
-		public FunctionWapper(RunTimeValueBase func,Player player)
+
+		/// <summary>
+		/// 绑定的委托
+		/// </summary>
+		public Delegate action;
+
+		internal FunctionWapper(rtFunction func,Player player)
 		{
 			this.player = player;
+			this.function = (rtFunction)func.Clone();
 
-			if (func.rtType == RunTimeDataType.rt_function)
-			{
-				ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)func;
-
-				this.function = function;
-			}
-			else if (func.rtType == player.swc.FunctionClass.getRtType())
-			{
-				ASBinCode.rtData.rtFunction function = (ASBinCode.rtData.rtFunction)
-					TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)func);
-
-				this.function = function;
-			}
-			else
-			{
-				throw new ASRunTimeException("目标不是Function", player.stackTrace(0));
-			}
 		}
 
-		public object Invoke(object[] args)
+		public object Invoke(params object[] args)
 		{
 			object v1=null;
 			object v2=null;
@@ -82,7 +72,7 @@ namespace ASRuntime
 			}
 
 			return player.InvokeFunctionWapper(this, argcount, v1, v2, v3, v4, v5, paraArgs);
-
+			
 		}
 
 	}

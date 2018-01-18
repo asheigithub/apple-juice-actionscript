@@ -29,14 +29,20 @@ namespace ASCTest.autoCreateCodes
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			//throw new NotImplementedException();
+			
+			try
+			{
+				//FunctionWapper wapper = new FunctionWapper(argements[0], stackframe.player);
 
-			FunctionWapper wapper = new FunctionWapper(argements[0], stackframe.player);
+				//object r = wapper.Invoke(null);
 
-			object r= wapper.Invoke(null);
-
-
-			success = true;
-
+				success = true;
+			}
+			catch (ASRunTimeException ex)
+			{
+				stackframe.throwError(token, 0, ex.ToString());
+				success = false;
+			}
 		}
 	}
 }

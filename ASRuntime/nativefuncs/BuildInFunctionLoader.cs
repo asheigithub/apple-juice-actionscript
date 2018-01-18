@@ -210,7 +210,8 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new system_enum_valueOf());
 			bin.regNativeFunction(new system_noctorclass_buildin());
 
-        }
+			MulitCastDelegate_buildin.regNativeFunctions(bin);
+		}
 
-    }
+	}
 }

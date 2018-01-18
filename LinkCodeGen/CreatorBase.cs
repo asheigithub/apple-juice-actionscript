@@ -145,6 +145,7 @@ namespace LinkCodeGen
 				return false;
 			}
 
+
 			if (type.IsByRef)
 				return true;
 
@@ -155,7 +156,10 @@ namespace LinkCodeGen
 
 			if (type.IsNested)
 			{
-				return true;
+				if (IsSkipType(type.DeclaringType))
+				{
+					return true;
+				}
 			}
 
 			if (type.IsGenericTypeDefinition)
@@ -166,6 +170,73 @@ namespace LinkCodeGen
 			{
 				return true;
 			}
+
+			if (IsDelegate(type))
+			{
+				//var m = GetDelegateMethodInfo(type);
+				//var n=GetSharpTypeName(type);
+				//var k = NativeCodeCreatorBase.GetTypeFullName(type);
+
+
+				var m = GetDelegateMethodInfo(type);
+				//***如果该委托包含要跳过的类型，则跳过****
+				if (m.IsGenericMethod)
+				{
+					return true;
+				}
+
+				if (m.ReturnType.IsGenericTypeDefinition)
+				{
+					return true;
+				}
+
+				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(m.ReturnType);
+				if (rt > ASBinCode.RunTimeDataType.unknown)
+				{
+					if (IsSkipType(m.ReturnType))
+					{
+						return true;
+					}
+				}
+
+				var paras = m.GetParameters();
+				foreach (var p in paras)
+				{
+					if (p.IsOut)
+					{
+						return true;
+					}
+					if (p.ParameterType.IsByRef)
+					{
+						return true;
+					}
+					//if (p.ParameterType.IsGenericType)
+					if (p.ParameterType.IsGenericTypeDefinition)
+					{
+						return true;
+					}
+
+					if (p.IsOptional)
+					{
+						if (p.RawDefaultValue != null)
+						{
+							var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
+							if (rrt > ASBinCode.RunTimeDataType.unknown)
+							{
+								return true;
+							}
+						}
+					}
+
+					if (IsSkipType(p.ParameterType))
+					{
+						return true;
+					}
+				}
+
+				return false;
+			}
+
 			//if (type.IsGenericType)
 			//{
 			//	return true;
@@ -184,13 +255,7 @@ namespace LinkCodeGen
 					return true;
 			}
 
-			if (IsDelegate(type))
-			{
-				//var m = GetDelegateMethodInfo(type);
-				//var n=GetSharpTypeName(type);
-				//var k = NativeCodeCreatorBase.GetTypeFullName(type);
-				return true;
-			}
+			
 			
 
 			if (Equals(type, typeof(TypedReference)))
@@ -198,15 +263,15 @@ namespace LinkCodeGen
 				return true;
 			}
 
-			if (Equals(type, typeof(Delegate)))
-			{
-				return true;
-			}
+			//if (Equals(type, typeof(Delegate)))
+			//{
+			//	return true;
+			//}
 
-			if (Equals(type, typeof(MulticastDelegate)))
-			{
-				return true;
-			}
+			//if (Equals(type, typeof(MulticastDelegate)))
+			//{
+			//	return true;
+			//}
 
 			if (type.BaseType != null)
 			{
@@ -300,6 +365,12 @@ namespace LinkCodeGen
 				return "Math_";
 			}
 
+			string pre = string.Empty;
+			if (type.IsNested)
+			{
+				pre = GetAS3ClassOrInterfaceName(type.DeclaringType) + "_";
+			}
+
 			if (type.IsGenericType)
 			{
 				var defparams = type.GetGenericArguments();
@@ -311,10 +382,10 @@ namespace LinkCodeGen
 				}
 
 				int idx = type.Name.IndexOf("`");
-				return type.Name.Substring(0,idx) + "_Of" + ext;
+				return pre +  type.Name.Substring(0,idx) + "_Of" + ext;
 			}
 
-			return type.Name;
+			return pre+type.Name;
 		}
 
 

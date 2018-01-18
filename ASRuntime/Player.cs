@@ -284,11 +284,13 @@ namespace ASRuntime
 				}
 				return null;
 			}
+			lock (this)
+			{
+				initPlayer();
 
-			initPlayer();
-
-			HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
-			return run2(defaultblock, data, result);
+				HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
+				return run2(defaultblock, data, result);
+			}			
 		}
 
 
@@ -2917,6 +2919,22 @@ namespace ASRuntime
 			}
 		}
 
+		public void throwOrShowError(ASRunTimeException exception)
+		{
+			if (currentRunFrame != null)
+			{
+				currentRunFrame.throwAneException(SourceToken.Empty, exception.ToString());
+			}
+			else
+			{
+				if (infoOutput != null)
+				{
+					infoOutput.Error("运行时错误");
+					infoOutput.Error(exception.ToString());
+				}
+			}
+		}
+
 		internal void outPutErrorMessage(error.InternalError err)
 		{
 			if (infoOutput != null)
@@ -2987,6 +3005,11 @@ namespace ASRuntime
 				if (skipline > 0)
 				{
 					skipline--;
+					continue;
+				}
+
+				if (item.block == blankBlock)
+				{
 					continue;
 				}
 
@@ -3115,23 +3138,23 @@ namespace ASRuntime
 			}
 			catch (RuntimeLinkTypeMapper.TypeLinkClassException e)
 			{
-				throw new ASRunTimeException("构造函数参数转换失败", e);
+				throw new ASRunTimeException("函数参数转换失败", e);
 			}
 			catch (KeyNotFoundException e)
 			{
-				throw new ASRunTimeException("构造函数参数转换失败", e);
+				throw new ASRunTimeException("函数参数转换失败", e);
 			}
 			catch (ArgumentException e)
 			{
-				throw new ASRunTimeException("构造函数参数转换失败", e);
+				throw new ASRunTimeException("函数参数转换失败", e);
 			}
 			catch (InvalidCastException e)
 			{
-				throw new ASRunTimeException("构造函数参数转换失败", e);
+				throw new ASRunTimeException("函数参数转换失败", e);
 			}
 			catch (IndexOutOfRangeException e)
 			{
-				throw new ASRunTimeException("构造函数参数转换失败", e);
+				throw new ASRunTimeException("函数参数转换失败", e);
 			}
 		}
 
@@ -3161,100 +3184,102 @@ namespace ASRuntime
 
 			try
 			{
-				initPlayer();
-
-				var cls = getClass(classname);
-				if (cls == null)
+				lock (this)
 				{
-					throw new ASRunTimeException(classname + "类型未找到", string.Empty);
-				}
+					initPlayer();
 
-				CallBlankBlock(null);
-
-				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
-				{
-					throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
-				}
-
-				var sig = swc.functions[cls.constructor_functionid].signature;
-				RunTimeValueBase vb1 = null;
-				RunTimeValueBase vb2 = null;
-				RunTimeValueBase vb3 = null;
-
-				RunTimeValueBase[] paraArgs = null;
-
-				currentRunFrame.call_parameter_slotCount += argcount;
-				int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
-				int stslotidx = slotidx;
-				if (argcount > 0)
-				{
-					vb1 = prepareParameter(sig, 0, v1, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 1)
-				{
-					vb2 = prepareParameter(sig, 1, v2, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 2)
-				{
-					vb3 = prepareParameter(sig, 2, v3, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 3)
-				{
-					paraArgs = new RunTimeValueBase[argcount - 3];
-					for (int i = 0; i < paraArgs.Length; i++)
+					var cls = getClass(classname);
+					if (cls == null)
 					{
-						paraArgs[i] = prepareParameter(sig, i + 3, args[i], stackSlots[slotidx]);
+						throw new ASRunTimeException(classname + "类型未找到", string.Empty);
+					}
+
+					CallBlankBlock(null);
+
+					if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
+					{
+						throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
+					}
+
+					var sig = swc.functions[cls.constructor_functionid].signature;
+					RunTimeValueBase vb1 = null;
+					RunTimeValueBase vb2 = null;
+					RunTimeValueBase vb3 = null;
+
+					RunTimeValueBase[] paraArgs = null;
+
+					currentRunFrame.call_parameter_slotCount += argcount;
+					int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+					int stslotidx = slotidx;
+					if (argcount > 0)
+					{
+						vb1 = prepareParameter(sig, 0, v1, stackSlots[slotidx]);
 						slotidx++;
 					}
-				}
-
-
-				error.InternalError err;
-				bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err,
-					static_instance[cls.staticClass.classid],
-					new rtInt(argcount), vb1, vb2, vb3, paraArgs);
-
-				currentRunFrame.call_parameter_slotCount = 0;
-				for (int i = stslotidx; i < slotidx; i++)
-				{
-					stackSlots[slotidx].clear();
-				}
-
-				if (!issuccess)
-				{
-					while (step())
+					if (argcount > 1)
 					{
-
+						vb2 = prepareParameter(sig, 1, v2, stackSlots[slotidx]);
+						slotidx++;
 					}
-					if (err != null)
+					if (argcount > 2)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						vb3 = prepareParameter(sig, 2, v3, stackSlots[slotidx]);
+						slotidx++;
+					}
+					if (argcount > 3)
+					{
+						paraArgs = new RunTimeValueBase[argcount - 3];
+						for (int i = 0; i < paraArgs.Length; i++)
+						{
+							paraArgs[i] = prepareParameter(sig, i + 3, args[i], stackSlots[slotidx]);
+							slotidx++;
+						}
+					}
+
+
+					error.InternalError err;
+					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err,
+						static_instance[cls.staticClass.classid],
+						new rtInt(argcount), vb1, vb2, vb3, paraArgs);
+
+					currentRunFrame.call_parameter_slotCount = 0;
+					for (int i = stslotidx; i < slotidx; i++)
+					{
+						stackSlots[slotidx].clear();
+					}
+
+					if (!issuccess)
+					{
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("对象创建失败", string.Empty);
+						}
 					}
 					else
 					{
-						throw new ASRunTimeException("对象创建失败", string.Empty);
+						var v = currentRunFrame._tempSlot1.getValue().Clone();
+
+						while (step())
+						{
+
+						}
+
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+
+						return v as rtObject;
 					}
 				}
-				else
-				{
-					var v = currentRunFrame._tempSlot1.getValue().Clone();
-
-					while (step())
-					{
-
-					}
-
-					if (err != null)
-					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
-					}
-
-					return v as rtObject;
-				}
-
 			}
 			finally
 			{
@@ -3368,8 +3393,12 @@ namespace ASRuntime
 		}
 		public object invokeMethod(string type, string methodname, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
 		{
-			var cls = getClassStaticInstance(type);
-			return invokeMethod(cls, methodname, argcount, v1, v2, v3, v4, v5, args);
+			lock (this)
+			{
+				var cls = getClassStaticInstance(type);
+				return invokeMethod(cls, methodname, argcount, v1, v2, v3, v4, v5, args);
+			}
+			
 		}
 
 
@@ -3400,11 +3429,15 @@ namespace ASRuntime
 
 		public object invokeMethod(rtObjectBase thisObj, string methodname, int argcount, object v1, object v2, object v3, object v4, object v5, params object[] args)
 		{
-			var method = getMethod(thisObj, methodname);
-			if (method == null)
-				throw new ASRunTimeException("方法未找到", string.Empty);
+			lock (this)
+			{
+				var method = getMethod(thisObj, methodname);
+				if (method == null)
+					throw new ASRunTimeException("方法未找到", string.Empty);
 
-			return invokeMethod(thisObj, method, argcount, v1, v2, v3, v4, v5, args);
+				return invokeMethod(thisObj, method, argcount, v1, v2, v3, v4, v5, args);
+			}
+			
 		}
 
 
@@ -3439,113 +3472,118 @@ namespace ASRuntime
 
 			try
 			{
-				initPlayer();
-				CallBlankBlock(null);
+				lock (this)
+				{
 
-				var signature = swc.functions[method.functionId].signature;
+					initPlayer();
+					CallBlankBlock(null);
 
-				RunTimeValueBase vb1 = null;
-				RunTimeValueBase vb2 = null;
-				RunTimeValueBase vb3 = null;
-				RunTimeValueBase vb4 = null;
-				RunTimeValueBase vb5 = null;
+					var signature = swc.functions[method.functionId].signature;
 
-				RunTimeValueBase[] paraArgs = null;
+					RunTimeValueBase vb1 = null;
+					RunTimeValueBase vb2 = null;
+					RunTimeValueBase vb3 = null;
+					RunTimeValueBase vb4 = null;
+					RunTimeValueBase vb5 = null;
 
-				currentRunFrame.call_parameter_slotCount += argcount;
+					RunTimeValueBase[] paraArgs = null;
 
-				int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
-				int stslotidx = slotidx;
-				if (argcount > 0)
-				{
-					vb1 = prepareParameter(signature, 0, v1, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 1)
-				{
-					vb2 = prepareParameter(signature, 1, v2, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 2)
-				{
-					vb3 = prepareParameter(signature, 2, v3, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 3)
-				{
-					vb4 = prepareParameter(signature, 3, v4, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 4)
-				{
-					vb5 = prepareParameter(signature, 4, v5, stackSlots[slotidx]);
-					slotidx++;
-				}
-				if (argcount > 5)
-				{
-					paraArgs = new RunTimeValueBase[argcount - 5];
-					for (int i = 0; i < paraArgs.Length; i++)
+					currentRunFrame.call_parameter_slotCount += argcount;
+
+					int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+					int stslotidx = slotidx;
+					if (argcount > 0)
 					{
-						paraArgs[i] = prepareParameter(signature, i + 5, args[i], stackSlots[slotidx]);
+						vb1 = prepareParameter(signature, 0, v1, stackSlots[slotidx]);
 						slotidx++;
 					}
-				}
-
-
-				error.InternalError err;
-				RunTimeValueBase v = null;
-				bool issuccess = runFunction(method, thisObj, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
-					, vb1, vb2, vb3, vb4, vb5, paraArgs
-					);
-
-				currentRunFrame.call_parameter_slotCount = 0;
-				for (int i = stslotidx; i < slotidx; i++)
-				{
-					stackSlots[slotidx].clear();
-				}
-
-				if (issuccess)
-				{
-					v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
-					while (step())
+					if (argcount > 1)
 					{
-
+						vb2 = prepareParameter(signature, 1, v2, stackSlots[slotidx]);
+						slotidx++;
 					}
-					if (err != null)
+					if (argcount > 2)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						vb3 = prepareParameter(signature, 2, v3, stackSlots[slotidx]);
+						slotidx++;
 					}
-				}
-				else
-				{
-					while (step())
+					if (argcount > 3)
 					{
+						vb4 = prepareParameter(signature, 3, v4, stackSlots[slotidx]);
+						slotidx++;
+					}
+					if (argcount > 4)
+					{
+						vb5 = prepareParameter(signature, 4, v5, stackSlots[slotidx]);
+						slotidx++;
+					}
+					if (argcount > 5)
+					{
+						paraArgs = new RunTimeValueBase[argcount - 5];
+						for (int i = 0; i < paraArgs.Length; i++)
+						{
+							paraArgs[i] = prepareParameter(signature, i + 5, args[i], stackSlots[slotidx]);
+							slotidx++;
+						}
+					}
 
-					}
-					if (err != null)
+
+					error.InternalError err;
+					RunTimeValueBase v = null;
+					bool issuccess = runFunction(method, thisObj, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
+						, vb1, vb2, vb3, vb4, vb5, paraArgs
+						);
+
+					currentRunFrame.call_parameter_slotCount = 0;
+					for (int i = stslotidx; i < slotidx; i++)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						stackSlots[slotidx].clear();
+					}
+
+					if (issuccess)
+					{
+						v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
 					}
 					else
 					{
-						throw new ASRunTimeException("方法调用失败", string.Empty);
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("方法调用失败", string.Empty);
+						}
+					}
+
+					if (signature.returnType == RunTimeDataType.fun_void)
+					{
+						return rtUndefined.undefined;
+					}
+
+					object obj;
+					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
+					{
+						return convertReturnValue(obj);
+					}
+					else
+					{
+						throw new ASRunTimeException("返回值转化失败", string.Empty);
 					}
 				}
 
-				if (signature.returnType == RunTimeDataType.fun_void)
-				{
-					return rtUndefined.undefined;
-				}
-
-				object obj;
-				if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
-				{
-					return convertReturnValue(obj);
-				}
-				else
-				{
-					throw new ASRunTimeException("返回值转化失败", string.Empty);
-				}
 			}
 			finally
 			{
@@ -3557,113 +3595,157 @@ namespace ASRuntime
 		internal object InvokeFunctionWapper(FunctionWapper wapper, int argcount, object v1, object v2, object v3, object v4, object v5, object[] args)
 		{
 
-			var method = wapper.function;
-			
-			int flag = getRuntimeStackFlag();
-
-			CallBlankBlock(null);
-
-			var signature = swc.functions[method.functionId].signature;
-
-			RunTimeValueBase vb1 = null;
-			RunTimeValueBase vb2 = null;
-			RunTimeValueBase vb3 = null;
-			RunTimeValueBase vb4 = null;
-			RunTimeValueBase vb5 = null;
-
-			RunTimeValueBase[] paraArgs = null;
-
-			currentRunFrame.call_parameter_slotCount += argcount;
-
-			int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
-			int stslotidx = slotidx;
-			if (argcount > 0)
+			lock (this)
 			{
-				vb1 = prepareParameter(signature, 0, v1, stackSlots[slotidx]);
-				slotidx++;
-			}
-			if (argcount > 1)
-			{
-				vb2 = prepareParameter(signature, 1, v2, stackSlots[slotidx]);
-				slotidx++;
-			}
-			if (argcount > 2)
-			{
-				vb3 = prepareParameter(signature, 2, v3, stackSlots[slotidx]);
-				slotidx++;
-			}
-			if (argcount > 3)
-			{
-				vb4 = prepareParameter(signature, 3, v4, stackSlots[slotidx]);
-				slotidx++;
-			}
-			if (argcount > 4)
-			{
-				vb5 = prepareParameter(signature, 4, v5, stackSlots[slotidx]);
-				slotidx++;
-			}
-			if (argcount > 5)
-			{
-				paraArgs = new RunTimeValueBase[argcount - 5];
-				for (int i = 0; i < paraArgs.Length; i++)
+				bool isblank = false;
+				if (currentRunFrame == null)
 				{
-					paraArgs[i] = prepareParameter(signature, i + 5, args[i], stackSlots[slotidx]);
-					slotidx++;
+					isblank = true;
+					CallBlankBlock(null);
 				}
-			}
 
-
-			error.InternalError err;
-			RunTimeValueBase v = null;
-			bool issuccess = runFunction(method, method.this_pointer, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
-				, vb1, vb2, vb3, vb4, vb5, paraArgs
-				);
-
-			currentRunFrame.call_parameter_slotCount = 0;
-			for (int i = stslotidx; i < slotidx; i++)
-			{
-				stackSlots[slotidx].clear();
-			}
-
-			if (issuccess)
-			{
-				v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
-
-				step_toStackflag(flag);
-
-				if (err != null)
+				try
 				{
-					throw new ASRunTimeException(err.message, err.getStackTrace());
-				}
-			}
-			else
-			{
-				step_toStackflag(flag);
+					var method = wapper.function;
 
-				if (err != null)
+					//int flag = getRuntimeStackFlag();
+
+					//CallBlankBlock(null);
+
+					var signature = swc.functions[method.functionId].signature;
+
+					RunTimeValueBase vb1 = null;
+					RunTimeValueBase vb2 = null;
+					RunTimeValueBase vb3 = null;
+					RunTimeValueBase vb4 = null;
+					RunTimeValueBase vb5 = null;
+
+					RunTimeValueBase[] paraArgs = null;
+
+					currentRunFrame.call_parameter_slotCount += argcount;
+
+					int slotidx = currentRunFrame.baseBottomSlotIndex; //currentRunFrame.offset + currentRunFrame.block.totalRegisters + 1 + 1;
+					int stslotidx = slotidx;
+					try
+					{
+
+						if (argcount > 0)
+						{
+							vb1 = prepareParameter(signature, 0, v1, stackSlots[slotidx]);
+							slotidx++;
+						}
+						if (argcount > 1)
+						{
+							vb2 = prepareParameter(signature, 1, v2, stackSlots[slotidx]);
+							slotidx++;
+						}
+						if (argcount > 2)
+						{
+							vb3 = prepareParameter(signature, 2, v3, stackSlots[slotidx]);
+							slotidx++;
+						}
+						if (argcount > 3)
+						{
+							vb4 = prepareParameter(signature, 3, v4, stackSlots[slotidx]);
+							slotidx++;
+						}
+						if (argcount > 4)
+						{
+							vb5 = prepareParameter(signature, 4, v5, stackSlots[slotidx]);
+							slotidx++;
+						}
+						if (argcount > 5)
+						{
+							paraArgs = new RunTimeValueBase[argcount - 5];
+							for (int i = 0; i < paraArgs.Length; i++)
+							{
+								paraArgs[i] = prepareParameter(signature, i + 5, args[i], stackSlots[slotidx]);
+								slotidx++;
+							}
+						}
+					}
+					catch
+					{
+						//清理
+						currentRunFrame.call_parameter_slotCount -= argcount;
+						for (int i = stslotidx; i < slotidx; i++)
+						{
+							stackSlots[slotidx].clear();
+						}
+
+						//step_toStackflag(flag);
+
+						throw;
+					}
+
+
+
+
+					error.InternalError err;
+					RunTimeValueBase v = null;
+					bool issuccess = runFunction(method, method.this_pointer, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
+						, vb1, vb2, vb3, vb4, vb5, paraArgs
+						);
+
+					currentRunFrame.call_parameter_slotCount -= argcount;
+					for (int i = stslotidx; i < slotidx; i++)
+					{
+						stackSlots[slotidx].clear();
+					}
+
+					if (issuccess)
+					{
+						v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
+
+						//step_toStackflag(flag);
+
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+					}
+					else
+					{
+						//step_toStackflag(flag);
+
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("方法调用失败", string.Empty);
+						}
+					}
+
+					if (signature.returnType == RunTimeDataType.fun_void)
+					{
+						return rtUndefined.undefined;
+					}
+
+					object obj;
+					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
+					{
+						return convertReturnValue(obj);
+					}
+					else
+					{
+						throw new ASRunTimeException("返回值转化失败", string.Empty);
+					}
+				}
+				finally
 				{
-					throw new ASRunTimeException(err.message, err.getStackTrace());
+					if (isblank)
+					{
+						clearEnv();
+					}
 				}
-				else
-				{
-					throw new ASRunTimeException("方法调用失败", string.Empty);
-				}
+
+
+				
+
 			}
 
-			if (signature.returnType == RunTimeDataType.fun_void)
-			{
-				return rtUndefined.undefined;
-			}
-
-			object obj;
-			if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
-			{
-				return convertReturnValue(obj);
-			}
-			else
-			{
-				throw new ASRunTimeException("返回值转化失败", string.Empty);
-			}
 
 		}
 
@@ -3726,85 +3808,90 @@ namespace ASRuntime
 
 			try
 			{
-				initPlayer();
-				CallBlankBlock(null);
+				lock (this)
+				{
+					initPlayer();
+					CallBlankBlock(null);
 
-				string[] path = null;
-				if (memberPath != null)
-				{
-					memberPath = memberPath.Trim();
-					path = memberPath.Split('.');
-				}
-				var signature = swc.functions[_getMemberValue.functionId].signature;
-
-				RunTimeValueBase p1 = rtNull.nullptr;
-				RunTimeValueBase p2 = rtNull.nullptr;
-				RunTimeValueBase extpath = rtNull.nullptr;
-				RunTimeValueBase index = rtNull.nullptr;
-
-				if (path.Length > 0)
-				{
-					p1 = new rtString(path[0]);
-				}
-				if (path.Length > 1)
-				{
-					p2 = new rtString(path[1]);
-				}
-				if (path.Length > 2)
-				{
-					extpath = new rtArray();
-					for (int i = 2; i < path.Length; i++)
+					string[] path = null;
+					if (memberPath != null)
 					{
-						((rtArray)extpath).innerArray.Add(new rtString(path[i]));
+						memberPath = memberPath.Trim();
+						path = memberPath.Split('.');
 					}
-				}
+					var signature = swc.functions[_getMemberValue.functionId].signature;
 
-				if (indexArgs != null)
-				{
-					index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
-				}
+					RunTimeValueBase p1 = rtNull.nullptr;
+					RunTimeValueBase p2 = rtNull.nullptr;
+					RunTimeValueBase extpath = rtNull.nullptr;
+					RunTimeValueBase index = rtNull.nullptr;
 
-				error.InternalError err;
-				RunTimeValueBase v = null;
-				bool issuccess = runFunction(_getMemberValue, _getMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
-					, thisObj, p1, p2, extpath, index);
-
-				if (issuccess)
-				{
-					v = (RunTimeValueBase)currentRunFrame._tempSlot2.getValue().Clone();
-					while (step())
+					if (path.Length > 0)
 					{
-
+						p1 = new rtString(path[0]);
 					}
-					if (err != null)
+					if (path.Length > 1)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						p2 = new rtString(path[1]);
 					}
-				}
-				else
-				{
-					while (step())
+					if (path.Length > 2)
 					{
+						extpath = new rtArray();
+						for (int i = 2; i < path.Length; i++)
+						{
+							((rtArray)extpath).innerArray.Add(new rtString(path[i]));
+						}
+					}
 
-					}
-					if (err != null)
+					if (indexArgs != null)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
+					}
+
+					error.InternalError err;
+					RunTimeValueBase v = null;
+					bool issuccess = runFunction(_getMemberValue, _getMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
+						, thisObj, p1, p2, extpath, index);
+
+					if (issuccess)
+					{
+						v = (RunTimeValueBase)currentRunFrame._tempSlot2.getValue().Clone();
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
 					}
 					else
 					{
-						throw new ASRunTimeException("成员访问失败", string.Empty);
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("成员访问失败", string.Empty);
+						}
+					}
+					object obj;
+					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
+					{
+						return convertReturnValue(obj);
+					}
+					else
+					{
+						throw new ASRunTimeException("成员获取返回值转化失败", string.Empty);
 					}
 				}
-				object obj;
-				if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
-				{
-					return convertReturnValue(obj);
-				}
-				else
-				{
-					throw new ASRunTimeException("成员获取返回值转化失败", string.Empty);
-				}
+
+				
 			}
 			finally
 			{
@@ -3832,76 +3919,78 @@ namespace ASRuntime
 
 			try
 			{
-				initPlayer();
-				CallBlankBlock(null);
-
-				string[] path = null;
-				if (memberPath != null)
+				lock (this)
 				{
-					memberPath = memberPath.Trim();
-					path = memberPath.Split('.');
-				}
-				var signature = swc.functions[_setMemberValue.functionId].signature;
+					initPlayer();
+					CallBlankBlock(null);
 
-				RunTimeValueBase setvalue = null;
-				setvalue = prepareParameter(signature, 1, value, currentRunFrame._tempSlot2);
-
-				RunTimeValueBase p1 = rtNull.nullptr;
-				RunTimeValueBase extpath = ASBinCode.rtData.rtNull.nullptr;
-				RunTimeValueBase index = rtNull.nullptr;
-
-				if (path.Length > 0)
-				{
-					p1 = new rtString(path[0]);
-				}
-				if (path.Length > 1)
-				{
-					extpath = new rtArray();
-					for (int i = 1; i < path.Length; i++)
+					string[] path = null;
+					if (memberPath != null)
 					{
-						((rtArray)extpath).innerArray.Add(new rtString(path[i]));
+						memberPath = memberPath.Trim();
+						path = memberPath.Split('.');
 					}
-				}
+					var signature = swc.functions[_setMemberValue.functionId].signature;
 
+					RunTimeValueBase setvalue = null;
+					setvalue = prepareParameter(signature, 1, value, currentRunFrame._tempSlot2);
 
-				if (indexArgs != null)
-				{
-					index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
-				}
+					RunTimeValueBase p1 = rtNull.nullptr;
+					RunTimeValueBase extpath = ASBinCode.rtData.rtNull.nullptr;
+					RunTimeValueBase index = rtNull.nullptr;
 
-				error.InternalError err;
-
-				bool issuccess = runFunction(_setMemberValue, _setMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
-					, thisObj, setvalue, p1, extpath, index);
-
-				if (issuccess)
-				{
-
-					while (step())
+					if (path.Length > 0)
 					{
-
+						p1 = new rtString(path[0]);
 					}
-					if (err != null)
+					if (path.Length > 1)
 					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						extpath = new rtArray();
+						for (int i = 1; i < path.Length; i++)
+						{
+							((rtArray)extpath).innerArray.Add(new rtString(path[i]));
+						}
 					}
-				}
-				else
-				{
-					while (step())
+
+
+					if (indexArgs != null)
+					{
+						index = prepareParameter(signature, 4, indexArgs, currentRunFrame._tempSlot1);
+					}
+
+					error.InternalError err;
+
+					bool issuccess = runFunction(_setMemberValue, _setMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
+						, thisObj, setvalue, p1, extpath, index);
+
+					if (issuccess)
 					{
 
-					}
-					if (err != null)
-					{
-						throw new ASRunTimeException(err.message, err.getStackTrace());
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
 					}
 					else
 					{
-						throw new ASRunTimeException("成员赋值失败", String.Empty);
+						while (step())
+						{
+
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("成员赋值失败", String.Empty);
+						}
 					}
 				}
-
 			}
 			finally
 			{
@@ -3959,6 +4048,8 @@ namespace ASRuntime
 		/// <returns></returns>
 		public rtObjectBase createByteArrayObject(out flash.utils.ByteArray byteArray)
 		{
+
+
 			var thisObj = createInstance("flash.utils.ByteArray");
 			byteArray =
 					(flash.utils.ByteArray)((ASBinCode.rtti.HostedObject)((rtObjectBase)(((rtObjectBase)thisObj).value.memberData[0].getValue())).value).hosted_object;
@@ -3971,6 +4062,45 @@ namespace ASRuntime
 
 		#endregion
 
+
+
+		public FunctionWapper makeFunctionWapper(RunTimeValueBase func,ASBinCode.rtti.Class cls)
+		{
+			ASBinCode.rtData.rtFunction function;
+			if (func.rtType == RunTimeDataType.rt_function)
+			{
+				function = (ASBinCode.rtData.rtFunction)func;
+			}
+			else if (func.rtType == swc.FunctionClass.getRtType())
+			{
+				function = (ASBinCode.rtData.rtFunction)
+					TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObjectBase)func);
+			}
+			else
+			{
+				throw new ASRunTimeException("目标不是Function",stackTrace(0));
+			}
+
+			if (function.dictWappers == null)
+			{
+				function.dictWappers = new Dictionary<RunTimeDataType, FunctionWapper>();
+			}
+
+			if (!function.dictWappers.ContainsKey(cls.getRtType()))
+			{
+				FunctionWapper wapper = new FunctionWapper(function, this);
+
+				function.dictWappers.Add(cls.getRtType(), wapper);
+
+				return wapper;
+			}
+			else
+			{
+				return function.dictWappers[cls.getRtType()];
+			}
+			
+
+		}
 
 
 

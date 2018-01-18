@@ -128,7 +128,9 @@
     <Compile Include="nativefuncs\Error_buildin.cs" />
     <Compile Include="nativefuncs\Function_buildin.cs" />
     <Compile Include="nativefuncs\Int_buildin.cs" />
+    <Compile Include="nativefuncs\IWapperDelegateMaker.cs" />
     <Compile Include="nativefuncs\LinkSystem_buildin.cs" />
+    <Compile Include="nativefuncs\MulitCastDelegate_buildin.cs" />
     <Compile Include="nativefuncs\NativeConstParameterFunction.cs" />
     <Compile Include="nativefuncs\Number_buildin.cs" />
     <Compile Include="nativefuncs\Object_buildin.cs" />

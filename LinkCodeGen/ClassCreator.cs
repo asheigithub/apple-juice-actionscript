@@ -449,7 +449,7 @@ namespace LinkCodeGen
 
 			as3api.Append("\t[link_system]");
 			as3api.AppendLine();
-			if (type.IsValueType)
+			if (type.IsValueType || type.IsSealed)
 			{
 				as3api.AppendFormat("\tpublic final class {0}", name);
 			}

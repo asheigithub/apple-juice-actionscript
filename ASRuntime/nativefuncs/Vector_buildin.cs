@@ -1881,7 +1881,7 @@ namespace ASRuntime.nativefuncs
 			if (argements[0].rtType == RunTimeDataType.rt_null)
 			{
 				success = false;
-				stackframe.throwError(token, 1009, "排序函数不能为空");
+				stackframe.throwError(token, 1009, "排序函数不能为null");
 				returnSlot.directSet(rtUndefined.undefined);
 				returnSlot.directSet(rtUndefined.undefined);
 			}
