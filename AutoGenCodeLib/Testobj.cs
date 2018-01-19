@@ -121,7 +121,16 @@ namespace AutoGenCodeLib
 
 		public delegate int TESTHandler<T>(string v1,int v2,T v3);
 
-		public TESTHandler<long> handler = (v1,v2,v3)=> { return 98765; };
+		public TESTHandler<long> handler;// = (v1,v2,v3)=> { return 98765; };
+
+
+		public int DoHandler(string v1,int v2,long v3)
+		{
+			return int.Parse(v1) + v2 + (int)v3;
+		}
+
+
+
 
 		public Type TestType(Type type)
 		{
@@ -129,6 +138,19 @@ namespace AutoGenCodeLib
 
 			return typeof(long);
 		}
+
+
+		public event EventHandler EventTest;
+
+		public void OnEvent()
+		{
+			if (EventTest != null)
+			{
+				EventTest(this, EventArgs.Empty);
+			}
+		}
+
+
 
 
 

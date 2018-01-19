@@ -352,8 +352,8 @@ namespace LinkCodeGen
 							//method.ReturnType.GetClassName(out tmp, out clsName, out isByRef);
 							//sb.AppendLine(string.Format("({1}){0};", param[0].Name, clsName));
 
-							storeresult += string.Format("({0})arg0\n", GetTypeFullName( method.ReturnType) );
-							
+							storeresult += string.Format("({0})arg0\n", GetTypeFullName(method.ReturnType));
+
 						}
 						break;
 					default:
@@ -362,7 +362,19 @@ namespace LinkCodeGen
 
 				return storeresult;
 			}
+			else if (method.IsSpecialName && method.Name.StartsWith("add_") && paras.Length == 1 && CreatorBase.IsDelegate(paras[0].ParameterType))
+			{
+				string eventname = method.Name.Substring(4);
 
+				storeresult += string.Format(".{0} += arg0",eventname);
+				return storeresult;
+			}
+			else if (method.IsSpecialName && method.Name.StartsWith("remove_") && paras.Length == 1 && CreatorBase.IsDelegate(paras[0].ParameterType))
+			{
+				string eventname = method.Name.Substring(7);
+				storeresult += string.Format(".{0} -= arg0",eventname);
+				return storeresult;
+			}
 
 			PropertyInfo pinfo;
 			if (CheckIsGetter(method, methodAtType, out pinfo))

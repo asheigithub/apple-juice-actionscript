@@ -34,6 +34,13 @@ namespace LinkCodeGen
 			
 				var paras = method.GetParameters();
 
+			bool ismakedelegate = true;
+
+			if (CreatorBase.IsDelegate(methodAtType))
+			{
+				ismakedelegate = false;
+			}
+
 			if (method is MethodInfo)
 			{
 				PropertyInfo propertyInfo;
@@ -43,12 +50,49 @@ namespace LinkCodeGen
 					paras[0] = new myparainfo( paras[1],0);
 					paras[1] = new myparainfo( temp,1);
 
+
+					ismakedelegate = false;
 				}
+
+				if (MethodNativeCodeCreator.CheckIsIndexerGetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				{					
+					ismakedelegate = false;
+				}
+				if (MethodNativeCodeCreator.CheckIsSetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				{
+					ismakedelegate = false;
+				}
+				if (MethodNativeCodeCreator.CheckIsGetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				{
+					ismakedelegate = false;
+				}
+
+				if (method.IsSpecialName)
+				{
+					ismakedelegate = false;
+				}
+
+				if (method.IsGenericMethodDefinition)
+				{
+					ismakedelegate = false;
+				}
+
 			}
 
 
-			string funccode = Properties.Resources.MethodFunc;
 
+
+
+
+			string funccode;
+			if (ismakedelegate)
+			{
+				funccode = Properties.Resources.IMethodGetterMethodFunc;
+			}
+			else
+			{
+				funccode= Properties.Resources.MethodFunc;
+			}
 				funccode = funccode.Replace("[classname]", classname);
 				funccode = funccode.Replace("[paracount]", paras.Length.ToString());
 
@@ -206,7 +250,45 @@ namespace LinkCodeGen
 					funccode = funccode.Replace("[storeresult]", "代码生成错误，不能转换返回类型");
 				}
 
-				return funccode;
+
+
+
+			if (ismakedelegate)
+			{
+				//typeof(AutoGenCodeLib.Testobj).GetMethod("TestType");
+
+				string types = "Type.EmptyTypes";
+
+				if (paras.Length > 0)
+				{
+					types = "new Type[] {";
+
+					for (int i = 0; i < paras.Length; i++)
+					{
+						types += "typeof(" + GetTypeFullName(paras[i].ParameterType) + ")";
+						if (i < paras.Length - 1)
+						{
+							types += ",";
+						}
+					}
+
+					types += "}";
+
+				}
+
+
+				string findmethod = string.Empty;
+				findmethod += "typeof("+ GetTypeFullName(methodAtType) +")";
+				findmethod += ".GetMethod(\""+method.Name+"\","+types+");";
+
+
+				funccode = funccode.Replace("[createmethod]", findmethod);
+
+			}
+
+
+
+			return funccode;
 			
 		}
 

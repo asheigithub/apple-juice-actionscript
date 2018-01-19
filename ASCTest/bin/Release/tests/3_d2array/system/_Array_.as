@@ -29,7 +29,7 @@ package system
 		[native, _system_Array_ctor_]
 		public function _Array_(length:int);
 		
-		[native, system_collections_icollection_count]
+		[native, system_collections_ICollection_get_Count]
 		public function get length():int;
 		
 		[native, _system_Array_rank_]
@@ -45,11 +45,11 @@ package system
 		public function getUpperBound(dimension:int):int; 
 		
 		[get_this_item];
-		[native, _system_collections_ilist_getThisItem_];
+		[native, system_collections_IList_getThisItem];
 		public function getValue(index:int):*;
 		
 		[set_this_item];
-		[native, _system_collections_ilist_setThisItem_];
+		[native, system_collections_IList_setThisItem];
 		public function setValue(value:*, index:int):void;
 		
 		
@@ -66,39 +66,47 @@ package system
 		public function setValue__(value:*,indices:_Array_):void;
 		
 
-		[native, system_collections_ienumerable_getenumerator_]
+		[native, system_collections_IEnumerable_getEnumerator]
 		public function getEnumerator():_IEnumerator_;
 		
 		
-		[native,system_collections_icollection_copyto]
+		[native,system_collections_ICollection_copyTo]
 		public function copyTo(array:_Array_, index:int):void;
 		
-		[native,_system_collections_ilist_isFixedSize_]
+		[native,system_collections_IList_get_IsFixedSize]
 		public function get isFixedSize():Boolean;
 		
-		[native,_system_collections_ilist_isReadOnly_]
+		[native,system_collections_IList_get_IsReadOnly]
 		public function get isReadOnly():Boolean;
 		
-		[native,_system_collections_ilist_add_]
+		[native,system_collections_IList_add]
 		private function add(value:*):int;
 		
-		[native,_system_collections_ilist_clear_]
+		[native,system_collections_IList_clear]
 		private function clear():void;
 		
-		[native,_system_collections_ilist_contains_]
+		[native,system_collections_IList_contains]
 		private function contains(value:*):Boolean;
 		
-		[native,_system_collections_ilist_indexOf_]
+		[native,system_collections_IList_indexOf]
 		private function indexOf(value:*):int;
 		
-		[native,_system_collections_ilist_insert_]
+		[native,system_collections_IList_insert]
 		private function insert(index:int, value:*):void;
 		
-		[native,_system_collections_ilist_remove_]
+		[native,system_collections_IList_remove]
 		private function remove(value:*):void;
 		
-		[native,_system_collections_ilist_removeAt_]
-		private function removeAt(index:int):void
+		[native,system_collections_IList_removeAt]
+		private function removeAt(index:int):void;
+		
+		
+		[native,system_collections_ICollection_get_SyncRoot]
+		private function get syncRoot():_Object_;
+		
+		
+		[native,system_collections_ICollection_get_IsSynchronized]
+		private function get isSynchronized():Boolean;
 	}
 
 }

@@ -283,8 +283,6 @@ namespace ASCTest
 			regAutoCreateCodes(bin);
 
 
-			bin.regNativeFunction(new autoCreateCodes.FuncTestbuildin());
-
         }
 
 

@@ -434,6 +434,21 @@ namespace LinkCodeGen
 			as3api.AppendLine("@imports");
 			as3api.AppendLine();
 
+			bool isdelegate=false;
+			if (IsDelegate(type))
+			{
+				as3api.AppendLine("\t/**");
+				as3api.AppendLine("\t*包装委托:");
+				as3api.Append("\t* ");
+				as3api.AppendLine( System.Security.SecurityElement.Escape( MethodNativeCodeCreatorBase.GetTypeFullName(type)).Replace("&"," &").Replace(";", "; "));
+				as3api.Append("\t* ");
+				as3api.AppendLine(System.Security.SecurityElement.Escape(GetDelegateSignature(type)).Replace("&", " &").Replace(";", "; "));
+				as3api.AppendLine("\t*/");
+
+				isdelegate = true;
+			}
+
+
 			if (type.IsValueType)
 			{
 				as3api.AppendLine("\t[struct]");
@@ -518,6 +533,7 @@ namespace LinkCodeGen
 			}
 
 			//***加入构造函数***
+			if (!isdelegate)
 			{
 				if (constructorlist.Count > 0)
 				{
@@ -536,7 +552,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public static function constructor" + "".PadRight(i, '_'));
 
-						appendFunctionParameters(as3api, constructorlist[i],type, typeimports, name);
+						appendFunctionParameters(as3api, constructorlist[i], type, typeimports, name);
 						dictStaticUseNames.Add(createinstancename, null);
 
 
@@ -559,7 +575,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public function " + name);
 
-						appendFunctionParameters(as3api, constructorlist[0], type,typeimports, null);
+						appendFunctionParameters(as3api, constructorlist[0], type, typeimports, null);
 
 						//***编写本地方法***
 						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
@@ -750,6 +766,59 @@ namespace LinkCodeGen
 					as3api.Append("();");
 				}
 			}
+			else
+			{
+				//***编写委托的特殊代码****
+				string as3delegeoperatorcode = @"
+		[native, _system_MulticastDelegate_combine_];
+		public static function combine(a:{name}, b:Function):{name};
+		
+
+		[native, _system_MulticastDelegate_remove_];
+		public static function remove(source:{name}, value:Function):{name};
+		
+		[operator,""+""];
+		[native, _system_MulticastDelegate_combine_];
+		private static function op_combine(a:{name}, b:Function):{name};
+
+
+		[operator,""-""];
+		[native, _system_MulticastDelegate_remove_];
+		private static function op_remove(source:{name}, value:Function):{name};
+";
+				as3api.Append(as3delegeoperatorcode.Replace("{name}",name));
+
+
+				string part1 = GetNativeFunctionPart1(type);
+
+				string ctorcode = @"
+		//*********构造函数*******
+		[native,{part1}_ctor];
+		public function {name}(func:Function);
+
+		[implicit_from];
+		[native,{part1}_implicit_from_];
+		private static function _implicit_from_value(func:Function):*;
+		
+		[explicit_from];
+		[native,{part1}_implicit_from_];
+		private static function _explicit_from_value(func:Function):*;
+";
+
+				ctorcode = ctorcode.Replace("{part1}", part1).Replace("{name}",name);
+				as3api.Append(ctorcode);
+
+				//***编写委托构造函数本地方法***
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_ctor"));
+				nativefuncClasses.Add(new DelegateCtorNativeCodeCreator(part1 + "_ctor", type).GetCode());
+
+				//***编写隐式类型转换本地方法***
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_implicit_from_"));
+				nativefuncClasses.Add(new DelegateImplicitConvertNativeCodeCreator(part1 + "_implicit_from_", type).GetCode());
+
+
+			}
+
 
 			{
 				//**字段***
@@ -903,10 +972,12 @@ namespace LinkCodeGen
 
 						as3api.Append("\t\t");
 
-						
-
-						as3api.Append("function getThisItem");
-						dictUseNames.Add("getThisItem", null);
+//"getThisItem"
+						var n=GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						//as3api.Append("function getThisItem");
+						as3api.Append("function "+n);
+						//dictUseNames.Add("getThisItem", null);
+						dictUseNames.Add(n, null);
 					}
 					else if (MethodNativeCodeCreator.CheckIsGetter(mapinterface, mapinterface.DeclaringType, out pinfo))
 					{
@@ -936,10 +1007,11 @@ namespace LinkCodeGen
 						as3api.AppendLine();
 
 						as3api.Append("\t\t");
-						
-						as3api.Append("function setThisItem");
-
-						dictUseNames.Add("setThisItem", null);
+//"setThisItem"
+						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						//as3api.Append("function setThisItem");
+						as3api.Append("function "+n);
+						dictUseNames.Add(n, null);
 
 
 
@@ -1009,19 +1081,20 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						as3api.Append("function getThisItem");
+//"getThisItem"
+						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						as3api.Append("function "+n);
 
 
 						if (method.IsStatic)
 						{
 							existsstaticindexgetter = true;
-							dictStaticUseNames.Add("getThisItem", null);
+							dictStaticUseNames.Add(n, null);
 						}
 						else
 						{
 							existsindexgetter=true;
-							dictUseNames.Add("getThisItem", null);
+							dictUseNames.Add(n, null);
 						}
 					}
 					else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
@@ -1065,17 +1138,20 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-						as3api.Append("function setThisItem");
+//"setThisItem"
+						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+
+						as3api.Append("function "+n);
 
 						if (method.IsStatic)
 						{
 							existsstaticindexsetter = true;
-							dictStaticUseNames.Add("setThisItem", null);
+							dictStaticUseNames.Add(n, null);
 						}
 						else
 						{
 							existsindexsetter = true;
-							dictUseNames.Add("setThisItem", null);
+							dictUseNames.Add(n, null);
 						}
 					}
 					else if (MethodNativeCodeCreator.CheckIsSetter(method, type, out pinfo))
@@ -1169,9 +1245,9 @@ namespace LinkCodeGen
 					string returntype = GetAS3TypeString(method.ReturnType, typeimports,null,null,null);
 
 					string nativefunname = InterfaceCreator.GetMethodNativeFunctionName(method, type, dictStaticUseNames, dictUseNames);
-
+					
 					string opcode;
-					string opersummary = MethodNativeCodeCreatorBase.GetOperatorOverrideSummary(method,type, method.GetParameters(), out opcode);
+					string opersummary = System.Security.SecurityElement.Escape(MethodNativeCodeCreatorBase.GetOperatorOverrideSummary(method,type, method.GetParameters(), out opcode).Replace("&", " &").Replace(";","; "));
 					if (opcode != null)
 					{
 						string summary = @"/**

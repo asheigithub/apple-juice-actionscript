@@ -5,39 +5,39 @@ package system.collections
 	public interface IList extends ICollection
 	{
 		[get_this_item];
-		[native, _system_collections_ilist_getThisItem_];
+		[native,system_collections_IList_getThisItem];
 		function getThisItem(index:int):*;
-		
+
 		[set_this_item];
-		[native, _system_collections_ilist_setThisItem_];
-		function setThisItem(value:*, index:int):void;
-		
-		[native,_system_collections_ilist_isFixedSize_]
-		function get isFixedSize():Boolean;
-		
-		[native,_system_collections_ilist_isReadOnly_]
-		function get isReadOnly():Boolean;
-		
-		[native,_system_collections_ilist_add_]
+		[native,system_collections_IList_setThisItem];
+		function setThisItem(value:*,index:int):void;
+
+		[native,system_collections_IList_add]
 		function add(value:*):int;
-		
-		[native,_system_collections_ilist_clear_]
-		function clear():void;
-		
-		[native,_system_collections_ilist_contains_]
+
+		[native,system_collections_IList_contains]
 		function contains(value:*):Boolean;
-		
-		[native,_system_collections_ilist_indexOf_]
+
+		[native,system_collections_IList_clear]
+		function clear():void;
+
+		[native,system_collections_IList_get_IsReadOnly]
+		function get isReadOnly():Boolean;
+
+		[native,system_collections_IList_get_IsFixedSize]
+		function get isFixedSize():Boolean;
+
+		[native,system_collections_IList_indexOf]
 		function indexOf(value:*):int;
-		
-		[native,_system_collections_ilist_insert_]
-		function insert(index:int, value:*):void;
-		
-		[native,_system_collections_ilist_remove_]
+
+		[native,system_collections_IList_insert]
+		function insert(index:int,value:*):void;
+
+		[native,system_collections_IList_remove]
 		function remove(value:*):void;
-		
-		[native,_system_collections_ilist_removeAt_]
-		function removeAt(index:int):void
+
+		[native,system_collections_IList_removeAt]
+		function removeAt(index:int):void;
 	}
 	
 }

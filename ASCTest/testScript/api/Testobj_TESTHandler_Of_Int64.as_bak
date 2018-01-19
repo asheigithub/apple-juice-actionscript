@@ -1,0 +1,62 @@
+package autogencodelib
+{
+	
+	import system.ICloneable;
+	import system.MulticastDelegate;
+	import system._Object_;
+	import system.IntPtr;
+	import system.Int64;
+	import system.IAsyncResult;
+	import system.AsyncCallback;
+
+
+	[link_system]
+	public final class Testobj_TESTHandler_Of_Int64 extends MulticastDelegate implements ICloneable
+	{
+		
+		[native, _system_MulticastDelegate_combine_];
+		public static function combine(a:Testobj_TESTHandler_Of_Int64, b:Function):Testobj_TESTHandler_Of_Int64;
+		
+
+		[native, _system_MulticastDelegate_remove_];
+		public static function remove(source:Testobj_TESTHandler_Of_Int64, value:Function):Testobj_TESTHandler_Of_Int64;
+		
+		[operator,"+"];
+		[native, _system_MulticastDelegate_combine_];
+		private static function op_combine(a:Testobj_TESTHandler_Of_Int64, b:Function):Testobj_TESTHandler_Of_Int64;
+				
+		[operator,"-"];
+		[native, _system_MulticastDelegate_remove_];
+		private static function op_remove(source:Testobj_TESTHandler_Of_Int64, value:Function):Testobj_TESTHandler_Of_Int64;
+		
+		
+		[creator];
+		[native,autogencodelib_TESTHandler_Of_Int64_creator];
+		private static function _creator(type:Class):*;
+
+		//*********构造函数*******
+		[native,autogencodelib_TESTHandler_Of_Int64_ctor];
+		public function Testobj_TESTHandler_Of_Int64(func:Function);
+
+		[implicit_from];
+		[native,autogencodelib_TESTHandler_Of_Int64_implicit_from_];
+		private static function _implicit_from_value(func:Function):*;
+		
+		[explicit_from];
+		[native,autogencodelib_TESTHandler_Of_Int64_implicit_from_];
+		private static function _explicit_from_value(func:Function):*;
+		
+		
+		//*********公共方法*******
+		[native,autogencodelib_TESTHandler_Of_Int64_invoke];
+		public function invoke(v1:String,v2:int,v3:Int64):int;
+
+		[native,autogencodelib_TESTHandler_Of_Int64_beginInvoke];
+		public function beginInvoke(v1:String,v2:int,v3:Int64,callback:AsyncCallback,object:_Object_):IAsyncResult;
+
+		[native,autogencodelib_TESTHandler_Of_Int64_endInvoke];
+		public function endInvoke(result:IAsyncResult):int;
+
+
+	}
+}

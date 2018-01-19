@@ -86,7 +86,7 @@ namespace LinkCodeGen
 			//*****类*******
 
 			
-			var classtype = typeof(AutoGenCodeLib.Testobj);
+			var classtype = typeof(System.Net.WebClient);
 			if (!creators.ContainsKey(classtype))
 			{
 				creators.Add(classtype, null);
@@ -129,14 +129,14 @@ namespace LinkCodeGen
 					foreach (var item in creators.Values)
 					{
 						Console.WriteLine("building:" + item.BuildIngType);
-						string code = item.Create();
+						string code = item.Create().Replace("\r","").Replace("\n","\r\n");
 
 
 						regclassSb.AppendLine("\t\t\t" + item.linkcodenamespace + "." + CreatorBase.GetNativeFunctionClassName(item.BuildIngType) + ".regNativeFunctions(bin);");
 						sw.WriteLine(code);
 
 					}
-
+					
 					regclassSb.AppendLine("\t\t}");
 					regclassSb.AppendLine("\t}");
 					regclassSb.AppendLine("\t}");
@@ -148,7 +148,7 @@ namespace LinkCodeGen
 
 			
 
-			System.IO.File.WriteAllText("retNativeCode.cs", regclassSb.ToString());
+			System.IO.File.WriteAllText("retNativeCode.cs", regclassSb.ToString().Replace("\r", "").Replace("\n", "\r\n"));
 			Console.WriteLine("创建完成");
 			Console.Read();
         }

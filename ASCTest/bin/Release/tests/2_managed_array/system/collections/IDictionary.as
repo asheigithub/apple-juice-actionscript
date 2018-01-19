@@ -5,41 +5,41 @@ package system.collections
 	public interface IDictionary extends ICollection
 	{
 		[get_this_item];
-		[native, _system_collections_idictionary_getThisItem_];
+		[native, system_collections_IDictionary_getThisItem];
 		function getThisItem(key:Object):*;
 		
 		[set_this_item];
-		[native, _system_collections_idictionary_setThisItem_];
+		[native, system_collections_IDictionary_setThisItem];
 		function setThisItem(value:*, key:Object):void;
 		
 		
-		[native,_system_collections_idictionary_isFixedSize_]
+		[native,system_collections_IDictionary_get_IsFixedSize]
 		function get isFixedSize():Boolean;
 		
-		[native,_system_collections_idictionary_isReadOnly_]
+		[native,system_collections_IDictionary_get_IsReadOnly]
 		function get isReadOnly():Boolean;
 		
-		[native,_system_collections_idictionary_keys_]
+		[native,system_collections_IDictionary_get_Keys]
 		function get keys():ICollection;
 		
-		[native,_system_collections_idictionary_values_]
+		[native,system_collections_IDictionary_get_Values]
 		function get values():ICollection;
 		
-		[native,_system_collections_idictionary_add_]
+		[native,system_collections_IDictionary_add]
 		function add(key:Object, value:*):void;
 		
-		[native,_system_collections_idictionary_clear_]
+		[native,system_collections_IDictionary_clear]
 		function clear():void;
 		
-		[native,_system_collections_idictionary_contains_]
+		[native,system_collections_IDictionary_contains]
 		function contains(key:Object):Boolean;
 		
-		[native,_system_collections_idictionary_remove_]
+		[native,system_collections_IDictionary_remove]
 		function remove(key:Object):void;
 		
 		
-		[native,system_collections_idictionary_getenumerator_]
-		function getEnumerator():_IEnumerator_;
+		[native,system_collections_IDictionary_getEnumerator_]
+		function getEnumerator_():IDictionaryEnumerator;
 		
 	}
 	

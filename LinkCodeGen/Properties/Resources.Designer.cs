@@ -145,6 +145,85 @@ namespace LinkCodeGen.Properties {
         }
         
         /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base(1)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///				para.Add(RunTimeDataType.rt_function);
+        ///				
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///			 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string DelegateCtor {
+            get {
+                return ResourceManager.GetString("DelegateCtor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction,IWapperDelegateMaker
+        ///		{
+        ///			public [classname]() : base(1)
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///				para.Add(RunTimeDataType.rt_function);
+        ///
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///				 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string DelegateImplicitFrom {
+            get {
+                return ResourceManager.GetString("DelegateImplicitFrom", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 		class {0} : NativeFunctionBase
         ///		{
         ///			public {0}()
@@ -307,6 +386,48 @@ namespace LinkCodeGen.Properties {
         internal static string FieldSetter {
             get {
                 return ResourceManager.GetString("FieldSetter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public override List&lt;RunTimeDataType&gt; parameters
+        ///			{
+        ///				get
+        ///				{
+        ///					return para;
+        ///				}
+        ///			}
+        ///
+        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string IMethodGetterMethodFunc {
+            get {
+                return ResourceManager.GetString("IMethodGetterMethodFunc", resourceCulture);
             }
         }
         

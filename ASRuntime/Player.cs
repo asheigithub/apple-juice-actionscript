@@ -1837,7 +1837,7 @@ namespace ASRuntime
 			funcCaller.SetFunctionThis(thisObj);
 			funcCaller.loadDefineFromFunction();
 
-			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error; return false; }
+			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError; return false; }
 			#region pushparameter
 			int c = 0;
 			bool success;
@@ -1863,7 +1863,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v1, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 					return false;
 				}
 				c++;
@@ -1879,7 +1879,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v2, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 					return false;
 				}
 				c++;
@@ -1894,7 +1894,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v3, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 					return false;
 				}
 				c++;
@@ -1909,7 +1909,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v4, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 					return false;
 				}
 				c++;
@@ -1924,7 +1924,7 @@ namespace ASRuntime
 				funcCaller.pushParameter(v5, c, out success);
 				if (!success)
 				{
-					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+					error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 					return false;
 				}
 				c++;
@@ -1941,7 +1941,7 @@ namespace ASRuntime
 					funcCaller.pushParameter(paraArgs[i], c, out success);
 					if (!success)
 					{
-						error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : receive_error;
+						error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError;
 						return false;
 					}
 					c++;
@@ -3733,6 +3733,20 @@ namespace ASRuntime
 						throw new ASRunTimeException("返回值转化失败", string.Empty);
 					}
 				}
+				catch (Exception ex)
+				{
+					if (isblank)
+					{
+						clearEnv();
+
+						throwOrShowError(new ASRunTimeException("方法调用失败", ex));
+						return null;
+					}
+					else
+					{
+						throw;
+					}
+				}
 				finally
 				{
 					if (isblank)
@@ -4062,11 +4076,12 @@ namespace ASRuntime
 
 		#endregion
 
+		delegate Type ddd(Type t);
 
-
-		public FunctionWapper makeFunctionWapper(RunTimeValueBase func,ASBinCode.rtti.Class cls)
+		public Delegate WapperFunctionDelegate(RunTimeValueBase func,ASBinCode.rtti.Class cls , Type delegateType,Action<FunctionWapper> createDelegate )
 		{
 			ASBinCode.rtData.rtFunction function;
+
 			if (func.rtType == RunTimeDataType.rt_function)
 			{
 				function = (ASBinCode.rtData.rtFunction)func;
@@ -4081,10 +4096,88 @@ namespace ASRuntime
 				throw new ASRunTimeException("目标不是Function",stackTrace(0));
 			}
 
-			if (function.dictWappers == null)
+			if (function.ismethod)
 			{
-				function.dictWappers = new Dictionary<RunTimeDataType, FunctionWapper>();
+				rtObjectBase rtObject = function.this_pointer as rtObjectBase;
+				if (rtObject == null)
+				{
+#if DEBUG
+					throw new InvalidOperationException("method的thispointer不应该为空且是rtObject");
+#else
+
+					throw new ASRunTimeException("method的thispointer不应该为空且是rtObject",stackTrace(0));
+#endif
+				}
+				var thisobjtype = swc.getClassByRunTimeDataType(rtObject.rtType);
+				if (thisobjtype.isLink_System)
+				{
+					var functiondefine = swc.functions[ function.functionId];
+					if (functiondefine.isNative)
+					{
+						var nativefunction = swc.getNativeFunction(function.functionId);
+
+						nativefuncs.IMethodGetter methodGetter = nativefunction as nativefuncs.IMethodGetter;
+						if (methodGetter != null)
+						{
+							System.Reflection.MethodInfo method;
+							try
+							{
+								method = methodGetter.GetMethodInfo();
+							}
+							catch (System.Reflection.AmbiguousMatchException e)
+							{
+								throw new ASRunTimeException("尝试获取" + functiondefine.name + "的MethodInfo失败," + e.Message, stackTrace(0));
+							}
+							catch (ArgumentNullException e)
+							{
+								throw new ASRunTimeException("尝试获取" + functiondefine.name + "的MethodInfo失败," + e.Message, stackTrace(0));
+							}
+							catch (ArgumentException e)
+							{
+								throw new ASRunTimeException("尝试获取" + functiondefine.name + "的MethodInfo失败," + e.Message, stackTrace(0));
+							}
+
+							object target = ((ASBinCode.rtti.LinkSystemObject)rtObject.value).GetLinkData();
+
+							try
+							{
+								return Delegate.CreateDelegate(delegateType, target, method);
+							}
+							catch (ArgumentNullException e)
+							{
+								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败,"+e.Message, stackTrace(0));
+							}
+							catch (ArgumentException e)
+							{
+								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败," + e.Message, stackTrace(0));
+							}
+							catch (MissingMethodException e)
+							{
+								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败," + e.Message, stackTrace(0));
+							}
+							catch (MethodAccessException e)
+							{
+								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败," + e.Message, stackTrace(0));
+							}
+
+						}
+					}
+
+
+
+
+
+					throw new ASRunTimeException("此方法不支持创建委托", stackTrace(0));
+				}
+
 			}
+
+
+			
+			//if (function.dictWappers == null)
+			//{
+			//	function.dictWappers = new Dictionary<RunTimeDataType, FunctionWapper>();
+			//}
 
 			if (!function.dictWappers.ContainsKey(cls.getRtType()))
 			{
@@ -4092,11 +4185,13 @@ namespace ASRuntime
 
 				function.dictWappers.Add(cls.getRtType(), wapper);
 
-				return wapper;
+				createDelegate(wapper);
+
+				return wapper.action;
 			}
 			else
 			{
-				return function.dictWappers[cls.getRtType()];
+				return function.dictWappers[cls.getRtType()].action;
 			}
 			
 

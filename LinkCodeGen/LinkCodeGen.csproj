@@ -47,6 +47,8 @@
     <Compile Include="ClassCreator.cs" />
     <Compile Include="CreateInstanceNativeCodeCreator.cs" />
     <Compile Include="CreatorBase.cs" />
+    <Compile Include="DelegateCtorNativeCodeCreator.cs" />
+    <Compile Include="DelegateImplicitConvertNativeCodeCreator.cs" />
     <Compile Include="EnumCreator.cs" />
     <Compile Include="FieldGetterNativeCodeCreator.cs" />
     <Compile Include="FieldSetterNativeCodeCreator.cs" />
@@ -73,9 +75,12 @@
   <ItemGroup>
     <Content Include="templates\CreateInstance.txt" />
     <Content Include="templates\CtorFunc.txt" />
+    <Content Include="templates\DelegateCtor.txt" />
+    <Content Include="templates\DelegateImplicitFrom.txt" />
     <Content Include="templates\EnumCtor.txt" />
     <Content Include="templates\FieldGetter.txt" />
     <Content Include="templates\FieldSetter.txt" />
+    <Content Include="templates\IMethodGetterMethodFunc.txt" />
     <Content Include="templates\LoadArgement.txt" />
     <Content Include="templates\LoadStructArgement.txt" />
     <Content Include="templates\LoadStructThis.txt" />

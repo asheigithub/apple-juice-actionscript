@@ -127,6 +127,7 @@
     <Compile Include="nativefuncs\Date_buildin.cs" />
     <Compile Include="nativefuncs\Error_buildin.cs" />
     <Compile Include="nativefuncs\Function_buildin.cs" />
+    <Compile Include="nativefuncs\IMethodGetter.cs" />
     <Compile Include="nativefuncs\Int_buildin.cs" />
     <Compile Include="nativefuncs\IWapperDelegateMaker.cs" />
     <Compile Include="nativefuncs\LinkSystem_buildin.cs" />

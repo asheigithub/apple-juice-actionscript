@@ -40,18 +40,46 @@ namespace ASBinCode.rtData
 		{
 			get
 			{
-				if (wapperContainer == null)
-					return null;
-				return wapperContainer.dictWappers;
-			}
-			set
-			{
-				if (wapperContainer == null)
+				if (!_ismethod)
 				{
-					wapperContainer = new WapperContainer();
+					if (wapperContainer == null)
+					{
+						wapperContainer = new WapperContainer();
+						wapperContainer.dictWappers = new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>();
+					}
+					else if (wapperContainer.dictWappers == null)
+					{
+						wapperContainer.dictWappers = new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>();
+					}
+
+
+					return wapperContainer.dictWappers;
 				}
-				wapperContainer.dictWappers = value;
+				else
+				{
+					rtObject rtObject = (rtObject)_this_pointer;
+
+					if (rtObject.value.dictDelegateWappers == null)
+					{
+						rtObject.value.dictDelegateWappers = new Dictionary<int, object>();
+						rtObject.value.dictDelegateWappers.Add(_functionid, new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>());
+					}
+					else if (!rtObject.value.dictDelegateWappers.ContainsKey(_functionid))
+					{
+						rtObject.value.dictDelegateWappers.Add(_functionid, new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>());
+					}
+
+					return (Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>)rtObject.value.dictDelegateWappers[_functionid];
+				}
 			}
+			//set
+			//{
+			//	if (wapperContainer == null)
+			//	{
+			//		wapperContainer = new WapperContainer();
+			//	}
+			//	wapperContainer.dictWappers = value;
+			//}
 		}
 
 

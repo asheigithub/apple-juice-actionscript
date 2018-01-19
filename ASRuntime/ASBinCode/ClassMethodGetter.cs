@@ -25,7 +25,12 @@ namespace ASBinCode
 
         public sealed  override  RunTimeValueBase getValue(RunTimeScope scope, ASRuntime.StackFrame frame)
 		{
-			return (RunTimeValueBase)getMethod(scope).Clone();
+			var result= (RunTimeValueBase)getMethod(scope).Clone();
+
+			_cachemethod.Clear();
+
+			return result;
+
 			//throw new NotImplementedException();
         }
 		

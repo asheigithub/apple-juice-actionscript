@@ -6,6 +6,6 @@ namespace ASRuntime.nativefuncs
 {
 	public interface IWapperDelegateMaker
 	{
-		FunctionWapper MakeWapper( ASBinCode.RunTimeValueBase function, Player player ,ASBinCode.rtti.Class cls);
+		Delegate MakeWapper( ASBinCode.RunTimeValueBase function, Player player ,ASBinCode.rtti.Class cls);
 	}
 }

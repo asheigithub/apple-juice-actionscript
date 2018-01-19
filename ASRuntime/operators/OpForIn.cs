@@ -525,15 +525,31 @@ namespace ASRuntime.operators
             }
             else if (obj is ASBinCode.rtti.Object)
             {
-                var dobj = ((ASBinCode.rtti.DynamicObject)
-                    frame.player.static_instance[obj._class.staticClass.classid].value);
+				//if (obj is LinkSystemObject && ((LinkSystemObject)obj).GetLinkData() is System.Collections.IEnumerable)
+				//{
+				//	var e = ((System.Collections.IEnumerable)((LinkSystemObject)obj).GetLinkData()).GetEnumerator();
+				//	while (e.MoveNext())
+				//	{
+						
+				//		player.linktypemapper.storeLinkObject_ToSlot(e.Current, RunTimeDataType.rt_void, frame._tempSlot2, player.swc, player);
+				//		yield return frame._tempSlot2.getValue();
+				//	}
+					
 
-                dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
-                var res = getForEach_IEnumerator(player, dobj, frame, step, scope);
-                while (res.MoveNext())
-                {
-                    yield return res.Current;
-                }
+				//}
+				//else
+				{
+					var dobj = ((ASBinCode.rtti.DynamicObject)
+						frame.player.static_instance[obj._class.staticClass.classid].value);
+
+					dobj = (ASBinCode.rtti.DynamicObject)((rtObjectBase)dobj.memberData[0].getValue()).value;
+					var res = getForEach_IEnumerator(player, dobj, frame, step, scope);
+					while (res.MoveNext())
+					{
+						yield return res.Current;
+					}
+
+				}
             }
 
             yield break;

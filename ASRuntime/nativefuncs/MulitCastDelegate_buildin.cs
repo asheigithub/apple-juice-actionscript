@@ -109,7 +109,7 @@ namespace ASRuntime.nativefuncs
 						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
 
 						var wapper = nativefunc.MakeWapper(argements[1], stackframe.player, cls.instanceClass);
-						arg1 = wapper.action;
+						arg1 = wapper;
 					}
 
 					object _result_ = MulticastDelegate.Combine(arg0, arg1);
@@ -262,7 +262,7 @@ namespace ASRuntime.nativefuncs
 						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
 
 						var wapper = nativefunc.MakeWapper(argements[1], stackframe.player, cls.instanceClass);
-						arg1 = wapper.action;
+						arg1 = wapper;
 					}
 
 					object _result_ = MulticastDelegate.Remove(arg0, arg1);

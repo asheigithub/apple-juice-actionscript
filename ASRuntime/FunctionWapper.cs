@@ -7,7 +7,7 @@ using System.Text;
 namespace ASRuntime
 {
 	/// <summary>
-	/// 包装Function,便于外部调用
+	/// 包装Function和Delegate
 	/// </summary>
 	public class FunctionWapper
 	{

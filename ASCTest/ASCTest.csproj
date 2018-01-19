@@ -62,7 +62,6 @@
     <Compile Include="..\LinkCodeGen\bin\Debug\retNativeCode.cs">
       <Link>autoCreateCodes\retNativeCode.cs</Link>
     </Compile>
-    <Compile Include="autoCreateCodes\FuncTestbuildin.cs" />
     <Compile Include="extFunctions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

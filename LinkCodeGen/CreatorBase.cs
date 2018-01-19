@@ -63,7 +63,28 @@ namespace LinkCodeGen
 
 		}
 
+		public static string GetDelegateSignature(Type d)
+		{
+			var method = GetDelegateMethodInfo(d);
 
+			string ret = NativeCodeCreatorBase.GetTypeFullName(method.ReturnType) + "(";
+
+			var paras = method.GetParameters();
+			for (int i = 0; i < paras.Length; i++)
+			{
+				ret += NativeCodeCreatorBase.GetTypeFullName(paras[i].ParameterType);
+
+				if (i < paras.Length - 1)
+				{
+					ret += ",";
+				}
+
+			}
+
+			ret = ret + ")";
+
+			return ret;
+		}
 
 
 		protected Type type;
@@ -404,6 +425,12 @@ namespace LinkCodeGen
 
 		private static string GetSharpTypeName(Type csharptype)
 		{
+			string pre = string.Empty;
+			if (csharptype.IsNested)
+			{
+				pre = GetSharpTypeName(csharptype.DeclaringType) + "_";
+			}
+
 			if (csharptype.IsGenericType)
 			{
 				var defparams = csharptype.GetGenericArguments();
@@ -415,11 +442,11 @@ namespace LinkCodeGen
 				}
 
 				int idx = csharptype.Name.IndexOf("`");
-				return csharptype.Name.Substring(0, idx) + "_Of" + ext;
+				return pre + csharptype.Name.Substring(0, idx) + "_Of" + ext;
 			}
 			else
 			{
-				return csharptype.Name;
+				return pre + csharptype.Name;
 			}
 		}
 
@@ -647,6 +674,19 @@ namespace LinkCodeGen
 
 		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
 		{
+			if (method.IsSpecialName && method.Name.StartsWith("add_") && method.GetParameters().Length==1 && IsDelegate( method.GetParameters()[0].ParameterType))
+			{
+				string eventname = method.Name.Substring(4);
+
+				return eventname + "_addEventListener";
+			}
+			else if (method.IsSpecialName && method.Name.StartsWith("remove_") && method.GetParameters().Length == 1 && IsDelegate(method.GetParameters()[0].ParameterType))
+			{
+				string eventname = method.Name.Substring(7);
+
+				return eventname + "_removeEventListener";
+			}
+
 			var members = methodAtType.GetMember(dotName);
 
 			if (methodAtType.IsInterface)

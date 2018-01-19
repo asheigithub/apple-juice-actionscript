@@ -124,6 +124,12 @@
   <data name="CtorFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\ctorfunc.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="DelegateCtor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\delegatector.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="DelegateImplicitFrom" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\delegateimplicitfrom.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="EnumCtor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\EnumCtor.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -135,6 +141,9 @@
   </data>
   <data name="FieldSetter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\fieldsetter.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="IMethodGetterMethodFunc" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\templates\imethodgettermethodfunc.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="LoadArgement" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\templates\loadargement.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
