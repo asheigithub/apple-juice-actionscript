@@ -1105,87 +1105,160 @@ namespace ASCompiler.compiler.builds
             ASBinCode.RightValueBase v1 = getRightValue(env, step.Arg2, step.token,builder);
             ASBinCode.RightValueBase v2 = getRightValue(env, step.Arg3, step.token,builder);
 
-            if (step.Arg1.IsReg)
-            {
-                OpCode code;
-                if (step.OpCode == "/")
-                {
-                    code = OpCode.div;
-                }
-                else if (step.OpCode == "%")
-                {
-                    code = OpCode.mod;
-                }
-                else if (step.OpCode == "*")
-                {
-                    code = OpCode.multi;
-                }
-                else
-                {
-                    throw new BuildException(
-                            new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                            "不支持的操作类型 " + step.Type + " " + step.OpCode));
-                }
+			if (step.Arg1.IsReg)
+			{
+				OpCode code;
+				if (step.OpCode == "/")
+				{
+					code = OpCode.div;
+				}
+				else if (step.OpCode == "%")
+				{
+					code = OpCode.mod;
+				}
+				else if (step.OpCode == "*")
+				{
+					code = OpCode.multi;
+				}
+				else
+				{
+					throw new BuildException(
+							new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+							"不支持的操作类型 " + step.Type + " " + step.OpCode));
+				}
 
-                var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, code,builder);
-                if (rt == ASBinCode.RunTimeDataType.unknown)
-                {
-                    throw new BuildException(
-                        new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
-                        "类型" + getTypeName( v1.valueType) + "与" + getTypeName( v2.valueType) + "的[" + step.OpCode + "]操作未定义."));
-                }
+				if (code == OpCode.multi)
+				{
+					if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
+					 (OverrideableOperator.mulit, v1.valueType, v2.valueType) != null)
+					{
+						ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
+						eax.setEAXTypeWhenCompile(
+							builder.bin.operatorOverrides.getOperatorDefine
+									(OverrideableOperator.mulit, v1.valueType, v2.valueType).signature.returnType);
+						ASBinCode.OpStep op;
+						op = new ASBinCode.OpStep(ASBinCode.OpCode.multi, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+						op.arg1 = v1;
+						op.arg1Type = v1.valueType;
+						op.arg2 = v2;
+						op.arg2Type = v2.valueType;
 
-                if (rt == RunTimeDataType.rt_number
-                        &&
-                        (v1.valueType == RunTimeDataType.rt_number || v1.valueType == RunTimeDataType.rt_int || v1.valueType == RunTimeDataType.rt_uint)
-                        &&
-                        (v2.valueType == RunTimeDataType.rt_number || v2.valueType == RunTimeDataType.rt_int || v2.valueType == RunTimeDataType.rt_uint)
-                        )
-                {
-                    if (step.OpCode == "*")
-                    {
-                        code = OpCode.multi_number;
-                    }
-                    else if (step.OpCode == "/")
-                    {
-                        code = OpCode.div_number;
-                    }
-                    else if (step.OpCode == "%")
-                    {
-                        code = OpCode.mod_number;
-                    }
-                }
-                else
-                {
-                    //操作类型转换
-                    if (v1.valueType != rt)
-                    {
-                        v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
-                    }
-                    if (v2.valueType != rt)
-                    {
-                        v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
-                    }
-                }
-                ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
-                eax.setEAXTypeWhenCompile(rt);
+						op.reg = eax;
+						op.regType = eax.valueType;
 
-                
-                ASBinCode.OpStep op
-                    = new ASBinCode.OpStep(code,
-                    new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
-                    );
-                
-                op.arg1 = v1;
-                op.arg1Type = v1.valueType;
-                op.arg2 = v2;
-                op.arg2Type = v2.valueType;
+						env.block.opSteps.Add(op);
+						return;
+					}
+				}
+				else if (code == OpCode.div)
+				{
+					if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
+					 (OverrideableOperator.div, v1.valueType, v2.valueType) != null)
+					{
+						ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
+						eax.setEAXTypeWhenCompile(
+							builder.bin.operatorOverrides.getOperatorDefine
+									(OverrideableOperator.div, v1.valueType, v2.valueType).signature.returnType);
+						ASBinCode.OpStep op;
+						op = new ASBinCode.OpStep(ASBinCode.OpCode.div, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+						op.arg1 = v1;
+						op.arg1Type = v1.valueType;
+						op.arg2 = v2;
+						op.arg2Type = v2.valueType;
 
-                op.reg = eax;
-                op.regType = eax.valueType;
+						op.reg = eax;
+						op.regType = eax.valueType;
 
-                env.block.opSteps.Add(op);
+						env.block.opSteps.Add(op);
+						return;
+					}
+				}
+				else if (code == OpCode.mod)
+				{
+					if (!env.isEval && builder.bin.operatorOverrides.getOperatorDefine
+					 (OverrideableOperator.mod, v1.valueType, v2.valueType) != null)
+					{
+						ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
+						eax.setEAXTypeWhenCompile(
+							builder.bin.operatorOverrides.getOperatorDefine
+									(OverrideableOperator.mod, v1.valueType, v2.valueType).signature.returnType);
+						ASBinCode.OpStep op;
+						op = new ASBinCode.OpStep(ASBinCode.OpCode.mod, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+						op.arg1 = v1;
+						op.arg1Type = v1.valueType;
+						op.arg2 = v2;
+						op.arg2Type = v2.valueType;
 
+						op.reg = eax;
+						op.regType = eax.valueType;
+
+						env.block.opSteps.Add(op);
+						return;
+					}
+				}
+
+				{ 
+
+					var rt = ASRuntime.TypeConverter.getImplicitOpType(v1.valueType, v2.valueType, code, builder);
+					if (rt == ASBinCode.RunTimeDataType.unknown)
+					{
+						throw new BuildException(
+							new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+							"类型" + getTypeName(v1.valueType) + "与" + getTypeName(v2.valueType) + "的[" + step.OpCode + "]操作未定义."));
+					}
+
+					if (rt == RunTimeDataType.rt_number
+							&&
+							(v1.valueType == RunTimeDataType.rt_number || v1.valueType == RunTimeDataType.rt_int || v1.valueType == RunTimeDataType.rt_uint)
+							&&
+							(v2.valueType == RunTimeDataType.rt_number || v2.valueType == RunTimeDataType.rt_int || v2.valueType == RunTimeDataType.rt_uint)
+							)
+					{
+						if (step.OpCode == "*")
+						{
+							code = OpCode.multi_number;
+						}
+						else if (step.OpCode == "/")
+						{
+							code = OpCode.div_number;
+						}
+						else if (step.OpCode == "%")
+						{
+							code = OpCode.mod_number;
+						}
+					}
+					else
+					{
+						//操作类型转换
+						if (v1.valueType != rt)
+						{
+							v1 = addCastOpStep(env, v1, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
+						}
+						if (v2.valueType != rt)
+						{
+							v2 = addCastOpStep(env, v2, rt, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile), builder);
+						}
+					}
+					ASBinCode.StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
+					eax.setEAXTypeWhenCompile(rt);
+
+
+					ASBinCode.OpStep op
+						= new ASBinCode.OpStep(code,
+						new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile)
+						);
+
+					op.arg1 = v1;
+					op.arg1Type = v1.valueType;
+					op.arg2 = v2;
+					op.arg2Type = v2.valueType;
+
+					op.reg = eax;
+					op.regType = eax.valueType;
+
+					env.block.opSteps.Add(op);
+
+				}
             }
             else
             {

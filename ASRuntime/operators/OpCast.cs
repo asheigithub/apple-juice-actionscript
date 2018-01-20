@@ -286,8 +286,9 @@ namespace ASRuntime.operators
                             var find = OpAccess_Dot.findInProtoType(dobj, "toString", frame, token, out haserror);
                             if (haserror)
                             {
-                                frame.endStep();
-                                callbacker.noticeRunFailed();
+								callbacker.noticeRunFailed();
+								frame.endStep();
+                                
                                 return;
                             }
 
@@ -325,9 +326,10 @@ namespace ASRuntime.operators
                                 dobj = OpAccess_Dot.findInProtoType(dobj, "toString", 
                                     frame, token, out haserror);
                                 if (haserror)
-                                { 
-                                    frame.endStep();
-                                    callbacker.noticeRunFailed();
+                                {
+									callbacker.noticeRunFailed();
+									frame.endStep();
+                                    
                                     return;
                                 }
                             }
@@ -435,8 +437,9 @@ namespace ASRuntime.operators
 						{
 							//**检查基类
 							frame.throwCastException(token, srcValue.rtType, targetType);
-							frame.endStep();
 							callbacker.noticeRunFailed();
+							frame.endStep();
+							
 						}
                     }
                 }
@@ -514,22 +517,27 @@ namespace ASRuntime.operators
                             else
                             {
                                 frame.throwCastException(token, srcValue.rtType, targetType);
-                                frame.endStep();
-                                callbacker.noticeRunFailed();
+								callbacker.noticeRunFailed();
+								frame.endStep();
+								
+								
+                               
                             }
                         }     
                         else
                         {
                             frame.throwCastException(token, srcValue.rtType, targetType);
-                            frame.endStep();
-                            callbacker.noticeRunFailed();
+							callbacker.noticeRunFailed();
+							frame.endStep();
+                            
                         }
                     }
                     else
                     {
                         frame.throwCastException(token, srcValue.rtType, targetType);
-                        frame.endStep();
-                        callbacker.noticeRunFailed();
+						callbacker.noticeRunFailed();
+						frame.endStep();
+                        
                     }
                 }
                 else
@@ -590,9 +598,10 @@ namespace ASRuntime.operators
                 BlockCallBackBase callbacker = (BlockCallBackBase)a[4];
 
                 frame.throwCastException((SourceToken)a[1], ((RunTimeValueBase)a[6]).rtType, RunTimeDataType.rt_string);
-                //转换异常后立刻结束执行
-                frame.endStep();
-                callbacker.noticeRunFailed();
+				callbacker.noticeRunFailed();
+				//转换异常后立刻结束执行
+				frame.endStep();
+                
             }
             else
             {
@@ -620,9 +629,10 @@ namespace ASRuntime.operators
                 {
                     frame.throwCastException((SourceToken)a[1], ((RunTimeValueBase)a[5]).rtType,
                        targetType);
-                    //转换异常后立刻结束执行
-                    frame.endStep();
-                    fc.noticeRunFailed();
+					fc.noticeRunFailed();
+					//转换异常后立刻结束执行
+					frame.endStep();
+                    
                 }
                 else
                 {
@@ -721,8 +731,9 @@ namespace ASRuntime.operators
             }
             else
             {
-                frame.endStep();
-                callbacker.noticeRunFailed();
+				callbacker.noticeRunFailed();
+				frame.endStep();
+                
             }
 
         }
@@ -981,8 +992,9 @@ namespace ASRuntime.operators
                     var find = OpAccess_Dot.findInProtoType(dobj, "valueOf", frame, token, out haserror);
                     if (haserror)
                     {
-                        frame.endStep();
-                        callbacker.noticeRunFailed();
+						callbacker.noticeRunFailed();
+						frame.endStep();
+                        
                         return;
                     }
 
@@ -1029,8 +1041,9 @@ namespace ASRuntime.operators
                             frame, token, out haserror);
                         if (haserror)
                         {
-                            frame.endStep();
-                            callbacker.noticeRunFailed();
+							callbacker.noticeRunFailed();
+							frame.endStep();
+                            
                             return;
                         }
                     }
@@ -1283,8 +1296,9 @@ namespace ASRuntime.operators
                     var find = OpAccess_Dot.findInProtoType(dobj, "toString", frame, token, out haserror);
                     if (haserror)
                     {
-                        frame.endStep();
-                        callbacker.noticeRunFailed();
+						callbacker.noticeRunFailed();
+						frame.endStep();
+                        
                         return;
                     }
 
@@ -1322,8 +1336,9 @@ namespace ASRuntime.operators
                             frame, token, out haserror);
                         if (haserror)
                         {
-                            frame.endStep();
-                            callbacker.noticeRunFailed();
+							callbacker.noticeRunFailed();
+							frame.endStep();
+                            
                             return;
                         }
                     }

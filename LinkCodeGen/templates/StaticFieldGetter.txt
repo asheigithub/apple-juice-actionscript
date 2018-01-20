@@ -47,7 +47,7 @@
 
 					success = true;
 				}
-				catch (RuntimeLinkTypeMapper.TypeLinkClassException tlc)
+				catch (ASRunTimeException tlc)
 				{
 					success = false;
 					stackframe.throwAneException(token, tlc.Message);

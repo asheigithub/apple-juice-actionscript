@@ -246,6 +246,11 @@ namespace LinkCodeGen
 				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type, staticusenames, usenames));
 			}
 
+			if (method.IsStatic)
+			{
+				nativefunName = "static_" + nativefunName;
+			}
+
 			return nativefunName;
 		}
 
@@ -440,7 +445,8 @@ namespace LinkCodeGen
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
-					as3api.Append("function getThisItem");
+					var name = GetMethodName(method.Name, method, type, null, null);
+					as3api.Append("function " + name);
 				}
 				else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
 				{
@@ -465,7 +471,8 @@ namespace LinkCodeGen
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
-					as3api.Append("function setThisItem");
+					var name = GetMethodName(method.Name, method, type, null, null);
+					as3api.Append("function " + name);
 
 					var temp = paras[0];
 					paras[0] = paras[1];
@@ -596,7 +603,7 @@ namespace LinkCodeGen
 			System.IO.File.WriteAllText(nativefunfile, usingcode.ToString()+ nativefunc.ToString());
 
 			return nativefunc.ToString();
-
+			
 		}
 
 	}

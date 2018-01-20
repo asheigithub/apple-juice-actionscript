@@ -179,7 +179,7 @@ namespace ASCTest.regNativeFunctions
                 }
                 catch
                 {
-                    throw new ASRunTimeException();
+                    throw new EngineException();
                 }
 
 
@@ -263,7 +263,7 @@ namespace ASCTest.regNativeFunctions
                 }
                 catch
                 {
-                    throw new ASRunTimeException();
+                    throw new EngineException();
                 }
 
 

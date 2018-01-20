@@ -1,11 +1,12 @@
 package system.collections 
 {
+	import system.ICloneable;
 	import system._Array_;
 	import system._Object_;
 	
 	
 	[link_system]
-	public class Hashtable extends _Object_	implements IDictionary
+	public class Hashtable extends _Object_	implements IDictionary, ICloneable
 	{
 		[creator];
 		[native, _system_Hashtable_creator_]
@@ -66,6 +67,10 @@ package system.collections
 		
 		[native, system_collections_IEnumerable_getEnumerator]
 		private function getEnumerator_():_IEnumerator_;
+		
+		
+		[native,system_ICloneable_clone]
+		private function clone():_Object_;
 		
 	}
 

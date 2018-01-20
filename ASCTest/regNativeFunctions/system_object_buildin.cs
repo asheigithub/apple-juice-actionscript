@@ -1,5 +1,7 @@
 ﻿using ASBinCode;
 using ASBinCode.rtti;
+using ASRuntime;
+using ASRuntime.nativefuncs;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -278,5 +280,78 @@ namespace ASCTest.regNativeFunctions
         }
 
     }
+
+	class system_Object_explicit_from : NativeConstParameterFunction
+	{
+		public system_Object_explicit_from() : base(1)
+		{
+			para = new List<RunTimeDataType>();
+			para.Add(RunTimeDataType.rt_void);
+		}
+
+		public override bool isMethod
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_system_Object_explicit_from_";
+			}
+		}
+
+		List<RunTimeDataType> para;
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return para;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.rt_void;
+			}
+		}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
+			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+
+			object lo;
+			if (stackframe.player.linktypemapper.rtValueToLinkObject(
+				argements[0],
+
+				stackframe.player.linktypemapper.getLinkType(cls.getRtType()),
+
+				bin, true, out lo
+				))
+			{
+
+				((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, lo);
+
+				success = true;
+			}
+			else
+			{
+				stackframe.throwCastException(token, argements[0].rtType,
+					cls.getRtType()
+					);
+				success = false;
+			}
+
+		}
+
+
+	}
 
 }

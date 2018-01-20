@@ -59,12 +59,7 @@ namespace ASBinCode.rtData
 				{
 					rtObject rtObject = (rtObject)_this_pointer;
 
-					if (rtObject.value.dictDelegateWappers == null)
-					{
-						rtObject.value.dictDelegateWappers = new Dictionary<int, object>();
-						rtObject.value.dictDelegateWappers.Add(_functionid, new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>());
-					}
-					else if (!rtObject.value.dictDelegateWappers.ContainsKey(_functionid))
+					if (!rtObject.value.dictDelegateWappers.ContainsKey(_functionid))
 					{
 						rtObject.value.dictDelegateWappers.Add(_functionid, new Dictionary<RunTimeDataType, ASRuntime.FunctionWapper>());
 					}

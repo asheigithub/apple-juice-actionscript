@@ -77,7 +77,7 @@ namespace ASBinCode
                 {
                     if (!instance_class.implements.ContainsKey(_class))
                     {
-                        throw new ASBinCode.ASRunTimeException();
+                        throw new ASRuntime.EngineException();
                     }
                 }
 #endif

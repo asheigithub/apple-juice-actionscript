@@ -26,6 +26,14 @@ namespace LinkCodeGen
 				CreatorBase.NotCreateNameSpace.AddRange(configs);
 			}
 
+			if (System.IO.File.Exists("notcreatetypes.txt"))
+			{
+				var configs = System.IO.File.ReadAllLines("notcreatetypes.txt");
+				CreatorBase.NotCreateTypes.AddRange(configs);
+			}
+
+
+
 
 			var assembly = System.Reflection.Assembly.GetAssembly(typeof(object));
 			StringBuilder regclassSb = new StringBuilder();
@@ -85,14 +93,31 @@ namespace LinkCodeGen
 
 			//*****类*******
 
-			
-			var classtype = typeof(System.Net.WebClient);
-			if (!creators.ContainsKey(classtype))
+			var types = typeof(object).Assembly.GetTypes();
+
+			foreach (var item in types)
 			{
-				creators.Add(classtype, null);
-				creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");				
+				var classtype = item;
+
+				if (!CreatorBase.IsSkipType(classtype) && !CreatorBase.IsSkipCreator(classtype)
+
+					&& classtype.IsClass && classtype.IsPublic
+					)
+				{
+					if (!creators.ContainsKey(classtype))
+					{
+						creators.Add(classtype, null);
+						creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+					}
+				}
 			}
-			
+			//var classtype = typeof(AppDomain);
+			//if (!creators.ContainsKey(classtype))
+			//{
+			//	creators.Add(classtype, null);
+			//	creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+			//}
+
 
 			using (System.IO.FileStream fs=new System.IO.FileStream("codeoutput.cs", System.IO.FileMode.Create))
 			{
@@ -102,14 +127,6 @@ namespace LinkCodeGen
 					CreatorBase.GenNativeFuncImport(usingcode);
 
 					sw.WriteLine(usingcode.ToString());
-
-					//string regCode = "partial class extFunctions : INativeFunctionRegister\n"
-					//+ "{\n"
-					//+ "\tprivate void regAutoCreateCodes(CSWC bin)"
-					//+"\t{"
-					//+"\t}"
-					//+ "}\n"
-					//+ "\n";
 
 					regclassSb.AppendLine("using System;");
 					regclassSb.AppendLine("using System.Collections.Generic;");

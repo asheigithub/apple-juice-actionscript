@@ -23,8 +23,8 @@ namespace LinkCodeGen
             isfinal = true;
             isStruct = false;
 
-            this.name = enumtype.Name;
-        }
+            this.name = GetAS3ClassOrInterfaceName(enumtype);
+		}
 
 
 
@@ -154,7 +154,7 @@ namespace LinkCodeGen
             as3api.AppendFormat("[native,{0}];", GetCtorNativeFuncName(type));
             as3api.AppendLine();
             as3api.Append("\t\t");
-            as3api.AppendFormat("public function {0}();",type.Name);
+            as3api.AppendFormat("public function {0}();",name);
             as3api.AppendLine();
             as3api.AppendLine();
 

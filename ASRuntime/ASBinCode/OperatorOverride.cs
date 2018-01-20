@@ -49,10 +49,22 @@ namespace ASBinCode
         /// </summary>
         subtraction=10,
 
+		/// <summary>
+		/// *
+		/// </summary>
+		mulit=11,
+		/// <summary>
+		/// /
+		/// </summary>
+		div=12,
+		/// <summary>
+		/// %
+		/// </summary>
+		mod =13,
         /// <summary>
         /// |
         /// </summary>
-        bitOr=11,
+        bitOr=14,
 
     }
 

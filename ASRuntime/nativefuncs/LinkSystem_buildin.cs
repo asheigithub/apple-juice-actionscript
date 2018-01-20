@@ -233,7 +233,7 @@ namespace ASRuntime.nativefuncs
 
         public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
         public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot,SourceToken token, object stackframe, out bool success)
@@ -310,7 +310,7 @@ namespace ASRuntime.nativefuncs
 
         public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
         public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)

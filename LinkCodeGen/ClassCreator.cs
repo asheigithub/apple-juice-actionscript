@@ -27,7 +27,9 @@ namespace LinkCodeGen
 				throw new ArgumentException("不支持泛型接口");
 			}
 
-			if (IsSkipCreator(classtype))
+
+
+			if (IsSkipCreator(classtype) || IsSkipType(classtype))
 			{
 				throw new ArgumentException("类型已配置为跳过");
 			}
@@ -116,7 +118,7 @@ namespace LinkCodeGen
 					for (int i = 0; i < map.TargetMethods.Length; i++)
 					{
 						var m = map.TargetMethods[i];
-						if (!InterfaceCreator.isMethodSkip(m))
+						if (!InterfaceCreator.isMethodSkip(map.InterfaceMethods[i]))
 						{
 							methodimplinterface mi = new methodimplinterface();
 							mi.method = m;
@@ -180,7 +182,7 @@ namespace LinkCodeGen
 						continue;
 					}
 
-					MakeCreator(method.ReturnType, typeCreators);
+					
 				}
 				bool parachecked = true;
 				var paras = method.GetParameters();
@@ -239,6 +241,8 @@ namespace LinkCodeGen
 
 				if (parachecked)
 				{
+					MakeCreator(method.ReturnType, typeCreators);
+
 					if (method.IsSpecialName && method.Name.StartsWith("op_") && method.IsStatic) //操作符重载
 					{
 						opoverrides.Add(method);
@@ -447,6 +451,37 @@ namespace LinkCodeGen
 
 				isdelegate = true;
 			}
+
+			//***编写类型摘要***
+			{
+				as3api.AppendLine("\t\t/**");
+
+				if (type.IsValueType)
+				{
+					as3api.AppendLine("\t\t* Struct");
+				}
+				else
+				{
+					if (type.IsAbstract)
+					{
+						as3api.AppendLine("\t\t* Abstract");
+					}
+					if (type.IsSealed)
+					{
+						as3api.AppendLine("\t\t* Sealed");
+					}
+				}
+
+				if (type.IsNested)
+				{
+					as3api.AppendLine("\t\t* Nested Type");
+				}
+
+				as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(this.type)).Replace("&", " &").Replace(";", "; "));
+				
+				as3api.AppendLine("\t\t*/");
+			}
+
 
 
 			if (type.IsValueType)
@@ -832,6 +867,38 @@ namespace LinkCodeGen
 						//[native, _system_Byte_MaxValue_getter]
 						//public static const MaxValue:Byte;
 
+						//****编写字段摘要****
+						{
+							as3api.AppendLine("\t\t/**");
+
+							as3api.AppendLine("\t\t* " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(this.type) + "." + field.Name).Replace("&", "& ").Replace(";", "; "));
+
+							if (field.FieldType != typeof(void))
+							{
+								as3api.AppendLine("\t\t*fieldtype:");
+
+								as3api.Append("\t\t*  ");
+								as3api.Append(" " + System.Security.SecurityElement.Escape(
+									NativeCodeCreatorBase.GetTypeFullName(
+										field.FieldType)).Replace("&", " &").Replace(";", "; "));
+
+								if (IsDelegate(field.FieldType))
+								{
+									as3api.Append(" [" +
+										System.Security.SecurityElement.Escape(
+										GetDelegateSignature(field.FieldType))
+										.Replace("&", " &").Replace(";", "; ")
+										+ "]");
+								}
+
+								as3api.AppendLine();
+							}
+
+
+							as3api.AppendLine("\t\t*/");
+						}
+
+
 						string fieldname = field.Name;
 
 
@@ -883,7 +950,6 @@ namespace LinkCodeGen
 
 							}
 						}
-
 
 
 						as3api.Append("\t\t");
@@ -988,6 +1054,10 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
+						if (method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
 						
 						as3api.Append("function get ");
 
@@ -1024,7 +1094,12 @@ namespace LinkCodeGen
 
 						as3api.Append("\t\t");
 						as3api.Append("public ");
-						
+
+						if (method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+
 						as3api.Append("function set ");
 
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
@@ -1037,7 +1112,12 @@ namespace LinkCodeGen
 						as3api.AppendLine(string.Format("\t\t[native,{0}];", InterfaceCreator.GetMethodNativeFunctionName(mapinterface, mapinterface.DeclaringType, null, null)));
 						as3api.Append("\t\t");
 						as3api.Append("public ");
-						
+
+						if (method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+
 						as3api.Append("function ");
 
 
@@ -1062,6 +1142,62 @@ namespace LinkCodeGen
 							dictUseNames.Add(GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames), null);
 						}
 					}
+
+					//****编写方法摘要****
+					{
+						as3api.AppendLine("\t\t/**");
+
+						as3api.AppendLine("\t\t* " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(type) +"."+  method.Name).Replace("&", " &").Replace(";", "; "));
+
+						var paras = method.GetParameters();
+						if (paras.Length > 0)
+						{
+							as3api.AppendLine("\t\t*parameters:");
+						}
+						foreach (var item in paras)
+						{
+							as3api.Append("\t\t*  " + item.Name );
+
+							as3api.Append(" : " + System.Security.SecurityElement.Escape( NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&"," &").Replace(";","; "));
+
+							if (IsDelegate(item.ParameterType))
+							{
+								as3api.Append(" [" +
+									System.Security.SecurityElement.Escape(
+									GetDelegateSignature(item.ParameterType))
+									.Replace("&"," &").Replace(";","; ")
+									+"]");
+							}
+
+							as3api.AppendLine();
+						}
+
+						if (method.ReturnType != typeof(void))
+						{
+							as3api.AppendLine("\t\t*return:" );
+
+							as3api.Append("\t\t*  ");
+							as3api.Append(" " + System.Security.SecurityElement.Escape(
+								NativeCodeCreatorBase.GetTypeFullName(
+									method.ReturnType)).Replace("&", " &").Replace(";", "; "));
+
+							if (IsDelegate(method.ReturnType))
+							{
+								as3api.Append(" [" +
+									System.Security.SecurityElement.Escape(
+									GetDelegateSignature(method.ReturnType))
+									.Replace("&", " &").Replace(";", "; ")
+									+ "]");
+							}
+
+							as3api.AppendLine();
+						}
+
+
+						as3api.AppendLine("\t\t*/");
+					}
+
+
 
 					string nativefunctionname= InterfaceCreator.GetMethodNativeFunctionName(method, type, dictStaticUseNames, dictUseNames);
 					System.Reflection.PropertyInfo pinfo;
@@ -1295,7 +1431,10 @@ namespace LinkCodeGen
 						opcode == ">=" ||
 						opcode == "<" ||
 						opcode == "<=" ||
-						opcode == "|"
+						opcode == "|"	||
+						opcode == "*" ||
+						opcode == "/" ||
+						opcode == "%"
 						)
 					{
 						bool abouttype = false;

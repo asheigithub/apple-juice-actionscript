@@ -298,6 +298,7 @@ namespace ASRuntime.operators
             cb.setCallBacker(_setthisitem_callbacker);
             cb.step = step;
             cb.args = frame;
+			
 
             funCaller.callbacker = cb;
             funCaller.call();

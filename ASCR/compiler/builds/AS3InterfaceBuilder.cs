@@ -809,25 +809,25 @@ namespace ASCompiler.compiler.builds
 
 
                             //***检查2个接口签名完全匹配***
-                            if (om.isGetter !=member.isGetter || om.isSetter !=member.isGetter)
+                            if (om.isGetter !=member.isGetter || om.isSetter !=member.isSetter)
                             {
                                 throw new BuildException(
                                     new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                            "重复的接口成员,访问器类型不匹配" + member.name)
+                                                            "重复的接口成员,访问器类型不匹配" + member.refClass.name + "::"+ member.name)
                                     );
                             }
                             else if (sig.returnType != sig2.returnType)
                             {
                                 throw new BuildException(
                                     new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                            "重复的接口成员,签名不匹配" + member.name)
+                                                            "重复的接口成员,签名不匹配" + member.refClass.name + "::" + member.name)
                                     );
                             }
                             else if (sig.parameters.Count != sig2.parameters.Count)
                             {
                                 throw new BuildException(
                                     new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                            "重复的接口成员,签名不匹配" + member.name)
+                                                            "重复的接口成员,签名不匹配" + member.refClass.name + "::" + member.name)
                                     );
                             }
                             else
@@ -843,7 +843,7 @@ namespace ASCompiler.compiler.builds
                                     {
                                         throw new BuildException(
                                             new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
-                                                                    "重复的接口成员,签名不匹配" + member.name)
+                                                                    "重复的接口成员,签名不匹配" + member.refClass.name + "::" + member.name)
                                             );
                                     }
                                 }

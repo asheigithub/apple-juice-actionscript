@@ -525,19 +525,48 @@ namespace ASRuntime.operators
             }
             else if (obj is ASBinCode.rtti.Object)
             {
-				//if (obj is LinkSystemObject && ((LinkSystemObject)obj).GetLinkData() is System.Collections.IEnumerable)
-				//{
-				//	var e = ((System.Collections.IEnumerable)((LinkSystemObject)obj).GetLinkData()).GetEnumerator();
-				//	while (e.MoveNext())
-				//	{
-						
-				//		player.linktypemapper.storeLinkObject_ToSlot(e.Current, RunTimeDataType.rt_void, frame._tempSlot2, player.swc, player);
-				//		yield return frame._tempSlot2.getValue();
-				//	}
-					
+				//***处理.net IEnumerable***
+				System.Collections.IEnumerator enumerator=null;
+				if (obj is LinkSystemObject)
+				{
+					var od = ((LinkSystemObject)obj).GetLinkData();
+					if (od is System.Collections.IEnumerable)
+					{
+						enumerator = ((System.Collections.IEnumerable)od).GetEnumerator();
+					}
+					else
+					{
+						enumerator = od as System.Collections.IEnumerator;
+					}
 
-				//}
-				//else
+				}
+
+				if (enumerator !=null)
+				{
+					var e = enumerator;
+					while (e.MoveNext())
+					{
+						int slotidx = frame.baseBottomSlotIndex;
+						if (slotidx >= Player.STACKSLOTLENGTH)
+						{
+							throw new ASRunTimeException("stack overflow",frame.player.stackTrace(0));
+						}
+						var tempslot = frame.stack[slotidx];
+						try
+						{
+							player.linktypemapper.storeLinkObject_ToSlot(e.Current, RunTimeDataType.rt_void, frame._tempSlot2, player.swc, player);							
+						}
+						finally
+						{
+							tempslot.clear();
+						}
+
+						yield return frame._tempSlot2.getValue();
+					}
+
+
+				}
+				else
 				{
 					var dobj = ((ASBinCode.rtti.DynamicObject)
 						frame.player.static_instance[obj._class.staticClass.classid].value);

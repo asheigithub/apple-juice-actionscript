@@ -14,7 +14,7 @@ namespace ASBinCode.rtti
         {
             this._class = _class;
             memberData = null;
-			dictDelegateWappers = null;
+			_dictDelegateWappers = null;
         }
         
         /// <summary>
@@ -26,13 +26,27 @@ namespace ASBinCode.rtti
         /// </summary>
         public SLOT[] memberData;
 
+		
+		private Dictionary<int, object> _dictDelegateWappers;
 		/// <summary>
 		/// 已缓存的方法到委托的包装
 		/// </summary>
-		internal Dictionary<int, object> dictDelegateWappers;
+		internal virtual Dictionary<int, object> dictDelegateWappers
+		{
+			get
+			{
+				if (_dictDelegateWappers == null)
+				{
+					_dictDelegateWappers = new Dictionary<int, object>();
+				}
+
+				return _dictDelegateWappers;
+			}
+		}
 
 
-        public override string ToString()
+
+		public override string ToString()
         {
             if (_class.staticClass == null)
             {

@@ -56,7 +56,7 @@ namespace ASRuntime.nativefuncs
         }
         public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
         public sealed override void executeAsync(RunTimeValueBase thisObj, 

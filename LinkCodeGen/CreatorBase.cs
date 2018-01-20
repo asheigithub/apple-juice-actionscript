@@ -17,6 +17,26 @@ namespace LinkCodeGen
 			as3keywords.Add("default", null);
 			as3keywords.Add("delete", null);
 			as3keywords.Add("use", null);
+			as3keywords.Add("continue", null);
+			as3keywords.Add("namespace", null);
+			as3keywords.Add("interface", null);
+			as3keywords.Add("class", null);
+			as3keywords.Add("implements", null);
+			as3keywords.Add("super", null);
+			as3keywords.Add("package", null);
+			as3keywords.Add("yield", null);
+			as3keywords.Add("break", null);
+			as3keywords.Add("for", null);
+			as3keywords.Add("in", null);
+			as3keywords.Add("loop", null);
+			as3keywords.Add("do", null);
+			as3keywords.Add("while", null);
+			as3keywords.Add("return", null);
+			as3keywords.Add("protected", null);
+			as3keywords.Add("public", null);
+			as3keywords.Add("private", null);
+			as3keywords.Add("static", null);
+
 		}
 
 		/// <summary>
@@ -150,7 +170,9 @@ namespace LinkCodeGen
 
 
 		public static List<string> NotCreateNameSpace = new List<string>();
-		
+
+		public static List<string> NotCreateTypes = new List<string>();
+
 		/// <summary>
 		/// 返回如果在成员中涉及这种类型是否要跳过
 		/// </summary>
@@ -276,6 +298,10 @@ namespace LinkCodeGen
 					return true;
 			}
 
+			if (NotCreateTypes.Contains(type.FullName))
+			{
+				return true;
+			}
 			
 			
 
@@ -283,16 +309,6 @@ namespace LinkCodeGen
 			{
 				return true;
 			}
-
-			//if (Equals(type, typeof(Delegate)))
-			//{
-			//	return true;
-			//}
-
-			//if (Equals(type, typeof(MulticastDelegate)))
-			//{
-			//	return true;
-			//}
 
 			if (type.BaseType != null)
 			{
@@ -473,20 +489,30 @@ namespace LinkCodeGen
 
 		private System.Reflection.MethodInfo isMapToInterface(System.Reflection.MethodBase method,System.Type checkinterface)
 		{
+			
 			var intfs= method.DeclaringType.GetInterfaces();
 			foreach (var intf in intfs)
 			{
 				if (intf == checkinterface)
 				{
-					var map = method.DeclaringType.GetInterfaceMap(checkinterface);
-
-					for (int i = 0; i < map.TargetMethods.Length; i++)
+					try
 					{
-						if (map.TargetMethods[i] == method)
+						var map = method.DeclaringType.GetInterfaceMap(checkinterface);
+
+						for (int i = 0; i < map.TargetMethods.Length; i++)
 						{
-							return map.InterfaceMethods[i];
+							if (map.TargetMethods[i] == method)
+							{
+								return map.InterfaceMethods[i];
+							}
 						}
 					}
+					catch (ArgumentException)
+					{
+						continue;
+					}
+
+					
 
 					
 				}
@@ -652,24 +678,36 @@ namespace LinkCodeGen
 			{
 				return "String";
 			}
-			if (type==typeof(Array) || type.IsArray)
+
+			do
 			{
-				if (!typeimports.ContainsKey(typeof(Array)))
+				if (type == typeof(Type))
 				{
-					typeimports.Add(typeof(Array), "import system._Array_;");
+					break;
 				}
-			}
-			if (this.type.Namespace != type.Namespace)
-			{
-				if (!typeimports.ContainsKey(type))
+
+				if (type == typeof(Array) || type.IsArray)
 				{
-					typeimports.Add(type, "import " + type.Namespace.ToLower() + "." + GetAS3ClassOrInterfaceName(type) + ";");
+					if (!typeimports.ContainsValue("import system._Array_;"))
+					{
+						typeimports.Add(typeof(Array), "import system._Array_;");
+					}
 				}
-			}
+				else if (this.type.Namespace != type.Namespace)
+				{
+					if (!typeimports.ContainsKey(type))
+					{
+						typeimports.Add(type, "import " + type.Namespace.ToLower() + "." + GetAS3ClassOrInterfaceName(type) + ";");
+					}
+				}
+
+
+			} while (false);
 
 			
+			string name=GetAS3ClassOrInterfaceName(type);
 
-			return GetAS3ClassOrInterfaceName(type);
+			return name;
 		}
 
 		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )

@@ -16,6 +16,12 @@ package system
 		[native, _system_Object_ctor];
 		public function _Object_();
 		
+		[native, _system_Object_explicit_from_];
+		public static function createObject(v:*):_Object_;
+		
+		
+		
+		
 		[native,_system_Object_static_equals]
 		public static function equals(objA:_Object_,objB:_Object_):Boolean;
 		

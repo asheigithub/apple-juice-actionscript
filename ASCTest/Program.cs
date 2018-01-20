@@ -196,7 +196,6 @@ namespace ASCTest
 				//byte[] bin = swc.toBytes();
 
 				//swc = ASBinCode.CSWC.loadFromBytes(bin);
-
 				//ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
 				//(new extFunctions()).registrationFunction(swc);
 

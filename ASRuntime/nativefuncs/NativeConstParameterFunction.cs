@@ -98,17 +98,17 @@ namespace ASRuntime.nativefuncs
 
         public sealed override void executeAsync(RunTimeValueBase thisObj, SLOT[] argements, SLOT resultSlot, object callbacker, object stackframe, SourceToken token, RunTimeScope scope)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
         public sealed override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
         public sealed override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
         {
-            throw new ASRunTimeException();
+            throw new EngineException();
         }
 
 

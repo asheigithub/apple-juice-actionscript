@@ -282,7 +282,7 @@ namespace ASRuntime
 #if DEBUG
             if (execing)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             execing = true;
@@ -1293,13 +1293,13 @@ namespace ASRuntime
 #if DEBUG
 			if (!execing || isclosed)
 			{
-				throw new ASRunTimeException();
+				throw new EngineException();
 			}
 			execing = false;
 
 			if (hasCallJump || hasCallReturn || runtimeError != null)
 			{
-				throw new ASRunTimeException();
+				throw new EngineException();
 			}
 
 #endif
@@ -1321,7 +1321,7 @@ namespace ASRuntime
 #if DEBUG
             if (!execing || isclosed)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
             execing = false;
             
@@ -1721,7 +1721,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 try块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
             return s.tryid;
         }
@@ -1741,7 +1741,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 catch块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
             return s.tryid;
         }
@@ -1762,7 +1762,7 @@ namespace ASRuntime
                 //                                                    "运行时异常 finally块不匹配"
                 //                                                    ));
                 //引擎异常，抛出
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
 
@@ -1981,7 +1981,7 @@ namespace ASRuntime
 #if DEBUG
             if (isclosed)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
 #endif
@@ -2002,7 +2002,7 @@ namespace ASRuntime
 #if DEBUG
 			if (call_parameter_slotCount != 0)
 			{
-				throw new ASRunTimeException();
+				throw new EngineException();
 			}
 #endif
 			//int end = offset + block.totalRegisters + 1 + 1 + call_parameter_slotCount;

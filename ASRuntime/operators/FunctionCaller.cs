@@ -678,7 +678,9 @@ namespace ASRuntime.operators
 
         private void check_para_failed(BlockCallBackBase sender, object args)
         {
-            if (callbacker != null)
+			//清理栈
+			clear_para_slot(invokerFrame, onstackparametercount); onstackparametercount = 0;
+			if (callbacker != null)
             {
                 callbacker.noticeRunFailed();
             }

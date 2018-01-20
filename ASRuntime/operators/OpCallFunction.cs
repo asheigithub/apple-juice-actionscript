@@ -411,7 +411,7 @@ namespace ASRuntime.operators
 
 #if DEBUG 
 			if (frame.typeconvertoperator != null)
-				throw new ASRunTimeException();
+				throw new EngineException();
 #endif
 
 			var toCallFunc = frame.funCaller.toCallFunc;var player = frame.player;
@@ -440,7 +440,7 @@ namespace ASRuntime.operators
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
-				throw new ASRunTimeException();
+				throw new EngineException();
 #endif
 
 			int index = step.jumoffset;
@@ -457,7 +457,7 @@ namespace ASRuntime.operators
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
-				throw new ASRunTimeException();
+				throw new EngineException();
 #endif
 			int _index = step.jumoffset;
 			//frame.funCaller.pushParameterToStack(arg, index);
@@ -493,7 +493,7 @@ namespace ASRuntime.operators
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
-				throw new ASRunTimeException();
+				throw new EngineException();
 #endif
 
 			bool success;
@@ -510,7 +510,7 @@ namespace ASRuntime.operators
 
 #if DEBUG
 			if (frame.typeconvertoperator != null)
-				throw new ASRunTimeException();
+				throw new EngineException();
 #endif
 
 			bool success;

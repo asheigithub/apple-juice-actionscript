@@ -17,6 +17,7 @@ namespace ASCTest
             bin.regNativeFunction(LinkSystem_Buildin.getToString("_system_Object_toString"));
             bin.regNativeFunction(LinkSystem_Buildin.getGetHashCode("_system_Object_getHashCode"));
             bin.regNativeFunction(LinkSystem_Buildin.getEquals("_system_Object_equals"));
+			bin.regNativeFunction(new system_Object_explicit_from());
             bin.regNativeFunction(new object_static_equals());
             bin.regNativeFunction(new object_static_referenceEquals());
 

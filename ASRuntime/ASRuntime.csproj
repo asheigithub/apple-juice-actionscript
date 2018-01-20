@@ -110,6 +110,7 @@
     <Compile Include="ConsoleOutput.cs" />
     <Compile Include="DictionaryKey_Value.cs" />
     <Compile Include="DynamicPropertySlot.cs" />
+    <Compile Include="EngineException.cs" />
     <Compile Include="error\InternalError.cs" />
     <Compile Include="flash\utils\ByteArray.cs" />
     <Compile Include="flash\utils\IDataInput.cs" />

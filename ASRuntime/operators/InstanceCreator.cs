@@ -560,7 +560,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
         }
 
@@ -604,7 +604,7 @@ namespace ASRuntime.operators
             }
             else
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
         }
 

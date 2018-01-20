@@ -521,37 +521,37 @@ namespace ASRuntime.operators
 
             public sealed override void setValue(rtUndefined value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(rtNull value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(int value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(string value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(uint value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(double value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
 
             public sealed override void setValue(rtBoolean value)
             {
-                throw new ASRunTimeException();
+                throw new EngineException();
             }
         }
 

@@ -1405,7 +1405,7 @@ namespace ASRuntime
 						}
 						break;
 					}
-					catch (ASRunTimeException)   //引擎抛出的异常直接抛出
+					catch (EngineException)   //引擎抛出的异常直接抛出
 					{
 						throw;
 					}
@@ -2902,7 +2902,7 @@ namespace ASRuntime
 			if (!ReferenceEquals(currentRunFrame, raiseframe))
 			{
 				//currentRunFrame.close();
-				throw new ASRunTimeException("", string.Empty);
+				throw new EngineException();
 			}
 #endif
 
@@ -3608,6 +3608,13 @@ namespace ASRuntime
 				{
 					var method = wapper.function;
 
+					int startOffset = currentRunFrame.baseBottomSlotIndex + argcount;
+					if (startOffset + swc.blocks[swc.functions[method.functionId].blockid].totalStackSlots + 1 + 1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
+					{
+						throw new ASRunTimeException("stack overflow", stackTrace(0));
+					}
+
+
 					//int flag = getRuntimeStackFlag();
 
 					//CallBlankBlock(null);
@@ -3740,12 +3747,9 @@ namespace ASRuntime
 						clearEnv();
 
 						throwOrShowError(new ASRunTimeException("方法调用失败", ex));
-						return null;
+						//return null;
 					}
-					else
-					{
-						throw;
-					}
+					throw;
 				}
 				finally
 				{

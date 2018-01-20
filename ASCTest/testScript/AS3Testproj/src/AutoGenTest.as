@@ -1,23 +1,13 @@
 package 
 {
-	import autogencodelib.Testobj;
-	import autogencodelib.Testobj_TESTHandler_Of_Int64;
-	import flash.display.Sprite;
-	import system.AsyncCallback;
-	import system.Char;
-	import system.Decimal;
-	import system.IAsyncResult;
-	import system.Int64;
-	import system.MulticastDelegate;
-	import system.UInt64;
-	import system.Uri;
-	import system._Array_;
-	import system.collections.generic.List_Of_Int32;
-	import system.collections.generic.List_Of_Int32_;
-	import system.net.DownloadStringCompletedEventArgs;
-	import system.net.DownloadStringCompletedEventHandler;
-	import system.net.WebClient;
 	
+	import flash.display.Sprite;
+	import system.Byte;
+	import system._Array_;
+	import system.io.MemoryStream;
+	import system.security.cryptography.MD5;
+	import system.security.cryptography.MD5CryptoServiceProvider;
+	import system.text.Encoding;
 	
 	[Doc]
 	/**
@@ -29,40 +19,24 @@ package
 		
 		public function AutoGenTest() 
 		{
-			var client:WebClient = new WebClient();
-			//trace( client.downloadString("http://www.baidu.com4"));
-			
-			client.DownloadStringCompleted_addEventListener(downloadcomplet);
-			client.downloadStringAsync( new Uri( "http://www.baidu.com"));
-			
-			client.cancelAsync();
+			var md5:MD5CryptoServiceProvider = new MD5CryptoServiceProvider();
 			
 			
-			var arr:_Array_ = _Array_.createInstance(int, 30);
-			arr[0] = 5;
-			arr[3] = 6;
 			
-			for each (var i in arr) 
+			var bytes:_Array_ = Encoding.UTF8.getBytes___("md5testttt");
+			
+			var ms:MemoryStream = MemoryStream.constructor__(bytes); 
+			
+			var md5bytes= md5.computeHash(ms);
+			
+			for each (var c:Byte in md5bytes) 
 			{
-				trace(i);
+				trace( c.toString___("X2") );
 			}
 			
-			
-			
-			client.dispose();
-			
+			ms.close();
 		}
 		
-		private function downloadcomplet(sender,args:DownloadStringCompletedEventArgs)
-		{
-			WebClient(sender).DownloadStringCompleted_removeEventListener(downloadcomplet);
-			
-			
-			trace(args.cancelled);
-			if(!args.cancelled)
-				trace(args.result);
-			WebClient(sender).dispose();
-		}
 	}
 	
 
