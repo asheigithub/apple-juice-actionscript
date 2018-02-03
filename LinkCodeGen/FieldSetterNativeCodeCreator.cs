@@ -49,7 +49,7 @@ namespace LinkCodeGen
 
 			if (type.IsValueType) //结构体，需要重新赋值回去
 			{
-				string replacethis = "((LinkObj<"+ type.FullName +">)((ASBinCode.rtData.rtObjectBase) thisObj).value).value = _this;";
+				string replacethis = "((LinkObj<"+ GetTypeFullName( type) +">)((ASBinCode.rtData.rtObjectBase) thisObj).value).value = _this;";
 				funccode = funccode.Replace("[replacethis]", replacethis);
 			}
 			else

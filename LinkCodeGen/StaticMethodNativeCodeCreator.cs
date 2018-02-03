@@ -27,12 +27,24 @@ namespace LinkCodeGen
 				paras[0] = new myparainfo(paras[1], 0);
 				paras[1] = new myparainfo(temp, 1);
 			}
-			
+
+
+			int paracount = paras.Length;
+			bool hasref = false;
+			foreach (var item in paras)
+			{
+				if (item.ParameterType.IsByRef)
+				{
+					paracount += 1;
+					hasref = true;
+					break;
+				}
+			}
 
 			string funccode = Properties.Resources.StaticMethodFunc;
 
 				funccode = funccode.Replace("[classname]", classname);
-				funccode = funccode.Replace("[paracount]", paras.Length.ToString());
+				funccode = funccode.Replace("[paracount]", paracount.ToString());
 
 				string pushparas = string.Empty;
 
@@ -42,6 +54,11 @@ namespace LinkCodeGen
 
 					pushparas = pushparas + "\t\t\t\t" + string.Format("para.Add({0});\n", GetAS3RuntimeTypeString(para.ParameterType));
 
+				}
+
+				if (hasref)
+				{
+					pushparas = pushparas + "\t\t\t\t" + string.Format("para.Add({0});\n", GetAS3RuntimeTypeString(typeof(ASRuntime.nativefuncs.linksystem.RefOutStore)));
 				}
 
 				funccode = funccode.Replace("[pushparas]", pushparas);
@@ -58,8 +75,13 @@ namespace LinkCodeGen
 
 
 				}
+			if (hasref)
+			{
+				loadargs = loadargs + GetLoadArgementString(typeof(ASRuntime.nativefuncs.linksystem.RefOutStore), paras.Length);
+				loadargs = loadargs + "\n";
+			}
 
-				funccode = funccode.Replace("[loadargement]", loadargs);
+			funccode = funccode.Replace("[loadargement]", loadargs);
 
 				var rettype = GetAS3Runtimetype(method.ReturnType);
 				if (rettype == ASBinCode.RunTimeDataType.fun_void)
@@ -174,7 +196,39 @@ namespace LinkCodeGen
 					funccode = funccode.Replace("[storeresult]", "代码生成错误，不能转换返回类型");
 				}
 
-				return funccode;
+
+			if (!hasref)
+			{
+				funccode = funccode.Replace("[storeref]", string.Empty);
+			}
+			else
+			{
+				string storetemplate = @"
+					if (arg[storeidx] != null)
+					{
+						arg[storeidx].SetValue(functionDefine.signature.parameters[[argidx]].name, arg[argidx]);
+					}
+";
+
+				string toreplace = @"
+					if (arg[storeidx] != null)
+					{
+						arg[storeidx].Clear();
+					}
+"; ;
+				toreplace = toreplace.Replace("[storeidx]", paras.Length.ToString());
+				for (int i = 0; i < paras.Length; i++)
+				{
+					if (paras[i].ParameterType.IsByRef)
+					{
+						toreplace += storetemplate.Replace("[storeidx]", paras.Length.ToString()).Replace("[argidx]", i.ToString());
+					}
+				}
+
+				funccode = funccode.Replace("[storeref]", toreplace);
+			}
+
+			return funccode;
 			
 		}
 

@@ -176,7 +176,7 @@ namespace LinkCodeGen.Properties {
         ///				get
         ///				{
         ///					return para;
-        ///			 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string DelegateCtor {
             get {
@@ -390,7 +390,7 @@ namespace LinkCodeGen.Properties {
         }
         
         /// <summary>
-        ///   查找类似 		class [classname] : NativeConstParameterFunction
+        ///   查找类似 		class [classname] : NativeConstParameterFunction,IMethodGetter
         ///		{
         ///			public [classname]() : base([paracount])
         ///			{
@@ -423,7 +423,7 @@ namespace LinkCodeGen.Properties {
         ///				}
         ///			}
         ///
-        ///			public over [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string IMethodGetterMethodFunc {
             get {

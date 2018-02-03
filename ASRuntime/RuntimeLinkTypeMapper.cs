@@ -568,6 +568,7 @@ namespace ASRuntime
 
 
 
+
 		/// <summary>
 		/// 定义AS3的Class到Type的链接
 		/// </summary>
@@ -576,30 +577,30 @@ namespace ASRuntime
 			public readonly RunTimeDataType rttype;
 			public readonly Type linktype;
 
-			public AS3Class_Type(RunTimeDataType rttype,Type linktype )
+			public AS3Class_Type(RunTimeDataType rttype, Type linktype)
 			{
 				this.rttype = rttype;
 				this.linktype = linktype;
 			}
 
 
-			public override Guid GUID => linktype.GUID;
+			public override Guid GUID { get { return linktype.GUID; } }
 
-			public override Module Module => linktype.Module;
+			public override Module Module { get { return linktype.Module; } }
 
-			public override Assembly Assembly => linktype.Assembly;
+			public override Assembly Assembly { get { return linktype.Assembly; } }
 
-			public override string FullName => linktype.FullName;
+			public override string FullName { get { return linktype.FullName; } }
 
-			public override string Namespace => linktype.Namespace;
+			public override string Namespace { get { return linktype.Namespace; } }
 
-			public override string AssemblyQualifiedName => linktype.AssemblyQualifiedName;
+			public override string AssemblyQualifiedName { get { return linktype.AssemblyQualifiedName; } }
 
-			public override Type BaseType => null;
+			public override Type BaseType { get { return null; } }
 
-			public override Type UnderlyingSystemType => linktype.UnderlyingSystemType;
+			public override Type UnderlyingSystemType { get { return linktype.UnderlyingSystemType; } }
 
-			public override string Name =>linktype.Name;
+			public override string Name { get { return linktype.Name; } }
 
 			public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
 			{

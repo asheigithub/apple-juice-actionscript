@@ -201,12 +201,24 @@ namespace ASRuntime.operators
         {
             if (toCallFunc.isNative)
             {
-                if (toCallFunc.native_index < 0)
-                {
-                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-                }
-                var nf = player.swc.nativefunctions[toCallFunc.native_index];
-                nf.bin = player.swc;
+				//if (toCallFunc.native_index < 0)
+				//{
+				//    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+				//}
+				//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				var nf = player.swc.getNativeFunction(toCallFunc.functionid);
+				if (nf == null)
+				{
+					invokerFrame.throwAneException(token, "函数 " + toCallFunc.name + "([" + toCallFunc.native_name + "])" + "的本地代码没找到");
+					invokerFrame.endStep();
+					if (callbacker != null)
+					{
+						callbacker.noticeRunFailed();
+					}
+					release();
+					return false;
+				}
+				nf.bin = player.swc;
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
 					nativefuncs.NativeConstParameterFunction func = ((nativefuncs.NativeConstParameterFunction)nf);

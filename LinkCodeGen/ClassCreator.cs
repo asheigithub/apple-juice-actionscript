@@ -141,6 +141,7 @@ namespace LinkCodeGen
 			foreach (var method in type.GetMethods())
 			{
 				
+
 				if (!method.DeclaringType.Equals(type)
 					)
 				{
@@ -188,19 +189,19 @@ namespace LinkCodeGen
 				var paras = method.GetParameters();
 				foreach (var p in paras)
 				{
-					if (p.IsOut)
+					if (p.IsOut && (method.IsSpecialName || IsDelegate(type)))
 					{
 						Console.WriteLine(method.ToString() + "参数" + p.Position + " " + p + "为out,跳过");
 						parachecked = false;
 						break;
 					}
-					if (p.ParameterType.IsByRef)
+					if (p.ParameterType.IsByRef && (method.IsSpecialName || IsDelegate(type)))
 					{
 						Console.WriteLine(method.ToString() + "参数" + p.Position + " " + p + "为byref,跳过");
 						parachecked = false;
 						break;
 					}
-					//if (p.ParameterType.IsGenericType)
+
 					if (p.ParameterType.IsGenericTypeDefinition)
 					{
 						Console.WriteLine(method.ToString() + "参数" + p.Position + " " + p + "为泛型,跳过");
@@ -222,7 +223,7 @@ namespace LinkCodeGen
 						}
 					}
 
-					if (IsSkipType(p.ParameterType))
+					if (IsSkipType(p.ParameterType,true))
 					{
 						Console.WriteLine(method.ToString() + "参数" + p.Position + " " + p + "被配置为需要跳过");
 						parachecked = false;
@@ -258,6 +259,10 @@ namespace LinkCodeGen
 			var ctors = type.GetConstructors();
 			foreach (var ctor in ctors)
 			{
+				if (type.IsAbstract)
+				{
+					continue;
+				}
 				if (!ctor.DeclaringType.Equals(type))
 				{
 					continue;
@@ -542,7 +547,7 @@ namespace LinkCodeGen
 				//[creator];
 				//[native, _system_ArrayList_creator_]
 				//private static function _creator(type:Class):*;
-				if (!(type.IsAbstract && type.IsSealed))
+				if (!(type.GetConstructors().Length==0 && type.IsSealed && type.IsClass))
 				{
 					regfunctions.Add(
 					"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\"" + GetCreatorNativeFuncName(type) + "\", default(" +NativeCodeCreatorBase.GetTypeFullName( type) + ")));");
@@ -1157,8 +1162,8 @@ namespace LinkCodeGen
 						foreach (var item in paras)
 						{
 							as3api.Append("\t\t*  " + item.Name );
-
-							as3api.Append(" : " + System.Security.SecurityElement.Escape( NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&"," &").Replace(";","; "));
+							
+							as3api.Append(" : " + ((item.IsOut && item.ParameterType.IsByRef)?"(Out)": (item.ParameterType.IsByRef?"(ByRef) ":""))+ System.Security.SecurityElement.Escape( NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&"," &").Replace(";","; "));
 
 							if (IsDelegate(item.ParameterType))
 							{
@@ -1808,7 +1813,7 @@ namespace LinkCodeGen
 					paras[1] = temp;
 				}
 			}
-
+			bool hasref = false;
 			for (int i = 0; i < paras.Length; i++)
 			{
 				var para = paras[i];
@@ -1816,6 +1821,11 @@ namespace LinkCodeGen
 				as3api.Append(":");
 
 				as3api.Append(GetAS3TypeString(para.ParameterType, typeimports,null,method,para ));
+
+				if (para.ParameterType.IsByRef)
+				{
+					hasref = true;
+				}
 
 				if (para.IsOptional)
 				{
@@ -1849,6 +1859,12 @@ namespace LinkCodeGen
 				}
 
 			}
+
+			if (hasref)
+			{
+				as3api.Append(",refout:as3runtime.RefOutStore");
+			}
+
 
 			as3api.Append(")");
 			if (!string.IsNullOrEmpty(returntype))

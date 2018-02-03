@@ -232,6 +232,7 @@ namespace ASCompiler.compiler
 			{
 				bin = new CSWC();
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
+				ASRuntime.nativefuncs.BuildInFunctionLoader.LoadBuildLinkSystemObjectFunctions(bin);
 
 				//基础库编译
 				lib = Grammar.makeLibProj();

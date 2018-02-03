@@ -58,6 +58,29 @@ namespace LinkCodeGen
 			}
 		}
 
+		public static String GetOutKeyWord(ParameterInfo parameter,MethodInfo method)
+		{
+			if (!parameter.ParameterType.IsByRef)
+			{
+				return "";
+			}
+
+			//if (method.Name == "ReadBlock" && method.DeclaringType.FullName == "System.IO.TextReader" && parameter.Name=="buffer")
+			//{
+			//	return "";
+			//}
+			//if (method.Name == "Read" && method.DeclaringType.FullName == "System.IO.TextReader" && parameter.Name == "buffer")
+			//{
+			//	return "";
+			//}
+			//if (method.Name == "Read" && method.DeclaringType.FullName == "System.IO.Stream" && parameter.Name == "buffer")
+			//{
+			//	return "";
+			//}
+
+			return "out";
+		}
+
 
 		public static bool IsDelegate(Type d)
 		{
@@ -178,7 +201,7 @@ namespace LinkCodeGen
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static bool IsSkipType(Type type)
+		public static bool IsSkipType(Type type,bool includeref=false)
 		{
 			if (type == null)
 				return true;
@@ -188,9 +211,23 @@ namespace LinkCodeGen
 				return false;
 			}
 
+			if (type.IsCOMObject)
+			{
+				return true;
+			}
+
 
 			if (type.IsByRef)
-				return true;
+			{
+				if (!includeref)
+				{
+					return true;
+				}
+				else if(type.HasElementType)
+				{
+					return IsSkipType(type.GetElementType());
+				}
+			}
 
 			if (type.IsNotPublic)
 			{
@@ -525,6 +562,15 @@ namespace LinkCodeGen
 
 		public string GetAS3TypeString(Type type, Dictionary<Type, string> typeimports,Type checktype,System.Reflection.MethodBase checkmethod,System.Reflection.ParameterInfo checkparameter)
 		{
+			if (type.IsByRef)
+			{
+				if (!typeimports.ContainsValue("import as3runtime.RefOutStore;"))
+				{
+					typeimports.Add(typeof(ASRuntime.nativefuncs.linksystem.RefOutStore), "import as3runtime.RefOutStore;");
+				}
+				return GetAS3TypeString(type.GetElementType(), typeimports, checktype, checkmethod, checkparameter);
+			}
+
 			if (checkparameter != null)
 			{
 

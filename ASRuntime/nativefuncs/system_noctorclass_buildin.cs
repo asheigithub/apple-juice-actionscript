@@ -12,13 +12,13 @@ namespace ASRuntime.nativefuncs
 	/// </summary>
 	class system_noctorclass_buildin : ASRuntime.nativefuncs.NativeConstParameterFunction
 	{
-		public system_noctorclass_buildin():base(0)
+		public system_noctorclass_buildin() : base(0)
 		{
 			para = new List<RunTimeDataType>();
 		}
 
 
-		public override string name => "$$_noctorclass";
+		public override string name { get { return "$$_noctorclass"; } }
 
 		List<RunTimeDataType> para;
 		public override List<RunTimeDataType> parameters
@@ -29,9 +29,9 @@ namespace ASRuntime.nativefuncs
 			}
 		}
 
-		public override RunTimeDataType returnType => RunTimeDataType.rt_void;
+		public override RunTimeDataType returnType { get { return RunTimeDataType.rt_void; } }
 
-		public override bool isMethod => true;
+		public override bool isMethod { get { return true; } }
 
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{

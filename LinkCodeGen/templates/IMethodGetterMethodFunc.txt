@@ -48,6 +48,7 @@
 				{
 [loadargement]
 					[storeresult]
+					[storeref]
 					success = true;
 				}
 				catch (ASRunTimeException tlc)

@@ -210,7 +210,46 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new system_enum_valueOf());
 			bin.regNativeFunction(new system_noctorclass_buildin());
 
-			MulitCastDelegate_buildin.regNativeFunctions(bin);
+		}
+
+		public static void LoadBuildLinkSystemObjectFunctions(ASBinCode.CSWC bin)
+		{
+			bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Object_creator__", default(object)));
+			bin.regNativeFunction(new linksystem.system_object_ctor());
+			bin.regNativeFunction(LinkSystem_Buildin.getToString("_system_Object_toString"));
+			bin.regNativeFunction(LinkSystem_Buildin.getGetHashCode("_system_Object_getHashCode"));
+			bin.regNativeFunction(LinkSystem_Buildin.getEquals("_system_Object_equals"));
+			bin.regNativeFunction(new linksystem.system_Object_explicit_from());
+			bin.regNativeFunction(new linksystem.object_static_equals());
+			bin.regNativeFunction(new linksystem.object_static_referenceEquals());
+
+
+			linksystem.system_collections_interface.regNativeFunctions(bin);
+			linksystem.system_arrays_buildin.regNativeFunctions(bin);
+			linksystem.system_collections_hashtable_buildin.regNativeFunctions(bin);
+			linksystem.system_collections_arraylist_buildin.regNativeFunctions(bin);
+			linksystem.system_collections_stack_buildin.regNativeFunctions(bin);
+			linksystem.system_collections_queue_buildin.regNativeFunctions(bin);
+
+			linksystem.system_ICloneable_buildin.regNativeFunctions(bin);
+
+			linksystem.system_byte_buildin.regNativeFunctions(bin);
+			linksystem.system_char_buildin.regNativeFunctions(bin);
+
+
+			linksystem.system_sbyte_buildin.regNativeFunctions(bin);
+			linksystem.system_uint64_buildin.regNativeFunctions(bin);
+
+			bin.regNativeFunction(new linksystem.system_int64_explicit_from());
+			bin.regNativeFunction(new linksystem.system_int64_implicit_from());
+			bin.regNativeFunction(new linksystem.system_int64_ctor());
+			bin.regNativeFunction(new linksystem.system_int64_valueOf());
+
+
+			linksystem.MulitCastDelegate_buildin.regNativeFunctions(bin);
+
+			linksystem.as3runtime_RefOutStore_buildin.regNativeFunctions(bin);
+
 		}
 
 	}

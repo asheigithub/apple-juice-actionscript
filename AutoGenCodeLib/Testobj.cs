@@ -4,8 +4,18 @@ using System.Text;
 
 namespace AutoGenCodeLib
 {
+	//public static class TestObjExtends
+	//{
+	//	public static string abc(this Testobj testobj,string abc)
+	//	{
+	//		return "extabc";
+	//	}
+	//}
+
     public class Testobj
 	{
+		
+
 		//public static Testobj Ins=new Testobj();
 
 		//public static long longvalue;
@@ -111,25 +121,34 @@ namespace AutoGenCodeLib
 		//	Console.WriteLine(type.)
 		//}
 
-		public class innerClass
-		{
+		//public class innerClass
+		//{
 
-		}
+		//}
 
-		public innerClass nc=new innerClass();
+		//public innerClass nc=new innerClass();
 
 
 		public delegate int TESTHandler<T>(string v1,int v2,T v3);
 
-		public TESTHandler<long> handler;// = (v1,v2,v3)=> { return 98765; };
+		public TESTHandler<float> handler;// = (v1,v2,v3)=> { return 98765; };
 
 
-		public int DoHandler(string v1,int v2,long v3)
+		public void read(ref byte[] buffer)
+		{
+
+		}
+
+
+		public int DoHandler(string v1,int v2,float v3)
 		{
 			return int.Parse(v1) + v2 + (int)v3;
 		}
 
-
+		public static void test(out int t2)
+		{
+			t2 = 100;
+		}
 
 
 		public Type TestType(Type type)
@@ -167,3 +186,4 @@ namespace AutoGenCodeLib
 		
 	}
 }
+

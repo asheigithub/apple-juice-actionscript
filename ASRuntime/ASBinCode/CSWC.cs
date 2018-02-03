@@ -149,13 +149,21 @@ namespace ASBinCode
         }
 
         public NativeFunctionBase getNativeFunction(int funcitonid)
-        {
-            var define = functions[funcitonid];
-            if (define.native_index == -1)
-            {
-                define.native_index = nativefunctionNameIndex[define.native_name];
-            }
-            return nativefunctions[define.native_index];
+        {	
+			var define = functions[funcitonid];
+			if (define.native_index == -1)
+			{
+				int nidx;
+				if (nativefunctionNameIndex.TryGetValue(define.native_name, out nidx))
+				{
+					define.native_index = nidx;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			return nativefunctions[define.native_index]; 
         }
 
 

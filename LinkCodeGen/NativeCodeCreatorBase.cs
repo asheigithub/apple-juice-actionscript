@@ -9,6 +9,11 @@ namespace LinkCodeGen
 	{
 		public static string GetAS3RuntimeTypeString(Type type)
 		{
+			if (type.IsByRef)
+			{
+				return GetAS3RuntimeTypeString(type.GetElementType());
+			}
+
 			if (type.Equals(typeof(void)))
 			{
 				return "RunTimeDataType.fun_void";
@@ -111,6 +116,13 @@ namespace LinkCodeGen
 
 		protected string GetLoadArgementString(Type parameterType,int position)
 		{
+			bool isbyRef=false;
+			if (parameterType.IsByRef)
+			{
+				isbyRef = true;
+				parameterType = parameterType.GetElementType();
+			}
+
 			var rttype = GetAS3Runtimetype(parameterType);
 
 			if (rttype > ASBinCode.RunTimeDataType.unknown)
@@ -169,6 +181,11 @@ namespace LinkCodeGen
 
 		public static string GetTypeFullName(Type type)
 		{
+			if (type.IsByRef)
+			{
+				return GetTypeFullName(type.GetElementType());
+			}
+
 			string pre = string.Empty;
 			if (type.IsNested)
 			{
@@ -191,7 +208,7 @@ namespace LinkCodeGen
 					}
 				}
 				int idx = type.Name.IndexOf("`");
-				string part1 = ns+ type.Name.Substring(0, idx);
+				string part1 = ns + type.Name.Substring(0, idx);
 
 				part1 = part1 + "<";
 
@@ -206,19 +223,29 @@ namespace LinkCodeGen
 				}
 
 				part1 += ">";
-				return pre + part1;
+
+				string result = pre + part1;
+
+				return result;
+			}
+			else if (type.IsArray)
+			{
+				string result=GetTypeFullName(type.GetElementType()) + "[]";
+				return result;
 			}
 			else
 			{
 				if (string.IsNullOrEmpty(pre))
 				{
-					return type.FullName;
+					string result = type.FullName;
+					return result;
 				}
 				else
 				{
-					return pre + type.Name;
+					string result = pre + type.Name;
+					return result;
 				}
-				
+
 			}
 		}
 

@@ -4119,6 +4119,11 @@ namespace ASRuntime
 					if (functiondefine.isNative)
 					{
 						var nativefunction = swc.getNativeFunction(function.functionId);
+						if (nativefunction == null)
+						{
+							throw new ASRunTimeException("函数" + functiondefine.name + "([" + functiondefine.native_name + "])" + "的本地代码没找到", stackTrace(0));
+						}
+
 
 						nativefuncs.IMethodGetter methodGetter = nativefunction as nativefuncs.IMethodGetter;
 						if (methodGetter != null)

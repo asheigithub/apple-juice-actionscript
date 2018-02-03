@@ -263,7 +263,7 @@ namespace LinkCodeGen
 		{
 			if (method.IsSpecialName && method.Name.StartsWith("op_"))
 			{
-				storeresult = storeresult.Substring(0, storeresult.LastIndexOf(methodAtType.FullName));
+				storeresult = storeresult.Substring(0, storeresult.LastIndexOf( GetTypeFullName( methodAtType)));
 
 				string op = method.Name.Substring(3);
 
@@ -414,7 +414,18 @@ namespace LinkCodeGen
 
 			for (int i = 0; i < paras.Length; i++)
 			{
-				storeresult += string.Format("({0})arg{1}", GetTypeFullName( paras[i].ParameterType), i);
+				if (paras[i].IsOut)
+				{
+					storeresult += string.Format( CreatorBase.GetOutKeyWord(paras[i],method) + " arg{0}", i);
+				}
+				else if (paras[i].ParameterType.IsByRef)
+				{
+					storeresult += string.Format("ref arg{0}", i);
+				}
+				else
+				{
+					storeresult += string.Format("({0})arg{1}", GetTypeFullName(paras[i].ParameterType), i);
+				}
 				if (i < paras.Length - 1)
 				{
 					storeresult += ",";

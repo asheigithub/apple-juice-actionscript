@@ -69,13 +69,13 @@ namespace ASRuntime.nativefuncs
 			para.Add(RunTimeDataType.rt_void);
 		}
 
-		public override string name => fn;
+		public override string name { get { return fn; } }
 
-		public override List<RunTimeDataType> parameters => para;
+		public override List<RunTimeDataType> parameters { get { return para; } }
 
-		public override RunTimeDataType returnType => RunTimeDataType.rt_void;
+		public override RunTimeDataType returnType { get { return RunTimeDataType.rt_void; } }
 
-		public override bool isMethod => true;
+		public override bool isMethod { get { return true; } }
 
 		public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
 		{

@@ -111,13 +111,18 @@ namespace LinkCodeGen
 					}
 				}
 			}
-			//var classtype = typeof(AppDomain);
+			//var classtype = typeof(AutoGenCodeLib.Testobj);
 			//if (!creators.ContainsKey(classtype))
 			//{
 			//	creators.Add(classtype, null);
 			//	creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
 			//}
-
+			//var classtype = typeof(ICloneable);
+			//if (!creators.ContainsKey(classtype))
+			//{
+			//	creators.Add(classtype, null);
+			//	creators[classtype] = new InterfaceCreator(classtype, "", "", creators, "ASCTest.regNativeFunctions");
+			//}
 
 			using (System.IO.FileStream fs=new System.IO.FileStream("codeoutput.cs", System.IO.FileMode.Create))
 			{
@@ -132,7 +137,7 @@ namespace LinkCodeGen
 					regclassSb.AppendLine("using System.Collections.Generic;");
 					regclassSb.AppendLine("using System.Text;");
 					regclassSb.AppendLine("using ASBinCode;");
-					regclassSb.AppendLine("using ASCTest.regNativeFunctions;");
+					//regclassSb.AppendLine("using ASCTest.regNativeFunctions;");
 					regclassSb.AppendLine("using ASRuntime.nativefuncs;");
 
 					regclassSb.AppendLine("namespace ASCTest");
