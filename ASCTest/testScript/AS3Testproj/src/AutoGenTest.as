@@ -11,6 +11,9 @@ package
 	import system.UInt64;
 	import system._Array_;
 	import system._Object_;
+	import system.collections.IEnumerable;
+	import system.collections.IEnumerator;
+	import system.collections._IEnumerator_;
 	import system.io.MemoryStream;
 	import system.security.cryptography.MD5;
 	import system.security.cryptography.MD5CryptoServiceProvider;
@@ -21,12 +24,56 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class AutoGenTest extends Sprite 
+	public class AutoGenTest extends Sprite implements IEnumerable
 	{
+		/* INTERFACE system.collections.IEnumerable */
+		
+		public function getEnumerator():IEnumerator 
+		{
+			return yieldload();
+		}
+		
+		private function yieldload()
+		{
+			yield return 1;
+			yield return 2;
+			yield return 3;
+			
+			function nestedyield()
+			{
+				yield return "n1";
+				yield return "n2";
+				
+			}
+			
+			for each (var i in nestedyield()) 
+			{
+				yield return i;
+			}
+			
+			yield return "yield hahaha";
+			
+			
+			
+		}
 		
 		public function AutoGenTest() 
 		{
+			var it:Iterator = //Iterator( _Array_.createInstance(int,10) ); 
+							  Iterator( this) ;
 			
+			trace(it);
+			
+			
+			for each (var i in it) 
+			{
+				trace(i);
+			}
+			
+			
+			var o = _Object_(5);
+			
+			trace(o);
 			
 			var md5:MD5CryptoServiceProvider = new MD5CryptoServiceProvider();
 			
@@ -86,6 +133,9 @@ package
 			return count;
 			
 		}
+		
+		
+		
 		
 		
 	}

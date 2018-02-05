@@ -16,11 +16,16 @@ package system
 		[native, _system_Object_ctor];
 		public function _Object_();
 		
+		/**
+		 * 将任意对象封装成.net Object对象。
+		 * 同强制类型转换 _Object_(v:*)
+		 */
 		[native, _system_Object_explicit_from_];
-		public static function createObject(v:*):_Object_;
+		public static function boxAnyToObject(v:*):_Object_;
 		
-		
-		
+		[operator, "op_explicit"];
+		[native, _system_Object_explicit_from_];
+		private static function op_explicit(v:*):_Object_;
 		
 		[native,_system_Object_static_equals]
 		public static function equals(objA:_Object_,objB:_Object_):Boolean;

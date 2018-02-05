@@ -32,8 +32,8 @@ namespace ASCTest
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\amd";
-				path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src";
+									   //path = @"../..\testScript\AS3Testproj\amd";
+				path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -88,7 +88,7 @@ namespace ASCTest
 
 			//*********加入API*****
 			{
-				string apidir = @"F:\ASTool\LinkCodeGen\bin\Debug\as3api";
+				string apidir = @"../../..\LinkCodeGen\bin\Debug\as3api";
 				if (System.IO.Directory.Exists(apidir))
 				{
 					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);

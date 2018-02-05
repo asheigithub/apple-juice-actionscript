@@ -14,7 +14,36 @@ namespace ASRuntime.operators
         {
             var v1 = step.arg1.getValue(scope, frame);
 
-            if (step.regType == RunTimeDataType.rt_void)
+			//***检查类型转换函数****
+			var f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.op_explicit,
+			   v1.rtType, step.regType);
+
+			if (f == null) //查找是否有任意类型转换到目标类型
+			{
+				f = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.op_explicit,
+					RunTimeDataType.rt_void, step.regType);
+			}
+
+			if (f != null)
+			{
+				FunctionCaller fc = frame.player.funcCallerPool.create(frame, step.token);
+				fc.SetFunction(f);
+				fc.loadDefineFromFunction();
+				if (!fc.createParaScope())
+				{
+					return;
+				}
+
+				//fc.releaseAfterCall = true;
+
+				bool success;
+				fc.pushParameter(v1, 0, out success);
+				fc.returnSlot = step.reg.getSlot(scope, frame);
+				fc.callbacker = fc;
+				fc.call();
+
+			}
+			else if (step.regType == RunTimeDataType.rt_void)
             {
                 step.reg.getSlot(scope, frame).directSet(v1);
 				//frame.endStep(step);
@@ -214,7 +243,36 @@ namespace ASRuntime.operators
             bool igrionValueOf
             )
         {
-            if ((srcValue.rtType < ASBinCode.RunTimeDataType._OBJECT || igrionValueOf) && targetType < ASBinCode.RunTimeDataType._OBJECT)
+			
+			//***检查类型转换函数****
+			var cf = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.op_explicit,
+			   srcValue.rtType, targetType);
+
+			if (cf == null) //查找是否有任意类型转换到目标类型
+			{
+				cf = frame.player.swc.operatorOverrides.getOperatorFunction(OverrideableOperator.op_explicit,
+					RunTimeDataType.rt_void, targetType);
+			}
+			if (cf != null)
+			{
+				FunctionCaller fc = frame.player.funcCallerPool.create(frame, token);
+				fc.SetFunction(cf);
+				fc.loadDefineFromFunction();
+				if (!fc.createParaScope())
+				{
+					callbacker.noticeRunFailed();
+					return;
+				}
+
+				bool success;
+				fc.pushParameter(srcValue, 0, out success);
+				fc.returnSlot = storeto;
+				fc.callbacker = callbacker;
+				
+				fc.call();
+
+			}
+			else if ((srcValue.rtType < ASBinCode.RunTimeDataType._OBJECT || igrionValueOf) && targetType < ASBinCode.RunTimeDataType._OBJECT)
             {
                 if (CastPrimitive_to_Primitive(targetType, srcValue, storeto, frame, token))
                 {

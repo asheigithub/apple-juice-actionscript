@@ -3291,7 +3291,7 @@ namespace ASRuntime
 
 		#region getMethod
 
-		private rtFunction getMethod(rtObjectBase thisObj, string name)
+		internal rtFunction getMethod(rtObjectBase thisObj, string name)
 		{
 			//if (currentRunFrame != null)
 			//	throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3594,6 +3594,11 @@ namespace ASRuntime
 
 		internal object InvokeFunctionWapper(FunctionWapper wapper, int argcount, object v1, object v2, object v3, object v4, object v5, object[] args)
 		{
+			return InvokeFunction(wapper.function, argcount, v1, v2, v3, v4, v5, args);
+		}
+
+		internal object InvokeFunction(rtFunction function, int argcount, object v1, object v2, object v3, object v4, object v5, object[] args)
+		{
 
 			lock (this)
 			{
@@ -3606,7 +3611,7 @@ namespace ASRuntime
 
 				try
 				{
-					var method = wapper.function;
+					var method = function;
 
 					int startOffset = currentRunFrame.baseBottomSlotIndex + argcount;
 					if (startOffset + swc.blocks[swc.functions[method.functionId].blockid].totalStackSlots + 1 + 1 >= STACKSLOTLENGTH || !stackframePool.hasCacheObj())
@@ -3730,14 +3735,32 @@ namespace ASRuntime
 						return rtUndefined.undefined;
 					}
 
-					object obj;
-					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
+					Type rttype=null;
+					try
 					{
-						return convertReturnValue(obj);
+						rttype = linktypemapper.getLinkType(signature.returnType);
+					}
+					catch (RuntimeLinkTypeMapper.TypeLinkClassException)
+					{
+
+					}
+
+
+					object obj;
+					if (rttype != null)
+					{
+						if (linktypemapper.rtValueToLinkObject(v, rttype, swc, true, out obj))
+						{
+							return convertReturnValue(obj);
+						}
+						else
+						{
+							throw new ASRunTimeException("返回值转化失败", string.Empty);
+						}
 					}
 					else
 					{
-						throw new ASRunTimeException("返回值转化失败", string.Empty);
+						return convertReturnValue(v);
 					}
 				}
 				catch (Exception ex)
@@ -3760,7 +3783,7 @@ namespace ASRuntime
 				}
 
 
-				
+
 
 			}
 
@@ -4206,7 +4229,15 @@ namespace ASRuntime
 
 		}
 
-
+		/// <summary>
+		/// 将可枚举对象包装成IEnumerator
+		/// </summary>
+		/// <param name="v"></param>
+		/// <returns></returns>
+		public System.Collections.IEnumerator WapperIterator(ASBinCode.RunTimeValueBase v)
+		{
+			return new ASRuntime.nativefuncs.linksystem.Iterator(v, this);
+		}
 
 		#endregion
 

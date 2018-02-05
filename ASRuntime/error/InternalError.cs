@@ -100,6 +100,47 @@ namespace ASRuntime.error
 							((rtObjectBase)errorValue).value.memberData[3].getValue().ToString();
 					}
 				}
+				else if(callStack !=null)
+				{
+					StringBuilder sb = new StringBuilder();
+
+					var toget = new List<ASRuntime.FrameInfo>(callStack);
+					toget.Reverse();
+
+					foreach (var item in toget)
+					{					
+						if (item.block.instructions.Length ==0 )
+						{
+							continue;
+						}
+
+						if (item.codeLinePtr < item.block.instructions.Length)
+						{
+							sb.Append("\tat ");
+							sb.Append(item.block.name);
+							sb.Append(" [");
+							sb.Append(item.block.instructions[item.codeLinePtr].token.sourceFile);
+							sb.Append(" ");
+							sb.Append(item.block.instructions[item.codeLinePtr].token.line + 1);
+							sb.Append(" ptr:");
+							sb.Append(item.block.instructions[item.codeLinePtr].token.ptr + 1);
+							sb.Append("]");
+							sb.AppendLine();
+						}
+						else
+						{
+							sb.Append("\tat ");
+							sb.AppendLine(item.block.name);
+						}
+
+
+					}
+
+
+
+					errinfo = sb.ToString();
+					
+				}
 
 				return  "\t"+errinfo;
 			}

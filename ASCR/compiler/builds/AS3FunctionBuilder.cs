@@ -2025,6 +2025,53 @@ namespace ASCompiler.compiler.builds
 											#endregion
 
 										}
+										else if (operatorCode == "op_explicit")
+										{
+											#region op_explict 前置类型转换 T1(T2)
+
+											if (function.signature.parameters[0].defaultValue != null
+													||
+													function.signature.parameters[0].isPara
+													)
+											{
+												throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+													 "操作符op_explicit参数不能有默认值，也不能是不固定数量");
+											}
+											if (function.signature.parameters[0].type > RunTimeDataType.unknown
+												)
+											{
+												var cls = builder.getClassByRunTimeDataType(function.signature.parameters[0].type);
+												if (cls.staticClass == null)//|| !cls.final)
+												{
+													throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+														 "操作符op_explicit参数类型必须不是Class");
+												}
+											}
+											
+											if (function.signature.returnType != iclass.instanceClass.getRtType()
+												)
+											{
+												throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+														 "操作符op_explicit返回类型类型必须是定义它的类型:" + iclass.ToString());
+											}
+
+											if (builder.bin.operatorOverrides.getOperatorFunction(OverrideableOperator.op_explicit,
+												function.signature.parameters[0].type,
+												function.signature.returnType
+												) == null
+												)
+											{
+												builder.bin.operatorOverrides.AddOperatorFunction(OverrideableOperator.op_explicit, function);
+											}
+											else
+											{
+												throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
+														 "重复的重载操作符op_explicit函数.");
+											}
+
+
+											#endregion
+										}
 										else
 										{
 											throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,

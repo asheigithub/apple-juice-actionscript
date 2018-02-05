@@ -180,9 +180,26 @@ namespace ASRuntime.operators
             IEnumerator<RunTimeValueBase> enumerator = saveObj.hosted_object as IEnumerator<RunTimeValueBase>;
 
 
-            if ( enumerator !=null && enumerator.MoveNext() )//slot.cache_enumerator !=null && slot.cache_enumerator.MoveNext())
+            if ( enumerator !=null )//&& enumerator.MoveNext() )//slot.cache_enumerator !=null && slot.cache_enumerator.MoveNext())
             {
-                step.reg.getSlot(scope, frame).setValue(rtBoolean.True);
+				try
+				{
+					if (enumerator.MoveNext())
+					{
+						step.reg.getSlot(scope, frame).setValue(rtBoolean.True);
+					}
+					else
+					{
+						step.reg.getSlot(scope, frame).setValue(rtBoolean.False);
+					}
+				}
+				catch (ASRunTimeException ex)
+				{
+					step.reg.getSlot(scope, frame).setValue(rtBoolean.False);
+					frame.throwAneException(step.token, ex.Message +"\n"+ ex.AS3StackTrace);
+					return;
+				}
+				
             }
             else
             {

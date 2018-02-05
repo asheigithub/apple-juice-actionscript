@@ -66,7 +66,12 @@ namespace ASBinCode
         /// </summary>
         bitOr=14,
 
-    }
+		/// <summary>
+		/// op_explicit 强制类型转换
+		/// </summary>
+		op_explicit = 15,
+
+	}
 
     public struct OperatorFunctionKey : IEquatable<OperatorFunctionKey>
     {
@@ -156,7 +161,7 @@ namespace ASBinCode
 
         public OperatorFunctions()
         {
-            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.bitOr+1];
+            operFunctions = new Dictionary<OperatorFunctionKey, DefineAndFunc>[(int)OverrideableOperator.op_explicit+1];
             for (int i = 0; i < operFunctions.Length; i++)
             {
                 operFunctions[i] = new Dictionary<OperatorFunctionKey, DefineAndFunc>();
@@ -167,23 +172,31 @@ namespace ASBinCode
         public void AddOperatorFunction(OverrideableOperator operCode,rtti.FunctionDefine function)
         {
             var dict = operFunctions[(int)operCode];
-            if (function.signature.parameters.Count == 2)
-            {
-                OperatorFunctionKey key = new OperatorFunctionKey(
-                    function.signature.parameters[0].type,
-                    function.signature.parameters[1].type
-                    );
-                dict.Add(key, new DefineAndFunc() { define= function,func=null });
-                
-            }
-            else
-            {
-                OperatorFunctionKey key = new OperatorFunctionKey(
-                   function.signature.parameters[0].type,
-                   RunTimeDataType.unknown
-                   );
-                dict.Add(key, new DefineAndFunc() { define = function, func = null });
-            }
+			if (function.signature.parameters.Count == 2)
+			{
+				OperatorFunctionKey key = new OperatorFunctionKey(
+					function.signature.parameters[0].type,
+					function.signature.parameters[1].type
+					);
+				dict.Add(key, new DefineAndFunc() { define = function, func = null });
+
+			}
+			else if (operCode == OverrideableOperator.op_explicit)
+			{
+				OperatorFunctionKey key = new OperatorFunctionKey(
+					function.signature.parameters[0].type,
+					function.signature.returnType
+					);
+				dict.Add(key, new DefineAndFunc() { define = function, func = null });
+			}
+			else
+			{
+				OperatorFunctionKey key = new OperatorFunctionKey(
+				   function.signature.parameters[0].type,
+				   RunTimeDataType.unknown
+				   );
+				dict.Add(key, new DefineAndFunc() { define = function, func = null });
+			}
         }
 
         public rtData.rtFunction getOperatorFunction(OverrideableOperator operCode,RunTimeDataType v1,RunTimeDataType v2)

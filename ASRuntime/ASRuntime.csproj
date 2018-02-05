@@ -132,6 +132,8 @@
     <Compile Include="nativefuncs\Int_buildin.cs" />
     <Compile Include="nativefuncs\IWapperDelegateMaker.cs" />
     <Compile Include="nativefuncs\linksystem\as3runtime_RefOutStore_buildin.cs" />
+    <Compile Include="nativefuncs\linksystem\asruntime_nativefuncs_linksystem_Iterator_buildin.cs" />
+    <Compile Include="nativefuncs\linksystem\Iterator.cs" />
     <Compile Include="nativefuncs\linksystem\MulitCastDelegate_buildin.cs" />
     <Compile Include="nativefuncs\linksystem\system_arrays_buildin.cs" />
     <Compile Include="nativefuncs\linksystem\system_byte_buildin.cs" />

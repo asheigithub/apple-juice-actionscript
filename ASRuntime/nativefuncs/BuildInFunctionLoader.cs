@@ -249,7 +249,7 @@ namespace ASRuntime.nativefuncs
 			linksystem.MulitCastDelegate_buildin.regNativeFunctions(bin);
 
 			linksystem.as3runtime_RefOutStore_buildin.regNativeFunctions(bin);
-
+			linksystem.asruntime_nativefuncs_linksystem_Iterator_buildin.regNativeFunctions(bin);
 		}
 
 	}

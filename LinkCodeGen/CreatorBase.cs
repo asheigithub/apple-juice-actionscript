@@ -439,6 +439,8 @@ namespace LinkCodeGen
 				return "Math_";
 			}
 
+			
+
 			string pre = string.Empty;
 			if (type.IsNested)
 			{
@@ -685,18 +687,24 @@ namespace LinkCodeGen
 			{
 				if (checkmethod.Name == "get_Key"
 					||
-					isMapToInterface(checkmethod,typeof(System.Collections.IDictionaryEnumerator)) !=null
+					isMapToInterface(checkmethod, typeof(System.Collections.IDictionaryEnumerator)) != null
 					)
 				{
 					return "Object";
 				}
 				else if (checkmethod.Name == "get_Value"
 					||
-					isMapToInterface(checkmethod, typeof(System.Collections.IDictionaryEnumerator)) !=null
+					isMapToInterface(checkmethod, typeof(System.Collections.IDictionaryEnumerator)) != null
 					)
 				{
 					return "*";
 				}
+			}
+
+
+			if (type.Equals(typeof(ASBinCode.RunTimeValueBase)))
+			{
+				return "*";
 			}
 
 			ASBinCode.RunTimeDataType rttype = MethodNativeCodeCreator.GetAS3Runtimetype(type);
@@ -724,6 +732,9 @@ namespace LinkCodeGen
 			{
 				return "String";
 			}
+
+			
+
 
 			do
 			{

@@ -16,6 +16,15 @@ namespace ASBinCode
 
         public ASRunTimeException(string msg, Exception innerException) : base(msg, innerException) { }
 
+		public string AS3StackTrace
+		{
+			get
+			{
+				return as3stacktrace==null?string.Empty:as3stacktrace;
+			}
+		}
+
+
 		public override string StackTrace
 		{
 			get

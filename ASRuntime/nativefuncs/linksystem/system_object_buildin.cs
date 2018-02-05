@@ -325,7 +325,7 @@ namespace ASRuntime.nativefuncs.linksystem
 		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
-			var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass;
+			var cls = stackframe.player.swc.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
 			object lo;
 			if (stackframe.player.linktypemapper.rtValueToLinkObject(
