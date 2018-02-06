@@ -31,11 +31,9 @@ namespace ASBinCode
 
 		
 		public readonly Dictionary<ILinkSystemObjCreator, Class> creator_Class;
-		//= new Dictionary<ILinkSystemObjCreator, Class>();
 		
 		public readonly Dictionary<Class, ILinkSystemObjCreator> class_Creator;
-		//= new Dictionary<Class, ILinkSystemObjCreator>();
-
+		
 		internal Dictionary<string, Class> _dictlinkcreatorfunctionname;
 		
         /// <summary>

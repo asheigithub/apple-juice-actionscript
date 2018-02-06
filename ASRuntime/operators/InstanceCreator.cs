@@ -71,6 +71,10 @@ namespace ASRuntime.operators
 			_function_constructor = null;
 			objectStoreToSlot = null;
 
+			toNoticeFailed1 = null;
+			toNoticeFailed2 = null;
+
+
 			tempSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 		}
 
@@ -239,7 +243,7 @@ namespace ASRuntime.operators
 		private static void creatorFailed(BlockCallBackBase sender, object args)
 		{
 			InstanceCreator ic = (InstanceCreator)args;
-			
+
 			if (ic.constructorCaller != null)
 			{
 				ic.constructorCaller.noticeRunFailed();
@@ -391,7 +395,7 @@ namespace ASRuntime.operators
 
         private void exec_step1()
         {
-			//afterCreateInstanceData callbacker = new afterCreateInstanceData();
+			
 			BlockCallBackBase callbacker = player.blockCallBackPool.create();
 			callbacker.args = this;
 
@@ -399,9 +403,27 @@ namespace ASRuntime.operators
 			callbacker.setWhenFailed(creatorFailed);
 
             ASBinCode.RunTimeScope objScope;
-
-            makeObj(player,token, _class, callbacker,this, out objScope);
+			
+			makeObj(player,token, _class, callbacker,this, out objScope);
+			
         }
+
+		internal BlockCallBackBase toNoticeFailed1;
+		internal BlockCallBackBase toNoticeFailed2;
+
+		internal void noticeWhenCreateAneFailed()
+		{
+			if (toNoticeFailed1 != null)
+			{
+				toNoticeFailed1.noticeRunFailed();
+				toNoticeFailed1 = null;
+			}
+			if (toNoticeFailed2 != null)
+			{
+				toNoticeFailed2.noticeRunFailed();
+				toNoticeFailed2 = null;
+			}
+		}
 
 		private static void afterCreateInstanceDataCallBacker(BlockCallBackBase sender, object args)
 		{
@@ -411,9 +433,9 @@ namespace ASRuntime.operators
 			RunTimeScope objScope = (RunTimeScope)sender.cacheObjects[2];
 			ASBinCode.rtData.rtObjectBase rtObject = (ASBinCode.rtData.rtObjectBase)sender.cacheObjects[1];
 
-			
-			ic.exec_step2(  obj, objScope, rtObject);
-
+			ic.toNoticeFailed1 = sender;
+			ic.exec_step2(obj, objScope, rtObject);
+			ic.toNoticeFailed1 = null;
 		}
 
 		private void exec_step2(
@@ -439,13 +461,41 @@ namespace ASRuntime.operators
                     dobj._prototype_ =  (DynamicObject)constructor.value;
                 }
             }
-            
+
+			ClassMember ctor = obj._class.constructor;
+
+			//if (obj._class.isCrossExtend)
+			//{
+			//	//***创建Adapter***
+			//	var scls = obj._class.super;
+			//	while (!scls.isLink_System)
+			//	{
+			//		scls = scls.super;
+			//	}
+
+			//	ctor = scls.crossExtendAdapterCreator;
+
+			//	var nf = player.swc.getNativeFunction(((MethodGetterBase)ctor.bindField).functionId);
+			//	if (!(nf is ICrossExtendAdapterCreator))
+			//	{
+			//		invokerFrame.throwAneException(token, "adapter不是ICrossExtendAdapterCreator");
+			//		callbacker.noticeRunFailed();
+			//		noticeWhenCreateAneFailed();
+			//		invokerFrame.endStep();
+			//		return;
+
+			//	}
+
+			//	constructorCaller.toCallFunc =  player.swc.functions[((MethodGetterBase)ctor.bindField).functionId];
+
+			//}
+
 
             //调用构造函数
-            if (obj._class.constructor != null)
+            if (ctor != null)
             {
                 ASBinCode.rtData.rtFunction function =
-                    (ASBinCode.rtData.rtFunction)((MethodGetterBase)obj._class.constructor.bindField).getConstructor(objScope);
+                    (ASBinCode.rtData.rtFunction)((MethodGetterBase)ctor.bindField).getConstructor(objScope);
 
 
 				HeapSlot _temp = tempSlot;
@@ -463,11 +513,15 @@ namespace ASRuntime.operators
 				callbacker.setWhenFailed(creatorFailed);
 				callbacker.setCallBacker(afterCallConstructorCallbacker);
 
+				
                 constructorCaller.callbacker = callbacker;
-                constructorCaller.call();
 
-                constructorCaller = null;
-                
+				toNoticeFailed2 = callbacker;
+				constructorCaller.call();
+				toNoticeFailed2 = null;
+
+				constructorCaller = null;
+
             }
             else
             {
@@ -554,8 +608,8 @@ namespace ASRuntime.operators
         {
             if (cls.isLink_System)
             {
-				ASBinCode.rtData.rtObjectBase rb;
-                ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb);
+				ASBinCode.rtData.rtObjectBase rb; ASBinCode.rtData.rtObjectBase lr;string err;
+				ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb,out lr,out err);
                 return (LinkSystemObject)obj;
             }
             else
@@ -568,9 +622,13 @@ namespace ASRuntime.operators
         {
             if (cls.isLink_System)
             {
-				ASBinCode.rtData.rtObjectBase rb;
-				ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb);
-                ASBinCode.rtData.rtObject rtObj = new ASBinCode.rtData.rtObject(obj, null);
+				ASBinCode.rtData.rtObjectBase rb; ASBinCode.rtData.rtObjectBase lr; string err;
+				ASBinCode.rtti.Object obj = createObject(player.swc, cls,null,out rb,out lr,out err);
+				ASBinCode.rtData.rtObjectBase rtObj;
+				if (lr != null)
+					rtObj = lr;
+				else
+					rtObj= new ASBinCode.rtData.rtObject(obj, null);
 
                 RunTimeScope scope = new RunTimeScope(
                     null
@@ -609,12 +667,16 @@ namespace ASRuntime.operators
         }
 
         
-        private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls,InstanceCreator creator,out ASBinCode.rtData.rtObjectBase rtObjectBase)
+        private static ASBinCode.rtti.Object createObject(CSWC swc,Class cls,InstanceCreator creator,
+			out ASBinCode.rtData.rtObjectBase rtObjectBase,
+			out ASBinCode.rtData.rtObjectBase linkrtobj,
+			out string errinfo
+			)
         {
             ASBinCode.rtti.Object obj = null;// = new ASBinCode.rtti.Object(cls);
-			rtObjectBase = null;
-            if (cls.isLink_System)
-            {
+			rtObjectBase = null;linkrtobj = null;errinfo = null;
+			if (cls.isLink_System)
+			{
 				if (creator != null)
 				{
 					StackSlot stackSlot = creator.objectStoreToSlot as StackSlot;
@@ -626,46 +688,75 @@ namespace ASRuntime.operators
 				}
 
 
-                var func = (NativeFunctionBase)swc.class_Creator[cls];
+				var func = (NativeFunctionBase)swc.class_Creator[cls];
 
-                string err;int no;
-                ASBinCode.rtData.rtObjectBase rtObj= 
-                    func.execute(null, null, cls, out err,out no) as ASBinCode.rtData.rtObjectBase ;
-                if (rtObj == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    return rtObj.value;
-                }
-            }
-            else if (
-                swc.DictionaryClass != null
-                &&
-                ClassMemberFinder.isInherits(cls, swc.DictionaryClass))
-            {
-                obj = new DictionaryObject(cls);
-            }
-            else if (cls.dynamic)
-            {
-                if (cls.isUnmanaged)
-                {
-                    obj = new HostedDynamicObject(cls);
-                }
-                else
-                {
-                    obj = new DynamicObject(cls);
-                }
-            }
-            else if (cls.isUnmanaged)
-            {
-                obj = new HostedObject(cls);
-            }
-            else
-            {
-                obj = new ASBinCode.rtti.Object(cls);
-            }
+				string err; int no;
+				ASBinCode.rtData.rtObjectBase rtObj =
+					func.execute(null, null, cls, out err, out no) as ASBinCode.rtData.rtObjectBase;
+				linkrtobj = rtObj;
+				if (rtObj == null)
+				{
+					errinfo = cls.ToString() + " create linksystem object failed";
+					return null;
+				}
+				else
+				{
+					return rtObj.value;
+				}
+			}
+			else if (cls.isCrossExtend)
+			{
+				var scls = cls.super;
+				while (!scls.isLink_System)
+				{
+					scls = scls.super;
+				}
+
+				var cextend = scls.staticClass.linkObjCreator;
+				var func = swc.getNativeFunction(( (ClassMethodGetter)cextend.bindField).functionId );
+
+				string err; int no;
+				ASBinCode.rtData.rtObjectBase rtObj =
+					func.execute(null, null, cls, out err, out no) as ASBinCode.rtData.rtObjectBase;
+				linkrtobj = rtObj;
+				if (rtObj == null)
+				{
+					errinfo = cls.ToString() + " create crossextend object failed";
+					return null;
+				}
+				else
+				{
+					LinkSystemObject lo = (LinkSystemObject)rtObj.value;
+					return lo;
+					
+				}
+			}
+			else if (
+				swc.DictionaryClass != null
+				&&
+				ClassMemberFinder.isInherits(cls, swc.DictionaryClass))
+			{
+				obj = new DictionaryObject(cls);
+			}
+			else if (cls.dynamic)
+			{
+				if (cls.isUnmanaged)
+				{
+					obj = new HostedDynamicObject(cls);
+				}
+				else
+				{
+					obj = new DynamicObject(cls);
+				}
+			}
+			else if (cls.isUnmanaged)
+			{
+				obj = new HostedObject(cls);
+			}
+			else
+			{
+				obj = new ASBinCode.rtti.Object(cls);
+			}
 
             return obj;
         }
@@ -680,13 +771,32 @@ namespace ASRuntime.operators
             BlockCallBackBase callbacker, InstanceCreator creator, out ASBinCode.RunTimeScope objScope)
         {
 
-			ASBinCode.rtData.rtObjectBase result;
+			ASBinCode.rtData.rtObjectBase result; ASBinCode.rtData.rtObjectBase lr;string err;
 
-            ASBinCode.rtti.Object obj = createObject(player.swc, cls,creator,out result);
+			ASBinCode.rtti.Object obj = createObject(player.swc, cls,creator,out result,out lr,out err);
+
+			if (obj == null)
+			{
+				objScope = null;
+				if (callbacker != null)
+				{
+					callbacker.noticeRunFailed();
+				}
+				player.throwWhenMakeObjFailed(new ASRunTimeException(err, player.stackTrace(0)));
+
+				return null;
+			}
 
 			if (result == null)
 			{
-				result = new ASBinCode.rtData.rtObject(obj, null);
+				if (lr == null)
+				{
+					result = new ASBinCode.rtData.rtObject(obj, null);
+				}
+				else
+				{
+					result = lr;
+				}
 				if (cls.fields.Count > 0)
 				{
 					obj.memberData = new ObjectMemberSlot[cls.fields.Count];

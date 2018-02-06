@@ -184,5 +184,45 @@ namespace ASRuntime.nativefuncs
             SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success
             );
 
+
+		private static int seed=int.MaxValue;
+
+		private static ExecuteToken lastchecktoken;
+
+		public ExecuteToken getExecToken(string functionname)
+		{
+			lastchecktoken=new ExecuteToken( seed--, functionname);
+			return lastchecktoken;
+		}
+		public static bool checkToken(ExecuteToken token)
+		{
+			return lastchecktoken.Equals(token);
+		}
+
+		public struct ExecuteToken :IEquatable<ExecuteToken>
+		{
+			public static ExecuteToken nulltoken = new ExecuteToken(int.MinValue,string.Empty);
+
+			public int tokenid;
+			public string functionname;
+
+			public ExecuteToken(int id,string fkey)
+			{
+				tokenid = id;
+				functionname = fkey;
+			}
+
+			public bool Equals(ExecuteToken other)
+			{
+				return tokenid == other.tokenid && functionname == other.functionname;
+			}
+
+			public override int GetHashCode()
+			{
+				return tokenid.GetHashCode() ^ functionname.GetHashCode();
+			}
+
+		}
+
     }
 }

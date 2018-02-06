@@ -142,6 +142,8 @@ namespace AutoGenCodeLib
 
 		public int DoHandler(string v1,int v2,float v3)
 		{
+			TestType(null);
+
 			return int.Parse(v1) + v2 + (int)v3;
 		}
 
@@ -151,7 +153,7 @@ namespace AutoGenCodeLib
 		}
 
 
-		public Type TestType(Type type)
+		public virtual Type TestType(Type type)
 		{
 			Console.WriteLine("inputtype: " + type);
 

@@ -45,10 +45,22 @@ namespace ASBinCode.rtti
         /// 是否链接到系统对象
         /// </summary>
         public bool isLink_System;
+
+		/// <summary>
+		/// 是否从actionscript继承系统链接对象
+		/// </summary>
+		public bool isCrossExtend;
+
         /// <summary>
         /// 系统对象创建器
         /// </summary>
         public ClassMember linkObjCreator;
+
+		/// <summary>
+		/// 如果能跨语言继承，则必须提供一个跨语言继承适配器创建器
+		/// </summary>
+		public ClassMember crossExtendAdapterCreator;
+
 
 		/// <summary>
 		/// 是否已编译成功
@@ -273,6 +285,8 @@ namespace ASBinCode.rtti
 			//public bool isLink_System;
 			bool isLink_System = reader.ReadBoolean();
 
+			bool isCrossExtend = reader.ReadBoolean();
+
 			//public readonly string md5key;
 			string md5key = reader.ReadString();
 			//public readonly int classid;
@@ -291,6 +305,7 @@ namespace ASBinCode.rtti
 			_class.isStruct = isStruct;
 			_class.structIndex = structIndex;
 			_class.isLink_System = isLink_System;
+			_class.isCrossExtend = isCrossExtend;
 
 			///// <summary>
 			///// 系统对象创建器
@@ -298,7 +313,7 @@ namespace ASBinCode.rtti
 			//public ClassMember linkObjCreator;
 			_class.linkObjCreator = serizlizer.DeserializeObject<ClassMember>(reader,ClassMember.LoadClassMember);
 
-
+			_class.crossExtendAdapterCreator = serizlizer.DeserializeObject<ClassMember>(reader, ClassMember.LoadClassMember);
 			///// <summary>
 			///// 是否已编译成功
 			///// </summary>
@@ -492,6 +507,9 @@ namespace ASBinCode.rtti
 			//public bool isLink_System;
 			writer.Write(isLink_System);
 
+			
+			writer.Write(isCrossExtend);
+
 			//public readonly string md5key;
 			writer.Write(md5key);
 			//public readonly int classid;
@@ -508,6 +526,9 @@ namespace ASBinCode.rtti
 			///// </summary>
 			//public ClassMember linkObjCreator;
 			serizlizer.SerializeObject<ClassMember>(writer, linkObjCreator);
+
+			serizlizer.SerializeObject<ClassMember>(writer, crossExtendAdapterCreator);
+
 			///// <summary>
 			///// 是否已编译成功
 			///// </summary>

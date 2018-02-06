@@ -646,20 +646,38 @@ namespace ASCompiler.compiler.builds
                     OpStep f = new OpStep(OpCode.flag_call_super_constructor,new SourceToken(step.token.line,step.token.ptr,step.token.sourceFile));
                     env.block.opSteps.Add(f);
 
-                    var superclass =
-                        ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class.super;
-                    while ( superclass !=null && superclass.constructor==null)
-                    {
-                        superclass = superclass.super;
-                    }
+					var testclass = ((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class;
 
-                    if (superclass != null)
-                    {
-                        var c = superclass.constructor;
-                        build_member(c.bindField, step, builder, env,superclass, superclass.constructor.name);
-                    }
+					var superclass =
+						((ASBinCode.scopes.ObjectInstanceScope)env.block.scope.parentScope)._class.super;
 
+					if (testclass.isCrossExtend && superclass.isLink_System )
+					{
+						//***调用父类的适配器版本****
 
+						if (superclass.crossExtendAdapterCreator == null)
+						{
+							throw new BuildException(
+								new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+								" 没有找到正确的适配器继承适配器."));
+						}
+
+						var c = superclass.crossExtendAdapterCreator;
+						build_member(c.bindField, step, builder, env, superclass, c.name);
+					}
+					else
+					{						
+						while (superclass != null && superclass.constructor == null)
+						{
+							superclass = superclass.super;
+						}
+
+						if (superclass != null)
+						{
+							var c = superclass.constructor;
+							build_member(c.bindField, step, builder, env, superclass, superclass.constructor.name);
+						}
+					}
                 }
                 else
                 {
@@ -945,7 +963,7 @@ namespace ASCompiler.compiler.builds
 
 						bool findsuccess;
 						var func = findFunction(signature, builder, out findsuccess);
-						if (findsuccess)
+						if (findsuccess && checkFunctionNotHasOverridesOrSealed(func,builder))
 						{
 							if (!func.isConstructor)
 							{
@@ -1196,9 +1214,17 @@ namespace ASCompiler.compiler.builds
 							if (!hasIntoPara)
 							{
 								builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
-
-									//特别注意接口的情况，接口的函数必须到运行时才能确定。所以检查时必须检查接口
+									//特别注意接口和被继承的情况，接口的函数必须到运行时才能确定。所以检查时必须检查接口
 									bool findsuccess;
+
+									var func = findFunction(signature, builder, out findsuccess);
+									if (!findsuccess || func == null || !checkFunctionNotHasOverridesOrSealed(func, builder))
+									{
+										return;
+									}
+									
+
+
 									if (isNativeModeConstPara(signature, builder, out findsuccess))
 									{
 										if (findsuccess)
@@ -1290,7 +1316,67 @@ namespace ASCompiler.compiler.builds
 
         }
 
-		
+		private bool checkFunctionNotHasOverridesOrSealed(ASBinCode.rtti.FunctionDefine func, Builder builder)
+		{
+			if (!func.isMethod)
+				return true;
+
+			if (func.IsAnonymous)
+				return true;
+
+			if (builder._signature_belone.ContainsKey(func.signature))
+			{
+				var obj = builder._signature_belone[func.signature];
+				if (obj == null)
+				{
+					return false;
+				}
+				else if (obj is ASBinCode.rtti.Class)
+				{
+					ASBinCode.rtti.Class cls = (ASBinCode.rtti.Class)obj;
+					if (cls.isInterface)
+					{
+						return false;
+					}
+					else if (cls.final)
+					{
+						return true;
+					}
+					else
+					{
+						//*** 确定是否含有虚方法***
+						foreach (var member in cls.classMembers)
+						{
+							MethodGetterBase method = member.bindField as MethodGetterBase;
+							if (method != null && method.functionId == func.functionid)
+							{
+								if (member.isPrivate)
+								{
+									return true;
+								}
+								if (member.isFinal)
+								{
+									return true;
+								}
+								if (member.isConstructor)
+									return true;
+								//***无法确定***
+
+							}
+
+						}
+						//return true;
+					}
+				}
+				else
+				{
+					return true;
+				}
+			}
+			
+
+			return false;
+		}
 
 		private ASBinCode.rtti.FunctionDefine findFunction(ASBinCode.rtti.FunctionSignature signature,Builder builder,out bool findsuccess)
 		{

@@ -133,7 +133,21 @@ namespace ASRuntime
 				}
 				else
 				{
-					throw new TypeLinkClassException(swc.getClassByRunTimeDataType(rtType) + " 不是一个链接到系统对象的类型");
+					var cls = swc.getClassByRunTimeDataType(rtType);
+					if (cls.staticClass==null &&  cls.instanceClass.isCrossExtend)
+					{
+						var scls = cls.instanceClass.super;
+						while (!scls.isLink_System)
+						{
+							scls = scls.super;
+						}
+
+						return getLinkType(scls.getRtType());
+					}
+					else
+					{
+						throw new TypeLinkClassException(cls + " 不是一个链接到系统对象的类型");
+					}
 				}
                 
             }
@@ -170,18 +184,23 @@ namespace ASRuntime
 
         public  void storeLinkObject_ToSlot(object obj,RunTimeDataType defineReturnType ,SLOT returnSlot, IClassFinder bin, Player player)
         {
-            if (obj == null)
-            {
-                returnSlot.setValue(ASBinCode.rtData.rtNull.nullptr);
-            }
-            else
-            {
-                RunTimeDataType rt =  defineReturnType; //getLinkType(funcDefine.signature.returnType);
-                //RunTimeDataType rt =
-                //    getRuntimeDataType(obj.GetType());
-                if (rt == RunTimeDataType.rt_void)
-                {
-                    rt = getRuntimeDataType(obj.GetType());
+			if (obj is ICrossExtendAdapter)
+			{
+				obj = ((ICrossExtendAdapter)obj).AS3Object;
+			}
+
+			if (obj == null)
+			{
+				returnSlot.setValue(ASBinCode.rtData.rtNull.nullptr);
+			}
+			else
+			{
+				RunTimeDataType rt = defineReturnType; //getLinkType(funcDefine.signature.returnType);
+													   //RunTimeDataType rt =
+													   //    getRuntimeDataType(obj.GetType());
+				if (rt == RunTimeDataType.rt_void)
+				{
+					rt = getRuntimeDataType(obj.GetType());
 
 					if (rt == _FLOAT)
 						rt = RunTimeDataType.rt_number;
@@ -189,32 +208,32 @@ namespace ASRuntime
 						rt = RunTimeDataType.rt_int;
 					else if (rt == _USHORT)
 						rt = RunTimeDataType.rt_uint;
-                }
+				}
 
-                if (rt == _DICT_KEY)
-                {
-                    DictionaryKey key = (DictionaryKey)obj;
-                    rt = _OBJECT_LINK;
-                    obj = key.key;
-					
-                }
+				if (rt == _DICT_KEY)
+				{
+					DictionaryKey key = (DictionaryKey)obj;
+					rt = _OBJECT_LINK;
+					obj = key.key;
 
-                if (rt == RunTimeDataType._OBJECT)
-                {
-                    rt = _OBJECT_LINK;
-                }
-                if (rt == _OBJECT_LINK)
-                {
-                    rt = ((RunTimeValueBase)obj).rtType;
-                    if (rt < RunTimeDataType.unknown)//否则走下面的Object路径
-                    {
-                        returnSlot.directSet((RunTimeValueBase)obj);
-                        return;
-                    }
-                }
-				
-                if (rt == RunTimeDataType.rt_int)
-                {
+				}
+
+				if (rt == RunTimeDataType._OBJECT)
+				{
+					rt = _OBJECT_LINK;
+				}
+				if (rt == _OBJECT_LINK)
+				{
+					rt = ((RunTimeValueBase)obj).rtType;
+					if (rt < RunTimeDataType.unknown)//否则走下面的Object路径
+					{
+						returnSlot.directSet((RunTimeValueBase)obj);
+						return;
+					}
+				}
+
+				if (rt == RunTimeDataType.rt_int)
+				{
 					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_uint)
 					{
@@ -240,10 +259,10 @@ namespace ASRuntime
 					{
 						returnSlot.setValue((int)obj);
 					}
-                    
-                }
-                else if (rt == RunTimeDataType.rt_uint)
-                {
+
+				}
+				else if (rt == RunTimeDataType.rt_uint)
+				{
 					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_int)
 					{
@@ -269,14 +288,14 @@ namespace ASRuntime
 					{
 						returnSlot.setValue((uint)obj);
 					}
-                }
-                else if (rt == RunTimeDataType.rt_string)
-                {
+				}
+				else if (rt == RunTimeDataType.rt_string)
+				{
 					var realObjType = getRuntimeDataType(obj.GetType());
 					returnSlot.setValue((string)obj);
-                }
-                else if (rt == RunTimeDataType.rt_number)
-                {
+				}
+				else if (rt == RunTimeDataType.rt_number)
+				{
 					var realObjType = getRuntimeDataType(obj.GetType());
 					if (realObjType == RunTimeDataType.rt_uint)
 					{
@@ -302,50 +321,50 @@ namespace ASRuntime
 					{
 						returnSlot.setValue((double)obj);
 					}
-                }
-                else if (rt == RunTimeDataType.rt_boolean)
-                {
+				}
+				else if (rt == RunTimeDataType.rt_boolean)
+				{
 					if ((bool)obj)
-                    {
-                        returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
-                    }
-                    else
-                    {
-                        returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
-                    }
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.True);
+					}
+					else
+					{
+						returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
+					}
 
-                }
-                else if (rt == RunTimeDataType.rt_array)
-                {
-                    returnSlot.directSet((ASBinCode.rtData.rtArray)obj);
-                }
-                else if (rt == RunTimeDataType.rt_function)
-                {
-                    returnSlot.directSet((ASBinCode.rtData.rtFunction)obj);
-                }
-                else if (rt > RunTimeDataType.unknown)
-                {
-                    Class rtCls;// = ((ASBinCode.rtData.rtObject)obj).value._class; //bin.getClassByRunTimeDataType(rt);
-                    ASBinCode.rtData.rtObjectBase testObj = obj as ASBinCode.rtData.rtObjectBase;
-                    if (testObj != null)
-                    {
-                        rtCls = ((ASBinCode.rtData.rtObjectBase)obj).value._class;
+				}
+				else if (rt == RunTimeDataType.rt_array)
+				{
+					returnSlot.directSet((ASBinCode.rtData.rtArray)obj);
+				}
+				else if (rt == RunTimeDataType.rt_function)
+				{
+					returnSlot.directSet((ASBinCode.rtData.rtFunction)obj);
+				}
+				else if (rt > RunTimeDataType.unknown)
+				{
+					Class rtCls;// = ((ASBinCode.rtData.rtObject)obj).value._class; //bin.getClassByRunTimeDataType(rt);
+					ASBinCode.rtData.rtObjectBase testObj = obj as ASBinCode.rtData.rtObjectBase;
+					if (testObj != null)
+					{
+						rtCls = ((ASBinCode.rtData.rtObjectBase)obj).value._class;
 
-                        if (rtCls.isLink_System)
-                        {
-                            var f = ((CSWC)bin).class_Creator[rtCls];
-                            f.setLinkObjectValueToSlot(returnSlot, player,
-                                ((LinkSystemObject)testObj.value).GetLinkData(), rtCls);
-                        }
-                        else
-                        {
-                            returnSlot.directSet((ASBinCode.rtData.rtObjectBase)obj);
-                        }
+						if (rtCls.isLink_System)
+						{
+							var f = ((CSWC)bin).class_Creator[rtCls];
+							f.setLinkObjectValueToSlot(returnSlot, player,
+								((LinkSystemObject)testObj.value).GetLinkData(), rtCls);
+						}
+						else
+						{
+							returnSlot.directSet((ASBinCode.rtData.rtObjectBase)obj);
+						}
 
-                    }
-                    else
-                    {
-                        rtCls = bin.getClassByRunTimeDataType(rt);
+					}
+					else
+					{
+						rtCls = bin.getClassByRunTimeDataType(rt);
 
 						if (rtCls.classid == player.swc.TypeClass.classid)
 						{
@@ -354,7 +373,7 @@ namespace ASRuntime
 							{
 								try
 								{
-									var rtcls = bin.getClassByRunTimeDataType( getRuntimeDataType(type));
+									var rtcls = bin.getClassByRunTimeDataType(getRuntimeDataType(type));
 
 									if (player.init_static_class(rtcls, SourceToken.Empty))
 									{
@@ -370,7 +389,7 @@ namespace ASRuntime
 								{
 									throw new TypeLinkClassException(type.FullName + " 没有链接到脚本");
 								}
-								
+
 
 							}
 							else
@@ -383,16 +402,16 @@ namespace ASRuntime
 							var f = ((CSWC)bin).class_Creator[rtCls];
 							f.setLinkObjectValueToSlot(returnSlot, player, obj, rtCls);
 						}
-						
+
 					}
 
 
-                }
-                else
-                {
-                    throw new ASRunTimeException("意外的链接类型", String.Empty);
-                }
-            }
+				}
+				else
+				{
+					throw new ASRunTimeException("意外的链接类型", String.Empty);
+				}
+			}
         }
 
 
@@ -501,17 +520,43 @@ namespace ASRuntime
                 if (vt > RunTimeDataType.unknown)
                 {
                     Class c = bin.getClassByRunTimeDataType(vt);
-                    if (c.isLink_System)
-                    {
-                        LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)value).value;
-                        linkobject = lo.GetLinkData();
+					if (c.isLink_System)
+					{
+						LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)value).value;
+						linkobject = lo.GetLinkData();
 
-                    }
-                    else
-                    {
-                        linkobject = null;
-                        return false;
-                    }
+					}
+					else if (c.isCrossExtend)
+					{
+						LinkSystemObject lo = (LinkSystemObject)((ASBinCode.rtData.rtObjectBase)value).value;
+						linkobject = lo.GetLinkData();
+					}
+					else if (c.staticClass == null)
+					{
+						if (c.instanceClass.isCrossExtend)
+						{
+							//***isCrossExtend Class转换为 基础类型的type
+							var sc = c.instanceClass.super;
+							while (!sc.isLink_System)
+							{
+								sc = sc.super;
+							}
+
+							var nf = (ICrossExtendAdapterCreator)swc.getNativeFunction(((ClassMethodGetter)sc.crossExtendAdapterCreator.bindField).functionId);
+
+							linkobject = nf.GetAdapterType();
+						}
+						else
+						{
+							linkobject = null;
+							return false;
+						}
+					}
+					else
+					{
+						linkobject = null;
+						return false;
+					}
                 }
                 else if (at == _objectType_) //托管object
                 {
@@ -714,7 +759,8 @@ namespace ASRuntime
 
 			protected override bool IsArrayImpl()
 			{
-				throw new NotImplementedException();
+				return linktype.IsArray;
+				//throw new NotImplementedException();
 			}
 
 			protected override bool IsByRefImpl()

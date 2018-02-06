@@ -341,6 +341,7 @@ namespace ASRuntime.operators
             BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
             cb.setCallBacker(objcreated);
+			
             cb.scope = scope;
             cb.step = step;
 
@@ -348,7 +349,9 @@ namespace ASRuntime.operators
             frame.instanceCreator.createInstance();
         }
 
-        public static void exec_instanceClass(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
+		
+
+		public static void exec_instanceClass(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //frame.instanceCreator.objectResult = step.reg.getISlot(scope);
             frame.instanceCreator.step = step;

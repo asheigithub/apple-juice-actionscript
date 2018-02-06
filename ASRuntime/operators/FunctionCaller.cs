@@ -56,10 +56,6 @@ namespace ASRuntime.operators
 		{
 			function.setThis(thisobj);
 		}
-		public bool isFuncEquals(ASBinCode.rtData.rtFunction function)
-		{
-			return this.function.Equals(function);
-		}
 
 		public RunTimeValueBase functionThisPointer
 		{
@@ -69,7 +65,14 @@ namespace ASRuntime.operators
 			}
 		}
 
-        public ASBinCode.rtti.FunctionDefine toCallFunc;
+		public bool isFuncEquals(ASBinCode.rtData.rtFunction function)
+		{
+			return this.function.Equals(function);
+		}
+
+		
+
+        internal ASBinCode.rtti.FunctionDefine toCallFunc;
 
         internal int pushedArgs;
 
@@ -613,7 +616,7 @@ namespace ASRuntime.operators
         }
 
         
-        private void check_para()
+        private void check_para(BlockCallBackBase checkparacb)
         {
             while (check_para_id < pushedArgs)
             {
@@ -684,6 +687,10 @@ namespace ASRuntime.operators
 				return;
 			}
 
+			if (checkparacb != null)
+			{
+				checkparacb.noticeEnd();
+			}
 			//***全部参数检查通过***
 			doCall_allcheckpass();
         }
@@ -705,7 +712,7 @@ namespace ASRuntime.operators
             {
                 //CallFuncHeap[sender._intArg].directSet(_tempSlot.getValue());
                 setCheckedParameter(sender._intArg, _tempSlot.getValue());
-                check_para();
+                check_para(sender);
             }
             else
             {
@@ -926,43 +933,46 @@ namespace ASRuntime.operators
                 }
                 else if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
-                    bool success;
+                    bool success=false;
                     player._nativefuncCaller = this;
-                    ((nativefuncs.NativeConstParameterFunction)nf).execute3(
-                        function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
-                        toCallFunc,
-                        returnSlot,
-                        token,
-                        invokerFrame,
-                        out success
-                        );
-                    player._nativefuncCaller = null;
-                    ((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
 
-					clear_para_slot(invokerFrame,onstackparametercount);
+					var nf3 = (nativefuncs.NativeConstParameterFunction)nf;
+					player._executeToken = nf3.getExecToken(toCallFunc.name);
+					
+						nf3.execute3(
+							function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+							toCallFunc,
+							returnSlot,
+							token,
+							invokerFrame,
+							out success
+							);
+
+					player._executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
+					player._nativefuncCaller = null;
+					((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
+
+					clear_para_slot(invokerFrame, onstackparametercount);
 					onstackparametercount = 0;
 
-                    if (success)
-                    {
-                        if (callbacker != null)
-                        {
-                            callbacker.call(callbacker.args);
-                        }
-                    }
-                    else
-                    {
-						invokerFrame.endStep();             
-                        if (callbacker != null)
-                        {
-                            callbacker.noticeRunFailed();
-                        }
-                        
-                    }
+					if (success)
+					{
+						if (callbacker != null)
+						{
+							callbacker.call(callbacker.args);
+						}
+					}
+					else
+					{
+						invokerFrame.endStep();
+						if (callbacker != null)
+						{
+							callbacker.noticeRunFailed();
+						}
 
-                    
-                    release();
-                    
-                    
+					}
+					release();
+
                 }
             }
         }
@@ -1092,7 +1102,7 @@ namespace ASRuntime.operators
 
 		public void call()
         {
-            check_para();
+            check_para(null);
         }
 
 		public void call_nocheck()

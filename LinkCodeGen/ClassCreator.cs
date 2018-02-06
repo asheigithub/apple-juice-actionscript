@@ -1059,7 +1059,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1100,7 +1100,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1118,7 +1118,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1222,7 +1222,12 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-//"getThisItem"
+
+						if (!method.IsVirtual || method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+						//"getThisItem"
 						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append("function "+n);
 
@@ -1250,6 +1255,12 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
+
+						if (!method.IsVirtual || method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+
 						as3api.Append("function get ");
 
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
@@ -1279,7 +1290,12 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-//"setThisItem"
+
+						if (!method.IsVirtual || method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+						//"setThisItem"
 						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
 
 						as3api.Append("function "+n);
@@ -1307,6 +1323,12 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
+
+						if (!method.IsVirtual || method.IsFinal)
+						{
+							as3api.Append("final ");
+						}
+
 						as3api.Append("function set ");
 
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
@@ -1329,6 +1351,11 @@ namespace LinkCodeGen
 						if (method.IsStatic)
 						{
 							as3api.Append("static ");
+						}
+
+						if (!method.IsVirtual || method.IsFinal)
+						{
+							as3api.Append("final ");
 						}
 
 						as3api.Append("function ");

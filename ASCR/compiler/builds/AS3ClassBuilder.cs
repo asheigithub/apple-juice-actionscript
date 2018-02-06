@@ -555,22 +555,59 @@ namespace ASCompiler.compiler.builds
                 }
             }
 
-            if (cls.isLink_System)
-            {
-                if (!cls.super.isLink_System
-                    &&
-                    cls.super != builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT)
-                    )
-                {
-                    throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
-                        "[link_system]的类只能继承自同样[link_system]的类"
-                        );
-                }
-            }
-
+			if (cls.isLink_System)
+			{
+				if (!cls.super.isLink_System
+					&&
+					cls.super != builder.getClassByRunTimeDataType(RunTimeDataType._OBJECT)
+					)
+				{
+					throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+						"[link_system]的类只能继承自同样[link_system]的类"
+						);
+				}
+			}
+			else
+			{
+				if (cls.super != null && cls.super.isLink_System)
+				{
+					if (cls.super.isStruct)
+					{
+						throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+						"actionscript类不能继承自[link_system]的[struct]类"
+						);
+					}
+					cls.isCrossExtend = true;
+				}
+			}
         }
 
-        public void checkCircularReference(ASTool.AS3.AS3Class as3class, Builder builder)
+
+		public void CheckCrossExtends(ASTool.AS3.AS3ClassInterfaceBase as3class, Builder builder)
+		{
+			var cls = builder.buildingclasses[as3class];
+			if (!cls.isLink_System)
+			{
+				if (cls.super != null && cls.super.isLink_System)
+				{
+					if (cls.super.isStruct)
+					{
+						throw new BuildException(as3class.token.line, as3class.token.ptr, as3class.token.sourceFile,
+						"actionscript类不能继承自[link_system]的[struct]类"
+						);
+					}
+					cls.isCrossExtend = true;
+				}
+				else if (cls.super != null && cls.super.isCrossExtend)
+				{
+					cls.isCrossExtend = true;
+				}
+
+			}
+		}
+
+
+		public void checkCircularReference(ASTool.AS3.AS3Class as3class, Builder builder)
         {
             var cls = builder.buildingclasses[as3class];
 
@@ -1451,6 +1488,7 @@ namespace ASCompiler.compiler.builds
 												fc.TypeStr = variable.TypeStr;
 												fc.IsMethod = true;
 												fc.IsGet = true;
+												fc.Access.IsFinal = true;
 
 												fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
 												//fc.ParentScope = builder.
@@ -1500,6 +1538,7 @@ namespace ASCompiler.compiler.builds
 												fc.TypeStr = "void";
 												fc.IsMethod = true;
 												fc.IsSet = true;
+												fc.Access.IsFinal = true;
 
 												fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
 												fc.Parameters.Add(
@@ -1756,6 +1795,7 @@ namespace ASCompiler.compiler.builds
                                                 fc.TypeStr = constant.TypeStr;
                                                 fc.IsMethod = true;
                                                 fc.IsGet = true;
+												fc.Access.IsFinal = true;
 
                                                 fc.Parameters = new List<ASTool.AS3.AS3Parameter>();
                                                 //fc.ParentScope = builder.

@@ -10,7 +10,7 @@ package system
 	/**
 	 * 托管数组的基类。可创建和操作托管数组
 	 */
-	public class _Array_ extends _Object_ implements IList, ICollection
+	public final class _Array_ extends _Object_ implements IList, ICollection
 	{
 		
 		[creator];

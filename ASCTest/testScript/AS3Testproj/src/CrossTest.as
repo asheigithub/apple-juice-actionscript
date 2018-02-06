@@ -1,0 +1,29 @@
+package 
+{
+	import autogencodelib.Testobj;
+	
+	/**
+	 * ...
+	 * @author 
+	 */
+	public class CrossTest extends Testobj 
+	{
+		public var b:int;
+		public function CrossTest() 
+		{
+			super();
+			b = 123;
+			trace(b);
+		}
+		
+		override public function testType(type:Class):Class 
+		{
+			trace("in override script: " + type);
+			
+			return super.testType(type);
+			
+		}
+		
+	}
+
+}

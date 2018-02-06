@@ -7,6 +7,7 @@ package
 	import autogencodelib.Testobj_TESTHandler_Of_Int64;
 	import flash.display.Sprite;
 	import system.Byte;
+	import system.Decimal;
 	import system.Int64;
 	import system.UInt64;
 	import system._Array_;
@@ -24,56 +25,32 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class AutoGenTest extends Sprite implements IEnumerable
+	public class AutoGenTest extends Sprite
 	{
-		/* INTERFACE system.collections.IEnumerable */
-		
-		public function getEnumerator():IEnumerator 
-		{
-			return yieldload();
-		}
-		
-		private function yieldload()
-		{
-			yield return 1;
-			yield return 2;
-			yield return 3;
-			
-			function nestedyield()
-			{
-				yield return "n1";
-				yield return "n2";
-				
-			}
-			
-			for each (var i in nestedyield()) 
-			{
-				yield return i;
-			}
-			
-			yield return "yield hahaha";
-			
-			
-			
-		}
+		public var b;
 		
 		public function AutoGenTest() 
 		{
-			var it:Iterator = //Iterator( _Array_.createInstance(int,10) ); 
-							  Iterator( this) ;
+			//var o = _Object_(5);			
+			//trace(o);
 			
-			trace(it);
+			var arr:_Array_= _Array_.createInstance(_Object_, 5);
+			
+			 b = new CrossExt2(99);
+			
+			 
+			 
+			 trace(b.b, b.i);
+			 
+			b.testType(CrossExt2);
+			
+			arr[0] = b;
+			
+			trace(arr[0].i,arr[0].testType(Decimal) );
 			
 			
-			for each (var i in it) 
-			{
-				trace(i);
-			}
+			//b.doHandler("678", 1, 2);
 			
-			
-			var o = _Object_(5);
-			
-			trace(o);
 			
 			//var md5:MD5CryptoServiceProvider = new MD5CryptoServiceProvider();
 			//
@@ -143,3 +120,4 @@ package
 	
 
 }
+

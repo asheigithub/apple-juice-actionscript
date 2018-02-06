@@ -141,6 +141,15 @@ namespace ASRuntime
 		/// </summary>
 		internal operators.FunctionCaller _nativefuncCaller;
 
+		/// <summary>
+		/// 当调用本地函数NativeConstParameterFunction类型时，会先从NativeConstParameterFunction申请一个令牌，然后对此赋值。
+		/// 如此本地函数可根据此令牌判断是否是从Player调用,以确定是否需要调用重写版本
+		/// </summary>
+		internal nativefuncs.NativeConstParameterFunction.ExecuteToken _executeToken;
+		public nativefuncs.NativeConstParameterFunction.ExecuteToken ExecuteToken
+		{
+			get { return _executeToken; }
+		}
 
 
 		private error.InternalError runtimeError;
@@ -184,6 +193,9 @@ namespace ASRuntime
 			//	runtimeStack.Pop().close();
 			//}
 			currentRunFrame = null;
+
+			_nativefuncCaller = null;
+			_executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
 		}
 
 		private void initPlayer()
@@ -1431,6 +1443,11 @@ namespace ASRuntime
 								_nativefuncCaller = null;
 							}
 
+							if (currentRunFrame.instanceCreator != null)
+							{
+								currentRunFrame.instanceCreator.noticeWhenCreateAneFailed();
+							}
+
 							SourceToken token;
 
 							if (currentRunFrame.codeLinePtr < currentRunFrame.block.instructions.Length)
@@ -1444,6 +1461,9 @@ namespace ASRuntime
 
 							currentRunFrame.throwAneException(token
 								, le.Message);
+
+							
+
 							currentRunFrame.receiveErrorFromStackFrame(currentRunFrame.runtimeError);
 
 							continue;
@@ -2033,6 +2053,8 @@ namespace ASRuntime
 
 		private IBlockCallBack _tempcallbacker;
 
+		private IBlockCallBack _runningtempcallbacker;
+
 		private StackFrame currentRunFrame;
 		public bool step()
 		{
@@ -2058,9 +2080,11 @@ namespace ASRuntime
 
 			if (_tempcallbacker != null)
 			{
-				var temp = _tempcallbacker;
+				_runningtempcallbacker= _tempcallbacker;
 				_tempcallbacker = null;
-				temp.call(temp.args);
+				_runningtempcallbacker.call(_runningtempcallbacker.args);
+
+				_runningtempcallbacker = null;
 
 				return true;
 			}
@@ -2919,6 +2943,22 @@ namespace ASRuntime
 			}
 		}
 
+		internal void throwWhenMakeObjFailed(ASRunTimeException exception)
+		{
+			if (currentRunFrame != null)
+			{
+				currentRunFrame.receiveErrorFromStackFrame(new error.InternalError(swc, SourceToken.Empty, exception.ToString()));
+			}
+			else
+			{
+				if (infoOutput != null)
+				{
+					infoOutput.Error("运行时错误");
+					infoOutput.Error(exception.ToString());
+				}
+			}
+		}
+
 		public void throwOrShowError(ASRunTimeException exception)
 		{
 			if (currentRunFrame != null)
@@ -3083,6 +3123,23 @@ namespace ASRuntime
 					case RunTimeDataType.rt_string:
 						return TypeConverter.ConvertToString(rv, null, null);
 					default:
+						if (rv.rtType > RunTimeDataType.unknown)
+						{
+							var cls = swc.getClassByRunTimeDataType(rv.rtType);
+							if (cls.staticClass == null)
+							{
+								try
+								{
+									return linktypemapper.getLinkType(rv.rtType);
+								}
+								catch (RuntimeLinkTypeMapper.TypeLinkClassException)
+								{
+									return obj;
+								}								
+							}
+
+						}
+
 						return obj;
 				}
 			}
@@ -3291,7 +3348,7 @@ namespace ASRuntime
 
 		#region getMethod
 
-		internal rtFunction getMethod(rtObjectBase thisObj, string name)
+		public rtFunction getMethod(rtObjectBase thisObj, string name)
 		{
 			//if (currentRunFrame != null)
 			//	throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
@@ -3597,7 +3654,7 @@ namespace ASRuntime
 			return InvokeFunction(wapper.function, argcount, v1, v2, v3, v4, v5, args);
 		}
 
-		internal object InvokeFunction(rtFunction function, int argcount, object v1, object v2, object v3, object v4, object v5, object[] args)
+		public object InvokeFunction(rtFunction function, int argcount, object v1, object v2, object v3, object v4, object v5, object[] args)
 		{
 
 			lock (this)

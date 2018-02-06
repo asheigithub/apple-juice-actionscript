@@ -789,10 +789,23 @@ namespace ASCompiler.compiler
                 builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
                 builder.buildClassDefineMembers(item.Key, this,true);
             }
+			//***确定是否脚本继承***
+			foreach (var item in copyclasses)
+			{
+				if (!tobuildfiles.Contains(item.Key.Package.AS3File))
+				{
+					continue;
+				}
+				if (item.Key is ASTool.AS3.AS3Class)
+				{
+					builds.AS3ClassBuilder builder = new builds.AS3ClassBuilder();
+					builder.CheckCrossExtends((ASTool.AS3.AS3Class)item.Key, this);
+				}
+			}
 
 
-            //确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
-            foreach (var item in copyclasses)
+			//确定类成员类型 (由于类成员类型也可能是类，所以必须要先编译类说明。)
+			foreach (var item in copyclasses)
             {
                 if (!tobuildfiles.Contains(item.Key.Package.AS3File))
                 {
@@ -1258,6 +1271,21 @@ namespace ASCompiler.compiler
                         }
                     }
                 }
+				if (cls.isCrossExtend)
+				{
+					//***查找到第一个linksystem的父类
+					var scls = cls.super;
+					while (!scls.isLink_System)
+					{
+						scls = scls.super;
+					}
+					if (scls.crossExtendAdapterCreator == null)
+					{
+						throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+										"从脚本继承系统的类,基类必须有[crossextendadapter]实例函数,代替基类的构造函数。当执行构造函数时构建Adapter实例");
+					}
+				}
+
                 if (cls.isLink_System)
                 {
                     if (!cls.isInterface)
@@ -1376,7 +1404,50 @@ namespace ASCompiler.compiler
                         }
                     }
 
-                    while (bin.classes.Count <= item.Value.staticClass.classid)
+					//***构造函数签名必须和Adapter签名匹配****
+					if (item.Value.constructor != null && item.Value.crossExtendAdapterCreator !=null)
+					{
+						
+						MethodGetterBase field1 = (MethodGetterBase)item.Value.constructor.bindField;
+						int blockid1 = field1.refdefinedinblockid;
+						var signature1 =
+								dictSignatures[blockid1][field1];
+
+
+						MethodGetterBase field2 = (MethodGetterBase)item.Value.crossExtendAdapterCreator.bindField;
+						int blockid2 = field1.refdefinedinblockid;
+						var signature2 =
+								dictSignatures[blockid2][field2];
+
+						if (signature1.parameters.Count != signature2.parameters.Count)
+						{
+							pushBuildError(
+							new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+							"[crossextendadapter]函数 和 构造函数必须签名完全相同")
+							);							
+						}
+						for (int i = 0; i < signature1.parameters.Count; i++)
+						{
+							if (signature1.parameters[i].type != signature2.parameters[i].type)
+							{
+								pushBuildError(
+									new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+									"[crossextendadapter]函数 和 构造函数必须签名完全相同")
+									);
+								break;
+							}
+						}
+						if (signature1.returnType != signature2.returnType)
+						{
+							pushBuildError(
+									new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+									"[crossextendadapter]函数 和 构造函数必须签名完全相同")
+									);
+						}
+
+					}
+
+					while (bin.classes.Count <= item.Value.staticClass.classid)
                     {
                         bin.classes.Add(null);
                     }

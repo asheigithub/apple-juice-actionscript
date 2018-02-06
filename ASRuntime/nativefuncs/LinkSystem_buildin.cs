@@ -13,8 +13,7 @@ namespace ASRuntime.nativefuncs
 			return new staticClassCreator(t, name);
 		}
 
-
-        public static NativeFunctionBase getCreator<T>(string name, T v)
+		public static NativeFunctionBase getCreator<T>(string name, T v)
         {
             return new creator<T>(name, v);
         }
