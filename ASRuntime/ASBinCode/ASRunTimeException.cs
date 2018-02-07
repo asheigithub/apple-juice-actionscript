@@ -16,6 +16,20 @@ namespace ASBinCode
 
         public ASRunTimeException(string msg, Exception innerException) : base(msg, innerException) { }
 
+		public override string Message
+		{
+			get
+			{
+				if (InnerException == null)
+					return base.Message;
+				else
+				{
+					return base.Message + "\n\t" + InnerException.Message;
+
+				}
+			}
+		}
+
 		public string AS3StackTrace
 		{
 			get

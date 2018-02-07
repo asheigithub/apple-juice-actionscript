@@ -937,7 +937,7 @@ namespace ASRuntime.operators
                     player._nativefuncCaller = this;
 
 					var nf3 = (nativefuncs.NativeConstParameterFunction)nf;
-					player._executeToken = nf3.getExecToken(toCallFunc.name);
+					player._executeToken = nf3.getExecToken(toCallFunc.functionid);
 					
 						nf3.execute3(
 							function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,

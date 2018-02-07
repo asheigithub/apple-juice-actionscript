@@ -25,7 +25,7 @@ namespace ASRuntime
 			{
 				this.player = player;
 			}
-			List<BlockCallBackBase> oo = new List<BlockCallBackBase>();
+			//List<BlockCallBackBase> oo = new List<BlockCallBackBase>();
 			public override BlockCallBackBase create()
 			{
 				BlockCallBackBase cb = base.create();
@@ -35,13 +35,13 @@ namespace ASRuntime
 				cb.isSuccess = false;
 				cb._intArg = 0; cb._intArg2 = 0;
 
-				oo.Add(cb);
+				//oo.Add(cb);
 
 				return cb;
 			}
 			public override void ret(BlockCallBackBase c)
 			{
-				oo.Remove(c);
+				//oo.Remove(c);
 
 				c.player = null;
 				base.ret(c);

@@ -2053,7 +2053,7 @@ namespace ASRuntime
 
 		private IBlockCallBack _tempcallbacker;
 
-		private IBlockCallBack _runningtempcallbacker;
+		//private IBlockCallBack _runningtempcallbacker;
 
 		private StackFrame currentRunFrame;
 		public bool step()
@@ -2080,11 +2080,11 @@ namespace ASRuntime
 
 			if (_tempcallbacker != null)
 			{
-				_runningtempcallbacker= _tempcallbacker;
+				var _runningtempcallbacker= _tempcallbacker;
 				_tempcallbacker = null;
 				_runningtempcallbacker.call(_runningtempcallbacker.args);
 
-				_runningtempcallbacker = null;
+				//_runningtempcallbacker = null;
 
 				return true;
 			}
@@ -3122,6 +3122,8 @@ namespace ASRuntime
 						return TypeConverter.ConvertToNumber(rv);
 					case RunTimeDataType.rt_string:
 						return TypeConverter.ConvertToString(rv, null, null);
+					case RunTimeDataType.rt_null:
+						return null;
 					default:
 						if (rv.rtType > RunTimeDataType.unknown)
 						{
@@ -3238,10 +3240,9 @@ namespace ASRuntime
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
-
-			try
+			lock (this)
 			{
-				lock (this)
+				try
 				{
 					initPlayer();
 
@@ -3336,11 +3337,13 @@ namespace ASRuntime
 
 						return v as rtObject;
 					}
+
 				}
-			}
-			finally
-			{
-				clearEnv();
+				finally
+				{
+					clearEnv();
+				}
+
 			}
 		}
 
@@ -3526,11 +3529,11 @@ namespace ASRuntime
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
-
-			try
+			lock (this)
 			{
-				lock (this)
+				try
 				{
+				
 
 					initPlayer();
 					CallBlankBlock(null);
@@ -3641,11 +3644,13 @@ namespace ASRuntime
 					}
 				}
 
+
+				finally
+				{
+					clearEnv();
+				}
 			}
-			finally
-			{
-				clearEnv();
-			}
+			
 		}
 
 
@@ -3767,6 +3772,10 @@ namespace ASRuntime
 						v = (RunTimeValueBase)currentRunFrame._tempSlot1.getValue().Clone();
 
 						//step_toStackflag(flag);
+						if (isblank)
+						{
+							while (step()) ;
+						}
 
 						if (err != null)
 						{
@@ -3776,6 +3785,10 @@ namespace ASRuntime
 					else
 					{
 						//step_toStackflag(flag);
+						if (isblank)
+						{
+							while (step()) ;
+						}
 
 						if (err != null)
 						{
@@ -3848,6 +3861,123 @@ namespace ASRuntime
 		}
 
 
+		public void MakeICrossExtendAdapterEnvironment(ICrossExtendAdapter adapter,ASBinCode.rtti.Class as3class)
+		{
+			if (adapter == null)
+				throw new ArgumentNullException("adapter");
+			if (as3class == null)
+			{
+				throw new ArgumentNullException("as3class");
+			}
+			if (adapter.AS3Object != null)
+			{
+				throw new ArgumentException("adapter对象已经组装完成");
+			}
+
+			ASBinCode.rtData.rtObject obj = createInstance(as3class.instanceClass);
+			ASBinCode.rtti.LinkSystemObject lo = (ASBinCode.rtti.LinkSystemObject)obj.value;
+			lo.SetLinkData(adapter);
+			adapter.SetAS3RuntimeEnvironment(this, as3class.instanceClass, obj);
+
+		}
+
+		private ASBinCode.rtData.rtObject createInstance(ASBinCode.rtti.Class as3class)
+		{
+
+			lock (this)
+			{
+				var cls = as3class;
+				if (cls == null)
+				{
+					throw new ASRunTimeException("参数as3class不能为空", string.Empty);
+				}
+
+				bool isblank = false;
+				if (currentRunFrame == null)
+				{
+					isblank = true;
+					CallBlankBlock(null);
+				}
+
+				try
+				{
+					initPlayer();
+					
+					if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
+					{
+						throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
+					}
+
+					var sig = swc.functions[cls.constructor_functionid].signature;
+					RunTimeValueBase vb1 = null;
+					RunTimeValueBase vb2 = null;
+					RunTimeValueBase vb3 = null;
+
+					RunTimeValueBase[] paraArgs = null;
+
+
+					error.InternalError err;
+					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err,
+						static_instance[cls.staticClass.classid],
+						new rtInt(0), vb1, vb2, vb3, paraArgs);
+
+					if (!issuccess)
+					{
+						if (isblank)
+						{
+							while (step()) ;
+						}
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+						else
+						{
+							throw new ASRunTimeException("跨脚本适配器创建失败", string.Empty);
+						}
+					}
+					else
+					{
+						var v = currentRunFrame._tempSlot1.getValue().Clone();
+
+						if (isblank)
+						{
+							while (step()) ;
+						}
+
+						if (err != null)
+						{
+							throw new ASRunTimeException(err.message, err.getStackTrace());
+						}
+
+						return v as rtObject;
+					}
+
+				}
+				catch (Exception ex)
+				{
+					if (isblank)
+					{
+						clearEnv();
+
+						throwOrShowError(new ASRunTimeException("跨脚本适配器创建失败", ex));
+						//return null;
+					}
+					throw;
+				}
+				finally
+				{
+					if (isblank)
+					{
+						clearEnv();
+					}
+				}
+			}
+
+			
+		}
+
+
 
 		#endregion
 
@@ -3903,11 +4033,10 @@ namespace ASRuntime
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
-
-			try
+			lock (this)
 			{
-				lock (this)
-				{
+				try
+				{				
 					initPlayer();
 					CallBlankBlock(null);
 
@@ -3989,12 +4118,12 @@ namespace ASRuntime
 					}
 				}
 
-				
-			}
-			finally
+				finally
 			{
 				clearEnv();
 			}
+			}
+			
 
 		}
 
@@ -4014,11 +4143,11 @@ namespace ASRuntime
 		{
 			if (currentRunFrame != null)
 				throw new InvalidOperationException("状态异常,不能在运行中调用此方法");
-
-			try
+			lock (this)
 			{
-				lock (this)
+				try
 				{
+				
 					initPlayer();
 					CallBlankBlock(null);
 
@@ -4089,11 +4218,12 @@ namespace ASRuntime
 						}
 					}
 				}
+				finally
+				{
+					clearEnv();
+				}
 			}
-			finally
-			{
-				clearEnv();
-			}
+			
 		}
 
 

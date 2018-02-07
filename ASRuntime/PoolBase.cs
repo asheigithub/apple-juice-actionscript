@@ -51,7 +51,7 @@ namespace ASRuntime
 			remain++;
 			
 			pool[posRet] = c;
-			posRet = (posRet + 1) % pool.Length ;
+			posRet = (posRet + 1) % maxcount ;
 
 		}
 
@@ -69,7 +69,7 @@ namespace ASRuntime
 				}
 			}
 		}
-
+		
 		public virtual T create()
 		{
 #if DEBUG
@@ -78,11 +78,14 @@ namespace ASRuntime
 				throw new EngineException("缓存池异常");
 			}
 #endif
-			remain--;
+			
 
+
+			remain--;
 			T r = pool[posGet];
-			posGet = (posGet + 1) % pool.Length;
+			posGet = (posGet + 1) % maxcount;
 			return r;
+			
 		}
 
 		public bool hasCacheObj()

@@ -186,40 +186,47 @@ namespace ASRuntime.nativefuncs
 
 
 		private static int seed=int.MaxValue;
-
+		private static object locker = new object();
 		private static ExecuteToken lastchecktoken;
 
-		public ExecuteToken getExecToken(string functionname)
+		public ExecuteToken getExecToken(int functionid)
 		{
-			lastchecktoken=new ExecuteToken( seed--, functionname);
-			return lastchecktoken;
+			lock (locker)
+			{
+				lastchecktoken = new ExecuteToken(seed--, functionid);
+				return lastchecktoken;
+			}
+			
 		}
 		public static bool checkToken(ExecuteToken token)
 		{
-			return lastchecktoken.Equals(token);
+			lock (locker)
+			{
+				return lastchecktoken.Equals(token);
+			}
 		}
 
 		public struct ExecuteToken :IEquatable<ExecuteToken>
 		{
-			public static ExecuteToken nulltoken = new ExecuteToken(int.MinValue,string.Empty);
+			public static ExecuteToken nulltoken = new ExecuteToken(int.MinValue,int.MinValue);
 
 			public int tokenid;
-			public string functionname;
+			public int functionid;
 
-			public ExecuteToken(int id,string fkey)
+			public ExecuteToken(int id,int fid)
 			{
 				tokenid = id;
-				functionname = fkey;
+				functionid = fid;
 			}
 
 			public bool Equals(ExecuteToken other)
 			{
-				return tokenid == other.tokenid && functionname == other.functionname;
+				return tokenid == other.tokenid && functionid == other.functionid;
 			}
 
 			public override int GetHashCode()
 			{
-				return tokenid.GetHashCode() ^ functionname.GetHashCode();
+				return tokenid.GetHashCode() ^ functionid.GetHashCode();
 			}
 
 		}

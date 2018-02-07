@@ -204,6 +204,28 @@ namespace ASBinCode.rtti
             }
         }
 
+		/// <summary>
+		/// 如果是跨脚本继承对象，则返回LinkSystem基类
+		/// </summary>
+		/// <returns></returns>
+		public Class getBaseLinkSystemClass()
+		{
+			if (isCrossExtend)
+			{
+				var s = super;
+				while (!s.isLink_System)
+				{
+					s = s.super;
+				}
+				return s;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+
         public RunTimeDataType getRtType()
         {
             return classid + RunTimeDataType._OBJECT;

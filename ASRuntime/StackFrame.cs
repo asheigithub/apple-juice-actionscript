@@ -12,6 +12,7 @@ namespace ASRuntime
     /// </summary>
     public sealed class StackFrame
     {
+		
 		internal class StackFramePool : PoolBase<StackFrame>
 		{
 			public StackFramePool(Player player,StackSlot[] stackSlot, double[] memnumber,int[] memint) : base(256)
@@ -27,7 +28,10 @@ namespace ASRuntime
 
 			public StackFrame create(CodeBlock block)
 			{
+				
 				StackFrame frame = base.create();
+					
+
 				frame.block = block;
 				frame.stepCount = block.instructions.Length;
 
@@ -35,9 +39,14 @@ namespace ASRuntime
 
 				frame.baseUseSlots = block.totalStackSlots + 2;
 				frame.baseBottomSlotIndex = 0;
-
+				
 				return frame;
 			}
+
+			//public override void ret(StackFrame c)
+			//{
+			//	base.ret(c);
+			//}
 
 		}
 

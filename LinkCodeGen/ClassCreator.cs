@@ -1020,7 +1020,20 @@ namespace LinkCodeGen
 						break;
 					}
 				}
-				
+
+				bool ismustfinal = false;
+				{
+					var param = method.GetParameters();
+					foreach (var item in param)
+					{
+						if (item.ParameterType.IsByRef)
+							ismustfinal = true;
+					}
+				}
+
+
+
+
 				string returntype = GetAS3TypeString(method.ReturnType, typeimports,null,null,null);
 
 				var mapinterface = maptointerfacemethod(method);
@@ -1059,7 +1072,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (!method.IsVirtual || method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1100,7 +1113,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (!method.IsVirtual || method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1118,7 +1131,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("public ");
 
-						if (!method.IsVirtual || method.IsFinal)
+						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1222,8 +1235,7 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						if (!method.IsVirtual || method.IsFinal)
+						else if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1255,8 +1267,7 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						if (!method.IsVirtual || method.IsFinal)
+						else if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1290,8 +1301,7 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						if (!method.IsVirtual || method.IsFinal)
+						else if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1323,8 +1333,7 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						if (!method.IsVirtual || method.IsFinal)
+						else if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}
@@ -1352,8 +1361,7 @@ namespace LinkCodeGen
 						{
 							as3api.Append("static ");
 						}
-
-						if (!method.IsVirtual || method.IsFinal)
+						else if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
 						}

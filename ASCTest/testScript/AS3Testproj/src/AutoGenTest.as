@@ -8,6 +8,7 @@ package
 	import flash.display.Sprite;
 	import system.Byte;
 	import system.Decimal;
+	import system.EventArgs;
 	import system.Int64;
 	import system.UInt64;
 	import system._Array_;
@@ -40,13 +41,23 @@ package
 			
 			 
 			 
-			 trace(b.b, b.i);
 			 
-			b.testType(CrossExt2);
+			 
+			trace(b.b, b.i);
+			 
+			//b.testType(CrossExt2);
 			
 			arr[0] = b;
 			
 			trace(arr[0].i,arr[0].testType(Decimal) );
+			
+			var c:Testobj = Testobj.createTestObj(CrossTest);
+			
+			c.EventTest_addEventListener(function(a,b){
+				trace("oneventhandler", a==c, b==EventArgs.Empty);
+			});
+			
+			trace(CrossTest(c).onEvent());
 			
 			
 			//b.doHandler("678", 1, 2);

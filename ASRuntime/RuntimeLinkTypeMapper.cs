@@ -176,9 +176,6 @@ namespace ASRuntime
                     throw new KeyNotFoundException();
                 }
             }
-
-            
-            
         }
 
 
@@ -373,7 +370,16 @@ namespace ASRuntime
 							{
 								try
 								{
-									var rtcls = bin.getClassByRunTimeDataType(getRuntimeDataType(type));
+									var rttype = getRuntimeDataType(type);
+									if (rttype < RunTimeDataType.unknown
+										&&
+										player.swc.primitive_to_class_table[rttype] != null
+										)
+									{
+										rttype = player.swc.primitive_to_class_table[rttype].getRtType();
+									}
+									
+									var rtcls = bin.getClassByRunTimeDataType(rttype);
 
 									if (player.init_static_class(rtcls, SourceToken.Empty))
 									{

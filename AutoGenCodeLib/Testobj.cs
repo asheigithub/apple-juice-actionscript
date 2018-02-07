@@ -14,7 +14,7 @@ namespace AutoGenCodeLib
 
     public class Testobj
 	{
-		
+
 
 		//public static Testobj Ins=new Testobj();
 
@@ -129,6 +129,14 @@ namespace AutoGenCodeLib
 		//public innerClass nc=new innerClass();
 
 
+		public static Testobj CreateTestObj(Type type)
+		{
+
+			return (Testobj)System.Activator.CreateInstance(type);
+
+		}
+
+
 		public delegate int TESTHandler<T>(string v1,int v2,T v3);
 
 		public TESTHandler<float> handler;// = (v1,v2,v3)=> { return 98765; };
@@ -139,10 +147,14 @@ namespace AutoGenCodeLib
 
 		}
 
+		public Testobj()
+		{
+			
+		}
 
 		public int DoHandler(string v1,int v2,float v3)
 		{
-			TestType(null);
+			TestType(typeof(System.Int64));
 
 			return int.Parse(v1) + v2 + (int)v3;
 		}

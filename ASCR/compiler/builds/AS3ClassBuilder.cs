@@ -596,11 +596,11 @@ namespace ASCompiler.compiler.builds
 						"actionscript类不能继承自[link_system]的[struct]类"
 						);
 					}
-					cls.isCrossExtend = true;
+					cls.isCrossExtend = true;					
 				}
 				else if (cls.super != null && cls.super.isCrossExtend)
 				{
-					cls.isCrossExtend = true;
+					cls.isCrossExtend = true;					
 				}
 
 			}
