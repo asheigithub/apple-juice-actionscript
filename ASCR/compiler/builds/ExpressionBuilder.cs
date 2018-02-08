@@ -601,8 +601,7 @@ namespace ASCompiler.compiler.builds
         {
             if (step.OpCode == "=")
             {
-
-                if (step.Arg1.IsReg) //在类似短路操作等编译过程中可能成为赋值目标
+				if (step.Arg1.IsReg) //在类似短路操作等编译过程中可能成为赋值目标
                 {
 
                     RightValueBase rv = getRightValue(env, step.Arg2, step.token, builder);
@@ -657,6 +656,20 @@ namespace ASCompiler.compiler.builds
 
                     }
 
+					//***如果之前有try read,则赋值目标为try read出的值***
+					bool hastryread=false;
+					for (int i = env.block.opSteps.Count-1; i >=0; i--)
+					{
+						var testop = env.block.opSteps[i];
+						if (testop.opCode == OpCode.try_read_getter && testop.arg1==eax)
+						{
+							eax = (StackSlotAccessor)testop.reg;
+							eax._isassigntarget = true;
+							hastryread = true;
+							break;
+						}
+					}
+
                     OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
                     op.reg = eax;
                     op.regType = eax.valueType;
@@ -667,7 +680,20 @@ namespace ASCompiler.compiler.builds
 
                     env.block.opSteps.Add(op);
 
+					if (hastryread) //
+					{
+						//***将值赋值回v1***
+						OpStep opwriteback = new OpStep(OpCode.try_write_setter,
+							new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+						opwriteback.reg = null;
+						opwriteback.regType = RunTimeDataType.unknown;
+						opwriteback.arg1 = eax;
+						opwriteback.arg1Type = eax.valueType;
+						opwriteback.arg2 = rv;
+						opwriteback.arg2Type = rv.valueType;
 
+						env.block.opSteps.Add(opwriteback);
+					}
 
 
 
@@ -704,6 +730,11 @@ namespace ASCompiler.compiler.builds
                     if (member is FindStaticMember)
                     {
                         memberLeftValue = ((FindStaticMember)member).buildAccessThisMember(step.token, env);
+
+						if (memberLeftValue is StackSlotAccessor)
+						{
+							((StackSlotAccessor)memberLeftValue)._isassigntarget = true;
+						}
 
                         if (
                             memberLeftValue is MethodGetterBase
@@ -782,7 +813,7 @@ namespace ASCompiler.compiler.builds
                         memberLeftValue = ((FindOutPackageScopeMember)member).buildAccessThisMember(step.token, env);
                         ((StackSlotAccessor)memberLeftValue)._isassigntarget = true;
                     }
-
+					
                     if (memberLeftValue is ClassPropertyGetter)
                     {
                         ClassPropertyGetter prop = (ClassPropertyGetter)memberLeftValue;
@@ -804,9 +835,9 @@ namespace ASCompiler.compiler.builds
 
                         RightValueBase rv = getRightValue(env, step.Arg2, step.token,builder);
 
-                        //**加入赋值操作***
-                        //**隐式类型转换检查
-                        if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType,builder))
+						//**加入赋值操作***
+						//**隐式类型转换检查
+						if (!ASRuntime.TypeConverter.testImplicitConvert(rv.valueType, lv.valueType,builder))
                         {
 
                             throw new BuildException( new BuildTypeError( step.token.line, step.token.ptr, step.token.sourceFile,

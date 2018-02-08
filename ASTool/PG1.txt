@@ -463,7 +463,7 @@
 <E4XAccess_1>  ::=identifier|"*"|"["<ExpressionList>"]";
 
 //<F_E4XAccess>  ::=".."<E4XNSAPPEND>;
-<F_E4XAccess>  ::=".."<NSAccess>|".*";
+<F_E4XAccess>  ::=".."<NSAccess>|".*"|"..*";
 <E4XFilter>    ::="(" <AExprList> ")";
 
 

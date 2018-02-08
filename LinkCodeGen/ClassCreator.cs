@@ -427,6 +427,8 @@ namespace LinkCodeGen
 
 
 			StringBuilder nativefunc = new StringBuilder();
+
+			StringBuilder adapterfunc = new StringBuilder();
 			//GenNativeFuncImport(nativefunc);
 			GenNativeFuncNameSpaceAndClass(nativefunc);
 
@@ -620,7 +622,7 @@ namespace LinkCodeGen
 						//***编写本地方法***
 						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
 						nativefuncClasses.Add(new CtorNativeCodeCreator(ctorname, constructorlist[0], type).GetCode());
-
+						
 
 					}
 
@@ -804,6 +806,99 @@ namespace LinkCodeGen
 					as3api.Append("public function " + name);
 
 					as3api.Append("();");
+				}
+
+				if (!type.IsSealed && !type.IsValueType && constructorlist.Count >0)
+				{
+					//****创建继承适配器****
+					string adaptername = GetNativeFunctionPart1(type) + "Adapter";
+					string extendclassname = MethodNativeCodeCreatorBase.GetTypeFullName(type);
+
+					adapterfunc.Append("\t\t");
+					adapterfunc.AppendLine("public class "+adaptername+" :"+extendclassname+" ,ASRuntime.ICrossExtendAdapter");
+					adapterfunc.Append("\t\t");
+					adapterfunc.AppendLine("{");
+
+
+					adapterfunc.AppendLine(@"
+			public ASBinCode.rtti.Class AS3Class { get { return typeclass; } }
+
+			public ASBinCode.rtData.rtObjectBase AS3Object { get { return bindAS3Object; } }
+
+			private Player player;
+			private Class typeclass;
+			private ASBinCode.rtData.rtObjectBase bindAS3Object;
+
+			public void SetAS3RuntimeEnvironment(Player player, Class typeclass, ASBinCode.rtData.rtObjectBase bindAS3Object)
+			{
+				this.player = player;
+				this.typeclass = typeclass;
+				this.bindAS3Object = bindAS3Object;
+			}
+");
+					var ctorfunc = constructorlist[0];
+					var paras = ctorfunc.GetParameters();
+					string ctor = @"			public " + adaptername + "(";
+
+					for (int i = 0; i < paras.Length; i++)
+					{
+						var p = paras[i];
+
+						ctor += NativeCodeCreatorBase.GetTypeFullName(p.ParameterType);
+						ctor += " ";
+						ctor += p.Name;
+
+						if (i < paras.Length - 1)
+						{
+							ctor += ",";
+						}
+					}
+
+
+					ctor += "):base(";
+					for (int i = 0; i < paras.Length; i++)
+					{
+						var p = paras[i];
+						ctor += p.Name;
+						if (i < paras.Length - 1)
+						{
+							ctor += ",";
+						}
+					}
+					ctor += "){}";
+
+					adapterfunc.AppendLine(ctor);
+
+					adapterfunc.Append("\t\t");
+					adapterfunc.Append("}");
+
+
+
+					//****追加adapter****
+					{
+						//[native, _system_ArrayList_ctor_]
+						//public function ArrayList();
+
+						string ctorname = "_" + GetNativeFunctionPart1(type) + "Adapter" + "_ctor";
+
+						as3api.AppendLine("\t\t//*********跨语言继承适配器*******");
+						as3api.AppendLine("\t\t[crossextendadapter];");
+						as3api.Append("\t\t");
+						as3api.AppendLine(string.Format("[native,{0}];", ctorname));
+						as3api.Append("\t\t");
+						as3api.Append("private function _" + name + "Adapter");
+
+						appendFunctionParameters(as3api, constructorlist[0], type, typeimports, null);
+
+						//***编写本地方法***
+						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						nativefuncClasses.Add(new AdapterCtorNativeCodeCreator(ctorname, constructorlist[0], type, GetNativeFunctionPart1(type) + "Adapter").GetCode());
+
+
+					}
+
+
+
 				}
 			}
 			else
@@ -1807,12 +1902,18 @@ namespace LinkCodeGen
 
 			EndRegFunction(nativefunc);
 
+			nativefunc.AppendLine(adapterfunc.ToString());
+
 			for (int i = 0; i < nativefuncClasses.Count; i++)
 			{
 				nativefunc.AppendLine(nativefuncClasses[i]);
 			}
 
 			EndNativeFuncClass(nativefunc);
+
+
+
+
 			//Console.WriteLine(as3api.ToString());
 
 			string as3file = "as3api/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";

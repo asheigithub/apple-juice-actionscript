@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdapterCtorNativeCodeCreator.cs" />
     <Compile Include="ClassCreator.cs" />
     <Compile Include="CreateInstanceNativeCodeCreator.cs" />
     <Compile Include="CreatorBase.cs" />
@@ -75,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\CreateInstance.txt" />
+    <Content Include="templates\AdapterCtorFunc.txt" />
     <Content Include="templates\CtorFunc.txt" />
     <Content Include="templates\DelegateCtor.txt" />
     <Content Include="templates\DelegateImplicitFrom.txt" />

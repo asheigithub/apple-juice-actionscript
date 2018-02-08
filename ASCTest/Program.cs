@@ -33,7 +33,7 @@ namespace ASCTest
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
 									   //path = @"../..\testScript\AS3Testproj\amd";
-				path = @"../..\testScript\AS3Testproj\src";
+				//path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -233,7 +233,7 @@ namespace ASCTest
                     for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];
-                        if (block != null && block.name.EndsWith("AutoGenTest"))
+                        if (block != null && block.name.EndsWith("hashBinary"))
                         {
                             Console.WriteLine();
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");

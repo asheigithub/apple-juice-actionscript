@@ -172,7 +172,7 @@ namespace ASRuntime.operators
 
                 }
 
-                //***调用设置器***
+                //***调用访问器***
 
                 var funCaller = player.funcCallerPool.create(frame, step.token);
                 //funCaller.releaseAfterCall = true;

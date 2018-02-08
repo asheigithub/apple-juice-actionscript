@@ -1,25 +1,24 @@
 package 
 {
 	
-	import as3runtime.RefOutStore;
-	import autogencodelib.TestObjExtends;
-	import autogencodelib.Testobj;
-	import autogencodelib.Testobj_TESTHandler_Of_Int64;
+	//import as3runtime.RefOutStore;
+	import com.adobe.crypto.MD5;
+	import com.adobe.crypto.SHA1;
+	import com.adobe.serialization.json.JSON;
 	import flash.display.Sprite;
-	import system.Byte;
-	import system.Decimal;
-	import system.EventArgs;
-	import system.Int64;
-	import system.UInt64;
-	import system._Array_;
-	import system._Object_;
-	import system.collections.IEnumerable;
-	import system.collections.IEnumerator;
-	import system.collections._IEnumerator_;
-	import system.io.MemoryStream;
-	import system.security.cryptography.MD5;
-	import system.security.cryptography.MD5CryptoServiceProvider;
-	import system.text.Encoding;
+	import flash.utils.getQualifiedClassName;
+	//import system.Byte;
+	//import system.Decimal;
+	//import system.EventArgs;
+	//import system.Int64;
+	//import system.UInt64;
+	//import system._Array_;
+	//import system._Object_;
+	//import system.collections.IEnumerable;
+	//import system.collections.IEnumerator;
+	//import system.collections._IEnumerator_;
+	//import system.io.MemoryStream;
+	//import system.text.Encoding;
 	
 	[Doc]
 	/**
@@ -28,36 +27,36 @@ package
 	 */
 	public class AutoGenTest extends Sprite
 	{
-		public var b;
+		//public var b;
 		
 		public function AutoGenTest() 
 		{
 			//var o = _Object_(5);			
 			//trace(o);
 			
-			var arr:_Array_= _Array_.createInstance(_Object_, 5);
-			
-			 b = new CrossExt2(99);
-			
-			 
-			 
-			 
-			 
-			trace(b.b, b.i);
-			 
-			//b.testType(CrossExt2);
-			
-			arr[0] = b;
-			
-			trace(arr[0].i,arr[0].testType(Decimal) );
-			
-			var c:Testobj = Testobj.createTestObj(CrossTest);
-			
-			c.EventTest_addEventListener(function(a,b){
-				trace("oneventhandler", a==c, b==EventArgs.Empty);
-			});
-			
-			trace(CrossTest(c).onEvent());
+			//var arr:_Array_= _Array_.createInstance(_Object_, 5);
+			//
+			 //b = new CrossExt2(99);
+			//
+			 //
+			 //
+			 //
+			 //
+			//trace(b.b, b.i);
+			 //
+			////b.testType(CrossExt2);
+			//
+			//arr[0] = b;
+			//
+			//trace(arr[0].i,arr[0].testType(Decimal) );
+			//
+			//var c:Testobj = Testobj.createTestObj(CrossTest);
+			//
+			//c.EventTest_addEventListener(function(a,b){
+				//trace("oneventhandler", a==c, b==EventArgs.Empty);
+			//});
+			//
+			//trace(CrossTest(c).onEvent());
 			
 			
 			//b.doHandler("678", 1, 2);
@@ -98,6 +97,51 @@ package
 			//
 			//trace( count);
 			
+			//trace(getQualifiedClassName(MD5));
+			
+			// com.adobe.serialization.json.
+			
+			var b = [1,2,3];
+			
+			trace(com.adobe.serialization.json.JSON.encode(b));
+			
+			var str ="this \"is\" \t a \/ string \b \f \r \h \\ \n with \' ch\\u0061rs that should be { } http://escaped.com/";
+			
+			var e = com.adobe.serialization.json.JSON.encode(str);
+			trace(e);
+			
+			var de= com.adobe.serialization.json.JSON.decode(e);
+			trace( MD5.hash( String(de)));
+			
+			var o:* = com.adobe.serialization.json.JSON.decode( "{\"p1\":true,\"p2\":false}" ) as Object;
+			
+			trace(o);
+			trace(o.p1);
+			
+			trace(o.p2);
+			
+			var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
+			var s:String = com.adobe.serialization.json.JSON.encode( obj );
+			
+			trace(s);
+			
+			
+			
+			//o = com.adobe.serialization.json.JSON.decode( str );
+			//trace(o,typeof o);
+			
+		}
+		
+		
+		
+		private var _a:int = 5;
+		public function get abc():int 
+		{
+			return _a;
+		}
+		public function set abc(i:int):void
+		{
+			_a = i;
 			
 		}
 		

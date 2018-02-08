@@ -3748,12 +3748,12 @@ Public Class AS3FileGrammarAnalyser
 
         node.exprsteplist = New AS3.Expr.AS3ExprStepList()
 
-        If node.Nodes(0).GrammerLeftNode.Name = ".." Then
+		If node.Nodes(0).GrammerLeftNode.Name = ".." Then
 
 
 
-            'If node.MatchedToken.StringValue = ".." Then
-            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
+			'If node.MatchedToken.StringValue = ".." Then
+			Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Pop()
 			Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
 
 
@@ -3762,99 +3762,112 @@ Public Class AS3FileGrammarAnalyser
 			If node.Nodes(1).Nodes.Count > 0 Then
 
 
-                VisitNodes(node.Nodes(1))
-                node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
+				VisitNodes(node.Nodes(1))
+				node.exprsteplist.AddRange(node.Nodes(1).exprsteplist)
 
 
 
-                Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-                op.Arg1 = arg1
-                op.Arg2 = arg2
-                op.Arg3 = MemberScopeStack.Peek().ExprDataStack.Pop()
-                op.OpCode = node.MatchedToken.StringValue
-                op.Type = Expr.OpType.E4XAccess
+				Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+				op.Arg1 = arg1
+				op.Arg2 = arg2
+				op.Arg3 = MemberScopeStack.Peek().ExprDataStack.Pop()
+				op.OpCode = node.MatchedToken.StringValue
+				op.Type = Expr.OpType.E4XAccess
 
 
-                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
-                node.exprsteplist.Add(op)
+				MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+				node.exprsteplist.Add(op)
 
-            Else
-                Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-                op.Arg1 = arg1
-                op.Arg2 = arg2
+			Else
+				Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+				op.Arg1 = arg1
+				op.Arg2 = arg2
 
-                op.OpCode = node.MatchedToken.StringValue
-                op.Type = Expr.OpType.E4XAccess
-
-
-                MemberScopeStack.Peek().ExprDataStack.Push(arg1)
-                node.exprsteplist.Add(op)
-            End If
+				op.OpCode = node.MatchedToken.StringValue
+				op.Type = Expr.OpType.E4XAccess
 
 
-
-
+				MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+				node.exprsteplist.Add(op)
+			End If
 
 
 
 
-            'Else
 
-            '    Dim arg3 As New AS3.Expr.AS3DataStackElement()
-            '    arg3.Data = New AS3.Expr.AS3DataValue()
-            '    arg3.Data.FF1Type = Expr.FF1DataValueType.e4xxml
-            '    arg3.Data.Value = "*"
 
-            '    MemberScopeStack.Peek().ExprDataStack.Push(arg3)
 
-            'End If
-        ElseIf node.Nodes(0).GrammerLeftNode.Name = ".*" Then
-            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
+
+			'Else
+
+			'    Dim arg3 As New AS3.Expr.AS3DataStackElement()
+			'    arg3.Data = New AS3.Expr.AS3DataValue()
+			'    arg3.Data.FF1Type = Expr.FF1DataValueType.e4xxml
+			'    arg3.Data.Value = "*"
+
+			'    MemberScopeStack.Peek().ExprDataStack.Push(arg3)
+
+			'End If
+		ElseIf node.Nodes(0).GrammerLeftNode.Name = ".*" Then
+			Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
 			Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
 
 			Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-            op.Arg1 = arg1
-            op.Arg2 = arg2
-            op.OpCode = "*"
-            op.Type = Expr.OpType.E4XAccess
+			op.Arg1 = arg1
+			op.Arg2 = arg2
+			op.OpCode = "*"
+			op.Type = Expr.OpType.E4XAccess
 
 
 
-            'If op.OpCode = ".." Then
-            MemberScopeStack.Peek().ExprDataStack.Pop()
-            'End If
+			'If op.OpCode = ".." Then
+			MemberScopeStack.Peek().ExprDataStack.Pop()
+			'End If
 
 
 
-            MemberScopeStack.Peek().ExprDataStack.Push(arg1)
-            node.exprsteplist.Add(op)
-
-
-        ElseIf node.Nodes(0).GrammerLeftNode.Name = "*" Then
-            'If node.MatchedToken.StringValue = ".." Then
-            Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
+			MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+			node.exprsteplist.Add(op)
+		ElseIf node.Nodes(0).GrammerLeftNode.Name = "..*" Then
+			Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
 			Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
 
 			Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
-            op.Arg1 = arg1
-            op.Arg2 = arg2
-            op.OpCode = node.MatchedToken.StringValue
-            op.Type = Expr.OpType.E4XAccess
+			op.Arg1 = arg1
+			op.Arg2 = arg2
+			op.OpCode = "..*"
+			op.Type = Expr.OpType.E4XAccess
+
+
+			MemberScopeStack.Peek().ExprDataStack.Pop()
+
+			MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+			node.exprsteplist.Add(op)
+
+		ElseIf node.Nodes(0).GrammerLeftNode.Name = "*" Then
+			'If node.MatchedToken.StringValue = ".." Then
+			Dim arg2 = MemberScopeStack.Peek().ExprDataStack.Peek()
+			Dim arg1 = AS3.Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
+
+			Dim op As New AS3.Expr.AS3ExprStep(node.MatchedToken)
+			op.Arg1 = arg1
+			op.Arg2 = arg2
+			op.OpCode = node.MatchedToken.StringValue
+			op.Type = Expr.OpType.E4XAccess
 
 
 
-            'If op.OpCode = ".." Then
-            MemberScopeStack.Peek().ExprDataStack.Pop()
-            'End If
+			'If op.OpCode = ".." Then
+			MemberScopeStack.Peek().ExprDataStack.Pop()
+			'End If
 
 
 
-            MemberScopeStack.Peek().ExprDataStack.Push(arg1)
-            node.exprsteplist.Add(op)
+			MemberScopeStack.Peek().ExprDataStack.Push(arg1)
+			node.exprsteplist.Add(op)
 
 
-
-        Else
+		Else
 
             'VisitNodes(node.Nodes(1))
 

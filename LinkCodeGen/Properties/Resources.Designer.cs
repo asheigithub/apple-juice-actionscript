@@ -61,6 +61,45 @@ namespace LinkCodeGen.Properties {
         }
         
         /// <summary>
+        ///   查找类似 		class [classname] : NativeConstParameterFunction,ICrossExtendAdapterCreator
+        ///		{
+        ///			public [classname]() : base([paracount])
+        ///			{
+        ///				para = new List&lt;RunTimeDataType&gt;();
+        ///[pushparas]
+        ///			}
+        ///
+        ///			public Type GetAdapterType()
+        ///			{
+        ///				return typeof([adapterclass]);
+        ///			}
+        ///
+        ///			public override bool isMethod
+        ///			{
+        ///				get
+        ///				{
+        ///					return true;
+        ///				}
+        ///			}
+        ///
+        ///			public override string name
+        ///			{
+        ///				get
+        ///				{
+        ///					return &quot;[classname]&quot;;
+        ///				}
+        ///			}
+        ///
+        ///			List&lt;RunTimeDataType&gt; para;
+        ///			public ove [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string AdapterCtorFunc {
+            get {
+                return ResourceManager.GetString("AdapterCtorFunc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 		class [classname] : NativeConstParameterFunction
         ///		{
         ///			public [classname]() : base([paracount])
