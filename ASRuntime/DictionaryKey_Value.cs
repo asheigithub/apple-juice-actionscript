@@ -79,7 +79,7 @@ namespace ASRuntime
     class DictionarySlot : ObjectMemberSlot,ILinkSlot
     {
         
-        public DictionarySlot(ASBinCode.rtData.rtObjectBase obj,RunTimeDataType functionClassRtType) : base(obj,functionClassRtType)
+        public DictionarySlot(ASBinCode.rtData.rtObjectBase obj,RunTimeDataType functionClassRtType) : base(obj,functionClassRtType,RunTimeDataType.rt_void,null)
         {
             propertyIsEnumerable = false;
         }

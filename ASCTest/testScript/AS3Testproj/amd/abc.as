@@ -82,34 +82,34 @@ package
 			//trace("action script:", (new Date()).getTime() - t );
 			//trace(total);
 			
-			//kkk(1);
-			//kkk(2);
-			//kkk(4);
-			//kkk(5);
+			kkk(1);
+			kkk(2);
+			kkk(4);
+			kkk(5);
 			
 		}
 		
-		//private function kkk(i:int):void
-		//{
-			//
-			//switch (i) 
-			//{
-				//case 1:
-				//case 2:
-					//kkk(i + 2);
-				//case 3:
-					//trace("case",i);
-				//break;
-			//case 4:
-				//trace(i + 2);
-			//default:
-				//
-				//trace("default", i);
-				//i++;
-				//trace("d2", i);
-			//}
-			//
-		//}
+		private function kkk(i:int):void
+		{
+			
+			switch (i) 
+			{
+				case 1:
+				case 2:
+					kkk(i + 2);
+				case 3:
+					trace("case",i);
+				break;
+			case 4:
+				trace(i + 2);
+			default:
+				
+				trace("default", i);
+				i++;
+				trace("d2", i);
+			}
+			
+		}
 		
 	}
 }

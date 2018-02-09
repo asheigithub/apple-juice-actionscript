@@ -81,6 +81,22 @@ namespace ASRuntime.operators
 						return;
 					}
 
+					if (slot is ObjectMemberSlot && !((ObjectMemberSlot)slot).isConstMember)
+					{
+						BlockCallBackBase cb = frame.player.blockCallBackPool.create();
+						cb.scope = scope;
+						cb.step = step;
+						cb.args = frame;
+						cb.setCallBacker(_objectmemberslotConvertCallbacker);
+						cb.cacheObjects[0] = slot;
+
+						//***调用强制类型转换***
+						OpCast.CastValue(v, ((ObjectMemberSlot)slot).slottype,
+							frame, step.token, scope, frame._tempSlot1, cb, false);
+
+						return;
+					}
+
 				}
 				string ext = String.Empty;
 
@@ -147,9 +163,35 @@ namespace ASRuntime.operators
 			}
             
         }
+		internal static void _objectmemberslotConvertCallbacker(BlockCallBackBase sender, object args)
+		{
+			StackFrame frame = (StackFrame)sender.args;
+			OpStep step = sender.step;
 
+			ASBinCode.RunTimeValueBase v = frame._tempSlot1.getValue();
+			//ASBinCode.SLOT slot = step.reg.getSlot(sender.scope, frame);
 
-        public static void _doPropAssigning(ClassPropertyGetter prop,StackFrame frame,
+			ObjectMemberSlot slot = (ObjectMemberSlot)sender.cacheObjects[0];
+
+			bool success;
+			slot.assign(v, out success);
+
+			if (!success)
+			{
+				frame.throwCastException(step.token,
+					   step.arg1.getValue(sender.scope, frame).rtType,
+					   slot.slottype
+						);
+				frame.endStep(step);
+			}
+			else
+			{
+				frame.endStepNoError();
+			}
+
+		}
+
+		public static void _doPropAssigning(ClassPropertyGetter prop,StackFrame frame,
             OpStep step,Player player, RunTimeScope scope,
             ASBinCode.rtData.rtObjectBase bindobj,RunTimeValueBase v , StackSlot sslot )
         {

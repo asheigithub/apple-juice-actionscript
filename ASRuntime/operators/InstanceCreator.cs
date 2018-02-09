@@ -802,7 +802,7 @@ namespace ASRuntime.operators
 					obj.memberData = new ObjectMemberSlot[cls.fields.Count];
 					for (int i = 0; i < obj.memberData.Length; i++)
 					{
-						obj.memberData[i] = new ObjectMemberSlot(result, player.swc.FunctionClass.getRtType());
+						obj.memberData[i] = new ObjectMemberSlot(result, player.swc.FunctionClass.getRtType(),cls.fields[i].valueType,player.swc);
 
 						if (cls.fields[i].defaultValue == null)
 						{

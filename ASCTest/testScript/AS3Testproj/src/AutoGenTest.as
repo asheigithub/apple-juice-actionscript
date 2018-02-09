@@ -4,8 +4,14 @@ package
 	//import as3runtime.RefOutStore;
 	import com.adobe.crypto.MD5;
 	import com.adobe.crypto.SHA1;
+	import com.adobe.crypto.SHA224;
+	import com.adobe.crypto.SHA256;
+	import com.adobe.images.BitmapData1;
+	import com.adobe.images.JPGEncoder;
+	import com.adobe.images.PNGEncoder;
 	import com.adobe.serialization.json.JSON;
 	import flash.display.Sprite;
+	import flash.utils.ByteArray;
 	import flash.utils.getQualifiedClassName;
 	//import system.Byte;
 	//import system.Decimal;
@@ -101,35 +107,57 @@ package
 			
 			// com.adobe.serialization.json.
 			
-			var b = [1,2,3];
-			
-			trace(com.adobe.serialization.json.JSON.encode(b));
-			
-			var str ="this \"is\" \t a \/ string \b \f \r \h \\ \n with \' ch\\u0061rs that should be { } http://escaped.com/";
-			
-			var e = com.adobe.serialization.json.JSON.encode(str);
-			trace(e);
-			
-			var de= com.adobe.serialization.json.JSON.decode(e);
-			trace( MD5.hash( String(de)));
-			
-			var o:* = com.adobe.serialization.json.JSON.decode( "{\"p1\":true,\"p2\":false}" ) as Object;
-			
-			trace(o);
-			trace(o.p1);
-			
-			trace(o.p2);
-			
-			var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
-			var s:String = com.adobe.serialization.json.JSON.encode( obj );
-			
-			trace(s);
-			
+			//var b = [1,2,3];
+			//
+			//trace(com.adobe.serialization.json.JSON.encode(b));
+			//
+			//var str ="this \"is\" \t a \/ string \b \f \r \h \\ \n with \' ch\\u0061rs that should be { } http://escaped.com/";
+			//
+			//var e = com.adobe.serialization.json.JSON.encode(str);
+			//trace(e);
+			//
+			//var de= com.adobe.serialization.json.JSON.decode(e);
+			//trace( MD5.hash( String(de)));
+			//
+			//var o:* = com.adobe.serialization.json.JSON.decode( "{\"p1\":true,\"p2\":false}" ) as Object;
+			//
+			//trace(o);
+			//trace(o.p1);
+			//
+			//trace(o.p2);
+			//
+			//var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
+			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
+			//
+			//trace(s);
+			var v:Vector.<String> = new Vector.<String>();
+			v[0] = null;
+			trace(  v[0], SHA1.hash(typeof v[0]));
 			
 			
 			//o = com.adobe.serialization.json.JSON.decode( str );
 			//trace(o,typeof o);
 			
+			var e:JPGEncoder = new JPGEncoder();
+			var bytes:ByteArray =e.encode( new BitmapData1(256, 256) );
+			
+			trace( SHA256.hashBytes( bytes));
+			
+			
+			//trace(SHA256.hash(""));
+			
+			//var t:Number = (new Date()).getTime();
+			//var millionAs:String = new String("");
+			//for ( var i:int = 0; i < 100000; i++ ) {
+				//millionAs += "a";
+//
+			//}
+			//
+			//trace("makestring:", ((new Date()).getTime() - t ));
+			//t = (new Date()).getTime();
+			//
+			//trace(SHA224.hash(millionAs));
+			//trace("gethash:", ((new Date()).getTime() - t ));
 		}
 		
 		

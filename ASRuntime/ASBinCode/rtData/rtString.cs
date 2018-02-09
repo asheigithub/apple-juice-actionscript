@@ -58,7 +58,7 @@ namespace ASBinCode.rtData
             }
             else
             {
-                return value.ToString();
+                return value;
             }
         }
 

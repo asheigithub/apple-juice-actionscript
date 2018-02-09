@@ -414,7 +414,7 @@ namespace ASRuntime
                 }
                 else
                 {
-					_stringValue.value = value;
+					_stringValue.value =  value;
 					//store[RunTimeDataType.rt_string] = _stringValue;
 					store[COMMREFTYPEOBJ] = _stringValue;
 					

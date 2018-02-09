@@ -168,7 +168,7 @@ namespace ASCompiler.compiler
 
 		public void optimizeFunctoinBlock(Builder builder, ASBinCode.rtti.FunctionDefine f)
 		{
-			
+
 			optimizeOtherStep();
 
 			convertVarToReg(builder, f);
@@ -1119,26 +1119,51 @@ namespace ASCompiler.compiler
 						return true;
 					}
 
-					//如果后面还有回跳并跳回当前行前，说明有问题
-					for (int l = k + 1; l < block.opSteps.Count; l++)
-					{
-						var sss = block.opSteps[l];
-						if ((builds.AS3FunctionBuilder.isJMP(sss.opCode) || builds.AS3FunctionBuilder.isIfJmp(sss.opCode))
-							&&
-							sss.jumoffset < 0
-							)
-						{
-							if (l + sss.jumoffset <= checkline)
-							{
-								return true;
-							}
-						}
+					////如果后面还有回跳并跳回当前行前，说明有问题
+					//for (int l = k + 1; l < block.opSteps.Count; l++)
+					//{
+					//	var sss = block.opSteps[l];
+					//	if ((builds.AS3FunctionBuilder.isJMP(sss.opCode) || builds.AS3FunctionBuilder.isIfJmp(sss.opCode))
+					//		&&
+					//		sss.jumoffset < 0
+					//		)
+					//	{
+					//		if (l + sss.jumoffset <= checkline)
+					//		{
+					//			return true;
+					//		}
+					//	}
 
-					}
+					//}
 					
 				}
 
 			}
+
+			List<int> jumpbacks = new List<int>();
+			var allines = collectAllSteps(checkline, jumpbacks);
+			
+			if (jumpbacks.Count > 0)
+			{
+				
+				//***跳回中间来的不行***
+				if (jumpbacks[0] <= checkline )
+				{
+					for (int i = 0; i < allines.Count; i++)
+					{
+						//if (!isSafeStep(block.opSteps[allines[i]]))
+							return true;
+					}
+
+					//return false;
+				}
+				
+
+			}
+
+
+
+
 
 			return false;
 		}
@@ -1330,11 +1355,11 @@ namespace ASCompiler.compiler
 
 
 					StackSlotAccessor register = item;
-					if (canOptimize(i,block.opSteps[i], register) 
-						||
-						
+					if (
 						isspecialcheck //说明为特殊检测
-						
+						||
+						canOptimize(i,block.opSteps[i], register) 
+
 						)
 					{
 						int lastline = findLastRefLine(register);
@@ -1695,33 +1720,78 @@ namespace ASCompiler.compiler
 						}
 					}
 				}
-				else if (opcode == OpCode.assigning)
+				else
 				{
-					var step = block.opSteps[i];
-					var sa = step.arg1 as StackSlotAccessor;
-					if (sa == null)
+					if (!isSafeStep(block.opSteps[i]))
 					{
-
-					}
-					else
-					{
-						if (sa._regMember != null &&
-						sa._regMember.bindField is ClassPropertyGetter)
-						{
-							failedline = i; continues.Add(i);
-							return false;
-						}
-
+						failedline = i; continues.Add(i);
+						return false;
 					}
 				}
-				else if (mabeCallfunction(block.opSteps[i].opCode))
-				{
-					failedline = i; continues.Add(i);
-					return false;
-				}
+				//else if (opcode == OpCode.assigning)
+				//{
+				//	var step = block.opSteps[i];
+				//	var sa = step.arg1 as StackSlotAccessor;
+				//	if (sa == null)
+				//	{
+
+				//	}
+				//	else
+				//	{
+				//		if (sa._regMember != null &&
+				//		sa._regMember.bindField is ClassPropertyGetter)
+				//		{
+				//			failedline = i; continues.Add(i);
+				//			return false;
+				//		}
+
+				//	}
+				//}
+				//else if (mabeCallfunction(block.opSteps[i].opCode))
+				//{
+				//	failedline = i; continues.Add(i);
+				//	return false;
+				//}
 			}
 			failedline = 0;
 			return true;
+		}
+
+		private bool isSafeStep(OpStep step)
+		{
+			var opcode = step.opCode;
+
+			if (builds.AS3FunctionBuilder.isIfJmp(opcode) || builds.AS3FunctionBuilder.isJMP(opcode))
+			{
+				//throw new Exception("这行不能在这里判断");
+			}
+
+
+			if (opcode == OpCode.assigning)
+			{
+				var sa = step.arg1 as StackSlotAccessor;
+				if (sa == null)
+				{
+
+				}
+				else
+				{
+					if (sa._regMember != null &&
+					sa._regMember.bindField is ClassPropertyGetter)
+					{
+						return false;
+					}
+
+				}
+			}
+			else if (mabeCallfunction(opcode))
+			{
+				return false;
+			}
+			
+			
+			return true;
+			
 		}
 
 		private bool canOptimize(int line,OpStep step, StackSlotAccessor register)
@@ -1744,33 +1814,6 @@ namespace ASCompiler.compiler
 				}
 			}
 
-			int lastline = findLastRefLine(register);
-			int bottomline = lastline;
-			//****如果后面有跳回lastline的，并且中间有不安全的地方，则返回false***
-			for (int i = lastline+1; i < block.opSteps.Count-1; i++)
-			{
-				var t = block.opSteps[i];
-				if (builds.AS3FunctionBuilder.isIfJmp(t.opCode) || builds.AS3FunctionBuilder.isJMP(t.opCode))
-				{
-					if (t.jumoffset < 0)
-					{
-						if (i + t.jumoffset <= lastline && i+t.jumoffset >=line)
-						{
-							bottomline = i;
-						}
-					}
-				}
-			}
-			if (bottomline > lastline)
-			{
-				int f = 0;
-				if (!isAllSafeOperator(lastline + 1, bottomline, bottomline, register, out f, new List<int>()))
-				{
-					return false;
-				}
-			}
-
-
 
 			if (register.valueType == RunTimeDataType.rt_number
 				||
@@ -1781,6 +1824,44 @@ namespace ASCompiler.compiler
 				register.valueType == RunTimeDataType.rt_boolean
 				)
 			{
+				List<int> jumpbacks = new List<int>();
+				var allines = collectAllSteps(line, jumpbacks);
+				int lastline = findLastRefLine(register);
+
+				if (jumpbacks.Count > 0)
+				{
+					if (step.arg1 == register || step.arg2 == register)
+					{
+						//***跳回来不行***
+						if (jumpbacks[0] <= lastline)
+						{
+							for (int i = 0; i < allines.Count; i++)
+							{
+								if (!isSafeStep(block.opSteps[allines[i]]))
+									return false;
+							}
+
+
+							//return false;
+						}
+					}
+					else
+					{
+						//***跳回中间来的不行***
+						if (jumpbacks[0] <= lastline && line <= jumpbacks[0])
+						{
+							for (int i = 0; i < allines.Count; i++)
+							{
+								if (!isSafeStep(block.opSteps[allines[i]]))
+									return false;
+							}
+
+							//return false;
+						}
+					}
+
+				}
+
 				if (step.opCode == OpCode.access_dot)
 				{
 					if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget ||
@@ -1799,8 +1880,74 @@ namespace ASCompiler.compiler
 
 				return canSaveToMemReg(step.opCode);
 			}
-			return false;
+			else
+			{
+				return false;
+			}
 		}
+
+		private List<int> collectAllSteps(int startline,List<int> jumpbacklines)
+		{
+			Dictionary<int, int> dictionary = new Dictionary<int, int>();
+			collectAllSteps(startline, dictionary);
+			List<int> result= new List<int>(dictionary.Keys);
+
+			result.Sort();
+
+			for (int i = 0; i < result.Count; i++)
+			{
+				int line = result[i];
+
+				var s = block.opSteps[line];
+				if (builds.AS3FunctionBuilder.isIfJmp(s.opCode) || builds.AS3FunctionBuilder.isJMP(s.opCode))
+				{
+					if (s.jumoffset < 0)
+					{
+						jumpbacklines.Add(line + s.jumoffset);
+					}
+				}
+			}
+			jumpbacklines.Sort();
+
+			return result;
+		}
+
+
+
+
+		private void  collectAllSteps(int startline,Dictionary<int,int> visited)
+		{			
+			for (int i = startline; i < block.opSteps.Count; i++)
+			{
+				if (!visited.ContainsKey(i))
+				{
+					visited.Add(i, i);
+
+					var step = block.opSteps[i];
+
+					if (builds.AS3FunctionBuilder.isJMP(step.opCode))
+					{
+						if (step.jumoffset > 0)
+						{
+							i += step.jumoffset;
+						}
+						else
+						{
+							int line = i + step.jumoffset;
+							collectAllSteps(line, visited);
+						}
+					}
+					else if (builds.AS3FunctionBuilder.isIfJmp(step.opCode))
+					{
+						//collectAllSteps(i + 1, visited);
+						collectAllSteps(i + step.jumoffset, visited);
+					}
+				}
+			}
+
+		}
+
+
 
 		private bool canSaveToMemReg(OpCode code)
 		{

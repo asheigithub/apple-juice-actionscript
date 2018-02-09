@@ -453,7 +453,21 @@ namespace ASRuntime.operators
 							vector_data.vector_type > RunTimeDataType.unknown &&
 							value.rtType == RunTimeDataType.rt_null
 						)
-
+						||
+						(
+							vector_data.vector_type == RunTimeDataType.rt_array &&
+							value.rtType == RunTimeDataType.rt_null
+						)
+						||
+						(
+							vector_data.vector_type == RunTimeDataType.rt_function &&
+							value.rtType == RunTimeDataType.rt_null
+						)
+						||
+						(
+							vector_data.vector_type == RunTimeDataType.rt_string &&
+							value.rtType == RunTimeDataType.rt_null
+						)
 					)
 					)
 				{

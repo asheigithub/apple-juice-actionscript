@@ -897,7 +897,7 @@ namespace ASRuntime.operators
             {
                 if (v.getValue().rtType == RunTimeDataType.rt_function)
                 {
-                    ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj,player.swc.FunctionClass.getRtType());
+                    ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj,player.swc.FunctionClass.getRtType(),RunTimeDataType.rt_void,player.swc);
                     tempslot.directSet(v.getValue());
                     v = tempslot;
                 }
@@ -909,7 +909,7 @@ namespace ASRuntime.operators
                     {
                         if (tout == RunTimeDataType.rt_function)
                         {
-                            ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj,player.swc.FunctionClass.getRtType());
+                            ObjectMemberSlot tempslot = new ObjectMemberSlot(rtObj,player.swc.FunctionClass.getRtType(),RunTimeDataType.rt_void,player.swc);
                             tempslot.directSet(
                                 TypeConverter.ObjectImplicit_ToPrimitive(
                                 (rtObjectBase)v.getValue()));
