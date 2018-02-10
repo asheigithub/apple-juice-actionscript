@@ -21,6 +21,34 @@ namespace ASBinCode
         /// </summary>
         public List<rtti.Class> primitive_to_class_table = new List<Class>();
 
+		private Class _arrayClass;
+		/// <summary>
+		/// Array类
+		/// </summary>
+		public Class ArrayClass
+		{
+			get
+			{
+				if (_arrayClass != null)
+					return _arrayClass;
+
+				if (primitive_to_class_table == null)
+					return null;
+
+				if (primitive_to_class_table.Count > RunTimeDataType.rt_array
+					&&
+					primitive_to_class_table[RunTimeDataType.rt_array] !=null
+					)
+				{
+					_arrayClass = primitive_to_class_table[RunTimeDataType.rt_array];
+					return _arrayClass;
+				}
+
+				return null;
+			}
+		}
+
+
 		[NonSerialized]
 		public List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
 		[NonSerialized]

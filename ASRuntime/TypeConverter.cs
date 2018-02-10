@@ -450,7 +450,7 @@ namespace ASRuntime
 			}
 			if (src.rtType == rt.rt_int || src.rtType == rt.rt_uint)
 			{
-				return dsttype == rt.rt_number;
+				return (dsttype == rt.rt_number || dsttype==rt.rt_int || dsttype==rt.rt_uint);
 			}
 
 

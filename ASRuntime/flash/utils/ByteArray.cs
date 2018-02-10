@@ -557,12 +557,14 @@ namespace ASRuntime.flash.utils
 			{
 				throw new EOFException();
 			}
-
-			while (ms.Position < ms.Length)
+			int writebytes = 0;
+			ms.Position = position;
+			while (ms.Position < ms.Length && writebytes<length)
 			{
+				writebytes++;
 				byteArray.ms.WriteByte((byte)ms.ReadByte());
 			}
-
+			//ms.Position = position;
 			position = (uint)ms.Position;
 		}
 

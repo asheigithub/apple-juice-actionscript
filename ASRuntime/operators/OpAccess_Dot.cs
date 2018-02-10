@@ -389,7 +389,23 @@ namespace ASRuntime.operators
             }
             else
             {
-                if (rtObj.value is DictionaryObject)
+				if (rtObj.value._class == player.swc.ArrayClass
+					&&
+					(
+					   v2.rtType == RunTimeDataType.rt_int ||
+					   v2.rtType == RunTimeDataType.rt_number ||
+					   v2.rtType == RunTimeDataType.rt_uint 
+					   
+					   )
+					)
+				{
+					if (_assess_array(TypeConverter.ObjectImplicit_ToPrimitive(rtObj), frame, step, scope))
+					{
+						return;
+					}
+				}
+
+				if (rtObj.value is DictionaryObject)
                 {
                     if (v2.rtType == RunTimeDataType.rt_boolean ||
                        v2.rtType == RunTimeDataType.rt_int ||
@@ -638,11 +654,18 @@ namespace ASRuntime.operators
                     {
                         if (ot == RunTimeDataType.rt_array)
                         {
-                            RunTimeValueBase obj = TypeConverter.ObjectImplicit_ToPrimitive(rtObj);
-                            if (_assess_array(obj, frame, step, scope))
-                            {
-                                return;
-                            }
+							double number;
+							if (double.TryParse(name, out number))
+							{
+								if (!double.IsNaN(number) && !double.IsInfinity(number) && (int)number>=0)
+								{
+									RunTimeValueBase obj = TypeConverter.ObjectImplicit_ToPrimitive(rtObj);
+									if (_assess_arraybyindex(obj, frame, step, scope, (int)number))
+									{
+										return;
+									}
+								}
+							}
                         }
                     }
                     
@@ -956,17 +979,25 @@ namespace ASRuntime.operators
                         step.token,1009, "Cannot access a property or method of a null object reference."
                         
                         );
-
+				frame.endStep();
             }
             else
             {
                 var player = frame.player;
-                if (obj is rtArray)
+				
+				if (obj is rtArray  
+					
+					)
                 {
-                    if (_assess_array(obj, frame, step, scope))
-                    {
-                        return;
-                    }
+					var v2type = step.arg2.valueType;
+					if ((v2type == RunTimeDataType.rt_int || v2type == RunTimeDataType.rt_number || v2type == RunTimeDataType.rt_uint))
+					{
+						if (_assess_array(obj, frame, step, scope)
+							)
+						{
+							return;
+						}
+					}
                 }
                 else if (obj is rtObjectBase)
                 {
@@ -1050,63 +1081,140 @@ namespace ASRuntime.operators
         }
 
 
-        private static bool _assess_array( RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope)
+		public static void exec_arrayAccessor_bind(StackFrame frame, OpStep step, RunTimeScope scope)
+		{
+			RunTimeValueBase obj = step.arg1.getValue(scope, frame);
+			if (rtNull.nullptr.Equals(obj))
+			{
+				frame.throwError(
+
+						step.token, 1009, "Cannot access a property or method of a null object reference."
+
+						);
+				frame.endStep();
+			}
+			else
+			{
+				//***访问数组的内容***
+				StackSlotAccessor register = (StackSlotAccessor)step.reg;
+				StackSlot stackSlot = (StackSlot)register.getSlot(scope, frame);
+
+				if (register._isdeletetarget)
+				{
+					int index = ((rtInt)step.arg2.getValue(scope,frame)).value;
+					var arr = ((rtArray)obj).innerArray;
+
+					if (index < arr.Count)
+					{
+						arr[index] = rtUndefined.undefined;
+					}
+					stackSlot._cache_arraySlot.idx = index;
+					stackSlot._cache_arraySlot.array = (rtArray)obj;
+					stackSlot.linkTo(stackSlot._cache_arraySlot);
+				}
+				else
+				{
+					int index = ((rtInt)step.arg2.getValue(scope, frame)).value;
+					if (index >= ((rtArray)obj).innerArray.Count)
+					{
+						var toadd = ((rtArray)obj).innerArray;
+						int addnum = index + 1 - toadd.Count;
+
+						while (addnum > 0)
+						{
+							addnum--;
+							toadd.Add(rtUndefined.undefined);
+						}
+					}
+					else if (index < 0)
+					{
+						exec_bracket_access(frame, step, scope);
+						return;
+					}
+
+					if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+					{
+						stackSlot._cache_arraySlot.idx = index;
+						stackSlot._cache_arraySlot.array = (rtArray)obj;
+
+						stackSlot.linkTo(stackSlot._cache_arraySlot);
+					}
+					else
+					{
+						stackSlot.directSet(((rtArray)obj).innerArray[index]);
+					}
+
+				}
+
+
+				frame.endStep();
+			}
+		}
+
+		private static bool _assess_arraybyindex(RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope,int number)
+		{
+			if ((int)number >= 0)
+			{
+				//***访问数组的内容***
+				StackSlotAccessor register = (StackSlotAccessor)step.reg;
+				StackSlot stackSlot = (StackSlot)register.getSlot(scope, frame);
+
+				if (register._isdeletetarget)
+				{
+					int index = (int)number;
+					var arr = ((rtArray)obj).innerArray;
+
+					if (index < arr.Count)
+					{
+						arr[index] = rtUndefined.undefined;
+					}
+					stackSlot._cache_arraySlot.idx = index;
+					stackSlot._cache_arraySlot.array = (rtArray)obj;
+					stackSlot.linkTo(stackSlot._cache_arraySlot);
+				}
+				else
+				{
+					if ((int)number >= ((rtArray)obj).innerArray.Count)
+					{
+						var toadd = ((rtArray)obj).innerArray;
+						int addnum = (int)number + 1 - toadd.Count;
+
+						while (addnum > 0)
+						{
+							addnum--;
+							toadd.Add(rtUndefined.undefined);
+						}
+					}
+
+					if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
+					{
+						stackSlot._cache_arraySlot.idx = (int)number;
+						stackSlot._cache_arraySlot.array = (rtArray)obj;
+
+						stackSlot.linkTo(stackSlot._cache_arraySlot);
+					}
+					else
+					{
+						stackSlot.directSet(((rtArray)obj).innerArray[(int)number]);
+					}
+
+				}
+
+
+				frame.endStep();
+				return true;
+			}
+
+			return false;
+		}
+
+		private static bool _assess_array( RunTimeValueBase obj, StackFrame frame, OpStep step, RunTimeScope scope)
         {
             var idx = step.arg2.getValue(scope, frame);
             var number = TypeConverter.ConvertToNumber(idx);
             if (!(double.IsNaN(number) || double.IsInfinity(number)))
             {
-                if ((int)number >= 0)
-                {
-					//***访问数组的内容***
-					StackSlotAccessor register = (StackSlotAccessor)step.reg;
-					StackSlot stackSlot= (StackSlot)register.getSlot(scope, frame);
-
-					if (register._isdeletetarget)
-					{
-						int index = (int)number;
-						var arr = ((rtArray)obj).innerArray;
-
-						if (index < arr.Count)
-						{
-							arr[index] = rtUndefined.undefined;
-						}
-						stackSlot._cache_arraySlot.idx = index;
-						stackSlot._cache_arraySlot.array = (rtArray)obj;
-						stackSlot.linkTo(stackSlot._cache_arraySlot);
-					}
-					else
-					{
-						if ((int)number >= ((rtArray)obj).innerArray.Count)
-						{
-							var toadd = ((rtArray)obj).innerArray;
-							int addnum = (int)number + 1 - toadd.Count;
-
-							while (addnum > 0)
-							{
-								addnum--;
-								toadd.Add(rtUndefined.undefined);
-							}
-						}
-
-						if (register._isassigntarget || register._hasUnaryOrShuffixOrDelete)
-						{
-							stackSlot._cache_arraySlot.idx = (int)number;
-							stackSlot._cache_arraySlot.array = (rtArray)obj;
-
-							stackSlot.linkTo( stackSlot._cache_arraySlot );
-						}
-						else
-						{
-							stackSlot.directSet(((rtArray)obj).innerArray[(int)number]);
-						}
-
-					}
-
-                    
-                    frame.endStep();
-                    return true;
-                }
+				return _assess_arraybyindex(obj, frame, step, scope, (int)number);
             }
             return false;
         }

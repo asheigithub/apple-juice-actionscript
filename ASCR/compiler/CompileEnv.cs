@@ -168,15 +168,23 @@ namespace ASCompiler.compiler
 
 		public void optimizeFunctoinBlock(Builder builder, ASBinCode.rtti.FunctionDefine f)
 		{
-
+			
 			optimizeOtherStep();
 
 			convertVarToReg(builder, f);
 
 			setTryState();//先刷一次TryState,便于优化时参考
-
-			optimizeReg2();
-
+			//if (
+			//	//!f.name.EndsWith("inflate")
+			//	//&&
+			//	//!f.name.EndsWith("stored")
+			//	//&&
+			//	!f.name.EndsWith("codes")
+			//	)
+			{
+				optimizeReg2();
+			}
+			
 			combieRegs();
 
 			optimizeJump();
@@ -1103,8 +1111,27 @@ namespace ASCompiler.compiler
 
 		}
 
+		//private bool checkTryBlock(int checkline, int lastline, StackSlotAccessor register)
+		//{
+		//	//**事先已判断所有的回跳行，所以不可能再出现跳回保存行的情况
+		//	//如果在catch块,finally块中被引用，可能导致异常的跳转，检查到就跳过
+		//	for (int k = checkline + 1; k < lastline + 1; k++)
+		//	{
+		//		var teststep = block.opSteps[k];
+		//		if (isReference(register, teststep))
+		//		{
+		//			if (teststep.trytype == 1 || teststep.trytype == 2)
+		//			{
+		//				return true;
+		//			}
+		//		}
 
-		private bool checkHasJumpBackOrTryBlock(int checkline,int lastline,StackSlotAccessor register)
+		//	}
+
+		//	return false;
+		//}
+
+		private bool checkHasJumpBackOrTryBlock(int checkline, int lastline, StackSlotAccessor register)
 		{
 			//**如果会跳回保存行，则说明不安全。
 			//会导致有可能递归操作时意外修改值。所以检查到就跳过。***
@@ -1119,7 +1146,7 @@ namespace ASCompiler.compiler
 						return true;
 					}
 
-					////如果后面还有回跳并跳回当前行前，说明有问题
+					//如果后面还有回跳并跳回当前行前，说明有问题
 					//for (int l = k + 1; l < block.opSteps.Count; l++)
 					//{
 					//	var sss = block.opSteps[l];
@@ -1135,31 +1162,31 @@ namespace ASCompiler.compiler
 					//	}
 
 					//}
-					
+
 				}
 
 			}
 
-			List<int> jumpbacks = new List<int>();
-			var allines = collectAllSteps(checkline, jumpbacks);
-			
-			if (jumpbacks.Count > 0)
-			{
-				
-				//***跳回中间来的不行***
-				if (jumpbacks[0] <= checkline )
-				{
-					for (int i = 0; i < allines.Count; i++)
-					{
-						//if (!isSafeStep(block.opSteps[allines[i]]))
-							return true;
-					}
+			//List<int> jumpbacks = new List<int>();
+			//var allines = collectAllSteps(checkline, jumpbacks);
 
-					//return false;
-				}
-				
+			//if (jumpbacks.Count > 0)
+			//{
 
-			}
+			//	//***跳回中间来的不行***
+			//	if (jumpbacks[0] <= checkline)
+			//	{
+			//		for (int i = 0; i < allines.Count; i++)
+			//		{
+			//			//if (!isSafeStep(block.opSteps[allines[i]]))
+			//			return true;
+			//		}
+
+			//		//return false;
+			//	}
+
+
+			//}
 
 
 
@@ -1168,55 +1195,7 @@ namespace ASCompiler.compiler
 			return false;
 		}
 
-		private bool checkWillVisitBack(int checkline, int lastline,Dictionary<int,int> visitedlines)
-		{
-			if (visitedlines == null)
-			{
-				visitedlines = new Dictionary<int, int>();
-			}
-
-			for (int i = checkline+1; i < block.opSteps.Count-1; i++)
-			{
-				if (!visitedlines.ContainsKey(i))
-				{
-					var t = block.opSteps[i];
-					visitedlines.Add(i, i);
-					if (builds.AS3FunctionBuilder.isJMP(t.opCode))
-					{
-						if (t.jumoffset > 0)
-						{
-							return checkWillVisitBack(i + t.jumoffset, lastline, visitedlines);
-						}
-						else
-						{
-							int nl = i + t.jumoffset;
-
-							if (nl <= lastline)
-							{
-								return true;
-							}
-						}
-					}
-					else if (builds.AS3FunctionBuilder.isIfJmp(t.opCode))
-					{
-						if (t.jumoffset < 0)
-						{
-							int nl = i + t.jumoffset;
-
-							if (nl <= lastline)
-							{
-								return true;
-							}
-						}
-						
-					}
-				}
-			}
-
-			return false;
-
-		}
-
+		
 		private void optimizeReg2()
 		{
 			#region 跳转目标
@@ -1286,6 +1265,9 @@ namespace ASCompiler.compiler
 			}
 			#endregion
 
+
+			
+
 			Dictionary<StackSlotAccessor, object> dictCanNotOptimize = new Dictionary<StackSlotAccessor, object>();
 
 			Dictionary<StackSlotAccessor, IMemReg> dictToOptimizeRegister = new Dictionary<StackSlotAccessor, IMemReg>();
@@ -1341,7 +1323,63 @@ namespace ASCompiler.compiler
 
 				foreach (var item in list)
 				{
-					bool isspecialcheck=false;
+					Dictionary<OpStep, object> dictJumpBackTarget = new Dictionary<OpStep, object>();
+					bool checkjumpbackpass = true;
+					#region 检查所有跳回来的目标行
+					{
+						List<int> jumpbacks = new List<int>();
+						var allines = collectAllSteps(i, jumpbacks);
+						int lastline = findLastRefLine(item);
+						if (jumpbacks.Count > 0)
+						{
+							foreach (var line in allines) //行中有不安全因素
+							{
+								if (!isSafeStep(block.opSteps[line], null))
+								{
+
+									if (step.reg == item && !(step.arg1 == item || step.arg2 == item))
+									{
+										//***跳回开始和结束之间***
+										foreach (var backline in jumpbacks)
+										{
+											if (backline > i && backline<=lastline)
+											{
+												if(!dictJumpBackTarget.ContainsKey(block.opSteps[backline]))
+													dictJumpBackTarget.Add(block.opSteps[backline],null);
+											}
+										}
+									}
+									else
+									{
+										
+										foreach (var backline in jumpbacks)
+										{
+											if (backline <= i)
+											{
+												//***如果有跳回头前，失败，不可以优化
+												checkjumpbackpass = false;
+											}
+											else if (backline <= lastline)
+											{
+												//必须保存
+												if (!dictJumpBackTarget.ContainsKey(block.opSteps[backline]))
+													dictJumpBackTarget.Add(block.opSteps[backline], null);
+											}
+										}
+									}
+
+									break;
+								}
+							}
+						}
+					}
+
+
+					#endregion
+
+
+
+					bool isspecialcheck =false;
 					#region 从特殊检测中移除
 					if (dictToCheck.ContainsKey(step))
 					{
@@ -1356,10 +1394,13 @@ namespace ASCompiler.compiler
 
 					StackSlotAccessor register = item;
 					if (
-						isspecialcheck //说明为特殊检测
-						||
-						canOptimize(i,block.opSteps[i], register) 
-
+						checkjumpbackpass
+						&&
+						(
+							isspecialcheck //说明为特殊检测
+							||
+							canOptimize(i,block.opSteps[i], register) 
+						)
 						)
 					{
 						int lastline = findLastRefLine(register);
@@ -1372,7 +1413,7 @@ namespace ASCompiler.compiler
 							startcheckline = i;
 						}
 
-						if (isAllSafeOperator(startcheckline, lastline, lastline, register, out failedline, continuelines))
+						if (isAllSafeOperator(startcheckline, lastline, lastline,dictJumpBackTarget, register, out failedline, continuelines))
 						{
 							
 							if (dictNeedSaveStep.ContainsKey(register))
@@ -1505,7 +1546,8 @@ namespace ASCompiler.compiler
 										savestep.arg1Type = register.valueType;
 
 										//***在各个分支之间插入相应代码***						
-										for (int m = continuelines[0] + 1; m < lastline + 1; m++)
+										//for (int m = continuelines[0] + 1; m < lastline + 1; m++)
+										for (int m = failedline ; m < lastline + 1; m++)
 										{
 											replaceStackSlotAccessor(register, store, block.opSteps[m]);
 										}
@@ -1534,22 +1576,30 @@ namespace ASCompiler.compiler
 									}
 									else
 									{
-										//在失败行后立即进行检测
-										if (!dictToCheck.ContainsKey( block.opSteps[ failedline + 1]))
+										if (dictJumpBackTarget.ContainsKey(block.opSteps[failedline]))
 										{
-											dictToCheck.Add(block.opSteps[failedline + 1], new Dictionary<StackSlotAccessor, int>());
+											//***必须保存，但是又没有保存，则表示无法继续优化了****
+											dictCanNotOptimize.Add(register, null);
 										}
-										if (!dictToCheck[block.opSteps[failedline + 1]].ContainsKey(register))
+										else
 										{
-											dictToCheck[block.opSteps[failedline + 1]].Add(register, -1);
-										}
+
+											//在失败行后立即进行检测
+											if (!dictToCheck.ContainsKey(block.opSteps[failedline + 1]))
+											{
+												dictToCheck.Add(block.opSteps[failedline + 1], new Dictionary<StackSlotAccessor, int>());
+											}
+											if (!dictToCheck[block.opSteps[failedline + 1]].ContainsKey(register))
+											{
+												dictToCheck[block.opSteps[failedline + 1]].Add(register, -1);
+											}
 
 
-										if (!dictNeedSaveStep.ContainsKey(register))
-										{
-											dictNeedSaveStep.Add(register, block.opSteps[i]);
+											if (!dictNeedSaveStep.ContainsKey(register))
+											{
+												dictNeedSaveStep.Add(register, block.opSteps[i]);
+											}
 										}
-
 									}
 								}
 								else
@@ -1608,13 +1658,13 @@ namespace ASCompiler.compiler
 
 
 
-		private bool isSafeOperator(StackSlotAccessor accessor, int line)
+		private bool isSafeOperator(StackSlotAccessor accessor, Dictionary<OpStep, object> jumpbacktargets, int line)
 		{
 			int fline; List<int> cline = new List<int>();
-			return isAllSafeOperator(line, line + 1, line + 1, accessor, out fline, cline);
+			return isAllSafeOperator(line, line + 1, line + 1, jumpbacktargets, accessor, out fline, cline);
 		}
 
-		private bool isAllSafeOperator(int st, int ed, int realend, StackSlotAccessor accessor, out int failedline, List<int> continues)
+		private bool isAllSafeOperator(int st, int ed, int realend, Dictionary<OpStep,object> jumpbacktargets ,StackSlotAccessor accessor, out int failedline, List<int> continues)
 		{
 			for (int i = st; i < ed; i++)
 			{
@@ -1626,7 +1676,7 @@ namespace ASCompiler.compiler
 						if (i + block.opSteps[i].jumoffset < realend)
 						{
 							List<int> c = new List<int>();
-							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, realend, realend, accessor, out failedline, c)
+							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, realend, realend,jumpbacktargets, accessor, out failedline, c)
 								)
 							{
 
@@ -1651,14 +1701,14 @@ namespace ASCompiler.compiler
 						{
 							bool isfailed1 = false; int failedline1;
 							List<int> c = new List<int>();
-							if (!isAllSafeOperator(i + 1, i + block.opSteps[i].jumoffset, realend, accessor, out failedline1, c)
+							if (!isAllSafeOperator(i + 1, i + block.opSteps[i].jumoffset, realend,jumpbacktargets, accessor, out failedline1, c)
 							)
 							{
 								isfailed1 = true;
 							}
 
 							//List<int> c2 = new List<int>();
-							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, ed, realend, accessor, out failedline, c)
+							if (!isAllSafeOperator(i + block.opSteps[i].jumoffset, ed, realend,jumpbacktargets, accessor, out failedline, c)
 								)
 							{
 								if (isfailed1)
@@ -1722,7 +1772,7 @@ namespace ASCompiler.compiler
 				}
 				else
 				{
-					if (!isSafeStep(block.opSteps[i]))
+					if (!isSafeStep(block.opSteps[i],jumpbacktargets))
 					{
 						failedline = i; continues.Add(i);
 						return false;
@@ -1757,7 +1807,7 @@ namespace ASCompiler.compiler
 			return true;
 		}
 
-		private bool isSafeStep(OpStep step)
+		private bool isSafeStep(OpStep step,Dictionary<OpStep,object> jumbacktagets)
 		{
 			var opcode = step.opCode;
 
@@ -1765,7 +1815,10 @@ namespace ASCompiler.compiler
 			{
 				//throw new Exception("这行不能在这里判断");
 			}
-
+			if (jumbacktagets !=null && jumbacktagets.ContainsKey(step))
+			{
+				return false;
+			}
 
 			if (opcode == OpCode.assigning)
 			{
@@ -1824,43 +1877,45 @@ namespace ASCompiler.compiler
 				register.valueType == RunTimeDataType.rt_boolean
 				)
 			{
-				List<int> jumpbacks = new List<int>();
-				var allines = collectAllSteps(line, jumpbacks);
-				int lastline = findLastRefLine(register);
+				//List<int> jumpbacks = new List<int>();
+				//var allines = collectAllSteps(line, jumpbacks);
+				//int lastline = findLastRefLine(register);
 
-				if (jumpbacks.Count > 0)
-				{
-					if (step.arg1 == register || step.arg2 == register)
-					{
-						//***跳回来不行***
-						if (jumpbacks[0] <= lastline)
-						{
-							for (int i = 0; i < allines.Count; i++)
-							{
-								if (!isSafeStep(block.opSteps[allines[i]]))
-									return false;
-							}
+				//if (jumpbacks.Count > 0)
+				//{
 
 
-							//return false;
-						}
-					}
-					else
-					{
-						//***跳回中间来的不行***
-						if (jumpbacks[0] <= lastline && line <= jumpbacks[0])
-						{
-							for (int i = 0; i < allines.Count; i++)
-							{
-								if (!isSafeStep(block.opSteps[allines[i]]))
-									return false;
-							}
+				//	if (step.arg1 == register || step.arg2 == register)
+				//	{
+				//		//***跳回来不行***
+				//		if (jumpbacks[0] <= lastline)
+				//		{
+				//			for (int i = 0; i < allines.Count; i++)
+				//			{
+				//				if (!isSafeStep(block.opSteps[allines[i]]))
+				//					return false;
+				//			}
 
-							//return false;
-						}
-					}
 
-				}
+				//			//return false;
+				//		}
+				//	}
+				//	else
+				//	{
+				//		//***跳回中间来的不行***
+				//		if (jumpbacks[0] <= lastline && line <= jumpbacks[0])
+				//		{
+				//			for (int i = 0; i < allines.Count; i++)
+				//			{
+				//				if (!isSafeStep(block.opSteps[allines[i]]))
+				//					return false;
+				//			}
+
+				//			//return false;
+				//		}
+				//	}
+
+				//}
 
 				if (step.opCode == OpCode.access_dot)
 				{
@@ -2103,7 +2158,7 @@ namespace ASCompiler.compiler
 				case OpCode.new_instance:
 				case OpCode.new_instance_class:
 				case OpCode.init_staticclass:
-				
+				case OpCode.arrayAccessor_bind:
 				case OpCode.access_dot_memregister:
 					return true;
 				default:

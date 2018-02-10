@@ -793,6 +793,9 @@ namespace ASRuntime
 									case OpCode.array_create:
 										operators.OpArray.exec_create(currentRunFrame, step, scope);
 										break;
+									case OpCode.arrayAccessor_bind:
+										operators.OpAccess_Dot.exec_arrayAccessor_bind(currentRunFrame, step, scope);
+										break;
 									case OpCode.vectorAccessor_bind:
 										operators.OpVector.exec_AccessorBind(currentRunFrame, step, scope);
 										break;
@@ -3633,6 +3636,7 @@ namespace ASRuntime
 						return rtUndefined.undefined;
 					}
 
+					
 					object obj;
 					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
 					{
@@ -3642,6 +3646,7 @@ namespace ASRuntime
 					{
 						throw new ASRunTimeException("返回值转化失败", string.Empty);
 					}
+					
 				}
 
 

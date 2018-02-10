@@ -254,6 +254,7 @@ namespace LinkCodeGen
 					}
 				}
 			}
+			
 
 			constructorlist = new List<System.Reflection.ConstructorInfo>();
 			var ctors = type.GetConstructors();
@@ -1245,7 +1246,7 @@ namespace LinkCodeGen
 					{
 						try
 						{
-							if (type.BaseType.GetMethod(method.Name) != null)
+							if (type.BaseType !=null && type.BaseType.GetMethod(method.Name) != null)
 							{
 								dictUseNames.Add(GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames), null);
 							}

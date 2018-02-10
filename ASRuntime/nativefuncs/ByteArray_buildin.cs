@@ -927,7 +927,7 @@ namespace ASRuntime.nativefuncs
 
 			uint offset = TypeConverter.ConvertToUInt(argements[1], stackframe, token);
 			uint length = TypeConverter.ConvertToUInt(argements[2], stackframe, token);
-
+			
 			try
 			{
 				success = true;
@@ -2443,7 +2443,7 @@ namespace ASRuntime.nativefuncs
 		public ByteArray_getThisItem() : base(1)
 		{
 			_paras = new List<RunTimeDataType>();
-			_paras.Add(RunTimeDataType.rt_int);
+			_paras.Add(RunTimeDataType.rt_number);
 		}
 
 		public override bool isMethod
@@ -2491,8 +2491,11 @@ namespace ASRuntime.nativefuncs
 			{
 				success = false;
 
-				stackframe.throwError(token, 1069, "Property "+ index +" not found on flash.utils.ByteArray and there is no default value.");
-
+				double origin = TypeConverter.ConvertToNumber(argements[0]);
+				if (origin < 0)
+				{
+					stackframe.throwError(token, 1069, "Property " + index + " not found on flash.utils.ByteArray and there is no default value.");
+				}
 				returnSlot.setValue(rtUndefined.undefined);
 			}
 			else
@@ -2531,7 +2534,7 @@ namespace ASRuntime.nativefuncs
 		{
 			_paras = new List<RunTimeDataType>();
 			_paras.Add(RunTimeDataType.rt_number);
-			_paras.Add(RunTimeDataType.rt_int);
+			_paras.Add(RunTimeDataType.rt_number);
 		}
 
 		public override bool isMethod

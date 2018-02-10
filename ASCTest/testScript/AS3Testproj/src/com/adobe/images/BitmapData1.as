@@ -31,12 +31,12 @@ package com.adobe.images
 		
 		public function getPixel(x:int,y:int):uint
 		{
-			return (0xff << 24) ;
+			return (0xff << 16) | ((int)( x / w * 255)<<8) |((int)( y /h * 255 ));
 			
 		}
 		public function getPixel32(x:int,y:int):uint
 		{
-			return (0xff << 24) ;
+			return (0xff << 24) |(0xff << 16) | ((int)( x / w * 255)<<8) |((int)( y /h * 255 ));
 			
 		}
 	}

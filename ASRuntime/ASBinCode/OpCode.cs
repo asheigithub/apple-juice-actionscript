@@ -346,116 +346,119 @@ namespace ASBinCode
         ///// </summary>
         //init_vector =85,
 
-        
+        /// <summary>
+		/// 绑定Array下标访问器
+		/// </summary>
+		arrayAccessor_bind=87,
+
         /// <summary>
         /// 绑定Vector访问器
         /// </summary>
-        vectorAccessor_bind=87,
+        vectorAccessor_bind=88,
         /// <summary>
         /// 先转换索引，再绑定Vector访问器
         /// </summary>
-        vectorAccessor_convertidx=88,
+        vectorAccessor_convertidx=89,
 
         /// <summary>
         /// 往vector里追加元素
         /// </summary>
-        vector_push=89,
+        vector_push=90,
         /// <summary>
         /// 把数组的内容拷贝到Vector
         /// </summary>
-        vector_pusharray=90,
+        vector_pusharray=91,
         /// <summary>
         /// 把Vector的内容拷贝到Vector
         /// </summary>
-        vector_pushvector = 91,
+        vector_pushvector = 92,
 
         /// <summary>
         /// 从初始数据中构造Vector
         /// 要么是数组，要么是完全匹配的Vector,要么是T要创建的Vector的T的子类的Vector
         /// </summary>
-        vector_initfrmdata=92,
+        vector_initfrmdata=93,
 
         /// <summary>
         /// 链接到包外成员
         /// </summary>
-        link_outpackagevairable=93,
+        link_outpackagevairable=94,
 
         /// <summary>
         /// 标记准备调父类的构造函数
         /// </summary>
-        flag_call_super_constructor =94,
+        flag_call_super_constructor =95,
 
 
         /// <summary>
         /// 获取forin的enumerator
         /// </summary>
-        forin_get_enumerator=95,
+        forin_get_enumerator=96,
         /// <summary>
         /// 获取foreach的enumerator
         /// </summary>
-        foreach_get_enumerator=96,
+        foreach_get_enumerator=97,
         /// <summary>
         /// 调movenext
         /// </summary>
-        enumerator_movenext=97,
+        enumerator_movenext=98,
 
         /// <summary>
         /// 调用读取当前值
         /// </summary>
-        enumerator_current=98,
+        enumerator_current=99,
 
         /// <summary>
         /// 关闭枚举器
         /// </summary>
-        enumerator_close = 99,
+        enumerator_close = 100,
 
         /// <summary>
         /// is运算符
         /// </summary>
-        logic_is=100,
+        logic_is=101,
         /// <summary>
         /// instanceof运算符
         /// </summary>
-        logic_instanceof=101,
+        logic_instanceof=102,
 
         /// <summary>
         /// as运算符
         /// </summary>
-        convert_as=102,
+        convert_as=103,
 
         /// <summary>
         /// in运算符
         /// </summary>
-        logic_in =103,
+        logic_in =104,
 
         /// <summary>
         /// typeof运算符
         /// </summary>
-        unary_typeof=104,
+        unary_typeof=105,
 
         /// <summary>
         /// 乘法 2个数字
         /// </summary>
-        multi_number =105,
+        multi_number =106,
 
-        div_number=106,
+        div_number=107,
 
-        mod_number=107,
+        mod_number=108,
 
-        unary_plus=108,
+        unary_plus=109,
 
-        function_create=109,
+        function_create=110,
 
-        yield_return=110,
+        yield_return=111,
 
-        yield_break=111,
+        yield_break=112,
 
-        yield_continuetoline=112,
+        yield_continuetoline=113,
 
 
 
-		//重置StackSlot;
-		reset_stackslot=113,
+		
 		
 		call_function_notcheck = 114,
 		call_function_notcheck_notreturnobject = 115,

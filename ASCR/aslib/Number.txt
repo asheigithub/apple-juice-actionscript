@@ -102,11 +102,42 @@
 		public static function floor (x:Number) : Number;
 		[native,_number_log]
 		public static function log (x:Number) : Number;
-		/*
-		public static function max (x:Number=-Infinity, y:Number=-Infinity, ...rest) : Number;
+		
+		public static function max (x:Number=-Infinity, y:Number=-Infinity, ...rest) : Number
+		{
+			var _max:Number=x;
+			if(y>_max)
+			{
+				_max=y;
+			}
 
-		public static function min (x:Number=Infinity, y:Number=Infinity, ...rest) : Number;
-		*/
+			for(var i:int=0;i<rest.length;i++)
+			{
+				if(rest[i]>_max)
+				{
+					_max=rest[i];
+				}
+			}
+			return _max;
+		}
+		
+		public static function min (x:Number=Infinity, y:Number=Infinity, ...rest) : Number
+		{
+			var _min:Number=x;
+			if(y<_min)
+			{
+				_min=y;
+			}
+
+			for(var i:int=0;i<rest.length;i++)
+			{
+				if(rest[i]<_min)
+				{
+					_min=rest[i];
+				}
+			}
+			return _min;
+		}
 
 		private var _v:Number;
 		/**

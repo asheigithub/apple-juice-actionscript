@@ -2805,6 +2805,11 @@ namespace ASCompiler.compiler.builds
                     eax.setEAXTypeWhenCompile(v1.valueType);
                     eax._hasUnaryOrShuffixOrDelete = true; eax._hasUnaryOrShuffix = true;
 
+					if (code == OpCode.decrement_uint)
+					{
+						eax.valueType = RunTimeDataType.rt_int;
+					}
+
 					op.reg = eax;
                     op.regType = eax.valueType;
 

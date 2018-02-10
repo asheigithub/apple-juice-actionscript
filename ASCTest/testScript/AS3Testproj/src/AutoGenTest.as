@@ -12,7 +12,13 @@ package
 	import com.adobe.serialization.json.JSON;
 	import flash.display.Sprite;
 	import flash.utils.ByteArray;
+	import flash.utils.Endian;
+	import flash.utils.IDataInput;
 	import flash.utils.getQualifiedClassName;
+	import nochump.util.zip.CRC32;
+	import nochump.util.zip.ZipEntry;
+	import nochump.util.zip.ZipFile;
+	import nochump.util.zip.ZipOutput;
 	//import system.Byte;
 	//import system.Decimal;
 	//import system.EventArgs;
@@ -130,21 +136,21 @@ package
 			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
 			//
 			//trace(s);
-			var v:Vector.<String> = new Vector.<String>();
-			v[0] = null;
-			trace(  v[0], SHA1.hash(typeof v[0]));
+			//var v:Vector.<String> = new Vector.<String>();
+			//v[0] = null;
+			//trace(  v[0], SHA1.hash(typeof v[0]));
 			
 			
 			//o = com.adobe.serialization.json.JSON.decode( str );
 			//trace(o,typeof o);
 			
-			var e:JPGEncoder = new JPGEncoder();
-			var bytes:ByteArray =e.encode( new BitmapData1(256, 256) );
+			//var e:JPGEncoder = new JPGEncoder();
+			//var bytes:ByteArray =e.encode( new BitmapData1(256, 256) );
+			//
+			//trace( SHA1.hashBytes( bytes));
 			
-			trace( SHA256.hashBytes( bytes));
 			
-			
-			//trace(SHA256.hash(""));
+			//trace(MD5.hash("abcdefghijklmnopqrstuvwxyz"));
 			
 			//var t:Number = (new Date()).getTime();
 			//var millionAs:String = new String("");
@@ -158,10 +164,79 @@ package
 			//
 			//trace(SHA224.hash(millionAs));
 			//trace("gethash:", ((new Date()).getTime() - t ));
+			
+			
+			
+			saveZip(new ByteArray());
+			
+			
 		}
 		
+		public static function saveZip(toread:ByteArray):void {
+			 var fileName:String = "helloworld.txt";
+			 var fileName2:String = "image.jpg";
+			 var fileData:ByteArray = new ByteArray();
+			 fileData.writeUTFBytes("Hello World!中文");
+			 var zipOut:ZipOutput = new ZipOutput();
+			// Add entry to zip
+			 var ze:ZipEntry = new ZipEntry(fileName);//这是一个文件
+			 var ze2:ZipEntry = new ZipEntry(fileName2);//这是一个文件
+			 
+			 
+			  var crc:CRC32 = new CRC32();
+			 
+			 var jpg:BitmapData1 = new BitmapData1(256, 256);
+			 var je:JPGEncoder = new JPGEncoder();
+			 var pixels:ByteArray = je.encode(jpg);
+			 
+			 crc.update(pixels);
+			 ze2.method = 0; ze2.size = pixels.length; ze2.crc =crc.getValue();
+			 
+			 zipOut.putNextEntry(ze2);
+			 zipOut.write(pixels);
+			
+			 crc.reset();
+			 crc.update(fileData);
+			 
+			 ze.method = 0; ze.size = fileData.length; ze.crc =crc.getValue();
+			 zipOut.putNextEntry(ze);
+			 zipOut.write(fileData);
+			 
+			 
+			 zipOut.closeEntry();
+			// end the zip
+			 zipOut.finish();
+			// access the zip data
+			 var zipData:ByteArray = zipOut.byteArray;
+			trace(zipData.position, zipData.length);
+		   //trace(MD5.hashBytes(zipData));
+
+		   //trace(SHA1.hashBytes(zipData));
+		   //return zipData;
+		   zipData.readBytes(toread);
+		}
+
 		
 		
+		//public static function showzip(input:IDataInput)
+		//{
+			//var zip:ZipFile = new ZipFile(input);			
+			//for (var i:int = 0; i < zip.entries.length; i++) 
+			//{
+				//var entry:ZipEntry = zip.entries[i];
+				//trace(entry.name,entry.size,entry.compressedSize);
+				//
+				//
+				//var data:ByteArray = zip.getInput(entry);
+				//data.position = 0;
+				//trace(data.length,data.readUTFBytes(data.length));
+				//
+			//}
+			//
+		//}
+		
+		
+
 		private var _a:int = 5;
 		public function get abc():int 
 		{

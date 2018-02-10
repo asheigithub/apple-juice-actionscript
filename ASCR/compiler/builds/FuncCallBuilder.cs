@@ -72,7 +72,7 @@ namespace ASCompiler.compiler.builds
 											op.arg2 = ASRuntime.TypeConverter.getDefaultValue(signature.returnType);op.arg2Type = signature.returnType;
 
 											var func = findFunction(signature, builder,out isfindsuccess);
-											if (func.isMethod && signature.onStackParameters == signature.parameters.Count)
+											if (func.isMethod && signature.onStackParameters == signature.parameters.Count && builder.bin.blocks[func.blockid].scope.members.Count==0)
 											{
 												op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative_method;
 											}
@@ -212,7 +212,7 @@ namespace ASCompiler.compiler.builds
 											op.arg2 = ASRuntime.TypeConverter.getDefaultValue(signature.returnType);op.arg2Type = signature.returnType;
 
 											var func = findFunction(signature, builder, out isfindsuccess);
-											if (func.isMethod && signature.onStackParameters == signature.parameters.Count)
+											if (func.isMethod && signature.onStackParameters == signature.parameters.Count && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 											{
 												op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative_method;
 											}
@@ -478,7 +478,7 @@ namespace ASCompiler.compiler.builds
 															op.arg2 = ASRuntime.TypeConverter.getDefaultValue(signature.returnType); op.arg2Type = signature.returnType;
 
 															var func = findFunction(signature, builder, out isfindsuccess);
-															if (func.isMethod && signature.onStackParameters == signature.parameters.Count)
+															if (func.isMethod && signature.onStackParameters == signature.parameters.Count && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 															{
 																op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative_method;
 															}
@@ -596,7 +596,7 @@ namespace ASCompiler.compiler.builds
 													op.arg2 = ASRuntime.TypeConverter.getDefaultValue(signature.returnType); op.arg2Type = signature.returnType;
 
 													var func = findFunction(signature, builder, out isfindsuccess);
-													if (func.isMethod && signature.onStackParameters == signature.parameters.Count)
+													if (func.isMethod && signature.onStackParameters == signature.parameters.Count && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 													{
 														op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative_method;
 													}
@@ -820,7 +820,7 @@ namespace ASCompiler.compiler.builds
 									op.arg2 = ASRuntime.TypeConverter.getDefaultValue(signature.returnType); op.arg2Type = signature.returnType;
 
 									var func = findFunction(signature, builder, out isfindsuccess);
-									if (func.isMethod && signature.onStackParameters== signature.parameters.Count )
+									if (func.isMethod && signature.onStackParameters== signature.parameters.Count && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 									{
 										op.opCode = OpCode.call_function_notcheck_notreturnobject_notnative_method;
 									}

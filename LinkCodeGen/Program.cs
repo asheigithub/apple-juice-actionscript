@@ -93,32 +93,32 @@ namespace LinkCodeGen
 
 			//*****类*******
 
-			var types = typeof(object).Assembly.GetTypes();
+			//var types = typeof(object).Assembly.GetTypes();
 
-			foreach (var item in types)
-			{
-				var classtype = item;
-
-				if (!CreatorBase.IsSkipType(classtype) && !CreatorBase.IsSkipCreator(classtype)
-
-					&& classtype.IsClass && classtype.IsPublic
-					)
-				{
-					if (!creators.ContainsKey(classtype))
-					{
-						creators.Add(classtype, null);
-						creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
-					}
-				}
-			}
-
-
-			//var classtype = typeof(AutoGenCodeLib.Testobj);
-			//if (!creators.ContainsKey(classtype))
+			//foreach (var item in types)
 			//{
-			//	creators.Add(classtype, null);
-			//	creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+			//	var classtype = item;
+
+			//	if (!CreatorBase.IsSkipType(classtype) && !CreatorBase.IsSkipCreator(classtype)
+
+			//		&& classtype.IsClass && classtype.IsPublic
+			//		)
+			//	{
+			//		if (!creators.ContainsKey(classtype))
+			//		{
+			//			creators.Add(classtype, null);
+			//			creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+			//		}
+			//	}
 			//}
+
+
+			var classtype = typeof(AutoGenCodeLib.Testobj);
+			if (!creators.ContainsKey(classtype))
+			{
+				creators.Add(classtype, null);
+				creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+			}
 
 			//var classtype = typeof(ICloneable);
 			//if (!creators.ContainsKey(classtype))

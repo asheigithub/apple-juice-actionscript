@@ -71,8 +71,18 @@ namespace ASCompiler
                 }
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "uint.as3"));
             }
+			{
+				string _array = Properties.Resources.Array;
+				var tree = grammar.ParseTree(_array, ASTool.AS3LexKeywords.LEXKEYWORDS,
+							ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Array.as3");
 
-            {
+				if (grammar.hasError)
+				{
+					return null;
+				}
+				trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Array.as3"));
+			}
+			{
                 string _number = Properties.Resources.Number;
                 var tree = grammar.ParseTree(_number, ASTool.AS3LexKeywords.LEXKEYWORDS,
                             ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Number.as3");
@@ -96,17 +106,7 @@ namespace ASCompiler
                 trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Function.as3"));
             }
 
-            {
-                string _array = Properties.Resources.Array;
-                var tree = grammar.ParseTree(_array, ASTool.AS3LexKeywords.LEXKEYWORDS,
-                            ASTool.AS3LexKeywords.LEXSKIPBLANKWORDS, "Array.as3");
-
-                if (grammar.hasError)
-                {
-                    return null;
-                }
-                trees.Add(new compiler.utils.Tuple<ASTool.GrammerTree, string>(tree, "Array.as3"));
-            }
+            
 
             {
                 string _boolean = Properties.Resources.Boolean;

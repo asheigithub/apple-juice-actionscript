@@ -307,9 +307,12 @@ namespace ASRuntime.operators
 
 			{
                 ASBinCode.rtData.rtUInt iv = (ASBinCode.rtData.rtUInt)v;
+
+				int vdec = (int)iv.value - 1;
                 iv.value--;
+
 				((LeftValueBase)step.arg1).getSlot(scope, frame).directSet(iv);
-				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(iv.value);
+				((ASBinCode.LeftValueBase)step.reg).getSlot(scope, frame).setValue(vdec);
 
 			}
 			//frame.endStep(step);

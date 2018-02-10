@@ -10,8 +10,21 @@ namespace ASRuntime.operators
     {
         public static void exec_AccessorBind(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
+			RunTimeValueBase obj = step.arg1.getValue(scope, frame);
+			if (rtNull.nullptr.Equals(obj))
+			{
+				frame.throwError(
+
+						step.token, 1009, "Cannot access a property or method of a null object reference."
+
+						);
+				frame.endStep();
+				return;
+			}
+
+
+			ASBinCode.rtti.Vector_Data vector =
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((rtObjectBase)obj).value).hosted_object;
 
             int idx = TypeConverter.ConvertToInt(step.arg2.getValue(scope, frame));
 
@@ -81,8 +94,19 @@ namespace ASRuntime.operators
 
         public static void exec_AccessorBind_ConvertIdx(StackFrame frame, OpStep step, RunTimeScope scope)
         {
-            ASBinCode.rtti.Vector_Data vector =
-                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObjectBase)step.arg1.getValue(scope, frame)).value).hosted_object;
+			RunTimeValueBase obj = step.arg1.getValue(scope, frame);
+			if (rtNull.nullptr.Equals(obj))
+			{
+				frame.throwError(
+
+						step.token, 1009, "Cannot access a property or method of a null object reference."
+
+						);
+				frame.endStep();
+				return;
+			}
+			ASBinCode.rtti.Vector_Data vector =
+                (ASBinCode.rtti.Vector_Data)((ASBinCode.rtti.HostedObject)((ASBinCode.rtData.rtObjectBase)obj).value).hosted_object;
 
 
             var idxvalue = step.arg2.getValue(scope, frame);

@@ -645,6 +645,9 @@ namespace ASRuntime
                 case OpCode.array_create:
                     operators.OpArray.exec_create(this, step, scope);
                     break;
+				case OpCode.arrayAccessor_bind:
+					operators.OpAccess_Dot.exec_arrayAccessor_bind(this, step, scope);
+					break;
                 case OpCode.vectorAccessor_bind:
                     operators.OpVector.exec_AccessorBind(this, step, scope);
                     break;

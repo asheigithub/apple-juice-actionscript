@@ -980,6 +980,13 @@ namespace ASRuntime.operators
 
 		internal void doCall_allcheckpass_nonative_hassetreturndefault_method()
 		{
+#if DEBUG
+			if (CallFuncHeap != null && CallFuncHeap.Length > 0)
+			{
+				throw new Exception("不能这么调用");
+			}
+#endif
+
 			player.callBlock_Method_NoHeap(player.swc.blocks[toCallFunc.blockid], returnSlot, token, callbacker, function.this_pointer);
 		}
 

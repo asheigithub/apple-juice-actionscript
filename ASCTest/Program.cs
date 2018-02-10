@@ -232,7 +232,7 @@ namespace ASCTest
 					for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];
-                        if (block != null && block.name.EndsWith("JPGEncoder::processDU"))
+						if (block != null && block.name.EndsWith("AutoGenTest"))// "CRC32::update"))
                         {
                             Console.WriteLine();
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
@@ -297,8 +297,18 @@ namespace ASCTest
 
 						//var s = player.invokeMethod("Test", "TTT", 3, 4);
 
+						//***zip***
+						ASRuntime.flash.utils.ByteArray array;
+						var byteArray = player.createByteArrayObject(out array);
 
+						//var bytes = System.IO.File.ReadAllBytes("E:/as3corelib/as3corelib-master.zip");
+						//array.writeBytes(bytes, 0, bytes.Length);
+						//array.position = 0;
 
+						//player.invokeMethod("AutoGenTest", "showzip", byteArray);
+						var by= player.invokeMethod("AutoGenTest", "saveZip",byteArray);
+						System.IO.File.WriteAllBytes("e:/kkk.zip", array.ToArray());
+						
 
 						Console.WriteLine();
 						Console.WriteLine("====程序输出====");

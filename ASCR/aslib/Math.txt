@@ -204,7 +204,24 @@
 		 * @playerversion	Flash 9
 		 * @playerversion	Lite 4
 		 */
-		//public static function max (val1:Number=-Infinity, val2:Number=-Infinity, ...rest) : Number;
+		public static function max (val1:Number=-Infinity, val2:Number=-Infinity, ...rest) : Number
+		{
+			var _max:Number=val1;
+			if(val2>_max)
+			{
+				_max=val2;
+			}
+
+			for(var i:int=0;i<rest.length;i++)
+			{
+				if(rest[i]>_max)
+				{
+					_max=rest[i];
+				}
+			}
+			return _max;
+		}
+
 
 		/**
 		 * 计算 val1 和 val2（或更多的值）并返回最小值。
@@ -216,7 +233,23 @@
 		 * @playerversion	Flash 9
 		 * @playerversion	Lite 4
 		 */
-		//public static function min (val1:Number=Infinity, val2:Number=Infinity, ...rest) : Number;
+		public static function min (val1:Number=Infinity, val2:Number=Infinity, ...rest) : Number
+		{
+			var _min:Number=val1;
+			if(val2<_min)
+			{
+				_min=val2;
+			}
+
+			for(var i:int=0;i<rest.length;i++)
+			{
+				if(rest[i]<_min)
+				{
+					_min=rest[i];
+				}
+			}
+			return _min;
+		}
 
 		/**
 		 * 计算并返回 base 的 pow 次幂。
