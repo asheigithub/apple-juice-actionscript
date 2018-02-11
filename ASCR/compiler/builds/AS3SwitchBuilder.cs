@@ -141,7 +141,7 @@ namespace ASCompiler.compiler.builds
 
 
                 OpStep lbl_case_start = new OpStep(OpCode.flag, new SourceToken(as3switch.Token.line, as3switch.Token.ptr, as3switch.Token.sourceFile));
-                lbl_case_start.flag = "LOOP_START_" + lblid;
+                lbl_case_start.flag = "SWITCH_START_" + lblid;
                 env.block.opSteps.Add(lbl_case_start);
 
                 for (int i = 0; i < as3switch.CaseList.Count; i++)
@@ -164,7 +164,7 @@ namespace ASCompiler.compiler.builds
                 }
 
                 OpStep lbl_case_end = new OpStep(OpCode.flag, new SourceToken(as3switch.Token.line, as3switch.Token.ptr, as3switch.Token.sourceFile));
-                lbl_case_end.flag = "LOOP_END_" + lblid;
+                lbl_case_end.flag = "SWITCH_END_" + lblid;
                 env.block.opSteps.Add(lbl_case_end);
             }
 

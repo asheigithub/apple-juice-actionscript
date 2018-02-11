@@ -37,7 +37,7 @@ namespace ASCompiler.compiler.builds
                                 op.regType = RunTimeDataType.unknown;
                                 op.arg1 = new ASBinCode.rtData.RightValue(
 									new ASBinCode.rtData.rtString("LOOP_CONTINUE_" + id));
-									//new ASBinCode.rtData.rtString("LOOP_START_" + id));
+									
 								op.arg1Type = RunTimeDataType.rt_string;
                                 op.arg2 = null;
                                 op.arg2Type = RunTimeDataType.unknown;
@@ -102,8 +102,8 @@ namespace ASCompiler.compiler.builds
                             op.reg = null;
                             op.regType = RunTimeDataType.unknown;
                             op.arg1 = new ASBinCode.rtData.RightValue(
-								//new ASBinCode.rtData.rtString("LOOP_CONTINUE_" + id));
-								new ASBinCode.rtData.rtString("LOOP_START_" + id));
+								new ASBinCode.rtData.rtString("LOOP_CONTINUE_" + id));
+								
 							op.arg1Type = RunTimeDataType.rt_string;
                             op.arg2 = null;
                             op.arg2Type = RunTimeDataType.unknown;

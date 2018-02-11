@@ -1400,6 +1400,11 @@ namespace ASCompiler.compiler.builds
             ASTool.AS3.Expr.AS3DataStackElement data, 
             ASTool.Token matchtoken,Builder builder,bool addtryreadproperty=false)
         {
+			if (data == null)
+			{
+				throw new BuildException(matchtoken.line,matchtoken.ptr,matchtoken.sourceFile,"getRightValue错误，data==null");
+			}
+
             if (data.IsReg)
             {
                 //if (env.tempEaxList.Count <= data.Reg.ID)

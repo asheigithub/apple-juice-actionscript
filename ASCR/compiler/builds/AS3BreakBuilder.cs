@@ -32,34 +32,46 @@ namespace ASCompiler.compiler.builds
         {
             if (string.IsNullOrEmpty(as3break.breakFlag))
             {
-                //throw new BuildException(as3break.Token.line, as3break.Token.ptr, as3break.Token.sourceFile,
-                //                    "语句关联break尚未实现");
-                //***向上查找
+				//throw new BuildException(as3break.Token.line, as3break.Token.ptr, as3break.Token.sourceFile,
+				//                    "语句关联break尚未实现");
+				//***向上查找
 
-                int l = 0;
+				//int l = 0;
+				Stack<string> flagstack = new Stack<string>();
 
                 for (int i = env.block.opSteps.Count -1; i >=0; i--)
                 {
                     var s = env.block.opSteps[i];
                     if (s.opCode == OpCode.flag)
                     {
-                        if (s.flag.StartsWith("LOOP_END_"))
+                        if (s.flag.StartsWith("LOOP_END_") || s.flag.StartsWith("SWITCH_END_"))
                         {
-                            l--;
+							flagstack.Push(s.flag);
+                            //l--;
                         }
 
-                        if (s.flag.StartsWith("LOOP_START_"))
+                        if (s.flag.StartsWith("LOOP_START_") || s.flag.StartsWith("SWITCH_START_"))
                         {
-                            if (l == 0)
+                            if (flagstack.Count==0)
                             {
-                                string id = s.flag.Substring(11);
+								string header = null;
+								if (s.flag.StartsWith("LOOP_START_"))
+								{
+									header = "LOOP_END_";
+								}
+								else
+								{
+									header = "SWITCH_END_";
+								}
+
+                                string id = s.flag.Substring(header.Length+2);
 
                                 //label标记跳转
                                 OpStep op = new OpStep(OpCode.jmp, new SourceToken(as3break.Token.line, as3break.Token.ptr, as3break.Token.sourceFile));
                                 op.reg = null;
                                 op.regType = RunTimeDataType.unknown;
                                 op.arg1 = new ASBinCode.rtData.RightValue(
-                                    new ASBinCode.rtData.rtString("LOOP_END_" + id));
+                                    new ASBinCode.rtData.rtString(header + id));
                                 op.arg1Type = RunTimeDataType.rt_string;
                                 op.arg2 = null;
                                 op.arg2Type = RunTimeDataType.unknown;
@@ -70,8 +82,20 @@ namespace ASCompiler.compiler.builds
                             }
                             else
                             {
-                                l++;
-                            }
+								string p= flagstack.Pop();
+								if ((p.StartsWith("LOOP_END_") && s.flag.StartsWith("LOOP_START_"))
+								||
+								(p.StartsWith("SWITCH_END_") && s.flag.StartsWith("SWITCH_START_")))
+
+								{
+
+								}
+								else
+								{
+									throw new BuildException(as3break.Token.line,as3break.Token.ptr,as3break.Token.sourceFile,"switch或loop开关不匹配");
+								}
+								//l++;
+							}
                         }
                     }
                 }

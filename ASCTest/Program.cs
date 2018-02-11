@@ -30,10 +30,10 @@ namespace ASCTest
             {
                 string path = args[0]; //path = @"F:\ASTool\ASCTest\bin\Release\tests\2_managed_array\";
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
-									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
+									   path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
 									   //path = @"../..\testScript\AS3Testproj\amd";
-				path = @"../..\testScript\AS3Testproj\src";
+				//path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -87,67 +87,67 @@ namespace ASCTest
 
 
 			//*********加入API*****
-			{
-				string apidir = @"../../..\LinkCodeGen\bin\Debug\as3api";
-				if (System.IO.Directory.Exists(apidir))
-				{
-					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//{
+			//	string apidir = @"../../..\LinkCodeGen\bin\Debug\as3api";
+			//	if (System.IO.Directory.Exists(apidir))
+			//	{
+			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-					foreach (var item in linkapi)
-					{
-						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-						if (projfile.StartsWith("/"))
-							projfile = projfile.Substring(1);
-						srcFileProjFile.Add(item, projfile);
-					}
+			//		foreach (var item in linkapi)
+			//		{
+			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+			//			if (projfile.StartsWith("/"))
+			//				projfile = projfile.Substring(1);
+			//			srcFileProjFile.Add(item, projfile);
+			//		}
 
-					string[] n = new string[files.Length + linkapi.Length];
-					linkapi.CopyTo(n, 0);
-					files.CopyTo(n, linkapi.Length);
-					files = n;
-				}
-			}
-			{
-				string apidir = @"..\..\testScript\sharpapi";
-				if (System.IO.Directory.Exists(apidir))
-				{
-					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//		string[] n = new string[files.Length + linkapi.Length];
+			//		linkapi.CopyTo(n, 0);
+			//		files.CopyTo(n, linkapi.Length);
+			//		files = n;
+			//	}
+			//}
+			//{
+			//	string apidir = @"..\..\testScript\sharpapi";
+			//	if (System.IO.Directory.Exists(apidir))
+			//	{
+			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-					foreach (var item in linkapi)
-					{
-						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-						if (projfile.StartsWith("/"))
-							projfile = projfile.Substring(1);
-						srcFileProjFile.Add(item, projfile);
-					}
+			//		foreach (var item in linkapi)
+			//		{
+			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+			//			if (projfile.StartsWith("/"))
+			//				projfile = projfile.Substring(1);
+			//			srcFileProjFile.Add(item, projfile);
+			//		}
 
-					string[] n = new string[files.Length + linkapi.Length];
-					linkapi.CopyTo(n, 0);
-					files.CopyTo(n, linkapi.Length);
-					files = n;
-				}
-			}
+			//		string[] n = new string[files.Length + linkapi.Length];
+			//		linkapi.CopyTo(n, 0);
+			//		files.CopyTo(n, linkapi.Length);
+			//		files = n;
+			//	}
+			//}
 			//*********************
 
 			//*********加入ProtoBuf API*****
-			//string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-			//if (System.IO.Directory.Exists(apidir))
-			//{
-			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
-			//	foreach (var item in linkapi)
-			//	{
-			//		string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-			//		if (projfile.StartsWith("/"))
-			//			projfile = projfile.Substring(1);
-			//		srcFileProjFile.Add(item, projfile);
-			//	}
+			string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+			if (System.IO.Directory.Exists(apidir))
+			{
+				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+				foreach (var item in linkapi)
+				{
+					string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+					if (projfile.StartsWith("/"))
+						projfile = projfile.Substring(1);
+					srcFileProjFile.Add(item, projfile);
+				}
 
 
-			//	string[] n = new string[files.Length + linkapi.Length];
-			//	linkapi.CopyTo(n, 0);
-			//	files.CopyTo(n, linkapi.Length);
-			//	files = n;
-			//}
+				string[] n = new string[files.Length + linkapi.Length];
+				linkapi.CopyTo(n, 0);
+				files.CopyTo(n, linkapi.Length);
+				files = n;
+			}
 			//*********************
 
 			var proj = new ASTool.AS3.AS3Proj();
@@ -258,57 +258,57 @@ namespace ASCTest
 
 
 
-						//var d = player.createInstance("SProtoSpace.group_area_info");
-						//uint len = (uint)player.getMemberValue(d, "groupids.length");
-						//player.setMemberValue(d, "groupids.length", 3);
-						//player.setMemberValue(d, "areaGroupName", null);
+						var d = player.createInstance("SProtoSpace.group_area_info");
+						uint len = (uint)player.getMemberValue(d, "groupids.length");
+						player.setMemberValue(d, "groupids.length", 3);
+						player.setMemberValue(d, "areaGroupName", null);
 
-						//for (int i = 0; i < 3; i++)
-						//{
-						//	player.setMemberValue(d, "groupids", i + 5, i);
-						//}
+						for (int i = 0; i < 3; i++)
+						{
+							player.setMemberValue(d, "groupids", i + 5, i);
+						}
 
-						////var d = player.createInstance("SProtoSpace.role_base_info");
-						//ASRuntime.flash.utils.ByteArray array;
-						//var byteArray = player.createByteArrayObject(out array);
-						////player.setMemberValue(d, "groupName", "账号你二大爷");
-
-
-
-						//var r = player.invokeMethod(d, "writeTo", byteArray);
-						//var d2 = player.createInstance("SProtoSpace.group_area_info");
-
-						//player.setMemberValue(byteArray, "position", 0);
-						//var k = player.invokeMethod(d2, "mergeFrom", byteArray);
-						//var m = player.getMemberValue(d2, "groupids.length");
-
-						//var ts = player.invokeMethod(byteArray, "toString");
-
-						//var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
-
-						//try
-						//{
-						//	player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
-						//}
-						//catch (ASBinCode.ASRunTimeException e)
-						//{
-						//	Console.WriteLine(e.ToString());
-						//}
-
-						//var s = player.invokeMethod("Test", "TTT", 3, 4);
-
-						//***zip***
+						//var d = player.createInstance("SProtoSpace.role_base_info");
 						ASRuntime.flash.utils.ByteArray array;
 						var byteArray = player.createByteArrayObject(out array);
+						//player.setMemberValue(d, "groupName", "账号你二大爷");
 
-						//var bytes = System.IO.File.ReadAllBytes("E:/as3corelib/as3corelib-master.zip");
-						//array.writeBytes(bytes, 0, bytes.Length);
-						//array.position = 0;
 
-						//player.invokeMethod("AutoGenTest", "showzip", byteArray);
-						var by= player.invokeMethod("AutoGenTest", "saveZip",byteArray);
-						System.IO.File.WriteAllBytes("e:/kkk.zip", array.ToArray());
-						
+
+						var r = player.invokeMethod(d, "writeTo", byteArray);
+						var d2 = player.createInstance("SProtoSpace.group_area_info");
+
+						player.setMemberValue(byteArray, "position", 0);
+						var k = player.invokeMethod(d2, "mergeFrom", byteArray);
+						var m = player.getMemberValue(d2, "groupids.length");
+
+						var ts = player.invokeMethod(byteArray, "toString");
+
+						var messageUnion = player.getMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id");
+
+						try
+						{
+							player.setMemberValue("SProtoSpace.base_msg_id", "name_check_ack_id", 5);
+						}
+						catch (ASBinCode.ASRunTimeException e)
+						{
+							Console.WriteLine(e.ToString());
+						}
+
+						var s = player.invokeMethod("Test", "TTT", 3, 4);
+
+						//***zip***
+						//ASRuntime.flash.utils.ByteArray array;
+						//var byteArray = player.createByteArrayObject(out array);
+
+						////var bytes = System.IO.File.ReadAllBytes("E:/as3corelib/as3corelib-master.zip");
+						////array.writeBytes(bytes, 0, bytes.Length);
+						////array.position = 0;
+
+						////player.invokeMethod("AutoGenTest", "showzip", byteArray);
+						//var by= player.invokeMethod("AutoGenTest", "saveZip",byteArray);
+						//System.IO.File.WriteAllBytes("e:/kkk.zip", array.ToArray());
+
 
 						Console.WriteLine();
 						Console.WriteLine("====程序输出====");
