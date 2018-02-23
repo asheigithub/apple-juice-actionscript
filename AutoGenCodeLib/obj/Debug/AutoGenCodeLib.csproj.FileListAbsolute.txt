@@ -1,10 +1,10 @@
-F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll
-F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
-F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.csprojResolveAssemblyReference.cache
-F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.csproj.CoreCompileInputs.cache
-F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
-F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
 E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.csproj.CoreCompileInputs.cache
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.csprojResolveAssemblyReference.cache

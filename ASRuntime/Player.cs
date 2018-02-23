@@ -49,7 +49,7 @@ namespace ASRuntime
 			}
 
 
-			if (swc.nativefunctions.Count == 0)
+			if (swc.NativeFunctionCount == 0)
 			{
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
 			}

@@ -54,13 +54,15 @@ namespace LinkCodeGen
 
         private string GetEnumItemNativeFuncName(System.Reflection.FieldInfo fieldinfo)
         {
-            return type.Namespace.ToLower().Replace(".", "_") + "_" + type.Name + "_" + fieldinfo.Name + "_getter";
-        }
+            //return type.Namespace.ToLower().Replace(".", "_") + "_" +  type.Name + "_" + fieldinfo.Name + "_getter";
+			return GetNativeFunctionPart1(type) + "_" + fieldinfo.Name + "_getter";
+		}
 
         private string GetEnumBitOrFuncName()
         {
-            return type.Namespace.ToLower().Replace(".", "_") + "_" + type.Name + "_operator_bitOr";
-        }
+			//return type.Namespace.ToLower().Replace(".", "_") + "_" + type.Name + "_operator_bitOr";
+			return GetNativeFunctionPart1(type) + "_"  +"operator_bitOr";
+		}
 
 
         private void GenNativeFuncNameSpaceAndClass(StringBuilder nativesb)
@@ -168,6 +170,10 @@ namespace LinkCodeGen
             //****创建枚举成员***
             foreach (var item in type.GetFields( System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
             {
+				if (IsObsolete(item,type))
+					continue;
+
+
 				string enumItemName = item.Name;
 				if (enumItemName == "Class") { enumItemName = "Class_"; }
 				if (enumItemName == "Object") { enumItemName = "Object_"; }
@@ -175,7 +181,7 @@ namespace LinkCodeGen
 				object v = item.GetValue(null);
                 as3api.Append("\t\t");
                 as3api.AppendLine("/**");
-                as3api.AppendLine("\t\t *" + enumItemName+" = "+Convert.ToInt32(v) );
+                as3api.AppendLine("\t\t *" + enumItemName+" = "+Convert.ToDecimal(v) );
                 as3api.AppendLine("\t\t */");
 
                 as3api.Append("\t\t");

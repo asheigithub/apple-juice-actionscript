@@ -210,9 +210,10 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new system_enum_valueOf());
 			bin.regNativeFunction(new system_noctorclass_buildin());
 
+			LoadBuildLinkSystemObjectFunctions(bin);
 		}
 
-		public static void LoadBuildLinkSystemObjectFunctions(ASBinCode.CSWC bin)
+		private static void LoadBuildLinkSystemObjectFunctions(ASBinCode.CSWC bin)
 		{
 			bin.regNativeFunction(LinkSystem_Buildin.getCreator("_system_Object_creator__", default(object)));
 			bin.regNativeFunction(new linksystem.system_object_ctor());

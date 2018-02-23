@@ -20,9 +20,8 @@ namespace ASCompiler.compiler
             try
             {
 
-                Builder builder = new Builder(true);
-                builder.isConsoleOut = false;
-
+				Builder builder = new Builder(new BuildOptions() { isConsoleOut = false },true);
+               
                 int bid = builder.getBlockId();
 
                 if (importBuilder != null && importBuilder._currentImports.Count > 0)

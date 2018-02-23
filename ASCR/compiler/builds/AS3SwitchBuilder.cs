@@ -99,6 +99,9 @@ namespace ASCompiler.compiler.builds
                             ASTool.AS3.AS3Expression expression = new ASTool.AS3.AS3Expression(c.token);
                             expression.exprStepList = new ASTool.AS3.Expr.AS3ExprStepList();
                             expression.exprStepList.Add(step);
+
+							expression.Value = c.holdreg;
+
                             compare.as3exprlist = new List<ASTool.AS3.AS3Expression>();
                             compare.as3exprlist.Add(expression);
 

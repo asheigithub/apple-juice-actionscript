@@ -2,6 +2,7 @@ package
 {
 	
 	//import as3runtime.RefOutStore;
+	import autogencodelib.Testobj;
 	import com.adobe.crypto.MD5;
 	import com.adobe.crypto.SHA1;
 	import com.adobe.crypto.SHA224;
@@ -11,6 +12,9 @@ package
 	import com.adobe.images.PNGEncoder;
 	import com.adobe.serialization.json.JSON;
 	import flash.display.Sprite;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 	import flash.utils.IDataInput;
@@ -19,6 +23,23 @@ package
 	import nochump.util.zip.ZipEntry;
 	import nochump.util.zip.ZipFile;
 	import nochump.util.zip.ZipOutput;
+	import simplejson.JsonObject;
+	import simplejson.SimpleJson;
+	import system.Byte;
+	import system.TimeSpan;
+	import system._Array_;
+	import system._Object_;
+	import system.collections.generic.KeyValuePair_Of_String__Object_;
+	import system.io.MemoryStream;
+	import system.security.cryptography.MD5CryptoServiceProvider;
+	import system.text.Encoding;
+	import unityengine.Debug;
+	import unityengine.GameObject;
+	import unityengine.MonoBehaviour;
+	import unityengine.Transform;
+	import unityengine.UObject;
+	import unityengine.Vector3;
+	import unityengine.scenemanagement.SceneManager;
 	//import system.Byte;
 	//import system.Decimal;
 	//import system.EventArgs;
@@ -39,16 +60,27 @@ package
 	 */
 	public class AutoGenTest extends Sprite
 	{
-		//public var b;
+		public var b;
 		
 		public function AutoGenTest() 
 		{
+			for (var i:int = 0; i < 100; i++) 
+			{
+				trace(Vector3.lerp(Vector3.zero, Vector3.up, i / 100 ).y);
+			}
+			
+			
+			
+			
+			//b = new Testobj();
+			//
+			//Testobj(b).ATTT(array);
 			//var o = _Object_(5);			
 			//trace(o);
 			
 			//var arr:_Array_= _Array_.createInstance(_Object_, 5);
 			//
-			 //b = new CrossExt2(99);
+			//b = new CrossExt2(99);
 			//
 			 //
 			 //
@@ -74,22 +106,22 @@ package
 			//b.doHandler("678", 1, 2);
 			
 			
-			//var md5:MD5CryptoServiceProvider = new MD5CryptoServiceProvider();
-			//
-			//
-			//
-			//var bytes:_Array_ = Encoding.UTF8.getBytes___("md5testttt");
-			//
-			//var ms:MemoryStream = MemoryStream.constructor__(bytes); 
-			//
-			//var md5bytes= md5.computeHash(ms);
-			//
-			//for each (var c:Byte in md5bytes) 
-			//{
-				//trace( c.toString___("X2") );
-			//}
-			//
-			//ms.close();
+			var md5:MD5CryptoServiceProvider = new MD5CryptoServiceProvider();
+			
+			
+			
+			var bytes:_Array_ = Encoding.UTF8.getBytes___("md5testttt");
+			
+			var ms:MemoryStream = MemoryStream.constructor__(bytes); 
+			
+			var md5bytes= md5.computeHash(ms);
+			
+			for each (var c:Byte in md5bytes) 
+			{
+				trace( c.toString___("X2") );
+			}
+			
+			ms.close();
 			//var t:Number = (new Date()).getTime();
 //
 			//var count:Number = 0;
@@ -140,7 +172,7 @@ package
 			//v[0] = null;
 			//trace(  v[0], SHA1.hash(typeof v[0]));
 			
-			
+
 			//o = com.adobe.serialization.json.JSON.decode( str );
 			//trace(o,typeof o);
 			
@@ -167,9 +199,13 @@ package
 			
 			
 			
-			saveZip(new ByteArray());
+			//saveZip(new ByteArray());
 			
-			
+			//var stream:FileStream = new FileStream();
+				//var file:File = new File('F:/code/Protobuf-as3-ILRuntime-master.zip');//绑定一个文件
+				//stream.open(file,FileMode.READ);//读取文件
+				//showzip(stream);
+				//stream.close();
 		}
 		
 		public static function saveZip(toread:ByteArray):void {
@@ -218,22 +254,22 @@ package
 
 		
 		
-		//public static function showzip(input:IDataInput)
-		//{
-			//var zip:ZipFile = new ZipFile(input);			
-			//for (var i:int = 0; i < zip.entries.length; i++) 
-			//{
-				//var entry:ZipEntry = zip.entries[i];
-				//trace(entry.name,entry.size,entry.compressedSize);
-				//
-				//
-				//var data:ByteArray = zip.getInput(entry);
-				//data.position = 0;
-				//trace(data.length,data.readUTFBytes(data.length));
-				//
-			//}
-			//
-		//}
+		public static function showzip(input:IDataInput)
+		{
+			var zip:ZipFile = new ZipFile(input);			
+			for (var i:int = 0; i < zip.entries.length; i++) 
+			{
+				var entry:ZipEntry = zip.entries[i];
+				trace(entry.name,entry.size,entry.compressedSize);
+				
+				
+				var data:ByteArray = zip.getInput(entry);
+				data.position = 0;
+				trace(data.length);// , data.readUTFBytes(data.length));
+				
+			}
+			
+		}
 		
 		
 
@@ -278,4 +314,14 @@ package
 	
 
 }
-
+//import autogencodelib.Testobj;
+//import system.globalization.Calendar;
+//
+//var a:AutoGenTest = new AutoGenTest();
+//a.b.testType(Calendar);
+//
+//var b:Testobj = a.b;
+//
+//trace(b.argsTest(1, 2, 3, 4, 5, 6));
+//
+//trace(b.doArgsTest(-100));

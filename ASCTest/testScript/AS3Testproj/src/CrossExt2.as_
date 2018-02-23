@@ -15,8 +15,14 @@ package
 		
 		override public function testType(type:Class):Class 
 		{
-			trace("override in CrossExt2");
+			trace("override in CrossExt2::testType");
 			return super.testType(type);
+		}
+		
+		override public function argsTest(a1:int, a2:int, a3:int, a4:int, a5:int, a6:int):String 
+		{
+			trace("override in CrossExt2::argsTest","a6",a6);
+			return super.argsTest(a1, a2, a3, a4, a5, a6+1000);
 		}
 		
 	}

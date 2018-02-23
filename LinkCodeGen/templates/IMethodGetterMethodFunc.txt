@@ -48,6 +48,7 @@
 				{
 [loadargement]
 					[storeresult]
+					[replacethis]
 					[storeref]
 					success = true;
 				}

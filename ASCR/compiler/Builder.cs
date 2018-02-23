@@ -8,8 +8,7 @@ namespace ASCompiler.compiler
 {
     public class Builder :IClassFinder 
     {
-        public bool isConsoleOut = true;
-
+        
         private int _structCount = 1;
 
         private int blockseed = 0;
@@ -71,14 +70,26 @@ namespace ASCompiler.compiler
 		internal Dictionary<FunctionSignature, FunctionDefine> _signature_define = new Dictionary<FunctionSignature, FunctionDefine>();
 		internal Dictionary<FunctionSignature, object> _signature_belone = new Dictionary<FunctionSignature, object>();
         internal readonly bool isEval;
-        public Builder(bool isEval)
+        internal Builder(BuildOptions options,bool isEval)
         {
+			this.options = options;
             this.isEval = isEval;
         }
-        public Builder():this(false)
-        {
 
+
+		public readonly BuildOptions options;
+
+		public Builder():this(new BuildOptions())
+		{
+
+		}
+
+        public Builder(BuildOptions options):this( options, false)
+        {
+			
         }
+
+
 
 
         /// <summary>
@@ -115,7 +126,7 @@ namespace ASCompiler.compiler
         {
             buildErrors.Add(err);
 
-            if (isConsoleOut)
+            if (options.isConsoleOut)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
 
@@ -232,13 +243,13 @@ namespace ASCompiler.compiler
 			{
 				bin = new CSWC();
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(bin);
-				ASRuntime.nativefuncs.BuildInFunctionLoader.LoadBuildLinkSystemObjectFunctions(bin);
+				//ASRuntime.nativefuncs.BuildInFunctionLoader.LoadBuildLinkSystemObjectFunctions(bin);
 
 				//基础库编译
 				lib = Grammar.makeLibProj();
 				if (lib == null)
 				{
-					if (isConsoleOut)
+					if (options.isConsoleOut)
 					{
 						Console.WriteLine("lib库编译失败，编译已终止");
 					}
@@ -345,7 +356,7 @@ namespace ASCompiler.compiler
 					_toOptimizeCallFunctionOpSteps.Clear();
 				}
 
-                if (isConsoleOut)
+                if (options.isConsoleOut)
                 {
                     Console.WriteLine("编译结束");
                 }
@@ -356,7 +367,7 @@ namespace ASCompiler.compiler
             }
             catch (TooManyBuildErrorException)
             {
-                if (isConsoleOut)
+                if (options.isConsoleOut)
                 {
                     Console.WriteLine("编译错误过多，编译已终止");
                 }
@@ -365,7 +376,7 @@ namespace ASCompiler.compiler
             {
                 pushBuildError(new BuildError(0, 0, "", "发生编译器内部错误"));
 
-                if (isConsoleOut)
+                if (options.isConsoleOut)
                 {
                     Console.WriteLine("编译已终止");
                 }
@@ -1293,17 +1304,27 @@ namespace ASCompiler.compiler
                         var creator =
                             buildoutfunctions[(ASTool.AS3.AS3Function)_buildingmembers[cls.staticClass.linkObjCreator]];
 
-                        int idx = bin.nativefunctionNameIndex[creator.native_name];
-                        var func = bin.nativefunctions[idx];
-                        ASBinCode.rtti.ILinkSystemObjCreator ic = func as ASBinCode.rtti.ILinkSystemObjCreator;
-                        if (ic == null)
-                        {
-                            throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-                                        "[creator]函数必须实现[ILinkSystemObjCreator]接口");
-                        }
+						if (options.CheckNativeFunctionSignature)
+						{
+							//int idx = bin.nativefunctionNameIndex[creator.native_name];
+							//var func = bin.nativefunctions[idx];
+							var func = bin.getNativeFunction(creator.native_name);
+							ASBinCode.rtti.ILinkSystemObjCreator ic = func as ASBinCode.rtti.ILinkSystemObjCreator;
+							if (ic == null)
+							{
+								throw new BuildException(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+											"[creator]函数必须实现[ILinkSystemObjCreator]接口");
+							}
 
-                        bin.creator_Class.Add(ic, cls);
-                        bin.class_Creator.Add(cls, ic);
+							bin.creator_Class.Add(ic, cls);
+							bin.class_Creator.Add(cls, ic);
+						}
+						else
+						{
+							mocks.MockNativeFunction mockcreator = new mocks.MockNativeFunction(creator.native_name);
+							bin.creator_Class.Add(mockcreator, cls);
+							bin.class_Creator.Add(cls, mockcreator);
+						}
 
                         if (cls.isStruct)
                         {
@@ -2302,7 +2323,7 @@ namespace ASCompiler.compiler
                                         CompileEnv tempEnv = new CompileEnv(new CodeBlock(0, "temp", -65535, true), false);
                                         buildExpression(tempEnv, variable.ValueExpr);
                                         RightValueBase tempRv = builds.ExpressionBuilder.getRightValue(tempEnv, variable.ValueExpr.Value,
-                                            stmt.Token, new Builder(true)
+                                            stmt.Token, new Builder(options,true)
                                             );
                                         newtype = tempRv.valueType;
                                     }

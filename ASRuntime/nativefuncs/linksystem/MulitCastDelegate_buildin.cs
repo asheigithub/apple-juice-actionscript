@@ -102,11 +102,12 @@ namespace ASRuntime.nativefuncs.linksystem
 
 						//***执行隐式转换****
 						var implfromfunction = stackframe.player.swc.functions[cls.implicit_from_functionid];
-						if (implfromfunction.native_index < 0)
-						{
-							implfromfunction.native_index = stackframe.player.swc.nativefunctionNameIndex[implfromfunction.native_name];
-						}
-						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
+						//if (implfromfunction.native_index < 0)
+						//{
+						//	implfromfunction.native_index = stackframe.player.swc.nativefunctionNameIndex[implfromfunction.native_name];
+						//}
+						//IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
+						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.getNativeFunction(implfromfunction);
 
 						var wapper = nativefunc.MakeWapper(argements[1], stackframe.player, cls.instanceClass);
 						arg1 = wapper;
@@ -255,11 +256,13 @@ namespace ASRuntime.nativefuncs.linksystem
 
 						//***执行隐式转换****
 						var implfromfunction = stackframe.player.swc.functions[cls.implicit_from_functionid];
-						if (implfromfunction.native_index < 0)
-						{
-							implfromfunction.native_index = stackframe.player.swc.nativefunctionNameIndex[implfromfunction.native_name];
-						}
-						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
+						//if (implfromfunction.native_index < 0)
+						//{
+						//	implfromfunction.native_index = stackframe.player.swc.nativefunctionNameIndex[implfromfunction.native_name];
+						//}
+						//IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.nativefunctions[implfromfunction.native_index];
+						IWapperDelegateMaker nativefunc = (IWapperDelegateMaker)stackframe.player.swc.getNativeFunction(implfromfunction);
+
 
 						var wapper = nativefunc.MakeWapper(argements[1], stackframe.player, cls.instanceClass);
 						arg1 = wapper;

@@ -387,7 +387,21 @@ namespace LinkCodeGen
 			{
 				//***索引器***
 
-				storeresult += "[" + string.Format("({0})arg{1}",GetTypeFullName( paras[0].ParameterType), 0) + "]\n";
+
+
+				storeresult += "[";//+ string.Format("({0})arg{1}", GetTypeFullName(paras[0].ParameterType), 0) + "]\n";
+
+				for (int i = 0; i < paras.Length; i++)
+				{
+					storeresult += string.Format("({0})arg{1}", GetTypeFullName(paras[i].ParameterType), i);
+					if (i < paras.Length - 1)
+					{
+						storeresult += ",";
+					}
+				}
+
+				storeresult += "]\n";
+
 				return storeresult;
 			}
 			else if (CheckIsSetter(method, methodAtType, out pinfo))
@@ -400,9 +414,28 @@ namespace LinkCodeGen
 			{
 				//***索引器***
 
-				storeresult += "[" + string.Format("({0})arg{1}",GetTypeFullName( paras[1].ParameterType), 1) + "] = "
-					+ string.Format("({0})arg{1}", GetTypeFullName( paras[0].ParameterType), 0) + "\n";
-				;
+				if (paras.Length > 2)
+				{
+					storeresult += "[";
+					for (int i = 0; i < paras.Length-1; i++)
+					{
+						storeresult += string.Format("({0})arg{1}", GetTypeFullName(paras[i].ParameterType), i);
+						if (i < paras.Length - 2)
+						{
+							storeresult += ",";
+						}
+					}
+					storeresult += "] = "
+						+ string.Format("({0})arg{1}", GetTypeFullName(paras[paras.Length - 1].ParameterType), paras.Length-1) + "\n";
+
+
+				}
+				else
+				{
+					storeresult += "[" + string.Format("({0})arg{1}", GetTypeFullName(paras[1].ParameterType), 1) + "] = "
+						+ string.Format("({0})arg{1}", GetTypeFullName(paras[0].ParameterType), 0) + "\n";
+					;
+				}
 				return storeresult;
 			}
 

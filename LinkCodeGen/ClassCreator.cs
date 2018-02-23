@@ -36,6 +36,7 @@ namespace LinkCodeGen
 
 
 			name = GetAS3ClassOrInterfaceName(classtype);
+			
 			//***分析实现的接口***
 			var impls = classtype.GetInterfaces();
 
@@ -71,7 +72,7 @@ namespace LinkCodeGen
 			//***链接基类***
 			if (classtype.BaseType != null )
 			{
-				if (!classtype.BaseType.IsGenericType)
+				//if (!classtype.BaseType.IsGenericType)
 				{
 					super = classtype.BaseType;
 
@@ -137,11 +138,10 @@ namespace LinkCodeGen
 
 			methodlist = new List<System.Reflection.MethodInfo>();
 			opoverrides = new List<System.Reflection.MethodInfo>();
+			virtualmethodlist = new List<MethodInfo>();
 
 			foreach (var method in type.GetMethods())
 			{
-				
-
 				if (!method.DeclaringType.Equals(type)
 					)
 				{
@@ -169,7 +169,7 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				if (IsObsolete(method))
+				if (IsObsolete(method,type))
 				{
 					continue;
 				}
@@ -183,7 +183,7 @@ namespace LinkCodeGen
 						continue;
 					}
 
-					
+					MakeCreator(method.ReturnType, typeCreators);
 				}
 				bool parachecked = true;
 				var paras = method.GetParameters();
@@ -233,9 +233,16 @@ namespace LinkCodeGen
 
 
 					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
-					if (pt > ASBinCode.RunTimeDataType.unknown && !IsSkipType(p.ParameterType))
+					if (pt > ASBinCode.RunTimeDataType.unknown)
 					{
-						MakeCreator(p.ParameterType, typeCreators);
+						var mt = p.ParameterType;
+						if (p.ParameterType.IsByRef)
+						{
+							mt = p.ParameterType.GetElementType();
+						}
+
+
+						MakeCreator(mt, typeCreators);
 					}
 
 				}
@@ -251,6 +258,25 @@ namespace LinkCodeGen
 					else
 					{
 						methodlist.Add(method);
+						
+						if (method.IsVirtual && !method.IsStatic && !method.IsSpecialName && !method.IsFinal)
+						{
+							bool hasref = false;
+							//***如果有ref或out的方法则不能重写***
+							foreach (var item in method.GetParameters())
+							{
+								if (item.ParameterType.IsByRef)
+								{
+									hasref = true;
+									break;
+								}
+							}
+							if (!hasref)
+							{
+								virtualmethodlist.Add(method);
+							}
+						}
+
 					}
 				}
 			}
@@ -358,7 +384,7 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				if (IsObsolete(field))
+				if (IsObsolete(field,type))
 				{
 					continue;
 				}
@@ -383,7 +409,7 @@ namespace LinkCodeGen
 
 		List<System.Reflection.MethodInfo> methodlist;
 		List<System.Reflection.MethodInfo> opoverrides;
-
+		List<System.Reflection.MethodInfo> virtualmethodlist;
 
 		List<System.Reflection.ConstructorInfo> constructorlist;
 		List<System.Reflection.FieldInfo> fieldlist;
@@ -408,7 +434,7 @@ namespace LinkCodeGen
 
 				for (int i = 0; i < map.TargetMethods.Length; i++)
 				{
-					if (map.TargetMethods[i].Equals(method))
+					if (map.TargetMethods[i].Equals(method) && !InterfaceCreator.isMethodSkip(map.InterfaceMethods[i]))
 					{
 						return map.InterfaceMethods[i];
 					}
@@ -426,10 +452,14 @@ namespace LinkCodeGen
 		{
 			Dictionary<Type, string> typeimports = new Dictionary<Type, string>();
 
+			Dictionary<MethodInfo, string> methodas3names = new Dictionary<MethodInfo, string>();
+
 
 			StringBuilder nativefunc = new StringBuilder();
 
 			StringBuilder adapterfunc = new StringBuilder();
+			StringBuilder adapteroverridefunc = new StringBuilder();
+
 			//GenNativeFuncImport(nativefunc);
 			GenNativeFuncNameSpaceAndClass(nativefunc);
 
@@ -870,6 +900,8 @@ namespace LinkCodeGen
 
 					adapterfunc.AppendLine(ctor);
 
+					adapterfunc.AppendLine("[overrides]");
+
 					adapterfunc.Append("\t\t");
 					adapterfunc.Append("}");
 
@@ -1071,6 +1103,10 @@ namespace LinkCodeGen
 							as3api.Append("var ");
 						}
 						as3api.Append(field.Name);
+						if (as3keywords.ContainsKey(field.Name))
+						{
+							as3api.Append("_");
+						}
 
 						string type = GetAS3TypeString(field.FieldType, typeimports,null,null,null);
 
@@ -1138,14 +1174,17 @@ namespace LinkCodeGen
 					returntype = GetAS3TypeString(method.ReturnType, typeimports, mapinterface.DeclaringType, method,null);
 
 					System.Reflection.PropertyInfo pinfo;
-					if (MethodNativeCodeCreator.CheckIsIndexerGetter(mapinterface, mapinterface.DeclaringType, out pinfo) && !existsindexgetter)
+					if (MethodNativeCodeCreator.CheckIsIndexerGetter(mapinterface, mapinterface.DeclaringType, out pinfo) && !existsindexgetter
+						
+						&& method.GetParameters().Length == 1
+						)
 					{
-						existsindexgetter = true;
 
+						existsindexgetter = true;
 						//****索引器****
 						as3api.Append("\t\t");
 						as3api.AppendLine("[get_this_item];");
-
+						
 						as3api.Append("\t\t");
 						as3api.AppendFormat("[native,{0}];", InterfaceCreator.GetMethodNativeFunctionName(mapinterface, mapinterface.DeclaringType,null,null));
 						as3api.AppendLine();
@@ -1179,9 +1218,13 @@ namespace LinkCodeGen
 						as3api.Append(mname);
 						dictUseNames.Add("get " + mname, null);
 					}
-					else if (MethodNativeCodeCreator.CheckIsIndexerSetter(mapinterface, mapinterface.DeclaringType, out pinfo) && !existsindexsetter)
+					else if (MethodNativeCodeCreator.CheckIsIndexerSetter(mapinterface, mapinterface.DeclaringType, out pinfo) && !existsindexsetter
+						&& method.GetParameters().Length == 2
+
+						)
 					{
 						existsindexsetter = true;
+						
 						//****索引器****
 						as3api.Append("\t\t");
 						as3api.AppendLine("[set_this_item];");
@@ -1238,6 +1281,9 @@ namespace LinkCodeGen
 						var mname = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 						dictUseNames.Add(mname, null);
+
+						methodas3names.Add(method, mname);
+
 					}
 				}
 				else
@@ -1315,7 +1361,11 @@ namespace LinkCodeGen
 
 					string nativefunctionname= InterfaceCreator.GetMethodNativeFunctionName(method, type, dictStaticUseNames, dictUseNames);
 					System.Reflection.PropertyInfo pinfo;
-					if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo)  && ( ( method.IsStatic && !existsstaticindexgetter ) || (!method.IsStatic && !existsindexgetter) ) )
+					if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo)  && ( ( method.IsStatic && !existsstaticindexgetter ) || (!method.IsStatic && !existsindexgetter) )
+
+						&& method.GetParameters().Length == 1
+
+						)
 					{
 						//****索引器****
 						as3api.Append("\t\t");
@@ -1382,7 +1432,10 @@ namespace LinkCodeGen
 							dictUseNames.Add("get " + mname, null);
 						}
 					}
-					else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo) && ((method.IsStatic && !existsstaticindexsetter) || (!method.IsStatic && !existsindexsetter)))
+					else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo) && ((method.IsStatic && !existsstaticindexsetter) || (!method.IsStatic && !existsindexsetter))
+
+						&& method.GetParameters().Length == 2
+						)
 					{
 						//****索引器****
 						as3api.Append("\t\t");
@@ -1477,6 +1530,9 @@ namespace LinkCodeGen
 						{
 							dictUseNames.Add(mname, null);
 						}
+
+						methodas3names.Add(method, mname);
+
 					}
 
 
@@ -1794,7 +1850,7 @@ namespace LinkCodeGen
 				string nativefunname = GetNativeFunctionPart1(type) + "_" + funname ;
 
 
-				as3api.AppendLine(string.Format("\t\t[native,{0}];", (string)kv.Value[1]));
+				as3api.AppendLine(string.Format("\t\t[native,{0}];", nativefunname));
 				as3api.AppendLine(string.Format("\t\tpublic function {0}():{1};", funname, as3argtype));
 				as3api.AppendLine();
 
@@ -1903,7 +1959,25 @@ namespace LinkCodeGen
 
 			EndRegFunction(nativefunc);
 
-			nativefunc.AppendLine(adapterfunc.ToString());
+			if (adapterfunc.Length > 0)
+			{
+				int vmindex=0;
+
+				//****函数重载***
+				foreach (var item in virtualmethodlist)
+				{
+					if (methodas3names.ContainsKey(item))
+					{
+						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++,methodas3names[item]);
+						adapteroverridefunc.AppendLine(mc.GetCode());
+
+					}
+				}
+			}
+
+			nativefunc.AppendLine(adapterfunc.Replace("[overrides]",adapteroverridefunc.ToString()).ToString());
+
+
 
 			for (int i = 0; i < nativefuncClasses.Count; i++)
 			{
@@ -1943,7 +2017,7 @@ namespace LinkCodeGen
 			if (method is MethodInfo)
 			{
 				PropertyInfo propertyInfo;
-				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, checktype, out propertyInfo))
+				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, checktype, out propertyInfo) && paras.Length==2)
 				{
 					var temp = paras[0];
 					paras[0] = paras[1];
@@ -1955,6 +2029,11 @@ namespace LinkCodeGen
 			{
 				var para = paras[i];
 				as3api.Append(para.Name);
+
+				if (as3keywords.ContainsKey(para.Name))
+				{
+					as3api.Append("_");
+				}
 				as3api.Append(":");
 
 				as3api.Append(GetAS3TypeString(para.ParameterType, typeimports,null,method,para ));
@@ -1963,7 +2042,7 @@ namespace LinkCodeGen
 				{
 					hasref = true;
 				}
-
+				
 				if (para.IsOptional)
 				{
 					as3api.Append("=");
@@ -1981,7 +2060,14 @@ namespace LinkCodeGen
 						}
 						else
 						{
-							as3api.Append(para.RawDefaultValue.ToString());
+							if (para.RawDefaultValue.GetType() == typeof(bool))
+							{
+								as3api.Append(para.RawDefaultValue.ToString().ToLower());
+							}
+							else
+							{
+								as3api.Append(para.RawDefaultValue.ToString());
+							}
 						}
 					}
 					else

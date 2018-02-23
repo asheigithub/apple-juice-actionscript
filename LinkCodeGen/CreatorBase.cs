@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LinkCodeGen
 {
-	abstract class CreatorBase
+	public abstract class CreatorBase
 	{
 		public static Dictionary<string, object> as3keywords;//= { "import","extend", "dynamic" };
 		static CreatorBase()
@@ -36,7 +36,12 @@ namespace LinkCodeGen
 			as3keywords.Add("public", null);
 			as3keywords.Add("private", null);
 			as3keywords.Add("static", null);
-
+			as3keywords.Add("throw", null);
+			as3keywords.Add("try", null);
+			as3keywords.Add("catch", null);
+			as3keywords.Add("finally", null);
+			as3keywords.Add("function", null);
+			as3keywords.Add("internal", null);
 		}
 
 		/// <summary>
@@ -44,10 +49,33 @@ namespace LinkCodeGen
 		/// </summary>
 		/// <param name="member"></param>
 		/// <returns></returns>
-		public static bool IsObsolete(System.Reflection.MemberInfo member)
+		public static bool IsObsolete(System.Reflection.MemberInfo member,System.Type definetype)
 		{
-			object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
+			var method = member as MethodInfo;
+			if (method != null)
+			{
+				PropertyInfo p;
+				if (MethodNativeCodeCreatorBase.CheckIsGetter(method, definetype, out p))
+				{
+					return IsObsolete(p, definetype);
+				}
+				if (MethodNativeCodeCreatorBase.CheckIsSetter(method, definetype, out p))
+				{
+					return IsObsolete(p, definetype);
+				}
+				if (MethodNativeCodeCreatorBase.CheckIsIndexerGetter(method, definetype, out p))
+				{
+					return IsObsolete(p, definetype);
+				}
+				if (MethodNativeCodeCreatorBase.CheckIsIndexerSetter(method, definetype, out p))
+				{
+					return IsObsolete(p, definetype);
+				}
+			}
 
+
+			object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
+			
 			if (objs.Length>0)
 			{
 				return true;
@@ -158,20 +186,20 @@ namespace LinkCodeGen
 		}
 
 
-		public void MakeCreator(Type type,Dictionary<Type,CreatorBase> typeCreators)
+		public static void MakeCreator(Type type, Dictionary<Type, CreatorBase> typeCreators, string as3apidocpath,string csharpnativecodepath,string linkcodenamespace)
 		{
 			if (type.IsInterface)
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
 				}
 			}
 			else if (type.IsEnum)
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath,linkcodenamespace);
+					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath, linkcodenamespace);
 				}
 			}
 			else if (type.IsArray)
@@ -179,16 +207,51 @@ namespace LinkCodeGen
 				var elementtype = type.GetElementType();
 				if (elementtype != null)
 				{
-					MakeCreator(elementtype, typeCreators);
+					MakeCreator(elementtype, typeCreators,as3apidocpath,csharpnativecodepath,linkcodenamespace);
 				}
 			}
 			else if (type.IsClass || type.IsValueType)
 			{
 				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
 				}
 			}
+		}
+
+
+		public void MakeCreator(Type type,Dictionary<Type,CreatorBase> typeCreators)
+		{
+			MakeCreator(type, typeCreators, as3apidocpath, csharpnativecodepath, linkcodenamespace);
+			//if (type.IsInterface)
+			//{
+			//	if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+			//	{
+			//		typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+			//	}
+			//}
+			//else if (type.IsEnum)
+			//{
+			//	if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+			//	{
+			//		typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath,linkcodenamespace);
+			//	}
+			//}
+			//else if (type.IsArray)
+			//{
+			//	var elementtype = type.GetElementType();
+			//	if (elementtype != null)
+			//	{
+			//		MakeCreator(elementtype, typeCreators);
+			//	}
+			//}
+			//else if (type.IsClass || type.IsValueType)
+			//{
+			//	if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+			//	{
+			//		typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+			//	}
+			//}
 		}
 
 
@@ -206,6 +269,17 @@ namespace LinkCodeGen
 			if (type == null)
 				return true;
 
+			
+			object[] objs = type.GetCustomAttributes(typeof(System.ObsoleteAttribute), false);
+
+			if (objs.Length > 0)
+			{
+				return true;
+			}
+			
+
+
+
 			if (Equals(type, typeof(Type))) //Type会转换为Class
 			{
 				return false;
@@ -214,6 +288,16 @@ namespace LinkCodeGen
 			if (type.IsCOMObject)
 			{
 				return true;
+			}
+
+			if (Equals(type, typeof(Enum)))
+			{
+				return true;
+			}
+
+			if (type.IsEnum)
+			{
+				return false;
 			}
 
 
@@ -402,11 +486,16 @@ namespace LinkCodeGen
 
 
 
-		public string GetAS3ClassOrInterfaceName(Type type)
+		public string GetAS3ClassOrInterfaceName(Type type,bool nestedcall=false)
 		{
 			if (type.Equals(typeof(Object)))
 			{
 				return "_Object_";
+			}
+
+			if (type.FullName == "UnityEngine.Object")
+			{
+				return "UObject";
 			}
 
 			if (type.Equals(typeof(Type)))
@@ -414,14 +503,21 @@ namespace LinkCodeGen
 				return "Class";
 			}
 
-			if (type.IsArray)
+			if (type == typeof(Array))
 			{
 				return "_Array_";
 			}
 
-			if (type == typeof(Array))
+			if (type.IsArray)
 			{
-				return "_Array_";
+				if (nestedcall)
+				{
+					return "_ArrayOf_" + GetAS3ClassOrInterfaceName(type.GetElementType(), true);
+				}
+				else
+				{
+					return "_Array_";
+				}
 			}
 
 			if (type.Equals(typeof(System.Collections.IEnumerable)))
@@ -444,7 +540,7 @@ namespace LinkCodeGen
 			string pre = string.Empty;
 			if (type.IsNested)
 			{
-				pre = GetAS3ClassOrInterfaceName(type.DeclaringType) + "_";
+				pre = GetAS3ClassOrInterfaceName(type.DeclaringType,true) + "_";
 			}
 
 			if (type.IsGenericType)
@@ -454,7 +550,7 @@ namespace LinkCodeGen
 				string ext = string.Empty;
 				foreach (var item in defparams)
 				{
-					ext +="_"+ GetAS3ClassOrInterfaceName(item);
+					ext +="_"+ GetAS3ClassOrInterfaceName(item,true);
 				}
 
 				int idx = type.Name.IndexOf("`");
@@ -475,7 +571,35 @@ namespace LinkCodeGen
 		public static string GetPackageName(Type csharptype)
 		{
 			string ns = csharptype.Namespace;
-			return ns.ToLower();
+
+			string[] p = ns.Split('.');
+
+
+			string package = string.Empty;
+
+			for (int i = 0; i < p.Length; i++)
+			{
+				string s = p[i].ToLower();
+				if (as3keywords.ContainsKey(s))
+				{
+					s = p[i];
+
+					if (as3keywords.ContainsKey(s))
+					{
+						s = s + "_";
+					}
+				}
+
+				package += s;
+
+				if (i < p.Length - 1)
+				{
+					package += ".";
+				}
+			}
+
+
+			return package;
 		}
 
 		private static string GetSharpTypeName(Type csharptype)
@@ -493,11 +617,15 @@ namespace LinkCodeGen
 				string ext = string.Empty;
 				foreach (var item in defparams)
 				{
-					ext += "_"+GetSharpTypeName(item) ;
+					ext += "_" + GetSharpTypeName(item);
 				}
 
 				int idx = csharptype.Name.IndexOf("`");
 				return pre + csharptype.Name.Substring(0, idx) + "_Of" + ext;
+			}
+			else if (csharptype.IsArray)
+			{
+				return pre +  "_ArrayOf" + GetSharpTypeName(csharptype.GetElementType());
 			}
 			else
 			{
@@ -782,7 +910,33 @@ namespace LinkCodeGen
 				return eventname + "_removeEventListener";
 			}
 
+			
 			var members = methodAtType.GetMember(dotName);
+
+			//var props = methodAtType.GetProperties();
+			//bool isprop = false;
+			//foreach (var item in props)
+			//{
+			//	if (Equals(method, item.GetGetMethod()))
+			//	{
+			//		isprop = true;
+			//	}
+			//}
+
+			//if (!isprop)
+			{
+				if (Char.IsLower(dotName[0]))
+				{
+					List<System.Reflection.MemberInfo> temp = new List<System.Reflection.MemberInfo>();
+					temp.AddRange(methodAtType.GetMember(Char.ToUpper(dotName[0]) + dotName.Substring(1)));
+
+					if (temp.Count > 0)
+					{
+						dotName = dotName + "".PadLeft(temp.Count, '_');
+					}
+
+				}
+			}
 
 			if (methodAtType.IsInterface)
 			{
@@ -825,14 +979,26 @@ namespace LinkCodeGen
 
 			for (int i = 0; i < members.Length; i++)
 			{
-				System.Reflection.MethodBase m = members[i] as System.Reflection.MethodBase;
-				if (m == null)
+				var m = members[i];
+
+				if (m is MethodBase)
 				{
-					continue;
+					if (((MethodBase)m).IsStatic != method.IsStatic)
+					{
+						continue;
+					}
 				}
-				if (m.IsStatic != method.IsStatic)
+				else if (m is PropertyInfo)
 				{
-					continue;
+					PropertyInfo p = (PropertyInfo)m;
+					if (Equals(p.GetGetMethod(), method))
+					{
+						break;
+					}
+					if (Equals(p.GetSetMethod(), method))
+					{
+						break;
+					}
 				}
 
 				if (members[i].Equals(method))
@@ -862,7 +1028,6 @@ namespace LinkCodeGen
 			{
 				v = v + "_";
 			}
-
 
 			if (method.IsStatic)
 			{

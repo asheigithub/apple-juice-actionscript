@@ -362,12 +362,13 @@ namespace ASRuntime.operators
 		{
 			if (toCallFunc.isNative)
 			{
-				if (toCallFunc.native_index < 0)
-				{
-					toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-				}
-				var nf = player.swc.nativefunctions[toCallFunc.native_index];
-				
+				//if (toCallFunc.native_index < 0)
+				//{
+				//	toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+				//}
+				//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				var nf = player.swc.getNativeFunction(toCallFunc);
+
 				if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
 				{
 					pushParameterNativeModeConstParameter(
@@ -577,11 +578,12 @@ namespace ASRuntime.operators
         {
             if (toCallFunc.isNative)
             {
-                if (toCallFunc.native_index < 0)
-                {
-                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-                }
-                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				//if (toCallFunc.native_index < 0)
+				//{
+				//    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+				//}
+				//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				var nf = player.swc.getNativeFunction(toCallFunc);
                 nf.bin = player.swc;
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
@@ -597,11 +599,12 @@ namespace ASRuntime.operators
             //CallFuncHeap[para_id].directSet(value);
             if (toCallFunc.isNative)
             {
-                if (toCallFunc.native_index < 0)
-                {
-                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-                }
-                var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				//if (toCallFunc.native_index < 0)
+				//{
+				//    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+				//}
+				//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				var nf = player.swc.getNativeFunction(toCallFunc);
                 nf.bin = player.swc;
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.const_parameter_0)
                 {
@@ -826,15 +829,14 @@ namespace ASRuntime.operators
             }
             else
             {
-                if (toCallFunc.native_index <0)
-                {
-                    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-                }
+				//if (toCallFunc.native_index <0)
+				//{
+				//    toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+				//}
 
-                
-
-                var nf = player.swc.nativefunctions[toCallFunc.native_index];
-                nf.bin = player.swc;
+				//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+				var nf = player.swc.getNativeFunction(toCallFunc);
+				nf.bin = player.swc;
 
                 if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_0)
                 {

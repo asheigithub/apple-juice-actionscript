@@ -50,9 +50,9 @@ namespace ASBinCode
 
 
 		[NonSerialized]
-		public List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
+		private List<NativeFunctionBase> nativefunctions;// = new List<NativeFunctionBase>();
 		[NonSerialized]
-		public Dictionary<string, int> nativefunctionNameIndex;// = new Dictionary<string, int>();
+		private Dictionary<string, int> nativefunctionNameIndex;// = new Dictionary<string, int>();
 
         public readonly Dictionary<ASBinCode.rtti.Class, RunTimeDataType>
             dict_Vector_type = new Dictionary<ASBinCode.rtti.Class, RunTimeDataType>();
@@ -192,6 +192,72 @@ namespace ASBinCode
 			return nativefunctions[define.native_index]; 
         }
 
+		public NativeFunctionBase getNativeFunction(FunctionDefine toCallFunc)
+		{
+			if (toCallFunc.native_index < 0)
+			{
+				int nidx;
+				if (nativefunctionNameIndex.TryGetValue(toCallFunc.native_name, out nidx))
+				{
+					toCallFunc.native_index = nidx;
+					return nativefunctions[nidx];
+				}
+				else
+				{
+					return null;
+				}
+			}
+			else
+			{
+				return nativefunctions[toCallFunc.native_index];
+			}
+			//var nf = player.swc.nativefunctions[toCallFunc.native_index];
+
+			//int nidx;
+			//if (nativefunctionNameIndex.TryGetValue(nativename, out nidx))
+			//{
+			//	return nativefunctions[nidx];
+			//}
+			//else
+			//{
+			//	return null;
+			//}
+		}
+
+		public NativeFunctionBase getNativeFunction(string nativename)
+		{
+			
+			int nidx;
+			if (nativefunctionNameIndex.TryGetValue(nativename, out nidx))
+			{
+				return nativefunctions[nidx];
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		public bool ContainsNativeFunction(string nativename)
+		{
+			int nidx;
+			if (nativefunctionNameIndex.TryGetValue(nativename, out nidx))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		public int NativeFunctionCount
+		{
+			get
+			{
+				return nativefunctions.Count;
+			}
+		}
 
 		public byte[] toBytes()
 		{

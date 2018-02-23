@@ -1383,7 +1383,52 @@ namespace ASCompiler.compiler.builds
 			//if (builder._signature_define.ContainsKey(signature))
 			{
 				findsuccess = true;
-				return builder._signature_define[signature];
+
+
+				var func = builder._signature_define[signature];
+
+				if (func != null && func.isNative)
+				{
+					try
+					{
+						var nf = builder.bin.getNativeFunction(func.native_name);
+
+						if (nf == null)
+						{
+							if (builder.options.CheckNativeFunctionSignature)
+							{
+								throw new NullReferenceException("没有找到对应的本地函数");
+							}
+							else
+							{
+								findsuccess = false;
+								return null;
+							}
+						}
+
+						if (nf.mode
+								== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+						{
+							return func;
+						}
+					}
+					catch (KeyNotFoundException)
+					{
+						if (builder.options.CheckNativeFunctionSignature)
+						{
+							throw;
+						}
+						else
+						{
+							findsuccess = false;
+							return null;
+						}
+					}
+
+
+				}
+
+				return func;
 			}
 			//findsuccess = false;
 			//return null;
@@ -1395,13 +1440,12 @@ namespace ASCompiler.compiler.builds
 			var func = findFunction(signature, builder,out findsuccess);
 			if (func != null && func.isNative)
 			{
-				if (builder.bin.nativefunctions[
-							builder.bin.nativefunctionNameIndex[func.native_name]].mode
-												== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+				var nf = builder.bin.getNativeFunction(func.native_name);
+				if (nf.mode== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
 				{
 					return true;
 				}
-			}
+							}
 			return false;
 		}
 

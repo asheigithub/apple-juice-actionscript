@@ -21,7 +21,7 @@ namespace LinkCodeGen
 
 			
 				PropertyInfo propertyInfo;
-				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo) && paras.Length == 2)
 				{
 				var temp = paras[0];
 				paras[0] = new myparainfo(paras[1], 0);

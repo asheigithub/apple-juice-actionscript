@@ -111,7 +111,7 @@ namespace LinkCodeGen
 			var methods = interfacetype.GetMethods();
 			foreach (var item in methods)
 			{
-				if (IsObsolete(item))
+				if (IsObsolete(item,type))
 				{
 					continue;
 				}
@@ -121,14 +121,19 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				if (item.ReturnType.IsGenericType)
+				if (item.ReturnType.IsGenericTypeDefinition)
 				{
 					continue;
 				}
 				
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(item.ReturnType);
-				if (rt > ASBinCode.RunTimeDataType.unknown && !IsSkipType(item.ReturnType))
+				if (rt > ASBinCode.RunTimeDataType.unknown )
 				{
+					if (IsSkipType(item.ReturnType))
+					{
+						continue;
+					}
+
 					MakeCreator(item.ReturnType,typeCreators);
 				}
 
@@ -136,15 +141,51 @@ namespace LinkCodeGen
 				var paras = item.GetParameters();
 				foreach (var p in paras)
 				{
-					if (p.ParameterType.IsGenericType)
+					if (p.IsOut)
 					{
 						parapass = false;
 						break;
 					}
-					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
-					if (pt > ASBinCode.RunTimeDataType.unknown && !IsSkipType(p.ParameterType))
+					if (p.ParameterType.IsByRef)
 					{
-						MakeCreator(p.ParameterType, typeCreators);
+						parapass = false;
+						break;
+					}
+
+					if (p.ParameterType.IsGenericTypeDefinition)
+					{
+						parapass = false;
+						break;
+					}
+
+					if (p.IsOptional)
+					{
+						if (p.RawDefaultValue != null)
+						{
+							var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
+							if (rrt > ASBinCode.RunTimeDataType.unknown)
+							{
+								parapass = false;
+								break;
+							}
+						}
+					}
+
+					if (IsSkipType(p.ParameterType, true))
+					{
+						parapass = false;
+						break;
+					}
+
+					var pt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
+					if (pt > ASBinCode.RunTimeDataType.unknown )
+					{
+						var mt = p.ParameterType;
+						if (p.ParameterType.IsByRef)
+						{
+							mt = p.ParameterType.GetElementType();
+						}
+						MakeCreator(mt, typeCreators);
 					}
 
 				}
@@ -205,7 +246,10 @@ namespace LinkCodeGen
 			string nativefunName;
 
 			System.Reflection.PropertyInfo pinfo;
-			if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo))
+			if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo)
+
+				&& method.GetParameters().Length == 1
+				)
 			{
 				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
 				if (testname == method.Name)
@@ -223,7 +267,10 @@ namespace LinkCodeGen
 				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type,staticusenames,usenames));
 
 			}
-			else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo))
+			else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo)
+
+				&& method.GetParameters().Length == 2
+				)
 			{
 				//****索引器****
 				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
@@ -256,58 +303,121 @@ namespace LinkCodeGen
 
 		public static bool isMethodSkip(System.Reflection.MethodInfo method)
 		{
-			if (IsObsolete(method))
+			var item = method;
+
+			if (IsObsolete(item, method.DeclaringType))
 			{
 				return true;
 			}
 
-			if (method.IsGenericMethod)
+			if (item.IsGenericMethod)
 			{
 				return true;
 			}
 
-			if (IsSkipType(method.ReturnType))
+			if (item.ReturnType.IsGenericTypeDefinition)
 			{
 				return true;
 			}
 
-			var paras = method.GetParameters();
-			foreach (var para in paras)
+			var rt = MethodNativeCodeCreator.GetAS3Runtimetype(item.ReturnType);
+			if (rt > ASBinCode.RunTimeDataType.unknown)
 			{
-				if (para.IsOut)
+				if (IsSkipType(method.ReturnType))
 				{
 					return true;
 				}
-				if (para.ParameterType.IsByRef)
+			}
+
+			
+			var paras = item.GetParameters();
+			foreach (var p in paras)
+			{
+				if (p.IsOut)
 				{
 					return true;
 				}
-				if (para.ParameterType.IsGenericType)
+				if (p.ParameterType.IsByRef)
 				{
 					return true;
 				}
 
-				if (para.IsOptional)
+				if (p.ParameterType.IsGenericTypeDefinition)
 				{
-					if (para.RawDefaultValue != null)
+					return true;
+				}
+
+				if (p.IsOptional)
+				{
+					if (p.RawDefaultValue != null)
 					{
-						var rt = MethodNativeCodeCreator.GetAS3Runtimetype(para.ParameterType);
-						if (rt > ASBinCode.RunTimeDataType.unknown)
+						var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
+						if (rrt > ASBinCode.RunTimeDataType.unknown)
 						{
 							return true;
 						}
 					}
 				}
 
-				if (IsSkipType(para.ParameterType))
+				if (IsSkipType(p.ParameterType, true))
 				{
 					return true;
 				}
-
 			}
 
 			return false;
-			
+			//if (IsObsolete(method,method.DeclaringType))
+			//{
+			//	return true;
+			//}
+
+			//if (method.IsGenericMethod)
+			//{
+			//	return true;
+			//}
+
+			//if (IsSkipType(method.ReturnType))
+			//{
+			//	return true;
+			//}
+
+			//var paras = method.GetParameters();
+			//foreach (var para in paras)
+			//{
+			//	if (para.IsOut)
+			//	{
+			//		return true;
+			//	}
+			//	if (para.ParameterType.IsByRef)
+			//	{
+			//		return true;
+			//	}
+			//	if (para.ParameterType.IsGenericType)
+			//	{
+			//		return true;
+			//	}
+
+			//	if (para.IsOptional)
+			//	{
+			//		if (para.RawDefaultValue != null)
+			//		{
+			//			var rt = MethodNativeCodeCreator.GetAS3Runtimetype(para.ParameterType);
+			//			if (rt > ASBinCode.RunTimeDataType.unknown)
+			//			{
+			//				return true;
+			//			}
+			//		}
+			//	}
+
+			//	if (IsSkipType(para.ParameterType))
+			//	{
+			//		return true;
+			//	}
+
+			//}
+
+			//return false;
+
 		}
 
 
@@ -509,6 +619,10 @@ namespace LinkCodeGen
 				{
 					var para = paras[i];
 					as3api.Append(para.Name);
+					if (as3keywords.ContainsKey(para.Name))
+					{
+						as3api.Append("_");
+					}
 					as3api.Append(":");
 					as3api.Append(GetAS3TypeString(para.ParameterType, typeimports,null,method,para));
 

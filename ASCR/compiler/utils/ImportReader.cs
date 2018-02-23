@@ -103,7 +103,7 @@ namespace ASCompiler.compiler.utils
 
                     if (!found)
                     {
-                        if (builder.isConsoleOut)
+                        if (builder.options.isConsoleOut)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine("Definition " + imp.Name + " could not be found.");

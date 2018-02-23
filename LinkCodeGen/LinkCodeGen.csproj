@@ -71,6 +71,7 @@
     <Compile Include="StaticFieldSetterNativeCodeCreator.cs" />
     <Compile Include="StaticMethodNativeCodeCreator.cs" />
     <Compile Include="ValueOfNativeCodeCreator.cs" />
+    <Compile Include="VirtualMethodNativeCodeCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -108,10 +109,6 @@
     <ProjectReference Include="..\ASRuntime\ASRuntime.csproj">
       <Project>{8c0a5542-f8c6-470c-b194-5a5c50c5a695}</Project>
       <Name>ASRuntime</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AutoGenCodeLib\AutoGenCodeLib.csproj">
-      <Project>{a4c59558-40e6-44c3-84a0-ea5a8fcff05a}</Project>
-      <Name>AutoGenCodeLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

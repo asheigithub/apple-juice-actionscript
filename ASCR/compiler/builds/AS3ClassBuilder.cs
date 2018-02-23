@@ -1413,9 +1413,9 @@ namespace ASCompiler.compiler.builds
 										{
 											string native_get = data[1].Data.Value.ToString();
 
-											if (builder.bin.nativefunctionNameIndex.ContainsKey(native_get))
+											if (builder.bin.ContainsNativeFunction(native_get))
 											{
-												var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
+												var nf = builder.bin.getNativeFunction(native_get); //builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
 												if (nf.isMethod)
 												{
 													if (nf.parameters.Count != 0)
@@ -1436,6 +1436,10 @@ namespace ASCompiler.compiler.builds
 														"本地函数 " + native_get + " isMethod属性不符");
 												}
 											}
+											else if (!builder.options.CheckNativeFunctionSignature)
+											{
+												//***跳过检查***
+											}
 											else
 											{
 												throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
@@ -1444,9 +1448,9 @@ namespace ASCompiler.compiler.builds
 
 											string native_set = data[2].Data.Value.ToString();
 
-											if (builder.bin.nativefunctionNameIndex.ContainsKey(native_set))
+											if (builder.bin.ContainsNativeFunction(native_set))
 											{
-												var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_set]];
+												var nf = builder.bin.getNativeFunction(native_set);//.nativefunctions[builder.bin.nativefunctionNameIndex[native_set]];
 												if (nf.isMethod)
 												{
 													if (nf.parameters.Count != 1)
@@ -1470,6 +1474,10 @@ namespace ASCompiler.compiler.builds
 													throw new BuildException(variable.token.line, variable.token.ptr, variable.token.sourceFile,
 														"本地函数 " + native_get + " isMethod属性不符");
 												}
+											}
+											else if (!builder.options.CheckNativeFunctionSignature)
+											{
+												//***跳过检查
 											}
 											else
 											{
@@ -1756,34 +1764,38 @@ namespace ASCompiler.compiler.builds
                                         {
                                             string native_get = data[1].Data.Value.ToString();
 
-                                            if (builder.bin.nativefunctionNameIndex.ContainsKey(native_get))
-                                            {
-                                                var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
-                                                if (nf.isMethod)
-                                                {
-                                                    if (nf.parameters.Count != 0)
-                                                    {
-                                                        throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
-                                                            "本地函数 " + native_get + "不接受参数");
-                                                    }
-                                                    //if (nf.returnType != RunTimeDataType.rt_void)
-                                                    //{
-                                                    //    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
-                                                    //        "本地函数 " + native_get + "必须返回*");
-                                                    //}
+											if (builder.bin.ContainsNativeFunction(native_get))
+											{
+												var nf = builder.bin.getNativeFunction(native_get);//nativefunctions[builder.bin.nativefunctionNameIndex[native_get]];
+												if (nf.isMethod)
+												{
+													if (nf.parameters.Count != 0)
+													{
+														throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+															"本地函数 " + native_get + "不接受参数");
+													}
+													//if (nf.returnType != RunTimeDataType.rt_void)
+													//{
+													//    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+													//        "本地函数 " + native_get + "必须返回*");
+													//}
 
-                                                }
-                                                else
-                                                {
-                                                    throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
-                                                        "本地函数 " + native_get + " isMethod属性不符");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
-                                                    "本地函数 " + native_get + " 未注册");
-                                            }
+												}
+												else
+												{
+													throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+														"本地函数 " + native_get + " isMethod属性不符");
+												}
+											}
+											else if (!builder.options.CheckNativeFunctionSignature)
+											{
+												//***跳过检查
+											}
+											else
+											{
+												throw new BuildException(constant.token.line, constant.token.ptr, constant.token.sourceFile,
+													"本地函数 " + native_get + " 未注册");
+											}
                                             //***检查通过，创建两个函数作为getter和setter放进去***
 
                                             {

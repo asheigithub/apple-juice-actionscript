@@ -415,11 +415,12 @@ namespace ASRuntime.operators
 #endif
 
 			var toCallFunc = frame.funCaller.toCallFunc;var player = frame.player;
-			if (toCallFunc.native_index < 0)
-			{
-				toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
-			}
-			var nf = (nativefuncs.NativeConstParameterFunction)player.swc.nativefunctions[toCallFunc.native_index];
+			//if (toCallFunc.native_index < 0)
+			//{
+			//	toCallFunc.native_index = player.swc.nativefunctionNameIndex[toCallFunc.native_name];
+			//}
+			//var nf = (nativefuncs.NativeConstParameterFunction)player.swc.nativefunctions[toCallFunc.native_index];
+			var nf = (nativefuncs.NativeConstParameterFunction)player.swc.getNativeFunction(toCallFunc);
 
 			bool success;
 			frame.funCaller.pushParameterNativeModeConstParameter(nf,arg, id, out success);

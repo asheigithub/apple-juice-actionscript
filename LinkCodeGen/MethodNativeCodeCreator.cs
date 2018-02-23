@@ -44,7 +44,7 @@ namespace LinkCodeGen
 			if (method is MethodInfo)
 			{
 				PropertyInfo propertyInfo;
-				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo))
+				if (MethodNativeCodeCreator.CheckIsIndexerSetter((MethodInfo)method, method.DeclaringType, out propertyInfo) && paras.Length == 2)
 				{
 					var temp = paras[0];
 					paras[0] = new myparainfo( paras[1],0);
@@ -277,6 +277,17 @@ namespace LinkCodeGen
 				{
 					funccode = funccode.Replace("[storeresult]", "代码生成错误，不能转换返回类型");
 				}
+
+			if (methodAtType.IsValueType) //结构体，需要重新赋值回去
+			{
+				string replacethis = "((LinkObj<" + GetTypeFullName(methodAtType) + ">)((ASBinCode.rtData.rtObjectBase) thisObj).value).value = _this;";
+				funccode = funccode.Replace("[replacethis]", replacethis);
+			}
+			else
+			{
+				funccode = funccode.Replace("[replacethis]", string.Empty);
+			}
+
 
 			if (!hasref)
 			{

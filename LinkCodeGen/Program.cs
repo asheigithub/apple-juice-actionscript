@@ -104,21 +104,17 @@ namespace LinkCodeGen
 			//		&& classtype.IsClass && classtype.IsPublic
 			//		)
 			//	{
-			//		if (!creators.ContainsKey(classtype))
-			//		{
-			//			creators.Add(classtype, null);
-			//			creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
-			//		}
+			//		CreatorBase.MakeCreator(classtype, creators, "", "", "ASCAutoGen.regNativeFunctions");
 			//	}
 			//}
 
 
-			var classtype = typeof(AutoGenCodeLib.Testobj);
-			if (!creators.ContainsKey(classtype))
-			{
-				creators.Add(classtype, null);
-				creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
-			}
+			//var classtype = typeof(AutoGenCodeLib.Testobj);
+			//if (!creators.ContainsKey(classtype))
+			//{
+			//	creators.Add(classtype, null);
+			//	creators[classtype] = new ClassCreator(classtype, "", "", creators, "ASCAutoGen.regNativeFunctions");
+			//}
 
 			//var classtype = typeof(ICloneable);
 			//if (!creators.ContainsKey(classtype))
@@ -126,6 +122,49 @@ namespace LinkCodeGen
 			//	creators.Add(classtype, null);
 			//	creators[classtype] = new InterfaceCreator(classtype, "", "", creators, "ASCTest.regNativeFunctions");
 			//}
+
+			List<Type> types = new List<Type>();
+			{
+				types.AddRange(typeof(object).Assembly.GetTypes());
+
+				var dll = System.Reflection.Assembly.LoadFrom(@"E:\Manju-pc\blacksmith\blacksmith\Library\UnityAssemblies\UnityEngine.dll");
+
+
+				types.AddRange(dll.GetTypes());
+
+				dll = System.Reflection.Assembly.LoadFrom(@"E:\Manju-pc\blacksmith\blacksmith\Library\UnityAssemblies\UnityEngine.UI.dll");
+				//foreach (var item in dll.GetTypes())
+				//{
+				//	if (item.Name.EndsWith("BaseMeshEffect"))
+				//	{
+				//		types.Add(item);
+				//	}
+				//}
+				//var dll = System.Reflection.Assembly.LoadFrom(@"E:\Manju-pc\blacksmithHorizontal\blacksmith\Assets\lib\SimpleJson.dll");
+
+
+
+				types.AddRange(dll.GetTypes());
+
+				//var dll = System.Reflection.Assembly.LoadFile(@"F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll");
+				//types.AddRange(dll.GetTypes());
+			}
+
+
+			foreach (var item in types)
+			{
+				var classtype = item;
+
+				if (!CreatorBase.IsSkipType(classtype) && !CreatorBase.IsSkipCreator(classtype)
+
+					&& (classtype.IsClass || classtype.IsValueType) && classtype.IsPublic
+					)
+				{
+					CreatorBase.MakeCreator(classtype, creators, "", "", "ASCAutoGen.regNativeFunctions");
+				}
+			}
+
+
 
 			using (System.IO.FileStream fs=new System.IO.FileStream("codeoutput.cs", System.IO.FileMode.Create))
 			{

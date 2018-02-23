@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildOptions.cs" />
     <Compile Include="compiler\Builder.cs" />
     <Compile Include="compiler\BuildError.cs" />
     <Compile Include="compiler\BuildException.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="compiler\ExpressionEval.cs" />
     <Compile Include="compiler\FindOutPackageScopeMember.cs" />
     <Compile Include="compiler\FindStaticMember.cs" />
+    <Compile Include="compiler\mocks\MockLinkSystemObjCreator.cs" />
     <Compile Include="compiler\TypeReader.cs" />
     <Compile Include="compiler\MemberFinder.cs" />
     <Compile Include="compiler\utils\ImportReader.cs" />

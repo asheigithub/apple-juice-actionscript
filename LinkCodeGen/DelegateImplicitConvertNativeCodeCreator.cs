@@ -43,7 +43,7 @@ namespace LinkCodeGen
 			string invokeparam = string.Empty;
 			for (int i = 0; i < param.Length; i++)
 			{
-				invokeparam += param[i].Name;
+				invokeparam += "__wapperargs__" + i;//param[i].Name;
 				if (i < param.Length - 1)
 				{
 					invokeparam += ",";

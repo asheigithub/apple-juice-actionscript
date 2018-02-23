@@ -124,23 +124,27 @@ namespace ASCompiler.compiler.builds
                                                     {
                                                         string creator = cargs[0].Data.Value.ToString();
 
-                                                        if (builder.bin.nativefunctionNameIndex.ContainsKey(creator))
-                                                        {
-                                                            
-                                                            var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[creator]];
-                                                            if (!(nf is ASBinCode.rtti.ILinkSystemObjCreator))
-                                                            {
-                                                                throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
-                                                                "链接接口必须有一个INativeFunctionRegister类型的创建器");
-                                                            }
+														if (builder.bin.ContainsNativeFunction(creator))
+														{
 
-                                                            creatorfunction = nf;
-                                                        }
-                                                        else
-                                                        {
-                                                            throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
-                                                                "本地函数 " + creator + " 未注册");
-                                                        }
+															var nf = builder.bin.getNativeFunction(creator);//nativefunctions[builder.bin.nativefunctionNameIndex[creator]];
+															if (!(nf is ASBinCode.rtti.ILinkSystemObjCreator))
+															{
+																throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+																"链接接口必须有一个INativeFunctionRegister类型的创建器");
+															}
+
+															creatorfunction = nf;
+														}
+														else if (!builder.options.CheckNativeFunctionSignature)
+														{
+															creatorfunction = new mocks.MockNativeFunction(creator);
+														}
+														else
+														{
+															throw new BuildException(as3interface.token.line, as3interface.token.ptr, as3interface.token.sourceFile,
+																"本地函数 " + creator + " 未注册");
+														}
 
                                                     }
                                                 }

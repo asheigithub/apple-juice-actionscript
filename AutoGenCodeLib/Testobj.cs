@@ -137,6 +137,12 @@ namespace AutoGenCodeLib
 		}
 
 
+		public void ATTT( EnvironmentVariableTarget environment )
+		{
+			Console.WriteLine(environment.ToString());
+		}
+
+
 		public delegate int TESTHandler<T>(string v1,int v2,T v3);
 
 		public TESTHandler<float> handler;// = (v1,v2,v3)=> { return 98765; };
@@ -164,6 +170,10 @@ namespace AutoGenCodeLib
 			t2 = 100;
 		}
 
+		public virtual string ArgsTest(int a1,int a2,int a3,int a4,int a5,int a6)
+		{
+			return "a6:" + a6;
+		}
 
 		public virtual Type TestType(Type type)
 		{
@@ -172,6 +182,15 @@ namespace AutoGenCodeLib
 			return typeof(long);
 		}
 
+		public virtual void Dialog()
+		{
+			Console.WriteLine("base dialog ");
+		}
+
+		public string DoArgsTest(int a6)
+		{
+			return ArgsTest(6, 7, 8, 9, 0, a6);
+		}
 
 		public event EventHandler EventTest;
 

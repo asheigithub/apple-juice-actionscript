@@ -962,7 +962,7 @@ namespace ASCompiler.compiler.builds
 								{
 									string native_to = data[1].Data.Value.ToString();
 
-									if (builder.bin.nativefunctionNameIndex.ContainsKey(native_to))
+									if (builder.bin.ContainsNativeFunction(native_to))
 									{
 										bool isvectorScope = false;
 										RunTimeDataType vt = RunTimeDataType.unknown;
@@ -979,7 +979,7 @@ namespace ASCompiler.compiler.builds
 											}
 										}
 
-										var nf = builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_to]];
+										var nf = builder.bin.getNativeFunction(native_to); //builder.bin.nativefunctions[builder.bin.nativefunctionNameIndex[native_to]];
 										if (as3function.IsMethod == nf.isMethod)
 										{
 											if (signature.returnType != nf.returnType
@@ -1038,6 +1038,11 @@ namespace ASCompiler.compiler.builds
 											throw new BuildException(as3function.token.line, as3function.token.ptr, as3function.token.sourceFile,
 												"本地函数 " + native_to + " isMethod属性不符");
 										}
+									}
+									else if (!builder.options.CheckNativeFunctionSignature)
+									{
+										function.isNative = true;
+										function.native_name = native_to;
 									}
 									else
 									{

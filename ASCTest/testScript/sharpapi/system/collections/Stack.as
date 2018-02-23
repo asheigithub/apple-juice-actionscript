@@ -1,10 +1,11 @@
 package system.collections 
 {
+	import system.ICloneable;
 	import system._Array_;
 	import system._Object_;
 	
 	[link_system]
-	public class Stack extends _Object_ implements ICollection
+	public class Stack extends _Object_ implements ICollection,ICloneable
 	{
 		[native,_system_collections_stack_static_createInstance]
 		public static function createInstance(c:ICollection):Stack;
@@ -54,6 +55,8 @@ package system.collections
 		[native,system_collections_ICollection_get_IsSynchronized]
 		private function get isSynchronized():Boolean;
 		
+		[native,system_ICloneable_clone]
+		function clone():_Object_;
 	}
 
 }
