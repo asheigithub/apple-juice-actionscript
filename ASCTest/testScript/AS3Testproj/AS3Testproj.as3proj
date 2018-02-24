@@ -19,7 +19,7 @@
     <class path="src" />
     <class path="..\api" />
     <class path="..\sharpapi" />
-    <class path="..\..\..\LinkCodeGen\bin\Debug\as3api" />
+    <class path="..\..\..\LinkCodeGenCLI\bin\Debug\as3api" />
   </classpaths>
   <!-- Build options -->
   <build>

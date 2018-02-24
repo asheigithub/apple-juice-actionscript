@@ -15,7 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AS", "AS", "{B4969010-E167-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkCodeGen", "LinkCodeGen\LinkCodeGen.csproj", "{4F9519E2-A209-49A5-BB20-1E5980664923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoGenCodeLib", "AutoGenCodeLib\AutoGenCodeLib.csproj", "{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoGenCodeTestLib", "AutoGenCodeLib\AutoGenCodeTestLib.csproj", "{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LinkCodeGenerator", "LinkCodeGenerator", "{9C61FD24-2770-4323-AB8D-5BDA8658461F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkCodeGenCLI", "LinkCodeGenCLI\LinkCodeGenCLI.csproj", "{E13DA238-07DC-4806-A7FA-B1CA8A846861}"
 EndProject
 Global
 	GlobalSection(Performance) = preSolution
@@ -76,6 +80,14 @@ Global
 		{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A}.Release|x86.Build.0 = Release|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Debug|x86.Build.0 = Debug|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|x86.ActiveCfg = Release|Any CPU
+		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,9 +96,14 @@ Global
 		{F6119D2E-215B-4FB1-A1C6-E83EDE52DA8C} = {B4969010-E167-4B5A-992A-005B9F9EC5E2}
 		{883162BB-0596-4ABC-BAA8-B3A1F04CC388} = {B4969010-E167-4B5A-992A-005B9F9EC5E2}
 		{8C0A5542-F8C6-470C-B194-5A5C50C5A695} = {B4969010-E167-4B5A-992A-005B9F9EC5E2}
+		{4F9519E2-A209-49A5-BB20-1E5980664923} = {9C61FD24-2770-4323-AB8D-5BDA8658461F}
+		{A4C59558-40E6-44C3-84A0-EA5A8FCFF05A} = {9C61FD24-2770-4323-AB8D-5BDA8658461F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E21E42CB-61D2-46EE-9085-5023B5BFE7B0}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

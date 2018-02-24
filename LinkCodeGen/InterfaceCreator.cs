@@ -136,7 +136,7 @@ namespace LinkCodeGen
 
 					MakeCreator(item.ReturnType,typeCreators);
 				}
-
+				bool hasoptional = false;
 				bool parapass = true;
 				var paras = item.GetParameters();
 				foreach (var p in paras)
@@ -160,6 +160,7 @@ namespace LinkCodeGen
 
 					if (p.IsOptional)
 					{
+						hasoptional = true;
 						if (p.RawDefaultValue != null)
 						{
 							var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
@@ -168,6 +169,14 @@ namespace LinkCodeGen
 								parapass = false;
 								break;
 							}
+						}
+					}
+					else
+					{
+						if (hasoptional)
+						{
+							parapass = false;
+							break;
 						}
 					}
 
@@ -329,7 +338,7 @@ namespace LinkCodeGen
 				}
 			}
 
-			
+			bool hasoptional=false;
 			var paras = item.GetParameters();
 			foreach (var p in paras)
 			{
@@ -349,6 +358,7 @@ namespace LinkCodeGen
 
 				if (p.IsOptional)
 				{
+					hasoptional = true;
 					if (p.RawDefaultValue != null)
 					{
 						var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
@@ -357,6 +367,11 @@ namespace LinkCodeGen
 							return true;
 						}
 					}
+				}
+				else
+				{
+					if (hasoptional)
+						return true;
 				}
 
 				if (IsSkipType(p.ParameterType, true))

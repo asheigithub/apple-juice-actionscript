@@ -147,7 +147,8 @@ namespace LinkCodeGen
 				{
 					continue;
 				}
-				
+
+
 				if (!method.IsPublic)
 				{
 					continue;
@@ -174,6 +175,28 @@ namespace LinkCodeGen
 					continue;
 				}
 
+
+				if (method.IsSpecialName && method.Name.StartsWith("add_") && method.GetParameters().Length == 1 && CreatorBase.IsDelegate(method.GetParameters()[0].ParameterType))
+				{
+					string eventname = method.Name.Substring(4);
+					var e= type.GetEvent(eventname);
+					if (IsObsolete(e, type))
+					{
+						continue;
+					}
+				}
+				if (method.IsSpecialName && method.Name.StartsWith("remove_") && method.GetParameters().Length == 1 && CreatorBase.IsDelegate(method.GetParameters()[0].ParameterType))
+				{
+					string eventname = method.Name.Substring(7);
+					var e = type.GetEvent(eventname);
+					if (IsObsolete(e, type))
+					{
+						continue;
+					}
+				}
+
+
+
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(method.ReturnType);
 				if (rt > ASBinCode.RunTimeDataType.unknown)
 				{
@@ -187,6 +210,7 @@ namespace LinkCodeGen
 				}
 				bool parachecked = true;
 				var paras = method.GetParameters();
+				bool hasoptional = false;
 				foreach (var p in paras)
 				{
 					if (p.IsOut && (method.IsSpecialName || IsDelegate(type)))
@@ -211,6 +235,8 @@ namespace LinkCodeGen
 
 					if (p.IsOptional)
 					{
+
+						hasoptional = true;
 						if (p.RawDefaultValue != null)
 						{
 							var rrt = MethodNativeCodeCreator.GetAS3Runtimetype(p.ParameterType);
@@ -220,6 +246,15 @@ namespace LinkCodeGen
 								parachecked = false;
 								break;
 							}
+						}
+
+					}
+					else
+					{
+						if (hasoptional)
+						{
+							parachecked = false;
+							break;
 						}
 					}
 
@@ -479,21 +514,23 @@ namespace LinkCodeGen
 			bool isdelegate=false;
 			if (IsDelegate(type))
 			{
-				as3api.AppendLine("\t/**");
-				as3api.AppendLine("\t*包装委托:");
-				as3api.Append("\t* ");
+				as3api.AppendLine("\t\t/**");
+				as3api.AppendLine("\t\t*包装委托:");
+				as3api.Append("\t\t* ");
 				as3api.AppendLine( System.Security.SecurityElement.Escape( MethodNativeCodeCreatorBase.GetTypeFullName(type)).Replace("&"," &").Replace(";", "; "));
-				as3api.Append("\t* ");
+				as3api.Append("\t\t* ");
 				as3api.AppendLine(System.Security.SecurityElement.Escape(GetDelegateSignature(type)).Replace("&", " &").Replace(";", "; "));
-				as3api.AppendLine("\t*/");
-
+				//as3api.AppendLine("\t*/");
+				as3api.AppendLine();
 				isdelegate = true;
 			}
 
 			//***编写类型摘要***
 			{
-				as3api.AppendLine("\t\t/**");
-
+				if (!isdelegate)
+				{
+					as3api.AppendLine("\t\t/**");
+				}
 				if (type.IsValueType)
 				{
 					as3api.AppendLine("\t\t* Struct");
@@ -548,7 +585,15 @@ namespace LinkCodeGen
 
 			if (super != null && !type.IsValueType)
 			{
-				as3api.AppendFormat(" extends {0}", GetAS3TypeString(super, typeimports,null,null,null));
+				var supername = GetAS3TypeString(super, typeimports, null, null, null);
+
+				if (supername == name)
+				{
+					supername = typeimports[super].Substring(7);
+					supername = supername.Substring(0, supername.Length - 1);
+				}
+
+				as3api.AppendFormat(" extends {0}", supername );
 			}
 			else
 			{
@@ -1419,6 +1464,8 @@ namespace LinkCodeGen
 						}
 
 						as3api.Append("function get ");
+
+						
 
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);

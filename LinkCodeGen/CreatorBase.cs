@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LinkCodeGen
 {
-	public abstract class CreatorBase
+	abstract class CreatorBase
 	{
 		public static Dictionary<string, object> as3keywords;//= { "import","extend", "dynamic" };
 		static CreatorBase()
@@ -73,17 +73,25 @@ namespace LinkCodeGen
 				}
 			}
 
+			var c = CustomAttributeData.GetCustomAttributes(member);
+			foreach (CustomAttributeData item in c)
+			{
+				if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
+				{
+					return true;
+				}
+			}
+			return false;
+			//object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
 
-			object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
-			
-			if (objs.Length>0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			//if (objs.Length>0)
+			//{
+			//	return true;
+			//}
+			//else
+			//{
+			//	return false;
+			//}
 		}
 
 		public static String GetOutKeyWord(ParameterInfo parameter,MethodInfo method)
@@ -268,14 +276,21 @@ namespace LinkCodeGen
 		{
 			if (type == null)
 				return true;
-
-			
-			object[] objs = type.GetCustomAttributes(typeof(System.ObsoleteAttribute), false);
-
-			if (objs.Length > 0)
+			var c = CustomAttributeData.GetCustomAttributes(type);
+			foreach (CustomAttributeData item in c)
 			{
-				return true;
+				if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
+				{
+					return true;
+				}
 			}
+
+			//object[] objs = type.GetCustomAttributes(typeof(System.ObsoleteAttribute), false);
+
+			//if (objs.Length > 0)
+			//{
+			//	return true;
+			//}
 			
 
 
@@ -297,6 +312,18 @@ namespace LinkCodeGen
 
 			if (type.IsEnum)
 			{
+				foreach (var item in NotCreateNameSpace)
+				{
+					if (type.Namespace == item)
+						return true;
+					if (type.Namespace.StartsWith(item + "."))
+						return true;
+				}
+
+				if (NotCreateTypes.Contains(type.FullName))
+				{
+					return true;
+				}
 				return false;
 			}
 
@@ -921,15 +948,27 @@ namespace LinkCodeGen
 			//	{
 			//		isprop = true;
 			//	}
+			//	if (Equals(method, item.GetSetMethod()))
+			//	{
+			//		isprop = true;
+			//	}
 			//}
-
+			
 			//if (!isprop)
 			{
 				if (Char.IsLower(dotName[0]))
 				{
 					List<System.Reflection.MemberInfo> temp = new List<System.Reflection.MemberInfo>();
-					temp.AddRange(methodAtType.GetMember(Char.ToUpper(dotName[0]) + dotName.Substring(1)));
 
+					var ms = methodAtType.GetMember(Char.ToUpper(dotName[0]) + dotName.Substring(1));
+					foreach (var item in ms)
+					{
+						if (item.MemberType != MemberTypes.NestedType)
+						{
+							temp.Add(item);
+						}
+					}
+					
 					if (temp.Count > 0)
 					{
 						dotName = dotName + "".PadLeft(temp.Count, '_');

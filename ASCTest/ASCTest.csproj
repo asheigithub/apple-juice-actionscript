@@ -56,18 +56,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>E:\Manju-pc\blacksmith\blacksmith\Library\UnityAssemblies\UnityEngine.dll</HintPath>
+      <HintPath>..\LinkCodeGenCLI\bin\ToGenLibrary\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>E:\Manju-pc\blacksmith\blacksmith\Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\LinkCodeGenCLI\bin\ToGenLibrary\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\LinkCodeGen\bin\Debug\codeoutput.cs">
+    <Compile Include="..\LinkCodeGenCLI\bin\Debug\codeoutput.cs">
       <Link>autoCreateCodes\codeoutput.cs</Link>
     </Compile>
-    <Compile Include="..\LinkCodeGen\bin\Debug\retNativeCode.cs">
-      <Link>autoCreateCodes\retNativeCode.cs</Link>
+    <Compile Include="..\LinkCodeGenCLI\bin\Debug\regNativeCode.cs">
+      <Link>autoCreateCodes\regNativeCode.cs</Link>
     </Compile>
     <Compile Include="autoCreateCodes\autogencodelib_TestobjAdapter.cs" />
     <Compile Include="extFunctions.cs" />
@@ -109,9 +109,9 @@
       <Project>{f6119d2e-215b-4fb1-a1c6-e83ede52da8c}</Project>
       <Name>ASTool</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AutoGenCodeLib\AutoGenCodeLib.csproj">
+    <ProjectReference Include="..\AutoGenCodeLib\AutoGenCodeTestLib.csproj">
       <Project>{a4c59558-40e6-44c3-84a0-ea5a8fcff05a}</Project>
-      <Name>AutoGenCodeLib</Name>
+      <Name>AutoGenCodeTestLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

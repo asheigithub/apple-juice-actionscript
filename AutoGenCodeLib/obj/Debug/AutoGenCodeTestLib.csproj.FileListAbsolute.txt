@@ -1,0 +1,5 @@
+F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb

@@ -58,23 +58,24 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class AutoGenTest extends Sprite
+	public class AutoGenTest extends flash.display.Sprite
 	{
 		public var b;
 		
 		public function AutoGenTest() 
 		{
-			for (var i:int = 0; i < 100; i++) 
-			{
-				trace(Vector3.lerp(Vector3.zero, Vector3.up, i / 100 ).y);
-			}
+			//for (var i:int = 0; i < 100; i++) 
+			//{
+				//trace(Vector3.lerp(Vector3.zero, Vector3.up, i / 100 ).y);
+			//}
 			
 			
 			
 			
 			//b = new Testobj();
 			//
-			//Testobj(b).ATTT(array);
+			//var arr1:_Array_ = _Array_.createInstance(String, 7); arr1[0]= "1"; arr1[3]="77";
+			//Testobj(b).paraTest(4, arr1);
 			//var o = _Object_(5);			
 			//trace(o);
 			

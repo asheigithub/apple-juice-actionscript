@@ -178,10 +178,10 @@ namespace LinkCodeGen
 				if (enumItemName == "Class") { enumItemName = "Class_"; }
 				if (enumItemName == "Object") { enumItemName = "Object_"; }
 
-				object v = item.GetValue(null);
+				//object v = item.GetValue(null);
                 as3api.Append("\t\t");
                 as3api.AppendLine("/**");
-                as3api.AppendLine("\t\t *" + enumItemName+" = "+Convert.ToDecimal(v) );
+                as3api.AppendLine("\t\t *" + enumItemName+" = "+item.ToString() );
                 as3api.AppendLine("\t\t */");
 
                 as3api.Append("\t\t");

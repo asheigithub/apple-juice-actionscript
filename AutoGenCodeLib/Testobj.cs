@@ -136,6 +136,10 @@ namespace AutoGenCodeLib
 
 		}
 
+		public void ParaTest(int a,params string[] arr)
+		{
+			Console.WriteLine("arr len:" + arr.Length);
+		}
 
 		public void ATTT( EnvironmentVariableTarget environment )
 		{

@@ -103,7 +103,7 @@ namespace ASCTest
 
 			//*********加入API*****
 			{
-				string apidir = @"../../..\LinkCodeGen\bin\Debug\as3api";
+				string apidir = @"../../..\LinkCodeGenCLI\bin\Debug\as3api";
 				if (System.IO.Directory.Exists(apidir))
 				{
 					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
@@ -224,20 +224,20 @@ namespace ASCTest
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
 			//builder.LoadLibrary(System.IO.File.ReadAllBytes("astoolglobal.swc"));
-			builder.Build(proj, new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
+			//builder.Build(proj, new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 
-			//builder.options.CheckNativeFunctionSignature = false;
-			//builder.Build(proj,null);
+			builder.options.CheckNativeFunctionSignature = false;
+			builder.Build(proj,null);
 
 			if (builder.buildErrors.Count == 0)
             {
                 ASBinCode.CSWC swc = builder.getBuildOutSWC();
 
-				//byte[] bin = swc.toBytes();
+				byte[] bin = swc.toBytes();
 
-				//swc = ASBinCode.CSWC.loadFromBytes(bin);
-				//ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
-				//(new extFunctions()).registrationFunction(swc);
+				swc = ASBinCode.CSWC.loadFromBytes(bin);
+				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
+				(new extFunctions()).registrationFunction(swc);
 
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
 				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());
