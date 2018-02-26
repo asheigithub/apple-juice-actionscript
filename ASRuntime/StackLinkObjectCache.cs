@@ -63,8 +63,11 @@ namespace ASRuntime
 
         private StackLinkObjectCache() { }
 
+		private Player player;
+
         public StackLinkObjectCache(CSWC bin,Player player)
         {
+			this.player = player;
             int maxstructidx = -1;
             foreach (var item in bin.class_Creator)
             {
@@ -77,37 +80,71 @@ namespace ASRuntime
                     }
                 }
             }
+
+			structuseswitchs = new bool[maxstructidx + 1];
+			strunctuseindexs = new int[maxstructidx + 1];
+			strunctusecount = 0;
+
             if (maxstructidx >= 0)
             {
                 cache = new StackCacheObject[maxstructidx + 1];
 				//cache[0] = player.alloc_pureHostedOrLinkedObject(player.swc.LinkObjectClass);
 				cache[0] = StackCacheObject.createFrom(this, player.alloc_pureHostedOrLinkedObject(player.swc.LinkObjectClass));
 
-                foreach (var item in bin.class_Creator)
-                {
-                    var cls = item.Key;
-                    if (cls.isStruct)
-                    {
-						//cache[cls.structIndex] = player.alloc_pureHostedOrLinkedObject(cls);
-						cache[cls.structIndex] = StackCacheObject.createFrom(this,player.alloc_pureHostedOrLinkedObject(cls));
+
+				foreach (var item in bin.class_Creator)
+				{
+					var cls = item.Key;
+					if (cls.isStruct)
+					{
+						cache[cls.structIndex] = StackCacheObject.createFrom(this, player.alloc_pureHostedOrLinkedObject(cls));
 					}
-                }
-            }
+				}
+			}
             
         }
 
+		private bool[] structuseswitchs;
+		private int[] strunctuseindexs;
+		private int strunctusecount;
+
         public StackCacheObject getCacheObj(Class cls)
         {
-            //if (cls.isStruct)
-            {//由于非结构体都是0，所以这里直接使用结构体索引返回即可
-                return cache[cls.structIndex];
-            }
-        }
+			if (cls.isStruct) //如果是结构体，需要标记回头清除。
+			{
+				int structindex = cls.structIndex;
+				if (!structuseswitchs[structindex])
+				{
+					structuseswitchs[structindex] = true;
+					strunctuseindexs[strunctusecount++] = structindex;
+				}
+			}
 
-        /// <summary>
-        /// 清除引用类型对象的引用 
-        /// </summary>
-        public void clearRefObj()
+			//if (cls.isStruct)
+			{//由于非结构体都是0，所以这里直接使用结构体索引返回即可
+				return cache[cls.structIndex];
+			}
+
+			//***结构体改为懒加载
+			//if (!cls.isStruct)
+			//{
+			//	return cache[cls.structIndex];
+			//}
+			//else
+			//{
+			//	if (cache[cls.structIndex] == null)
+			//	{
+			//		cache[cls.structIndex] = StackCacheObject.createFrom(this, player.alloc_pureHostedOrLinkedObject(cls));
+			//	}
+			//	return cache[cls.structIndex];
+			//}
+
+		}
+
+		/// <summary>
+		/// 清除引用类型对象的引用 
+		/// </summary>
+		public void clearRefObj()
         {
             if (cache != null)
             {
@@ -115,19 +152,38 @@ namespace ASRuntime
                 cache[0].rtType = RunTimeDataType.unknown;
                 ((LinkObj<object>)cache[0].value).value = null;
             }
-			
+
+			//防止结构体引用了引用对象。。。所以需要清理复位
+			while (strunctusecount>0)
+			{
+				int structindex = strunctuseindexs[strunctusecount];
+				structuseswitchs[structindex] = false;
+				((LinkSystemObject)cache[structindex].value).ResetLinkData();
+
+				strunctusecount--;
+			}
+
         }
 
         public StackLinkObjectCache Clone()
         {
             StackLinkObjectCache c = new StackLinkObjectCache();
+			c.player = player;
             if (cache != null)
             {
                 c.cache = new StackCacheObject[cache.Length];
+				c.structuseswitchs = new bool[structuseswitchs.Length];
+				c.strunctuseindexs = new int[strunctuseindexs.Length];
+				c.strunctusecount = 0;
+
                 for (int i = 0; i < cache.Length; i++)
                 {
 					//c.cache[i] = (rtObject)cache[i].Clone();
-					c.cache[i] = StackCacheObject.createFrom(c,cache[i]);
+
+					if (cache[i] != null)
+					{
+						c.cache[i] = StackCacheObject.createFrom(c, cache[i]);
+					}
 				}
             }
             return c;

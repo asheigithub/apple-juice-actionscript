@@ -1,4 +1,4 @@
-﻿		class {0} : ASRuntime.nativefuncs.NativeConstParameterFunction
+﻿		public class {0} : ASRuntime.nativefuncs.NativeConstParameterFunction
 		{
 			public {0}() : base(2)
 			{

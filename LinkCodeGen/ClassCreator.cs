@@ -676,7 +676,10 @@ namespace LinkCodeGen
 
 
 						//***编写本地方法***
-						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", createinstancename));
+						//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", createinstancename));
+						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + createinstancename, createinstancename));
+
+
 						nativefuncClasses.Add(new CreateInstanceNativeCodeCreator(createinstancename, constructorlist[i], type).GetCode());
 
 
@@ -696,7 +699,9 @@ namespace LinkCodeGen
 						appendFunctionParameters(as3api, constructorlist[0], type, typeimports, null);
 
 						//***编写本地方法***
-						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + ctorname, ctorname));
+
 						nativefuncClasses.Add(new CtorNativeCodeCreator(ctorname, constructorlist[0], type).GetCode());
 						
 
@@ -869,7 +874,9 @@ namespace LinkCodeGen
 						as3api.Append("();");
 
 						//***编写本地方法***
-						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + ctorname, ctorname));
+
 						nativefuncClasses.Add(new CtorNativeCodeCreator(ctorname, null, type).GetCode());
 					}
 				}
@@ -969,7 +976,9 @@ namespace LinkCodeGen
 						appendFunctionParameters(as3api, constructorlist[0], type, typeimports, null);
 
 						//***编写本地方法***
-						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
+						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + ctorname, ctorname));
+
 						nativefuncClasses.Add(new AdapterCtorNativeCodeCreator(ctorname, constructorlist[0], type, GetNativeFunctionPart1(type) + "Adapter").GetCode());
 
 
@@ -1022,11 +1031,17 @@ namespace LinkCodeGen
 				as3api.Append(ctorcode);
 
 				//***编写委托构造函数本地方法***
-				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_ctor"));
+				//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_ctor"));
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + part1 + "_ctor", part1 + "_ctor"));
+
+
 				nativefuncClasses.Add(new DelegateCtorNativeCodeCreator(part1 + "_ctor", type).GetCode());
 
 				//***编写隐式类型转换本地方法***
-				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_implicit_from_"));
+				//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", part1 + "_implicit_from_"));
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + part1 + "_implicit_from_", part1 + "_implicit_from_"));
+
+
 				nativefuncClasses.Add(new DelegateImplicitConvertNativeCodeCreator(part1 + "_implicit_from_", type).GetCode());
 
 
@@ -1099,14 +1114,20 @@ namespace LinkCodeGen
 							if (field.IsStatic)
 							{
 								string gettername = GetNativeFunctionPart1(this.type) + "_" + fieldname + "_getter";
-								regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", gettername));
+								//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", gettername));
+								regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + gettername, gettername));
+
+
 								nativefuncClasses.Add(new StaticFieldGetterNativeCodeCreator(gettername, this.type, field).GetCode());
 
 								if (!(field.IsInitOnly || (field.IsLiteral && !field.IsInitOnly)))
 								{
 									//***注册赋值***
 									string funname = GetNativeFunctionPart1(this.type) + "_" + fieldname + "_setter";
-									regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", funname));
+									//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", funname));
+									regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + funname, funname));
+
+
 									nativefuncClasses.Add(new StaticFieldSetterNativeCodeCreator(funname, this.type, field).GetCode());
 
 								}
@@ -1114,14 +1135,20 @@ namespace LinkCodeGen
 							else
 							{
 								string gettername = GetNativeFunctionPart1(this.type) + "_" + fieldname + "_getter";
-								regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", gettername));
+								//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", gettername));
+								regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + gettername, gettername));
+
+
 								nativefuncClasses.Add(new FieldGetterNativeCodeCreator(gettername, this.type, field).GetCode());
 
 								if (!(field.IsInitOnly || (field.IsLiteral && !field.IsInitOnly)))
 								{
 									//***注册赋值***
 									string funname = GetNativeFunctionPart1(this.type) + "_" + fieldname + "_setter";
-									regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", funname));
+									//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", funname));
+									regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + funname, funname));
+
+
 									nativefuncClasses.Add(new FieldSetterNativeCodeCreator(funname, this.type, field).GetCode());
 
 								}
@@ -1584,7 +1611,8 @@ namespace LinkCodeGen
 
 
 					//***编写方法的本地代码***
-					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunctionname));
+					//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunctionname));
+					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunctionname,nativefunctionname));
 
 					if (method.IsStatic)
 					{
@@ -1656,7 +1684,8 @@ namespace LinkCodeGen
 					appendFunctionParameters(as3api, method,type, typeimports, returntype);
 
 					//***编写方法的本地代码***
-					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+					//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunname, nativefunname));
 
 					StaticMethodNativeCodeCreator mc = new StaticMethodNativeCodeCreator(nativefunname, method, type);
 					nativefuncClasses.Add(mc.GetCode());
@@ -1903,7 +1932,9 @@ namespace LinkCodeGen
 
 
 				//***编写方法的本地代码***
-				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+				//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunname, nativefunname));
+
 
 				ValueOfNativeCodeCreator mc = new ValueOfNativeCodeCreator(nativefunname,type, kv.Key);
 				nativefuncClasses.Add(mc.GetCode());
@@ -1940,7 +1971,9 @@ namespace LinkCodeGen
 					as3api.AppendLine();
 
 					//***编写方法的本地代码***
-					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+					//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", nativefunname));
+					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunname, nativefunname));
+
 
 					ValueOfNativeCodeCreator mc = new ValueOfNativeCodeCreator(nativefunname, type, kv.Key);
 					nativefuncClasses.Add(mc.GetCode());

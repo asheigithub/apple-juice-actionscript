@@ -64,10 +64,10 @@ package
 		
 		public function AutoGenTest() 
 		{
-			//for (var i:int = 0; i < 100; i++) 
-			//{
-				//trace(Vector3.lerp(Vector3.zero, Vector3.up, i / 100 ).y);
-			//}
+			for (var i:int = 0; i < 100; i++) 
+			{
+				trace(Vector3.lerp(Vector3.zero, Vector3.up, i / 100 ).y);
+			}
 			
 			
 			

@@ -185,6 +185,17 @@ namespace LinkCodeGen
 
 		public readonly string linkcodenamespace;
 
+		public string LinkCodeNampScapePart
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(linkcodenamespace))
+					return string.Empty + GetNativeFunctionClassName(type) + ".";
+				else
+					return linkcodenamespace + "." + GetNativeFunctionClassName(type) + ".";
+			}
+		}
+
 		public CreatorBase(Type type, string as3apidocpath, string csharpnativecodepath,string linkcodenamespace)
 		{
 			this.type = type;

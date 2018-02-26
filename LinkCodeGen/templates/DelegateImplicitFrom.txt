@@ -1,4 +1,4 @@
-﻿		class [classname] : NativeConstParameterFunction,IWapperDelegateMaker
+﻿		public class [classname] : NativeConstParameterFunction,IWapperDelegateMaker
 		{
 			public [classname]() : base(1)
 			{

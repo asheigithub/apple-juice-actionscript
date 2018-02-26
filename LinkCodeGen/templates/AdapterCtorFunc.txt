@@ -1,4 +1,4 @@
-﻿		class [classname] : NativeConstParameterFunction,ICrossExtendAdapterCreator
+﻿		public class [classname] : NativeConstParameterFunction,ICrossExtendAdapterCreator
 		{
 			public [classname]() : base([paracount])
 			{

@@ -36,7 +36,10 @@ namespace ASBinCode.rtti
             value = (T)linkvalue;
         }
 
-
+		public sealed override  void ResetLinkData()
+		{
+			value = default(T);
+		}
         
         public override object GetLinkData()
         {
@@ -97,5 +100,9 @@ namespace ASBinCode.rtti
         /// </summary>
         /// <returns></returns>
         public abstract object GetLinkData();
+
+
+		public abstract void ResetLinkData();
+
     }
 }

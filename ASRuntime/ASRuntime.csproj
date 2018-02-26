@@ -56,6 +56,7 @@
     <Compile Include="ASBinCode\IScope.cs" />
     <Compile Include="ASBinCode\MemRegister.cs" />
     <Compile Include="ASBinCode\MethodGetterBase.cs" />
+    <Compile Include="ASBinCode\nativefunctions\INativeFunctionFactory.cs" />
     <Compile Include="ASBinCode\nativefunctions\NativeFunctionBase.cs" />
     <Compile Include="ASBinCode\OpCode.cs" />
     <Compile Include="ASBinCode\OperatorOverride.cs" />

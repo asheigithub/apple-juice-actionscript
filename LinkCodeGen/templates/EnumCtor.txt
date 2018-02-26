@@ -1,4 +1,4 @@
-﻿		class {0} : NativeFunctionBase
+﻿		public class {0} : NativeFunctionBase
 		{
 			public {0}()
 			{

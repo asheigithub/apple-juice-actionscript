@@ -146,11 +146,6 @@ namespace LinkCodeGenCLI
 			
 		}
 
-		private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-		{
-			throw new NotImplementedException();
-		}
-
 		private static string m_rootAssembly;
 		private static System.Reflection.Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
 		{

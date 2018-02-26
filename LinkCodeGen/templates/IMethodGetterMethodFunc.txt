@@ -1,4 +1,4 @@
-﻿		class [classname] : NativeConstParameterFunction,IMethodGetter
+﻿		public class [classname] : NativeConstParameterFunction,IMethodGetter
 		{
 			public [classname]() : base([paracount])
 			{

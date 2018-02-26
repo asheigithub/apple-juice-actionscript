@@ -681,7 +681,9 @@ namespace LinkCodeGen
 				as3api.AppendLine();
 
 				//***编写方法的本地代码***
-				regfunctions.Add( string.Format( "\t\t\tbin.regNativeFunction(new {0}());", nativefunName ));
+				//regfunctions.Add( string.Format( "\t\t\tbin.regNativeFunction(new {0}());", nativefunName ));
+				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunName,nativefunName));
+
 
 				MethodNativeCodeCreator mc = new MethodNativeCodeCreator(nativefunName, method,type);
 				nativefuncClasses.Add(mc.GetCode());

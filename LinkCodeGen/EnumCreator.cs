@@ -160,12 +160,18 @@ namespace LinkCodeGen
             as3api.AppendLine();
             as3api.AppendLine();
 
-            regfunctions.Add(
-                string.Format("\t\t\tbin.regNativeFunction(new {0}());"
-                ,GetCtorNativeFuncName(type)
-                )
-                );
-            nativefuncClasses.Add(GetCtorClassString());
+			//regfunctions.Add(
+			//    string.Format("\t\t\tbin.regNativeFunction(new {0}());"
+			//    ,GetCtorNativeFuncName(type)
+			//    )
+			//    );
+			regfunctions.Add(
+				string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");"
+				, LinkCodeNampScapePart+ GetCtorNativeFuncName(type)
+				, GetCtorNativeFuncName(type)
+				)
+				);
+			nativefuncClasses.Add(GetCtorClassString());
 
             //****创建枚举成员***
             foreach (var item in type.GetFields( System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public))
@@ -229,10 +235,11 @@ namespace LinkCodeGen
             bitorclass= bitorclass.Replace("{1}", NativeCodeCreatorBase.GetTypeFullName(type));
             nativefuncClasses.Add( bitorclass);
 
-            regfunctions.Add("\t\t\tbin.regNativeFunction(new "+ GetEnumBitOrFuncName() +"());");
+			//regfunctions.Add("\t\t\tbin.regNativeFunction(new "+ GetEnumBitOrFuncName() +"());");
+			regfunctions.Add("\t\t\tbin.regNativeFunction(\"" + LinkCodeNampScapePart + GetEnumBitOrFuncName() + "\",\"" + GetEnumBitOrFuncName() + "\");");
 
 
-            EndClassDefine(as3api);
+			EndClassDefine(as3api);
             EndAS3File(as3api);
 
 

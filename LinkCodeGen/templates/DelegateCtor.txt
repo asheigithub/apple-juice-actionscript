@@ -1,4 +1,4 @@
-﻿		class [classname] : NativeConstParameterFunction
+﻿		public class [classname] : NativeConstParameterFunction
 		{
 			public [classname]() : base(1)
 			{

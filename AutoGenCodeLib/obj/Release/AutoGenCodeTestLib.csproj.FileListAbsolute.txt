@@ -1,0 +1,6 @@
+F:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csprojResolveAssemblyReference.cache
+F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache
+F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.dll
+F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.pdb

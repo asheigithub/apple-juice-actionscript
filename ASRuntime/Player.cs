@@ -8,7 +8,7 @@ namespace ASRuntime
 {
 	public class Player
 	{
-		internal const int STACKSLOTLENGTH = 1024;
+		internal const int STACKSLOTLENGTH = 512;
 
 		internal IRuntimeOutput infoOutput;
 
