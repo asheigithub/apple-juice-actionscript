@@ -92,7 +92,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <Content Include="aslib\Endian.txt" />
     <Content Include="aslib\EOFError.txt" />
     <Content Include="aslib\IDataInput.txt" />

@@ -171,7 +171,7 @@ namespace ASBinCode
 
 			StackSlotAccessor register = new StackSlotAccessor(id,stmtid); serizlized.Add(key, register);
 			register._index = _index;
-
+			register.valueType = valuetype;
 			///// <summary>
 			///// 指示是否delete目标
 			///// </summary>

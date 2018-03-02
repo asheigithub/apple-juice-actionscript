@@ -40,8 +40,19 @@ Public Class TokenList
             If currentindx < Count Then
                 Return Me(currentindx)
             Else
-                Return Token.TokenEOF
-            End If
+				'Return Token.TokenEOF
+
+				Dim eof As New Token()
+				eof.Type = Token.TokenType.eof
+				eof.sourceFile = FileName
+				If Count > 0 Then
+					eof.line = Me(Count - 1).line
+					eof.ptr = Me(Count - 1).ptr
+				End If
+
+				Return eof
+
+			End If
 
         End Get
 
@@ -57,8 +68,10 @@ Public Class TokenList
             currentindx += 1
 
             If CurrentToken.Type = Token.TokenType.eof Then
-                Return Token.TokenEOF
-            End If
+				'Return Token.TokenEOF
+				'Return New Token() With {.Type = Token.TokenType.eof}
+				Return CurrentToken
+			End If
 
             If CurrentToken.Type <> Token.TokenType.comments And CurrentToken.Type <> Token.TokenType.whitespace Then
                 Return CurrentToken
@@ -121,8 +134,18 @@ Public Class TokenList
         End While
 
 
-        Return Token.TokenEOF
-    End Function
+		Dim eof As New Token()
+		eof.Type = Token.TokenType.eof
+		eof.sourceFile = FileName
+		If Count > 0 Then
+			eof.line = Me(Count - 1).line
+			eof.ptr = Me(Count - 1).ptr
+		End If
+
+		Return eof
+
+		'Return Token.TokenEOF
+	End Function
 
 
     'Public Function SkipLPR(index As Integer) As Integer

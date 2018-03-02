@@ -17,8 +17,8 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="..\api" />
-    <class path="..\sharpapi" />
+    <class path="..\..\..\as3_commapi\api" />
+    <class path="..\..\..\as3_commapi\sharpapi" />
     <class path="..\..\..\LinkCodeGenCLI\bin\Debug\as3api" />
   </classpaths>
   <!-- Build options -->

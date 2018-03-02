@@ -460,214 +460,231 @@ Public Class Grammar
         Return False
     End Function
 
-    Public Function ParseTree(input As String, definekeywords As IEnumerable(Of String), defineSkipBlankWords As IEnumerable(Of String), Optional srcfile As String = "") As GrammerTree
+	Public Function ParseTree(input As String, definekeywords As IEnumerable(Of String), defineSkipBlankWords As IEnumerable(Of String), Optional srcfile As String = "", Optional srcfileFullPath As String = "") As GrammerTree
 
-        Dim tree As New GrammerTree()
+		If srcfileFullPath = "" And srcfile <> "" Then
+			srcfileFullPath = srcfile
+		End If
 
-        tree.Root = New GrammerExpr() With {.GrammerLeftNode = glines(0).Main}
-        Dim treenodestack As New Stack(Of GrammerExpr)
-        treenodestack.Push(tree.Root)
+		Dim tree As New GrammerTree()
 
-        Dim words As TokenList
-        Try
-            words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input)
-        Catch ex As LexException
+		tree.Root = New GrammerExpr() With {.GrammerLeftNode = glines(0).Main}
+		Dim treenodestack As New Stack(Of GrammerExpr)
+		treenodestack.Push(tree.Root)
 
-            hasError = True
+		Dim words As TokenList
+		Try
+			words = New Lex(srcfile, definekeywords, defineSkipBlankWords, True).GetWords(input)
+			For index = 0 To words.Count - 1
+				words(index).sourceFileFullPath = srcfileFullPath
+			Next
+		Catch ex As LexException
 
-            Console.WriteLine(ex.Message & " line:" & ex.line & " ptr:" & ex.ptr)
+			hasError = True
 
+			'Console.WriteLine(ex.Message & " line:" & ex.line & " ptr:" & ex.ptr)
+			Console.Error.Write(srcfileFullPath & ":" & ex.line + 1 & ":Error: " & ex.Message)
+			Console.Error.Write(vbLf)
+			input = input.Replace(vbCrLf, vbLf)
+			input = input.Replace(vbCr, vbLf)
+			Dim lines = input.Split(vbLf)
 
-            Return tree
-        End Try
+			Console.Error.Write(vbTab & vbTab & lines(ex.line))
+			Console.Error.Write(vbLf)
+			Console.Error.Write(vbTab & vbTab & "^".PadLeft(ex.ptr))
+			Console.Error.Write(vbLf)
+			Console.Error.Write(vbLf)
 
-
-
-        '#Region "检查 this 和 super关键字"
-        For index = 0 To words.Count - 1
-            Dim token = words(index)
-            If token.Type = Token.TokenType.identifier Then
-                If token.StringValue = "this" Then
-                    token.Type = Token.TokenType.this_pointer
-                ElseIf token.StringValue = "super" Then
-                    token.Type = Token.TokenType.super_pointer
-                End If
-            End If
-        Next
-
-        '#End Region
-
-        'continue、break、return和throw后跟换行符会添加一个分号
-        For index = 0 To words.Count - 1
-            Dim token = words(index)
-            If token.Type = Token.TokenType.identifier Then
-                If token.StringValue = "continue" Or
-                    token.StringValue = "break" Or
-                    token.StringValue = "return" Or
-                    token.StringValue = "throw" Then
-
-                    '***查询后面到换行直接是否全是空白，如果是则插入一个分号
-
-                    For k = index + 1 To words.Count - 1
-                        Dim nt = words(k)
-                        If nt.Type = Token.TokenType.other And nt.StringValue = ";" Then
-                            Exit For
-                        ElseIf nt.Type = token.TokenType.whitespace And nt.StringValue = vbLf Then
-
-                            nt.Type = Token.TokenType.other
-                            nt.StringValue = ";"
-                            Exit For
-
-                        ElseIf nt.Type = Token.TokenType.comments Then
-
-                        Else
-                            Exit For
-                        End If
-
-                    Next
-
-                End If
-            End If
-        Next
-
-
-        '#Region "检测语句label"
-
-        '***检测label  label:for label:while label:do label:switch***
-        '这些关键字前出现 identifier ":" 说明是一个label标记
-        For index = 2 To words.Count - 1
-            Dim token = words(index)
-            If token.Type = Token.TokenType.identifier Then
-                If token.StringValue = "for" Or
-                    token.StringValue = "while" Or
-                    token.StringValue = "do" Or
-                    token.StringValue = "switch" Or
-                    token.StringValue = "if" Or
-                    token.StringValue = "try" Or
-                    token.StringValue = "with" Then
-                    '**前向查找
-                    Dim found As Boolean = False
-                    Dim fidx = index
-
-                    Dim fstep As Integer = 0
-                    Dim stepidx = 0
-
-                    While Not found AndAlso fidx > 0
-                        fidx = fidx - 1
-                        Dim test = words(fidx)
-
-                        If fstep = 0 Then '查找":"
-                            If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
-                                Continue While
-                            ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
-                                fstep = 1
-                                stepidx = fidx
-                                Continue While
-                            Else
-                                Exit While
-                            End If
-                        End If
-
-                        If fstep = 1 Then '查找 identifier为 label名
-                            If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
-                                Continue While
-                            ElseIf test.Type = Token.TokenType.identifier Then
-
-                                '前一个必须是空或者;
-                                If fidx > 0 Then
-                                    Dim test2 = words(fidx - 1)
-                                    If Not (test2.Type = Token.TokenType.whitespace Or
-                                            (test2.Type = Token.TokenType.other AndAlso
-                                            test2.StringValue = ";")) Then
-
-                                        Exit While
-
-                                    End If
-
-                                End If
-
-
-                                found = True
-                                test.Type = Token.TokenType.label
-
-
-                                '**将label:移动到关键字后面去
-                                words(fidx) = words(index) '关键字向前移动
-                                words(index) = words(stepidx) '冒号后移
-                                words(stepidx) = test
-
-
-                                index = index + 3
-                                Exit While
-                            Else
-                                Exit While
-                            End If
-                        End If
-
-                    End While
-                End If
-            End If
-        Next
-        '#End Region
-
-        '#Region "查找代码块label"
-        ' label:{
-
-        For i = 2 To words.Count - 1
-            Dim token = words(i)
-            If token.Type = Token.TokenType.other Then
-                If token.StringValue = "{" Then
-                    '**前向查找":"
-
-                    Dim fidx As Integer = i
+			Return tree
+		End Try
 
 
 
-                    While fidx > 0
-                        fidx = fidx - 1
-                        Dim test = words(fidx)
+		'#Region "检查 this 和 super关键字"
+		For index = 0 To words.Count - 1
+			Dim token = words(index)
+			If token.Type = Token.TokenType.identifier Then
+				If token.StringValue = "this" Then
+					token.Type = Token.TokenType.this_pointer
+				ElseIf token.StringValue = "super" Then
+					token.Type = Token.TokenType.super_pointer
+				End If
+			End If
+		Next
 
-                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
-                            Continue While
-                        ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
-                            Exit While
-                        Else
-                            Exit While
-                        End If
-                    End While
+		'#End Region
 
-                    If Not (words(fidx).Type = Token.TokenType.other And words(fidx).StringValue = ":") Then
-                        Continue For
-                    End If
-                    Dim stepidx As Integer = fidx
+		'continue、break、return和throw后跟换行符会添加一个分号
+		For index = 0 To words.Count - 1
+			Dim token = words(index)
+			If token.Type = Token.TokenType.identifier Then
+				If token.StringValue = "continue" Or
+					token.StringValue = "break" Or
+					token.StringValue = "return" Or
+					token.StringValue = "throw" Then
 
-                    '***向前查找identifier;
-                    While fidx > 0
-                        fidx = fidx - 1
-                        Dim test = words(fidx)
+					'***查询后面到换行直接是否全是空白，如果是则插入一个分号
 
-                        If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
-                            Continue While
-                        ElseIf test.Type = Token.TokenType.identifier Then
-                            Exit While
-                        Else
-                            Exit While
-                        End If
-                    End While
-                    If Not words(fidx).Type = Token.TokenType.identifier Then
-                        Continue For
-                    End If
+					For k = index + 1 To words.Count - 1
+						Dim nt = words(k)
+						If nt.Type = Token.TokenType.other And nt.StringValue = ";" Then
+							Exit For
+						ElseIf nt.Type = Token.TokenType.whitespace And nt.StringValue = vbLf Then
 
-                    Dim identifieridx As Integer = fidx
+							nt.Type = Token.TokenType.other
+							nt.StringValue = ";"
+							Exit For
 
-                    If words(identifieridx).StringValue = "default" Then
-                        Continue For
-                    End If
+						ElseIf nt.Type = Token.TokenType.comments Then
 
-                    '***向前查找其他排除项***
-                    While fidx > 0
-                        fidx = fidx - 1
-                        Dim test = words(fidx)
+						Else
+							Exit For
+						End If
+
+					Next
+
+				End If
+			End If
+		Next
+
+
+		'#Region "检测语句label"
+
+		'***检测label  label:for label:while label:do label:switch***
+		'这些关键字前出现 identifier ":" 说明是一个label标记
+		For index = 2 To words.Count - 1
+			Dim token = words(index)
+			If token.Type = Token.TokenType.identifier Then
+				If token.StringValue = "for" Or
+					token.StringValue = "while" Or
+					token.StringValue = "do" Or
+					token.StringValue = "switch" Or
+					token.StringValue = "if" Or
+					token.StringValue = "try" Or
+					token.StringValue = "with" Then
+					'**前向查找
+					Dim found As Boolean = False
+					Dim fidx = index
+
+					Dim fstep As Integer = 0
+					Dim stepidx = 0
+
+					While Not found AndAlso fidx > 0
+						fidx = fidx - 1
+						Dim test = words(fidx)
+
+						If fstep = 0 Then '查找":"
+							If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+								Continue While
+							ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
+								fstep = 1
+								stepidx = fidx
+								Continue While
+							Else
+								Exit While
+							End If
+						End If
+
+						If fstep = 1 Then '查找 identifier为 label名
+							If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+								Continue While
+							ElseIf test.Type = Token.TokenType.identifier Then
+
+								'前一个必须是空或者;
+								If fidx > 0 Then
+									Dim test2 = words(fidx - 1)
+									If Not (test2.Type = Token.TokenType.whitespace Or
+											(test2.Type = Token.TokenType.other AndAlso
+											test2.StringValue = ";")) Then
+
+										Exit While
+
+									End If
+
+								End If
+
+
+								found = True
+								test.Type = Token.TokenType.label
+
+
+								'**将label:移动到关键字后面去
+								words(fidx) = words(index) '关键字向前移动
+								words(index) = words(stepidx) '冒号后移
+								words(stepidx) = test
+
+
+								index = index + 3
+								Exit While
+							Else
+								Exit While
+							End If
+						End If
+
+					End While
+				End If
+			End If
+		Next
+		'#End Region
+
+		'#Region "查找代码块label"
+		' label:{
+
+		For i = 2 To words.Count - 1
+			Dim token = words(i)
+			If token.Type = Token.TokenType.other Then
+				If token.StringValue = "{" Then
+					'**前向查找":"
+
+					Dim fidx As Integer = i
+
+
+
+					While fidx > 0
+						fidx = fidx - 1
+						Dim test = words(fidx)
+
+						If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+							Continue While
+						ElseIf test.Type = Token.TokenType.other And test.StringValue = ":" Then
+							Exit While
+						Else
+							Exit While
+						End If
+					End While
+
+					If Not (words(fidx).Type = Token.TokenType.other And words(fidx).StringValue = ":") Then
+						Continue For
+					End If
+					Dim stepidx As Integer = fidx
+
+					'***向前查找identifier;
+					While fidx > 0
+						fidx = fidx - 1
+						Dim test = words(fidx)
+
+						If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
+							Continue While
+						ElseIf test.Type = Token.TokenType.identifier Then
+							Exit While
+						Else
+							Exit While
+						End If
+					End While
+					If Not words(fidx).Type = Token.TokenType.identifier Then
+						Continue For
+					End If
+
+					Dim identifieridx As Integer = fidx
+
+					If words(identifieridx).StringValue = "default" Then
+						Continue For
+					End If
+
+					'***向前查找其他排除项***
+					While fidx > 0
+						fidx = fidx - 1
+						Dim test = words(fidx)
 
 						If test.Type = Token.TokenType.whitespace Or test.Type = Token.TokenType.comments Then
 							Continue While
@@ -695,164 +712,165 @@ Public Class Grammar
 								Continue For
 							End If
 						ElseIf test.Type = Token.TokenType.identifier And (
-                            test.StringValue = "case") Then
-                            Continue For
-                        Else
-                            Exit While
-                        End If
-                    End While
+							test.StringValue = "case") Then
+							Continue For
+						Else
+							Exit While
+						End If
+					End While
 
-                    words(identifieridx).Type = Token.TokenType.label
+					words(identifieridx).Type = Token.TokenType.label
 
-                    Dim temp = words(identifieridx)
-                    '**将label:移动到关键字后面去
-                    words(identifieridx) = words(i) '关键字向前移动
-                    words(i) = words(stepidx) '冒号后移
-                    words(stepidx) = temp
-
-
-                End If
-            End If
-        Next
+					Dim temp = words(identifieridx)
+					'**将label:移动到关键字后面去
+					words(identifieridx) = words(i) '关键字向前移动
+					words(i) = words(stepidx) '冒号后移
+					words(stepidx) = temp
 
 
-        '#End Region
+				End If
+			End If
+		Next
 
 
+		'#End Region
+
+		input = input.Replace(vbCrLf, vbLf)
+		input = input.Replace(vbCr, vbLf)
+		Dim ls = input.Split(vbLf)
+
+		words.Reset()
+		words.GetNextToken()
 
 
-        words.Reset()
-        words.GetNextToken()
+		Dim stack As New Stack(Of GrammarNode)
+		stack.Push(GrammarNode.GNodeEOF)
+		stack.Push(glines(0).Main)
 
+		Dim X = stack.Peek()
 
-        Dim stack As New Stack(Of GrammarNode)
-        stack.Push(GrammarNode.GNodeEOF)
-        stack.Push(glines(0).Main)
-
-        Dim X = stack.Peek()
-
-        Dim matched As String = ""
-
-
-
-        While Not X.Equals1(GrammarNode.GNodeEOF)
-            Dim selectedline As String = ""
-
-            If MathGNodeAndToken(X, words.CurrentToken) Then
-
-                Dim tnode = treenodestack.Pop()
-                tnode.MatchedToken = words.CurrentToken
-
-                stack.Pop()
-
-                matched = matched & words.CurrentToken.StringValue
-
-
-                'words.GetNextToken()
-                words.GetNextTokenWithWhiteBlank()
-
-            ElseIf termianlnodes.ContainsKey(X) Then
-
-                If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
-                    '***吃掉无用空白***
-                    words.GetNextTokenWithWhiteBlank()
-
-                Else
-
-                    'Console.WriteLine("无法匹配" & words.CurrentToken.StringValue)
-                    ThrowError("无法匹配", words.CurrentToken)
-
-                    Dim node = treenodestack.Pop()
-                    node.InputToken = words.CurrentToken
-
-                    Exit While
-                End If
-            ElseIf Not M(X).ContainsKey(GetGNode(words.CurrentToken)) Then
-                If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
-                    '***吃掉无用空白***
-                    words.GetNextTokenWithWhiteBlank()
-
-                Else
-                    ThrowError("不可接受", words.CurrentToken)
-                    Dim node = treenodestack.Pop()
-                    node.InputToken = words.CurrentToken
-                    Exit While
-                End If
-            ElseIf M(X)(GetGNode(words.CurrentToken)) Is Nothing Then
-
-                If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
-                    '***吃掉无用空白***
-                    words.GetNextTokenWithWhiteBlank()
-
-                Else
-                    ThrowError("无法匹配", words.CurrentToken)
-
-                    Dim node = treenodestack.Pop()
-                    node.InputToken = words.CurrentToken
-
-                    Exit While
-                End If
-            Else
-                Dim line = M(X)(GetGNode(words.CurrentToken))
+		Dim matched As String = ""
 
 
 
-                '***输出产生式***
+		While Not X.Equals1(GrammarNode.GNodeEOF)
+			Dim selectedline As String = ""
 
-                Dim node = treenodestack.Pop()
-                node.MatchedToken = words.CurrentToken
-                node.SelectGrammerLine = line
+			If MathGNodeAndToken(X, words.CurrentToken) Then
 
-                If Not (line.Derivation.Count = 1 And line.Derivation(0).Type = GrammarNodeType.null) Then
+				Dim tnode = treenodestack.Pop()
+				tnode.MatchedToken = words.CurrentToken
 
-                    For index = 0 To line.Derivation.Count - 1
-                        Dim tnode As New GrammerExpr()
-                        tnode.GrammerLeftNode = line.Derivation(index)
-                        node.Nodes.Add(tnode)
-                        tnode.Parent = node
-                    Next
+				stack.Pop()
 
-                    For index = node.Nodes.Count - 1 To 0 Step -1
-                        treenodestack.Push(node.Nodes(index))
-                    Next
-
-                End If
+				matched = matched & words.CurrentToken.StringValue
 
 
+				'words.GetNextToken()
+				words.GetNextTokenWithWhiteBlank()
+
+			ElseIf termianlnodes.ContainsKey(X) Then
+
+				If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
+					'***吃掉无用空白***
+					words.GetNextTokenWithWhiteBlank()
+
+				Else
+
+					'Console.WriteLine("无法匹配" & words.CurrentToken.StringValue)
+					ThrowError("无法匹配", words.CurrentToken, ls)
+
+					Dim node = treenodestack.Pop()
+					node.InputToken = words.CurrentToken
+
+					Exit While
+				End If
+			ElseIf Not M(X).ContainsKey(GetGNode(words.CurrentToken)) Then
+				If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
+					'***吃掉无用空白***
+					words.GetNextTokenWithWhiteBlank()
+
+				Else
+					ThrowError("不可接受", words.CurrentToken, ls)
+					Dim node = treenodestack.Pop()
+					node.InputToken = words.CurrentToken
+					Exit While
+				End If
+			ElseIf M(X)(GetGNode(words.CurrentToken)) Is Nothing Then
+
+				If GetGNode(words.CurrentToken).Type = GrammarNodeType.whitespace Then
+					'***吃掉无用空白***
+					words.GetNextTokenWithWhiteBlank()
+
+				Else
+					ThrowError("无法匹配", words.CurrentToken, ls)
+
+					Dim node = treenodestack.Pop()
+					node.InputToken = words.CurrentToken
+
+					Exit While
+				End If
+			Else
+				Dim line = M(X)(GetGNode(words.CurrentToken))
 
 
-                selectedline = line.ToString()
-                stack.Pop()
+
+				'***输出产生式***
+
+				Dim node = treenodestack.Pop()
+				node.MatchedToken = words.CurrentToken
+				node.SelectGrammerLine = line
+
+				If Not (line.Derivation.Count = 1 And line.Derivation(0).Type = GrammarNodeType.null) Then
+
+					For index = 0 To line.Derivation.Count - 1
+						Dim tnode As New GrammerExpr()
+						tnode.GrammerLeftNode = line.Derivation(index)
+						node.Nodes.Add(tnode)
+						tnode.Parent = node
+					Next
+
+					For index = node.Nodes.Count - 1 To 0 Step -1
+						treenodestack.Push(node.Nodes(index))
+					Next
+
+				End If
 
 
 
 
-                If Not (line.Derivation.Count = 1 And line.Derivation(0).Type = GrammarNodeType.null) Then
-                    For index = line.Derivation.Count - 1 To 0 Step -1
-                        stack.Push(line.Derivation(index))
-                    Next
-                End If
-            End If
+				selectedline = line.ToString()
+				stack.Pop()
 
 
-            X = stack.Peek()
-
-            'Console.Write(matched)
-            'Console.Write(vbTab)
-
-            'Console.Write(vbTab)
-            'Console.Write(selectedline)
-
-            'Console.WriteLine()
-
-        End While
 
 
-        Return tree
+				If Not (line.Derivation.Count = 1 And line.Derivation(0).Type = GrammarNodeType.null) Then
+					For index = line.Derivation.Count - 1 To 0 Step -1
+						stack.Push(line.Derivation(index))
+					Next
+				End If
+			End If
 
-    End Function
 
-    Private Function GetGNode(token As Token) As GrammarNode
+			X = stack.Peek()
+
+			'Console.Write(matched)
+			'Console.Write(vbTab)
+
+			'Console.Write(vbTab)
+			'Console.Write(selectedline)
+
+			'Console.WriteLine()
+
+		End While
+
+
+		Return tree
+
+	End Function
+
+	Private Function GetGNode(token As Token) As GrammarNode
         If token.Type = ASTool.Token.TokenType.eof Then
             Return GrammarNode.GNodeEOF
         End If
@@ -1007,15 +1025,24 @@ Public Class Grammar
 	End Function
 
 
-    Private Sub ThrowError(msg As String, token As Token)
+	Private Sub ThrowError(msg As String, token As Token, lines As String())
 
-        hasError = True
+		hasError = True
 
-        Console.WriteLine(String.Format("匹配失败!{0} 行{1} 列{2},符号{3} ", msg, token.line + 1, token.ptr, token.StringValue))
-    End Sub
+		'Console.WriteLine(String.Format("匹配失败!{0} 行{1} 列{2},符号{3} ", msg, token.line + 1, token.ptr, token.StringValue))
+		Console.Error.WriteLine(token.sourceFileFullPath & ":" & token.line + 1 & ":Error:" & msg)
 
 
-    Public Sub ListGNodes()
+
+		Console.Error.WriteLine(lines(token.line))
+		Console.Error.WriteLine("^".PadLeft(token.ptr))
+		Console.Error.WriteLine()
+
+
+	End Sub
+
+
+	Public Sub ListGNodes()
         Dim sb As New Text.StringBuilder()
 
 

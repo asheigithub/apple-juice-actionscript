@@ -34,6 +34,15 @@ namespace LinkCodeGen
 		}
 
 		/// <summary>
+		/// 添加要跳过的成员名
+		/// </summary>
+		/// <param name="members"></param>
+		public void AddNotCreateMember(IList<string> members)
+		{
+			CreatorBase.NoCreateMember.AddRange(members);
+		}
+
+		/// <summary>
 		/// 添加要生成代码的类型
 		/// </summary>
 		/// <param name="types"></param>
@@ -95,6 +104,8 @@ namespace LinkCodeGen
 				regclassSb.AppendLine("\t\tprivate void regAutoCreateCodes(CSWC bin)");
 				regclassSb.AppendLine("\t\t{");
 
+				int count = creators.Values.Count;
+				float c = 0;
 				foreach (var item in creators.Values)
 				{
 					Console.WriteLine("building:" + item.BuildIngType);
@@ -104,6 +115,8 @@ namespace LinkCodeGen
 					regclassSb.AppendLine("\t\t\t" + item.linkcodenamespace + "." + CreatorBase.GetNativeFunctionClassName(item.BuildIngType) + ".regNativeFunctions(bin);");
 					sw.WriteLine(code);
 
+					c += 1;
+					regclassSb.AppendLine("\t\t\tprogress=" + (c/count).ToString() +"f;" );
 				}
 
 				regclassSb.AppendLine("\t\t}");

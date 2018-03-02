@@ -69,7 +69,6 @@ F:\ASTOOL\ASTool\ASCR\obj\Debug\ASCompiler.csproj.GenerateResource.Cache
 F:\ASTOOL\ASTool\ASCR\obj\Debug\ASCompiler.csproj.CoreCompileInputs.cache
 F:\ASTOOL\ASTool\ASCR\obj\Debug\ASCompiler.dll
 F:\ASTOOL\ASTool\ASCR\obj\Debug\ASCompiler.pdb
-F:\ASTool\ASCR\bin\Debug\ASCompiler.dll.config
 F:\ASTool\ASCR\bin\Debug\ASCompiler.dll
 F:\ASTool\ASCR\bin\Debug\ASCompiler.pdb
 F:\ASTool\ASCR\bin\Debug\ASRuntime.dll
@@ -77,7 +76,6 @@ F:\ASTool\ASCR\bin\Debug\ASTool.dll
 F:\ASTool\ASCR\bin\Debug\ASRuntime.pdb
 F:\ASTool\ASCR\bin\Debug\ASTool.pdb
 F:\ASTool\ASCR\bin\Debug\ASTool.xml
-F:\ASTool\ASCR\bin\Debug\ASTool.dll.config
 F:\ASTool\ASCR\obj\Debug\ASCompiler.csprojResolveAssemblyReference.cache
 F:\ASTool\ASCR\obj\Debug\ASCompiler.Properties.Resources.resources
 F:\ASTool\ASCR\obj\Debug\ASCompiler.csproj.GenerateResource.Cache

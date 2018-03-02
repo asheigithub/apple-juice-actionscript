@@ -89,14 +89,14 @@ namespace ASRuntime
 						defaultblock.totalStackSlots = 1;
 
 						{
-							OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, new SourceToken(0, 0, ""));
+							OpStep opMakeArgs = new OpStep(OpCode.prepare_constructor_argement, SourceToken.Empty);
 							opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(swc.classes[i].classid));
 							opMakeArgs.arg1Type = RunTimeDataType.rt_int;
 							defaultblock.opSteps.Add(opMakeArgs);
 
 						}
 						{
-							OpStep step = new OpStep(OpCode.new_instance, new SourceToken(0, 0, ""));
+							OpStep step = new OpStep(OpCode.new_instance, SourceToken.Empty);
 							step.arg1 = new RightValue(new rtInt(swc.classes[i].classid));
 							step.arg1Type = swc.classes[i].getRtType();
 							step.reg = new StackSlotAccessor(0, ushort.MaxValue);
@@ -232,7 +232,7 @@ namespace ASRuntime
 					var block = swc.blocks[swc.ErrorClass.outscopeblockid];
 					HeapSlot[] initdata = genHeapFromCodeBlock(block);
 					callBlock(block, initdata, new StackSlot(swc, this), null,
-						new SourceToken(0, 0, ""), null,
+						SourceToken.Empty, null,
 						null, RunTimeScopeType.startup
 						);
 					while (step())
@@ -302,7 +302,7 @@ namespace ASRuntime
 
 				HeapSlot[] data = genHeapFromCodeBlock(defaultblock);
 				return run2(defaultblock, data, result);
-			}			
+			}
 		}
 
 
@@ -310,7 +310,7 @@ namespace ASRuntime
 		{
 
 			var topscope = callBlock(runblock, blockMemberHeap, new StackSlot(swc, this), null,
-				new SourceToken(0, 0, ""), null,
+				SourceToken.Empty, null,
 				null, RunTimeScopeType.startup
 				);
 			displayStackFrame = runtimeStack.Peek().getInfo();
@@ -1572,7 +1572,7 @@ namespace ASRuntime
 			if (blankBlock == null)
 			{
 				blankBlock = new CodeBlock(int.MaxValue - 1, "#blank", -65535, false);
-				blankBlock.opSteps.Add(new OpStep(OpCode.flag, new SourceToken(0, 0, string.Empty))); blankBlock.instructions = blankBlock.opSteps.ToArray(); blankBlock.opSteps = null;
+				blankBlock.opSteps.Add(new OpStep(OpCode.flag, SourceToken.Empty)); blankBlock.instructions = blankBlock.opSteps.ToArray(); blankBlock.opSteps = null;
 				blankScope = new RunTimeScope(emptyMembers, blankBlock.id, null, null, RunTimeScopeType.function);
 			}
 
@@ -2041,13 +2041,13 @@ namespace ASRuntime
 			}
 		}
 
-		private void runfuntionEnd(BlockCallBackBase sender, object args)
+		private static void runfuntionEnd(BlockCallBackBase sender, object args)
 		{
 			((runFuncResult)sender.cacheObjects[0]).isEnd = true;
 			((runFuncResult)sender.cacheObjects[0]).isSuccess = true;
 			sender.isSuccess = true;
 		}
-		private void runfuntionFailed(BlockCallBackBase sender, object args)
+		private static void runfuntionFailed(BlockCallBackBase sender, object args)
 		{
 			((runFuncResult)sender.cacheObjects[0]).isEnd = true;
 			((runFuncResult)sender.cacheObjects[0]).isSuccess = false;
@@ -2083,7 +2083,7 @@ namespace ASRuntime
 
 			if (_tempcallbacker != null)
 			{
-				var _runningtempcallbacker= _tempcallbacker;
+				var _runningtempcallbacker = _tempcallbacker;
 				_tempcallbacker = null;
 				_runningtempcallbacker.call(_runningtempcallbacker.args);
 
@@ -3140,7 +3140,7 @@ namespace ASRuntime
 								catch (RuntimeLinkTypeMapper.TypeLinkClassException)
 								{
 									return obj;
-								}								
+								}
 							}
 
 						}
@@ -3257,7 +3257,7 @@ namespace ASRuntime
 
 					CallBlankBlock(null);
 
-					if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
+					if (!operators.InstanceCreator.init_static_class(cls, this, SourceToken.Empty))
 					{
 						throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
 					}
@@ -3299,7 +3299,7 @@ namespace ASRuntime
 
 
 					error.InternalError err;
-					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err,
+					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, SourceToken.Empty, out err,
 						static_instance[cls.staticClass.classid],
 						new rtInt(argcount), vb1, vb2, vb3, paraArgs);
 
@@ -3461,7 +3461,7 @@ namespace ASRuntime
 				var cls = getClassStaticInstance(type);
 				return invokeMethod(cls, methodname, argcount, v1, v2, v3, v4, v5, args);
 			}
-			
+
 		}
 
 
@@ -3500,7 +3500,7 @@ namespace ASRuntime
 
 				return invokeMethod(thisObj, method, argcount, v1, v2, v3, v4, v5, args);
 			}
-			
+
 		}
 
 
@@ -3536,7 +3536,7 @@ namespace ASRuntime
 			{
 				try
 				{
-				
+
 
 					initPlayer();
 					CallBlankBlock(null);
@@ -3593,7 +3593,7 @@ namespace ASRuntime
 
 					error.InternalError err;
 					RunTimeValueBase v = null;
-					bool issuccess = runFunction(method, thisObj, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
+					bool issuccess = runFunction(method, thisObj, currentRunFrame._tempSlot1, SourceToken.Empty, out err
 						, vb1, vb2, vb3, vb4, vb5, paraArgs
 						);
 
@@ -3636,7 +3636,7 @@ namespace ASRuntime
 						return rtUndefined.undefined;
 					}
 
-					
+
 					object obj;
 					if (linktypemapper.rtValueToLinkObject(v, linktypemapper.getLinkType(signature.returnType), swc, true, out obj))
 					{
@@ -3646,7 +3646,7 @@ namespace ASRuntime
 					{
 						throw new ASRunTimeException("返回值转化失败", string.Empty);
 					}
-					
+
 				}
 
 
@@ -3655,7 +3655,7 @@ namespace ASRuntime
 					clearEnv();
 				}
 			}
-			
+
 		}
 
 
@@ -3762,7 +3762,7 @@ namespace ASRuntime
 
 					error.InternalError err;
 					RunTimeValueBase v = null;
-					bool issuccess = runFunction(method, method.this_pointer, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err
+					bool issuccess = runFunction(method, method.this_pointer, currentRunFrame._tempSlot1, SourceToken.Empty, out err
 						, vb1, vb2, vb3, vb4, vb5, paraArgs
 						);
 
@@ -3810,7 +3810,7 @@ namespace ASRuntime
 						return rtUndefined.undefined;
 					}
 
-					Type rttype=null;
+					Type rttype = null;
 					try
 					{
 						rttype = linktypemapper.getLinkType(signature.returnType);
@@ -3866,7 +3866,7 @@ namespace ASRuntime
 		}
 
 
-		public void MakeICrossExtendAdapterEnvironment(ICrossExtendAdapter adapter,ASBinCode.rtti.Class as3class)
+		public void MakeICrossExtendAdapterEnvironment(ICrossExtendAdapter adapter, ASBinCode.rtti.Class as3class)
 		{
 			if (adapter == null)
 				throw new ArgumentNullException("adapter");
@@ -3907,8 +3907,8 @@ namespace ASRuntime
 				try
 				{
 					initPlayer();
-					
-					if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
+
+					if (!operators.InstanceCreator.init_static_class(cls, this, SourceToken.Empty))
 					{
 						throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
 					}
@@ -3922,7 +3922,7 @@ namespace ASRuntime
 
 
 					error.InternalError err;
-					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, new SourceToken(0, 0, string.Empty), out err,
+					bool issuccess = runFunction(_createinstance, _buildin_class_, currentRunFrame._tempSlot1, SourceToken.Empty, out err,
 						static_instance[cls.staticClass.classid],
 						new rtInt(0), vb1, vb2, vb3, paraArgs);
 
@@ -3979,7 +3979,7 @@ namespace ASRuntime
 				}
 			}
 
-			
+
 		}
 
 
@@ -4005,7 +4005,7 @@ namespace ASRuntime
 
 				CallBlankBlock(null);
 
-				if (!operators.InstanceCreator.init_static_class(cls, this, new SourceToken(0, 0, string.Empty)))
+				if (!operators.InstanceCreator.init_static_class(cls, this, SourceToken.Empty))
 				{
 					throw new ASRunTimeException("初始化静态实例时失败", string.Empty);
 				}
@@ -4041,7 +4041,7 @@ namespace ASRuntime
 			lock (this)
 			{
 				try
-				{				
+				{
 					initPlayer();
 					CallBlankBlock(null);
 
@@ -4082,7 +4082,7 @@ namespace ASRuntime
 
 					error.InternalError err;
 					RunTimeValueBase v = null;
-					bool issuccess = runFunction(_getMemberValue, _getMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
+					bool issuccess = runFunction(_getMemberValue, _getMemberValue.this_pointer, currentRunFrame._tempSlot2, SourceToken.Empty, out err
 						, thisObj, p1, p2, extpath, index);
 
 					if (issuccess)
@@ -4124,11 +4124,11 @@ namespace ASRuntime
 				}
 
 				finally
-			{
-				clearEnv();
+				{
+					clearEnv();
+				}
 			}
-			}
-			
+
 
 		}
 
@@ -4152,7 +4152,7 @@ namespace ASRuntime
 			{
 				try
 				{
-				
+
 					initPlayer();
 					CallBlankBlock(null);
 
@@ -4192,7 +4192,7 @@ namespace ASRuntime
 
 					error.InternalError err;
 
-					bool issuccess = runFunction(_setMemberValue, _setMemberValue.this_pointer, currentRunFrame._tempSlot2, new SourceToken(0, 0, string.Empty), out err
+					bool issuccess = runFunction(_setMemberValue, _setMemberValue.this_pointer, currentRunFrame._tempSlot2, SourceToken.Empty, out err
 						, thisObj, setvalue, p1, extpath, index);
 
 					if (issuccess)
@@ -4228,7 +4228,7 @@ namespace ASRuntime
 					clearEnv();
 				}
 			}
-			
+
 		}
 
 
@@ -4297,7 +4297,7 @@ namespace ASRuntime
 
 		delegate Type ddd(Type t);
 
-		public Delegate WapperFunctionDelegate(RunTimeValueBase func,ASBinCode.rtti.Class cls , Type delegateType,Action<FunctionWapper> createDelegate )
+		public Delegate WapperFunctionDelegate(RunTimeValueBase func, ASBinCode.rtti.Class cls, Type delegateType, Action<FunctionWapper> createDelegate)
 		{
 			ASBinCode.rtData.rtFunction function;
 
@@ -4312,7 +4312,7 @@ namespace ASRuntime
 			}
 			else
 			{
-				throw new ASRunTimeException("目标不是Function",stackTrace(0));
+				throw new ASRunTimeException("目标不是Function", stackTrace(0));
 			}
 
 			if (function.ismethod)
@@ -4330,7 +4330,7 @@ namespace ASRuntime
 				var thisobjtype = swc.getClassByRunTimeDataType(rtObject.rtType);
 				if (thisobjtype.isLink_System)
 				{
-					var functiondefine = swc.functions[ function.functionId];
+					var functiondefine = swc.functions[function.functionId];
 					if (functiondefine.isNative)
 					{
 						var nativefunction = swc.getNativeFunction(function.functionId);
@@ -4369,7 +4369,7 @@ namespace ASRuntime
 							}
 							catch (ArgumentNullException e)
 							{
-								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败,"+e.Message, stackTrace(0));
+								throw new ASRunTimeException("尝试创建" + functiondefine.name + "的委托失败," + e.Message, stackTrace(0));
 							}
 							catch (ArgumentException e)
 							{
@@ -4397,7 +4397,7 @@ namespace ASRuntime
 			}
 
 
-			
+
 			//if (function.dictWappers == null)
 			//{
 			//	function.dictWappers = new Dictionary<RunTimeDataType, FunctionWapper>();
@@ -4417,7 +4417,7 @@ namespace ASRuntime
 			{
 				return function.dictWappers[cls.getRtType()].action;
 			}
-			
+
 
 		}
 

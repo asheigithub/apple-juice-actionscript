@@ -47,8 +47,8 @@ namespace ASCTest
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-									   //path = @"../..\testScript\AS3Testproj\amd";
-				path = @"../..\testScript\AS3Testproj\src";
+									   path = @"../..\testScript\AS3Testproj\amd";
+				//path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -102,67 +102,67 @@ namespace ASCTest
 
 
 			//*********加入API*****
-			{
-				string apidir = @"../../..\LinkCodeGenCLI\bin\Debug\as3api";
-				if (System.IO.Directory.Exists(apidir))
-				{
-					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//{
+			//	string apidir = @"../../..\LinkCodeGenCLI\bin\Debug\as3api";
+			//	if (System.IO.Directory.Exists(apidir))
+			//	{
+			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-					foreach (var item in linkapi)
-					{
-						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-						if (projfile.StartsWith("/"))
-							projfile = projfile.Substring(1);
-						srcFileProjFile.Add(item, projfile);
-					}
+			//		foreach (var item in linkapi)
+			//		{
+			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+			//			if (projfile.StartsWith("/"))
+			//				projfile = projfile.Substring(1);
+			//			srcFileProjFile.Add(item, projfile);
+			//		}
 
-					string[] n = new string[files.Length + linkapi.Length];
-					linkapi.CopyTo(n, 0);
-					files.CopyTo(n, linkapi.Length);
-					files = n;
-				}
-			}
-			{
-				string apidir = @"..\..\testScript\sharpapi";
-				if (System.IO.Directory.Exists(apidir))
-				{
-					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			//		string[] n = new string[files.Length + linkapi.Length];
+			//		linkapi.CopyTo(n, 0);
+			//		files.CopyTo(n, linkapi.Length);
+			//		files = n;
+			//	}
+			//}
+			//{
+			//	string apidir = @"..\..\..\as3_commapi\sharpapi";
+			//	if (System.IO.Directory.Exists(apidir))
+			//	{
+			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-					foreach (var item in linkapi)
-					{
-						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-						if (projfile.StartsWith("/"))
-							projfile = projfile.Substring(1);
-						srcFileProjFile.Add(item, projfile);
-					}
+			//		foreach (var item in linkapi)
+			//		{
+			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+			//			if (projfile.StartsWith("/"))
+			//				projfile = projfile.Substring(1);
+			//			srcFileProjFile.Add(item, projfile);
+			//		}
 
-					string[] n = new string[files.Length + linkapi.Length];
-					linkapi.CopyTo(n, 0);
-					files.CopyTo(n, linkapi.Length);
-					files = n;
-				}
-			}
+			//		string[] n = new string[files.Length + linkapi.Length];
+			//		linkapi.CopyTo(n, 0);
+			//		files.CopyTo(n, linkapi.Length);
+			//		files = n;
+			//	}
+			//}
 			//*********************
 
 			//*********加入ProtoBuf API*****
-			//string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-			//if (System.IO.Directory.Exists(apidir))
-			//{
-			//	var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
-			//	foreach (var item in linkapi)
-			//	{
-			//		string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-			//		if (projfile.StartsWith("/"))
-			//			projfile = projfile.Substring(1);
-			//		srcFileProjFile.Add(item, projfile);
-			//	}
+			string apidir = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
+			if (System.IO.Directory.Exists(apidir))
+			{
+				var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+				foreach (var item in linkapi)
+				{
+					string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+					if (projfile.StartsWith("/"))
+						projfile = projfile.Substring(1);
+					srcFileProjFile.Add(item, projfile);
+				}
 
 
-			//	string[] n = new string[files.Length + linkapi.Length];
-			//	linkapi.CopyTo(n, 0);
-			//	files.CopyTo(n, linkapi.Length);
-			//	files = n;
-			//}
+				string[] n = new string[files.Length + linkapi.Length];
+				linkapi.CopyTo(n, 0);
+				files.CopyTo(n, linkapi.Length);
+				files = n;
+			}
 			//*********************
 
 			var proj = new ASTool.AS3.AS3Proj();
@@ -223,6 +223,9 @@ namespace ASCTest
             //return;
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
+
+			//builder.LoadLibrary(System.IO.File.ReadAllBytes("F:/ASTool/LinkCodeGenCLI/bin/Debug/as3unitylib.cswc"));
+
 			//builder.LoadLibrary(System.IO.File.ReadAllBytes("astoolglobal.swc"));
 			//builder.Build(proj, new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );
 

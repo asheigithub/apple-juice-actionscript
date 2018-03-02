@@ -36,18 +36,29 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine.UI">
-      <HintPath>E:\Manju-pc\blacksmithHorizontal\blacksmith\Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ASCR\ASCompiler.csproj">
+      <Project>{883162bb-0596-4abc-baa8-b3a1f04cc388}</Project>
+      <Name>ASCompiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ASRuntime\ASRuntime.csproj">
+      <Project>{8c0a5542-f8c6-470c-b194-5a5c50c5a695}</Project>
+      <Name>ASRuntime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ASTool\ASTool.vbproj">
+      <Project>{f6119d2e-215b-4fb1-a1c6-e83ede52da8c}</Project>
+      <Name>ASTool</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LinkCodeGen\LinkCodeGen.csproj">
       <Project>{4f9519e2-a209-49a5-bb20-1e5980664923}</Project>
       <Name>LinkCodeGen</Name>

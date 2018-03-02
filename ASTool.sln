@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LinkCodeGenerator", "LinkCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinkCodeGenCLI", "LinkCodeGenCLI\LinkCodeGenCLI.csproj", "{E13DA238-07DC-4806-A7FA-B1CA8A846861}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMXMLCCLI", "CMXMLCCLI\CMXMLCCLI.csproj", "{965D8695-C1AE-45D5-B720-E4B30E3D4A80}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -88,6 +90,14 @@ Global
 		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|x86.ActiveCfg = Release|Any CPU
 		{E13DA238-07DC-4806-A7FA-B1CA8A846861}.Release|x86.Build.0 = Release|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Debug|x86.Build.0 = Debug|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Release|x86.ActiveCfg = Release|Any CPU
+		{965D8695-C1AE-45D5-B720-E4B30E3D4A80}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,6 +111,15 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E21E42CB-61D2-46EE-9085-5023B5BFE7B0}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true

@@ -71,8 +71,8 @@ Public Class Lex
             word = getNextWord(input, ptr)
             If Not word Is Nothing Then
 
-                words.Add(word)
-            End If
+				words.Add(word)
+			End If
 
 
 
@@ -452,9 +452,9 @@ readnumber:
             result.ptr = linepos
             result.StringValue += ch
 
-            result.StringValue += getNumberSerial(input, currentptr)
+			result.StringValue += getNumberSerial(input, currentptr, linepos)
 
-            Dim csymobl = getNextChar(input, currentptr)
+			Dim csymobl = getNextChar(input, currentptr)
             If csymobl = "." Then
 
                 If result.StringValue(0) = "." Then
@@ -463,10 +463,10 @@ readnumber:
 
                 result.StringValue += csymobl
 
-                result.StringValue += getNumberSerial(input, currentptr)
+				result.StringValue += getNumberSerial(input, currentptr, linepos)
 
 
-                csymobl = getNextChar(input, currentptr)
+				csymobl = getNextChar(input, currentptr)
 
             End If
 
@@ -481,16 +481,16 @@ readnumber:
                             result.StringValue += csymobl
                             result.StringValue += getNextChar(input, currentptr)
 
-                            result.StringValue += getNumberSerial(input, currentptr)
+							result.StringValue += getNumberSerial(input, currentptr, linepos)
 
-                            getNextChar(input, currentptr)
+							getNextChar(input, currentptr)
 
                         End If
                     End If
                 ElseIf Not en1 Is Nothing AndAlso Char.IsDigit(en1(0)) Then
                     result.StringValue += csymobl
-                    result.StringValue += getNumberSerial(input, currentptr)
-                    getNextChar(input, currentptr)
+					result.StringValue += getNumberSerial(input, currentptr, linepos)
+					getNextChar(input, currentptr)
 
                 End If
 
@@ -622,7 +622,11 @@ readnumber:
 
                     End If
 
-                End While
+					If seeNextChar(input, currentptr + k) Is Nothing Then
+						Exit While
+					End If
+
+				End While
 
 
 
@@ -636,31 +640,31 @@ readnumber:
         Return False
     End Function
 
-    Private Function getNumberSerial(input As String, ByRef currentptr As Integer) As String
-        Dim r As String = ""
-        Do
-            Dim nc = seeNextChar(input, currentptr)
+	Private Function getNumberSerial(input As String, ByRef currentptr As Integer, lineptr As Integer) As String
+		Dim r As String = ""
+		Do
+			Dim nc = seeNextChar(input, currentptr)
 
-            If nc Is Nothing Then
-                Return r
-            End If
+			If nc Is Nothing Then
+				Return r
+			End If
 
-            If Char.IsDigit(nc(0)) Then
-                r = r + getNextChar(input, currentptr)
-            ElseIf isIdStChar(nc) And nc.ToLower() <> "e" Then
-                Throw New LexException("解析数值错误", cline, currentptr)
-            Else
+			If Char.IsDigit(nc(0)) Then
+				r = r + getNextChar(input, currentptr)
+			ElseIf isIdStChar(nc) And nc.ToLower() <> "e" Then
+				Throw New LexException("解析数值错误", cline, lineptr)
+			Else
 
-                Return r
-            End If
+				Return r
+			End If
 
-        Loop
-
-
-    End Function
+		Loop
 
 
-    Private Function getNextChar(input As String, ByRef currentptr As Integer) As String
+	End Function
+
+
+	Private Function getNextChar(input As String, ByRef currentptr As Integer) As String
 
 
 

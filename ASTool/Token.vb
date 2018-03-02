@@ -62,14 +62,9 @@
 
 
     End Enum
-    ''' <summary>
-    ''' 结束符
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Shared TokenEOF As New Token() With {.Type = TokenType.eof}
 
 
-    Public Sub New()
+	Public Sub New()
         Type = TokenType.other
         StringValue = String.Empty
     End Sub
@@ -96,6 +91,10 @@
     ''' <remarks></remarks>
     Public sourceFile As String
 
+	''' <summary>
+	''' 源文件全路径
+	''' </summary>
+	Public sourceFileFullPath As String
 
 	Public Overrides Function ToString() As String
 		Return Type.ToString() & " " & StringValue

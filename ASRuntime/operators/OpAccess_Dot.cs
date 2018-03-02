@@ -1223,10 +1223,13 @@ namespace ASRuntime.operators
         {
             internal rtArray array;
             internal int idx;
-            public arraySlot(rtArray array,int idx)
+			private IClassFinder classFinder;
+            public arraySlot(rtArray array,int idx,IClassFinder classFinder)
             {
                 this.array = array;
                 this.idx = idx;
+
+				this.classFinder = classFinder;
             }
 
 			public override SLOT assign(RunTimeValueBase value, out bool success)
@@ -1269,6 +1272,31 @@ namespace ASRuntime.operators
 							break;
 					}
 
+
+
+					if (value.rtType > RunTimeDataType.unknown)
+					{
+						var vd = array.innerArray[idx];
+						
+						{
+							var cls = classFinder.getClassByRunTimeDataType(value.rtType);
+							if (cls.isLink_System)
+							{
+								ASBinCode.rtti.LinkSystemObject link = (ASBinCode.rtti.LinkSystemObject)((rtObjectBase)vd).value;
+
+								if (cls.isStruct)
+								{
+									link.CopyStructData((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)value).value);
+								}
+								else
+								{
+									((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+								}
+								success = true;
+								return this;
+							}
+						}
+					}
 
 				}
 

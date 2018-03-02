@@ -130,11 +130,18 @@ namespace ASCompiler.compiler
             {
                 Console.ForegroundColor = ConsoleColor.Red;
 
-                Console.WriteLine("file :" + err.srcFile);
-                Console.WriteLine("line :" + (err.line+1) + " ptr :" + (err.ptr+1));
-                Console.WriteLine(err.errorMsg);
+				//Console.Error.WriteLine("file :" + err.srcFile);
+				//Console.Error.WriteLine("line :" + (err.line+1) + " ptr :" + (err.ptr+1));
+				//Console.Error.WriteLine(err.errorMsg);
 
-                Console.ResetColor();
+				Console.Error.WriteLine(err.srcFile + ":" + (err.line + 1) + ":Error: " + err.errorMsg);
+
+				//input = input.Replace(vbCrLf, vbLf)
+				//input = input.Replace(vbCr, vbLf)
+				//Dim lines = input.Split(vbLf)
+				Console.Error.WriteLine();
+				
+				Console.ResetColor();
             }
 
             if (buildErrors.Count > 10)

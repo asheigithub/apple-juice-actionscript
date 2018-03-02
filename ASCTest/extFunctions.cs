@@ -8,8 +8,7 @@ namespace ASCTest
 {
     public partial class extFunctions : INativeFunctionRegister , INativeFunctionFactory
     {
-		private Type[] types;
-
+		public float progress = 0;
 		public NativeFunctionBase Create(string typename)
 		{
 			//Type ft = this.GetType().Assembly.GetType(typename);

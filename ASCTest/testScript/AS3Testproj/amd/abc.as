@@ -147,4 +147,3 @@ trace(f);
 var f = new fib();
 var ff = fib(f);
 trace(ff);
-

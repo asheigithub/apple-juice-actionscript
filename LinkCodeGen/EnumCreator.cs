@@ -178,7 +178,10 @@ namespace LinkCodeGen
             {
 				if (IsObsolete(item,type))
 					continue;
-
+				if (IsSkipMember(item))
+				{
+					continue;
+				}
 
 				string enumItemName = item.Name;
 				if (enumItemName == "Class") { enumItemName = "Class_"; }
@@ -261,8 +264,8 @@ namespace LinkCodeGen
 
             //Console.WriteLine(nativefunc.ToString());
 
-            string as3file = "as3api/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
-            string nativefunfile = "buildins/" + GetNativeFunctionClassName(type) + ".cs";
+            string as3file = as3apidocpath + "/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
+            string nativefunfile = csharpnativecodepath +"/" + GetNativeFunctionClassName(type) + ".cs";
 
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
             System.IO.File.WriteAllText(as3file, as3api.ToString());

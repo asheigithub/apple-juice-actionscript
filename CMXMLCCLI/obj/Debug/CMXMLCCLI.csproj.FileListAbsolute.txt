@@ -1,0 +1,13 @@
+F:\ASTool\CMXMLCCLI\bin\Debug\CMXMLCCLI.exe
+F:\ASTool\CMXMLCCLI\bin\Debug\CMXMLCCLI.pdb
+F:\ASTool\CMXMLCCLI\bin\Debug\ASCompiler.dll
+F:\ASTool\CMXMLCCLI\bin\Debug\ASRuntime.dll
+F:\ASTool\CMXMLCCLI\bin\Debug\ASTool.dll
+F:\ASTool\CMXMLCCLI\bin\Debug\ASCompiler.pdb
+F:\ASTool\CMXMLCCLI\bin\Debug\ASRuntime.pdb
+F:\ASTool\CMXMLCCLI\bin\Debug\ASTool.pdb
+F:\ASTool\CMXMLCCLI\bin\Debug\ASTool.xml
+F:\ASTool\CMXMLCCLI\obj\Debug\CMXMLCCLI.csprojResolveAssemblyReference.cache
+F:\ASTool\CMXMLCCLI\obj\Debug\CMXMLCCLI.csproj.CoreCompileInputs.cache
+F:\ASTool\CMXMLCCLI\obj\Debug\CMXMLCCLI.exe
+F:\ASTool\CMXMLCCLI\obj\Debug\CMXMLCCLI.pdb

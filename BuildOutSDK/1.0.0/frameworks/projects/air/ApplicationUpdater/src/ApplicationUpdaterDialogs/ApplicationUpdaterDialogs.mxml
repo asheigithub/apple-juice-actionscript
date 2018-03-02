@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ADOBE SYSTEMS INCORPORATED
+ Copyright 2008 Adobe Systems Incorporated
+ All Rights Reserved.
+
+NOTICE:  Adobe permits you to use, modify, and distribute this file in accordance with the 
+terms of the Adobe license agreement accompanying it.  If you have received this file from a 
+source other than Adobe, then your use, modification, or distribution of it requires the prior 
+written permission of Adobe.
+-->
+<components:ApplicationUpdaterApplication xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="horizontal"
+    xmlns:flash="flash.filters.*"
+   	xmlns:air="*"
+    verticalScrollPolicy="off"
+    horizontalScrollPolicy="off"
+    applicationComplete="onApplicationComplete()"
+    height="1000"
+    width="2000"
+    showStatusBar="false"
+    visible="false"
+	xmlns:components="components.*">
+	<mx:Metadata>
+		[ResourceBundle("ApplicationUpdaterDialogs")]
+	</mx:Metadata>
+	<mx:Style source="assets/styles.css"/>
+	<mx:Script>
+		<![CDATA[
+			import air.update.ApplicationUpdater;
+			import air.update.events.DownloadErrorEvent;
+			import air.update.events.StatusFileUpdateErrorEvent;
+			import air.update.events.StatusFileUpdateEvent;
+			import air.update.events.StatusUpdateErrorEvent;
+			import air.update.events.StatusUpdateEvent;
+			import air.update.events.UpdateEvent;
+			import air.update.locale.UpdaterResourceManager;
+			
+			import com.adobe.utils.LocaleUtil;
+			
+			import flash.desktop.NativeApplication;
+			import flash.filesystem.File;
+			import flash.filesystem.FileMode;
+			import flash.filesystem.FileStream;
+			
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.core.Container;
+			import mx.core.UIComponent;
+			import mx.effects.easing.Bounce;
+			import mx.effects.effectClasses.HideShowEffectTargetFilter;
+			import mx.events.ResizeEvent;
+			import mx.events.StateChangeEvent;
+			import mx.managers.FocusManager;
+			import mx.resources.IResourceBundle;
+			import mx.resources.ResourceBundle;
+			import mx.utils.StringUtil;
+			
+			//
+			private var AIR_UI_LANGUAGES:Array = ["en_US","de","es","fr","it","ja","ko","pt","ru","zh_Hans","zh_Hant","cs","nl","pl","sv","tr"];			
+			//
+			private static const LOGGING_UI:Boolean = false;
+			
+			[Embed(source="assets/UpdateIcon.png")]
+			[Bindable]
+			private var m_updateIcon : Class;
+
+			[Embed(source="assets/down_arrow.png")]
+			[Bindable]
+			private var m_downArrowImage: Class;
+			
+			private var _applicationUpdater:Object;
+			private var m_title:String;
+			//
+			private var isInstallPostponed:Boolean;
+			//
+			private var errorID:String = "";
+			
+			private var applicationName:String = "";
+			private var applicationVersionLabel:String = "";
+			//
+			private var updateVersionLabel:String = "";
+			private var updaterResourceManager:UpdaterResourceManager = new UpdaterResourceManager();
+			private var details:Array = [];
+			//
+			
+			private function onApplicationComplete():void 
+			{
+				log("Initialized. Locales: ",resourceManager.localeChain, " --- ",  resourceManager.getLocales(), "---", updaterResourceManager.localeChain);
+				focusManager = new FocusManager(this);
+				log("Focus: ", focusManager);
+				updaterResourceManager.addEventListener(Event.CHANGE, 
+						function(e:Event):void
+						{
+							dispatchEvent(e);
+							setDetails();
+						});
+				
+				//resourceManager.localeChain = AIR_UI_LANGUAGES;				
+				addEventListener(StateChangeEvent.CURRENT_STATE_CHANGE, onCurrentStateChange);
+				addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+				addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+				setWindowWidth(); 
+				stage.addEventListener(Event.RESIZE, onResize);
+				currentState = "CheckForUpdate";
+				txtCheckApplication.text = getApplicationName();
+			}
+			
+			[Bindable("change")]
+			private function _T( stringId : String, ...args ) : String 
+			{
+				var translated:String = updaterResourceManager.getString(stringId, args);
+				//var translated:String = resourceManager.getString(className, stringId, args);
+				//log("_T(" + stringId + ")= " + translated);
+				return translated;
+			}
+			
+			private function onResizing(e:Event):void
+			{
+				log("RESIZE:" + e);
+				printSize();
+				printTree("", 	stage);
+			}
+			
+			private function onAddedToStage(e:Event):void
+			{
+				log("Added to stage");
+				setWindowWidth();
+				addListeners();
+				stage.addEventListener(Event.RESIZE, onResize);
+			}
+			
+			private function setWindowWidth():void
+			{
+				log("Set Window Width");
+				//printSize();				
+				var ws:String = _T('appWidth');
+				if (!ws) {
+					if (width != 530) setWidth(530);
+				} else {
+					var w:int = int(_T('appWidth'));
+					if (width != w) setWidth(w);
+				}
+				
+			}
+			
+			private function onRemovedFromStage(e:Event):void
+			{
+				removeListeners();
+				stage.removeEventListener(Event.RESIZE, onResize);
+			}
+			
+			public function getLocaleChain():Array 
+			{
+				return updaterResourceManager.localeChain;
+			}
+			
+			public function setLocaleChain(locale:Array):void
+			{
+				var arr:Array = [];
+				for each(var key:String in locale)
+				{
+					arr.push(key);
+				}
+				resourceManager.localeChain = arr;
+				log("Locale changed: ", arr);
+			}
+			
+			public function addResources(lang:String, res:Object):void
+			{
+				log("Add resource for " + lang);
+				var rb:IResourceBundle = new ResourceBundle(lang, className);
+				for (var key:String in res)
+				{
+					rb.content[key.toString()] = res[key].toString();
+					log("Add " + key + " = " + res[key]);
+				}
+				resourceManager.addResourceBundle(rb);
+			}
+			
+			private function printSize():void
+			{
+//				log("SIZE: " + " Stage SH/SW: " + stage.stageHeight + "/" + stage.stageWidth + " Stage: H/W: " + stage.height + "/" + stage.width, " Window H/W: " + stage.nativeWindow.height + "/" + stage.nativeWindow.width);
+//				log("Win H/W: " + height + "/" + width + " Stage SH/SW: " + stage.stageHeight + "/" + stage.stageWidth + " UpperBox H/W: " + upperBox.height + "/" + upperBox.width) ;
+//				log("Loader H/W: " + loaderInfo.height + "/" + loaderInfo.width);
+//				log("Native H/W: " + stage.nativeWindow.height + "/" + stage.nativeWindow.width);
+			}
+
+			private function onResize(event:Event):void
+			{
+				printSize();
+			}
+			
+			private function printObject(s:String, o:DisplayObject):void
+			{
+				var r:Rectangle = o.getBounds(upperBox);
+				var r1:Rectangle = o.getRect(upperBox);
+				if (o is UIComponent)
+				{
+					var u:UIComponent = UIComponent(o);
+					trace(s, r, r1, u.getStyle("paddingTop"), u.getStyle("paddingBottom"), u.getStyle("paddingLeft"), u.getStyle("paddingRight")); 
+				}
+				else
+				{
+					trace(s, r, r1);
+				}
+			}
+			
+			private function printTree(s:String, o:DisplayObjectContainer):void
+			{
+				printObject(s + o.name, o);
+				for (var i:int = 0; i < o.numChildren; i ++)
+				{
+					var d:DisplayObject = o.getChildAt(i);
+					if (d is DisplayObjectContainer)
+					{
+						printTree(s + "\t", d as DisplayObjectContainer);
+					} else {
+						printObject(s + "\t" + d.name, d);
+					}
+				}
+				
+			}
+			
+			private function onCurrentStateChange(e:StateChangeEvent):void
+			{
+				log("StateChange: " + (e.oldState ? e.oldState : "nothing") +  "->" + (e.newState ? e.newState : "nothing"));
+				updaterResourceManager.initialize();
+				//printTree("", 	stage);		
+			}
+			
+			private function log(... args):void
+			{
+				var s:String = "UpdaterUI: ";
+				var file:File = new File(File.documentsDirectory.nativePath +   "/../.airappupdaterui.log");
+				if (args == null) return;
+				if (!LOGGING_UI && !file.exists) return;
+				for(var i:int = 0; i < args.length; i ++)
+				{
+					s += (i > 0 ? "," : "") + (args[i] != null ? args[i].toString() : "null");
+				}
+				if (LOGGING_UI) trace("UpdaterUI: ", args);
+				try
+				{
+					if (file.exists)
+					{
+						var fs:FileStream = new FileStream();
+						fs.open(file, FileMode.APPEND);
+						fs.writeUTFBytes(s + "\n");
+						fs.close();
+					}
+				}catch(e:Error) {};
+			}
+			
+			private function onToggleReleaseNotes():void
+			{
+				switch(currentState) 
+				{
+					case "UpdateAvailable":
+						currentState = "UpdateAvailable_More";
+						//updateText.htmlText = text;
+						updateLinkButton.styleName="applicationUpdaterLinkOpen";
+						break;
+					case "UpdateAvailable_More":
+						currentState = "UpdateAvailable";
+						setHeight(261);
+						updateLinkButton.styleName="applicationUpdaterLinkClose";						
+						break;		
+								
+					case "DownloadProgress":
+						currentState = "DownloadProgress_More";
+						//downloadText.htmlText = text;
+						downloadLinkButton.styleName="applicationUpdaterLinkOpen";
+						break;
+					case "DownloadProgress_More":
+						currentState = "DownloadProgress";
+						setHeight(243);
+						downloadLinkButton.styleName="applicationUpdaterLinkClose";						
+						break;
+						
+					case "InstallUpdate":
+						currentState = "InstallUpdate_More";
+						//installText.htmlText = text;
+						installLinkButton.styleName="applicationUpdaterLinkOpen";
+						break;
+					case "InstallUpdate_More":
+						currentState = "InstallUpdate";
+						setHeight(303);
+						installLinkButton.styleName="applicationUpdaterLinkClose";
+						break;
+				}
+			}
+			
+			private function addListeners():void
+			{
+				if (_applicationUpdater == null) return;
+				//
+				_applicationUpdater.addEventListener(UpdateEvent.CHECK_FOR_UPDATE, appCheckForUpdate);
+				_applicationUpdater.addEventListener(StatusUpdateEvent.UPDATE_STATUS, appCheckStatus);
+				_applicationUpdater.addEventListener(StatusUpdateErrorEvent.UPDATE_ERROR, appCheckError);
+				//
+				_applicationUpdater.addEventListener(UpdateEvent.DOWNLOAD_START, appDownloadStart);
+				_applicationUpdater.addEventListener(ProgressEvent.PROGRESS, appDownloadProgress);
+				_applicationUpdater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, appDownloadError);
+				_applicationUpdater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, appDownloadComplete);
+				//
+				_applicationUpdater.addEventListener(StatusFileUpdateEvent.FILE_UPDATE_STATUS, appFileStatus);
+				_applicationUpdater.addEventListener(StatusFileUpdateErrorEvent.FILE_UPDATE_ERROR, appFileError);
+				_applicationUpdater.addEventListener(UpdateEvent.BEFORE_INSTALL, appBeforeInstall);				
+				//
+				_applicationUpdater.addEventListener(ErrorEvent.ERROR, appUnhandledError);				
+			}
+			
+			private function removeListeners():void
+			{
+				if (_applicationUpdater != null) 
+				{
+					_applicationUpdater.removeEventListener(UpdateEvent.CHECK_FOR_UPDATE, appCheckForUpdate);
+					_applicationUpdater.removeEventListener(StatusUpdateEvent.UPDATE_STATUS, appCheckStatus);
+					_applicationUpdater.removeEventListener(StatusUpdateErrorEvent.UPDATE_ERROR, appCheckError);
+					//
+					_applicationUpdater.removeEventListener(UpdateEvent.DOWNLOAD_START, appDownloadStart);
+					_applicationUpdater.removeEventListener(ProgressEvent.PROGRESS, appDownloadProgress);
+					_applicationUpdater.removeEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, appDownloadError);
+					_applicationUpdater.removeEventListener(UpdateEvent.DOWNLOAD_COMPLETE, appDownloadComplete);
+					_applicationUpdater.removeEventListener(StatusFileUpdateEvent.FILE_UPDATE_STATUS, appFileStatus);
+					_applicationUpdater.removeEventListener(StatusFileUpdateErrorEvent.FILE_UPDATE_ERROR, appFileError);
+					_applicationUpdater.removeEventListener(UpdateEvent.BEFORE_INSTALL, appBeforeInstall);
+					//
+					_applicationUpdater.removeEventListener(ErrorEvent.ERROR, appUnhandledError);
+				}		
+			}
+			
+			//
+			public function setApplicationUpdater(app:Object):void
+			{
+				if (app == _applicationUpdater) return;
+				// remove old listeners
+				removeListeners();
+				_applicationUpdater = app;
+				addListeners();
+			}
+			
+			private function isDialogVisible(stateDialog:String):Boolean
+			{
+				var isVisible:Boolean = true;
+				switch(stateDialog)
+				{
+					// CheckForUpdate
+					case 'CheckForUpdate':
+					case 'NoUpdates':
+					case 'ConnectionError':
+						isVisible = _applicationUpdater.isCheckForUpdateVisible;
+						break;
+					// Download	
+					case 'UpdateAvailable':
+					case 'UpdateAvailable_More':
+						isVisible = _applicationUpdater.isDownloadUpdateVisible;
+						break;
+					// Progress
+					case 'DownloadProgress':
+					case 'DownloadProgress_More':
+						isVisible = _applicationUpdater.isDownloadProgressVisible;
+						break;
+					case 'InstallUpdate':
+					case 'InstallUpdate_More':
+						isVisible = _applicationUpdater.isInstallUpdateVisible;
+						break;
+					case 'FileUpdateAvailable':
+					case 'FileNoUpdates':
+					case 'FileError':
+						isVisible = _applicationUpdater.isFileUpdateVisible;
+						break;
+					case 'UnexpectedError':
+						isVisible = _applicationUpdater.isUnexpectedErrorVisible;
+						break;
+					default:
+						isVisible = true;
+				}
+				return isVisible;
+			}
+			
+			private function showWindow():void
+			{
+				log("ShowWindow: " + currentState + " [" + (isDialogVisible(currentState) ? " visible" : "hidden") + "]");
+				if (isDialogVisible(currentState)) {
+					// set stage dimensions
+					updateWindow();
+					visible = true;
+					stage.nativeWindow.activate();
+				} else {
+					visible = false;
+				}
+			}
+			
+			private function updateWindow():void
+			{
+				setWindowWidth();
+				switch(currentState)
+				{
+					case 'CheckForUpdate':
+					case 'NoUpdates':					
+						setHeight(210);
+						break;
+					case 'ConnectionError':
+					case 'UnexpectedError':
+						setHeight(175);
+						break;
+					case 'UpdateAvailable':
+						setHeight(261);
+						break;
+					case 'DownloadProgress':
+						setHeight(243);
+						break;
+					case 'InstallUpdate':
+						setHeight(303);					
+						break;
+				}
+				stage.nativeWindow.title = windowTitle;
+			}
+			
+			//
+			private function appCheckForUpdate(event:Event):void
+			{
+				log("appCheckForUpdate", event);
+				isInstallPostponed = false;
+				currentState = "CheckForUpdate";
+				// reset details
+				details = [];
+				txtCheckApplication.text = getApplicationName();
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();	
+				}
+				showWindow();
+			}
+			
+			private function appCheckStatus(event:Event):void
+			{
+                var updateEvent:StatusUpdateEvent = new StatusUpdateEvent(event.type, event.bubbles, event.cancelable,
+																event["available"], event["version"], event["details"], event["versionLabel"]);
+				log("appCheckStatus", event);
+				if (updateEvent.available) {
+					currentState = "UpdateAvailable";
+					txtUpdateApplication.text = getApplicationName();
+					txtUpdateCurrentVersion.text = getApplicationVersionLabel();
+					txtUpdateNewVersion.text = updateEvent.versionLabel;
+					updateLinkButton.styleName="applicationUpdaterLinkClose";
+					// set text in all textareas
+					details = updateEvent.details;
+					setDetails();
+					updateVersionLabel = updateEvent.versionLabel;
+				} else {
+					currentState = "NoUpdates";
+					txtNoUpdateApplication.text = getApplicationName();
+				}
+
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();	
+				}
+
+				showWindow();				
+			}
+
+			// StatusUpdateErrorEvent
+			private function appCheckError(event:ErrorEvent):void {
+                log("appCheckError", event);
+				currentState = "ConnectionError";
+				errorID = event.errorID.toString();
+				txtCheckError.text = _T('msgCheckError', [errorID]);
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();	
+				}
+				showWindow();
+			}
+			
+			private function appDownloadStart(event:Event):void {
+                //log("appDownloadStart", event);
+				if (currentState.indexOf("_More") >= 0) {
+					currentState = "DownloadProgress_More";	
+					downloadLinkButton.styleName="applicationUpdaterLinkOpen";
+				} else {
+					currentState = "DownloadProgress";
+					downloadLinkButton.styleName="applicationUpdaterLinkClose";
+				}
+				titleDownloadProgress.text = _T('titleProgress');
+				messageProgress.htmlText = _T('msgProgress');
+				btnCancelDownload.label = _T('btnCancel');
+				progressBar.styleName = "applicationUpdaterProgressPending";
+
+				showWindow();
+			}
+			
+			private function appDownloadProgress(event:ProgressEvent):void {
+				//log("Progress: state=" + currentState + " download: " + event.bytesLoaded + "/" + event.bytesTotal); 
+				if (visible && (currentState == "DownloadProgress" || currentState == "DownloadProgress_More"))
+				{
+					//log("Set progress bar:" + progressBar.percentComplete);
+					progressBar.setProgress(event.bytesLoaded, event.bytesTotal);
+				}
+			}
+			
+			// DownloadErrorEvent
+			private function appDownloadError(event:ErrorEvent):void {
+				log("appDownloadError", event);
+				if (visible)
+				{
+					// this is needed only if download progress is visible
+					if (currentState == "DownloadProgress" || currentState == "DownloadProgress_More")
+					{
+						errorID = event.errorID.toString();
+						progressBar.styleName = "applicationUpdaterProgressError";
+						titleDownloadProgress.text = _T('titleDownloadError');
+						messageProgress.text = _T('msgDownloadError', [errorID]);
+						btnCancelDownload.label = _T('btnClose');
+					}
+				// the error may occur during the UpdateAvailable state, so we need to transition to DownloadProgress
+				// which may be hidden
+				} else if (currentState == "UpdateAvailable" || currentState == "UpdateAvailable_More") { 
+						errorID = event.errorID.toString();
+						// this happens if the .air file doesn't exists
+						appDownloadStart(null);
+						progressBar.setProgress(1,1);
+						progressBar.styleName = "applicationUpdaterProgressError";
+						titleDownloadProgress.text = _T('titleDownloadError');
+						messageProgress.text = _T('msgDownloadError', [errorID]);
+						btnCancelDownload.label = _T('btnClose');
+				}
+
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();	
+				}
+
+				showWindow();
+			}
+			
+			private function appDownloadComplete(event:Event):void {
+				log("appDownloadComplete", event);
+
+				if (currentState.indexOf("_More") >= 0) {
+					currentState = "InstallUpdate_More";
+					installLinkButton.styleName="applicationUpdaterLinkOpen";
+				} else {
+					currentState = "InstallUpdate";
+					installLinkButton.styleName="applicationUpdaterLinkClose";
+				}
+				txtInstallApplication.text = getApplicationName();
+				txtInstallCurrentVersion.text = getApplicationVersionLabel();
+				txtInstallNewVersion.text = updateVersionLabel;
+
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();	
+				}
+				showWindow();
+			}
+
+			private function appUnhandledError(event:ErrorEvent):void
+			{
+				log("appUnhandledError", event);
+				currentState = "UnexpectedError";
+				txtUnexpectedError.text = _T('msgUnexpectedError', event.errorID);
+				if (isDialogVisible(currentState))
+				{
+					event.preventDefault();
+				}
+				showWindow();
+			}
+
+			private function appFileStatus(event:Event):void
+			{
+                var updateEvent:StatusFileUpdateEvent = new StatusFileUpdateEvent(event.type, event.bubbles, event.cancelable,
+                                                        event["available"], event["version"], event["path"], event["versionLabel"]);
+				log("appFileStatus", event);
+				if (updateEvent.available)
+				{
+					currentState = "FileUpdateAvailable";
+					txtFileApplication.text = getApplicationName();
+					txtFileName.text = new File(updateEvent.path).name;
+					txtFileCurrentVersion.text = getApplicationVersionLabel();
+					txtFileNewVersion.text = updateEvent.versionLabel;
+				} else {
+					currentState = "FileNoUpdates";
+					txtNoFileName.text = new File(updateEvent.path).name;
+				}
+
+				if (isDialogVisible(currentState)) 
+				{
+					event.preventDefault();
+				}
+
+				showWindow();
+			}
+
+			// StatusFileUpdateErrorEvent
+			private function appFileError(event:ErrorEvent):void
+			{
+				log("appFileError", event);
+				currentState = "FileError";
+				msgFileError.text = _T('msgFileError', [event.errorID]);
+				if(isDialogVisible(currentState))
+				{
+					event.preventDefault();
+				}
+				showWindow();				
+			}
+
+			private function appBeforeInstall(event:Event):void
+			{
+				log("appBeforeInstall", event);
+				if (isInstallPostponed) event.preventDefault();
+			}
+
+			private function onClose():void
+			{
+				log("onClose");
+				currentState = null;
+				if (_applicationUpdater != null && !isInstallPostponed) _applicationUpdater.cancelUpdate();
+				
+			}
+			
+			private function onCheckForUpdates():void
+			{
+				log("onCheckForUpdates");
+				if (_applicationUpdater != null) _applicationUpdater.checkForUpdate();
+			}
+			
+			
+			private function onDownloadNow():void
+			{
+				log("onDownloadNow");
+				if (_applicationUpdater != null) _applicationUpdater.downloadUpdate();
+			}
+			
+			private function onInstallNow():void
+			{
+				log("onInstallNow");
+				isInstallPostponed = false;
+				if (_applicationUpdater != null) _applicationUpdater.installUpdate();
+			}
+			
+			private function onInstallLater():void
+			{
+				log("onInstallLater");
+				// we just need to hide the window
+				// because the update will be install at next restart
+				isInstallPostponed = true;
+				visible = false;
+				if (_applicationUpdater != null) _applicationUpdater.installUpdate();
+			}
+			
+			private function setHeight(h:uint):void
+			{
+				height = stage.stageHeight = h;
+			}
+			
+			private function setWidth(w:uint):void
+			{
+				width = stage.stageWidth = w;
+			}
+			
+			private function getApplicationName():String
+			{
+				if (applicationName) 
+				{
+					return applicationName;
+				}
+				var xmlNS:Namespace = new Namespace("http://www.w3.org/XML/1998/namespace");
+				var appXML:XML = NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace = appXML.namespace();
+				// filename is mandatory
+				var elem:XMLList = appXML.ns::filename;
+				// use name is if it exists in the application descriptor
+				if ((appXML.ns::name).length() != 0)
+				{
+					elem = appXML.ns::name;
+				}
+				// See if element contains simple content
+				if (elem.hasSimpleContent())
+				{
+					applicationName = elem.toString();
+				}
+				else
+				{
+					// Gather all the languages from the text children
+					var elemChildren:XMLList = elem.ns::text;
+					var langArray:Array = new Array();
+					for each (var child:XML in elemChildren)
+					{
+						langArray.push(child.@xmlNS::lang.toString());
+					}	
+				
+					// Sort the languages
+					langArray = LocaleUtil.sortLanguagesByPreference(langArray, getLocaleChain(), "", false);
+				
+					// Retrieve the text child that matches the first element in
+					// the language array, or the first text child if language
+					// array is empty.
+					if (langArray.length > 0)
+					{
+						var defaultLang:String = langArray[0];
+						var qName:QName = new QName( xmlNS, "lang" );
+						var langs:XMLList = elemChildren.( attribute( qName ) == defaultLang ); 
+						applicationName = langs[0].toString();
+					}
+					else if (elemChildren.length() > 0)
+					{
+						applicationName = elemChildren[0].toString();
+					}
+				}
+				return applicationName;
+			}
+			
+			private function getApplicationVersionLabel():String
+			{
+				if (applicationVersionLabel)
+				{
+					return applicationVersionLabel;
+				}
+				var appXML:XML = NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace = appXML.namespace();
+				//if <version> is undefined , namespace is >=2.5
+				if(appXML.ns::version == undefined)
+				{
+					applicationVersionLabel = ((appXML.ns::versionLabel == undefined) ? (appXML.ns::versionNumber) : (appXML.ns::versionLabel)); 
+				}
+				else
+				{
+					applicationVersionLabel = appXML.ns::version;
+				}
+				return applicationVersionLabel;
+			}			
+		
+			private function get windowTitle():String
+			{
+				if (m_title != null) return m_title;
+				var appXML:XML = NativeApplication.nativeApplication.applicationDescriptor;
+				var ns:Namespace = appXML.namespace();
+				var title:String = _T('titleWindow');
+				title = !title ? "Updating:" : title; 
+				m_title = title + " " + appXML.ns::filename;
+				return m_title;				
+			} 
+			
+			private function setDetails():void
+			{
+				// invalidate application name
+				applicationName = "";
+				var forceRefreshApplicationName:String = getApplicationName();
+				// invalidate window title
+				m_title = null;
+				stage.nativeWindow.title = windowTitle;
+				var text:String = "";
+				if (details.length == 1)
+				{
+					text = details[0][1];
+				} else if (details.length > 1) {
+					var lang:Array = [];
+					var description:Object = {};
+					for(var i:int = 0; i < details.length; i++)
+					{
+						lang.push(details[i][0]);
+						description[details[i][0]] = details[i][1];
+					}
+					// try to match descriptor to localeChain
+					var sorted:Array = LocaleUtil.sortLanguagesByPreference(lang, resourceManager.localeChain, details[0][0], false);
+					text = description[sorted[0]];
+				}
+				//
+				if (updateText) updateText.text = text;
+				if (downloadText) downloadText.text = text;
+				if (installText) installText.text = text;
+			}
+			
+			/** TEST-ONLY for generating UI strings */
+			/*
+			public function _setCurrentState(state:String):Boolean{
+				if(state.indexOf("ConnectionError")!=-1){
+					appCheckError(new StatusUpdateErrorEvent(StatusUpdateErrorEvent.UPDATE_ERROR, false, false, "", 16827));
+				}else if(state.indexOf("UnexpectedError")!=-1){	
+					appUnhandledError(new ErrorEvent(ErrorEvent.ERROR, false, false, "", 16827));
+				}else if(state.indexOf("FileError")!=-1){	
+					appFileError(new StatusFileUpdateErrorEvent(StatusFileUpdateErrorEvent.FILE_UPDATE_ERROR, false, false, "", 16827));
+				}else if(state.indexOf("DownloadError")!=-1 ){
+					currentState = "DownloadProgress";
+					appDownloadError(new DownloadErrorEvent(DownloadErrorEvent.DOWNLOAD_ERROR, false, false, "", 16827 ));
+				}else if( state.indexOf("UpdateError")!=-1 ){
+					currentState = "UpdateAvailable";
+					visible = false;
+					appDownloadError(new DownloadErrorEvent(DownloadErrorEvent.DOWNLOAD_ERROR, false, false, "", 16827));
+				}else if(state == "DownloadProgress"){
+					currentState = "CheckForUpdate";
+					appDownloadStart(null);
+					appDownloadProgress(new ProgressEvent(ProgressEvent.PROGRESS, false, false, 100, 100));
+				} else if(state.indexOf("_More")!=-1){
+						currentState = state.substr(0, state.length-5);
+						onToggleReleaseNotes();
+				}else{
+					currentState = state;
+				}
+				switch(currentState)
+				{
+					case "UpdateAvailable":
+					case "UpdateAvailable_More":
+						txtUpdateApplication.text = getApplicationName();
+						txtUpdateCurrentVersion.text = getApplicationVersionLabel();
+						txtUpdateNewVersion.text = "2.0";
+						break;			
+					case "InstallUpdate":
+					case "InstallUpdate_More":
+						txtInstallApplication.text = getApplicationName();
+						txtInstallCurrentVersion.text = getApplicationVersionLabel();
+						txtInstallNewVersion.text = "2.0";
+						break;
+					case "FileUpdateAvailable":
+						txtFileApplication.text = getApplicationName();
+						txtFileName.text = "TestUpdateFile.air";
+						txtFileCurrentVersion.text = getApplicationVersionLabel();
+						txtFileNewVersion.text = "2.0";
+						break;
+					case "FileNoUpdates":
+						txtNoFileName.text = "TestUpdateFile.air";
+						break;
+					case "NoUpdates":
+						txtNoUpdateApplication.text = getApplicationName();
+						break;
+				}
+				showWindow();
+				return true;
+			}
+			*/
+
+			protected function hideFromAccessibility( obj : DisplayObject ) : void {
+				var acc : AccessibilityProperties = new AccessibilityProperties(); 
+				acc.silent = true;
+				obj.accessibilityProperties =  acc;
+			}
+
+		]]>
+	</mx:Script>
+	
+	<components:ApplicationUpdaterVBox id="upperBox" width="100%" height="100%" styleName="applicationUpdaterUpperBox">
+		<components:ApplicationUpdaterHBox horizontalGap="10" width="100%" height="100%">
+			<components:ApplicationUpdaterVBox id="imageBox" styleName="applicationUpdaterImageBox" creationComplete="hideFromAccessibility(imageBox)" >
+				<components:ApplicationUpdaterImage id="iconImage" source="@Embed('assets/UpdateIcon.png')" width='81' height='74' creationComplete="hideFromAccessibility(iconImage)" />
+			</components:ApplicationUpdaterVBox>
+			<components:ApplicationUpdaterVBox id="contentBox" styleName="applicationUpdaterTopContentBox" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="auto">
+			</components:ApplicationUpdaterVBox>
+		</components:ApplicationUpdaterHBox>
+	</components:ApplicationUpdaterVBox>	
+	
+	<components:states>
+		<mx:State name="CheckForUpdate" enterState="setHeight(210); focusManager.setFocus(btnCheck)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleCheck')}"  width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgCheck')}" width="100%"/>
+					<components:ApplicationUpdaterForm width="100%" height="100%" verticalGap="-2">
+						<components:ApplicationUpdaterFormItem label="{_T('lblApplication')}" textAlign="left" width="100%">
+							<components:TruncatedLabel id="txtCheckApplication" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%"/>
+					<components:OSButtonBarHBox styleName="applicationUpdaterButtonRow">
+						<components:ApplicationUpdaterButton id="btnCheck" styleName="applicationUpdaterDefaultButton" label="{_T('btnCheck')}" click="onCheckForUpdates();"/>
+						<components:ApplicationUpdaterButton label="{_T('btnCancel')}" click="onClose()" />
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>				
+			</mx:AddChild>
+		</mx:State>
+
+		<mx:State name="NoUpdates" enterState="setHeight(210); focusManager.setFocus(btnCloseNoUpdates)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleCheckNoUpdates')}" width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgCheckNoUpdates')}" width="100%"/>
+					<components:ApplicationUpdaterForm width="100%" verticalGap="-2">
+						<components:ApplicationUpdaterFormItem label="{_T('lblApplication')}" textAlign="left" width="100%">
+							<components:TruncatedLabel id="txtNoUpdateApplication" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%"/>			
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnCloseNoUpdates" styleName="applicationUpdaterDefaultButton" label="{_T('btnClose')}" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="ConnectionError" enterState="setHeight(176); focusManager.setFocus(btnCloseConnectionError)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleCheckError')}" width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" id="txtCheckError" htmlText="{_T('msgCheckError')}" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="100%" />	
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnCloseConnectionError" styleName="applicationUpdaterDefaultButton" label="{_T('btnClose')}" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="UnexpectedError" enterState="setHeight(176); focusManager.setFocus(btnCloseUnexpectedError)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleUnexpectedError')}" width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" id="txtUnexpectedError" htmlText="{_T('msgUnexpectedError')}" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="100%"/>			
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnCloseUnexpectedError" styleName="applicationUpdaterDefaultButton" label="{_T('btnClose')}" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>	
+		
+		<mx:State name="UpdateAvailable" enterState="setHeight(261); focusManager.setFocus(btnDownload)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" width="100%" height="100%" styleName="applicationUpdaterContentBox">
+					<components:ApplicationUpdaterLabel id="titleUpdateAvailable" styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleUpdate')}" width="100%"/>
+					<components:ApplicationUpdaterText id="messageUpdate" styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgUpdate')}" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="14" />
+					<components:ApplicationUpdaterForm width="100%" height="100%" verticalGap="-2" paddingTop="0">
+						<components:ApplicationUpdaterFormItem label="{_T('lblApplication')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtUpdateApplication" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblInstalledVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtUpdateCurrentVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblAvailableVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtUpdateNewVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%"/>
+					<components:OSButtonBarHBox>
+						<components:ApplicationUpdaterButton id="btnDownload" styleName="applicationUpdaterDefaultButton" label="{_T('btnDownload')}" click="onDownloadNow()"/>
+						<components:ApplicationUpdaterButton label="{_T('btnDownloadLater')}" click="onClose()" />
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{upperBox}" creationPolicy="all">
+				<components:ApplicationUpdaterVBox width="100%" id="releaseBox" verticalGap="0" styleName="applicationUpdaterReleaseBox">
+					<components:ApplicationUpdaterHRule id="updateAvailableHRule" width="100%" height="2" creationComplete="hideFromAccessibility(updateAvailableHRule)" />
+       			 	<components:ApplicationUpdaterLinkButton id="updateLinkButton" label="{_T('lnkReleaseNotes')}" styleName="applicationUpdaterLinkClose" click="onToggleReleaseNotes()" />
+				</components:ApplicationUpdaterVBox>				
+			</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="UpdateAvailable_More" basedOn="UpdateAvailable" enterState="setHeight(363);">
+			<mx:AddChild relativeTo="{ releaseBox }" creationPolicy="all">
+				<components:ApplicationUpdaterHBox width="100%" height="100%">
+					<components:ApplicationUpdaterCanvas styleName="applicationUpdaterTextBorderWrapper" width="100%">
+						<components:ApplicationUpdaterTextArea id="updateText" width="100%" height="100" verticalScrollPolicy="auto" styleName="applicationUpdaterReleaseText" condenseWhite="true" editable="false" selectable="true" >
+						</components:ApplicationUpdaterTextArea>
+					</components:ApplicationUpdaterCanvas>
+				</components:ApplicationUpdaterHBox>
+			</mx:AddChild>		
+		</mx:State>
+		
+		<mx:State name="DownloadProgress" enterState="setHeight(243); focusManager.setFocus(btnCancelDownload)" >
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox  styleName="applicationUpdaterContentBox"  width="100%" height="100%">
+					<components:ApplicationUpdaterLabel id="titleDownloadProgress" styleName="applicationUpdaterH1" condenseWhite="true" width="100%"/>
+					<components:ApplicationUpdaterText id="messageProgress" styleName="applicationUpdaterH2" condenseWhite="true" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="14" />
+					<components:ApplicationUpdaterProgressBar width="90%" id="progressBar" label="" labelPlacement="bottom" mode="manual" styleName="applicationUpdaterProgressPending" trackHeight="12" creationComplete="hideFromAccessibility(progressBar)" />
+					<components:ApplicationUpdaterSpacer height="100%" />
+					<components:OSButtonBarHBox width="100%" styleName="applicationUpdaterButtonRow">
+						<components:ApplicationUpdaterButton id="btnCancelDownload" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{ upperBox }"  creationPolicy="all">
+				<components:ApplicationUpdaterVBox width="100%" id="downloadBox" verticalGap="0" styleName="applicationUpdaterReleaseBox">
+					<components:ApplicationUpdaterHRule width="100%" height="2" />
+        		 	<components:ApplicationUpdaterLinkButton id="downloadLinkButton" label="{_T('lnkReleaseNotes')}" styleName="applicationUpdaterLinkClose" click="onToggleReleaseNotes()" />
+				</components:ApplicationUpdaterVBox>				
+			</mx:AddChild>					
+		</mx:State>
+		
+		<mx:State name="DownloadProgress_More" basedOn="DownloadProgress" enterState="setHeight(345);">
+			<mx:AddChild relativeTo="{ downloadBox }" creationPolicy="all">
+				<components:ApplicationUpdaterHBox width="100%" height="100%">
+					<components:ApplicationUpdaterCanvas styleName="applicationUpdaterTextBorderWrapper" width="100%">
+						<components:ApplicationUpdaterTextArea id="downloadText" width="100%" height="100" verticalScrollPolicy="auto" styleName="applicationUpdaterReleaseText" condenseWhite="true" editable="false" selectable="true" >
+						</components:ApplicationUpdaterTextArea>
+					</components:ApplicationUpdaterCanvas>
+				</components:ApplicationUpdaterHBox>
+			</mx:AddChild>			
+		</mx:State>
+		
+		<mx:State name="InstallUpdate" enterState="setHeight(303); installProgressBar.setProgress(100,100); focusManager.setFocus(btnInstall)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleInstall')}" width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgInstall')}" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="14" />			
+					<components:ApplicationUpdaterProgressBar width="90%" id="installProgressBar" label="" labelWidth="0" fontSize="0" labelPlacement="left" mode="manual" styleName="applicationUpdaterProgressComplete" trackHeight="12" creationComplete="hideFromAccessibility(installProgressBar)" />
+					<components:ApplicationUpdaterForm width="100%" verticalGap="-2">
+						<components:ApplicationUpdaterFormItem label="{_T('lblApplication')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtInstallApplication" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblInstalledVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtInstallCurrentVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblAvailableVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtInstallNewVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%" />	
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnInstall" styleName="applicationUpdaterDefaultButton" label="{_T('btnInstall')}" click="onInstallNow()"/>
+						<components:ApplicationUpdaterButton label="{_T('btnInstallLater')}" click="onInstallLater()" />
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{ upperBox }"  creationPolicy="all">
+				<components:ApplicationUpdaterVBox width="100%" id="installBox" verticalGap="0" styleName="applicationUpdaterReleaseBox">
+					<components:ApplicationUpdaterHRule id="installUpdateHRule" width="100%" height="2"  creationComplete="hideFromAccessibility(installUpdateHRule)" />
+        		 	<components:ApplicationUpdaterLinkButton id="installLinkButton" label="{_T('lnkReleaseNotes')}" styleName="applicationUpdaterLinkClose" click="onToggleReleaseNotes()" />
+				</components:ApplicationUpdaterVBox>				
+			</mx:AddChild>			
+		</mx:State>
+		
+		<mx:State name="InstallUpdate_More" basedOn="InstallUpdate" enterState="setHeight(405);installProgressBar.setProgress(100,100);">
+			<mx:AddChild relativeTo="{ installBox }" creationPolicy="all">
+				<components:ApplicationUpdaterHBox width="100%" height="100%">
+					<components:ApplicationUpdaterCanvas styleName="applicationUpdaterTextBorderWrapper" width="100%">
+						<components:ApplicationUpdaterTextArea id="installText" width="100%" height="100" verticalScrollPolicy="auto" styleName="applicationUpdaterReleaseText" condenseWhite="true" editable="false" selectable="true" >
+						</components:ApplicationUpdaterTextArea>
+					</components:ApplicationUpdaterCanvas>
+				</components:ApplicationUpdaterHBox>
+			</mx:AddChild>			
+		</mx:State>
+		
+		<mx:State name="FileUpdateAvailable" enterState="setHeight(244); focusManager.setFocus(btnFileInstall)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel id="titleFileUpdateAvailable" styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleFileUpdate')}" width="100%"/>
+					<components:ApplicationUpdaterText id="messageFileUpdate" styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgFileUpdate')}"  width="100%"/>
+					<components:ApplicationUpdaterForm width="100%" verticalGap="-2">
+						<components:ApplicationUpdaterFormItem label="{_T('lblFile')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtFileName" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblApplication')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtFileApplication" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblInstalledVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtFileCurrentVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+						<components:ApplicationUpdaterFormItem label="{_T('lblAvailableVersion')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtFileNewVersion" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%" />						
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnFileInstall" styleName="applicationUpdaterDefaultButton" label="{_T('btnInstall')}" click="onInstallNow()"/>
+						<components:ApplicationUpdaterButton label="{_T('btnCancel')}" click="onClose()" />	
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>
+		
+		<mx:State name="FileNoUpdates" enterState="setHeight(194); focusManager.setFocus(btnCloseFileNoUpdates)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleFileNoUpdate')}" width="100%"/>
+					<components:ApplicationUpdaterText id="msgFileNoUpdate" styleName="applicationUpdaterH2" condenseWhite="true" htmlText="{_T('msgFileNoUpdate')}"  width="100%"/>
+					<components:ApplicationUpdaterForm width="100%" verticalGap="-2">
+						<components:ApplicationUpdaterFormItem label="{_T('lblFile')}" width="100%" textAlign="left">
+							<components:TruncatedLabel id="txtNoFileName" styleName="applicationUpdaterFormItemText" condenseWhite="true" maxWidth="200" text="" />	
+						</components:ApplicationUpdaterFormItem>
+					</components:ApplicationUpdaterForm>
+					<components:ApplicationUpdaterSpacer height="100%" />								
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnCloseFileNoUpdates" styleName="applicationUpdaterDefaultButton" label="{_T('btnClose')}" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>			
+		
+		<mx:State name="FileError" enterState="setHeight(176); focusManager.setFocus(btnCloseFileError)">
+			<mx:AddChild relativeTo="{ contentBox }" creationPolicy="all">
+				<components:ApplicationUpdaterVBox creationPolicy="all" styleName="applicationUpdaterContentBox" width="100%" height="100%">
+					<components:ApplicationUpdaterLabel styleName="applicationUpdaterH1" condenseWhite="true" text="{_T('titleFileError')}" width="100%"/>
+					<components:ApplicationUpdaterText styleName="applicationUpdaterH2" condenseWhite="true" id="msgFileError" htmlText="{_T('msgFileError')}" width="100%"/>
+					<components:ApplicationUpdaterSpacer height="100%" />	
+					<components:OSButtonBarHBox width='100%' styleName='applicationUpdaterButtonRow'>
+						<components:ApplicationUpdaterButton id="btnCloseFileError" styleName="applicationUpdaterDefaultButton" label="{_T('btnClose')}" click="onClose()"/>
+					</components:OSButtonBarHBox>
+				</components:ApplicationUpdaterVBox>
+			</mx:AddChild>
+		</mx:State>
+		
+	</components:states>
+</components:ApplicationUpdaterApplication>

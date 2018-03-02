@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Sealed: false
+Main-Class: com.adobe.flash.compiler.clients.MXMLC

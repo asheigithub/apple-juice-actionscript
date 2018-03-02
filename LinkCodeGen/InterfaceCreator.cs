@@ -125,7 +125,12 @@ namespace LinkCodeGen
 				{
 					continue;
 				}
-				
+
+				if (IsSkipMember(item))
+				{
+					continue;
+				}
+
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(item.ReturnType);
 				if (rt > ASBinCode.RunTimeDataType.unknown )
 				{
@@ -325,6 +330,11 @@ namespace LinkCodeGen
 			}
 
 			if (item.ReturnType.IsGenericTypeDefinition)
+			{
+				return true;
+			}
+
+			if (IsSkipMember(item))
 			{
 				return true;
 			}
@@ -720,8 +730,8 @@ namespace LinkCodeGen
 			//Console.WriteLine(as3api.ToString());
 			//Console.WriteLine(nativefunc.ToString());
 
-			string as3file = "as3api/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
-			string nativefunfile = "buildins/" + GetNativeFunctionClassName(type) + ".cs";
+			string as3file = as3apidocpath + "/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
+			string nativefunfile = csharpnativecodepath + "/" + GetNativeFunctionClassName(type) + ".cs";
 
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
 			System.IO.File.WriteAllText(as3file, as3api.ToString());

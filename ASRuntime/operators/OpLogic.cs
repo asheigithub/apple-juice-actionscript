@@ -156,7 +156,37 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    if (ASBinCode.ClassMemberFinder.isInherits
+					if (cls.instanceClass.isLink_System)
+					{
+						ASBinCode.rtData.rtObjectBase objectBase = (ASBinCode.rtData.rtObjectBase)v1;
+
+						LinkSystemObject link = objectBase.value as LinkSystemObject;
+
+						if (link != null)
+						{
+							var t = frame.player.linktypemapper.getLinkType(cls.instanceClass.getRtType());
+
+							var o = link.GetLinkData();
+
+							if (o != null)
+							{
+								if (t.IsInstanceOfType(o))
+								{
+									step.reg.getSlot(scope, frame).directSet(iftrue);
+									return;
+								}
+							}
+
+						}
+						else
+						{
+							step.reg.getSlot(scope, frame).directSet(iffalse);
+							return;
+						}
+					}
+
+
+					if (ASBinCode.ClassMemberFinder.isInherits
                         (((ASBinCode.rtData.rtObjectBase)v1).value._class,
                         cls.instanceClass)
                         ||

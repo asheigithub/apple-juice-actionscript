@@ -272,6 +272,18 @@ namespace LinkCodeGen
 			//	}
 			//}
 		}
+		public static List<string> NoCreateMember = new List<string>();
+
+		public static bool IsSkipMember(MemberInfo memberInfo)
+		{
+			string key = memberInfo.DeclaringType.FullName + "::"+ memberInfo.ToString();
+
+			if (NoCreateMember.Contains(key))
+			{
+				return true;
+			}
+			return false;
+		}
 
 
 		public static List<string> NotCreateNameSpace = new List<string>();
@@ -372,13 +384,28 @@ namespace LinkCodeGen
 			{
 				return true;
 			}
+			
+
+			if (type.IsArray)
+			{
+				return IsSkipType(type.GetElementType());
+			}
+
+			foreach (var item in NotCreateNameSpace)
+			{
+				if (type.Namespace == item)
+					return true;
+				if (type.Namespace.StartsWith(item + "."))
+					return true;
+			}
+
+			if (NotCreateTypes.Contains(type.FullName))
+			{
+				return true;
+			}
 
 			if (IsDelegate(type))
 			{
-				//var m = GetDelegateMethodInfo(type);
-				//var n=GetSharpTypeName(type);
-				//var k = NativeCodeCreatorBase.GetTypeFullName(type);
-
 
 				var m = GetDelegateMethodInfo(type);
 				//***如果该委托包含要跳过的类型，则跳过****
@@ -439,30 +466,9 @@ namespace LinkCodeGen
 				return false;
 			}
 
-			//if (type.IsGenericType)
-			//{
-			//	return true;
-			//}
 
-			if (type.IsArray)
-			{
-				return IsSkipType(type.GetElementType());
-			}
 
-			foreach (var item in NotCreateNameSpace)
-			{
-				if (type.Namespace == item)
-					return true;
-				if (type.Namespace.StartsWith(item + "."))
-					return true;
-			}
 
-			if (NotCreateTypes.Contains(type.FullName))
-			{
-				return true;
-			}
-			
-			
 
 			if (Equals(type, typeof(TypedReference)))
 			{

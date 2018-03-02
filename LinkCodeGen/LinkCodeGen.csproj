@@ -77,9 +77,6 @@
     <Compile Include="VirtualMethodNativeCodeCreator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="templates\CreateInstance.txt" />
     <Content Include="templates\AdapterCtorFunc.txt" />
     <Content Include="templates\CtorFunc.txt" />
