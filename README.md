@@ -1,4 +1,4 @@
-# ASTool
+3# ASTool
 ### .net2.0实现的ActionScript3 编译器和解释器
 支持除了 namespace 和 with 和 E4X XML操作外的一切actionscript3语法特性。   
 
@@ -19,11 +19,16 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 ##### Demo
 热更新示例工程。  
 其中  
-AS3Hotfix_U56为Unity5.6的工程  
-HotFixProj 为FlashDevelop的ActionScript3热更代码工程
-linkcodegencli 为生成api和api文档的工具
-unityassembly  为要生成api的unity dll
-buildgame   为Unity导出的windows版示例.
+###### AS3Hotfix_U56
+Unity5.6的工程  
+###### HotFixProj 
+FlashDevelop的ActionScript3热更代码工程
+###### linkcodegencli 
+生成api和api文档的工具
+###### unityassembly  
+要生成api的unity dll
+###### buildgame   
+Unity导出的windows版示例.
 
 如果安装了FlashDevelop并且安装了Java，则可以用FlashDevelop打开actionscript3项目，点击编译即可将热更代码发布到Unity.  
 如果没有安装FlashDevelop,则可以执行 "编译代码到unity.bat",可以使用其他文本编辑器（比如notepad - -b）来修改代码，并热更发布到Unity.同时会将热更代码发布到 demogame.exe,并立即执行。  
