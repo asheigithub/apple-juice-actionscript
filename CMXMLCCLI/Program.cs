@@ -16,13 +16,15 @@ namespace CMXMLCCLI
 
 			List<string> srcpathList = new List<string>();
 
-
+			string projpath = string.Empty;
 			foreach (var arg in args)
 			{
 				//Console.WriteLine(arg);
-				if (arg.StartsWith("-load-config+=obj"))
+				if (arg.StartsWith("-load-config+=") && arg.EndsWith(".xml"))
 				{
 					string configpath = arg.Substring(14);
+
+					projpath =  System.IO.Path.GetDirectoryName( System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(configpath)));
 
 					System.Xml.Linq.XDocument document = System.Xml.Linq.XDocument.Load(configpath);
 					//***读取源代码类路径***
@@ -82,12 +84,15 @@ namespace CMXMLCCLI
 				return;
 			}
 
-			//***输出文件在obj下面，所以libcswc就在lib下面***
 			libcswc =
-				System.IO.Path.GetDirectoryName(
-					System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(outputfile))
-				) + "/lib/as3unitylib.cswc";
+				projpath  + "/lib/as3unitylib.cswc";
 
+			if (!System.IO.File.Exists(libcswc))
+			{
+				Console.Error.WriteLine("没有找到as3unitylib.cswc。请重新执行LinkCodeGenCLI来生成api并将as3unitylib.cswc生成到如下位置:"+libcswc );
+
+				Environment.Exit(1);
+			}
 			HashSet<string> inlibclass = new HashSet<string>();
 			{
 				byte[] bin = System.IO.File.ReadAllBytes(libcswc);
@@ -102,11 +107,13 @@ namespace CMXMLCCLI
 						}
 						else
 						{
-							inlibclass.Add((item.package.Replace('.','/') + "/" + item.name + ".as"));
+							inlibclass.Add((item.package.Replace('.', '/') + "/" + item.name + ".as"));
 						}
 					}
 				}
 			}
+			
+
 
 			ASTool.Grammar grammar = ASCompiler.Grammar.getGrammar();
 			string[] files = null;
