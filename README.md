@@ -17,6 +17,17 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 是一个自定义的 AIRSDK.可被FlashDevelop识别并加载，使用它来进行代码的编译和发布。
 
 ##### Demo
-热更新示例工程。
+热更新示例工程。  
+其中  
+AS3Hotfix_U56为Unity5.6的工程  
+HotFixProj 为FlashDevelop的ActionScript3热更代码工程
+linkcodegencli 为生成api和api文档的工具
+unityassembly  为要生成api的unity dll
+buildgame   为Unity导出的windows版示例.
 
+如果安装了FlashDevelop并且安装了Java，则可以用FlashDevelop打开actionscript3项目，点击编译即可将热更代码发布到Unity.  
+如果没有安装FlashDevelop,则可以执行 "编译代码到unity.bat",可以使用其他文本编辑器（比如notepad - -b）来修改代码，并热更发布到Unity.同时会将热更代码发布到 demogame.exe,并立即执行。  
 
+"重新生成API.bat" 会重新生成dll的api文档。如果自己编写了C# dll api,则可将此dll添加到linkcodegencli的配置中，执行一次"重新生成API.bat",即可将api导出到as3以供使用。
+
+FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹，linkcodegencli会将生成的as3 api生成一个叫做as3unitylib.cswc的二进制文件到里面。编译时会加载此文件以提交编译速度。如果缺少此文件，则编译会失败并提示。
