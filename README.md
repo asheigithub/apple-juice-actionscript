@@ -6,6 +6,53 @@
 编译器部分实现了完整的编译期类型检查。并且有完整的错误提示。已经和FlashDevelop完成了集成，可以直接在FlashDevelop中开发并一键编译发布到Unity。   
 Unity的API或者自己开发的C# API提供了工具直接转换为actionscript api文件和对接代码，并且直接注册到FlashDevelop工程中。详见Demo。
 
+#### api全自动导出 ####
+
+> 自动将.net类库导出给脚本使用。并且保留有原始类型信息。例如**UnityEngine.Avatar**导出后的api形式为:
+
+    package unityengine
+    {
+
+
+		/**
+		* Sealed
+		*  UnityEngine.Avatar
+		*/
+		[no_constructor]
+		[link_system]
+		public final class Avatar extends UObject
+		{
+			[creator];
+			[native,unityengine_Avatar_creator];
+			private static function _creator(type:Class):*;
+			[native,$$_noctorclass];
+			public function Avatar();
+			//*********公共方法*******
+			/**
+			* UnityEngine.Avatar.get_isValid
+			*return:
+			*   System.Boolean
+			*/
+			[native,unityengine_Avatar_get_isValid]
+			public final function get isValid():Boolean;
+	
+			/**
+			* UnityEngine.Avatar.get_isHuman
+			*return:
+			*   System.Boolean
+			*/
+			[native,unityengine_Avatar_get_isHuman]
+			public final function get isHuman():Boolean;
+	
+	
+		}
+    }
+
+> IDE能提供智能感知提示。
+
+> 自动导出的API为actionscript3风格。比如**UnityEngine.UI.Button** 将被导出为 **unityengine.ui.Button**
+
+> 能将.net 类库中的类型包含继承关系和接口实现关系的导出。例如，**UnityEngine.MeshRenderer**  继承自 **UnityEngine.Renderer**  。那么导出后的as3类型也会保持以上的关系。
 
 
 
@@ -45,3 +92,30 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 ![](images/as3_unity_demo2.gif)
 - 没有安装Unity和FlashDevelop时的体验方法  
 ![](images/as3_unity_demo3.gif)
+
+##### API生成工具的使用说明 #####
+> LinkCodeGenCLI.exe 工具可用于将C#的dll 导出到ActionScript3 API。它会将需要导出的API生成一份 ActionScript3代码文件，一份C#代码文件，最后会将所有C#代码合并为一个单个文件，并生成一个API注册文件，最后还有一个api的二进制字节码文件。
+> 
+> 如果还配置了一同编译的as3类库路径，则还会一并编译指定的as3类库。当最终编译热更新项目时，会加载此时生成的二进制字节码。
+> 
+> 约定要求这个文件需要生成到FlashDevelop项目的 lib目录下，名字叫as3unitylib.cswc。
+> 
+> *buildassemblys*配置节配置想要导出API的dll。每个*assembly*子节点配置一个dll。*assembly*子节点下还可以配置*type*节点，如果这么做了，那么只有配置的类型会被导出，否则将导出所有可以导出的类型。
+> 
+> 例如
+
+    <buildassemblys>
+    <assembly value="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Unity Full v3.5\System.dll">
+      <type value="aa"></type>
+    </assembly>
+    </buildassemblys>
+
+> 只有名字叫aa的类型才会被导出，因此实际上不会有任何类型被导出。
+
+> *skipcreatortypes*节下配置的是实现已经手工写过api的类型。由于某些类型比较特殊，需要特别对待以满足特殊需求，这些类型被在这里指明。
+
+> *notcreatenamespace*节配置的命名空间下的全部类型都不会被导出。
+
+> *notcreatetypes*节配置的类型不会被导出。
+
+> *notcreatemembers*节配置的成员在遇到时会被跳过。Unity在运行时，某些类型的某些成员会不可用。为此，只能在导出api时跳过这些成员。在这里配置这些成员。
