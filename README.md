@@ -43,5 +43,5 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 
 - 环境安装完全时的参考流程  
 ![](images/as3_unity_demo2.gif)
-
-----------
+- 没有安装Unity和FlashDevelop时的体验方法  
+![](images/as3_unity_demo3.gif)
