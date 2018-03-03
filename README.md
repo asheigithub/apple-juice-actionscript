@@ -35,7 +35,20 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 		)()
 	));
 ````
-- 自动将.net 委托对应到ActionScript3的function对象。
+- 自动将.net 委托对应到ActionScript3的function对象。例如:
+````actionscript
+    var btn:Button = Button( GameObject.find("Button").getComponent(Button));			
+	btn.onClick.addListener(			
+		onclick			
+	);
+
+	btn.onClick.addListener(
+		function()
+		{
+			trace("hahaha",this);					
+		}
+	);
+````
 - 自动处理.net 类库中的 out ref类型的参数。这样的方法也可自动导出。例如 long.TryParse:
 ````actionscript
 	/**
