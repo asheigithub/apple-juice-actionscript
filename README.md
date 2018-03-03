@@ -35,6 +35,26 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 		)()
 	));
 ````
+- 自动将.net 委托对应到ActionScript3的function对象。
+- 自动处理.net 类库中的 out ref类型的参数。这样的方法也可自动导出。例如 long.TryParse:
+````actionscript
+	/**
+	* System.Int64.TryParse
+	*parameters:
+	*  s : System.String
+	*  result : (Out)System.Int64
+	*return:
+	*   System.Boolean
+	*/
+	[native,static_system_Int64_tryParse];
+	public static function tryParse(s:String,result:Int64,refout:as3runtime.RefOutStore):Boolean;
+
+````
+
+- 完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。
+- 完全实现的面向对象支持。完整支持类继承和接口。
+- FlashDevelop IDE支持。可以完全利用IDE的智能提示，编译错误也可在IDE中得到反馈。可在IDE中直接编译热更新代码成到Unity项目
+
 
 #### api全自动导出 ####
 
