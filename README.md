@@ -103,13 +103,13 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 > *buildassemblys*配置节配置想要导出API的dll。每个*assembly*子节点配置一个dll。*assembly*子节点下还可以配置*type*节点，如果这么做了，那么只有配置的类型会被导出，否则将导出所有可以导出的类型。
 > 
 > 例如
-
+````xml
     <buildassemblys>
     <assembly value="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Unity Full v3.5\System.dll">
       <type value="aa"></type>
     </assembly>
     </buildassemblys>
-
+````
 > 只有名字叫aa的类型才会被导出，因此实际上不会有任何类型被导出。
 
 > *skipcreatortypes*节下配置的是实现已经手工写过api的类型。由于某些类型比较特殊，需要特别对待以满足特殊需求，这些类型被在这里指明。
