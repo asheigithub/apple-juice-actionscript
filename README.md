@@ -47,7 +47,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 	
 		}
     }
-
+````
 > IDE能提供智能感知提示。
 
 > 自动导出的API为actionscript3风格。比如**UnityEngine.UI.Button** 将被导出为 **unityengine.ui.Button**
