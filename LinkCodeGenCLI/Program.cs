@@ -92,6 +92,7 @@ namespace LinkCodeGenCLI
 				{
 					Console.WriteLine("sdk文件夹无效");
 					Console.WriteLine("请指定ASRuntimeSDK地址");
+					Environment.Exit(1);
 					return;
 				}
 			}
@@ -99,6 +100,7 @@ namespace LinkCodeGenCLI
 			{
 				Console.WriteLine("sdk文件夹没有找到");
 				Console.WriteLine("请指定ASRuntimeSDK地址");
+				Environment.Exit(1);
 				return;
 			}
 
@@ -125,7 +127,7 @@ namespace LinkCodeGenCLI
 
 
 						List<string> definetypes = new List<string>();
-						foreach (AssemblyTypeElement  type in asm.Types)
+						foreach (AssemblyTypeElement type in asm.Types)
 						{
 							definetypes.Add(type.StringValue);
 						}
@@ -134,13 +136,23 @@ namespace LinkCodeGenCLI
 						{
 							if (definetypes.Count == 0
 								||
-								definetypes.Contains(type.FullName )
+								definetypes.Contains(type.FullName)
 								)
 							{
 								types.Add(type);
 							}
 						}
 
+					}
+					catch (System.BadImageFormatException e)
+					{
+						Console.WriteLine(e.ToString());
+
+						Console.WriteLine("可能加载了无法分析的dll。请到Unity的安装目录下/Editor/Data/Managed/目录下加载UnityEngine.dll, /Editor/Data/UnityExtensions/Unity/GUISystem/下加载UnityEngine.UI.dll。");
+
+
+						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Environment.Exit(1);
 					}
 					catch (System.Reflection.ReflectionTypeLoadException e)
 					{
@@ -151,18 +163,21 @@ namespace LinkCodeGenCLI
 						}
 
 						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Environment.Exit(1);
 						return;
 					}
 					catch (FileNotFoundException e)
 					{
 						Console.WriteLine(e.ToString());
 						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Environment.Exit(1);
 						return;
 					}
 					catch (System.Security.SecurityException e)
 					{
 						Console.WriteLine(e.ToString());
 						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Environment.Exit(1);
 						return;
 					}
 
@@ -263,7 +278,8 @@ namespace LinkCodeGenCLI
 				{
 					Console.WriteLine(files[i]);
 					Console.WriteLine("解析语法树失败!");
-					Console.ReadLine();
+					
+					Environment.Exit(1);
 					return;
 				}
 				
@@ -272,7 +288,7 @@ namespace LinkCodeGenCLI
 				{
 					Console.WriteLine(analyser.err.ToString());
 					Console.WriteLine("语义分析失败!");
-					Console.ReadLine();
+					Environment.Exit(1);
 					return;
 				}
 			}

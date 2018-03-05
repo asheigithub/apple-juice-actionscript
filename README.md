@@ -182,3 +182,7 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 > *notcreatetypes*节配置的类型不会被导出。
 
 > *notcreatemembers*节配置的成员在遇到时会被跳过。Unity在运行时，某些类型的某些成员会不可用。为此，只能在导出api时跳过这些成员。在这里配置这些成员。
+
+##### Unity API dll的位置 #####
+> 要定位Unity的dll,请到Unity的安装目录下查找。Unity工程的Library里面的dll有些读取时会引发BadImageFormatException异常。当发生这种情况时，请到Unity安装目录的/Editor/Data/Managed/目录下加载UnityEngine.dll, /Editor/Data/UnityExtensions/Unity/GUISystem/下加载UnityEngine.UI.dll。
+> Unity2017工程中将dll拆成了许多小dll,但导出api时只需到安装目录下去定位这2个dll即可.

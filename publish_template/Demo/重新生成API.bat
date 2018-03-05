@@ -12,7 +12,7 @@ del /q AS3Hotfix_U56\Assets\ScriptSupport\Generated\*.*
 
 linkcodegencli\LinkCodeGenCLI.exe
 
-if not errorlevel 0 goto error
+if %errorlevel% NEQ 0 goto error
 
 
 goto end
