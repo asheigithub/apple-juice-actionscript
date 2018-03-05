@@ -5,7 +5,7 @@
 
 @pause
 
-..\SDK1.0.0\bin\CMXMLCCLI.exe -load-config+=HotFixProj\obj\HotFixProjConfig.xml -o AS3Hotfix_U56\Assets\StreamingAssets\hotfix.cswc
+..\SDK1.0.0\bin\CMXMLCCLI.exe -load-config+=HotFixProj\obj\HotFixProjConfig.cli.xml -o AS3Hotfix_U56\Assets\StreamingAssets\hotfix.cswc
 
 
 

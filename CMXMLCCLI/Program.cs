@@ -43,7 +43,8 @@ namespace CMXMLCCLI
 							//!p.Replace('\\', '/').EndsWith("/as3_unityapi")
 							)
 						{
-							srcpathList.Add(p);
+							srcpathList.Add( System.IO.Path.GetFullPath(p));
+							Console.WriteLine("加入源码路径:" + System.IO.Path.GetFullPath(p));
 						}
 					}
 
@@ -134,7 +135,7 @@ namespace CMXMLCCLI
 
 					foreach (var item in files)
 					{
-						
+
 						string projfile = item.Replace("\\", "/").Replace(path.Replace("\\", "/"), "");
 						if (projfile.StartsWith("/"))
 							projfile = projfile.Substring(1);
@@ -147,8 +148,15 @@ namespace CMXMLCCLI
 							Console.WriteLine("load file: " + projfile);
 
 						}
-						
+
 					}
+				}
+				else
+				{
+					Console.Error.WriteLine("源码路径 " + path +" 没有找到.");
+
+					Environment.Exit(1);
+					return;
 				}
 			}
 
