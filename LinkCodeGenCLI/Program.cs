@@ -318,10 +318,28 @@ namespace LinkCodeGenCLI
 		{
 			AssemblyName name = new AssemblyName(args.Name);
 			String asmToCheck = m_rootAssembly + "/" + name.Name + ".dll";
+
 			if (File.Exists(asmToCheck))
 			{
 				return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
 			}
+			else
+			{
+				var resolvepath = (StringListSection)System.Configuration.ConfigurationManager.GetSection("resolvepath");
+
+				foreach (AssemblyElement ele in resolvepath.Types)
+				{
+					asmToCheck = ele.StringValue  + "/" + name.Name + ".dll";
+
+					if (File.Exists(asmToCheck))
+					{
+						return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
+					}
+
+				}
+
+			}
+
 
 			return Assembly.ReflectionOnlyLoad(args.Name);
 

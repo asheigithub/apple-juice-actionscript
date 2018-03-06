@@ -175,6 +175,8 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 ````
 > 只有名字叫aa的类型才会被导出，因此实际上不会有任何类型被导出。
 
+> *resolvepath*节下配置dll的查找路径。当解析dll时，可能需要加载它依赖的dll,例如当加载ScriptAssemblies\Assembly-CSharp.dll时，可能需要到UnityAssemblies下查找UnityEngine.CoreModule.dll等。在这里配置dll查找路径
+
 > *skipcreatortypes*节下配置的是实现已经手工写过api的类型。由于某些类型比较特殊，需要特别对待以满足特殊需求，这些类型被在这里指明。
 
 > *notcreatenamespace*节配置的命名空间下的全部类型都不会被导出。
