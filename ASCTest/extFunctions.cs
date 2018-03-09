@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using ASBinCode;
@@ -35,14 +36,17 @@ namespace ASCTest
 
 		}
 
-		public void registrationFunction(CSWC bin)
-        {
+		public void registrationAllFunction(CSWC bin)
+		{
 			bin.SetNativeFunctionFactory(this);
 			regAutoCreateCodes(bin);
-        }
+		}
 
+		IEnumerator INativeFunctionRegister.registrationFunction(CSWC bin)
+		{
+			bin.SetNativeFunctionFactory(this);
 
-		
-
+			throw new NotImplementedException();
+		}
 	}
 }

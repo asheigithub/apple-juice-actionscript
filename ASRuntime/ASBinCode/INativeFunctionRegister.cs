@@ -6,7 +6,7 @@ namespace ASBinCode
 {
     public interface INativeFunctionRegister
     {
-        void registrationFunction(CSWC bin);
+		System.Collections.IEnumerator registrationFunction(CSWC bin);
         
     }
 }

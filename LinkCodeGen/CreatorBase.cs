@@ -391,6 +391,9 @@ namespace LinkCodeGen
 				return IsSkipType(type.GetElementType());
 			}
 
+			if (type.Namespace == null)
+				return true;
+
 			foreach (var item in NotCreateNameSpace)
 			{
 				if (type.Namespace == item)

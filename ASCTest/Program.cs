@@ -242,7 +242,7 @@ namespace ASCTest
 				
 				swc = ASBinCode.CSWC.loadFromBytes(bin);
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
-				(new extFunctions()).registrationFunction(swc);
+				(new extFunctions()).registrationAllFunction(swc);
 				
 				//System.IO.File.WriteAllBytes("astoolglobal.swc", swc.toBytes());
 				//System.IO.File.WriteAllBytes("as3protobuf.swc", swc.toBytes());

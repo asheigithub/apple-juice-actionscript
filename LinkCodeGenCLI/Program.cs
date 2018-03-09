@@ -12,7 +12,45 @@ namespace LinkCodeGenCLI
 	{
 		static void Main(string[] args)
 		{
-			System.Environment.CurrentDirectory = System.IO.Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location);
+			
+			bool dirseted = false;
+			for (int i = 0; i < args.Length; i++)
+			{
+				if (args[i].StartsWith("config="))
+				{
+					string tempconfig = args[i].Substring(7);
+					if (System.IO.File.Exists(tempconfig))
+					{
+						AppConfig.Change( System.IO.Path.GetFullPath(tempconfig));
+						System.Environment.CurrentDirectory = System.IO.Path.GetDirectoryName( System.IO.Path.GetFullPath( tempconfig));
+						dirseted = true;
+					}
+					else
+					{
+						
+						Console.WriteLine("指定的config文件不存在:"+ System.IO.Path.GetFullPath( tempconfig));
+						Environment.Exit(1);
+						return;
+					}
+				}
+			}
+			if (!dirseted)
+			{
+				System.Environment.CurrentDirectory = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			}
+
+			System.Configuration.AppSettingsReader appSettingsReader = new System.Configuration.AppSettingsReader();
+
+			string outputcode = (string)appSettingsReader.GetValue("combiedcodefile", typeof(string));
+			string as3apipath = (string)appSettingsReader.GetValue("as3apipath", typeof(string));
+			string csharpcodepath = (string)appSettingsReader.GetValue("csharpcodepath", typeof(string));
+			string csharpcodenamespace = (string)appSettingsReader.GetValue("csharpcodenamespace", typeof(string));
+			string regfunctioncodenamespace = (string)appSettingsReader.GetValue("regfunctioncodenamespace", typeof(string));
+			string regfunctioncode = (string)appSettingsReader.GetValue("regfunctioncodefile", typeof(string));
+
+			bool makemscorelib = (bool)appSettingsReader.GetValue("makemscorlib", typeof(bool));
+
+
 
 			LinkCodeGen.Generator generator = new LinkCodeGen.Generator();
 
@@ -31,6 +69,11 @@ namespace LinkCodeGenCLI
 				foreach (AssemblyElement ele in notcreatenamespace.Types)
 					configs.Add(ele.StringValue);
 				generator.AddNotCreateNameSpace(configs);
+
+
+				generator.AddNotCreateNameSpace(new string[] {
+					"ASBinCode","ASRuntime",csharpcodenamespace,regfunctioncodenamespace
+				});
 			}
 
 			{
@@ -49,22 +92,20 @@ namespace LinkCodeGenCLI
 			}
 
 
-			System.Configuration.AppSettingsReader appSettingsReader = new System.Configuration.AppSettingsReader();
-
-			string outputcode = (string)appSettingsReader.GetValue("combiedcodefile", typeof(string));
-			string as3apipath = (string)appSettingsReader.GetValue("as3apipath", typeof(string));
-			string csharpcodepath = (string)appSettingsReader.GetValue("csharpcodepath", typeof(string));
-			string csharpcodenamespace = (string)appSettingsReader.GetValue("csharpcodenamespace", typeof(string));
-			string regfunctioncodenamespace = (string)appSettingsReader.GetValue("regfunctioncodenamespace", typeof(string));
-			string regfunctioncode = (string)appSettingsReader.GetValue("regfunctioncodefile", typeof(string));
-
-			bool makemscorelib = (bool)appSettingsReader.GetValue("makemscorlib", typeof(bool));
-
+			
 
 			string[] files = null;
 			Dictionary<string, string> srcFileProjFile = new Dictionary<string, string>();
 
 			string sdkpath = (string)appSettingsReader.GetValue("sdkpath", typeof(string));
+			if (sdkpath == "auto")
+			{
+				
+				sdkpath = System.IO.Path.GetDirectoryName( System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+				Console.WriteLine("SDK路径设置为自动。");
+
+			}
+
 
 			if (System.IO.Directory.Exists(sdkpath))
 			{
@@ -104,6 +145,13 @@ namespace LinkCodeGenCLI
 				return;
 			}
 
+			SDKPATH = sdkpath;
+
+			outputcode = replacePathVariable(outputcode);
+			as3apipath = replacePathVariable(as3apipath);
+			csharpcodepath = replacePathVariable(csharpcodepath);
+			regfunctioncode = replacePathVariable(regfunctioncode);
+
 			//****加载dll***
 			List<Type> types = new List<Type>();
 			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
@@ -127,22 +175,58 @@ namespace LinkCodeGenCLI
 
 
 						List<string> definetypes = new List<string>();
+
+						List<string> definenamespaces = new List<string>();
+
 						foreach (AssemblyTypeElement type in asm.Types)
 						{
-							definetypes.Add(type.StringValue);
+							if (type.DefineType == "type")
+							{
+								definetypes.Add(type.StringValue);
+							}
+							else if (type.DefineType == "namespace")
+							{
+								definenamespaces.Add(type.StringValue);
+							}
+							else
+							{
+								Console.WriteLine("导出类型配置错误。definetype只能是 type 或者 namespace");
+
+								Environment.Exit(1);
+								return;
+							}
 						}
 
 						foreach (var type in dll.GetExportedTypes())
 						{
-							if (definetypes.Count == 0
-								||
-								definetypes.Contains(type.FullName)
+							if (definetypes.Count == 0 && definenamespaces.Count == 0
+								//||
+								//definetypes.Contains(type.FullName)
 								)
 							{
 								types.Add(type);
 							}
+							else
+							{
+								if (definetypes.Contains(type.FullName))
+								{
+									types.Add(type);
+								}
+								else if (definenamespaces.Contains(type.Namespace))
+								{
+									types.Add(type);
+								}
+							}
 						}
 
+					}
+					catch (System.IO.FileLoadException e)
+					{
+						Console.WriteLine(e.ToString());
+						
+						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Environment.Exit(1);
+						return;
 					}
 					catch (System.BadImageFormatException e)
 					{
@@ -230,9 +314,10 @@ namespace LinkCodeGenCLI
 				var includelibcode = (StringListSection)System.Configuration.ConfigurationManager.GetSection("includelibcode");
 				List<string> configs = new List<string>();
 				foreach (AssemblyElement ele in includelibcode.Types)
-					configs.Add(ele.StringValue);
+					configs.Add( replacePathVariable( ele.StringValue));
 				foreach (var apidir in configs)
 				{
+					
 					if (System.IO.Directory.Exists(apidir))
 					{
 						var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
@@ -313,12 +398,21 @@ namespace LinkCodeGenCLI
 			
 		}
 
+		private static string SDKPATH;
+
+		private static string replacePathVariable(string input)
+		{
+			return input.Replace("$(sdkpath)", SDKPATH);
+		}
+
+
+
 		private static string m_rootAssembly;
 		private static System.Reflection.Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
 		{
 			AssemblyName name = new AssemblyName(args.Name);
 			String asmToCheck = m_rootAssembly + "/" + name.Name + ".dll";
-
+			
 			if (File.Exists(asmToCheck))
 			{
 				return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
@@ -329,7 +423,7 @@ namespace LinkCodeGenCLI
 
 				foreach (AssemblyElement ele in resolvepath.Types)
 				{
-					asmToCheck = ele.StringValue  + "/" + name.Name + ".dll";
+					asmToCheck = replacePathVariable( ele.StringValue  + "/" + name.Name + ".dll");
 
 					if (File.Exists(asmToCheck))
 					{
@@ -438,7 +532,7 @@ namespace LinkCodeGenCLI
 			}
 		}
 
-		[ConfigurationProperty("", IsDefaultCollection = true)]
+		[ConfigurationProperty("",IsDefaultCollection =true)]
 		public AssemblyTypeCollection Types
 		{
 			get
@@ -447,6 +541,7 @@ namespace LinkCodeGenCLI
 			}
 		}
 
+		
 	}
 
 
@@ -466,6 +561,21 @@ namespace LinkCodeGenCLI
 
 	public class AssemblyTypeElement : ConfigurationElement
 	{
+		[ConfigurationProperty("definetype", IsRequired = true)]
+		public string DefineType
+		{
+			get
+			{
+				return (string)base["definetype"];
+			}
+
+			set
+			{
+				base["definetype"] = value;
+			}
+		}
+
+
 		[ConfigurationProperty("value", IsRequired = true)]
 		public string StringValue
 		{
@@ -480,6 +590,9 @@ namespace LinkCodeGenCLI
 			}
 		}
 	}
+
+
+	
 
 	#endregion
 

@@ -184,6 +184,8 @@ namespace LinkCodeGen
 				}
 
 				string enumItemName = item.Name;
+				if (as3keywords.ContainsKey(enumItemName))
+					enumItemName = enumItemName + "_";
 				if (enumItemName == "Class") { enumItemName = "Class_"; }
 				if (enumItemName == "Object") { enumItemName = "Object_"; }
 
