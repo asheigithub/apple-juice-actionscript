@@ -205,20 +205,20 @@ namespace LinkCodeGen
 		}
 
 
-		public static void MakeCreator(Type type, Dictionary<Type, CreatorBase> typeCreators, string as3apidocpath,string csharpnativecodepath,string linkcodenamespace)
+		public static void MakeCreator(Type type, Dictionary<TypeKey, CreatorBase> typeCreators, string as3apidocpath,string csharpnativecodepath,string linkcodenamespace)
 		{
 			if (type.IsInterface)
 			{
-				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				if (!typeCreators.ContainsKey( new TypeKey( type)) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
+					typeCreators.Add(new TypeKey(type), null); typeCreators[new TypeKey(type)] = new InterfaceCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
 				}
 			}
 			else if (type.IsEnum)
 			{
-				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				if (!typeCreators.ContainsKey(new TypeKey(type)) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new EnumCreator(type, as3apidocpath, csharpnativecodepath, linkcodenamespace);
+					typeCreators.Add(new TypeKey(type), null); typeCreators[new TypeKey(type)] = new EnumCreator(type, as3apidocpath, csharpnativecodepath, linkcodenamespace);
 				}
 			}
 			else if (type.IsArray)
@@ -231,15 +231,15 @@ namespace LinkCodeGen
 			}
 			else if (type.IsClass || type.IsValueType)
 			{
-				if (!typeCreators.ContainsKey(type) && !IsSkipCreator(type))
+				if (!typeCreators.ContainsKey(new TypeKey(type)) && !IsSkipCreator(type))
 				{
-					typeCreators.Add(type, null); typeCreators[type] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
+					typeCreators.Add(new TypeKey(type), null); typeCreators[new TypeKey(type)] = new ClassCreator(type, as3apidocpath, csharpnativecodepath, typeCreators, linkcodenamespace);
 				}
 			}
 		}
 
 
-		public void MakeCreator(Type type,Dictionary<Type,CreatorBase> typeCreators)
+		public void MakeCreator(Type type,Dictionary<TypeKey,CreatorBase> typeCreators)
 		{
 			MakeCreator(type, typeCreators, as3apidocpath, csharpnativecodepath, linkcodenamespace);
 			//if (type.IsInterface)
@@ -929,7 +929,10 @@ namespace LinkCodeGen
 				{
 					if (!typeimports.ContainsKey(type))
 					{
-						typeimports.Add(type, "import " + type.Namespace.ToLower() + "." + GetAS3ClassOrInterfaceName(type) + ";");
+						typeimports.Add(type, "import " + 
+							//type.Namespace.ToLower() 
+							GetPackageName(type)
+							+ "." + GetAS3ClassOrInterfaceName(type) + ";");
 					}
 				}
 
@@ -938,8 +941,21 @@ namespace LinkCodeGen
 
 			
 			string name=GetAS3ClassOrInterfaceName(type);
-
-			return name;
+			if (type.Equals(typeof(Type)) || name=="_Array_")
+			{
+				return name;
+			}
+			else
+			{
+				if (GetPackageName(this.type) != GetPackageName(type))
+				{
+					return GetPackageName(type) + "." + name;
+				}
+				else
+				{
+					return name;
+				}
+			}
 		}
 
 		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
@@ -1139,4 +1155,35 @@ namespace LinkCodeGen
 		}
 
 	}
+
+
+	class TypeKey
+	{
+		private Type t;
+		private string key;
+		public TypeKey(Type t)
+		{
+			this.t = t;
+
+
+			key = (t.Namespace == null ? string.Empty : t.Namespace) + "::" + t.FullName;
+		}
+
+		public override int GetHashCode()
+		{
+			return key.GetHashCode();
+		}
+
+		public override bool Equals(object obj)
+		{
+			TypeKey other = obj as TypeKey;
+			if (other == null)
+				return false;
+
+			return Equals(this.key, other.key);
+		}
+
+
+	}
+
 }

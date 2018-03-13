@@ -8,7 +8,7 @@ namespace LinkCodeGen
 	class ClassCreator:CreatorBase
 	{
 		public ClassCreator(Type classtype, string as3apidocpath, string csharpnativecodepath,
-			Dictionary<Type, CreatorBase> typeCreators,
+			Dictionary<TypeKey, CreatorBase> typeCreators,
 			string linkcodenamespace
 			):base(classtype,as3apidocpath,csharpnativecodepath,linkcodenamespace)
         {
@@ -61,9 +61,9 @@ namespace LinkCodeGen
 
 				
 
-				if (!typeCreators.ContainsKey(intf))
+				if (!typeCreators.ContainsKey( new TypeKey( intf)))
 				{
-					typeCreators.Add(intf, null);typeCreators[intf]= new InterfaceCreator(intf, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+					typeCreators.Add(new TypeKey( intf), null);typeCreators[ new TypeKey( intf)]= new InterfaceCreator(intf, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 				}
 
 				
@@ -78,9 +78,9 @@ namespace LinkCodeGen
 
 					if (!IsSkipCreator(classtype.BaseType))
 					{
-						if (!typeCreators.ContainsKey(classtype.BaseType))
+						if (!typeCreators.ContainsKey( new TypeKey( classtype.BaseType)))
 						{
-							typeCreators.Add(classtype.BaseType, null); typeCreators[classtype.BaseType] = new ClassCreator(classtype.BaseType, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+							typeCreators.Add( new TypeKey( classtype.BaseType), null); typeCreators[ new TypeKey( classtype.BaseType)] = new ClassCreator(classtype.BaseType, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 						}
 					}
 					
@@ -112,7 +112,7 @@ namespace LinkCodeGen
 
 				
 				
-				if (typeCreators.ContainsKey(_interface) || IsSkipCreator(_interface))
+				if (typeCreators.ContainsKey( new TypeKey( _interface)) || IsSkipCreator(_interface))
 				{
 					InterfaceMapping map = type.GetInterfaceMap(_interface);
 

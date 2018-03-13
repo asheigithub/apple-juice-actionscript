@@ -66,7 +66,7 @@ namespace LinkCodeGen
 			string regfunctioncodenamespace, out string regfunctioncode)
 		{
 
-			Dictionary<Type, CreatorBase> creators = new Dictionary<Type, CreatorBase>();
+			Dictionary<TypeKey, CreatorBase> creators = new Dictionary<TypeKey, CreatorBase>();
 			foreach (var item in types)
 			{
 				var classtype = item;
@@ -101,7 +101,8 @@ namespace LinkCodeGen
 
 				regclassSb.AppendLine("\tpartial class extFunctions : INativeFunctionRegister");
 				regclassSb.AppendLine("\t{");
-				regclassSb.AppendLine("\t\tprivate System.Collections.IEnumerator regAutoCreateCodes(CSWC bin)");
+				//regclassSb.AppendLine("\t\tprivate System.Collections.IEnumerator regAutoCreateCodes(CSWC bin)");
+				regclassSb.AppendLine("\t\tprivate void regAutoCreateCodes(CSWC bin)");
 				regclassSb.AppendLine("\t\t{");
 				
 				int count = creators.Values.Count;
@@ -117,7 +118,7 @@ namespace LinkCodeGen
 
 					c += 1;
 					regclassSb.AppendLine("\t\t\tprogress=" + (c/count).ToString() +"f;" );
-					regclassSb.AppendLine("\t\t\tyield return null;");
+					//regclassSb.AppendLine("\t\t\tyield return null;");
 				}
 
 				regclassSb.AppendLine("\t\t}");

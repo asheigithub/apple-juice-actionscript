@@ -58,7 +58,7 @@ namespace LinkCodeGen
 
 		
 		public InterfaceCreator(Type interfacetype, string as3apidocpath, string csharpnativecodepath,
-			Dictionary<Type,CreatorBase> typeCreators ,
+			Dictionary<TypeKey,CreatorBase> typeCreators ,
 			string linkcodenamespace
 			):base(interfacetype,as3apidocpath,csharpnativecodepath,linkcodenamespace)
         {
@@ -88,9 +88,9 @@ namespace LinkCodeGen
 
 			foreach (var item in exts)
 			{
-				if (!typeCreators.ContainsKey(item) && !IsSkipCreator(item) && !IsSkipType(item))
+				if (!typeCreators.ContainsKey(new TypeKey( item)) && !IsSkipCreator(item) && !IsSkipType(item))
 				{
-					typeCreators.Add(item, null); typeCreators[item]= new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
+					typeCreators.Add( new TypeKey( item), null); typeCreators[ new TypeKey( item)]= new InterfaceCreator(item, as3apidocpath, csharpnativecodepath, typeCreators,linkcodenamespace);
 				}
 			}
 

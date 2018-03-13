@@ -20,6 +20,8 @@ LinkCodeGenCLI/bin/
 LinkCodeGenCLI/obj/
 CMXMLCCLI/obj/
 CMXMLCCLI/bin/
+AutoGenCodeLib/bin/
+AutoGenCodeLib/obj/
 *.pdb
 *.cache
 .vs/ASTool/v15/sqlite3/storage.ide
