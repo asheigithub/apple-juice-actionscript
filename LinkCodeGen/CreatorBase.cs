@@ -1166,7 +1166,7 @@ namespace LinkCodeGen
 			this.t = t;
 
 
-			key = (t.Namespace == null ? string.Empty : t.Namespace) + "::" + t.FullName;
+			key = (t.Namespace == null ? string.Empty : t.Namespace) + "::" + NativeCodeCreatorBase.GetTypeFullName(t);
 		}
 
 		public override int GetHashCode()

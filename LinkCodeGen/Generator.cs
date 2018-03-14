@@ -101,9 +101,10 @@ namespace LinkCodeGen
 
 				regclassSb.AppendLine("\tpartial class extFunctions : INativeFunctionRegister");
 				regclassSb.AppendLine("\t{");
-				//regclassSb.AppendLine("\t\tprivate System.Collections.IEnumerator regAutoCreateCodes(CSWC bin)");
-				regclassSb.AppendLine("\t\tprivate void regAutoCreateCodes(CSWC bin)");
+				regclassSb.AppendLine("\t\tprivate System.Collections.IEnumerator regAutoCreateCodes(CSWC bin)");
+				//regclassSb.AppendLine("\t\tprivate void regAutoCreateCodes(CSWC bin)");
 				regclassSb.AppendLine("\t\t{");
+
 				
 				int count = creators.Values.Count;
 				float c = 0;
@@ -111,14 +112,13 @@ namespace LinkCodeGen
 				{
 					Console.WriteLine("building:" + item.BuildIngType);
 					string code = item.Create().Replace("\r", "").Replace("\n", "\r\n");
-
 					
 					regclassSb.AppendLine("\t\t\t" + item.linkcodenamespace + "." + CreatorBase.GetNativeFunctionClassName(item.BuildIngType) + ".regNativeFunctions(bin);");
 					sw.WriteLine(code);
 
 					c += 1;
 					regclassSb.AppendLine("\t\t\tprogress=" + (c/count).ToString() +"f;" );
-					//regclassSb.AppendLine("\t\t\tyield return null;");
+					regclassSb.AppendLine("\t\t\tyield return null;");
 				}
 
 				regclassSb.AppendLine("\t\t}");

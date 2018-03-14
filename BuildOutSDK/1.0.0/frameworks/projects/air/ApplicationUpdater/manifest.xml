@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<componentPackage>
-    <component id="ApplicationUpdater" class="air.update.ApplicationUpdater"/>
-</componentPackage>

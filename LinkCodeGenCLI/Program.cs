@@ -168,11 +168,12 @@ namespace LinkCodeGenCLI
 					string fullpath = System.IO.Path.GetFullPath(assembly);
 
 					m_rootAssembly = System.IO.Path.GetDirectoryName(fullpath);
-
+					
 					try
 					{
 						var dll = System.Reflection.Assembly.ReflectionOnlyLoadFrom(fullpath);
 
+						dictionaryAssemblyLoadPath.Add(dll.FullName, fullpath);
 
 						List<string> definetypes = new List<string>();
 
@@ -394,7 +395,10 @@ namespace LinkCodeGenCLI
 				Console.WriteLine("创建完成.按任意键结束。");
 				Console.ReadLine();
 			}
-			
+			else
+			{
+				Environment.Exit(1);
+			}
 			
 		}
 
@@ -406,15 +410,23 @@ namespace LinkCodeGenCLI
 		}
 
 
+		private static Dictionary<string, string> dictionaryAssemblyLoadPath = new Dictionary<string, string>();
 
 		private static string m_rootAssembly;
 		private static System.Reflection.Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
 		{
 			AssemblyName name = new AssemblyName(args.Name);
+
+			if (dictionaryAssemblyLoadPath.ContainsKey(args.Name))
+			{
+				return Assembly.ReflectionOnlyLoadFrom(dictionaryAssemblyLoadPath[args.Name]);
+			}
+
 			String asmToCheck = m_rootAssembly + "/" + name.Name + ".dll";
 			
 			if (File.Exists(asmToCheck))
 			{
+				dictionaryAssemblyLoadPath.Add(args.Name, asmToCheck);
 				return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
 			}
 			else
@@ -427,6 +439,7 @@ namespace LinkCodeGenCLI
 
 					if (File.Exists(asmToCheck))
 					{
+						dictionaryAssemblyLoadPath.Add(args.Name, asmToCheck);
 						return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
 					}
 
@@ -434,7 +447,7 @@ namespace LinkCodeGenCLI
 
 			}
 
-
+			
 			return Assembly.ReflectionOnlyLoad(args.Name);
 
 		}

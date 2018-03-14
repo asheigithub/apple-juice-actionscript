@@ -22,6 +22,8 @@ CMXMLCCLI/obj/
 CMXMLCCLI/bin/
 AutoGenCodeLib/bin/
 AutoGenCodeLib/obj/
+UnityPluginTool/bin/
+UnityPluginTool/obj/
 *.pdb
 *.cache
 .vs/ASTool/v15/sqlite3/storage.ide

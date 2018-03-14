@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<componentPackage>
-    <component id="ServiceMonitor" class="air.net.ServiceMonitor"/>
-    <component id="URLMonitor" class="air.net.URLMonitor"/>
-    <component id="SocketMonitor" class="air.net.SocketMonitor"/>
-    <component id="SecureSocketMonitor" class="air.net.SecureSocketMonitor"/>
-    <component id="URLFilePromise" class="air.desktop.URLFilePromise"/>
-</componentPackage>
