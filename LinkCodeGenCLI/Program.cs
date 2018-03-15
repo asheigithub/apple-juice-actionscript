@@ -28,7 +28,7 @@ namespace LinkCodeGenCLI
 					else
 					{
 						
-						Console.WriteLine("指定的config文件不存在:"+ System.IO.Path.GetFullPath( tempconfig));
+						Console.WriteLine("The specified config file does not exist:" + System.IO.Path.GetFullPath( tempconfig));
 						Environment.Exit(1);
 						return;
 					}
@@ -102,7 +102,7 @@ namespace LinkCodeGenCLI
 			{
 				
 				sdkpath = System.IO.Path.GetDirectoryName( System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-				Console.WriteLine("SDK路径设置为自动。");
+				Console.WriteLine("The SDK path is set to Automatic.");
 
 			}
 
@@ -131,16 +131,16 @@ namespace LinkCodeGenCLI
 				}
 				else
 				{
-					Console.WriteLine("sdk文件夹无效");
-					Console.WriteLine("请指定ASRuntimeSDK地址");
+					Console.WriteLine("Invalid SDK folder");
+					Console.WriteLine("Please specify the ASRuntimeSDK path");
 					Environment.Exit(1);
 					return;
 				}
 			}
 			else
 			{
-				Console.WriteLine("sdk文件夹没有找到");
-				Console.WriteLine("请指定ASRuntimeSDK地址");
+				Console.WriteLine("SDK folder not found");
+				Console.WriteLine("Please specify the ASRuntimeSDK path");
 				Environment.Exit(1);
 				return;
 			}
@@ -191,7 +191,7 @@ namespace LinkCodeGenCLI
 							}
 							else
 							{
-								Console.WriteLine("导出类型配置错误。definetype只能是 type 或者 namespace");
+								Console.WriteLine("Export Type Configuration Error。'definetype' can only be 'type' or 'namespace'");
 
 								Environment.Exit(1);
 								return;
@@ -225,7 +225,7 @@ namespace LinkCodeGenCLI
 					{
 						Console.WriteLine(e.ToString());
 						
-						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "Load failed");
 						Environment.Exit(1);
 						return;
 					}
@@ -233,10 +233,10 @@ namespace LinkCodeGenCLI
 					{
 						Console.WriteLine(e.ToString());
 
-						Console.WriteLine("可能加载了无法分析的dll。请到Unity的安装目录下/Editor/Data/Managed/目录下加载UnityEngine.dll, /Editor/Data/UnityExtensions/Unity/GUISystem/下加载UnityEngine.UI.dll。");
+						Console.WriteLine("A DLL that cannot be parsed may have been loaded.Please go to Unity's installation directory find the '/Editor/Data/Managed' Directory loading UnityEngine.dll, '/Editor/Data/UnityExtensions/Unity/GUISystem/' loading UnityEngine.UI.dll。");
 
 
-						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						//Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
 						Environment.Exit(1);
 					}
 					catch (System.Reflection.ReflectionTypeLoadException e)
@@ -247,21 +247,21 @@ namespace LinkCodeGenCLI
 							Console.WriteLine(l.ToString());
 						}
 
-						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						//Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
 						Environment.Exit(1);
 						return;
 					}
 					catch (FileNotFoundException e)
 					{
 						Console.WriteLine(e.ToString());
-						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						//Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
 						Environment.Exit(1);
 						return;
 					}
 					catch (System.Security.SecurityException e)
 					{
 						Console.WriteLine(e.ToString());
-						Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
+						//Console.WriteLine(System.IO.Path.GetFileName(fullpath) + "读取失败");
 						Environment.Exit(1);
 						return;
 					}
@@ -285,7 +285,7 @@ namespace LinkCodeGenCLI
 
 			Console.WriteLine();
 			Console.WriteLine();
-			Console.WriteLine("开始编译lib");
+			Console.WriteLine("now compiling");
 
 
 
@@ -363,7 +363,7 @@ namespace LinkCodeGenCLI
 				if (grammar.hasError)
 				{
 					Console.WriteLine(files[i]);
-					Console.WriteLine("解析语法树失败!");
+					Console.WriteLine("Parse Syntax tree failed!");
 					
 					Environment.Exit(1);
 					return;
@@ -373,7 +373,7 @@ namespace LinkCodeGenCLI
 				if (!analyser.Analyse(tree)) //生成项目的语法树
 				{
 					Console.WriteLine(analyser.err.ToString());
-					Console.WriteLine("语义分析失败!");
+					Console.WriteLine("Semantic analysis failed!");
 					Environment.Exit(1);
 					return;
 				}
@@ -392,7 +392,7 @@ namespace LinkCodeGenCLI
 				string as3libfile = (string)appSettingsReader.GetValue("as3libfile", typeof(string));
 				System.IO.File.WriteAllBytes(as3libfile, swc.toBytes());
 
-				Console.WriteLine("创建完成.按任意键结束。");
+				Console.WriteLine("The work is done. Press any key to finish。");
 				Console.ReadLine();
 			}
 			else

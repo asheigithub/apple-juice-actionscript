@@ -17,20 +17,20 @@
   </startup>
   
   <appSettings>
-    <!--生成的单一CSharp代码文件-->
+    <!--Generated single CSharp code file-->
     <add key="combiedcodefile" value="{TEMPPATH}/codeoutput.cs"/>
-    <!--生成的as3api所在目录-->
+    <!--The directory where the ACTIONSCRIPT3 API code is created-->
     <add key="as3apipath" value="as3_unity"/>
-    <!--生成的csharp代码所在目录-->
+    <!--The directory where the C # code is created-->
     <add key="csharpcodepath" value="{UNITYPROJPATH}/Assets/Standard Assets/ASRuntime/ScriptSupport/Generated"/>
-    <!--生成的csharp代码的命名空间-->
+    <!--namespaces for generated C # code-->
     <add key="csharpcodenamespace" value="ASCAutoGen.regNativeFunctions"/>
     <!--生成的csharp注册代码的命名空间-->
     <add key="regfunctioncodenamespace" value="ASRuntime"/>
     <!--生成的csharp注册代码文件-->
     <add key="regfunctioncodefile" value="{UNITYPROJPATH}/Assets/Standard Assets/ASRuntime/ScriptSupport/Generated/regNativeCode.cs"/>
 
-    <!--是否将.net的mscorlib模块库导出代码   这里将mono的dll拷入目录，所以这里是false-->
+    <!--是否将.net的mscorlib模块库导出代码  这里是false-->
     <add key="makemscorlib" value="false"/>
 
     <!--AS3RuntimeSDK地址-->
@@ -47,7 +47,7 @@
     <item value="$(sdkpath)\as3corelib"></item>
   </includelibcode>
 
-<!--要导出api的dll-->
+<!--Configure DLLs to export-->
   <buildassemblys>
    
 	<assembly value="{SYSTEMDLL}"></assembly>
@@ -55,7 +55,9 @@
 	<assembly value="{UNITYPROJPATH}\Library\ScriptAssemblies\Assembly-CSharp.dll"></assembly>
 	
   </buildassemblys>
-  <!--在哪些路径下查找dll.例如当加载ScriptAssemblies\Assembly-CSharp.dll时，可能需要到UnityAssemblies下查找等。在这里配置dll查找路径-->
+  <!--Which paths to find dependent assemblies for DLLs.
+	For example, when loading Scriptassemblies/assembly-csharp.dll, 
+	you may need to find its dependent assemblies in the UnityAssemblies path, and so on.-->
   <resolvepath>
 	<item value="{UNITYINSTALLPATH}\Editor\Data\Managed"></item>
 	<item value="{UNITYINSTALLPATH}\Editor\Data\UnityExtensions\Unity\GUISystem"></item>
@@ -63,7 +65,7 @@
   </resolvepath>
   
   
-  <!--已经手工创建的类型-->
+  <!--Types that have been created manually-->
   <skipcreatortypes>  
     <item value="ASBinCode.RunTimeValueBase"></item>
     <item value="System.ICloneable"></item>
@@ -87,7 +89,7 @@
   </skipcreatortypes>
 
   
-  <!--如下命名空间内的类型将会被跳过-->
+  <!--Types in the following namespaces will be skipped-->
   <notcreatenamespace>
     <item value="System.Reflection"></item>
     <item value="System.Runtime"></item>
@@ -135,7 +137,7 @@
 	<item value="System.IO.Ports"></item>
   </notcreatenamespace>
 
-  <!--如下类型将会被跳过-->
+  <!--The following types will be skipped-->
   <notcreatetypes>
     <item value="System.Exception"></item>
     <item value="System.AppDomain"></item>
@@ -199,7 +201,7 @@
 
   
   
-  <!--如下的成员将会被跳过-->
+  <!--The following members will be skipped-->
   <notcreatemembers>
     <item value="UnityEngine.AnimatorControllerParameter::Void set_name(System.String)"></item>
     <item value="UnityEngine.Input::Boolean IsJoystickPreconfigured(System.String)"></item>

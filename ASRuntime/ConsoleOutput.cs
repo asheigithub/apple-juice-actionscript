@@ -8,7 +8,7 @@ namespace ASRuntime
 	{
 		public void Error(string str)
 		{
-#if UNITY_5_3_OR_NEWER
+#if !WHENDEV
 			UnityEngine.Debug.LogError(str);
 			
 #else
@@ -22,7 +22,7 @@ namespace ASRuntime
 
 		public void Info(string str)
 		{
-#if UNITY_5_3_OR_NEWER
+#if !WHENDEV
 			UnityEngine.Debug.Log(str);
 #else
 			Console.WriteLine(str);
@@ -31,7 +31,7 @@ namespace ASRuntime
 
 		public void Warring(string str)
 		{
-#if UNITY_5_3_OR_NEWER
+#if !WHENDEV
 			UnityEngine.Debug.LogWarning(str);
 #else
 			Console.ForegroundColor = ConsoleColor.Yellow;

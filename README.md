@@ -144,11 +144,12 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 - as3_unity 自动生成的Unity API
 - src       热更新代码目录
 - bat       包含批处理文件 
-- lib       包含as3unitylib.cswc 字节码文件
 >1. ComplieCode.bat 可以编译代码并发布到Unity
-2. CreateUnityAPI.bat 可以重新调用linkcodegen.exe 导出Unity API
-3. SetupSDK.bat 设置ASRuntimeSDK的路径。
+>2. CreateUnityAPI.bat 可以重新调用linkcodegen.exe 导出Unity API
+>3. SetupSDK.bat 设置ASRuntimeSDK的路径。
 
+- lib       包含as3unitylib.cswc 字节码文件
+- genapi.config.xml             配置哪些API被导出
 - 开发AS3项目
 > 如果安装了FlashDevelop并且安装了Java，则可以用FlashDevelop打开actionscript3项目，点击编译即可将热更代码发布到Unity.  
 如果没有安装FlashDevelop,则可以执行 "bat/ComplieCode.bat",可以使用其他文本编辑器（比如notepad）来修改代码，并热更发布到Unity.
@@ -168,7 +169,13 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 > 如果还配置了一同编译的as3类库路径，则还会一并编译指定的as3类库。当最终编译热更新项目时，会加载此时生成的二进制字节码。
 > 
 > 约定要求这个文件需要生成到FlashDevelop项目的 lib目录下，名字叫as3unitylib.cswc。
-> 
+
+>可以用命令行参数给LinkCodeGenCLI.exe指定一个配置文件。例如  
+>`LinkCodeGenCLI.exe config=genapi.config.xml`  
+
+
+配置说明
+
 > *buildassemblys*配置节配置想要导出API的dll。每个*assembly*子节点配置一个dll。*assembly*子节点下还可以配置*type*节点，如果这么做了，那么只有配置的类型会被导出，否则将导出所有可以导出的类型。
 > 
 > 例如
@@ -192,6 +199,8 @@ FlashDevelop项目的约定：FlashDevelop项目下需要有一个lib文件夹�
 
 > *notcreatemembers*节配置的成员在遇到时会被跳过。Unity在运行时，某些类型的某些成员会不可用。为此，只能在导出api时跳过这些成员。在这里配置这些成员。
 
-##### Unity API dll的位置 #####
-> 要定位Unity的dll,请到Unity的安装目录下查找。Unity工程的Library里面的dll有些读取时会引发BadImageFormatException异常。当发生这种情况时，请到Unity安装目录的/Editor/Data/Managed/目录下加载UnityEngine.dll, /Editor/Data/UnityExtensions/Unity/GUISystem/下加载UnityEngine.UI.dll。
-> Unity2017 v2之后,Unity将UnityEngine.dll拆成了许多小dll,其中工程目录Library/UnityAssemblies中的UnityEngine.dll是无法被加载的。因此查找路径要注意顺序，先到安装目录下找，再到Library/UnityAssemblies中查找，否则可能会导致dll加载失败。
+如何定位 Unity API dll的位置
+> 要定位Unity的dll,请到Unity的安装目录下查找。  
+> Unity工程的Library里面的dll有些读取时会引发BadImageFormatException异常。当发生这种情况时，请到Unity安装目录的/Editor/Data/Managed/目录下加载UnityEngine.dll, /Editor/Data/UnityExtensions/Unity/GUISystem/下加载UnityEngine.UI.dll。  
+> Unity2017 v2之后,Unity将UnityEngine.dll拆成了许多小dll,其中工程目录Library/UnityAssemblies中的UnityEngine.dll是无法被加载的。  
+> 因此查找路径要注意顺序，先到安装目录下找，再到Library/UnityAssemblies中查找，否则可能会导致dll加载失败。

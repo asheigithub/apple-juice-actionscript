@@ -49,13 +49,13 @@
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(13, 47);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(41, 12);
+			this.label1.Size = new System.Drawing.Size(77, 12);
 			this.label1.TabIndex = 0;
-			this.label1.Text = "项目名";
+			this.label1.Text = "Project Name";
 			// 
 			// txtProjName
 			// 
-			this.txtProjName.Location = new System.Drawing.Point(84, 47);
+			this.txtProjName.Location = new System.Drawing.Point(96, 47);
 			this.txtProjName.Name = "txtProjName";
 			this.txtProjName.Size = new System.Drawing.Size(193, 21);
 			this.txtProjName.TabIndex = 1;
@@ -67,13 +67,13 @@
 			this.label2.AutoSize = true;
 			this.label2.Location = new System.Drawing.Point(15, 85);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(53, 12);
+			this.label2.Size = new System.Drawing.Size(77, 12);
 			this.label2.TabIndex = 2;
-			this.label2.Text = "项目路径";
+			this.label2.Text = "Project Path";
 			// 
 			// txtProjPath
 			// 
-			this.txtProjPath.Location = new System.Drawing.Point(84, 85);
+			this.txtProjPath.Location = new System.Drawing.Point(96, 85);
 			this.txtProjPath.Name = "txtProjPath";
 			this.txtProjPath.Size = new System.Drawing.Size(367, 21);
 			this.txtProjPath.TabIndex = 3;
@@ -81,31 +81,31 @@
 			// 
 			// btnBrow
 			// 
-			this.btnBrow.Location = new System.Drawing.Point(457, 85);
+			this.btnBrow.Location = new System.Drawing.Point(469, 83);
 			this.btnBrow.Name = "btnBrow";
 			this.btnBrow.Size = new System.Drawing.Size(75, 23);
 			this.btnBrow.TabIndex = 4;
-			this.btnBrow.Text = "浏览";
+			this.btnBrow.Text = "Browse";
 			this.btnBrow.UseVisualStyleBackColor = true;
 			this.btnBrow.Click += new System.EventHandler(this.btnBrow_Click);
 			// 
 			// btnOK
 			// 
-			this.btnOK.Location = new System.Drawing.Point(457, 139);
+			this.btnOK.Location = new System.Drawing.Point(469, 139);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 5;
-			this.btnOK.Text = "确定";
+			this.btnOK.Text = "OK";
 			this.btnOK.UseVisualStyleBackColor = true;
 			this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
 			// 
 			// btnCancel
 			// 
-			this.btnCancel.Location = new System.Drawing.Point(539, 139);
+			this.btnCancel.Location = new System.Drawing.Point(550, 139);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 6;
-			this.btnCancel.Text = "取消";
+			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 			// 
@@ -138,9 +138,9 @@
 			this.chkCreateDirectionary.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.chkCreateDirectionary.Location = new System.Drawing.Point(15, 170);
 			this.chkCreateDirectionary.Name = "chkCreateDirectionary";
-			this.chkCreateDirectionary.Size = new System.Drawing.Size(96, 16);
+			this.chkCreateDirectionary.Size = new System.Drawing.Size(168, 16);
 			this.chkCreateDirectionary.TabIndex = 8;
-			this.chkCreateDirectionary.Text = "创建项目目录";
+			this.chkCreateDirectionary.Text = "Create project directory";
 			this.chkCreateDirectionary.UseVisualStyleBackColor = true;
 			this.chkCreateDirectionary.CheckedChanged += new System.EventHandler(this.chkCreateDirectionary_CheckedChanged);
 			// 
@@ -149,10 +149,10 @@
 			this.linkLabel1.AutoSize = true;
 			this.linkLabel1.Location = new System.Drawing.Point(455, 9);
 			this.linkLabel1.Name = "linkLabel1";
-			this.linkLabel1.Size = new System.Drawing.Size(125, 12);
+			this.linkLabel1.Size = new System.Drawing.Size(131, 12);
 			this.linkLabel1.TabIndex = 9;
 			this.linkLabel1.TabStop = true;
-			this.linkLabel1.Text = "前往下载flashDevelop";
+			this.linkLabel1.Text = "Download flashDevelop";
 			this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
 			// 
 			// label4
@@ -160,9 +160,9 @@
 			this.label4.AutoSize = true;
 			this.label4.Location = new System.Drawing.Point(17, 9);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(233, 12);
+			this.label4.Size = new System.Drawing.Size(251, 12);
 			this.label4.TabIndex = 11;
-			this.label4.Text = "将创建FlashDevelop工程作为热更新工程。";
+			this.label4.Text = "The FlashDevelop project will be created ";
 			// 
 			// FrmSetAS3HotFixProjPath
 			// 
@@ -183,7 +183,7 @@
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FrmSetAS3HotFixProjPath";
-			this.Text = "创建AS3热更项目";
+			this.Text = "Create AS3 Hot Fix Project";
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.ResumeLayout(false);

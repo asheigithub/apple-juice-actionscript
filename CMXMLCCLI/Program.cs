@@ -44,7 +44,7 @@ namespace CMXMLCCLI
 							)
 						{
 							srcpathList.Add( System.IO.Path.GetFullPath(p));
-							Console.WriteLine("加入源码路径:" + System.IO.Path.GetFullPath(p));
+							Console.WriteLine("Add Source Path:" + System.IO.Path.GetFullPath(p));
 						}
 					}
 
@@ -68,7 +68,7 @@ namespace CMXMLCCLI
 
 			if (!argloaded)
 			{
-				Console.Error.WriteLine("没有找到配置文件");
+				Console.Error.WriteLine("Configuration file not found");
 
 				Environment.Exit(1);
 
@@ -79,7 +79,7 @@ namespace CMXMLCCLI
 
 			if (outputfile == null)
 			{
-				Console.Error.WriteLine("没有配置输出文件");
+				Console.Error.WriteLine("No output file configured");
 				Environment.Exit(1);
 
 				return;
@@ -90,7 +90,7 @@ namespace CMXMLCCLI
 
 			if (!System.IO.File.Exists(libcswc))
 			{
-				Console.Error.WriteLine("没有找到as3unitylib.cswc。请重新执行LinkCodeGenCLI来生成api并将as3unitylib.cswc生成到如下位置:"+libcswc );
+				Console.Error.WriteLine("No as3unitylib.cswc found.Execute LinkCodeGenCLI.exe to generate the API and generate 'as3unitylib.cswc' to the following locations:" + libcswc );
 
 				Environment.Exit(1);
 			}
@@ -170,7 +170,7 @@ namespace CMXMLCCLI
 				}
 				else
 				{
-					Console.Error.WriteLine(item.Key + ":" + 1 + ":Error: " + "同名文件重复编译");
+					Console.Error.WriteLine(item.Key + ":" + 1 + ":Error: " + "Duplicate compilation of file with same name");
 					Environment.Exit(1);
 
 					return;
@@ -245,10 +245,10 @@ namespace CMXMLCCLI
 					, 
 					bin);
 
-				Console.WriteLine("写入文件" + 
+				Console.WriteLine("Write to File" + 
 					//as3libfile 
 					outputfile
-					+ " 共" + bin.Length + "字节" );
+					+ " total" + bin.Length + "bytes" );
 
 				
 				return;

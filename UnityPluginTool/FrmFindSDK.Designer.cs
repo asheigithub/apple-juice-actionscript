@@ -41,9 +41,9 @@
 			this.label1.AutoSize = true;
 			this.label1.Location = new System.Drawing.Point(12, 18);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(155, 12);
+			this.label1.Size = new System.Drawing.Size(125, 12);
 			this.label1.TabIndex = 0;
-			this.label1.Text = "选择ASRuntime SDK所在目录";
+			this.label1.Text = "Select ASRuntime SDK";
 			// 
 			// folderBrowserDialog1
 			// 
@@ -63,7 +63,7 @@
 			this.btnFind.Name = "btnFind";
 			this.btnFind.Size = new System.Drawing.Size(56, 23);
 			this.btnFind.TabIndex = 2;
-			this.btnFind.Text = "浏览";
+			this.btnFind.Text = "Browse";
 			this.btnFind.UseVisualStyleBackColor = true;
 			this.btnFind.Click += new System.EventHandler(this.btnFind_Click);
 			// 
@@ -73,7 +73,7 @@
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(56, 23);
 			this.btnOK.TabIndex = 3;
-			this.btnOK.Text = "确定";
+			this.btnOK.Text = "OK";
 			this.btnOK.UseVisualStyleBackColor = true;
 			this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
 			// 
@@ -83,9 +83,9 @@
 			this.label2.ForeColor = System.Drawing.Color.Red;
 			this.label2.Location = new System.Drawing.Point(14, 82);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(167, 12);
+			this.label2.Size = new System.Drawing.Size(131, 12);
 			this.label2.TabIndex = 4;
-			this.label2.Text = "没有选择有效的ASRuntime SDK";
+			this.label2.Text = "No valid SDK selected";
 			// 
 			// FrmFindSDK
 			// 
@@ -100,7 +100,7 @@
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FrmFindSDK";
-			this.Text = "查找SDK";
+			this.Text = "Set up SDK";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

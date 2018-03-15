@@ -28,7 +28,7 @@ namespace ASRuntimeUnityPluginTool
 		private void updatelabel()
 		{
 
-			toolStripStatusLabel1.Text = "项目将创建在:" + getProjFile();
+			toolStripStatusLabel1.Text = "Project will be created in:" + getProjFile();
 
 		}
 
@@ -48,7 +48,7 @@ namespace ASRuntimeUnityPluginTool
 			var pjdir = System.IO.Path.GetDirectoryName(pjfile);
 			if (System.IO.Directory.Exists(pjfile) && System.IO.Directory.GetFileSystemEntries(pjdir).Length > 0)
 			{
-				MessageBox.Show(pjdir + "目录不为空!请选择一个空白目录","", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(pjdir + "Directory is not empty. Please select a blank directory.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
 			DialogResult = DialogResult.OK;
