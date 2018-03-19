@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Apple Juice</title>
+  
+  
+  <link href="/doc_cn/atom.xml" rel="self"/>
+  
+  <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/"/>
+  <updated>2018-03-19T11:44:30.013Z</updated>
+  <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/</id>
+  
+  <author>
+    <name>asheigithub</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>创建Unity工程</title>
+    <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-1-5-insert-2018-03-19/"/>
+    <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-1-5-insert-2018-03-19/</id>
+    <published>2018-03-19T11:22:58.000Z</published>
+    <updated>2018-03-19T11:44:30.013Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="开始使用" scheme="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>导入Unity插件</title>
+    <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/"/>
+    <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/</id>
+    <published>2018-03-19T11:22:04.000Z</published>
+    <updated>2018-03-19T11:44:51.720Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="开始使用" scheme="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>概述</title>
+    <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/"/>
+    <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/</id>
+    <published>2018-03-19T11:21:45.000Z</published>
+    <updated>2018-03-19T11:42:58.158Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+      <category term="开始使用" scheme="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>欢迎</title>
+    <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/index-2018-03-16/"/>
+    <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/index-2018-03-16/</id>
+    <published>2018-03-16T10:41:21.000Z</published>
+    <updated>2018-03-19T10:48:39.743Z</updated>
+    
+    <content type="html"><![CDATA[<p>欢迎使用 <a href="https://github.com/asheigithub/apple-juice-actionscript" title="这是一个ActionScript3 编译器和虚拟机" rel="external nofollow noopener noreferrer" target="_blank">Apple Juice</a><br>这是一个纯 .net2.0实现的ActionScript3 编译器和虚拟机。</p><blockquote><p>支持除了 namespace 和 with 和 E4X XML操作外的一切actionscript3语法特性。   </p></blockquote><blockquote><p>可以将actionscript3代码编译为字节码，然后加载并动态执行。VM由纯C# 2.0代码实现，可以直接让Unity来读取并执行生成的字节码，就是可用Unity完成热更新操作。<br>编译器部分实现了完整的编译期类型检查。并且有完整的错误提示。已经和FlashDevelop完成了集成，可以直接在FlashDevelop中开发并一键编译发布到Unity。<br>Unity的API或者自己开发的C# API提供了工具直接转换为actionscript api文件和对接代码，并且直接注册到FlashDevelop工程中。</p></blockquote><h4 id="特色"><a href="#特色" class="headerlink" title="特色"></a>特色</h4><ul><li>对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。</li><li>对导出的类型有特殊优化。只要在方法的局部变量中使用，则脚本本身不产生额外的对象分配。</li><li><p>实现操作符重载。导出的对象如果有操作符重载，则在脚本中同样可以使用。如下代码是完全合法的。</p><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cube.transform.localPosition += v * Time.deltaTime;</span><br></pre></td></tr></table></figure></li><li><p>可以使用yield语句返回一个IEnumerator,然后用Iterator包装为.net的IEnumerator接口。所以可以直接在脚本中写Unity的协程。如如下代码所示:  </p><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mono:MonoBehaviour = GameObject.find(<span class="string">"AS3Player"</span>).getComponent(MonoBehaviour) <span class="keyword">as</span> MonoBehaviour;</span><br><span class="line">trace(mono.name);</span><br><span class="line">mono.startCoroutine( Iterator(  </span><br><span class="line">(</span><br><span class="line"><span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">trace(<span class="string">"a"</span>,Time.frameCount);</span><br><span class="line"></span><br><span class="line">yield <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">trace(<span class="string">"b"</span>,Time.frameCount);</span><br><span class="line"></span><br><span class="line">yield <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">trace(<span class="string">"c"</span>,Time.frameCount);</span><br><span class="line">yield <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line">)()</span><br><span class="line">));</span><br></pre></td></tr></table></figure></li><li><p>自动将.net 委托对应到ActionScript3的function对象。例如:</p><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> btn:Button = Button( GameObject.find(<span class="string">"Button"</span>).getComponent(Button));</span><br><span class="line">btn.onClick.addListener(</span><br><span class="line">onclick</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">btn.onClick.addListener(</span><br><span class="line"><span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">trace(<span class="string">"hahaha"</span>,<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure></li><li><p>自动处理.net 类库中的 out ref类型的参数。这样的方法也可自动导出。例如 long.TryParse:</p><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.Int64.TryParse</span></span><br><span class="line"><span class="comment">*parameters:</span></span><br><span class="line"><span class="comment">*  s : System.String</span></span><br><span class="line"><span class="comment">*  result : (Out)System.Int64</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.Boolean</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,static_system_Int64_tryParse];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">tryParse</span><span class="params">(s:String,result:Int64,refout:as3runtime.RefOutStore)</span>:Boolean</span>;</span><br></pre></td></tr></table></figure></li><li><p>完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。</p></li><li>完全实现的面向对象支持。完整支持类继承和接口。</li><li>FlashDevelop IDE支持。可以完全利用IDE的智能提示，编译错误也可在IDE中得到反馈。可在IDE中直接编译热更新代码成到Unity项目</li></ul><h4 id="api全自动导出"><a href="#api全自动导出" class="headerlink" title="api全自动导出"></a>api全自动导出</h4><blockquote><p>自动将.net类库导出给脚本使用。并且保留有原始类型信息。例如<strong>UnityEngine.Avatar</strong>导出后的api形式为:<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">package</span> <span class="title">unityengine</span></span></span><br><span class="line"><span class="class">   &#123;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Sealed</span></span><br><span class="line"><span class="comment">*  UnityEngine.Avatar</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[no_constructor]</span><br><span class="line">[link_system]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Avatar</span> <span class="keyword">extends</span> <span class="title">UObject</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">[creator];</span><br><span class="line">[<span class="keyword">native</span>,unityengine_Avatar_creator];</span><br><span class="line">private static function _creator(type:Class):*;</span><br><span class="line">[<span class="keyword">native</span>,$$_noctorclass];</span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Avatar</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">//*********公共方法*******</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* UnityEngine.Avatar.get_isValid</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.Boolean</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,unityengine_Avatar_get_isValid]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span> <span class="title">isValid</span><span class="params">()</span>:Boolean</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* UnityEngine.Avatar.get_isHuman</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.Boolean</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,unityengine_Avatar_get_isHuman]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">get</span> <span class="title">isHuman</span><span class="params">()</span>:Boolean</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p></blockquote><blockquote><p>IDE能提供智能感知提示。</p></blockquote><blockquote><p>自动导出的API为actionscript3风格。比如<strong>UnityEngine.UI.Button</strong> 将被导出为 <strong>unityengine.ui.Button</strong></p></blockquote><blockquote><p>能将.net 类库中的类型包含继承关系和接口实现关系的导出。例如，<strong>UnityEngine.MeshRenderer</strong>  继承自 <strong>UnityEngine.Renderer</strong>  。那么导出后的as3类型也会保持以上的关系。</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;欢迎使用 &lt;a href=&quot;https://github.com/asheigithub/apple-juice-actionscript&quot; title=&quot;这是一个ActionScript3 编译器和虚拟机&quot; rel=&quot;external nofollow noopener 
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
