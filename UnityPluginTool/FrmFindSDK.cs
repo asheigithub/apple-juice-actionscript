@@ -45,6 +45,8 @@ namespace ASRuntimeUnityPluginTool
 				if (System.IO.File.Exists(path + "/air-sdk-description.xml")
 					&&
 					System.IO.File.Exists(path + "/bin/CMXMLCCLI.exe")
+					&&
+					System.IO.File.Exists(path + "/unity/ASRuntimeUnityPluginTool.exe")
 					)
 				{
 					label2.Visible = false;
