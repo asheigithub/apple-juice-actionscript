@@ -73,7 +73,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 
 > 自动将.net类库导出给脚本使用。并且保留有原始类型信息。例如**UnityEngine.Avatar**导出后的api形式为:
 ````actionscript
-    package unityengine
+	package unityengine
     {
 
 
