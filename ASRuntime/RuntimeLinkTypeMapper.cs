@@ -329,7 +329,7 @@ namespace ASRuntime
 					{
 						returnSlot.setValue(ASBinCode.rtData.rtBoolean.False);
 					}
-
+					
 				}
 				else if (rt == RunTimeDataType.rt_array)
 				{

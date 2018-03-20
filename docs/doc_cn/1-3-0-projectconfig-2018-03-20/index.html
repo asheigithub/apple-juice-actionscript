@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    
+    <title>ActionScript3项目配置 | Apple Juice</title>
+    
+    
+        <meta name="keywords" content="ActionScript3项目配置">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="ActionScript3项目目录结构如下  .├─── as3_unity├─── bat│     ├───CompileCode.bat│     └───CreateUnityAPI.bat├─── bin├─── lib│     └───as3unitylib.cswc├─── obj│     └───&amp;lt;projectname&amp;gt;Config.xml├─── src│">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ActionScript3项目配置">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/index.html">
+<meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="ActionScript3项目目录结构如下  .├─── as3_unity├─── bat│     ├───CompileCode.bat│     └───CreateUnityAPI.bat├─── bin├─── lib│     └───as3unitylib.cswc├─── obj│     └───&amp;lt;projectname&amp;gt;Config.xml├─── src│">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-20T09:00:13.387Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ActionScript3项目配置">
+<meta name="twitter:description" content="ActionScript3项目目录结构如下  .├─── as3_unity├─── bat│     ├───CompileCode.bat│     └───CreateUnityAPI.bat├─── bin├─── lib│     └───as3unitylib.cswc├─── obj│     └───&amp;lt;projectname&amp;gt;Config.xml├─── src│">
+    
+
+    
+
+    
+        <link rel="icon" href="/apple-juice-actionscript/doc_cn/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/css/style.css">
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/plugins/cookie/1.4.1/jquery.cookie.js"></script>
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+    
+</head>
+</html>
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/apple-juice-actionscript/doc_cn/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Apple Juice</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
+                
+            </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/apple-juice-actionscript/doc_cn/',
+        CONTENT_URL: '/apple-juice-actionscript/doc_cn/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/apple-juice-actionscript/doc_cn/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap" id="categories">
+        <h3 class="widget-title">
+            <span>分类</span>
+            &nbsp;
+            <a id="allExpand" href="#">
+                <i class="fa fa-angle-double-down fa-2x"></i>
+            </a>
+        </h3>
+        
+        
+        
+         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            开始使用
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
+    </div>
+    <script>
+        $(document).ready(function() {
+            var iconFolderOpenClass  = 'fa-folder-open';
+            var iconFolderCloseClass = 'fa-folder';
+            var iconAllExpandClass = 'fa-angle-double-down';
+            var iconAllPackClass = 'fa-angle-double-up';
+            // Handle directory-tree expansion:
+            // 左键单独展开目录
+            $(document).on('click', '#categories a[data-role="directory"]', function (event) {
+                event.preventDefault();
+
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var subtree = $(this).siblings('ul');
+                icon.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if (expanded) {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideUp({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderCloseClass);
+                } else {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideDown({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderOpenClass);
+                }
+            });
+            // 右键展开下属所有目录
+            $('#categories a[data-role="directory"]').bind("contextmenu", function(event){
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var listNode = $(this).siblings('ul');
+                var subtrees = $.merge(listNode.find('li ul'), listNode);
+                var icons = $.merge(listNode.find('.fa'), icon);
+                icons.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if(expanded) {
+                    subtrees.slideUp({ duration: 100 });
+                    icons.addClass(iconFolderCloseClass);
+                } else {
+                    subtrees.slideDown({ duration: 100 });
+                    icons.addClass(iconFolderOpenClass);
+                }
+            })
+            // 展开关闭所有目录按钮
+            $(document).on('click', '#allExpand', function (event) {
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconAllExpandClass);
+                icon.removeClass(iconAllExpandClass).removeClass(iconAllPackClass);
+                if(expanded) {
+                    $('#sidebar .fa.fa-folder').removeClass('fa-folder').addClass('fa-folder-open')
+                    $('#categories li ul').slideDown({ duration: 100 });
+                    icon.addClass(iconAllPackClass);
+                } else {
+                    $('#sidebar .fa.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder')
+                    $('#categories li ul').slideUp({ duration: 100 });
+                    icon.addClass(iconAllExpandClass);
+                }
+            });  
+        });
+    </script>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+            <section id="main"><article id="post-1-3-0-projectconfig" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/1-1configureproject/">配置项目</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">
+            <time datetime="2018-03-20T03:34:55.000Z" itemprop="datePublished">2018-03-20</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+                
+    
+        <h1 class="article-title" itemprop="name">
+            ActionScript3项目配置
+        </h1>
+    
+
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <p>ActionScript3项目目录结构如下</p>
+<blockquote>
+<p>.<br>├─── as3_unity<br>├─── bat<br>│     ├───CompileCode.bat<br>│     └───CreateUnityAPI.bat<br>├─── bin<br>├─── lib<br>│     └───as3unitylib.cswc<br>├─── obj<br>│     └───&lt;projectname&gt;Config.xml<br>├─── src<br>│     └───Main.as<br>├─── application.xml<br>├─── genapi.config.xml<br>├─── ASRuntime_readme.txt<br>└─── &lt;projectname&gt;.as3proj  </p>
+</blockquote>
+<h4 id="lt-projectname-gt-as3proj"><a href="#lt-projectname-gt-as3proj" class="headerlink" title="&lt;projectname&gt;.as3proj"></a>&lt;projectname&gt;.as3proj</h4><p>项目配置文件。<br>其中配置了SDK的路径:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">output</span>&gt;</span></span><br><span class="line"> ...  </span><br><span class="line"> <span class="tag">&lt;<span class="name">movie</span> <span class="attr">preferredSDK</span>=<span class="string">"F:\ASTool_UnityTest\publish\SDK1.0.0"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">output</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>工程中的源码路径和类库路径<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">classpaths</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--src code--&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">class</span> <span class="attr">path</span>=<span class="string">"src"</span> /&gt;</span></span><br><span class="line"> <span class="comment">&lt;!--api code--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">class</span> <span class="attr">path</span>=<span class="string">"F:\ASTool_UnityTest\publish\SDK1.0.0\as3_commapi\api"</span> /&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">class</span> <span class="attr">path</span>=<span class="string">"F:\ASTool_UnityTest\publish\SDK1.0.0\as3_commapi\sharpapi"</span> /&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">class</span> <span class="attr">path</span>=<span class="string">"as3_unity"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">classpaths</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="bat"><a href="#bat" class="headerlink" title="bat"></a>bat</h4><p>包含了几个有用的bat文件。  </p>
+<ol>
+<li>CompileCode.bat 如果没有安装FlashDevelop或者没有安装JAVA,则运行此bat可以编译代码并发布到Unity工程。</li>
+<li>CreateUnityAPI.bat 运行此bat可以重新创建Unity API。</li>
+</ol>
+<h4 id="lib-as3unitylib-cswc"><a href="#lib-as3unitylib-cswc" class="headerlink" title="lib/as3unitylib.cswc"></a>lib/as3unitylib.cswc</h4><p>当创建Unity API时会自动编译生成此文件，这是一个预编译的ActionScript3 API字节码文件。当编译ActionScript3工程时，编译器会加载此文件对代码进行类型检查等操作。</p>
+<h4 id="lt-projectname-gt-Config-xml"><a href="#lt-projectname-gt-Config-xml" class="headerlink" title="&lt;projectname&gt;Config.xml"></a>&lt;projectname&gt;Config.xml</h4><p>传递给编译器的工程配置文件。如果使用FlashDevelop,则每次编译时FlashDevelop会自动生成这个文件。但是，如果不使用FlashDevelop,则必须手工编辑此配置文件，然后用 bat/CompileCode.bat 进行编译。当然，第一次生成ActionScript3工程时，也会自动创建好这个文件，如果确保脚本代码都写在<br>src目录中，则无需对此进行修改。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">source-path</span> <span class="attr">append</span>=<span class="string">"true"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">path-element</span>&gt;</span>F:\ASTool_UnityTest\AS3HotFixU47\HotFixProj\src<span class="tag">&lt;/<span class="name">path-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">path-element</span>&gt;</span>F:\ASTool_UnityTest\publish\SDK1.0.0\as3_commapi\api<span class="tag">&lt;/<span class="name">path-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">path-element</span>&gt;</span>F:\ASTool_UnityTest\publish\SDK1.0.0\as3_commapi\sharpapi<span class="tag">&lt;/<span class="name">path-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">path-element</span>&gt;</span>F:\ASTool_UnityTest\AS3HotFixU47\HotFixProj\as3_unity<span class="tag">&lt;/<span class="name">path-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">path-element</span>&gt;</span>D:\Program Files (x86)\FlashDevelop\Library\AS3\classes<span class="tag">&lt;/<span class="name">path-element</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">source-path</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="src"><a href="#src" class="headerlink" title="src"></a>src</h4><p>源代码目录。</p>
+<h4 id="genapi-config-xml"><a href="#genapi-config-xml" class="headerlink" title="genapi.config.xml"></a>genapi.config.xml</h4><p>API代码生成器的详细配置。这个工具可用来创建.net类库和ActionScript3之间交互的API。<br><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/" title="API配置说明">API配置说明</a></p>
+
+            </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
+    
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
+</section>
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            asheigithub &copy; 2018 
+            
+			<a href="https://github.com/asheigithub/apple-juice-actionscript/blob/master/LICENSE" rel="external nofollow noopener noreferrer" target="_blank"><img style="max-width:100%;" alt="license" src="https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" data-canonical-src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+			
+            <br> Powered by <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a>. Theme - <a href="https://github.com/zthxxx/hexo-theme-Wikitten" rel="external nofollow noopener noreferrer" target="_blank">wikitten</a>
+            
+        </div>
+    </div>
+</footer>
+        
+
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+        <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true,
+            TeX: {
+                equationNumbers: {
+                  autoNumber: 'AMS'
+                }
+            }
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/apple-juice-actionscript/doc_cn/js/main.js"></script>
+
+    </div>
+</body>

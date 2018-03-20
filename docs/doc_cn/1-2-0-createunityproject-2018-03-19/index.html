@@ -3,20 +3,25 @@
 <head>
     <meta charset="utf-8">
     
-    <title>导入Unity插件 | Apple Juice</title>
+    <title>创建Unity工程和脚本工程 | Apple Juice</title>
     
     
-        <meta name="keywords" content="导入Unity插件">
+        <meta name="keywords" content="创建Unity工程和脚本工程">
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta property="og:type" content="article">
-<meta property="og:title" content="导入Unity插件">
+    <meta name="description" content="先下载最新的发布包，并解压。解压后的目录内容如下:  .├─── SDK[X.X.X]└─── UnityPackage     └───AS3RuntimeForUnity.unitypackage  SDK[X.X.X] 是一个自定义的 AIRSDK.可被FlashDevelop识别并加载，使用它来进行代码的编译和发布。  UnityPackage 内含Unity插件包 “AS3Runtime">
+<meta property="og:type" content="article">
+<meta property="og:title" content="创建Unity工程和脚本工程">
 <meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/index.html">
 <meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="先下载最新的发布包，并解压。解压后的目录内容如下:  .├─── SDK[X.X.X]└─── UnityPackage     └───AS3RuntimeForUnity.unitypackage  SDK[X.X.X] 是一个自定义的 AIRSDK.可被FlashDevelop识别并加载，使用它来进行代码的编译和发布。  UnityPackage 内含Unity插件包 “AS3Runtime">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-19T11:44:51.720Z">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/as3_unity_demo4.gif">
+<meta property="og:updated_time" content="2018-03-20T09:00:06.500Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="导入Unity插件">
+<meta name="twitter:title" content="创建Unity工程和脚本工程">
+<meta name="twitter:description" content="先下载最新的发布包，并解压。解压后的目录内容如下:  .├─── SDK[X.X.X]└─── UnityPackage     └───AS3RuntimeForUnity.unitypackage  SDK[X.X.X] 是一个自定义的 AIRSDK.可被FlashDevelop识别并加载，使用它来进行代码的编译和发布。  UnityPackage 内含Unity插件包 “AS3Runtime">
+<meta name="twitter:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/as3_unity_demo4.gif">
     
 
     
@@ -61,10 +66,6 @@
                     <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
                 
                     <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
-                
-                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/categories">分类</a>
-                
-                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/tags">标签</a>
                 
                     <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
                 
@@ -117,10 +118,6 @@
                 
                     <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
                 
-                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/categories">分类</a></td>
-                
-                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/tags">标签</a></td>
-                
                     <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
                 
                 <td>
@@ -159,7 +156,25 @@
                             &nbsp;
                             开始使用
                         </a>
-                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-5-insert-2018-03-19/">创建Unity工程</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">导入Unity插件</a></li>  </ul> 
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
     </div>
@@ -242,7 +257,10 @@
                         
     <div class="article-category">
     	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/开始使用/">开始使用</a>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/1-1configureproject/">配置项目</a>
     </div>
 
                         
@@ -262,7 +280,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            导入Unity插件
+            创建Unity工程和脚本工程
         </h1>
     
 
@@ -275,7 +293,36 @@
             
         
         
-            
+            <p>先下载最新的发布包，并解压。解压后的目录内容如下:</p>
+<blockquote>
+<p>.<br>├─── SDK[X.X.X]<br>└─── UnityPackage<br>     └───AS3RuntimeForUnity.unitypackage</p>
+</blockquote>
+<h4 id="SDK-X-X-X"><a href="#SDK-X-X-X" class="headerlink" title="SDK[X.X.X]"></a>SDK[X.X.X]</h4><blockquote>
+<p>是一个自定义的 AIRSDK.可被FlashDevelop识别并加载，使用它来进行代码的编译和发布。</p>
+</blockquote>
+<h4 id="UnityPackage"><a href="#UnityPackage" class="headerlink" title="UnityPackage"></a>UnityPackage</h4><blockquote>
+<p>内含Unity插件包 “AS3RuntimeForUnity.unitypackage”。  </p>
+</blockquote>
+<p>项目创建步骤:</p>
+<ol>
+<li>先创建一个Unity工程。然后导入UnityPackage内的Unity插件包。</li>
+<li>点击菜单 ASRuntime/Create ActionScript3 FlashDevelop HotFixProj。</li>
+<li>根据提示先定位SDK的位置。</li>
+<li>然后根据提示创建AS3热更新项目。项目创建完成后，会根据默认配置生成Unity的API。  <blockquote>
+<p>ActionScript3项目要求创建在一个空白的文件夹中。</p>
+</blockquote>
+</li>
+</ol>
+<p>项目测试：</p>
+<ol>
+<li>在Unity工程中，打开测试场景”Assets/HotFixDemoScene1.scene”。</li>
+<li>在刚才生成的ActionScript3工程目录中，用FlashDevelop打开<protname>.as3proj 工程文件。</protname></li>
+<li>在AS3工程中修改代码</li>
+<li>点击FlashDevelop的编译按钮,进行编译</li>
+<li>回到Unity工程，点击播放，即可看到修改的结果。</li>
+</ol>
+<p><img src="/apple-juice-actionscript/doc_cn/images/as3_unity_demo4.gif" alt="动态说明"></p>
+
             </div>
         
         <footer class="article-footer">

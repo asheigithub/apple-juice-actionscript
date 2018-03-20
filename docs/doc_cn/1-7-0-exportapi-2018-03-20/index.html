@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    
+    <title>.net API的导出 | Apple Juice</title>
+    
+    
+        <meta name="keywords" content=".net API的导出">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+<meta property="og:type" content="article">
+<meta property="og:title" content=".net API的导出">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/index.html">
+<meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-20T12:43:37.148Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content=".net API的导出">
+<meta name="twitter:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+    
+
+    
+
+    
+        <link rel="icon" href="/apple-juice-actionscript/doc_cn/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/css/style.css">
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/plugins/cookie/1.4.1/jquery.cookie.js"></script>
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+    
+</head>
+</html>
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/apple-juice-actionscript/doc_cn/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Apple Juice</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
+                
+            </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/apple-juice-actionscript/doc_cn/',
+        CONTENT_URL: '/apple-juice-actionscript/doc_cn/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/apple-juice-actionscript/doc_cn/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap" id="categories">
+        <h3 class="widget-title">
+            <span>分类</span>
+            &nbsp;
+            <a id="allExpand" href="#">
+                <i class="fa fa-angle-double-down fa-2x"></i>
+            </a>
+        </h3>
+        
+        
+        
+         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            开始使用
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
+    </div>
+    <script>
+        $(document).ready(function() {
+            var iconFolderOpenClass  = 'fa-folder-open';
+            var iconFolderCloseClass = 'fa-folder';
+            var iconAllExpandClass = 'fa-angle-double-down';
+            var iconAllPackClass = 'fa-angle-double-up';
+            // Handle directory-tree expansion:
+            // 左键单独展开目录
+            $(document).on('click', '#categories a[data-role="directory"]', function (event) {
+                event.preventDefault();
+
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var subtree = $(this).siblings('ul');
+                icon.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if (expanded) {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideUp({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderCloseClass);
+                } else {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideDown({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderOpenClass);
+                }
+            });
+            // 右键展开下属所有目录
+            $('#categories a[data-role="directory"]').bind("contextmenu", function(event){
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var listNode = $(this).siblings('ul');
+                var subtrees = $.merge(listNode.find('li ul'), listNode);
+                var icons = $.merge(listNode.find('.fa'), icon);
+                icons.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if(expanded) {
+                    subtrees.slideUp({ duration: 100 });
+                    icons.addClass(iconFolderCloseClass);
+                } else {
+                    subtrees.slideDown({ duration: 100 });
+                    icons.addClass(iconFolderOpenClass);
+                }
+            })
+            // 展开关闭所有目录按钮
+            $(document).on('click', '#allExpand', function (event) {
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconAllExpandClass);
+                icon.removeClass(iconAllExpandClass).removeClass(iconAllPackClass);
+                if(expanded) {
+                    $('#sidebar .fa.fa-folder').removeClass('fa-folder').addClass('fa-folder-open')
+                    $('#categories li ul').slideDown({ duration: 100 });
+                    icon.addClass(iconAllPackClass);
+                } else {
+                    $('#sidebar .fa.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder')
+                    $('#categories li ul').slideUp({ duration: 100 });
+                    icon.addClass(iconAllExpandClass);
+                }
+            });  
+        });
+    </script>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+            <section id="main"><article id="post-1-7-0-exportapi" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/beginuse/1-2useas3/">使用ActionScript3</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">
+            <time datetime="2018-03-20T12:04:22.000Z" itemprop="datePublished">2018-03-20</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+                
+    
+        <h1 class="article-title" itemprop="name">
+            .net API的导出
+        </h1>
+    
+
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <p>.net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。</p>
+<h4 id="不能被导出的类型"><a href="#不能被导出的类型" class="headerlink" title="不能被导出的类型"></a>不能被导出的类型</h4><ul>
+<li>标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出.</li>
+<li>System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联,System.Type类型本身不会被导出。</li>
+<li>非公开的类型和成员不会被导出。只有Public的类型才能导出。</li>
+<li>泛型定义类型不会被导出。但是如果.net类库中有泛型类型，这个泛型类型是可以被导出的。例如 List<t> 本身是不会被导出的，但是如果.net类库中有List<string> 这样的类型，则List<string>会被自动处理。  </string></string></t></li>
+<li>如果某个类型继承自不可导出的类型，那么它也同样不能导出。</li>
+</ul>
+<h4 id="不能被导出的成员"><a href="#不能被导出的成员" class="headerlink" title="不能被导出的成员"></a>不能被导出的成员</h4><ul>
+<li>如果某个方法的参数或者返回值是不能导出的类型，则它不会被导出。</li>
+<li>如果某个成员被标记为System.ObsoleteAttribute的，则它不会被导出。</li>
+<li>如果某个方法是泛型定义方法，则它不会被导出。但是泛型方法是可以被导出的。例如 MonoBehaviour.GetComponent<t>,这个方法不会被导出。但是如果某个类型继承了MonoBehaviour,又定义了 GetComponent<renderer>,则这个方法是可以被导出的。</renderer></t></li>
+</ul>
+<h4 id="导出时的特殊处理"><a href="#导出时的特殊处理" class="headerlink" title="导出时的特殊处理"></a>导出时的特殊处理</h4><ul>
+<li>泛型类型导出时，名字改为 &lt;TypeName&gt; _Of_ &lt;GenericType&gt;。例如  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UnityEngine.Events.UnityAction&lt;System.Boolean&gt;</span><br></pre></td></tr></table></figure>
+<p>将导出为<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">UnityAction_Of_Boolean</span> <span class="keyword">extends</span> <span class="title">system</span>.<span class="title">MulticastDelegate</span> <span class="keyword">implements</span> <span class="title">system</span>.<span class="title">ICloneable</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>方法重载。.net支持重载，ActionScript3则不支持重载。因此，当遇到这样的情况时，工具将会在重载的函数后面加上一个下划线_。例如，System.DateTime.GetDateTimeFormats有若干重载，则会导出为如下API:  </li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.DateTime.GetDateTimeFormats</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.String[]</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_getDateTimeFormats];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">getDateTimeFormats</span><span class="params">()</span>:_Array_</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.DateTime.GetDateTimeFormats</span></span><br><span class="line"><span class="comment">*parameters:</span></span><br><span class="line"><span class="comment">*  provider : System.IFormatProvider</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.String[]</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_getDateTimeFormats_];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">getDateTimeFormats_</span><span class="params">(provider:IFormatProvider)</span>:_Array_</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.DateTime.GetDateTimeFormats</span></span><br><span class="line"><span class="comment">*parameters:</span></span><br><span class="line"><span class="comment">*  format : System.Char</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.String[]</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_getDateTimeFormats__];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">getDateTimeFormats__</span><span class="params">(format:Char)</span>:_Array_</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.DateTime.GetDateTimeFormats</span></span><br><span class="line"><span class="comment">*parameters:</span></span><br><span class="line"><span class="comment">*  format : System.Char</span></span><br><span class="line"><span class="comment">*  provider : System.IFormatProvider</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.String[]</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_getDateTimeFormats___];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">function</span> <span class="title">getDateTimeFormats___</span><span class="params">(format:Char,provider:IFormatProvider)</span>:_Array_</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果是构造函数重载，则保留找到的第一个构造函数，其他构造函数改名为constructor_。若有多个重载，则追加下划线。例如System.DateTime有许多构造函数，则导出为:  </li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//*********构造函数*******</span></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor_];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor_</span><span class="params">(ticks:Int64,kind:DateTimeKind)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor__];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor__</span><span class="params">(year:int,month:int,day:int)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor___];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor___</span><span class="params">(year:int,month:int,day:int,calendar:system.globalization.Calendar)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor____];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor____</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor_____];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor_____</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,kind:DateTimeKind)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor______];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor______</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,calendar:system.globalization.Calendar)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor_______];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor_______</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,millisecond:int)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor________];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor________</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,millisecond:int,kind:DateTimeKind)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor_________];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor_________</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,millisecond:int,calendar:system.globalization.Calendar)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_constructor__________];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">constructor__________</span><span class="params">(year:int,month:int,day:int,hour:int,minute:int,second:int,millisecond:int,calendar:system.globalization.Calendar,kind:DateTimeKind)</span>:DateTime</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">native</span>,system_DateTime_ctor];</span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">DateTime</span><span class="params">(ticks:Int64)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>操作符重载。 .net支持操作符重载。对于这样的类型，导出后同样保留了可用的操作符重载。例如System.Decimal,导出后保留了各种操作符重载，在脚本中同样可用。  </li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 计算 d1 % d2</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">[<span class="keyword">native</span>,static_system_Decimal_op_Modulus];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">op_Modulus</span><span class="params">(d1:Decimal,d2:Decimal)</span>:Decimal</span>;</span><br><span class="line"></span><br><span class="line">[operator,<span class="string">"%"</span>];</span><br><span class="line">[<span class="keyword">native</span>,static_system_Decimal_op_Modulus];</span><br><span class="line">private static function _operator_op_Modulus(d1:Decimal,d2:Decimal):Decimal;</span><br></pre></td></tr></table></figure>
+<p>如下代码<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> d1:Decimal = <span class="keyword">new</span> Decimal(<span class="number">77</span>);</span><br><span class="line"><span class="keyword">var</span> d2:Decimal = <span class="keyword">new</span> Decimal(<span class="number">65</span>);</span><br><span class="line"></span><br><span class="line">trace(<span class="string">"d1 % d2 ="</span>,d1 % d2);</span><br></pre></td></tr></table></figure></p>
+<p>执行结果<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">d1 % d2 = 12</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>委托的操作符重载有 +和-。因此+=和-=是可用的。但是需要注意一点，如果委托变量为null,则不能直接使用+=,必须使用=进行赋值。当变量不为null时，可用+=,-=来操作多路委托。</p>
+</blockquote>
+
+            </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
+    
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
+</section>
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            asheigithub &copy; 2018 
+            
+			<a href="https://github.com/asheigithub/apple-juice-actionscript/blob/master/LICENSE" rel="external nofollow noopener noreferrer" target="_blank"><img style="max-width:100%;" alt="license" src="https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" data-canonical-src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+			
+            <br> Powered by <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a>. Theme - <a href="https://github.com/zthxxx/hexo-theme-Wikitten" rel="external nofollow noopener noreferrer" target="_blank">wikitten</a>
+            
+        </div>
+    </div>
+</footer>
+        
+
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+        <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true,
+            TeX: {
+                equationNumbers: {
+                  autoNumber: 'AMS'
+                }
+            }
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/apple-juice-actionscript/doc_cn/js/main.js"></script>
+
+    </div>
+</body>
