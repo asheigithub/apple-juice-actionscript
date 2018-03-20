@@ -2,6 +2,11 @@
 ### 文档地址
 - 中文文档
   [https://asheigithub.github.io/apple-juice-actionscript/doc_cn/](https://asheigithub.github.io/apple-juice-actionscript/doc_cn/ "中文文档")
+  
+
+### 下载地址
+[as3_unity预览测试包0.9.2](https://github.com/asheigithub/ASTool/raw/master/publish/v0.9.2/as3_unity_0.9.2.zip)
+  
 ### .net2.0实现的ActionScript3 编译器和虚拟机
 >支持除了 namespace 和 with 和 E4X XML操作外的一切actionscript3语法特性。   
 
@@ -45,6 +50,3 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 > 能将.net 类库中的类型包含继承关系和接口实现关系的导出。例如，**UnityEngine.MeshRenderer**  继承自 **UnityEngine.Renderer**  。那么导出后的as3类型也会保持以上的关系。
 
 
-
-### 下载地址
-[as3_unity预览测试包0.9.2](https://github.com/asheigithub/ASTool/raw/master/publish/v0.9.2/as3_unity_0.9.2.zip)
