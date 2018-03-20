@@ -1,4 +1,13 @@
 ## Apple Juice
+  
+.net2.0实现的ActionScript3 编译器和虚拟机
+>支持除了 namespace 和 with 和 E4X XML操作外的一切actionscript3语法特性。   
+
+>可以将actionscript3代码编译为字节码，然后加载并动态执行。VM由纯C# 2.0代码实现，可以直接让Unity来读取并执行生成的字节码，就是可用Unity完成热更新操作。  
+编译器部分实现了完整的编译期类型检查。并且有完整的错误提示。已经和FlashDevelop完成了集成，可以直接在FlashDevelop中开发并一键编译发布到Unity。   
+Unity的API或者自己开发的C# API提供了工具直接转换为actionscript api文件和对接代码，并且直接注册到FlashDevelop工程中。
+
+
 ### 文档地址
 - 中文文档
   [https://asheigithub.github.io/apple-juice-actionscript/doc_cn/](https://asheigithub.github.io/apple-juice-actionscript/doc_cn/ "中文文档")
@@ -6,13 +15,6 @@
 
 ### 下载地址
 [as3_unity预览测试包0.9.2](https://github.com/asheigithub/ASTool/raw/master/publish/v0.9.2/as3_unity_0.9.2.zip)
-  
-### .net2.0实现的ActionScript3 编译器和虚拟机
->支持除了 namespace 和 with 和 E4X XML操作外的一切actionscript3语法特性。   
-
->可以将actionscript3代码编译为字节码，然后加载并动态执行。VM由纯C# 2.0代码实现，可以直接让Unity来读取并执行生成的字节码，就是可用Unity完成热更新操作。  
-编译器部分实现了完整的编译期类型检查。并且有完整的错误提示。已经和FlashDevelop完成了集成，可以直接在FlashDevelop中开发并一键编译发布到Unity。   
-Unity的API或者自己开发的C# API提供了工具直接转换为actionscript api文件和对接代码，并且直接注册到FlashDevelop工程中。
 
 #### 特色 ####
 - 对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。
