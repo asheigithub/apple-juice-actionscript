@@ -9,17 +9,17 @@
         <meta name="keywords" content=".net API的导出">
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+    <meta name="description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 不在任何命名空间下的类型不会被导出。 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和Actio">
 <meta property="og:type" content="article">
 <meta property="og:title" content=".net API的导出">
 <meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/index.html">
 <meta property="og:site_name" content="Apple Juice">
-<meta property="og:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+<meta property="og:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 不在任何命名空间下的类型不会被导出。 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和Actio">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-20T12:43:37.148Z">
+<meta property="og:updated_time" content="2018-03-21T02:33:29.391Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content=".net API的导出">
-<meta name="twitter:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联">
+<meta name="twitter:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 不在任何命名空间下的类型不会被导出。 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和Actio">
     
 
     
@@ -170,7 +170,16 @@
                             &nbsp;
                             使用ActionScript3
                         </a>
-                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  </ul> 
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            Unity工程
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">Unity工程目录结构</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a></li>  </ul> 
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
@@ -293,6 +302,7 @@
         
             <p>.net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。</p>
 <h4 id="不能被导出的类型"><a href="#不能被导出的类型" class="headerlink" title="不能被导出的类型"></a>不能被导出的类型</h4><ul>
+<li>不在任何命名空间下的类型不会被导出。</li>
 <li>标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出.</li>
 <li>System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联,System.Type类型本身不会被导出。</li>
 <li>非公开的类型和成员不会被导出。只有Public的类型才能导出。</li>
@@ -300,6 +310,7 @@
 <li>如果某个类型继承自不可导出的类型，那么它也同样不能导出。</li>
 </ul>
 <h4 id="不能被导出的成员"><a href="#不能被导出的成员" class="headerlink" title="不能被导出的成员"></a>不能被导出的成员</h4><ul>
+<li>非公开的成员不会被导出。</li>
 <li>如果某个方法的参数或者返回值是不能导出的类型，则它不会被导出。</li>
 <li>如果某个成员被标记为System.ObsoleteAttribute的，则它不会被导出。</li>
 <li>如果某个方法是泛型定义方法，则它不会被导出。但是泛型方法是可以被导出的。例如 MonoBehaviour.GetComponent<t>,这个方法不会被导出。但是如果某个类型继承了MonoBehaviour,又定义了 GetComponent<renderer>,则这个方法是可以被导出的。</renderer></t></li>

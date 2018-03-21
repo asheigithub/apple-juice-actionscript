@@ -2,9 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/</loc>
+    
+    <lastmod>2018-03-21T11:51:27.025Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/</loc>
+    
+    <lastmod>2018-03-21T11:39:00.916Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/</loc>
+    
+    <lastmod>2018-03-21T11:00:12.600Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/</loc>
+    
+    <lastmod>2018-03-21T10:31:22.185Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/index-2018-03-16/</loc>
+    
+    <lastmod>2018-03-21T02:34:59.908Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/</loc>
     
-    <lastmod>2018-03-20T12:43:37.148Z</lastmod>
+    <lastmod>2018-03-21T02:33:29.391Z</lastmod>
     
   </url>
   
@@ -12,13 +47,6 @@
     <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/</loc>
     
     <lastmod>2018-03-20T12:11:48.021Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/index-2018-03-16/</loc>
-    
-    <lastmod>2018-03-20T12:00:34.863Z</lastmod>
     
   </url>
   
@@ -40,13 +68,6 @@
     <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/</loc>
     
     <lastmod>2018-03-20T09:00:13.387Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/</loc>
-    
-    <lastmod>2018-03-20T09:00:06.500Z</lastmod>
     
   </url>
   

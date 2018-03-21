@@ -166,7 +166,16 @@
                             &nbsp;
                             使用ActionScript3
                         </a>
-                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  </ul> 
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            Unity工程
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">Unity工程目录结构</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a></li>  </ul> 
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
@@ -302,8 +311,9 @@
 <li><p>自动处理.net 类库中的 out ref类型的参数。这样的方法也可自动导出。例如 long.TryParse:</p>
 <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* System.Int64.TryParse</span></span><br><span class="line"><span class="comment">*parameters:</span></span><br><span class="line"><span class="comment">*  s : System.String</span></span><br><span class="line"><span class="comment">*  result : (Out)System.Int64</span></span><br><span class="line"><span class="comment">*return:</span></span><br><span class="line"><span class="comment">*   System.Boolean</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">[<span class="keyword">native</span>,static_system_Int64_tryParse];</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">function</span> <span class="title">tryParse</span><span class="params">(s:String,result:Int64,refout:as3runtime.RefOutStore)</span>:Boolean</span>;</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。</p>
+<li><p>可以在ActionScript3脚本中继承.net类库。还可以覆盖基类的虚方法。</p>
 </li>
+<li>完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。</li>
 <li>完全实现的面向对象支持。完整支持类继承和接口。</li>
 <li>FlashDevelop IDE支持。可以完全利用IDE的智能提示，编译错误也可在IDE中得到反馈。可在IDE中直接编译热更新代码成到Unity项目</li>
 </ul>
