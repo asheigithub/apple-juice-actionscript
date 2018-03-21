@@ -28,7 +28,7 @@
     <!--生成的csharp注册代码的命名空间-->
     <add key="regfunctioncodenamespace" value="ASRuntime"/>
     <!--生成的csharp注册代码文件-->
-    <add key="regfunctioncodefile" value="{UNITYPROJPATH}/Assets/Standard Assets/ASRuntime/ScriptSupport/Generated/regNativeCode.cs"/>
+    <add key="regfunctioncodefile" value="{UNITYPROJPATH}/Assets/ASRuntimePlayer/RegCode/regNativeCode.cs"/>
 
     <!--是否将.net的mscorlib模块库导出代码  这里是false-->
     <add key="makemscorlib" value="false"/>

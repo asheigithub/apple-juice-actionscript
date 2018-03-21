@@ -14,7 +14,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
   
 
 ### 下载地址
-[as3_unity预览测试包0.9.2](https://github.com/asheigithub/ASTool/raw/master/publish/v0.9.2/as3_unity_0.9.2.zip)
+[as3_unity预览测试包0.9.3](https://github.com/asheigithub/ASTool/raw/master/publish/lastrelease/as3_unity.zip)
 
 #### 特色 ####
 - 对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。
@@ -44,6 +44,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 ````
 - 自动将.net 委托对应到ActionScript3的function对象。
 - 自动处理.net 类库中的 out ref类型的参数。
+- 可以在ActionScript3脚本中继承.net类库。还可以覆盖基类的虚方法。
 - 完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。
 - 完全实现的面向对象支持。完整支持类继承和接口。
 - FlashDevelop IDE支持。可以完全利用IDE的智能提示，编译错误也可在IDE中得到反馈。可在IDE中直接编译热更新代码成到Unity项目

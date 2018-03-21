@@ -273,11 +273,18 @@ namespace LinkCodeGenCLI
 
 			generator.AddTypes(types);
 
-
+			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(outputcode)))
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(outputcode));
+			}
+			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(regfunctioncode)))
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(regfunctioncode));
+			}
 			using (System.IO.FileStream fs = new System.IO.FileStream(outputcode, System.IO.FileMode.Create))
 			{
 				string regcode;
-				generator.MakeCode(fs, as3apipath, csharpcodepath, csharpcodenamespace, regfunctioncodenamespace, out regcode);
+				generator.MakeCode(fs, as3apipath, csharpcodepath, csharpcodenamespace, regfunctioncodenamespace, System.IO.Path.GetDirectoryName( regfunctioncode) , out regcode);
 				System.IO.File.WriteAllText(regfunctioncode, regcode);
 			}
 

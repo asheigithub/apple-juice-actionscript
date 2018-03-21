@@ -228,7 +228,7 @@ namespace LinkCodeGen
 			nativesb.AppendLine("namespace " + linkcodenamespace);
 			nativesb.AppendLine("{");
 			nativesb.Append("\t");
-			nativesb.Append("class ");
+			nativesb.Append("public class ");
 			nativesb.AppendLine(GetNativeFunctionClassName(type));
 			nativesb.Append("\t");
 			nativesb.AppendLine("{");

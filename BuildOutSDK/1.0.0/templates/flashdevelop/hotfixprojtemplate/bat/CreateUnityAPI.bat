@@ -15,7 +15,7 @@ for /f "tokens=* delims=" %%i in ('dir /ad /s /b "%str%"^|sort /r') do (
    rd "%%i"
 )
 
-
+del /q "{UNITYPROJPATH}\Assets\ASRuntimePlayer\RegCode\*.*"
 del /q "{UNITYPROJPATH}\Assets\Standard Assets\ASRuntime\ScriptSupport\Generated\*.*"
 
 

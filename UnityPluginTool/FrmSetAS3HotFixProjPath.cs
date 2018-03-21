@@ -46,7 +46,7 @@ namespace ASRuntimeUnityPluginTool
 			string pjfile = getProjFile();
 
 			var pjdir = System.IO.Path.GetDirectoryName(pjfile);
-			if (System.IO.Directory.Exists(pjfile) && System.IO.Directory.GetFileSystemEntries(pjdir).Length > 0)
+			if (System.IO.Directory.Exists(pjdir) && System.IO.Directory.GetFileSystemEntries(pjdir).Length > 0)
 			{
 				MessageBox.Show(pjdir + "Directory is not empty. Please select a blank directory.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;

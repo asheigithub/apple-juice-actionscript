@@ -301,11 +301,19 @@ namespace ASBinCode
 
 			if (f == null)
 			{
-				if (nativeFunctionFactory != null)
+				try
 				{
-					f = nativeFunctionFactory.Create(registedNativeFunctionType[nidx]);
-					nativefunctions[nidx] = f;
+					if (nativeFunctionFactory != null)
+					{
+						f = nativeFunctionFactory.Create(registedNativeFunctionType[nidx]);
+						nativefunctions[nidx] = f;
+					}
 				}
+				catch (ASRunTimeException)
+				{
+					return null;
+				}
+
 				//Type ft = System.Reflection.Assembly.GetEntryAssembly().GetType(registedNativeFunctionType[nidx]);
 				//f = (NativeFunctionBase)System.Activator.CreateInstance(ft);
 				//nativefunctions[nidx] = f;

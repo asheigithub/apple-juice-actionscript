@@ -63,7 +63,7 @@ namespace LinkCodeGen
 		}
 
 		public void MakeCode(System.IO.Stream combiedcodestm, string as3apipath, string csharpcodepath, string chsharpcodenamespace,
-			string regfunctioncodenamespace, out string regfunctioncode)
+			string regfunctioncodenamespace,string AssemblyCSharpCodePath, out string regfunctioncode)
 		{
 
 			Dictionary<TypeKey, CreatorBase> creators = new Dictionary<TypeKey, CreatorBase>();
@@ -76,7 +76,14 @@ namespace LinkCodeGen
 					&& (classtype.IsClass || classtype.IsValueType) && classtype.IsPublic
 					)
 				{
-					CreatorBase.MakeCreator(classtype, creators, as3apipath, csharpcodepath, chsharpcodenamespace);
+					if (AssemblyCSharpCodePath != null && classtype.Assembly.GetName().Name == "Assembly-CSharp")
+					{
+						CreatorBase.MakeCreator(classtype, creators, as3apipath, AssemblyCSharpCodePath, chsharpcodenamespace);
+					}
+					else
+					{
+						CreatorBase.MakeCreator(classtype, creators, as3apipath, csharpcodepath, chsharpcodenamespace);
+					}
 				}
 			}
 
