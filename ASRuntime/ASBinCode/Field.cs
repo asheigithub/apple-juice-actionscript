@@ -187,7 +187,7 @@ namespace ASBinCode
 			field.isProtected = reader.ReadBoolean();
 			field.isStatic = reader.ReadBoolean();
 
-			int metas = reader.ReadInt32();
+			int metas = reader.ReadSByte();
 			for (int i = 0; i < metas; i++)
 			{
 				field.metas.Add(serizlizer.DeserializeObject<FieldMeta>(reader, FieldMeta.LoadFieldMeta));
@@ -216,8 +216,8 @@ namespace ASBinCode
 			writer.Write(isStatic);
 			//public List<FieldMeta> metas;
 
-			writer.Write(metas.Count);
-			for (int i = 0; i < metas.Count; i++)
+			writer.Write((sbyte)metas.Count);
+			for (int i = 0; i < (sbyte)metas.Count; i++)
 			{
 				serizlizer.SerializeObject(writer, metas[i]);
 			}

@@ -715,6 +715,12 @@ namespace ASRuntime.operators
 				var cextend = scls.staticClass.linkObjCreator;
 				var func = swc.getNativeFunction(( (ClassMethodGetter)cextend.bindField).functionId );
 
+				if (func == null)
+				{
+					errinfo = cls.ToString() + " create crossextend object failed, creator function not found";
+					return null;
+				}
+
 				string err; int no;
 				ASBinCode.rtData.rtObjectBase rtObj =
 					func.execute(null, null, cls, out err, out no) as ASBinCode.rtData.rtObjectBase;

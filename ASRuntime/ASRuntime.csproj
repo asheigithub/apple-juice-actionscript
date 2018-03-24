@@ -154,6 +154,7 @@
     <Compile Include="nativefuncs\NativeConstParameterFunction.cs" />
     <Compile Include="nativefuncs\Number_buildin.cs" />
     <Compile Include="nativefuncs\Object_buildin.cs" />
+    <Compile Include="nativefuncs\ReflectionInvokeNativeFunction.cs" />
     <Compile Include="nativefuncs\RegExp_buildin.cs" />
     <Compile Include="nativefuncs\String_buildin.cs" />
     <Compile Include="nativefuncs\system_noctorclass_buildin.cs" />

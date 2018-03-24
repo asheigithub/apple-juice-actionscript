@@ -43,7 +43,7 @@ namespace ASBinCode.scopes
 		{
 			serizlizer.SerializeObject(writer, (ScopeBase)_parent);
 
-			writer.Write(memberlist.Count);
+			writer.Write((ushort)memberlist.Count);
 			for (int i = 0; i < memberlist.Count; i++)
 			{
 				//((ISWCSerializable)memberlist[i]).Serialize(writer, serizlizer);
@@ -55,7 +55,7 @@ namespace ASBinCode.scopes
 		{
 			_parent = serizlizer.DeserializeObject<ScopeBase>(reader, Deserialize);
 
-			int count = reader.ReadInt32();
+			int count = reader.ReadUInt16(); //reader.ReadInt32();
 			for (int i = 0; i < count; i++)
 			{
 				memberlist.Add( (IMember)serizlizer.DeserializeObject<ISWCSerializable>(reader,ISWCSerializableLoader.LoadIMember) );

@@ -16,99 +16,38 @@ namespace AutoGenCodeLib
 	{
 
 
-		//public static Testobj Ins=new Testobj();
+		public static Testobj Ins = new Testobj();
 
-		//public static long longvalue;
+		public static long longvalue;
 
-		//public static Testobj KKK(Testobj testobj,double v2)
-		//{
-		//	 testobj.y += v2;
-		//	return new Testobj() { x=testobj.x,y=testobj.y };
-		//}
+		public static Testobj KKK(Testobj testobj, double v2)
+		{
+			testobj.y += v2;
+			return new Testobj() { x = testobj.x, y = testobj.y };
+		}
 
-		//public static int operator +(Testobj t1,Testobj t2)
-		//{
-		//	return (int)t1.x + (int)t2.x;
-		//}
+		public Testobj(uint x)
+		{
+			this.x = x;
+			this.y = 0;
+		}
 
-		//public static int operator +(Testobj t1, string t2)
-		//{
-		//	return (int)t1.x + t2.Length;
-		//}
+		public Testobj(double y)
+		{
+			this.y = y;
+			this.x = 0;
+		}
 
-		//public static Testobj operator ++(Testobj t1)
-		//{
-		//	 ++t1.x;
-		//	return t1;
-		//}
-		//public static Testobj operator --(Testobj t1)
-		//{
-		//	--t1.x;
-		//	return t1;
-		//}
+		public ulong x;
 
-		//public static ulong operator ~(Testobj t1)
-		//{
-		//	return ~t1.x;
-		//}
+		public double y;
 
-		//public static string operator ^(Testobj t1, Testobj t2)
-		//{
-		//	return t1.ToString() + " ^ " + t2.ToString();
-		//}
+		public List<string> listtest = new List<string>();
 
-		//public static string operator |(Testobj t1, Testobj t2)
-		//{
-		//	return t1.ToString() + " | " + t2.ToString();
-		//}
-
-		//public static string operator &(Testobj t1, Testobj t2)
-		//{
-		//	return t1.ToString() + " & " + t2.ToString();
-		//}
-
-
-		//public static bool operator +(Testobj t)
-		//{
-		//	return t.x < 10;
-		//}
-
-		//public static bool operator -(Testobj t)
-		//{
-		//	return t.x > 10;
-		//}
-
-		//public static string operator <<(Testobj t1,int t2)
-		//{
-		//	return t1.ToString() + "<<" + t2.ToString();
-		//}
-		//public static string operator >>(Testobj t1, int t2)
-		//{
-		//	return t1.ToString() + ">>" + t2.ToString();
-		//}
-
-		//public Testobj(uint x)
-		//{
-		//	this.x = x;
-		//	this.y = 0;
-		//}
-
-		//public Testobj(double y)
-		//{
-		//	this.y = y;
-		//	this.x = 0;
-		//}
-
-		//public  ulong x;
-
-		//public  double y;
-
-		//public List<string> listtest = new List<string>();
-
-		//public List<string> geteList(List<int> iii)
-		//{
-		//	return listtest;
-		//}
+		public List<string> geteList(List<int> iii)
+		{
+			return listtest;
+		}
 
 
 		//public override string ToString()
@@ -121,13 +60,34 @@ namespace AutoGenCodeLib
 		//	Console.WriteLine(type.)
 		//}
 
-		//public class innerClass
-		//{
+		public class innerClass
+		{
 
-		//}
+		}
 
-		//public innerClass nc=new innerClass();
 
+		public string this[int a]
+		{
+			get { return "idx:" + a + " hashcode:"+a.GetHashCode(); }
+
+			set
+			{
+				Console.WriteLine("set idx " + a + " to value:" + value);	
+			}
+		}
+
+
+		public innerClass nc = new innerClass();
+
+		public static Testobj[] make(int count)
+		{
+			Testobj[] r = new Testobj[count];
+			for (int i = 0; i < count; i++)
+			{
+				r[i] = new Testobj((uint)i);
+			}
+			return r;
+		}
 
 		public static Testobj CreateTestObj(Type type)
 		{
@@ -206,8 +166,16 @@ namespace AutoGenCodeLib
 			}
 		}
 
+		public TimeSpan GetTS(Decimal ms)
+		{
+			return TimeSpan.FromMilliseconds((double)ms);
+		}
 
-
+		public TimeSpan GetTS<T>(Decimal ms)
+		{
+			T a;
+			return TimeSpan.MinValue;
+		}
 
 
 		//public void TestArray(int[] arr)

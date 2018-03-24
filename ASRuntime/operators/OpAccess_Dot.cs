@@ -302,9 +302,15 @@ namespace ASRuntime.operators
 
                 if (!(register._isassigntarget || register._hasUnaryOrShuffixOrDelete))
                 {
-                    if (rtObj.value._class.get_this_item != null)
+					var _class = rtObj.value._class;
+					while (_class !=null && _class.get_this_item ==null)
+					{
+						_class = _class.super;
+					}
+
+                    if ( _class.get_this_item !=null )//rtObj.value._class.get_this_item != null)
                     {
-						var function = player.swc.functions[((MethodGetterBase)rtObj.value._class.get_this_item.bindField).functionId];
+						var function = player.swc.functions[((MethodGetterBase)_class.get_this_item.bindField).functionId];
 
 						if (TypeConverter.testIndexGetSetMatch(v2, function.signature.parameters[0].type, player.swc))
 						{
@@ -312,7 +318,7 @@ namespace ASRuntime.operators
 							//***调用索引器get***
 							RunTimeValueBase func;
 
-							func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
+							func = ((MethodGetterBase)_class.get_this_item.bindField).getMethod(
 								rtObj
 								);
 
@@ -348,9 +354,15 @@ namespace ASRuntime.operators
                 }
                 else
                 {
-                    if (rtObj.value._class.set_this_item != null)
+					var _class = rtObj.value._class;
+					while (_class != null && _class.set_this_item == null)
+					{
+						_class = _class.super;
+					}
+
+					if (_class.set_this_item != null)
                     {
-                        if (rtObj.value._class.get_this_item == null)
+                        if (_class.get_this_item == null)
                         {
                             frame.throwError((new error.InternalError(frame.player.swc, step.token,
                              "有set_this_item则必须有get_this_item"
@@ -359,10 +371,10 @@ namespace ASRuntime.operators
                             return;
                         }
 
-						ClassMethodGetter methodGetter = rtObj.value._class.set_this_item.bindField as ClassMethodGetter;
+						ClassMethodGetter methodGetter = _class.set_this_item.bindField as ClassMethodGetter;
 						if (methodGetter != null)
 						{
-							var function = frame.player.swc.functions[((ClassMethodGetter)rtObj.value._class.set_this_item.bindField).functionId];
+							var function = frame.player.swc.functions[((ClassMethodGetter)_class.set_this_item.bindField).functionId];
 
 							if (TypeConverter.testIndexGetSetMatch(v2, function.signature.parameters[1].type,player.swc))
 							{
@@ -372,6 +384,8 @@ namespace ASRuntime.operators
 
 								dslot._cache_setthisslot.bindObj = rtObj;
 								dslot._cache_setthisslot.setindex = v2;
+								dslot._cache_setthisslot.set_this_item = _class.set_this_item;
+								dslot._cache_setthisslot.get_this_item = _class.get_this_item;
 
 								frame.endStep(step);
 

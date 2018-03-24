@@ -87,6 +87,7 @@ namespace ASBinCode.rtti
 
 		public void Serialize(BinaryWriter writer, CSWCSerizlizer serizlizer)
 		{
+			
 			/// <summary>
 			/// 参数名
 			/// </summary>

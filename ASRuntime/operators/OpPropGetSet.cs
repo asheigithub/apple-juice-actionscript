@@ -33,7 +33,7 @@ namespace ASRuntime.operators
                 var rtObj = sslot.bindObj;
                 var player = frame.player;
                 var v2 = sslot.setindex;
-                func = ((MethodGetterBase)rtObj.value._class.get_this_item.bindField).getMethod(
+                func = ((MethodGetterBase)sslot.get_this_item.bindField).getMethod(
                     rtObj
                     );
 
@@ -59,7 +59,7 @@ namespace ASRuntime.operators
                 ret.stackObjects._temp_try_write_setthisitem = ret._cache_setthisslot;ret.refPropChanged = true;
                 ret._cache_setthisslot.bindObj = rtObj;
                 ret._cache_setthisslot.setindex = v2;
-
+				ret._cache_setthisslot.set_this_item = sslot.set_this_item;
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
                 cb.setCallBacker(_get_this_item_callbacker);
@@ -231,7 +231,7 @@ namespace ASRuntime.operators
                 slot.stackObjects._temp_try_write_setthisitem = null;
 
                 OpAssigning._doSetThisItem(
-                    sslot.bindObj,
+                    sslot.bindObj,sslot.set_this_item,
                     slot.getValue(),
                     sslot.setindex,
                     slot, frame, step

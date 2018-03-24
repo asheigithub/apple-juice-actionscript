@@ -329,7 +329,7 @@ namespace ASRuntime
 
             var cacheobj = _linkObjCache.getCacheObj(clsType);
 			
-            if (clsType.isStruct)
+            if (clsType.isStruct )
             {
                 var link = (ASBinCode.rtti.LinkObj<T>)cacheobj.value;
                 link.value = value;

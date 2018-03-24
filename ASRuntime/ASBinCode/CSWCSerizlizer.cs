@@ -174,7 +174,7 @@ namespace ASBinCode
 		private IDictionary<int,object> serizlizedObjects = new Dictionary<int,object>();
 		private Dictionary<serizlizedObj, int> dictSerizlized = new Dictionary<serizlizedObj, int>();
 
-		public enum TagType : int
+		public enum TagType : byte
 		{
 			WRITEINSTANCEANDCACHEIT=0,
 			INSTANCEATCACHE=1,
@@ -273,12 +273,12 @@ namespace ASBinCode
 
 		internal void WriteTag(System.IO.BinaryWriter writer,TagType tag)
 		{
-			writer.Write((int)tag);
+			writer.Write((byte)tag);
 		}
 
 		internal TagType ReadTag(System.IO.BinaryReader reader)
 		{
-			return (TagType)reader.ReadInt32();
+			return (TagType)reader.ReadByte();
 		}
 
 

@@ -12,24 +12,20 @@ namespace ASCTest
 		public float progress = 0;
 		public NativeFunctionBase Create(string typename)
 		{
-			//Type ft = this.GetType().Assembly.GetType(typename);
-			//return (NativeFunctionBase)System.Activator.CreateInstance(ft);
-			//if (types == null)
-			//	types = typeof(extFunctions).Assembly.GetTypes();
-
-			//foreach (var item in types)
-			//{
-			//	if (item.FullName == typename)
-			//	{
-
-			//	}
-			//}
-
 			int dot = typename.LastIndexOf('.');
 			string t1 = typename.Substring(0, dot);
 			string t2 = typename.Substring(dot + 1);
 
-			Type c = this.GetType().Assembly.GetType(t1);
+			Type c = typeof(ASRuntime.Player).Assembly.GetType(t1);
+
+			if (c == null)
+			{
+				c = this.GetType().Assembly.GetType(t1);
+			}
+
+			if (c == null)
+				throw new ASRunTimeException("nativefunction " + typename + "not found",new InvalidOperationException());
+			
 			Type nt = c.GetNestedType(t2);
 
 			return (NativeFunctionBase)System.Activator.CreateInstance(nt);
@@ -39,7 +35,11 @@ namespace ASCTest
 		public void registrationAllFunction(CSWC bin)
 		{
 			bin.SetNativeFunctionFactory(this);
-			regAutoCreateCodes(bin);
+			var it= regAutoCreateCodes(bin);
+			while (it.MoveNext())
+			{
+				
+			}
 		}
 
 		IEnumerator INativeFunctionRegister.registrationFunction(CSWC bin)

@@ -105,10 +105,10 @@ namespace ASBinCode
 			block.hasTryStmt = hasTryStmt;
 			serizlized.Add(key,block);	
 
-			block.totalStackSlots = reader.ReadInt32();
+			block.totalStackSlots = reader.ReadUInt16();
 			block.scope = serizlizer.DeserializeObject<scopes.ScopeBase>(reader, scopes.ScopeBase.Deserialize);
 
-			int stepscount = reader.ReadInt32();
+			int stepscount = reader.ReadUInt16();
 			block.instructions = new OpStep[stepscount];block.opSteps = null;
 			for (int i = 0; i < stepscount; i++)
 			{
@@ -117,7 +117,7 @@ namespace ASBinCode
 				block.instructions[i] = step;
 			}
 
-			int regconvcount = reader.ReadInt32();
+			int regconvcount = reader.ReadUInt16();
 			block.regConvFromVar = new StackSlotAccessor[regconvcount];
 			for (int i = 0; i < regconvcount; i++)
 			{
@@ -138,7 +138,7 @@ namespace ASBinCode
 			writer.Write(define_class_id);
 			writer.Write(isoutclass);
 			writer.Write(hasTryStmt);
-			writer.Write(totalStackSlots);
+			writer.Write((ushort)totalStackSlots);
 
 			serizlizer.SerializeObject(writer, (scopes.ScopeBase)scope);
 
@@ -149,14 +149,14 @@ namespace ASBinCode
 			//	serizlizer.SerializeObject(writer, step);
 			//}
 
-			writer.Write(instructions.Length);
+			writer.Write((ushort)instructions.Length);
 			for (int i = 0; i < instructions.Length; i++)
 			{
 				var step = instructions[i];
 				serizlizer.SerializeObject(writer, step);
 			}
 
-			writer.Write(regConvFromVar.Length);
+			writer.Write((ushort)regConvFromVar.Length);
 			for (int i = 0; i < regConvFromVar.Length; i++)
 			{
 				StackSlotAccessor conv = regConvFromVar[i];

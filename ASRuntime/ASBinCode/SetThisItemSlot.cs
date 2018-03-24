@@ -9,14 +9,17 @@ namespace ASBinCode
     {
         public rtObjectBase bindObj;
         public RunTimeValueBase setindex;
-        
-        public override void clear()
+		public ASBinCode.rtti.ClassMember set_this_item;
+		public ASBinCode.rtti.ClassMember get_this_item;
+
+		public override void clear()
         {
             setindex = null;
             
             bindObj = null;
 
-            
+			set_this_item = null;
+			get_this_item = null;
         }
 
         public override bool isSetThisItem

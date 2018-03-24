@@ -300,7 +300,7 @@ namespace ASBinCode.rtti
 			///// 结构体排序序号(从1开始排起)
 			///// </summary>
 			//public int structIndex;
-			int structIndex = reader.ReadInt32();
+			int structIndex = reader.ReadUInt16(); //reader.ReadInt32();
 			///// <summary>
 			///// 是否链接到系统对象
 			///// </summary>
@@ -447,7 +447,7 @@ namespace ASBinCode.rtti
 			///// 类成员定义
 			///// </summary>
 			//public ClassMemberList classMembers;
-			int membercount = reader.ReadInt32();
+			int membercount = reader.ReadUInt16(); //reader.ReadInt32();
 			for (int i = 0; i < membercount; i++)
 			{
 				_class.classMembers.Add(serizlizer.DeserializeObject<ClassMember>(reader, ClassMember.LoadClassMember));
@@ -457,7 +457,7 @@ namespace ASBinCode.rtti
 			///// 数据字段表
 			///// </summary>
 			//public List<ClassMember> fields;
-			int fieldscount = reader.ReadInt32();
+			int fieldscount = reader.ReadUInt16(); //reader.ReadInt32();
 			for (int i = 0; i < fieldscount; i++)
 			{
 				_class.fields.Add(serizlizer.DeserializeObject<ClassMember>(reader, ClassMember.LoadClassMember));
@@ -474,7 +474,7 @@ namespace ASBinCode.rtti
 			///// 记录了接口的一个方法对应类的哪个成员实现
 			///// </summary>
 			//public Dictionary<Class, int[]> implements;
-			int implementscount = reader.ReadInt32();
+			int implementscount = reader.ReadSByte();
 			for (int i = 0; i < implementscount; i++)
 			{
 				Class keyclass = serizlizer.DeserializeObject<Class>(reader, Class.LoadClass);
@@ -522,7 +522,7 @@ namespace ASBinCode.rtti
 			///// 结构体排序序号(从1开始排起)
 			///// </summary>
 			//public int structIndex;
-			writer.Write(structIndex);
+			writer.Write((ushort)structIndex);
 			///// <summary>
 			///// 是否链接到系统对象
 			///// </summary>
@@ -664,7 +664,7 @@ namespace ASBinCode.rtti
 			///// 类成员定义
 			///// </summary>
 			//public ClassMemberList classMembers;
-			writer.Write(classMembers.Count);
+			writer.Write((ushort)classMembers.Count);
 			for (int i = 0; i < classMembers.Count; i++)
 			{
 				serizlizer.SerializeObject(writer, classMembers[i]);
@@ -674,7 +674,7 @@ namespace ASBinCode.rtti
 			///// 数据字段表
 			///// </summary>
 			//public List<ClassMember> fields;
-			writer.Write(fields.Count);
+			writer.Write((ushort)fields.Count);
 			for (int i = 0; i < fields.Count; i++)
 			{
 				serizlizer.SerializeObject(writer, fields[i]);
@@ -694,7 +694,7 @@ namespace ASBinCode.rtti
 
 			if (!isInterface)
 			{
-				writer.Write(implements.Count);
+				writer.Write((sbyte)implements.Count);
 				foreach (var item in implements)
 				{
 					serizlizer.SerializeObject(writer, item.Key);
@@ -707,7 +707,7 @@ namespace ASBinCode.rtti
 			}
 			else
 			{
-				writer.Write(0);
+				writer.Write((sbyte)0);
 			}
 
 		}

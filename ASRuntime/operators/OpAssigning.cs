@@ -44,7 +44,7 @@ namespace ASRuntime.operators
 
 					if (slot is SetThisItemSlot)
 					{
-						_doSetThisItem(((SetThisItemSlot)slot).bindObj, v, ((SetThisItemSlot)slot).setindex, oslot, frame, step);
+						_doSetThisItem(((SetThisItemSlot)slot).bindObj, ((SetThisItemSlot)slot).set_this_item ,v, ((SetThisItemSlot)slot).setindex, oslot, frame, step);
 
 						return;
 					}
@@ -297,14 +297,14 @@ namespace ASRuntime.operators
         }
 
 
-        public static void _doSetThisItem(ASBinCode.rtData.rtObjectBase thisObj,
+        public static void _doSetThisItem(ASBinCode.rtData.rtObjectBase thisObj, ASBinCode.rtti.ClassMember set_this_item,
             RunTimeValueBase v,RunTimeValueBase index,StackSlot slot,StackFrame frame,OpStep step
             )
         {
             //***读取setter***
             RunTimeValueBase func;
 
-            func = ((MethodGetterBase)thisObj.value._class.set_this_item.bindField).getMethod(
+            func = ((MethodGetterBase)set_this_item.bindField).getMethod(
                 thisObj
                 );
             

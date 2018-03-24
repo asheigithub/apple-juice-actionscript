@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2018/2/27'</value>
+      <value>'2018/3/23'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -33,11 +33,12 @@
       <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src</path-element>
       <path-element>F:\ASTool\as3_commapi\api</path-element>
       <path-element>F:\ASTool\as3_commapi\sharpapi</path-element>
+      <path-element>F:\ASTool\LinkCodeGenCLI\bin\Debug\as3api</path-element>
       <path-element>D:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\AutoGenTest.as</path-element>
+    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

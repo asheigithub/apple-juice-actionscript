@@ -47,8 +47,8 @@ namespace ASCTest
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-									   path = @"../..\testScript\AS3Testproj\amd";
-				//path = @"../..\testScript\AS3Testproj\src";
+									   //path = @"../..\testScript\AS3Testproj\amd";
+				path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -224,7 +224,7 @@ namespace ASCTest
             ASCompiler.compiler.Builder builder = new ASCompiler.compiler.Builder();
 			//builder.LoadLibrary( System.IO.File.ReadAllBytes("as3protobuf.swc") );
 
-			//builder.LoadLibrary(System.IO.File.ReadAllBytes("F:/ASTool/LinkCodeGenCLI/bin/Debug/as3unitylib.cswc"));
+			builder.LoadLibrary(System.IO.File.ReadAllBytes("F:/ASTool/LinkCodeGenCLI/bin/Debug/as3unitylib.cswc"));
 
 			//builder.LoadLibrary(System.IO.File.ReadAllBytes("astoolglobal.swc"));
 			//builder.Build(proj, new ASBinCode.INativeFunctionRegister[] { new extFunctions() } );

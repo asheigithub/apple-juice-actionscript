@@ -1154,6 +1154,66 @@ namespace LinkCodeGen
 			as3sb.AppendLine("}");
 		}
 
+
+
+
+		public static string GetReflectionInvokeNativeFunctionTypeCodeString(Type type)
+		{
+			//public const int LINKTYPE = 0;
+			//public const int SHORT = 1;
+			//public const int USHORT = 2;
+			//public const int INT = 3;
+			//public const int UINT = 4;
+			//public const int FLOAT = 5;
+			//public const int NUMBER = 6;
+			//public const int BOOLEAN = 7;
+			//public const int STRING = 8;
+			//public const int VOID = 9;
+
+
+			if (type == typeof(void))
+			{
+				return "ReflectionInvokeNativeFunction.VOID";
+			}
+			else if (type == typeof(bool))
+			{
+				return "ReflectionInvokeNativeFunction.BOOLEAN";
+			}
+			else if (type == typeof(short))
+			{
+				return "ReflectionInvokeNativeFunction.SHORT";
+			}
+			else if (type == typeof(ushort))
+			{
+				return "ReflectionInvokeNativeFunction.USHORT";
+			}
+			else if (type == typeof(int))
+			{
+				return "ReflectionInvokeNativeFunction.INT";
+			}
+			else if (type == typeof(uint))
+			{
+				return "ReflectionInvokeNativeFunction.UINT";
+			}
+			else if (type == typeof(float))
+			{
+				return "ReflectionInvokeNativeFunction.FLOAT";
+			}
+			else if (type == typeof(double))
+			{
+				return "ReflectionInvokeNativeFunction.NUMBER";
+			}
+			else if (type == typeof(string))
+			{
+				return "ReflectionInvokeNativeFunction.STRING";
+			}
+			else
+			{
+				return "ReflectionInvokeNativeFunction.LINKTYPE";
+			}
+		}
+
+
 	}
 
 

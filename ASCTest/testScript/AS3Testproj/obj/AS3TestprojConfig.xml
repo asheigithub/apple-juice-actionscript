@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2018/2/27'</value>
+      <value>'2018/3/24'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -38,7 +38,7 @@
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\AutoGenTest.as</path-element>
+    <path-element>F:\ASTool\ASCTest\testScript\AS3Testproj\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

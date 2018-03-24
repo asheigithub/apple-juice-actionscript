@@ -691,12 +691,89 @@ namespace LinkCodeGen
 				as3api.AppendLine();
 
 				//***编写方法的本地代码***
-				//regfunctions.Add( string.Format( "\t\t\tbin.regNativeFunction(new {0}());", nativefunName ));
-				regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunName,nativefunName));
 
 
-				MethodNativeCodeCreator mc = new MethodNativeCodeCreator(nativefunName, method,type);
-				nativefuncClasses.Add(mc.GetCode());
+				//****检测是否可以用反射。***
+				bool checkreflection = true;
+				
+				if (method.ReturnType.IsByRef)
+					checkreflection = false;
+				
+
+				var param = method.GetParameters();
+				foreach (var item in param)
+				{
+					if (item.ParameterType.IsByRef)
+						checkreflection = false;
+					if (item.ParameterType.Equals(typeof(Type)))
+						checkreflection = false;
+					//if (item.ParameterType.IsValueType)
+					//	checkreflection = false;
+				}
+				if (method.ReturnType.Equals(typeof(Type)))
+					checkreflection = false;
+
+				if (checkreflection && false)
+				{
+					bool needswap = false;
+					System.Reflection.PropertyInfo propertyInfo;
+					if (MethodNativeCodeCreator.CheckIsIndexerSetter((System.Reflection.MethodInfo)method, method.DeclaringType, out propertyInfo) && param.Length == 2)
+					{
+						needswap = true;
+					}
+
+					string returntypestr;
+					if (method.ReturnType.IsValueType && !method.ReturnType.Equals(typeof(void)))
+					{
+						returntypestr = NativeCodeCreatorBase.GetTypeFullName(method.ReturnType);
+					}
+					else
+					{
+						returntypestr = "object";
+					}
+					string regrefl = string.Format("\t\t\tbin.regNativeFunction(new ReflectionInvokeNativeFunction<" + returntypestr + ">("
+					+ (method.IsStatic ? "true" : "false") + ","
+						+ (needswap ? "true" : "false") + ","
+						+ param.Length + ",\"{0}\",\"{1}\",", nativefunName, method.Name);
+					regrefl += GetReflectionInvokeNativeFunctionTypeCodeString(method.ReturnType) + " ,\n\t\t\t\t";
+
+					regrefl += "new int[]";
+					regrefl += "{";
+
+					if (needswap)
+					{
+						regrefl += GetReflectionInvokeNativeFunctionTypeCodeString(param[1].ParameterType);
+						regrefl += ",\n\t\t\t\t";
+						regrefl += GetReflectionInvokeNativeFunctionTypeCodeString(param[0].ParameterType);
+					}
+					else
+					{
+						for (int i = 0; i < param.Length; i++)
+						{
+							regrefl += GetReflectionInvokeNativeFunctionTypeCodeString(param[i].ParameterType);
+							if (i < param.Length - 1)
+							{
+								regrefl += ",\n\t\t\t\t";
+							}
+						}
+					}
+					regrefl += "}))";
+
+					regrefl += ";";
+
+					regfunctions.Add(regrefl);
+
+				}
+				else
+				{
+
+					regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunName, nativefunName));
+					MethodNativeCodeCreator mc = new MethodNativeCodeCreator(nativefunName, method, type);
+					nativefuncClasses.Add(mc.GetCode());
+
+				}
+
+
 			}
 
 			as3api.AppendLine("\t}");

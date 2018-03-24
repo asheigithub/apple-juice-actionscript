@@ -273,13 +273,13 @@ namespace LinkCodeGenCLI
 
 			generator.AddTypes(types);
 
-			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(outputcode)))
+			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName( System.IO.Path.GetFullPath( outputcode))))
 			{
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(outputcode));
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(outputcode)));
 			}
-			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(regfunctioncode)))
+			if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName( System.IO.Path.GetFullPath( regfunctioncode))))
 			{
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(regfunctioncode));
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(regfunctioncode)));
 			}
 			using (System.IO.FileStream fs = new System.IO.FileStream(outputcode, System.IO.FileMode.Create))
 			{
@@ -397,7 +397,10 @@ namespace LinkCodeGenCLI
 				byte[] bin = swc.toBytes();
 
 				string as3libfile = (string)appSettingsReader.GetValue("as3libfile", typeof(string));
-				System.IO.File.WriteAllBytes(as3libfile, swc.toBytes());
+				System.IO.File.WriteAllBytes(as3libfile, bin);
+
+				//ASBinCode.CSWC.loadFromBytes(bin);
+
 
 				Console.WriteLine("The work is done. Press any key to finish。");
 				Console.ReadLine();
