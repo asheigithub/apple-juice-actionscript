@@ -152,6 +152,8 @@ namespace LinkCodeGenCLI
 			csharpcodepath = replacePathVariable(csharpcodepath);
 			regfunctioncode = replacePathVariable(regfunctioncode);
 
+			List<string> notexistdlls = new List<string>();
+
 			//****加载dll***
 			List<Type> types = new List<Type>();
 			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
@@ -171,6 +173,12 @@ namespace LinkCodeGenCLI
 					
 					try
 					{
+						if (!System.IO.File.Exists(fullpath))
+						{
+							notexistdlls.Add(fullpath);
+							continue;
+						}
+
 						var dll = System.Reflection.Assembly.ReflectionOnlyLoadFrom(fullpath);
 
 						dictionaryAssemblyLoadPath.Add(dll.FullName, fullpath);
@@ -401,7 +409,19 @@ namespace LinkCodeGenCLI
 
 				//ASBinCode.CSWC.loadFromBytes(bin);
 
+				if (notexistdlls.Count > 0)
+				{
+					Console.ForegroundColor = ConsoleColor.Yellow;
+					Console.WriteLine("The following DLL file is not found, please check");
 
+					foreach (var item in notexistdlls)
+					{
+						Console.WriteLine("\t"+ item);
+					}
+
+				}
+
+				Console.ResetColor();
 				Console.WriteLine("The work is done. Press any key to finish。");
 				Console.ReadLine();
 			}

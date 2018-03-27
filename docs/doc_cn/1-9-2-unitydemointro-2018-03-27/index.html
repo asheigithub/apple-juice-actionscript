@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    
+    <title>Demo工程介绍 | Apple Juice</title>
+    
+    
+        <meta name="keywords" content="Demo工程介绍">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="Unity部分打开HotFixDemoScene1.scene场景，就能看到示例工程。本示例工程介绍了怎样使用ActionScript3执行逻辑。总体而言，要在Unity项目中执行ActionScript3,需要以下几个步骤：  创建ActionScript3运行时。 加载ActionScript3字节码。 创建ActionScript3的入口对象。 调用 或者每帧都调用一次刚才创建的Action">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Demo工程介绍">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/index.html">
+<meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="Unity部分打开HotFixDemoScene1.scene场景，就能看到示例工程。本示例工程介绍了怎样使用ActionScript3执行逻辑。总体而言，要在Unity项目中执行ActionScript3,需要以下几个步骤：  创建ActionScript3运行时。 加载ActionScript3字节码。 创建ActionScript3的入口对象。 调用 或者每帧都调用一次刚才创建的Action">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/unitydemointro/nogc.jpg">
+<meta property="og:updated_time" content="2018-03-27T10:14:17.618Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Demo工程介绍">
+<meta name="twitter:description" content="Unity部分打开HotFixDemoScene1.scene场景，就能看到示例工程。本示例工程介绍了怎样使用ActionScript3执行逻辑。总体而言，要在Unity项目中执行ActionScript3,需要以下几个步骤：  创建ActionScript3运行时。 加载ActionScript3字节码。 创建ActionScript3的入口对象。 调用 或者每帧都调用一次刚才创建的Action">
+<meta name="twitter:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/unitydemointro/nogc.jpg">
+    
+
+    
+
+    
+        <link rel="icon" href="/apple-juice-actionscript/doc_cn/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/css/style.css">
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/plugins/cookie/1.4.1/jquery.cookie.js"></script>
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+    
+</head>
+</html>
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/apple-juice-actionscript/doc_cn/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Apple Juice</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
+                
+            </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/apple-juice-actionscript/doc_cn/',
+        CONTENT_URL: '/apple-juice-actionscript/doc_cn/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/apple-juice-actionscript/doc_cn/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap" id="categories">
+        <h3 class="widget-title">
+            <span>分类</span>
+            &nbsp;
+            <a id="allExpand" href="#">
+                <i class="fa fa-angle-double-down fa-2x"></i>
+            </a>
+        </h3>
+        
+        
+        
+         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            开始使用
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            Unity工程
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">内容说明</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">Demo工程介绍</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
+    </div>
+    <script>
+        $(document).ready(function() {
+            var iconFolderOpenClass  = 'fa-folder-open';
+            var iconFolderCloseClass = 'fa-folder';
+            var iconAllExpandClass = 'fa-angle-double-down';
+            var iconAllPackClass = 'fa-angle-double-up';
+            // Handle directory-tree expansion:
+            // 左键单独展开目录
+            $(document).on('click', '#categories a[data-role="directory"]', function (event) {
+                event.preventDefault();
+
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var subtree = $(this).siblings('ul');
+                icon.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if (expanded) {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideUp({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderCloseClass);
+                } else {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideDown({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderOpenClass);
+                }
+            });
+            // 右键展开下属所有目录
+            $('#categories a[data-role="directory"]').bind("contextmenu", function(event){
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var listNode = $(this).siblings('ul');
+                var subtrees = $.merge(listNode.find('li ul'), listNode);
+                var icons = $.merge(listNode.find('.fa'), icon);
+                icons.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if(expanded) {
+                    subtrees.slideUp({ duration: 100 });
+                    icons.addClass(iconFolderCloseClass);
+                } else {
+                    subtrees.slideDown({ duration: 100 });
+                    icons.addClass(iconFolderOpenClass);
+                }
+            })
+            // 展开关闭所有目录按钮
+            $(document).on('click', '#allExpand', function (event) {
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconAllExpandClass);
+                icon.removeClass(iconAllExpandClass).removeClass(iconAllPackClass);
+                if(expanded) {
+                    $('#sidebar .fa.fa-folder').removeClass('fa-folder').addClass('fa-folder-open')
+                    $('#categories li ul').slideDown({ duration: 100 });
+                    icon.addClass(iconAllPackClass);
+                } else {
+                    $('#sidebar .fa.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder')
+                    $('#categories li ul').slideUp({ duration: 100 });
+                    icon.addClass(iconAllExpandClass);
+                }
+            });  
+        });
+    </script>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+            <section id="main"><article id="post-1-9-2-unitydemointro" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/1-3unityproj/">Unity工程</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">
+            <time datetime="2018-03-27T07:49:37.000Z" itemprop="datePublished">2018-03-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Demo工程介绍
+        </h1>
+    
+
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <h3 id="Unity部分"><a href="#Unity部分" class="headerlink" title="Unity部分"></a>Unity部分</h3><p>打开HotFixDemoScene1.scene场景，就能看到示例工程。本示例工程介绍了怎样使用ActionScript3执行逻辑。<br>总体而言，要在Unity项目中执行ActionScript3,需要以下几个步骤：</p>
+<ol>
+<li>创建ActionScript3运行时。</li>
+<li>加载ActionScript3字节码。</li>
+<li>创建ActionScript3的入口对象。</li>
+<li>调用 或者每帧都调用一次刚才创建的ActionScript3对象的某个方法。</li>
+</ol>
+<h4 id="创建ActionScript3运行时"><a href="#创建ActionScript3运行时" class="headerlink" title="创建ActionScript3运行时"></a>创建ActionScript3运行时</h4><p>首先需要创建一个ActionScript3的虚拟机。这个虚拟机可以实际执行ActionScript3代码。一般来说全局只需要一个，在任意需要执行ActionScrip3的地方都调用这个虚拟机来执行。<br>有两种方案，一种是将虚拟机保存在一个全局静态变量中，另一种是创建一个GameObject,使它一直存在于场景中。在这个GameObject上附加一个MonoBehaviour,让这个MonoBehaviour承载虚拟机。 可随时用GameObject.Find()来访问。<br>本Demo工程选用第二种方案。<br>在场景中有一个名叫AS3Player的GameObject。在下面挂载了ActionScriptStartUp.cs。ActionScriptStartUp是一个Monobehaviour。如前所述，此Monobehaviour承载了运行时，并且每帧都会调用ActionScript3的方法，以驱动逻辑更新。</p>
+<p>以下代码可创建AS3运行时。<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> flashplayer = <span class="keyword">new</span> ASRuntime.Player();</span><br></pre></td></tr></table></figure></p>
+<p>以下代码用以从二进制字节数组中加载as3代码。  </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_ANDROID</span></span><br><span class="line">		</span><br><span class="line">		WWW www = <span class="keyword">new</span> WWW(Application.streamingAssetsPath + <span class="string">"/hotfix.cswc"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">		WWW www = <span class="keyword">new</span> WWW(<span class="string">"file:///"</span> + Application.streamingAssetsPath + <span class="string">"/hotfix.cswc"</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">		<span class="keyword">while</span> (!www.isDone)</span><br><span class="line">			<span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (!<span class="keyword">string</span>.IsNullOrEmpty(www.error))</span><br><span class="line">			UnityEngine.Debug.LogError(www.error);</span><br><span class="line"></span><br><span class="line">		<span class="comment">//加载as3编译器生成的字节码。</span></span><br><span class="line">		<span class="comment">//Loads the byte code generated by the compiler.</span></span><br><span class="line">		ASBinCode.CSWC swc = ASBinCode.CSWC.loadFromBytes(www.bytes);</span><br><span class="line">		www.Dispose();</span><br><span class="line">		</span><br><span class="line">		ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>字节码可以保存在任意地方，您也可以从网络下载字节码。</p>
+</blockquote>
+<p>以下代码开始加载API代码。由于可能导出了大量的API函数，因此加载时可以试用进度条。<br>使用协程功能，可以避免卡顿，和监测加载进度。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//**注册本地代码有可能非常之多。所以提供了一个进度条**</span></span><br><span class="line">		<span class="comment">//API code can be very much. So a progress bar is provided</span></span><br><span class="line">		<span class="keyword">int</span> functioncount = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">while</span> (regenumerator.MoveNext())</span><br><span class="line">		&#123;</span><br><span class="line">			functioncount++;</span><br><span class="line">			<span class="keyword">if</span> (functioncount % <span class="number">50</span> == <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				progress.<span class="keyword">value</span> = extfunctions.progress;</span><br><span class="line">				progressValue.text = <span class="string">"loading:"</span> + extfunctions.progress * <span class="number">100</span> + <span class="string">"%"</span>;</span><br><span class="line">				<span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，需要让运行时加载二进制字节码，用以下代码进行加载:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flashplayer.loadCode(swc);</span><br></pre></td></tr></table></figure>
+<p>当运行时加载完成字节码后，即可调用运行时的一些方法，来对ActionScript3代码进行操作。<br>例如，createInstance()可用来创建一个ActionScript3对象，getMethod则可以访问对象的某个方法，等等。<br>我们创建 Main.as 的一个对象实例，然后找到它的update方法，并保存起来。每帧都执行一次此实例的update方法，即可推动逻辑更新。  </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">main = flashplayer.createInstance(<span class="string">"Main"</span>);</span><br><span class="line">updatemethod= flashplayer.getMethod(main, <span class="string">"update"</span>);</span><br></pre></td></tr></table></figure>
+<p>在MonoBehaviour的Update()方法中，调用运行时驱动ActionScript3代码。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (player != <span class="literal">null</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		player.invokeMethod(main, updatemethod);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ActionScript3部分"><a href="#ActionScript3部分" class="headerlink" title="ActionScript3部分"></a>ActionScript3部分</h3><p>现在我们来看ActionScript3部分的代码。<br>本Demo的逻辑功能都定义在Main类中。当上面创建Main的实例时，构造函数将会被调用。<br>构造函数中，创建了100个立方体到场景中。<br>然后，给场景中的按钮追加事件处理函数。</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> cube:UObject = GameObject.find(<span class="string">"Cube"</span>);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) </span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">var</span> c2:GameObject = GameObject.createPrimitive( PrimitiveType.Cube); <span class="comment">//UObject.instantiate__(cube) as GameObject;</span></span><br><span class="line">	MeshRenderer( c2.getComponent(MeshRenderer)).material = MeshRenderer( GameObject( cube).getComponent(MeshRenderer)).material;</span><br><span class="line">	</span><br><span class="line">	c2.transform.position = <span class="keyword">new</span> Vector3( Random.range(<span class="number">-5</span>,<span class="number">5</span>),Random.range(<span class="number">0</span>,<span class="number">5</span>),Random.range(<span class="number">-5</span>,<span class="number">5</span>) );</span><br><span class="line">	</span><br><span class="line">	cubes.push(c2);</span><br><span class="line">	</span><br><span class="line">	mvs.push( <span class="keyword">new</span> Vector3(Random.range( <span class="number">-5</span>, <span class="number">5</span>), Random.range(<span class="number">-5</span>, <span class="number">5</span>), Random.range( <span class="number">-5</span>, <span class="number">5</span>)) );</span><br><span class="line">	mvs[mvs.length - <span class="number">1</span>].normalize();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//if (i &gt; 10)</span></span><br><span class="line">	<span class="comment">//&#123;</span></span><br><span class="line">		<span class="comment">//c2.setActive(false);</span></span><br><span class="line">		<span class="comment">//</span></span><br><span class="line">	<span class="comment">//&#125;</span></span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> btn:Button = Button( GameObject.find(<span class="string">"Button"</span>).getComponent(Button));	</span><br><span class="line"></span><br><span class="line">btn.onClick.addListener(			</span><br><span class="line">	onclick			</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>Main类有实例方法update。在Unity工程中，每帧都会驱动此方法，这个方法更新立方体们的位置。</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">update</span><span class="params">()</span>:void</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (isstop)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) </span><br><span class="line">	&#123;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">var</span> cube:GameObject = cubes[i];</span><br><span class="line">		<span class="keyword">var</span> v:Vector3 = mvs[i];</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">var</span> vv:Vector3 = <span class="keyword">new</span> Vector3(<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>);</span><br><span class="line">		</span><br><span class="line">		cube.transform.localPosition += v * Time.deltaTime;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">var</span> p:Vector3 = cube.transform.localPosition;</span><br><span class="line">		<span class="keyword">if</span> (p.x &lt;<span class="number">-5</span> || p.y &lt; <span class="number">-5</span> || p.z &lt; <span class="number">-5</span> || p.x &gt; <span class="number">5</span> || p.y &gt; <span class="number">5</span> || p.z &gt; <span class="number">5</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			mvs[i] =-mvs[i];</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//var k:NavMesh;</span></span><br><span class="line">		<span class="comment">//k = cube;</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>您可以点击场景中的按钮，观察事件的处理。</p>
+<blockquote>
+<p>update方法中，可以看到使用了大量的new Vector3操作。由于Vector3是一个结构体。在C#中，方法内部new结构体不会导致GC。<br>Apple Juice 脚本引擎同样实现了这个效果，因此，update代码是不会导致内存分配的。  </p>
+</blockquote>
+<p><img src="/apple-juice-actionscript/doc_cn/images/unitydemointro/nogc.jpg" alt="nogc"></p>
+
+            </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
+    
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
+</section>
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            asheigithub &copy; 2018 
+            
+			<a href="https://github.com/asheigithub/apple-juice-actionscript/blob/master/LICENSE" rel="external nofollow noopener noreferrer" target="_blank"><img style="max-width:100%;" alt="license" src="https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" data-canonical-src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+			
+            <br> Powered by <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a>. Theme - <a href="https://github.com/zthxxx/hexo-theme-Wikitten" rel="external nofollow noopener noreferrer" target="_blank">wikitten</a>
+            
+        </div>
+    </div>
+</footer>
+        
+
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+        <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true,
+            TeX: {
+                equationNumbers: {
+                  autoNumber: 'AMS'
+                }
+            }
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/apple-juice-actionscript/doc_cn/js/main.js"></script>
+
+    </div>
+</body>

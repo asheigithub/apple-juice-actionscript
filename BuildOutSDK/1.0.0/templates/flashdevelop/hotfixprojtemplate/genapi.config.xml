@@ -60,6 +60,7 @@
 	you may need to find its dependent assemblies in the UnityAssemblies path, and so on.-->
   <resolvepath>
 	<item value="{UNITYINSTALLPATH}\Editor\Data\Managed"></item>
+	<item value="{UNITYINSTALLPATH}\Editor\Data\Managed\UnityEngine"></item>
 	<item value="{UNITYINSTALLPATH}\Editor\Data\UnityExtensions\Unity\GUISystem"></item>
 	<item value="{UNITYPROJPATH}\Library\UnityAssemblies"></item>
   </resolvepath>
