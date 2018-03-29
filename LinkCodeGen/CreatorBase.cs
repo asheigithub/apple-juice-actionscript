@@ -1056,6 +1056,10 @@ namespace LinkCodeGen
 			{
 				var m = members[i];
 
+				if (IsSkipMember(m))
+					continue;
+
+
 				if (m is MethodBase)
 				{
 					if (((MethodBase)m).IsStatic != method.IsStatic)

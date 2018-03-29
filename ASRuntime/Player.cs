@@ -4346,7 +4346,7 @@ namespace ASRuntime
 							System.Reflection.MethodInfo method;
 							try
 							{
-								method = methodGetter.GetMethodInfo();
+								method = methodGetter.GetMethodInfo(functiondefine,swc,this);
 							}
 							catch (System.Reflection.AmbiguousMatchException e)
 							{

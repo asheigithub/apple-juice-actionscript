@@ -5,6 +5,7 @@ using ASBinCode;
 using ASBinCode.rtti;
 using System.Reflection;
 using System.Globalization;
+using ASBinCode.rtData;
 
 namespace ASRuntime.nativefuncs
 {
@@ -32,7 +33,7 @@ namespace ASRuntime.nativefuncs
 	/// <summary>
 	/// 通过反射调用本地函数。
 	/// </summary>
-	public sealed class ReflectionInvokeNativeFunction<T> : ReflectionInvokeNativeFunction
+	public sealed class ReflectionInvokeNativeFunction<T> : ReflectionInvokeNativeFunction,IMethodGetter
 	{
 		
 
@@ -201,7 +202,8 @@ namespace ASRuntime.nativefuncs
 			return result;
 
 		}
-
+		private object _cthis;
+		private RunTimeValueBase _cthisobj;
 
 		private MethodInfo _cachemethod;
 		private object[] sendparameters;
@@ -238,26 +240,9 @@ namespace ASRuntime.nativefuncs
 			{
 				try
 				{
-					if (!isstatic)
-					{
-						_cachemethod =
-							_this.GetType().GetMethod(reflectionname, System.Reflection.BindingFlags.Public | BindingFlags.Instance, new MyBinder(),
-							getNativeFunctionParameterTypes(functionDefine, stackframe.player.swc, stackframe.player), null);
-					}
-					else
-					{
-						var cls = ((ASBinCode.rtData.rtObjectBase)thisObj).value._class;
-
-						var cextend = cls.linkObjCreator;
-						var func = stackframe.player.swc.getNativeFunction(((ClassMethodGetter)cextend.bindField).functionId);
-						var type = ((ILinkSystemObjCreator)func).getLinkSystemObjType();
-
-						_cachemethod =
-							type.GetMethod(reflectionname, System.Reflection.BindingFlags.Public | BindingFlags.Static, new MyBinder(),
-							getNativeFunctionParameterTypes(functionDefine, stackframe.player.swc, stackframe.player), null);
-
-					}
-
+					_cthis = _this;_cthisobj = thisObj;
+					GetMethodInfo(functionDefine, stackframe.player.swc, stackframe.player);
+					
 					if (_cachemethod == null)
 					{
 						isreflectionfailed = true;
@@ -293,7 +278,10 @@ namespace ASRuntime.nativefuncs
 					stackframe.throwAneException(token, referrormsg);
 					return;
 				}
-
+				finally
+				{
+					_cthis = null; _cthisobj = null;
+				}
 
 
 				sendparameters = new object[functionDefine.signature.parameters.Count];
@@ -356,6 +344,7 @@ namespace ASRuntime.nativefuncs
 					sendparameters[1] = temp;
 				}
 
+				
 
 				object _result_ = _cachemethod.Invoke(_this, sendparameters);
 				if (!isstatic)
@@ -456,12 +445,30 @@ namespace ASRuntime.nativefuncs
 
 		}
 
+		public MethodInfo GetMethodInfo(ASBinCode.rtti.FunctionDefine functionDefine, ASBinCode.CSWC swc, ASRuntime.Player player)
+		{
+			if (!isstatic)
+			{
+				_cachemethod =
+					_cthis.GetType().GetMethod(reflectionname, System.Reflection.BindingFlags.Public | BindingFlags.Instance, new MyBinder(),
+					getNativeFunctionParameterTypes(functionDefine, swc, player), null);
+			}
+			else
+			{
+				var cls = ((ASBinCode.rtData.rtObjectBase)_cthisobj).value._class;
 
+				var cextend = cls.linkObjCreator;
+				var func = swc.getNativeFunction(((ClassMethodGetter)cextend.bindField).functionId);
+				var type = ((ILinkSystemObjCreator)func).getLinkSystemObjType();
 
+				_cachemethod =
+					type.GetMethod(reflectionname, System.Reflection.BindingFlags.Public | BindingFlags.Static, new MyBinder(),
+					getNativeFunctionParameterTypes(functionDefine, swc, player), null);
 
+			}
 
-
-
+			return _cachemethod;
+		}
 
 		class MyBinder : Binder
 		{

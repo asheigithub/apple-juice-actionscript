@@ -99,7 +99,7 @@ namespace ASRuntime.nativefuncs.linksystem
 			}
 
 			private System.Reflection.MethodInfo method;
-			public System.Reflection.MethodInfo GetMethodInfo()
+			public System.Reflection.MethodInfo GetMethodInfo(ASBinCode.rtti.FunctionDefine functionDefine, ASBinCode.CSWC swc, ASRuntime.Player player)
 			{
 				if (method == null)
 				{

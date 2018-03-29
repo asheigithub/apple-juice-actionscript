@@ -20,6 +20,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 - 对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。
 - 对导出的类型有特殊优化。只要在方法的局部变量中使用，则脚本本身不产生额外的对象分配。
 - 实现操作符重载。导出的对象如果有操作符重载，则在脚本中同样可以使用。
+- 可以直接在脚本中继承MonoBehaviour。并且还可以将它挂载到GameObject上。
 - 可以使用yield语句返回一个IEnumerator,然后用Iterator包装为.net的IEnumerator接口。所以可以直接在脚本中写Unity的协程。如如下代码所示:  
 ````actionscript
     var mono:MonoBehaviour = GameObject.find("AS3Player").getComponent(MonoBehaviour) as MonoBehaviour;

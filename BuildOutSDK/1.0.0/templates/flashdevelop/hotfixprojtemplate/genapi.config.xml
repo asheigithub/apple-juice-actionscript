@@ -220,7 +220,7 @@
     
     <item value="UnityEngine.Texture2D::Boolean get_alphaIsTransparency()"></item>
     <item value="UnityEngine.Texture2D::Void set_alphaIsTransparency(Boolean)"></item>
-
+	<item value="UnityEngine.GameObject::UnityEngine.Component AddComponent(System.String)"></item>
 
   </notcreatemembers>
 </configuration>

@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Apple Juice">
 <meta property="og:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 不在任何命名空间下的类型不会被导出。 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和Actio">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-27T10:15:12.467Z">
+<meta property="og:updated_time" content="2018-03-28T10:13:07.178Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content=".net API的导出">
 <meta name="twitter:description" content=".net API可以由SDK中的工具LinkCodeGen.exe进行导出。但是由于语言限制，某些类型是无法被导出的。 不能被导出的类型 不在任何命名空间下的类型不会被导出。 标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出. System.Type类型。 System.Type类型和Actio">
@@ -183,6 +183,24 @@
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            进阶话题
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            更好的使用
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a></li>  </ul> 
+                    </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
     </div>
     <script>
@@ -306,7 +324,7 @@
 <li>标记为System.ObsoleteAttribute的类型。这些类型被标记为过时的，有可能导致编译失败。因此，工具检查到这样的类型或成员时，将不会导出.</li>
 <li>System.Type类型。 System.Type类型和ActionScript3的Class有特殊关联,System.Type类型本身不会被导出。</li>
 <li>非公开的类型和成员不会被导出。只有Public的类型才能导出。</li>
-<li>泛型定义类型不会被导出。但是如果.net类库中有泛型类型，这个泛型类型是可以被导出的。例如 List<t> 本身是不会被导出的，但是如果.net类库中有List<string> 这样的类型，则List<string>会被自动处理。  </string></string></t></li>
+<li>泛型定义类型不会被导出。但是如果.net类库中有泛型类型，这个泛型类型是可以被导出的。例如 List&lt;T&gt; 本身是不会被导出的，但是如果.net类库中有List&lt;String&gt; 这样的类型，则List&lt;String&gt;会被自动处理。  </li>
 <li>如果某个类型继承自不可导出的类型，那么它也同样不能导出。</li>
 </ul>
 <h4 id="不能被导出的成员"><a href="#不能被导出的成员" class="headerlink" title="不能被导出的成员"></a>不能被导出的成员</h4><ul>

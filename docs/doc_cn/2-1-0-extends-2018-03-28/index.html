@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    
+    <title>脚本继承 | Apple Juice</title>
+    
+    
+        <meta name="keywords" content="脚本继承">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="继承继承是指一种代码重用的形式，允许基于现有类开发新类。现有类通常称为基类 或超类，新类通常称为子类。继承的主要优势是，允许重复使用基类中的代码，但不修改现有代码。此外，继承不要求改变其它类与基类交互的方式。不必修改可能已经过彻底测试或可能已被使用的现有类，使用继承可将该类视为一个集成模块，可使用其它属性或方法对它进行扩展。因此，您使用 extends 关键字指明类从另一类继承。通过继承还可以在代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="脚本继承">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/index.html">
+<meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="继承继承是指一种代码重用的形式，允许基于现有类开发新类。现有类通常称为基类 或超类，新类通常称为子类。继承的主要优势是，允许重复使用基类中的代码，但不修改现有代码。此外，继承不要求改变其它类与基类交互的方式。不必修改可能已经过彻底测试或可能已被使用的现有类，使用继承可将该类视为一个集成模块，可使用其它属性或方法对它进行扩展。因此，您使用 extends 关键字指明类从另一类继承。通过继承还可以在代">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/2-1-0/s1.jpg">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/2-1-0/s2.jpg">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/2-1-0/s3.jpg">
+<meta property="og:updated_time" content="2018-03-28T10:27:41.589Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="脚本继承">
+<meta name="twitter:description" content="继承继承是指一种代码重用的形式，允许基于现有类开发新类。现有类通常称为基类 或超类，新类通常称为子类。继承的主要优势是，允许重复使用基类中的代码，但不修改现有代码。此外，继承不要求改变其它类与基类交互的方式。不必修改可能已经过彻底测试或可能已被使用的现有类，使用继承可将该类视为一个集成模块，可使用其它属性或方法对它进行扩展。因此，您使用 extends 关键字指明类从另一类继承。通过继承还可以在代">
+<meta name="twitter:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/2-1-0/s1.jpg">
+    
+
+    
+
+    
+        <link rel="icon" href="/apple-juice-actionscript/doc_cn/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/css/style.css">
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/plugins/cookie/1.4.1/jquery.cookie.js"></script>
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+    
+</head>
+</html>
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/apple-juice-actionscript/doc_cn/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Apple Juice</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
+                
+            </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/apple-juice-actionscript/doc_cn/',
+        CONTENT_URL: '/apple-juice-actionscript/doc_cn/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/apple-juice-actionscript/doc_cn/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap" id="categories">
+        <h3 class="widget-title">
+            <span>分类</span>
+            &nbsp;
+            <a id="allExpand" href="#">
+                <i class="fa fa-angle-double-down fa-2x"></i>
+            </a>
+        </h3>
+        
+        
+        
+         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            开始使用
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            Unity工程
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">内容说明</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">Demo工程介绍</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            进阶话题
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            更好的使用
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
+    </div>
+    <script>
+        $(document).ready(function() {
+            var iconFolderOpenClass  = 'fa-folder-open';
+            var iconFolderCloseClass = 'fa-folder';
+            var iconAllExpandClass = 'fa-angle-double-down';
+            var iconAllPackClass = 'fa-angle-double-up';
+            // Handle directory-tree expansion:
+            // 左键单独展开目录
+            $(document).on('click', '#categories a[data-role="directory"]', function (event) {
+                event.preventDefault();
+
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var subtree = $(this).siblings('ul');
+                icon.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if (expanded) {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideUp({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderCloseClass);
+                } else {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideDown({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderOpenClass);
+                }
+            });
+            // 右键展开下属所有目录
+            $('#categories a[data-role="directory"]').bind("contextmenu", function(event){
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var listNode = $(this).siblings('ul');
+                var subtrees = $.merge(listNode.find('li ul'), listNode);
+                var icons = $.merge(listNode.find('.fa'), icon);
+                icons.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if(expanded) {
+                    subtrees.slideUp({ duration: 100 });
+                    icons.addClass(iconFolderCloseClass);
+                } else {
+                    subtrees.slideDown({ duration: 100 });
+                    icons.addClass(iconFolderOpenClass);
+                }
+            })
+            // 展开关闭所有目录按钮
+            $(document).on('click', '#allExpand', function (event) {
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconAllExpandClass);
+                icon.removeClass(iconAllExpandClass).removeClass(iconAllPackClass);
+                if(expanded) {
+                    $('#sidebar .fa.fa-folder').removeClass('fa-folder').addClass('fa-folder-open')
+                    $('#categories li ul').slideDown({ duration: 100 });
+                    icon.addClass(iconAllPackClass);
+                } else {
+                    $('#sidebar .fa.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder')
+                    $('#categories li ul').slideUp({ duration: 100 });
+                    icon.addClass(iconAllExpandClass);
+                }
+            });  
+        });
+    </script>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+            <section id="main"><article id="post-2-1-0-extends" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/">进阶话题</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/2-2adv/">更好的使用</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">
+            <time datetime="2018-03-28T09:01:19.000Z" itemprop="datePublished">2018-03-28</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+                
+    
+        <h1 class="article-title" itemprop="name">
+            脚本继承
+        </h1>
+    
+
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><p>继承是指一种代码重用的形式，允许基于现有类开发新类。现有类通常称为基类 或超类，新类通常称为子类。继承的主要优势是，允许重复使用基类中的代码，但不修改现有代码。此外，继承不要求改变其它类与基类交互的方式。不必修改可能已经过彻底测试或可能已被使用的现有类，使用继承可将该类视为一个集成模块，可使用其它属性或方法对它进行扩展。因此，您使用 extends 关键字指明类从另一类继承。<br>通过继承还可以在代码中利用多态。有一种方法在应用于不同数据类型时会有不同行为，多态就是对这样的方法应用一个方法名的能力。</p>
+<hr>
+<p>如前所述，我们可以在宿主(Unity)工程中定义基类，然后在脚本中扩展它或者修改它。<br>我们在Unity中定义一个名为 Shape 的基类就是一个简单的示例，该类有名为 Circle 和 Square 的两个子类。Shape 类定义了名为 area() 的方法，该方法返回形状的面积。如果已实现多态，则可以对 Circle 和 Square 类型的对象调用 area() 方法，然后执行正确的计算。使用继承能实现多态，实现的方式是允许子类继承和重新定义或覆盖 基类中的方法。我们可以在宿主工程中创建Circle类，在ActionScript3工程中创建Square类。  </p>
+<ol>
+<li>打开Unity工程，在Assets目录中创建一个C#脚本。  <img src="/apple-juice-actionscript/doc_cn/images/2-1-0/s1.jpg" alt="创建脚本"></li>
+<li><p>将如下代码写入脚本中。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">extendtest</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Shape</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">double</span> <span class="title">area</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">double</span>.NaN;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Circle</span> : <span class="title">Shape</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">private</span> <span class="keyword">double</span> radius = <span class="number">1</span>;</span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">double</span> <span class="title">area</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">return</span> (Mathf.PI * (radius * radius));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>打开ActionScript3工程，使用bat/CreateUnityAPI.bat将刚才写的代码导出API。  <img src="/apple-juice-actionscript/doc_cn/images/2-1-0/s2.jpg" alt="导出API"></p>
+</li>
+<li>打开Main.as。在Main.as底部，最后一个}后面写下如下代码:<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">import</span> extendtest.Circle;</span></span><br><span class="line"><span class="meta"><span class="meta-keyword">import</span> extendtest.Shape;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//我们在ActionScript3中继承Shape,并且覆盖它的area方法。</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Square</span> <span class="keyword">extends</span> <span class="title">Shape</span> </span></span><br><span class="line"><span class="class"></span>&#123; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> side:Number = <span class="number">1</span>; </span><br><span class="line">    <span class="keyword">override</span> <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">area</span><span class="params">()</span>:Number </span></span><br><span class="line"><span class="function">    </span>&#123; </span><br><span class="line">        <span class="keyword">return</span> (side * side); </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br><span class="line"> </span><br><span class="line"><span class="keyword">var</span> cir:Circle = <span class="keyword">new</span> Circle(); </span><br><span class="line">trace(<span class="string">"Circele:"</span>,cir.area()); <span class="comment">// output: 3.141592653589793 </span></span><br><span class="line"><span class="keyword">var</span> sq:Square = <span class="keyword">new</span> Square(); </span><br><span class="line">trace(<span class="string">"Square:"</span>, sq.area());  <span class="comment">// output: 1</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>由于某些未知原因，在Unity工程中定义的类型，如果使用 abstract 定义为抽象类，导出工具在分析Assembly-CSharp.dll时，无非正确的得到它是抽象类这个信息。因此，不要在Unity工程中用抽象类定义API。</p>
+</blockquote>
+<ol>
+<li>点击编译。将代码发布到Unity。</li>
+<li>在Unity总执行场景，可以看到运行结果。其中，Circele是在Unity中定义，而Shape却是在脚本中定义的。  <img src="/apple-juice-actionscript/doc_cn/images/2-1-0/s3.jpg" alt="导出API"></li>
+</ol>
+<blockquote>
+<p>在Main.as底部，包体的外部写下代码，在ActionScript3中称为包外代码，在这里定义的类型叫包外类。这些代码会在Main第一次被实例化前被调用。在这里添加代码是一个方便的测试方式，Apple Juice也同样实现了这个ActionScript3的语言特性。</p>
+</blockquote>
+<h3 id="特殊情况"><a href="#特殊情况" class="headerlink" title="特殊情况"></a>特殊情况</h3><p>某些类型没有构造函数，或者它们的使用方式比较特殊，是使用某种类似工厂的方法创建的。最典型的例子就是MonoBehaviour。对于这些特殊的类型，如果要在脚本中继承，则还需要一些额外的处理。后面的章节将讲述原理和解决方法。</p>
+
+            </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
+    
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
+</section>
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            asheigithub &copy; 2018 
+            
+			<a href="https://github.com/asheigithub/apple-juice-actionscript/blob/master/LICENSE" rel="external nofollow noopener noreferrer" target="_blank"><img style="max-width:100%;" alt="license" src="https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" data-canonical-src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+			
+            <br> Powered by <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a>. Theme - <a href="https://github.com/zthxxx/hexo-theme-Wikitten" rel="external nofollow noopener noreferrer" target="_blank">wikitten</a>
+            
+        </div>
+    </div>
+</footer>
+        
+
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+        <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true,
+            TeX: {
+                equationNumbers: {
+                  autoNumber: 'AMS'
+                }
+            }
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/apple-juice-actionscript/doc_cn/js/main.js"></script>
+
+    </div>
+</body>

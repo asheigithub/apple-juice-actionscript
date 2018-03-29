@@ -143,7 +143,7 @@ namespace ASBinCode
 
 		private Dictionary<int, string> registedNativeFunctionType;
 
-		public void regNativeFunction(string nativefunctiontype,string nativefunctionname)
+		public void regNativeFunction(string nativefunctiontype, string nativefunctionname)
 		{
 			if (!nativefunctionNameIndex.ContainsKey(nativefunctionname))
 			{
@@ -183,12 +183,12 @@ namespace ASBinCode
 			}
 		}
 
-		public void regNativeFunction(NativeFunctionBase nativefunction)
-        {
-            if (!nativefunctionNameIndex.ContainsKey(nativefunction.name))
-            {
-                nativefunctionNameIndex.Add(nativefunction.name, nativefunctions.Count);
-                nativefunctions.Add(nativefunction);
+		public void regNativeFunction(NativeFunctionBase nativefunction, bool isReplace)
+		{
+			if (!nativefunctionNameIndex.ContainsKey(nativefunction.name))
+			{
+				nativefunctionNameIndex.Add(nativefunction.name, nativefunctions.Count);
+				nativefunctions.Add(nativefunction);
 
 				if (_dictlinkcreatorfunctionname.ContainsKey(nativefunction.name))
 				{
@@ -199,21 +199,46 @@ namespace ASBinCode
 					}
 					else
 					{
-						class_Creator[_dictlinkcreatorfunctionname[nativefunction.name]]=(ILinkSystemObjCreator)nativefunction;
-						creator_Class[(ILinkSystemObjCreator)nativefunction]= _dictlinkcreatorfunctionname[nativefunction.name];
+						class_Creator[_dictlinkcreatorfunctionname[nativefunction.name]] = (ILinkSystemObjCreator)nativefunction;
+						creator_Class[(ILinkSystemObjCreator)nativefunction] = _dictlinkcreatorfunctionname[nativefunction.name];
 					}
 
 				}
 
-            }
-            else
-            {
-                throw new InvalidOperationException("同名函数已存在");
-            }
-        }
+			}
+			else if (isReplace)
+			{
+				int idx = nativefunctionNameIndex[nativefunction.name];
+				nativefunctions[idx] = nativefunction;
 
-        public NativeFunctionBase getNativeFunction(int funcitonid)
-        {	
+				if (_dictlinkcreatorfunctionname.ContainsKey(nativefunction.name))
+				{
+					if (!class_Creator.ContainsKey(_dictlinkcreatorfunctionname[nativefunction.name]))
+					{
+						class_Creator.Add(_dictlinkcreatorfunctionname[nativefunction.name], (ILinkSystemObjCreator)nativefunction);
+						creator_Class.Add((ILinkSystemObjCreator)nativefunction, _dictlinkcreatorfunctionname[nativefunction.name]);
+					}
+					else
+					{
+						class_Creator[_dictlinkcreatorfunctionname[nativefunction.name]] = (ILinkSystemObjCreator)nativefunction;
+						creator_Class[(ILinkSystemObjCreator)nativefunction] = _dictlinkcreatorfunctionname[nativefunction.name];
+					}
+
+				}
+			}
+			else
+			{
+				throw new InvalidOperationException("同名函数已存在");
+			}
+		}
+
+		public void regNativeFunction(NativeFunctionBase nativefunction)
+		{
+			regNativeFunction(nativefunction, false);
+		}
+
+		public NativeFunctionBase getNativeFunction(int funcitonid)
+		{
 			var define = functions[funcitonid];
 			if (define.native_index == -1)
 			{
@@ -267,7 +292,7 @@ namespace ASBinCode
 
 		public NativeFunctionBase getNativeFunction(string nativename)
 		{
-			
+
 			int nidx;
 			if (nativefunctionNameIndex.TryGetValue(nativename, out nidx))
 			{
@@ -347,7 +372,7 @@ namespace ASBinCode
 		{
 			byte[] bin;
 			{
-				
+
 				CSWCSerizlizer serizlizer = new CSWCSerizlizer();
 				bin = serizlizer.Serialize(this);
 
@@ -357,19 +382,19 @@ namespace ASBinCode
 
 		public static CSWC loadFromBytes(byte[] data)
 		{
-			
+
 			CSWCSerizlizer serizlizer = new CSWCSerizlizer();
 			return serizlizer.Deserialize(data);
 
-			
+
 		}
 
 
 		public Class getClassByRunTimeDataType(RunTimeDataType rttype)
-        {
-            return classes[rttype - RunTimeDataType._OBJECT];
-            //throw new NotImplementedException();
-        }
+		{
+			return classes[rttype - RunTimeDataType._OBJECT];
+			//throw new NotImplementedException();
+		}
 
 
 		private Dictionary<string, Class> dictionary;

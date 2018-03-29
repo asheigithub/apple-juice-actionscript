@@ -9,6 +9,6 @@ namespace ASRuntime.nativefuncs
 	/// </summary>
 	public interface IMethodGetter
 	{
-		System.Reflection.MethodInfo GetMethodInfo();
+		System.Reflection.MethodInfo GetMethodInfo(ASBinCode.rtti.FunctionDefine functionDefine,ASBinCode.CSWC swc,ASRuntime.Player player);
 	}
 }
