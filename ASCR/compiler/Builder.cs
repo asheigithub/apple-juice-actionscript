@@ -1109,7 +1109,7 @@ namespace ASCompiler.compiler
                                     for (int j = 0; j < cls.classMembers.Count; j++)
                                     {
                                         if (cls.classMembers[j] == tooverridefunc)
-                                        {
+                                        {											
                                             cls.classMembers[j] = nf;
 
                                         }

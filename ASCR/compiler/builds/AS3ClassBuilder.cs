@@ -703,7 +703,7 @@ namespace ASCompiler.compiler.builds
             }
         }
 
-        private void copyInheritsFromSuper(ASBinCode.rtti.Class cls,CompileEnv env)
+        private void copyInheritsFromSuper(ASBinCode.rtti.Class cls,CompileEnv env,Builder builder)
         {
             var supercls = cls.super;
             if (supercls == null)
@@ -735,7 +735,14 @@ namespace ASCompiler.compiler.builds
                 member.setTypeWhenCompile(sm.valueType);
 
                 member.virtualLink = sm;
-                member.virtualLinkFromClass = supercls;
+				//member.virtualLinkFromClass = supercls;
+
+				//member.overridedMember = sm.overridedMember;
+
+				if (sm.refClass != supercls)
+				{
+					throw new Exception("编译器内部异常,不正确的基类");
+				}
 
                 if (sm.inheritFrom == null)
                 {
@@ -754,7 +761,11 @@ namespace ASCompiler.compiler.builds
                     member.inheritSrcMember = sm.inheritSrcMember;
                 }
 
-                cls.classMembers.Add(member);
+				cls.classMembers.Add(member);
+
+				
+
+
 
                 if (supercls.fields.Contains(sm))
                 {
@@ -762,7 +773,6 @@ namespace ASCompiler.compiler.builds
 
                     cls.fields.Add(member);
                 }
-
 
             }
 
@@ -784,7 +794,7 @@ namespace ASCompiler.compiler.builds
                 CompileEnv env = new CompileEnv(block, false);
                 builder._classbuildingEnv.Add(cls, env);
 
-                copyInheritsFromSuper(cls, env);
+                copyInheritsFromSuper(cls, env,builder);
 
                 for (int i = 0; i < classstmts.Count; i++)
                 {
@@ -809,6 +819,59 @@ namespace ASCompiler.compiler.builds
                     buildClassMember(env, fc, cls, builder, false);
                 }
 
+
+				//****检查要从父类继承过来的，父类override祖父类的成员，但是又没有被本类override的成员****
+				List<ASBinCode.rtti.ClassMember> hassetmembers = new List<ASBinCode.rtti.ClassMember>();
+				if (builder._overridefunctions.ContainsKey(cls))
+				{
+					foreach (var item in builder._overridefunctions[cls].Values)
+					{
+						hassetmembers.AddRange(item);
+					}
+
+					
+				}
+				for (int i = 0; i < cls.classMembers.Count; i++)
+				{
+					var m = cls.classMembers[i];
+					if (m.inheritFrom == null)
+					{
+						break;
+					}
+
+					if (m.isOverride && ! hassetmembers.Contains(m))
+					{
+						//***查询覆盖***
+						List<ASBinCode.rtti.ClassMember> tooverride = new List<ASBinCode.rtti.ClassMember>();
+						for (int j = 0; j < i; j++)
+						{
+							var om = cls.classMembers[j];
+							if (om.name == m.name)
+							{
+								tooverride.Add(om);
+							}
+						}
+
+						Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>
+									dictOvs = new Dictionary<ASBinCode.rtti.ClassMember, List<ASBinCode.rtti.ClassMember>>();
+						if (!builder._overridefunctions.ContainsKey(cls))
+						{
+							builder._overridefunctions.Add(cls,
+								dictOvs);
+						}
+						
+						builder._overridefunctions[cls].Add(
+							m.virtualLink, tooverride
+							);
+					}
+
+				}
+
+
+
+
+
+
                 if (cls.isLink_System)
                 {
                     if (cls.fields.Count > 0)
@@ -831,7 +894,7 @@ namespace ASCompiler.compiler.builds
                 CompileEnv envMeta = new CompileEnv(metablock, false);
                 builder._classbuildingEnv.Add(metaclass, envMeta);
 
-                copyInheritsFromSuper(metaclass, envMeta);
+                copyInheritsFromSuper(metaclass, envMeta,builder);
 
                 for (int i = 0; i < classstmts.Count; i++)
                 {
@@ -1102,6 +1165,7 @@ namespace ASCompiler.compiler.builds
                                 }
 
                                 member.virtualLink = tooverridefunctions[tooverridefunctions.Count -1];
+								
                                 builder._overridefunctions[cls].Add(
                                     member, tooverridefunctions
                                     );
@@ -1191,8 +1255,8 @@ namespace ASCompiler.compiler.builds
                                 }
 
                                 member.virtualLink = tooverridefunctions[tooverridefunctions.Count -1];
-
-                                builder._overridefunctions[cls].Add(
+								
+								builder._overridefunctions[cls].Add(
                                     member, tooverridefunctions
                                     );
                             }

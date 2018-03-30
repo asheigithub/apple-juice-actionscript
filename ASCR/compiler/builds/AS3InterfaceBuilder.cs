@@ -361,7 +361,7 @@ namespace ASCompiler.compiler.builds
                 {
                     if (!as3function.IsAnonymous)
                     {
-                        List<ASBinCode.rtti.ClassMember> tooverridefunctions = new List<ASBinCode.rtti.ClassMember>();
+                        //List<ASBinCode.rtti.ClassMember> tooverridefunctions = new List<ASBinCode.rtti.ClassMember>();
 
 
                         string funcname = as3function.Name;
@@ -734,7 +734,7 @@ namespace ASCompiler.compiler.builds
                     member.setTypeWhenCompile(sm.valueType);
 
                     member.virtualLink = sm;
-                    member.virtualLinkFromClass = supercls;
+                    //member.virtualLinkFromClass = supercls;
 
                     if (sm.inheritFrom == null)
                     {

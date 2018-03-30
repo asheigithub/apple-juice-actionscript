@@ -207,7 +207,7 @@ namespace ASBinCode
 
 
             var m = ((rtObjectBase)scope.this_pointer).value._class.classMembers[indexofMember];
-            while (!ReferenceEquals(m.virtualLinkFromClass, superClass))
+            while (!ReferenceEquals(m.virtualLink.refClass, superClass))
             {
                 m = m.virtualLink;
             }

@@ -1,6 +1,6 @@
 package
 {
-	[Doc]
+	
 	public class abc
 	{
 		//public function abc()
@@ -38,6 +38,7 @@ package
 		{
 			
 			
+
 			
 			//local total = 0
 			//local t = os.clock()

@@ -308,7 +308,7 @@ namespace ASRuntime.operators
 						_class = _class.super;
 					}
 
-                    if ( _class.get_this_item !=null )//rtObj.value._class.get_this_item != null)
+                    if ( _class !=null && _class.get_this_item !=null )//rtObj.value._class.get_this_item != null)
                     {
 						var function = player.swc.functions[((MethodGetterBase)_class.get_this_item.bindField).functionId];
 
@@ -360,7 +360,7 @@ namespace ASRuntime.operators
 						_class = _class.super;
 					}
 
-					if (_class.set_this_item != null)
+					if (_class !=null && _class.set_this_item != null)
                     {
                         if (_class.get_this_item == null)
                         {

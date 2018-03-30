@@ -74,8 +74,10 @@ namespace ASBinCode.rtti
 
 
         public ClassMember virtualLink;
-        public Class virtualLinkFromClass;
-
+		//public Class virtualLinkFromClass;
+		
+		//public ClassMember overridedMember; 
+		
 		private RunTimeDataType _type;
 
 		//序列化时用
@@ -204,7 +206,9 @@ namespace ASBinCode.rtti
 			//public ClassMember virtualLink;
 			classMember.virtualLink = serizlizer.DeserializeObject<ClassMember>(reader, ClassMember.LoadClassMember);
 			//public Class virtualLinkFromClass;
-			classMember.virtualLinkFromClass = serizlizer.DeserializeObject<Class>(reader, Class.LoadClass);
+			//classMember.virtualLinkFromClass = serizlizer.DeserializeObject<Class>(reader, Class.LoadClass);
+
+			//classMember.overridedMember = serizlizer.DeserializeObject<ClassMember>(reader, ClassMember.LoadClassMember);
 
 			//private RunTimeDataType _type;
 			classMember._type = reader.ReadInt32();
@@ -293,7 +297,9 @@ namespace ASBinCode.rtti
 			//public ClassMember virtualLink;
 			serizlizer.SerializeObject(writer, virtualLink);
 			//public Class virtualLinkFromClass;
-			serizlizer.SerializeObject(writer, virtualLinkFromClass);
+			//serizlizer.SerializeObject(writer, virtualLinkFromClass);
+
+			//serizlizer.SerializeObject(writer, overridedMember);
 
 			//private RunTimeDataType _type;
 			writer.Write((int)_type);
