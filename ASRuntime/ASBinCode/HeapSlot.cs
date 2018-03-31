@@ -109,10 +109,14 @@ namespace ASBinCode
                                     }
                                     else
                                     {
-										((rtObjectBase)this.value).value = ro.value; 
-                                        //ro.value = ((rtObject)value).value;
-                                    }
-                                }
+										var dst = ((rtObjectBase)this.value).value;
+										var src = ro.value;
+
+										((rtti.LinkObj<object>)dst).SetLinkData(((rtti.LinkObj<object>)src).value);
+
+										//((rtObjectBase)this.value).value = ro.value; 
+									}
+								}
                                 else
                                 {
                                     this.value = value;
