@@ -117,6 +117,7 @@ namespace ASBinCode
 		public int MaxMemIntCount;
 		public int MaxMemUIntCount;
 		public int MaxMemBooleanCount;
+		//public int MaxMemObjectCount;
 
 		public List<IMemReg> MemRegList;
 

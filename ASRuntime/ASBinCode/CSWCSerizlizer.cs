@@ -408,7 +408,7 @@ namespace ASBinCode
 					bw.Write(swc.MaxMemIntCount);
 					bw.Write(swc.MaxMemUIntCount);
 					bw.Write(swc.MaxMemBooleanCount);
-
+					//bw.Write(swc.MaxMemObjectCount);
 
 				}
 
@@ -543,7 +543,7 @@ namespace ASBinCode
 					swc.MaxMemIntCount = br.ReadInt32();
 					swc.MaxMemUIntCount = br.ReadInt32();
 					swc.MaxMemBooleanCount = br.ReadInt32();
-
+					//swc.MaxMemObjectCount = br.ReadInt32();
 				}
 			}
 

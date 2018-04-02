@@ -222,5 +222,30 @@
     <item value="UnityEngine.Texture2D::Void set_alphaIsTransparency(Boolean)"></item>
 	<item value="UnityEngine.GameObject::UnityEngine.Component AddComponent(System.String)"></item>
 
+	 
+	<item value="UnityEngine.GameObject::Void SendMessage(System.String, System.Object)"></item>
+	<item value="UnityEngine.GameObject::Void SendMessage(System.String)"></item>
+    <item value="UnityEngine.GameObject::Void SendMessage(System.String, UnityEngine.SendMessageOptions)"></item>
+	
+	<item value="UnityEngine.GameObject::Void BroadcastMessage(System.String, System.Object)"></item>
+	<item value="UnityEngine.GameObject::Void BroadcastMessage(System.String)"></item>
+    <item value="UnityEngine.GameObject::Void BroadcastMessage(System.String, UnityEngine.SendMessageOptions)"></item>
+	 
+    <item value="UnityEngine.GameObject::Void SendMessageUpwards(System.String, System.Object)"></item>
+	<item value="UnityEngine.GameObject::Void SendMessageUpwards(System.String)"></item>
+    <item value="UnityEngine.GameObject::Void SendMessageUpwards(System.String, UnityEngine.SendMessageOptions)"></item>
+	
+	<item value="UnityEngine.Component::Void SendMessage(System.String, System.Object)"></item>
+	<item value="UnityEngine.Component::Void SendMessage(System.String)"></item>
+    <item value="UnityEngine.Component::Void SendMessage(System.String, UnityEngine.SendMessageOptions)"></item>
+	
+	<item value="UnityEngine.Component::Void BroadcastMessage(System.String, System.Object)"></item>
+	<item value="UnityEngine.Component::Void BroadcastMessage(System.String)"></item>
+    <item value="UnityEngine.Component::Void BroadcastMessage(System.String, UnityEngine.SendMessageOptions)"></item>
+	 
+    <item value="UnityEngine.Component::Void SendMessageUpwards(System.String, System.Object)"></item>
+	<item value="UnityEngine.Component::Void SendMessageUpwards(System.String)"></item>
+    <item value="UnityEngine.Component::Void SendMessageUpwards(System.String, UnityEngine.SendMessageOptions)"></item>
+	  
   </notcreatemembers>
 </configuration>

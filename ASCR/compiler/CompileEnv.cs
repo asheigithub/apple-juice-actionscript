@@ -1420,6 +1420,8 @@ namespace ASCompiler.compiler
 							{
 								if (checkHasJumpBackOrTryBlock(i, lastline, register))
 								{
+									dictCanNotOptimize.Add(register, null);
+									i--;
 									break;
 								}
 								else
@@ -1460,7 +1462,9 @@ namespace ASCompiler.compiler
 									else
 									{
 										dictCanNotOptimize.Add(register, null);
+										i--;
 										break;
+										
 									}
 								}
 							}
@@ -1489,7 +1493,12 @@ namespace ASCompiler.compiler
 								if (step.opCode == OpCode.access_dot)
 									step.opCode = OpCode.access_dot_memregister;
 							}
-
+							//else if (register.valueType >= RunTimeDataType._OBJECT)
+							//{
+							//	dictToOptimizeRegister.Add(register, new MemRegister_Object(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
+							//	if (step.opCode == OpCode.access_dot)
+							//		step.opCode = OpCode.access_dot_memregister;
+							//}
 							i--;
 							break;
 						}
@@ -1877,45 +1886,6 @@ namespace ASCompiler.compiler
 				register.valueType == RunTimeDataType.rt_boolean
 				)
 			{
-				//List<int> jumpbacks = new List<int>();
-				//var allines = collectAllSteps(line, jumpbacks);
-				//int lastline = findLastRefLine(register);
-
-				//if (jumpbacks.Count > 0)
-				//{
-
-
-				//	if (step.arg1 == register || step.arg2 == register)
-				//	{
-				//		//***跳回来不行***
-				//		if (jumpbacks[0] <= lastline)
-				//		{
-				//			for (int i = 0; i < allines.Count; i++)
-				//			{
-				//				if (!isSafeStep(block.opSteps[allines[i]]))
-				//					return false;
-				//			}
-
-
-				//			//return false;
-				//		}
-				//	}
-				//	else
-				//	{
-				//		//***跳回中间来的不行***
-				//		if (jumpbacks[0] <= lastline && line <= jumpbacks[0])
-				//		{
-				//			for (int i = 0; i < allines.Count; i++)
-				//			{
-				//				if (!isSafeStep(block.opSteps[allines[i]]))
-				//					return false;
-				//			}
-
-				//			//return false;
-				//		}
-				//	}
-
-				//}
 
 				if (step.opCode == OpCode.access_dot)
 				{
@@ -1935,6 +1905,25 @@ namespace ASCompiler.compiler
 
 				return canSaveToMemReg(step.opCode);
 			}
+			//else if (register.valueType >= RunTimeDataType._OBJECT)
+			//{
+			//	if (step.opCode == OpCode.access_dot)
+			//	{
+			//		if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget ||
+			//			(
+			//			register._regMember != null &&
+			//			register._regMember.bindField is ClassPropertyGetter))
+			//		{
+			//			return false;
+			//		}
+			//		else
+			//		{
+			//			return true;
+			//		}
+			//	}
+
+			//	return canSaveToMemReg(step.opCode);
+			//}
 			else
 			{
 				return false;

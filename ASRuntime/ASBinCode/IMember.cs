@@ -77,6 +77,10 @@ namespace ASBinCode
 			{
 				return MemRegister_UInt.LoadRegister(reader, serizlizer, serizlized, key);
 			}
+			//else if (membertype == 14)
+			//{
+			//	return MemRegister_Object.LoadRegister(reader, serizlizer, serizlized, key);
+			//}
 			else
 			{
 				throw new IOException("格式异常");

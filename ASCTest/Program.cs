@@ -48,7 +48,7 @@ namespace ASCTest
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
 									   //path = @"../..\testScript\AS3Testproj\amd";
-				//path = @"../..\testScript\AS3Testproj\src";
+				path = @"../..\testScript\AS3Testproj\src";
 
 
 
@@ -102,46 +102,46 @@ namespace ASCTest
 
 
 			//*********加入API*****
-			//{
-			//	string apidir = @"../../..\LinkCodeGenCLI\bin\Debug\as3api";
-			//	if (System.IO.Directory.Exists(apidir))
-			//	{
-			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+			{
+				string apidir = @"../../..\LinkCodeGenCLI\bin\Debug\as3api";
+				if (System.IO.Directory.Exists(apidir))
+				{
+					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-			//		foreach (var item in linkapi)
-			//		{
-			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-			//			if (projfile.StartsWith("/"))
-			//				projfile = projfile.Substring(1);
-			//			srcFileProjFile.Add(item, projfile);
-			//		}
+					foreach (var item in linkapi)
+					{
+						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+						if (projfile.StartsWith("/"))
+							projfile = projfile.Substring(1);
+						srcFileProjFile.Add(item, projfile);
+					}
 
-			//		string[] n = new string[files.Length + linkapi.Length];
-			//		linkapi.CopyTo(n, 0);
-			//		files.CopyTo(n, linkapi.Length);
-			//		files = n;
-			//	}
-			//}
-			//{
-			//	string apidir = @"..\..\..\as3_commapi\sharpapi";
-			//	if (System.IO.Directory.Exists(apidir))
-			//	{
-			//		var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
+					string[] n = new string[files.Length + linkapi.Length];
+					linkapi.CopyTo(n, 0);
+					files.CopyTo(n, linkapi.Length);
+					files = n;
+				}
+			}
+			{
+				string apidir = @"..\..\..\as3_commapi\sharpapi";
+				if (System.IO.Directory.Exists(apidir))
+				{
+					var linkapi = System.IO.Directory.GetFiles(apidir, "*.as", System.IO.SearchOption.AllDirectories);
 
-			//		foreach (var item in linkapi)
-			//		{
-			//			string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
-			//			if (projfile.StartsWith("/"))
-			//				projfile = projfile.Substring(1);
-			//			srcFileProjFile.Add(item, projfile);
-			//		}
+					foreach (var item in linkapi)
+					{
+						string projfile = item.Replace("\\", "/").Replace(apidir.Replace("\\", "/"), "");
+						if (projfile.StartsWith("/"))
+							projfile = projfile.Substring(1);
+						srcFileProjFile.Add(item, projfile);
+					}
 
-			//		string[] n = new string[files.Length + linkapi.Length];
-			//		linkapi.CopyTo(n, 0);
-			//		files.CopyTo(n, linkapi.Length);
-			//		files = n;
-			//	}
-			//}
+					string[] n = new string[files.Length + linkapi.Length];
+					linkapi.CopyTo(n, 0);
+					files.CopyTo(n, linkapi.Length);
+					files = n;
+				}
+			}
 			//*********************
 
 			//*********加入ProtoBuf API*****
@@ -256,7 +256,7 @@ namespace ASCTest
 					for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];
-						if (block != null && block.name.EndsWith("::AutoGenTest"))// "CRC32::update"))
+						if (block != null && block.name.EndsWith("::Main"))// "CRC32::update"))
                         {
                             Console.WriteLine();
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");
@@ -325,13 +325,13 @@ namespace ASCTest
 						//ASRuntime.flash.utils.ByteArray array;
 						//var byteArray = player.createByteArrayObject(out array);
 
-						////var bytes = System.IO.File.ReadAllBytes(@"F:/code/Protobuf-as3-ILRuntime-master.zip");
-						////array.writeBytes(bytes, 0, bytes.Length);
-						////array.position = 0;
+						//var bytes = System.IO.File.ReadAllBytes(@"F:/code/Protobuf-as3-ILRuntime-master.zip");
+						//array.writeBytes(bytes, 0, bytes.Length);
+						//array.position = 0;
 
-						////player.invokeMethod("AutoGenTest", "showzip", byteArray);
-						//var by = player.invokeMethod("AutoGenTest", "saveZip", byteArray);
-						//System.IO.File.WriteAllBytes("e:/kkk.zip", array.ToArray());
+						//player.invokeMethod("Main", "showzip", byteArray);
+						////var by = player.invokeMethod("Main", "saveZip", byteArray);
+						////System.IO.File.WriteAllBytes("e:/kkk.zip", array.ToArray());
 
 
 						Console.WriteLine();
