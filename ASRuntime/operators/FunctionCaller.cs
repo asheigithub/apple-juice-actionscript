@@ -881,42 +881,42 @@ namespace ASRuntime.operators
 					}
 
 				}
-				else if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_1)
-				{
-					player._nativefuncCaller = this;
-					bool success;
+				//else if (nf.mode == NativeFunctionBase.NativeFunctionMode.normal_1)
+				//{
+				//	player._nativefuncCaller = this;
+				//	bool success;
 
-					nf.execute2(
-						function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
-						toCallFunc,
-						CallFuncHeap,
-						returnSlot,
-						token,
-						invokerFrame,
-						out success
-						);
-					player._nativefuncCaller = null;
-					if (success)
-					{
-						if (callbacker != null)
-						{
-							callbacker.call(callbacker.args);
-						}
-					}
-					else
-					{
-						invokerFrame.endStep();
-						if (callbacker != null)
-						{
-							callbacker.noticeRunFailed();
-						}
+				//	nf.execute2(
+				//		function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+				//		toCallFunc,
+				//		CallFuncHeap,
+				//		returnSlot,
+				//		token,
+				//		invokerFrame,
+				//		out success
+				//		);
+				//	player._nativefuncCaller = null;
+				//	if (success)
+				//	{
+				//		if (callbacker != null)
+				//		{
+				//			callbacker.call(callbacker.args);
+				//		}
+				//	}
+				//	else
+				//	{
+				//		invokerFrame.endStep();
+				//		if (callbacker != null)
+				//		{
+				//			callbacker.noticeRunFailed();
+				//		}
 
-					}
+				//	}
 
-					release();
+				//	release();
 
 
-				}
+				//}
 				else if (nf.mode == NativeFunctionBase.NativeFunctionMode.async_0)
 				{
 					nf.executeAsync(function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
@@ -976,6 +976,7 @@ namespace ASRuntime.operators
 					release();
 
 				}
+				
 			}
 		}
 

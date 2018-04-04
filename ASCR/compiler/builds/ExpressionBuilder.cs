@@ -570,8 +570,9 @@ namespace ASCompiler.compiler.builds
             //***再访问***
             OpStep opInvokeSetter = new OpStep(OpCode.call_function,
             new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
-            opInvokeSetter.reg = eax;
-            opInvokeSetter.regType = eax.valueType;
+			opInvokeSetter.reg = env.getAdditionalRegister(); //eax;
+			opInvokeSetter.reg.valueType= RunTimeDataType.rt_void;
+			opInvokeSetter.regType = RunTimeDataType.rt_void; //eax.valueType;
             opInvokeSetter.arg1 = func;
             opInvokeSetter.arg1Type = func.valueType;
             eax.isFuncResult = true;

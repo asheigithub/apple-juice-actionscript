@@ -12,7 +12,7 @@ namespace ASBinCode
             normal_0=0,
             async_0=1,
 
-            normal_1=2,
+            //normal_1=2,
             const_parameter_0=3,
         }
 
@@ -58,16 +58,16 @@ namespace ASBinCode
 
         }
 
-        public virtual void execute2(RunTimeValueBase thisObj, 
-            rtti.FunctionDefine functionDefine,
-            SLOT[] argements, 
-            SLOT   returnSlot,
-            SourceToken token,
-            object stackframe, 
-            out bool success)
-        {
-            throw new NotImplementedException();
-        }
+        //public virtual void execute2(RunTimeValueBase thisObj, 
+        //    rtti.FunctionDefine functionDefine,
+        //    SLOT[] argements, 
+        //    SLOT   returnSlot,
+        //    SourceToken token,
+        //    object stackframe, 
+        //    out bool success)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
     }
 }

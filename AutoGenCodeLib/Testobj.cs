@@ -178,6 +178,13 @@ namespace AutoGenCodeLib
 		}
 
 
+		public void Roation(float x, float y, float z)
+		{
+
+		}
+
+
+
 		//public void TestArray(int[] arr)
 		//{
 		//	Console.WriteLine(arr[0]);

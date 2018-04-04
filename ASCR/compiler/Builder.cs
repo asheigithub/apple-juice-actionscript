@@ -339,10 +339,8 @@ namespace ASCompiler.compiler
 								{
 									bin.MaxMemBooleanCount = Math.Max(bin.MaxMemBooleanCount, c.Value);
 								}
-								//else if (c.Key >= RunTimeDataType._OBJECT)
-								//{
-								//	bin.MaxMemObjectCount = Math.Max(bin.MaxMemObjectCount, c.Value);
-								//}
+								
+								
 							}
 						}
 						if(item.memCacheList !=null)

@@ -32,11 +32,7 @@ namespace ASRuntime
 		/// 内存缓存int
 		/// </summary>
 		private int[] memint;
-		/// <summary>
-		/// 内存缓存Object的StackSlot;
-		/// </summary>
-		//private StackSlot[] memobjectslot;
-
+		
 		internal CSWC swc;
 		private CodeBlock defaultblock;
 		public void loadCode(CSWC swc, CodeBlock block = null)
@@ -45,8 +41,7 @@ namespace ASRuntime
 
 			memnumber = new double[swc.MaxMemNumberCount];
 			memint = new int[swc.MaxMemIntCount];
-			//memobjectslot = new StackSlot[swc.MaxMemObjectCount];
-
+			
 			foreach (var m in swc.MemRegList)
 			{
 				m.setMemCache_Number(memnumber);
@@ -184,10 +179,7 @@ namespace ASRuntime
 				stackSlots[i].clear();
 			}
 
-			//for (int i = 0; i < memobjectslot.Length; i++)
-			//{
-			//	memobjectslot[i].clear();
-			//}
+			
 
 
 			funcCallerPool.reset();
@@ -227,20 +219,9 @@ namespace ASRuntime
 				}
 
 
-				//for (int i = 0; i < memobjectslot.Length; i++)
-				//{
-				//	memobjectslot[i] = new StackSlot(swc, this);
-				//	memobjectslot[i]._linkObjCache = lobjcache.Clone();
-				//}
+				
 
-				//foreach (var item in swc.MemRegList)
-				//{
-				//	MemRegister_Object memRegister_Object = item as MemRegister_Object;
-				//	if (memRegister_Object != null)
-				//	{
-				//		memRegister_Object.memSlot_ = memobjectslot[ memRegister_Object.Id];
-				//	}
-				//}
+				
 
 
 				stackframePool = new StackFrame.StackFramePool(this, stackSlots, memnumber, memint);

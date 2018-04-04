@@ -8,43 +8,43 @@ namespace ASRuntime.nativefuncs
 {
     public static class LinkSystem_Buildin
     {
-		public static NativeFunctionBase getStaticClassCreator(string name,Type t)
+		public static NativeConstParameterFunction getStaticClassCreator(string name,Type t)
 		{
 			return new staticClassCreator(t, name);
 		}
 
-		public static NativeFunctionBase getCreator<T>(string name, T v)
+		public static NativeConstParameterFunction getCreator<T>(string name, T v)
         {
             return new creator<T>(name, v);
         }
-        public static NativeFunctionBase getToString(string name)
+        public static NativeConstParameterFunction getToString(string name)
         {
             return new toString(name);
         }
-        public static NativeFunctionBase getGetHashCode(string name)
+        public static NativeConstParameterFunction getGetHashCode(string name)
         {
             return new getHashCode(name);
         }
-        public static NativeFunctionBase getEquals(string name)
+        public static NativeConstParameterFunction getEquals(string name)
         {
             return new equals(name);
         }
 
-        public static NativeFunctionBase getStruct_static_field_getter<T>
+        public static NativeConstParameterFunction getStruct_static_field_getter<T>
             (string name,static_struct_field_getter<T>.DelegateGetStaticValue getter)
             where T : struct
         {
             return new static_struct_field_getter<T>(name, getter);
         }
 
-        public static NativeFunctionBase getCompareTo<T>
+        public static NativeConstParameterFunction getCompareTo<T>
             (string name)
             where T : IComparable
         {
             return new compareto<T>(name);
         }
 
-        public static NativeFunctionBase getCompareTo_Generic<T>
+        public static NativeConstParameterFunction getCompareTo_Generic<T>
             (string name)
             where T : IComparable<T>
         {
@@ -55,12 +55,12 @@ namespace ASRuntime.nativefuncs
 
 	#region creator
 
-	class staticClassCreator : NativeFunctionBase, ILinkSystemObjCreator
+	class staticClassCreator : NativeConstParameterFunction, ILinkSystemObjCreator
 	{
 		private string fn;
 		private Type t;
 		List<RunTimeDataType> para;
-		public staticClassCreator(Type type,string name)
+		public staticClassCreator(Type type,string name):base(1)
 		{
 			t = type;
 			fn = name;
@@ -76,14 +76,24 @@ namespace ASRuntime.nativefuncs
 
 		public override bool isMethod { get { return true; } }
 
-		public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//	throw new NotImplementedException();
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 		{
 			throw new NotImplementedException();
 		}
 
+
 		public Type getLinkSystemObjType()
 		{
 			return t;
+		}
+
+		public RunTimeValueBase makeObject(Class cls)
+		{
+			throw new NotImplementedException();
 		}
 
 		public void setLinkObjectValueToSlot(SLOT slot, object player, object value, Class clsType)
@@ -95,12 +105,12 @@ namespace ASRuntime.nativefuncs
 
 
 
-	class creator<T> : NativeFunctionBase,ILinkSystemObjCreator
+	class creator<T> : NativeConstParameterFunction,ILinkSystemObjCreator
     {
         private T defaultvalue;
         private string funname;
 
-        public creator(string funname, T v)
+        public creator(string funname, T v):base(1)
         {
             _type = typeof(T);
             this.defaultvalue = v;
@@ -142,28 +152,50 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;
-            errorno = 0;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;
+		//    errorno = 0;
 
-            var cls = (Class)stackframe;
+		//    var cls = (Class)stackframe;
 
-            if (cls.isStruct)
-            {
-                LinkObj<T> obj = new LinkObj<T>((Class)stackframe);
+		//    if (cls.isStruct)
+		//    {
+		//        LinkObj<T> obj = new LinkObj<T>((Class)stackframe);
 
-                return new ASBinCode.rtData.rtObject(obj, null);
-            }
-            else
-            {
-                LinkObj<object> obj = new LinkObj<object>((Class)stackframe);
+		//        return new ASBinCode.rtData.rtObject(obj, null);
+		//    }
+		//    else
+		//    {
+		//        LinkObj<object> obj = new LinkObj<object>((Class)stackframe);
 
-                return new ASBinCode.rtData.rtObject(obj, null);
-            }
-        }
+		//        return new ASBinCode.rtData.rtObject(obj, null);
+		//    }
+		//}
 
-        private Type _type;
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			throw new NotImplementedException();
+		}
+
+		public RunTimeValueBase makeObject(Class cls)
+		{
+			if (cls.isStruct)
+			{
+				LinkObj<T> obj = new LinkObj<T>(cls);
+
+				return new ASBinCode.rtData.rtObject(obj, null);
+			}
+			else
+			{
+				LinkObj<object> obj = new LinkObj<object>(cls);
+
+				return new ASBinCode.rtData.rtObject(obj, null);
+			}
+		}
+
+
+		private Type _type;
         public Type getLinkSystemObjType()
         {
             return _type;
@@ -181,10 +213,10 @@ namespace ASRuntime.nativefuncs
 
     #region toString
 
-    class toString : NativeFunctionBase
+    class toString : NativeConstParameterFunction //NativeFunctionBase
     {
         string funcname;
-        public toString(string name)
+        public toString(string name):base(0)
         {
             funcname = name;
             para = new List<RunTimeDataType>();
@@ -223,45 +255,56 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+		//public override NativeFunctionMode mode
+		//{
+		//    get
+		//    {
+		//        return NativeFunctionMode.normal_1;
+		//    }
+		//}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new EngineException();
-        }
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    throw new EngineException();
+		//}
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot,SourceToken token, object stackframe, out bool success)
-        {
-            //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
-            success = true;
-            
-            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+		//public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot,SourceToken token, object stackframe, out bool success)
+		//{
+		//    //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
+		//    success = true;
 
-            string tostr = iv.ToString();
+		//    LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
-            returnSlot.setValue(tostr);
+		//    string tostr = iv.ToString();
 
-            //return new ASBinCode.rtData.rtString(iv.ToString());
+		//    returnSlot.setValue(tostr);
+
+		//    //return new ASBinCode.rtData.rtString(iv.ToString());
 
 
-        }
+		//}
 
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+
+			LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+
+			string tostr = iv.ToString();
+
+			returnSlot.setValue(tostr);
+		}
+
+	}
 
     #endregion
 
     #region getHashCode
 
-    class getHashCode : NativeFunctionBase
+    class getHashCode : NativeConstParameterFunction //NativeFunctionBase
     {
         string funcname;
-        public getHashCode(string name)
+        public getHashCode(string name):base(0)
         {
             funcname = name;
             para = new List<RunTimeDataType>();
@@ -300,36 +343,49 @@ namespace ASRuntime.nativefuncs
             }
         }
 
-        public override NativeFunctionMode mode
-        {
-            get
-            {
-                return NativeFunctionMode.normal_1;
-            }
-        }
+		//public override NativeFunctionMode mode
+		//{
+		//    get
+		//    {
+		//        return NativeFunctionMode.normal_1;
+		//    }
+		//}
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            throw new EngineException();
-        }
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    throw new EngineException();
+		//}
 
-        public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
-            success = true;
+		//public override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+		//{
+		//    //base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
+		//    success = true;
 
-            LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+		//    LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
-            int hashcode = iv.GetHashCode();
+		//    int hashcode = iv.GetHashCode();
 
-            returnSlot.setValue(hashcode);
+		//    returnSlot.setValue(hashcode);
 
-            //return new ASBinCode.rtData.rtString(iv.ToString());
+		//    //return new ASBinCode.rtData.rtString(iv.ToString());
 
 
-        }
+		//}
 
-    }
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			//base.execute2(thisObj, functionDefine, argements, returnSlot, stackframe, out success);
+			success = true;
+
+			LinkSystemObject iv = ((LinkSystemObject)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+
+			int hashcode = iv.GetHashCode();
+
+			returnSlot.setValue(hashcode);
+
+			//return new ASBinCode.rtData.rtString(iv.ToString());
+		}
+	}
 
     #endregion
 

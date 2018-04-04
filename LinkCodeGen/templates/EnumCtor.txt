@@ -1,6 +1,6 @@
-﻿		public class {0} : NativeFunctionBase
+﻿		public class {0} : NativeConstParameterFunction
 		{
-			public {0}()
+			public {0}():base(0)
 			{
 				para = new List<RunTimeDataType>();
 			}
@@ -38,10 +38,9 @@
 				}
 			}
 
-			public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+			public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
 			{
-				errormessage = null; errorno = 0;
-				return ASBinCode.rtData.rtUndefined.undefined;
-
+				success = true;
+				returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 			}
 		}

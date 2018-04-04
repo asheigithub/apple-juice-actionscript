@@ -1218,12 +1218,12 @@ namespace ASCompiler.compiler.builds
 									bool findsuccess;
 
 									var func = findFunction(signature, builder, out findsuccess);
+
 									if (!findsuccess || func == null || !checkFunctionNotHasOverridesOrSealed(func, builder))
 									{
 										return;
 									}
 									
-
 
 									if (isNativeModeConstPara(signature, builder, out findsuccess))
 									{
@@ -1318,6 +1318,7 @@ namespace ASCompiler.compiler.builds
 
 		private bool checkFunctionNotHasOverridesOrSealed(ASBinCode.rtti.FunctionDefine func, Builder builder)
 		{
+			
 			if (!func.isMethod)
 				return true;
 
@@ -1334,6 +1335,7 @@ namespace ASCompiler.compiler.builds
 				else if (obj is ASBinCode.rtti.Class)
 				{
 					ASBinCode.rtti.Class cls = (ASBinCode.rtti.Class)obj;
+
 					if (cls.isInterface)
 					{
 						return false;
@@ -1401,16 +1403,17 @@ namespace ASCompiler.compiler.builds
 							}
 							else
 							{
-								findsuccess = false;
-								return null;
+
+								//findsuccess = false;
+								//return null;
 							}
 						}
 
-						if (nf.mode
-								== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
-						{
-							return func;
-						}
+						//if (nf.mode
+						//		== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+						//{
+						//	return func;
+						//}
 					}
 					catch (KeyNotFoundException)
 					{
@@ -1441,11 +1444,50 @@ namespace ASCompiler.compiler.builds
 			if (func != null && func.isNative)
 			{
 				var nf = builder.bin.getNativeFunction(func.native_name);
-				if (nf.mode== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
+
+				if (nf == null && !builder.options.CheckNativeFunctionSignature)
+				{
+					//***如果跳过了本地函数检查签名，那么如果是link_system的，肯定是
+					if (builder._signature_belone.ContainsKey(signature))
+					{
+						var obj = builder._signature_belone[signature];
+						if (obj == null)
+						{
+							findsuccess = false;
+							return false;
+						}
+						else if (obj is ASBinCode.rtti.Class)
+						{
+							ASBinCode.rtti.Class cls = (ASBinCode.rtti.Class)obj;
+							if (!cls.isLink_System)
+							{
+								findsuccess = false;
+								return false;
+							}
+							else
+							{
+								return true;
+							}
+						}
+						else
+						{
+							findsuccess = false;
+							return false;
+						}
+					}
+					else
+					{
+						findsuccess = false;
+						return false;
+					}
+
+
+				}
+				else if (nf.mode== NativeFunctionBase.NativeFunctionMode.const_parameter_0)
 				{
 					return true;
 				}
-							}
+			}
 			return false;
 		}
 
@@ -1458,6 +1500,24 @@ namespace ASCompiler.compiler.builds
 			}
 			else if (func != null)
 			{
+				#region 不检查本地函数存在的情况
+
+				var nf = builder.bin.getNativeFunction(func.native_name);
+
+				if (nf == null && !builder.options.CheckNativeFunctionSignature)
+				{
+					findsuccess = false;
+					return false;
+					
+				}
+
+
+
+				#endregion
+
+
+				#region 检查本地函数存在的情况
+
 				if (builder._signature_belone.ContainsKey(signature))
 				{
 					var obj = builder._signature_belone[signature];
@@ -1486,6 +1546,8 @@ namespace ASCompiler.compiler.builds
 				{
 					return false;
 				}
+
+				#endregion
 			}
 			else
 			{

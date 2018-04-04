@@ -1334,7 +1334,7 @@ namespace ASCompiler.compiler
 						{
 							foreach (var line in allines) //行中有不安全因素
 							{
-								if (!isSafeStep(block.opSteps[line], null))
+								if (!isSafeStep(block.opSteps[line],item, null))
 								{
 
 									if (step.reg == item && !(step.arg1 == item || step.arg2 == item))
@@ -1420,9 +1420,10 @@ namespace ASCompiler.compiler
 							{
 								if (checkHasJumpBackOrTryBlock(i, lastline, register))
 								{
-									dictCanNotOptimize.Add(register, null);
-									i--;
-									break;
+									//dictCanNotOptimize.Add(register, null);
+									//i--;
+									//break;
+									continue;
 								}
 								else
 								{
@@ -1462,9 +1463,9 @@ namespace ASCompiler.compiler
 									else
 									{
 										dictCanNotOptimize.Add(register, null);
-										i--;
-										break;
-										
+										//i--;
+										//break;
+										continue;
 									}
 								}
 							}
@@ -1472,33 +1473,29 @@ namespace ASCompiler.compiler
 							if (register.valueType == RunTimeDataType.rt_number)
 							{
 								dictToOptimizeRegister.Add(register, new MemRegister_Number(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
-								if (step.opCode == OpCode.access_dot)
+								if (step.opCode == OpCode.access_dot && register == step.reg)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_boolean)
 							{
 								dictToOptimizeRegister.Add(register, new MemRegister_Boolean(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
-								if (step.opCode == OpCode.access_dot)
+								if (step.opCode == OpCode.access_dot && register == step.reg)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_int)
 							{
 								dictToOptimizeRegister.Add(register, new MemRegister_Int(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
-								if (step.opCode == OpCode.access_dot)
+								if (step.opCode == OpCode.access_dot && register == step.reg)
 									step.opCode = OpCode.access_dot_memregister;
 							}
 							else if (register.valueType == RunTimeDataType.rt_uint)
 							{
 								dictToOptimizeRegister.Add(register, new MemRegister_UInt(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
-								if (step.opCode == OpCode.access_dot)
+								if (step.opCode == OpCode.access_dot && register == step.reg)
 									step.opCode = OpCode.access_dot_memregister;
 							}
-							//else if (register.valueType >= RunTimeDataType._OBJECT)
-							//{
-							//	dictToOptimizeRegister.Add(register, new MemRegister_Object(register.Id)); dictMem_StackSlotAccessor.Add(dictToOptimizeRegister[register], register);
-							//	if (step.opCode == OpCode.access_dot)
-							//		step.opCode = OpCode.access_dot_memregister;
-							//}
+							
+							
 							i--;
 							break;
 						}
@@ -1665,14 +1662,6 @@ namespace ASCompiler.compiler
 		}
 
 
-
-
-		private bool isSafeOperator(StackSlotAccessor accessor, Dictionary<OpStep, object> jumpbacktargets, int line)
-		{
-			int fline; List<int> cline = new List<int>();
-			return isAllSafeOperator(line, line + 1, line + 1, jumpbacktargets, accessor, out fline, cline);
-		}
-
 		private bool isAllSafeOperator(int st, int ed, int realend, Dictionary<OpStep,object> jumpbacktargets ,StackSlotAccessor accessor, out int failedline, List<int> continues)
 		{
 			for (int i = st; i < ed; i++)
@@ -1781,7 +1770,7 @@ namespace ASCompiler.compiler
 				}
 				else
 				{
-					if (!isSafeStep(block.opSteps[i],jumpbacktargets))
+					if (!isSafeStep(block.opSteps[i],accessor,jumpbacktargets))
 					{
 						failedline = i; continues.Add(i);
 						return false;
@@ -1816,7 +1805,7 @@ namespace ASCompiler.compiler
 			return true;
 		}
 
-		private bool isSafeStep(OpStep step,Dictionary<OpStep,object> jumbacktagets)
+		private bool isSafeStep(OpStep step,StackSlotAccessor register,Dictionary<OpStep,object> jumbacktagets)
 		{
 			var opcode = step.opCode;
 
@@ -1905,25 +1894,6 @@ namespace ASCompiler.compiler
 
 				return canSaveToMemReg(step.opCode);
 			}
-			//else if (register.valueType >= RunTimeDataType._OBJECT)
-			//{
-			//	if (step.opCode == OpCode.access_dot)
-			//	{
-			//		if (register._hasUnaryOrShuffixOrDelete || register._isassigntarget ||
-			//			(
-			//			register._regMember != null &&
-			//			register._regMember.bindField is ClassPropertyGetter))
-			//		{
-			//			return false;
-			//		}
-			//		else
-			//		{
-			//			return true;
-			//		}
-			//	}
-
-			//	return canSaveToMemReg(step.opCode);
-			//}
 			else
 			{
 				return false;
@@ -2422,6 +2392,46 @@ namespace ASCompiler.compiler
 		/// </summary>
 		public void completSteps(Builder builder)
 		{
+			#region 删除所有的临时property容器
+
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.access_dot)
+				{
+					if (step.reg is StackSlotAccessor)
+					{
+						StackSlotAccessor register = (StackSlotAccessor)step.reg;
+
+						if (register._regMember != null && register._regMember.bindField is ClassPropertyGetter)
+						{
+							bool hasref = false;
+							for (int j = i + 1; j < block.opSteps.Count; j++)
+							{
+								var test = block.opSteps[j];
+
+								if (test.arg1 == register || test.arg2 == register)
+								{
+									hasref = true;
+									break;
+								}
+							}
+
+							if (!hasref)
+							{
+								block.opSteps.RemoveAt(i);
+								i--;
+							}
+						}
+
+					}
+
+				}
+			}
+
+			#endregion
+
+
 			#region 查找所有的InitStaticClass并提前
 			{
 				Dictionary<int, int> initstatics = new Dictionary<int, int>();
@@ -2483,6 +2493,15 @@ namespace ASCompiler.compiler
 				}
 			}
 			#endregion
+
+
+			#region 将method提前出循环
+
+
+
+			#endregion
+
+
 
 			setJumpOffSet();
 			setTryState();

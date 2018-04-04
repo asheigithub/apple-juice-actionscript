@@ -67,4 +67,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy *.dll $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli\
+copy *.exe $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli\</PostBuildEvent>
+  </PropertyGroup>
 </Project>

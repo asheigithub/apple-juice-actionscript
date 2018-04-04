@@ -2,6 +2,7 @@ package
 {
 	import autogencodelib.Testobj;
 	import com.adobe.crypto.SHA1;
+	import com.adobe.serialization.json.JSON;
 	import com.adobe.images.BitmapData1;
 	import com.adobe.images.JPGEncoder;
 	import flash.display.Sprite;
@@ -15,8 +16,11 @@ package
 	import nochump.util.zip.ZipEntry;
 	import nochump.util.zip.ZipFile;
 	import nochump.util.zip.ZipOutput;
+	import system.DateTime;
 	import system.EnvironmentVariableTarget;
+	import system.TimeSpan;
 	import system._Array_;
+	import system._Object_;
 	
 	[Doc]
 	/**
@@ -29,23 +33,29 @@ package
 		public function Main()
 		{
 			
+			//var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
+			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
+			//
+			//trace(s);
+			//var v:Vector.<String> = new Vector.<String>();
+			//v[0] = null;
+			//trace(  v[0], SHA1.hash(typeof v[0]));
 			
-			var v:Vector.<String> = new Vector.<String>();
-			
-			
-			var millionAs:String = new String("");
-			for ( var i:int = 0; i < 10000; i++ ) {
-			
-			v.push("a");
-			
-			//millionAs += "a";
-			}
-			
-			millionAs = v.join();
+			//var v:Vector.<String> = new Vector.<String>();
+			//
+			//var millionAs:String = new String("");
+			//for ( var i:int = 0; i < 10000; i++ ) {
+			//
+			//v.push("a");
+			//
+			////millionAs += "a";
+			//}
+			//
+			//millionAs = v.join();
 			
 			//trace(v.length,v[0],v[1],v[2],v[10000-1].length);
-			
-			trace(SHA1.hash(millionAs));
+			//
+			//trace(SHA1.hash(millionAs));
 			
 			
 			//var c:Class = getDefinitionByName("Main::et");
@@ -73,6 +83,21 @@ package
 			//t[99] += "bbbc";
 			//
 			//trace(t[99]);
+			
+			
+			var t:Testobj = new Testobj(3);
+			
+			var st:DateTime = DateTime.now;
+			
+			for (var i:int = 0; i < 200000	; i++) 
+			{
+				t.roation(1,2,3);
+			}
+			
+			trace( TimeSpan(DateTime.now-st).totalMilliseconds );
+			
+			
+			
 		//var stream:FileStream = new FileStream();
 				//var file:File = new File('F:/code/Protobuf-as3-ILRuntime-master.zip');//绑定一个文件
 				//stream.open(file,FileMode.READ);//读取文件
@@ -146,6 +171,7 @@ package
 	}
 
 }
+
 
 //import autogencodelib.Testobj;
 //

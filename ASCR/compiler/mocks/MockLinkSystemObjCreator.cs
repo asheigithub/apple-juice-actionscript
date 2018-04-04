@@ -34,6 +34,11 @@ namespace ASCompiler.compiler.mocks
 			throw new NotImplementedException();
 		}
 
+		public RunTimeValueBase makeObject(Class cls)
+		{
+			throw new NotImplementedException();
+		}
+
 		public void setLinkObjectValueToSlot(SLOT slot, object player, object value, Class clsType)
 		{
 			throw new NotImplementedException();

@@ -1,6 +1,6 @@
 package
 {
-	[Doc]
+	
 	public class abc
 	{
 		//public function abc()

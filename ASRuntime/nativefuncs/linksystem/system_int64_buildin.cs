@@ -9,9 +9,9 @@ using ASRuntime;
 namespace ASRuntime.nativefuncs.linksystem
 {
 
-    class system_int64_ctor : NativeFunctionBase
+    class system_int64_ctor : NativeConstParameterFunction
     {
-        public system_int64_ctor()
+        public system_int64_ctor():base(1)
         {
             para = new List<RunTimeDataType>();
             para.Add(RunTimeDataType.rt_number);
@@ -50,14 +50,22 @@ namespace ASRuntime.nativefuncs.linksystem
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null;errorno = 0;
-            ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
-            return ASBinCode.rtData.rtUndefined.undefined;
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null;errorno = 0;
+		//    ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0].getValue());
+		//    return ASBinCode.rtData.rtUndefined.undefined;
 
-        }
-    }
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = (long)ASRuntime.TypeConverter.ConvertToNumber(argements[0]);
+			returnSlot.directSet( ASBinCode.rtData.rtUndefined.undefined);
+		}
+
+	}
 
     //class system_int64_toString : NativeFunctionBase
     //{
@@ -256,9 +264,9 @@ namespace ASRuntime.nativefuncs.linksystem
 	}
 
 
-    class system_int64_valueOf : NativeFunctionBase
+    class system_int64_valueOf : NativeConstParameterFunction
     {
-        public system_int64_valueOf()
+        public system_int64_valueOf():base(0)
         {
             para = new List<RunTimeDataType>();
         }
@@ -296,15 +304,23 @@ namespace ASRuntime.nativefuncs.linksystem
             }
         }
 
-        public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
-        {
-            errormessage = null; errorno = 0;
-            LinkObj<long> i64 = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
-            
-            return new ASBinCode.rtData.rtNumber(i64.value);
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//    errormessage = null; errorno = 0;
+		//    LinkObj<long> i64 = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
 
-        }
-    }
+		//    return new ASBinCode.rtData.rtNumber(i64.value);
+
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			success = true;
+			LinkObj<long> i64 = ((LinkObj<long>)((ASBinCode.rtData.rtObjectBase)thisObj).value);
+
+			returnSlot.setValue((double)i64.value);
+			//return new ASBinCode.rtData.rtNumber(i64.value);
+		}
+	}
 
 
     //sealed class system_int64_MaxValue_getter : NativeFunctionBase

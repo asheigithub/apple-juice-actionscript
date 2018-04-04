@@ -8,5 +8,7 @@ namespace ASBinCode.rtti
     {
         Type getLinkSystemObjType();
         void setLinkObjectValueToSlot(SLOT slot,object player, object value, Class clsType);
-    }
+		RunTimeValueBase makeObject(Class cls);
+
+	}
 }

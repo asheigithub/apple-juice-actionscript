@@ -106,10 +106,10 @@ namespace ASRuntime.nativefuncs
             throw new EngineException();
         }
 
-        public sealed override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        {
-            throw new EngineException();
-        }
+        //public sealed override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+        //{
+        //    throw new EngineException();
+        //}
 
 
 
