@@ -173,6 +173,45 @@ namespace ASCompiler.compiler
 
 			convertVarToReg(builder, f);
 
+			#region 将method提前出循环
+
+			for (int i = 0; i < block.opSteps.Count; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.access_method)
+				{
+					bool existsloop=false;
+					//***向前提前到对象的后面***
+					for (int j = i - 1; j >= 0; j--)
+					{
+						var ss = block.opSteps[j];
+
+						if (ss.opCode == OpCode.flag && ss.flag.IndexOf("LOOP") >= 0)
+						{
+							existsloop = true;
+						}
+
+						if (ss.reg == step.arg1 && existsloop)
+						{
+							int swap = j + 1;
+							if (i != swap)
+							{
+								block.opSteps.RemoveAt(i);
+								block.opSteps.Insert(swap, step);
+							}
+							break;
+						}
+
+					}
+				}
+
+			}
+
+			setJumpOffSet();
+
+			#endregion
+
+
 			setTryState();//先刷一次TryState,便于优化时参考
 			//if (
 			//	//!f.name.EndsWith("inflate")
@@ -2493,14 +2532,6 @@ namespace ASCompiler.compiler
 				}
 			}
 			#endregion
-
-
-			#region 将method提前出循环
-
-
-
-			#endregion
-
 
 
 			setJumpOffSet();
