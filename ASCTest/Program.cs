@@ -325,7 +325,8 @@ namespace ASCTest
 						//ASRuntime.flash.utils.ByteArray array;
 						//var byteArray = player.createByteArrayObject(out array);
 
-						//var bytes = System.IO.File.ReadAllBytes(@"F:/code/Protobuf-as3-ILRuntime-master.zip");
+						//////var bytes = System.IO.File.ReadAllBytes(@"F:/code/Protobuf-as3-ILRuntime-master.zip");
+						//var bytes = System.IO.File.ReadAllBytes(@"F:/3STOOGES.zip");
 						//array.writeBytes(bytes, 0, bytes.Length);
 						//array.position = 0;
 

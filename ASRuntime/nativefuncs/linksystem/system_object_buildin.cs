@@ -391,6 +391,7 @@ namespace ASRuntime.nativefuncs.linksystem
 
 	}
 
+
 	class system_Object_explicit_from : NativeConstParameterFunction
 	{
 		public system_Object_explicit_from() : base(1)
@@ -437,6 +438,19 @@ namespace ASRuntime.nativefuncs.linksystem
 			//var v = (stackframe.player.alloc_pureHostedOrLinkedObject(((ASBinCode.rtData.rtObjectBase)thisObj).value._class.instanceClass));
 			var cls = stackframe.player.swc.getClassByRunTimeDataType(functionDefine.signature.returnType);
 
+
+			if (argements[0].rtType > RunTimeDataType.unknown)
+			{
+				var vcls = stackframe.player.swc.getClassByRunTimeDataType(argements[0].rtType);
+				if (vcls.staticClass == null)
+				{
+					((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, argements[0]);
+					success = false;
+					return;
+				}
+			}
+
+
 			object lo;
 			if (stackframe.player.linktypemapper.rtValueToLinkObject(
 				argements[0],
@@ -453,10 +467,13 @@ namespace ASRuntime.nativefuncs.linksystem
 			}
 			else
 			{
-				stackframe.throwCastException(token, argements[0].rtType,
-					cls.getRtType()
-					);
+				((StackSlot)returnSlot).setLinkObjectValue(cls, stackframe.player, argements[0]);
 				success = false;
+
+				//stackframe.throwCastException(token, argements[0].rtType,
+				//	cls.getRtType()
+				//	);
+				//success = false;
 			}
 
 		}

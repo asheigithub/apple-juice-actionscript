@@ -485,6 +485,8 @@ namespace ASBinCode
 
 		make_para_scope_method_noparameters=133,
 		make_para_scope_withsignature_noparameters=134,
+		//确定调用nativeconstpara函数
+		make_para_scope_withsignature_nativeconstpara = 191,
 
 		function_return_funvoid =135,
 		function_return_nofunction=136,
@@ -642,7 +644,9 @@ namespace ASBinCode
 		/// <summary>
 		/// 从vector中取值并保存到memint中,索引为memint
 		/// </summary>
-		vector_getvalue_memint_memintidx=190
-		
+		vector_getvalue_memint_memintidx=190,
+
+		//***191被使用，代码放到make_para****部分***
+		//make_para_scope_withsignature_nativeconstpara = 191,
 	}
 }

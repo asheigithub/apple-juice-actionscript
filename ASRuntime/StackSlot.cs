@@ -50,6 +50,7 @@ namespace ASRuntime
 			_stringValue = new rtString(string.Empty);
 
 			_functionValue = new rtFunction(-1, false);
+			_functon_result = new rtFunction(-1, false);
         }
 
         private rtNumber _numberValue;
@@ -63,9 +64,15 @@ namespace ASRuntime
 #endif 
 			rtFunction _functionValue;
 
+#if DEBUG
+		private
+#else
+		internal
+#endif
+			rtFunction _functon_result;
 
 
- 
+
 		internal StackObjects stackObjects;
 
 		internal operators.OpAccess_Dot.arraySlot _cache_arraySlot;
@@ -362,12 +369,17 @@ namespace ASRuntime
 				{
 					case -1:
 						return linktarget.getValue();
-					case RunTimeDataType.rt_function:
-					case RunTimeDataType.rt_string:
+					
 					case RunTimeDataType.rt_array:
+					case RunTimeDataType.rt_string:					
 						//return store[COMMREFTYPEOBJ];
 					case RunTimeDataType._OBJECT:
 						return store[COMMREFTYPEOBJ];
+					case RunTimeDataType.rt_function:
+						_functon_result.CopyFrom(_functionValue);
+						return _functon_result;
+
+
 					//var k = store[COMMREFTYPEOBJ];
 					//if (k is StackLinkObjectCache.StackCacheObject)
 					//{
@@ -535,6 +547,7 @@ namespace ASRuntime
 					_cache_setthisslot.clear();
 					_linkObjCache.clearRefObj();
 					_functionValue.Clear();
+					_functon_result.Clear();
 					needclear = false;
 				}
 

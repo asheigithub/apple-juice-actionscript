@@ -365,7 +365,7 @@ namespace ASCompiler.compiler
 					_toOptimizeCallFunctionOpSteps.Clear();
 				}
 
-                if (options.isConsoleOut)
+				if (options.isConsoleOut)
                 {
                     Console.WriteLine("编译结束");
                 }

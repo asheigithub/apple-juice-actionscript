@@ -980,6 +980,53 @@ namespace ASRuntime.operators
 			}
 		}
 
+		internal void doCall_allcheckpass_nativefunctionconstpara(NativeFunctionBase nf)
+		{
+			{
+				bool success = false;
+				player._nativefuncCaller = this;
+
+				var nf3 = (nativefuncs.NativeConstParameterFunction)nf;
+				player._executeToken = nf3.getExecToken(toCallFunc.functionid);
+
+				nf3.execute3(
+					function.this_pointer != null ? function.this_pointer : invokerFrame.scope.this_pointer,
+					toCallFunc,
+					returnSlot,
+					token,
+					invokerFrame,
+					out success
+					);
+
+				player._executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
+				player._nativefuncCaller = null;
+				((nativefuncs.NativeConstParameterFunction)nf).clearParameter();
+
+				clear_para_slot(invokerFrame, onstackparametercount);
+				onstackparametercount = 0;
+
+				if (success)
+				{
+					if (callbacker != null)
+					{
+						callbacker.call(callbacker.args);
+					}
+				}
+				else
+				{
+					invokerFrame.endStep();
+					if (callbacker != null)
+					{
+						callbacker.noticeRunFailed();
+					}
+
+				}
+				release();
+
+			}
+		}
+
+
 
 		internal void doCall_allcheckpass_nonative_hassetreturndefault_method()
 		{
@@ -1057,6 +1104,7 @@ namespace ASRuntime.operators
 						slot._cache_setthisslot.clear();
 						slot._linkObjCache.clearRefObj();
 						slot._functionValue.Clear();
+						slot._functon_result.Clear();
 						slot.needclear = false;
 					}
 
@@ -1163,6 +1211,7 @@ namespace ASRuntime.operators
 							slot._cache_setthisslot.clear();
 							slot._linkObjCache.clearRefObj();
 							slot._functionValue.Clear();
+							slot._functon_result.Clear();
 							slot.needclear = false;
 						}
 

@@ -404,6 +404,7 @@ namespace ASRuntime
 												slot._cache_setthisslot.clear();
 												slot._linkObjCache.clearRefObj();
 												slot._functionValue.Clear();
+												slot._functon_result.Clear();
 												slot.needclear = false;
 											}
 
@@ -943,13 +944,87 @@ namespace ASRuntime
 										operators.OpCallFunction.push_parameter_skipcheck_testnative(currentRunFrame, step, scope);
 										break;
 									case OpCode.push_parameter_nativeconstpara:
-										operators.OpCallFunction.push_parameter_nativeconstpara(currentRunFrame, step, scope);
+										//operators.OpCallFunction.push_parameter_nativeconstpara(currentRunFrame, step, scope);
+										{
+											var fc = currentRunFrame.funCaller;
+
+											var toCallFunc = fc.toCallFunc;
+											var nf = (nativefuncs.NativeConstParameterFunction)swc.getNativeFunction(toCallFunc);
+											{
+												//int id = ((rtInt)step.arg2.getValue(scope, this)).value;
+												RunTimeValueBase arg = step.arg1.getValue(scope, currentRunFrame);
+												bool success;
+												fc.pushParameterNativeModeConstParameter(nf, arg, step.memregid1, out success);
+
+											}
+
+											int count = step.jumoffset;
+											for (int i = 1; i < count; i++)
+											{
+												var stepn = block.instructions[currentRunFrame.codeLinePtr + i];
+												//int id = ((rtInt)stepn.arg2.getValue(scope, this)).value;
+												RunTimeValueBase arg = stepn.arg1.getValue(scope, currentRunFrame);
+												bool success;
+												fc.pushParameterNativeModeConstParameter(nf, arg, step.memregid1+i, out success);
+
+											}
+
+											currentRunFrame.codeLinePtr += count;
+
+											fc.callbacker = fc;
+											fc.returnSlot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
+											nf.bin = swc;
+											fc.doCall_allcheckpass_nativefunctionconstpara(nf);
+											currentRunFrame.funCaller = null;
+
+
+
+										}
+
 										break;
 									case OpCode.push_parameter_para:
 										operators.OpCallFunction.push_parameter_para(currentRunFrame, step, scope);
 										break;
 									case OpCode.make_para_scope_method:
 										operators.OpCallFunction.create_paraScope_Method(currentRunFrame, step, scope);
+										break;
+									case OpCode.make_para_scope_withsignature_nativeconstpara:
+
+										{
+											rtFunction function
+												= (rtFunction)step.arg1.getValue(scope, currentRunFrame);
+
+											var funcCaller = funcCallerPool.create(currentRunFrame, step.token);
+											funcCaller.SetFunction(function);
+											funcCaller._tempSlot = currentRunFrame._tempSlot1;
+											funcCaller.toCallFunc = swc.functions[function.functionId];
+											if (!funcCaller.createParaScope()) { break; }
+
+											currentRunFrame.funCaller = funcCaller;
+
+											currentRunFrame.codeLinePtr++;
+
+											var nf = (nativefuncs.NativeConstParameterFunction)swc.getNativeFunction(function.functionId);
+											int count = step.jumoffset;
+											for (int i = 0; i < count; i++)
+											{
+												var stepn = block.instructions[currentRunFrame.codeLinePtr + i];
+												RunTimeValueBase arg = stepn.arg1.getValue(scope, currentRunFrame);
+												bool success;
+												funcCaller.pushParameterNativeModeConstParameter(nf, arg, i, out success);
+
+											}
+
+											currentRunFrame.codeLinePtr += count;
+
+											funcCaller.callbacker = funcCaller;
+											funcCaller.returnSlot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
+											nf.bin = swc;
+											funcCaller.doCall_allcheckpass_nativefunctionconstpara(nf);
+											currentRunFrame.funCaller = null;
+
+										}
+
 										break;
 									case OpCode.make_para_scope_withsignature:
 										operators.OpCallFunction.create_paraScope_WithSignature(currentRunFrame, step, scope);

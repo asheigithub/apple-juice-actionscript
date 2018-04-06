@@ -11,3 +11,15 @@ F:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.csprojResolveAssemblyReference.cache
 F:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.csproj.CoreCompileInputs.cache
 F:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.exe
 F:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.pdb
+E:\ASTool\CMXMLCCLI\bin\Release\CMXMLCCLI.exe
+E:\ASTool\CMXMLCCLI\bin\Release\CMXMLCCLI.pdb
+E:\ASTool\CMXMLCCLI\bin\Release\ASCompiler.dll
+E:\ASTool\CMXMLCCLI\bin\Release\ASRuntime.dll
+E:\ASTool\CMXMLCCLI\bin\Release\ASTool.dll
+E:\ASTool\CMXMLCCLI\bin\Release\ASCompiler.pdb
+E:\ASTool\CMXMLCCLI\bin\Release\ASRuntime.pdb
+E:\ASTool\CMXMLCCLI\bin\Release\ASTool.pdb
+E:\ASTool\CMXMLCCLI\bin\Release\ASTool.xml
+E:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.csprojResolveAssemblyReference.cache
+E:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.exe
+E:\ASTool\CMXMLCCLI\obj\Release\CMXMLCCLI.pdb

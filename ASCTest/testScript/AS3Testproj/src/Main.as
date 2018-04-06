@@ -52,9 +52,9 @@ package
 			//}
 			//
 			//millionAs = v.join();
-			
-			//trace(v.length,v[0],v[1],v[2],v[10000-1].length);
 			//
+			////trace(v.length,v[0],v[1],v[2],v[10000-1].length);
+			////
 			//trace(SHA1.hash(millionAs));
 			
 			
@@ -88,10 +88,17 @@ package
 			var t:Testobj = new Testobj(3);
 			
 			var st:DateTime = DateTime.now;
-			
+			//var m:Number;
 			for (var i:int = 0; i < 200000	; i++) 
 			{
+				//m = i;
+				//m++;
+				//m++;
 				t.roation(1,2,3);
+				
+				//m--; m--;
+				
+				//this.abc(3, 4, 5);
 			}
 			
 			trace( TimeSpan(DateTime.now-st).totalMilliseconds );
@@ -103,6 +110,11 @@ package
 				//stream.open(file,FileMode.READ);//读取文件
 				//showzip(stream);
 				//stream.close();
+		}
+		
+		private function abc(x:Number,y:Number,z:Number):void
+		{
+			
 		}
 		
 		public static function saveZip(toread:ByteArray):void

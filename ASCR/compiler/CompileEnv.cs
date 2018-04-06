@@ -174,35 +174,101 @@ namespace ASCompiler.compiler
 			convertVarToReg(builder, f);
 
 			#region 将method提前出循环
+			int laststmt = 0;
+			for (int j = block.opSteps.Count - 1; j >= 0; j--)
+			{
+				var sl = block.opSteps[j];
+				{
+					StackSlotAccessor r = sl.reg as StackSlotAccessor;
+					if (r != null)
+					{
+						laststmt = r.stmtid; break;
+					}
+				}
+				{
+					StackSlotAccessor r = sl.arg1 as StackSlotAccessor;
+					if (r != null)
+					{
+						laststmt = r.stmtid; break;
+					}
+				}
+				{
+					StackSlotAccessor r = sl.arg2 as StackSlotAccessor;
+					if (r != null)
+					{
+						laststmt = r.stmtid; break;
+					}
+				}
+			}
+
 
 			for (int i = 0; i < block.opSteps.Count; i++)
 			{
 				var step = block.opSteps[i];
 				if (step.opCode == OpCode.access_method)
 				{
-					bool existsloop=false;
-					//***向前提前到对象的后面***
-					for (int j = i - 1; j >= 0; j--)
+					bool isstatic = false;
+					if (step.arg1 is StaticClassDataGetter || step.arg1 is ThisPointer || step.arg1 is SuperPointer)
 					{
-						var ss = block.opSteps[j];
-
-						if (ss.opCode == OpCode.flag && ss.flag.IndexOf("LOOP") >= 0)
+						isstatic = true;
+					}
+					if (!isstatic)
+					{
+						bool existsloop = false;
+						//***向前提前到对象的后面***
+						for (int j = i - 1; j >= 0; j--)
 						{
-							existsloop = true;
+							var ss = block.opSteps[j];
+
+							if (ss.opCode == OpCode.flag && ss.flag.IndexOf("LOOP") >= 0)
+							{
+								existsloop = true;
+							}
+
+							if (ss.reg == step.arg1 && existsloop)
+							{
+								int swap = j + 1;
+								if (i != swap)
+								{
+									
+									block.opSteps.RemoveAt(i);
+									block.opSteps.Insert(swap, step);
+								}
+								break;
+							}
+						}
+					}
+					else
+					{
+						int l = 0; int lst = 0;
+						//***向前提到循环外部**
+						for (int j = 0; j < i; j++)
+						{
+							var ss = block.opSteps[j];
+
+							if (ss.opCode == OpCode.flag && ss.flag.IndexOf("LOOP_START_") >= 0)
+							{
+								if (l == 0)
+									lst = j;
+								l++;
+							}
+							if (ss.opCode == OpCode.flag && ss.flag.IndexOf("LOOP_END_") >= 0)
+							{
+								l--;
+							}
 						}
 
-						if (ss.reg == step.arg1 && existsloop)
+						if (l > 0)
 						{
-							int swap = j + 1;
-							if (i != swap)
-							{
-								block.opSteps.RemoveAt(i);
-								block.opSteps.Insert(swap, step);
-							}
+							((StackSlotAccessor)step.reg).stmtid = laststmt;
+
+							block.opSteps.RemoveAt(i);
+							block.opSteps.Insert(lst, step);
 							break;
 						}
-
 					}
+
+
 				}
 
 			}
@@ -210,7 +276,6 @@ namespace ASCompiler.compiler
 			setJumpOffSet();
 
 			#endregion
-
 
 			setTryState();//先刷一次TryState,便于优化时参考
 			//if (
@@ -1596,8 +1661,26 @@ namespace ASCompiler.compiler
 										{
 											replaceStackSlotAccessor(register, store, block.opSteps[m]);
 										}
+										//***调整插入行。如果失败行是函数调用，则把保存行放到make_para前面
+										int _instertline = failedline;
+										if (block.opSteps[_instertline].opCode == OpCode.call_function
+											||
+											block.opSteps[_instertline].opCode == OpCode.call_function_notcheck
+											||
+											block.opSteps[_instertline].opCode == OpCode.call_function_notcheck_notreturnobject
+											||
+											block.opSteps[_instertline].opCode == OpCode.call_function_notcheck_notreturnobject_notnative
+											||
+											block.opSteps[_instertline].opCode == OpCode.call_function_notcheck_notreturnobject_notnative_method
+											)
+										{
+											while (block.opSteps[_instertline].opCode != OpCode.make_para_scope)
+											{
+												_instertline--;
+											}
+										}
 
-										block.opSteps.Insert(failedline, savestep);
+										block.opSteps.Insert(_instertline, savestep);
 
 										//dictCanNotOptimizeRegister.Add(store, null);
 										dictNeedSaveStep.Add(store, savestep);

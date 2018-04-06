@@ -4,3 +4,7 @@ F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csprojResolveAssemblyRef
 F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache
 F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.dll
 F:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.pdb
+E:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.dll
+E:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.pdb
+E:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.dll
+E:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.pdb
