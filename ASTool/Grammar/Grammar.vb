@@ -865,7 +865,6 @@ Public Class Grammar
 
 		End While
 
-
 		Return tree
 
 	End Function

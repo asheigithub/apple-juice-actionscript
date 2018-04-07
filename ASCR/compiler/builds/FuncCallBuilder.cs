@@ -976,32 +976,32 @@ namespace ASCompiler.compiler.builds
 										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
 										opMakeArgs.jumoffset = signature.parameters.Count;
 									}
-									else
-									if (isNativeNotModeConstPara(signature, builder, out findsuccess))
-									{
-										if (signature.onStackParameters == signature.parameters.Count)
-										{
-											if (signature.parameters.Count == 0)
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
-											}
-											else
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
-												opMakeArgs.jumoffset = signature.parameters.Count;
-												for (int i = 0; i < signature.parameters.Count; i++)
-												{
-													var p = signature.parameters[i];
-													if (p.isPara || p.defaultValue != null)
-													{
-														opMakeArgs.jumoffset = i;
-														break;
-													}
-												}
-											}
-										}
+									//else
+									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+									//{
+									//	if (signature.onStackParameters == signature.parameters.Count)
+									//	{
+									//		if (signature.parameters.Count == 0)
+									//		{
+									//			opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
+									//		}
+									//		else
+									//		{
+									//			opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
+									//			opMakeArgs.jumoffset = signature.parameters.Count;
+									//			for (int i = 0; i < signature.parameters.Count; i++)
+									//			{
+									//				var p = signature.parameters[i];
+									//				if (p.isPara || p.defaultValue != null)
+									//				{
+									//					opMakeArgs.jumoffset = i;
+									//					break;
+									//				}
+									//			}
+									//		}
+									//	}
 
-									}
+									//}
 									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 									{
 										if (signature.onStackParameters == signature.parameters.Count)
@@ -1038,34 +1038,34 @@ namespace ASCompiler.compiler.builds
 										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
 										opMakeArgs.jumoffset = signature.parameters.Count;
 									}
-									else
-									if (isNativeNotModeConstPara(signature, builder, out findsuccess))
-									{
-										if (signature.onStackParameters == signature.parameters.Count)
-										{
-											if (signature.parameters.Count == 0)
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
-											}
-											else
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
-												opMakeArgs.jumoffset = signature.parameters.Count;
-												for (int i = 0; i < signature.parameters.Count; i++)
-												{
-													var p = signature.parameters[i];
-													if (p.isPara || p.defaultValue != null)
-													{
-														opMakeArgs.jumoffset = i;
-														break;
-													}
-												}
+									//else
+									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+									//{
+									//	if (signature.onStackParameters == signature.parameters.Count)
+									//	{
+									//		if (signature.parameters.Count == 0)
+									//		{
+									//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
+									//		}
+									//		else
+									//		{
+									//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
+									//			opMakeArgs.jumoffset = signature.parameters.Count;
+									//			for (int i = 0; i < signature.parameters.Count; i++)
+									//			{
+									//				var p = signature.parameters[i];
+									//				if (p.isPara || p.defaultValue != null)
+									//				{
+									//					opMakeArgs.jumoffset = i;
+									//					break;
+									//				}
+									//			}
 
-											}
+									//		}
 
-										}
+									//	}
 
-									}
+									//}
 									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
 									{
 										if (signature.onStackParameters == signature.parameters.Count)

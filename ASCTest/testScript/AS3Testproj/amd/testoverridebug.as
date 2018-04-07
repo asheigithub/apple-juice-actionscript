@@ -1,6 +1,6 @@
 package 
 {
-	[Doc]
+	
 	/**
 	 * ...
 	 * @author 

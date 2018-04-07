@@ -1034,6 +1034,7 @@ namespace ASRuntime
 										break;
 									case OpCode.make_para_scope_withsignature_allparaonstack:
 										operators.OpCallFunction.create_paraScope_WithSignature_AllParaOnStack(currentRunFrame, step, scope);
+										
 										break;
 									case OpCode.make_para_scope_method_noparameters:
 										operators.OpCallFunction.create_paraScope_Method_NoParameters(currentRunFrame, step, scope);
@@ -2135,6 +2136,13 @@ namespace ASRuntime
 			((runFuncResult)sender.cacheObjects[0]).isEnd = true;
 			((runFuncResult)sender.cacheObjects[0]).isSuccess = false;
 			sender.isSuccess = false;
+		}
+
+		internal error.InternalError clear_nativeinvokeraiseerror()
+		{
+			var temp = receive_error;
+			receive_error = null;
+			return temp;
 		}
 
 		private IBlockCallBack _tempcallbacker;

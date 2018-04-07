@@ -197,7 +197,7 @@ namespace ASRuntime.operators
 
 		}
 
-		public static void create_paraScope_WithSignature_AllParaOnStack(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
+		public static bool create_paraScope_WithSignature_AllParaOnStack(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)
 		{
 			rtFunction function
 				= (rtFunction)step.arg1.getValue(frame.scope, frame);
@@ -208,7 +208,7 @@ namespace ASRuntime.operators
 			{
 				frame.throwError(new error.InternalError(frame.player.swc, step.token, "stack overflow"));
 				frame.endStep();
-				return;
+				return false;
 			}
 
 			var funcCaller = frame.player.funcCallerPool.create(frame, step.token);
@@ -241,7 +241,7 @@ namespace ASRuntime.operators
 
 
 			frame.endStepNoError();
-
+			return true;
 		}
 
 		public static void create_paraScope_WithSignature(StackFrame frame, ASBinCode.OpStep step, RunTimeScope scope)

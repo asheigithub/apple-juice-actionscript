@@ -877,7 +877,10 @@ namespace ASRuntime
 					operators.OpCallFunction.create_paraScope_Method_NotNativeConstPara_AllParaOnStack(this, step, scope);
 					break;
 				case OpCode.make_para_scope_withsignature_allparaonstack:
+
 					operators.OpCallFunction.create_paraScope_WithSignature_AllParaOnStack(this, step, scope);
+					
+
 					break;
 				case OpCode.make_para_scope_method_noparameters:
 					operators.OpCallFunction.create_paraScope_Method_NoParameters(this,step,scope);

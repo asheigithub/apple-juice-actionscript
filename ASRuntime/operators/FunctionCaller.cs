@@ -959,7 +959,16 @@ namespace ASRuntime.operators
 
 					if (success)
 					{
-						if (callbacker != null)
+						var receive_err = player.clear_nativeinvokeraiseerror();
+						if (receive_err != null)
+						{
+							invokerFrame.receiveErrorFromStackFrame(receive_err);
+							if (callbacker != null)
+							{
+								callbacker.noticeRunFailed();
+							}
+						}
+						else if (callbacker != null)
 						{
 							callbacker.call(callbacker.args);
 						}
@@ -1007,7 +1016,16 @@ namespace ASRuntime.operators
 
 				if (success)
 				{
-					if (callbacker != null)
+					var receive_err = player.clear_nativeinvokeraiseerror();
+					if (receive_err != null)
+					{
+						invokerFrame.receiveErrorFromStackFrame(receive_err);
+						if (callbacker != null)
+						{
+							callbacker.noticeRunFailed();
+						}
+					}
+					else if (callbacker != null)
 					{
 						callbacker.call(callbacker.args);
 					}

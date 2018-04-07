@@ -1,102 +1,103 @@
 ﻿Namespace AS3.Expr
-    Public Class AS3DataStackElement
-        ''' <summary>
-        ''' 是否是寄存器
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public IsReg As Boolean
 
-        Public Data As AS3DataValue
+	Public Class AS3DataStackElement
+		''' <summary>
+		''' 是否是寄存器
+		''' </summary>
+		''' <remarks></remarks>
+		Public IsReg As Boolean
 
-        Public Reg As AS3Reg
+		Public Data As AS3DataValue
+
+		Public Reg As AS3Reg
 
 
 
-        Public Overrides Function ToString() As String
-           
-            If IsReg Then
+		Public Overrides Function ToString() As String
+
+			If IsReg Then
 
 				Return "<V" & Reg.ID & " G:" & Reg.StmtID & ">"
 			Else
 
-                If Not Data.Value Is Nothing Then
+				If Not Data.Value Is Nothing Then
 
-                    If TypeOf Data.Value Is List(Of AS3DataStackElement) Then
+					If TypeOf Data.Value Is List(Of AS3DataStackElement) Then
 
-                        Dim result As String = "["
+						Dim result As String = "["
 
-                        For Each k In CType(Data.Value, List(Of AS3DataStackElement))
+						For Each k In CType(Data.Value, List(Of AS3DataStackElement))
 
-                            result &= k.ToString() & ","
+							result &= k.ToString() & ","
 
-                        Next
+						Next
 
-                        If result.Length > 1 Then
-                            result = result.Substring(0, result.Length - 1)
-                        End If
+						If result.Length > 1 Then
+							result = result.Substring(0, result.Length - 1)
+						End If
 
-                        result &= "]"
+						result &= "]"
 
-                        If Data.FF1Type = FF1DataValueType.as3_callargements Then
-                            result = "args:" & result
-                        ElseIf Data.FF1Type = FF1DataValueType.as3_expressionlist Then
+						If Data.FF1Type = FF1DataValueType.as3_callargements Then
+							result = "args:" & result
+						ElseIf Data.FF1Type = FF1DataValueType.as3_expressionlist Then
 
-                            result = "expressionlist:(" & result.Substring(1, result.Length - 2) & ")"
+							result = "expressionlist:(" & result.Substring(1, result.Length - 2) & ")"
 
-                        End If
+						End If
 
-                        Return result
-                    ElseIf TypeOf Data.Value Is Hashtable Then '动态对象
-                        Dim hastable = CType(Data.Value, Hashtable)
+						Return result
+					ElseIf TypeOf Data.Value Is Hashtable Then '动态对象
+						Dim hastable = CType(Data.Value, Hashtable)
 
-                        Dim result As String = "{"
+						Dim result As String = "{"
 
-                        For Each k In hastable.Keys
-                            result &= CType(k, Token).StringValue & ":" & CType(hastable(k), AS3.Expr.AS3DataStackElement).ToString()
-                            result &= ","
-                        Next
-                        If result.Length > 1 Then
-                            result = result.Substring(0, result.Length - 1)
-                        End If
+						For Each k In hastable.Keys
+							result &= CType(k, Token).StringValue & ":" & CType(hastable(k), AS3.Expr.AS3DataStackElement).ToString()
+							result &= ","
+						Next
+						If result.Length > 1 Then
+							result = result.Substring(0, result.Length - 1)
+						End If
 
-                        result &= "}"
+						result &= "}"
 
-                        Return result
-                    ElseIf TypeOf Data.Value Is AS3Vector Then
+						Return result
+					ElseIf TypeOf Data.Value Is AS3Vector Then
 
-                        Dim result As String = "Vector.<" & CType(Data.Value, AS3Vector).VectorTypeStr & ">["
+						Dim result As String = "Vector.<" & CType(Data.Value, AS3Vector).VectorTypeStr & ">["
 
-                        If Not CType(Data.Value, AS3Vector).Constructor Is Nothing Then
+						If Not CType(Data.Value, AS3Vector).Constructor Is Nothing Then
 
-                            result = result & CType(Data.Value, AS3Vector).Constructor.ToString()
-                        End If
+							result = result & CType(Data.Value, AS3Vector).Constructor.ToString()
+						End If
 
-                        result &= "]"
+						result &= "]"
 
-                        Return result
+						Return result
 
-                    ElseIf Data.FF1Type = FF1DataValueType.const_string Then
+					ElseIf Data.FF1Type = FF1DataValueType.const_string Then
 
-                        Return """" & Data.Value.ToString().Replace("\", "\\").Replace(vbBack, "\b").Replace(vbFormFeed, "\f").Replace(vbLf, "\n").Replace(vbCr, "\r").Replace(vbTab, "\t").Replace("""", "\""") & """"
-                    ElseIf Data.FF1Type = FF1DataValueType.compiler_const Then
-                        Return "CONFIG::" & Data.Value.ToString()
+						Return """" & Data.Value.ToString().Replace("\", "\\").Replace(vbBack, "\b").Replace(vbFormFeed, "\f").Replace(vbLf, "\n").Replace(vbCr, "\r").Replace(vbTab, "\t").Replace("""", "\""") & """"
+					ElseIf Data.FF1Type = FF1DataValueType.compiler_const Then
+						Return "CONFIG::" & Data.Value.ToString()
 
-                    ElseIf TypeOf Data.Value Is AS3Function Then
-                        Return IIf(CType(Data.Value, AS3Function).IsMethod, "", "closure") & " function @funid=" & Data.Value.GetHashCode().ToString()
-                    Else
+					ElseIf TypeOf Data.Value Is AS3Function Then
+						Return IIf(CType(Data.Value, AS3Function).IsMethod, "", "closure") & " function @funid=" & Data.Value.GetHashCode().ToString()
+					Else
 
-                        Return Data.Value.ToString()
-                    End If
+						Return Data.Value.ToString()
+					End If
 
 
-                Else
-                    Return "null"
+				Else
+					Return "null"
 
-                End If
+				End If
 
-            End If
+			End If
 
-        End Function
+		End Function
 
 
 		Public Shared Function MakeReg(regno As Integer, groupid As Integer) As AS3DataStackElement

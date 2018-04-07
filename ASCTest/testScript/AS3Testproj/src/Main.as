@@ -33,6 +33,8 @@ package
 		public function Main()
 		{
 			
+			
+			
 			//var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
 			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
 			//
@@ -98,7 +100,7 @@ package
 				
 				//m--; m--;
 				
-				//this.abc(3, 4, 5);
+				//this.abc(3, 4,10);
 			}
 			
 			trace( TimeSpan(DateTime.now-st).totalMilliseconds );
@@ -112,9 +114,9 @@ package
 				//stream.close();
 		}
 		
-		private function abc(x:Number,y:Number,z:Number):void
+		private function abc(x:Number,y:Number,z:Number=7):void
 		{
-			
+			//trace(z);
 		}
 		
 		public static function saveZip(toread:ByteArray):void

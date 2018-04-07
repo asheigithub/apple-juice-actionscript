@@ -1,6 +1,6 @@
 package
 {
-	
+	[Doc]
 	public class abc
 	{
 		//public function abc()
@@ -120,7 +120,7 @@ package
 class fib
 {
 	
-function fibonacci_recursion( n:int ):int
+final function fibonacci_recursion( n:int ):int
 {
 	
     if( n <= 2 )
