@@ -205,8 +205,14 @@ namespace ASCompiler.compiler
 			for (int i = 0; i < block.opSteps.Count; i++)
 			{
 				var step = block.opSteps[i];
-				if (step.opCode == OpCode.access_method)
+				if (step.opCode == OpCode.access_method )
 				{
+					StackSlotAccessor r = (StackSlotAccessor)step.reg;
+					if (r._isassigntarget || r._isdeletetarget)
+					{
+						continue;
+					}
+
 					bool isstatic = false;
 					if (step.arg1 is StaticClassDataGetter || step.arg1 is ThisPointer || step.arg1 is SuperPointer)
 					{
@@ -230,7 +236,7 @@ namespace ASCompiler.compiler
 								int swap = j + 1;
 								if (i != swap)
 								{
-									
+									((StackSlotAccessor)step.reg).stmtid = laststmt;
 									block.opSteps.RemoveAt(i);
 									block.opSteps.Insert(swap, step);
 								}
@@ -271,6 +277,57 @@ namespace ASCompiler.compiler
 
 				}
 
+			}
+
+			//**合并相同的method****
+
+			Dictionary<OpStep, object> toremoveline = new Dictionary<OpStep, object>();
+			for (int i = 0; i < block.opSteps.Count-1; i++)
+			{
+				var step = block.opSteps[i];
+				if (step.opCode == OpCode.access_method)
+				{
+					StackSlotAccessor r = (StackSlotAccessor)step.reg;
+					if (r._isassigntarget || r._isdeletetarget)
+					{
+						continue;
+					}
+
+					//***查找连续的access_method****
+					for (int j = i+1; j < block.opSteps.Count; j++)
+					{
+						var s2 = block.opSteps[j];
+						if (s2.opCode != OpCode.access_method)
+						{
+							break;
+						}
+						StackSlotAccessor r2 = (StackSlotAccessor)s2.reg;
+						if (r2._isassigntarget || r2._isdeletetarget)
+						{
+							break;
+						}
+
+						if (step.arg1 == s2.arg1 && step.arg2 == s2.arg2)
+						{
+							if (!toremoveline.ContainsKey(s2))
+							{
+								toremoveline.Add(s2, j);
+							}
+							//***替换后面所有的s2.reg为step.reg
+							for (int k = j+1; k < block.opSteps.Count; k++)
+							{
+								replaceStackSlotAccessor((StackSlotAccessor)s2.reg, (StackSlotAccessor)step.reg, block.opSteps[k]); 
+							}
+							
+						}
+
+					}
+				}
+			}
+
+			foreach (var item in toremoveline.Keys)
+			{
+				block.opSteps.Remove(item);
 			}
 
 			setJumpOffSet();

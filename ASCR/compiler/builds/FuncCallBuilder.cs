@@ -974,7 +974,24 @@ namespace ASCompiler.compiler.builds
 									if (isNativeModeConstPara(signature, builder, out findsuccess))
 									{
 										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
-										opMakeArgs.jumoffset = signature.parameters.Count;
+
+										int acount = signature.parameters.Count;
+										while (acount>0)
+										{
+											if (signature.parameters[acount - 1].defaultValue != null
+												||
+												signature.parameters[acount - 1].isPara
+											)
+											{
+												acount--;
+											}
+											else
+											{
+												break;
+											}
+										}
+
+										opMakeArgs.jumoffset = acount;opMakeArgs.memregid1 = (short)signature.parameters.Count;
 									}
 									//else
 									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
@@ -1036,7 +1053,23 @@ namespace ASCompiler.compiler.builds
 									if (isNativeModeConstPara(signature, builder, out findsuccess))
 									{
 										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
-										opMakeArgs.jumoffset = signature.parameters.Count;
+										int acount = signature.parameters.Count;
+										while (acount > 0)
+										{
+											if (signature.parameters[acount - 1].defaultValue != null
+												||
+												signature.parameters[acount - 1].isPara
+											)
+											{
+												acount--;
+											}
+											else
+											{
+												break;
+											}
+										}
+
+										opMakeArgs.jumoffset = acount; opMakeArgs.memregid1 = (short)signature.parameters.Count;
 									}
 									//else
 									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
@@ -1242,9 +1275,13 @@ namespace ASCompiler.compiler.builds
 									{
 										if (findsuccess)
 										{
-											opPushArgs.opCode = OpCode.push_parameter_nativeconstpara;
-											opPushArgs.jumoffset = signature.parameters.Count -  ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null,null)).value;
-											opPushArgs.memregid1 = (short)((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+											int pid = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+											if (signature.parameters[pid].defaultValue == null)
+											{
+												opPushArgs.opCode = OpCode.push_parameter_nativeconstpara;
+												opPushArgs.jumoffset = signature.parameters.Count - ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+												opPushArgs.memregid1 = (short)((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+											}
 										}
 									}
 									else if (isNativeNotModeConstPara(signature, builder, out findsuccess))

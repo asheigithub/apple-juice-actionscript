@@ -859,14 +859,21 @@ namespace ASRuntime
 
 						}
 
-						codeLinePtr += count;
-
-						funCaller.callbacker = funCaller;
-						funCaller.returnSlot = block.instructions[codeLinePtr].reg.getSlot(scope, this);
-						nf.bin = player.swc;
-						funCaller.doCall_allcheckpass_nativefunctionconstpara(nf);
-						funCaller = null;
-
+						
+						if (step.jumoffset == step.memregid1)
+						{
+							codeLinePtr += count;
+							funCaller.callbacker = funCaller;
+							funCaller.returnSlot = block.instructions[codeLinePtr].reg.getSlot(scope, this);
+							nf.bin = player.swc;
+							funCaller.doCall_allcheckpass_nativefunctionconstpara(nf);
+							funCaller = null;
+						}
+						else
+						{
+							codeLinePtr += count-1;
+							endStepNoError();
+						}
 					}
 
 					break;

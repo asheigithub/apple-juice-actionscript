@@ -32,8 +32,12 @@ namespace ASRuntime
 		/// 内存缓存int
 		/// </summary>
 		private int[] memint;
-		
+
+#if WHENDEV
 		internal CSWC swc;
+#else
+		public CSWC swc;
+#endif
 		private CodeBlock defaultblock;
 		public void loadCode(CSWC swc, CodeBlock block = null)
 		{
@@ -158,7 +162,7 @@ namespace ASRuntime
 		/// 调用堆栈
 		/// </summary>
 		private MyStack runtimeStack;
-		StackSlot[] stackSlots;
+		internal StackSlot[] stackSlots;
 		private FrameInfo displayStackFrame;
 
 		internal StackFrame.StackFramePool stackframePool;
@@ -452,7 +456,7 @@ namespace ASRuntime
 							else
 							{
 								//currentRunFrame.step();
-					#region 人肉内联
+#region 人肉内联
 
 								var block = currentRunFrame.block;
 
@@ -1015,14 +1019,20 @@ namespace ASRuntime
 
 											}
 
-											currentRunFrame.codeLinePtr += count;
+											if (step.jumoffset == step.memregid1)
+											{
+												currentRunFrame.codeLinePtr += count;
 
-											funcCaller.callbacker = funcCaller;
-											funcCaller.returnSlot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
-											nf.bin = swc;
-											funcCaller.doCall_allcheckpass_nativefunctionconstpara(nf);
-											currentRunFrame.funCaller = null;
-
+												funcCaller.callbacker = funcCaller;
+												funcCaller.returnSlot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
+												nf.bin = swc;
+												funcCaller.doCall_allcheckpass_nativefunctionconstpara(nf);
+												currentRunFrame.funCaller = null;
+											}
+											else
+											{
+												currentRunFrame.codeLinePtr += count;
+											}
 										}
 
 										break;
@@ -1490,7 +1500,7 @@ namespace ASRuntime
 										throw new Exception(step.opCode + "操作未实现");
 								}
 
-					#endregion
+#endregion
 
 
 							}
@@ -1945,7 +1955,7 @@ namespace ASRuntime
 			funcCaller.loadDefineFromFunction();
 
 			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError; return false; }
-			#region pushparameter
+#region pushparameter
 			int c = 0;
 			bool success;
 
@@ -2055,7 +2065,7 @@ namespace ASRuntime
 				}
 			}
 
-			#endregion
+#endregion
 
 			funcCaller.returnSlot = resultSlot;
 			funcCaller._tempSlot = currentRunFrame._tempSlot2;
@@ -2212,7 +2222,7 @@ namespace ASRuntime
 				currentRunFrame.step();
 #else
 
-				#region 人肉内联
+#region 人肉内联
 
 				var block = currentRunFrame.block;
 				
@@ -2991,7 +3001,7 @@ namespace ASRuntime
 				}
 
 
-				#endregion
+#endregion
 
 #endif
 
@@ -3196,7 +3206,7 @@ namespace ASRuntime
 
 
 
-		#region 外部接口
+#region 外部接口
 
 		private object convertReturnValue(object obj)
 		{
@@ -3245,7 +3255,7 @@ namespace ASRuntime
 			}
 		}
 
-		#region getClass
+#region getClass
 
 		public ASBinCode.rtti.Class getClass(string name)
 		{
@@ -3257,9 +3267,9 @@ namespace ASRuntime
 			return swc.getClassDefinitionByName(name);
 		}
 
-		#endregion
+#endregion
 
-		#region prepaeParameter
+#region prepaeParameter
 
 		private RunTimeValueBase prepareParameter(ASBinCode.rtti.FunctionSignature sig, int paraIndex, object value, StackSlot tempSLot)
 		{
@@ -3311,9 +3321,9 @@ namespace ASRuntime
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region createInstance
+#region createInstance
 
 		public ASBinCode.rtData.rtObject createInstance(string classname)
 		{
@@ -3441,9 +3451,9 @@ namespace ASRuntime
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region getMethod
+#region getMethod
 
 		public rtFunction getMethod(rtObjectBase thisObj, string name)
 		{
@@ -3517,10 +3527,10 @@ namespace ASRuntime
 			//	}
 			//}
 		}
-		#endregion
+#endregion
 
 
-		#region invokeMethod
+#region invokeMethod
 		public object invokeMethod(string type, string methodname)
 		{
 			return invokeMethod(type, methodname, 0, null, null, null, null, null, null);
@@ -4075,9 +4085,9 @@ namespace ASRuntime
 
 
 
-		#endregion
+#endregion
 
-		#region getClassStaticInstance
+#region getClassStaticInstance
 		private rtObjectBase getClassStaticInstance(string type)
 		{
 
@@ -4110,9 +4120,9 @@ namespace ASRuntime
 			}
 
 		}
-		#endregion
+#endregion
 
-		#region get_set_member
+#region get_set_member
 
 		public object getMemberValue(rtObjectBase thisObj, string memberPath)
 		{
@@ -4360,10 +4370,10 @@ namespace ASRuntime
 			setMemberValue(clsObj, memberPath, value, indexArgs);
 		}
 
-		#endregion
+#endregion
 
 
-		#region ByteArray
+#region ByteArray
 
 		/// <summary>
 		/// 创建一个ByteArray对象
@@ -4384,7 +4394,7 @@ namespace ASRuntime
 		}
 
 
-		#endregion
+#endregion
 
 		delegate Type ddd(Type t);
 
@@ -4522,7 +4532,7 @@ namespace ASRuntime
 			return new ASRuntime.nativefuncs.linksystem.Iterator(v, this);
 		}
 
-		#endregion
+#endregion
 
 
 
