@@ -96,12 +96,17 @@ package
 				//m = i;
 				//m++;
 				//m++;
-				t.roation(1,2,3);
 				
+				t.roation(1, 2, 3);
+				
+				
+				
+				//t.inner.inner.inner.inner.name="123123";
 				//m--; m--;
 				
 				//this.abc(3, 4,10);
 			}
+			
 			
 			trace( TimeSpan(DateTime.now-st).totalMilliseconds );
 			

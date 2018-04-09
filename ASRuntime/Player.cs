@@ -456,7 +456,7 @@ namespace ASRuntime
 							else
 							{
 								//currentRunFrame.step();
-#region 人肉内联
+					#region 人肉内联
 
 								var block = currentRunFrame.block;
 
@@ -994,9 +994,87 @@ namespace ASRuntime
 										break;
 									case OpCode.make_para_scope_withsignature_nativeconstpara:
 
+										if (step.jumoffset == step.memregid1)
 										{
-											rtFunction function
-												= (rtFunction)step.arg1.getValue(scope, currentRunFrame);
+											++currentRunFrame.codeLinePtr;
+											rtFunction function;
+											MethodGetterBase mb = step.arg1 as MethodGetterBase;
+											if (mb != null)
+											{
+												function = (rtFunction)mb.getMethod(scope);
+											}
+											else
+											{
+												function = (rtFunction)step.arg1.getValue(scope, currentRunFrame);
+											}
+											var nf = (nativefuncs.NativeConstParameterFunction)swc.getNativeFunction(function.functionId);
+
+											int count = step.jumoffset;
+
+											nf.bindTempSlot();
+											nf.bin = swc;
+											bool success = false;
+											try
+											{
+												for (int i = 0; i < count; i++)
+												{
+													var stepn = block.instructions[currentRunFrame.codeLinePtr];
+													RunTimeValueBase arg = stepn.arg1.getValue(scope, currentRunFrame);
+
+													nf.setTempSlotValue(arg, i);
+											
+													++ currentRunFrame.codeLinePtr;
+												}
+
+												var returnslot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
+
+												nf.execute3(
+												function.this_pointer != null ? function.this_pointer : scope.this_pointer,
+												swc.functions[function.functionId],
+												returnslot,
+												step.token,
+												currentRunFrame,
+												out success
+												);
+											}
+											finally
+											{
+												nf.unbindTempSlot();
+											}
+
+
+											_executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
+											_nativefuncCaller = null;
+
+											if (success)
+											{
+												var receive_err = clear_nativeinvokeraiseerror();
+												if (receive_err != null)
+												{
+													currentRunFrame.receiveErrorFromStackFrame(receive_err);
+												}
+												else
+												{
+													++currentRunFrame.codeLinePtr;
+												}
+											}
+											else
+											{
+												currentRunFrame.endStep();
+											}
+										}
+										else
+										{
+											rtFunction function;
+											MethodGetterBase mb = step.arg1 as MethodGetterBase;
+											if (mb != null)
+											{
+												function = (rtFunction)mb.getMethod(scope);
+											}
+											else
+											{
+												function = (rtFunction)step.arg1.getValue(scope, currentRunFrame);
+											}
 
 											var funcCaller = funcCallerPool.create(currentRunFrame, step.token);
 											funcCaller.SetFunction(function);
@@ -1500,7 +1578,7 @@ namespace ASRuntime
 										throw new Exception(step.opCode + "操作未实现");
 								}
 
-#endregion
+					#endregion
 
 
 							}

@@ -581,6 +581,11 @@ namespace ASCompiler.compiler.builds
                 opMakeArgs.arg1 = func;
                 opMakeArgs.arg1Type = func.valueType;
                 env.block.opSteps.Add(opMakeArgs);
+
+				builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
+					FuncCallBuilder.optimize_makepara(b, signature, opMakeArgs);
+				});
+
             }
 
             {
@@ -591,7 +596,10 @@ namespace ASCompiler.compiler.builds
                 opPushArgs.arg2 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(0));
                 opPushArgs.arg2Type = RunTimeDataType.rt_int;
                 env.block.opSteps.Add(opPushArgs);
-            }
+				builder._toOptimizeCallFunctionOpSteps.Add((b) => {
+					FuncCallBuilder.optimize_pushargements(b, signature, opPushArgs);
+				});
+			}
 
             env.block.opSteps.Add(opInvokeSetter);
 
@@ -1375,12 +1383,18 @@ namespace ASCompiler.compiler.builds
             opInvokeGetter.arg1 = func;
             opInvokeGetter.arg1Type = func.valueType;
             gv.isFuncResult = true;
-            {
-                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
-                opMakeArgs.arg1 = func;
-                opMakeArgs.arg1Type = func.valueType;
-                env.block.opSteps.Add(opMakeArgs);
-            }
+			{
+				OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(matchtoken.line, matchtoken.ptr, matchtoken.sourceFile));
+				opMakeArgs.arg1 = func;
+				opMakeArgs.arg1Type = func.valueType;
+				env.block.opSteps.Add(opMakeArgs);
+
+				builder._toOptimizeCallFunctionOpSteps.Add((b) =>
+				{
+					FuncCallBuilder.optimize_makepara(b, signature, opMakeArgs);
+				});
+			}
+
 
             env.block.opSteps.Add(opInvokeGetter);
 

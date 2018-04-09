@@ -30,12 +30,14 @@ namespace AutoGenCodeLib
 		{
 			this.x = x;
 			this.y = 0;
+			nc = new innerClass(this);
 		}
 
 		public Testobj(double y)
 		{
 			this.y = y;
 			this.x = 0;
+			nc = new innerClass(this);
 		}
 
 		public ulong x;
@@ -62,6 +64,22 @@ namespace AutoGenCodeLib
 
 		public class innerClass
 		{
+			private Testobj testobj;
+
+			public innerClass(Testobj testobj)
+			{
+				this.testobj = testobj;
+			}
+
+			public innerClass inner
+			{
+				get
+				{
+					return testobj.nc;
+				}
+			}
+
+			public string name { get; set; }
 
 		}
 
@@ -77,7 +95,12 @@ namespace AutoGenCodeLib
 		}
 
 
-		public innerClass nc = new innerClass();
+		private innerClass nc;
+
+		public innerClass inner
+		{
+			get { return nc; }
+		}
 
 		public static Testobj[] make(int count)
 		{

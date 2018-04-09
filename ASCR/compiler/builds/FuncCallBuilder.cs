@@ -961,185 +961,188 @@ namespace ASCompiler.compiler.builds
 				{
 					builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
 
-						bool findsuccess;
-						var func = findFunction(signature, builder, out findsuccess);
-						if (findsuccess && checkFunctionNotHasOverridesOrSealed(func,builder))
-						{
-							if (!func.isConstructor)
-							{
-								if (func.isMethod && (opMakeArgs.arg1 is MethodGetterBase ))
-								{
-									opMakeArgs.opCode = OpCode.make_para_scope_method;
+						optimize_makepara(b, signature, opMakeArgs);
 
-									if (isNativeModeConstPara(signature, builder, out findsuccess))
-									{
-										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
+					//	bool findsuccess;
+					//	var func = findFunction(signature, builder, out findsuccess);
+					//	if (findsuccess && checkFunctionNotHasOverridesOrSealed(func,builder))
+					//	{
+					//		if (!func.isConstructor)
+					//		{
+					//			if (func.isMethod && (opMakeArgs.arg1 is MethodGetterBase ))
+					//			{
+					//				opMakeArgs.opCode = OpCode.make_para_scope_method;
 
-										int acount = signature.parameters.Count;
-										while (acount>0)
-										{
-											if (signature.parameters[acount - 1].defaultValue != null
-												||
-												signature.parameters[acount - 1].isPara
-											)
-											{
-												acount--;
-											}
-											else
-											{
-												break;
-											}
-										}
+					//				if (isNativeModeConstPara(signature, builder, out findsuccess))
+					//				{
+					//					opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
 
-										opMakeArgs.jumoffset = acount;opMakeArgs.memregid1 = (short)signature.parameters.Count;
-									}
-									//else
-									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
-									//{
-									//	if (signature.onStackParameters == signature.parameters.Count)
-									//	{
-									//		if (signature.parameters.Count == 0)
-									//		{
-									//			opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
-									//		}
-									//		else
-									//		{
-									//			opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
-									//			opMakeArgs.jumoffset = signature.parameters.Count;
-									//			for (int i = 0; i < signature.parameters.Count; i++)
-									//			{
-									//				var p = signature.parameters[i];
-									//				if (p.isPara || p.defaultValue != null)
-									//				{
-									//					opMakeArgs.jumoffset = i;
-									//					break;
-									//				}
-									//			}
-									//		}
-									//	}
+					//					int acount = signature.parameters.Count;
+					//					while (acount>0)
+					//					{
+					//						if (signature.parameters[acount - 1].defaultValue != null
+					//							||
+					//							signature.parameters[acount - 1].isPara
+					//						)
+					//						{
+					//							acount--;
+					//						}
+					//						else
+					//						{
+					//							break;
+					//						}
+					//					}
 
-									//}
-									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
-									{
-										if (signature.onStackParameters == signature.parameters.Count)
-										{
-											if (signature.parameters.Count == 0 )
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
-											}
-											else
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
-												opMakeArgs.jumoffset = signature.parameters.Count;
-												for (int i = 0; i < signature.parameters.Count; i++)
-												{
-													var p = signature.parameters[i];
-													if (p.isPara || p.defaultValue != null)
-													{
-														opMakeArgs.jumoffset = i;
-														break;
-													}
-												}
-											}
-										}
-									}
+					//					opMakeArgs.jumoffset = acount;opMakeArgs.memregid1 = (short)signature.parameters.Count;
+					//				}
+					//				//else
+					//				//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+					//				//{
+					//				//	if (signature.onStackParameters == signature.parameters.Count)
+					//				//	{
+					//				//		if (signature.parameters.Count == 0)
+					//				//		{
+					//				//			opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
+					//				//		}
+					//				//		else
+					//				//		{
+					//				//			opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
+					//				//			opMakeArgs.jumoffset = signature.parameters.Count;
+					//				//			for (int i = 0; i < signature.parameters.Count; i++)
+					//				//			{
+					//				//				var p = signature.parameters[i];
+					//				//				if (p.isPara || p.defaultValue != null)
+					//				//				{
+					//				//					opMakeArgs.jumoffset = i;
+					//				//					break;
+					//				//				}
+					//				//			}
+					//				//		}
+					//				//	}
 
-								}
+					//				//}
+					//				else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
+					//				{
+					//					if (signature.onStackParameters == signature.parameters.Count)
+					//					{
+					//						if (signature.parameters.Count == 0 )
+					//						{
+					//							opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
+					//						}
+					//						else
+					//						{
+					//							opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
+					//							opMakeArgs.jumoffset = signature.parameters.Count;
+					//							for (int i = 0; i < signature.parameters.Count; i++)
+					//							{
+					//								var p = signature.parameters[i];
+					//								if (p.isPara || p.defaultValue != null)
+					//								{
+					//									opMakeArgs.jumoffset = i;
+					//									break;
+					//								}
+					//							}
+					//						}
+					//					}
+					//				}
 
-								else
-								{
-									opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+					//			}
 
-									if (isNativeModeConstPara(signature, builder, out findsuccess))
-									{
-										opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
-										int acount = signature.parameters.Count;
-										while (acount > 0)
-										{
-											if (signature.parameters[acount - 1].defaultValue != null
-												||
-												signature.parameters[acount - 1].isPara
-											)
-											{
-												acount--;
-											}
-											else
-											{
-												break;
-											}
-										}
+					//			else
+					//			{
+					//				opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
 
-										opMakeArgs.jumoffset = acount; opMakeArgs.memregid1 = (short)signature.parameters.Count;
-									}
-									//else
-									//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
-									//{
-									//	if (signature.onStackParameters == signature.parameters.Count)
-									//	{
-									//		if (signature.parameters.Count == 0)
-									//		{
-									//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
-									//		}
-									//		else
-									//		{
-									//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
-									//			opMakeArgs.jumoffset = signature.parameters.Count;
-									//			for (int i = 0; i < signature.parameters.Count; i++)
-									//			{
-									//				var p = signature.parameters[i];
-									//				if (p.isPara || p.defaultValue != null)
-									//				{
-									//					opMakeArgs.jumoffset = i;
-									//					break;
-									//				}
-									//			}
+					//				if (isNativeModeConstPara(signature, builder, out findsuccess))
+					//				{
+					//					opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
+					//					int acount = signature.parameters.Count;
+					//					while (acount > 0)
+					//					{
+					//						if (signature.parameters[acount - 1].defaultValue != null
+					//							||
+					//							signature.parameters[acount - 1].isPara
+					//						)
+					//						{
+					//							acount--;
+					//						}
+					//						else
+					//						{
+					//							break;
+					//						}
+					//					}
 
-									//		}
+					//					opMakeArgs.jumoffset = acount; opMakeArgs.memregid1 = (short)signature.parameters.Count;
+					//				}
+					//				//else
+					//				//if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+					//				//{
+					//				//	if (signature.onStackParameters == signature.parameters.Count)
+					//				//	{
+					//				//		if (signature.parameters.Count == 0)
+					//				//		{
+					//				//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
+					//				//		}
+					//				//		else
+					//				//		{
+					//				//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
+					//				//			opMakeArgs.jumoffset = signature.parameters.Count;
+					//				//			for (int i = 0; i < signature.parameters.Count; i++)
+					//				//			{
+					//				//				var p = signature.parameters[i];
+					//				//				if (p.isPara || p.defaultValue != null)
+					//				//				{
+					//				//					opMakeArgs.jumoffset = i;
+					//				//					break;
+					//				//				}
+					//				//			}
 
-									//	}
+					//				//		}
 
-									//}
-									else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
-									{
-										if (signature.onStackParameters == signature.parameters.Count)
-										{
-											if (signature.parameters.Count == 0)
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
-											}
-											else
-											{
-												opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
-												opMakeArgs.jumoffset = signature.parameters.Count;
-												for (int i = 0; i < signature.parameters.Count; i++)
-												{
-													var p = signature.parameters[i];
-													if (p.isPara || p.defaultValue != null)
-													{
-														opMakeArgs.jumoffset = i;
-														break;
-													}
-												}
-											}
-										}
-									}
+					//				//	}
 
-								}
-							}
-						}
-						else
-						{
-							if (opMakeArgs.arg1 is MethodGetterBase)
-							{
-								opMakeArgs.opCode = OpCode.make_para_scope_method;
-							}
-							else
-							{
-								opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
-							}
-						}
+					//				//}
+					//				else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
+					//				{
+					//					if (signature.onStackParameters == signature.parameters.Count)
+					//					{
+					//						if (signature.parameters.Count == 0)
+					//						{
+					//							opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
+					//						}
+					//						else
+					//						{
+					//							opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
+					//							opMakeArgs.jumoffset = signature.parameters.Count;
+					//							for (int i = 0; i < signature.parameters.Count; i++)
+					//							{
+					//								var p = signature.parameters[i];
+					//								if (p.isPara || p.defaultValue != null)
+					//								{
+					//									opMakeArgs.jumoffset = i;
+					//									break;
+					//								}
+					//							}
+					//						}
+					//					}
+					//				}
 
-					});
+					//			}
+					//		}
+					//	}
+					//	else
+					//	{
+					//		if (opMakeArgs.arg1 is MethodGetterBase)
+					//		{
+					//			opMakeArgs.opCode = OpCode.make_para_scope_method;
+					//		}
+					//		else
+					//		{
+					//			opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+					//		}
+					//	}
+
+					}
+					);
 				}
 
 				
@@ -1260,101 +1263,105 @@ namespace ASCompiler.compiler.builds
 							if (!hasIntoPara)
 							{
 								builder._toOptimizeCallFunctionOpSteps.Add((b)=> {
-									//特别注意接口和被继承的情况，接口的函数必须到运行时才能确定。所以检查时必须检查接口
-									bool findsuccess;
 
-									var func = findFunction(signature, builder, out findsuccess);
+									optimize_pushargements(b, signature, opPushArgs);
 
-									if (!findsuccess || func == null || !checkFunctionNotHasOverridesOrSealed(func, builder))
-									{
-										return;
-									}
+									////特别注意接口和被继承的情况，接口的函数必须到运行时才能确定。所以检查时必须检查接口
+									//bool findsuccess;
+
+									//var func = findFunction(signature, builder, out findsuccess);
+
+									//if (!findsuccess || func == null || !checkFunctionNotHasOverridesOrSealed(func, builder))
+									//{
+									//	return;
+									//}
 									
 
-									if (isNativeModeConstPara(signature, builder, out findsuccess))
-									{
-										if (findsuccess)
-										{
-											int pid = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
-											if (signature.parameters[pid].defaultValue == null)
-											{
-												opPushArgs.opCode = OpCode.push_parameter_nativeconstpara;
-												opPushArgs.jumoffset = signature.parameters.Count - ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
-												opPushArgs.memregid1 = (short)((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
-											}
-										}
-									}
-									else if (isNativeNotModeConstPara(signature, builder, out findsuccess))
-									{
-										if (findsuccess)
-										{
-											int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
-											var parameter = signature.parameters[idx];
-											if (signature.onStackParameters > 0)
-											{
-												if (parameter.isOnStack)
-												{
-													opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
-													opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
-												}
-												else
-												{
-													opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
-													opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
-												}
-											}
-											else
-											{
-												opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
-												opPushArgs.jumoffset = idx;
-											}
-										}
-									}
-									else
-									{
-										bool checkisnotnative;
-										if (isNotNative(signature, builder, out checkisnotnative))
-										{
-											if (checkisnotnative)
-											{
-												int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
-												var parameter = signature.parameters[idx];
+									//if (isNativeModeConstPara(signature, builder, out findsuccess))
+									//{
+									//	if (findsuccess)
+									//	{
+									//		int pid = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+									//		if (signature.parameters[pid].defaultValue == null)
+									//		{
+									//			opPushArgs.opCode = OpCode.push_parameter_nativeconstpara;
+									//			opPushArgs.jumoffset = signature.parameters.Count - ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+									//			opPushArgs.memregid1 = (short)((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+									//		}
+									//	}
+									//}
+									//else if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+									//{
+									//	if (findsuccess)
+									//	{
+									//		int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+									//		var parameter = signature.parameters[idx];
+									//		if (signature.onStackParameters > 0)
+									//		{
+									//			if (parameter.isOnStack)
+									//			{
+									//				opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
+									//				opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
+									//			}
+									//			else
+									//			{
+									//				opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+									//				opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
+									//			}
+									//		}
+									//		else
+									//		{
+									//			opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+									//			opPushArgs.jumoffset = idx;
+									//		}
+									//	}
+									//}
+									//else
+									//{
+									//	bool checkisnotnative;
+									//	if (isNotNative(signature, builder, out checkisnotnative))
+									//	{
+									//		if (checkisnotnative)
+									//		{
+									//			int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+									//			var parameter = signature.parameters[idx];
 
-												if (signature.onStackParameters > 0)
-												{
-													if (parameter.isOnStack)
-													{
-														opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
-														opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
-													}
-													else
-													{
-														opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
-														opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
-													}
-												}
-												else
-												{
-													opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
-													opPushArgs.jumoffset = idx;
-												}
+									//			if (signature.onStackParameters > 0)
+									//			{
+									//				if (parameter.isOnStack)
+									//				{
+									//					opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
+									//					opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
+									//				}
+									//				else
+									//				{
+									//					opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+									//					opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
+									//				}
+									//			}
+									//			else
+									//			{
+									//				opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+									//				opPushArgs.jumoffset = idx;
+									//			}
 
-											}
-											else
-											{
+									//		}
+									//		else
+									//		{
 
-												opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
-											}
-										}
-										else
-										{
+									//			opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+									//		}
+									//	}
+									//	else
+									//	{
 
-											opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
-										}
+									//		opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+									//	}
 
-									}
+									//}
 
-								});
+								}
+								);
 							}
 							else
 							{
@@ -1370,7 +1377,234 @@ namespace ASCompiler.compiler.builds
 
         }
 
-		private bool checkFunctionNotHasOverridesOrSealed(ASBinCode.rtti.FunctionDefine func, Builder builder)
+
+
+		internal static void optimize_makepara(Builder builder,ASBinCode.rtti.FunctionSignature signature,OpStep opMakeArgs)
+		{
+			bool findsuccess;
+			var func = findFunction(signature, builder, out findsuccess);
+			if (findsuccess && checkFunctionNotHasOverridesOrSealed(func, builder))
+			{
+				if (!func.isConstructor)
+				{
+					if (func.isMethod && (opMakeArgs.arg1 is MethodGetterBase))
+					{
+						opMakeArgs.opCode = OpCode.make_para_scope_method;
+
+						if (isNativeModeConstPara(signature, builder, out findsuccess))
+						{
+							opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
+
+							int acount = signature.parameters.Count;
+							while (acount > 0)
+							{
+								if (signature.parameters[acount - 1].defaultValue != null
+									||
+									signature.parameters[acount - 1].isPara
+								)
+								{
+									acount--;
+								}
+								else
+								{
+									break;
+								}
+							}
+
+							opMakeArgs.jumoffset = acount; opMakeArgs.memregid1 = (short)signature.parameters.Count;
+						}
+						else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
+						{
+							if (signature.onStackParameters == signature.parameters.Count)
+							{
+								if (signature.parameters.Count == 0)
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_method_noparameters;
+								}
+								else
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_method_notnativeconstpara_allparaonstack;
+									opMakeArgs.jumoffset = signature.parameters.Count;
+									for (int i = 0; i < signature.parameters.Count; i++)
+									{
+										var p = signature.parameters[i];
+										if (p.isPara || p.defaultValue != null)
+										{
+											opMakeArgs.jumoffset = i;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+					}
+
+					else
+					{
+						opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+
+						if (isNativeModeConstPara(signature, builder, out findsuccess))
+						{
+							opMakeArgs.opCode = OpCode.make_para_scope_withsignature_nativeconstpara;
+							int acount = signature.parameters.Count;
+							while (acount > 0)
+							{
+								if (signature.parameters[acount - 1].defaultValue != null
+									||
+									signature.parameters[acount - 1].isPara
+								)
+								{
+									acount--;
+								}
+								else
+								{
+									break;
+								}
+							}
+
+							opMakeArgs.jumoffset = acount; opMakeArgs.memregid1 = (short)signature.parameters.Count;
+						}
+						else if (isNotNative(signature, builder, out findsuccess) && builder.bin.blocks[func.blockid].scope.members.Count == 0)
+						{
+							if (signature.onStackParameters == signature.parameters.Count)
+							{
+								if (signature.parameters.Count == 0)
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_withsignature_noparameters;
+								}
+								else
+								{
+									opMakeArgs.opCode = OpCode.make_para_scope_withsignature_allparaonstack;
+									opMakeArgs.jumoffset = signature.parameters.Count;
+									for (int i = 0; i < signature.parameters.Count; i++)
+									{
+										var p = signature.parameters[i];
+										if (p.isPara || p.defaultValue != null)
+										{
+											opMakeArgs.jumoffset = i;
+											break;
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+			else
+			{
+				if (opMakeArgs.arg1 is MethodGetterBase)
+				{
+					opMakeArgs.opCode = OpCode.make_para_scope_method;
+				}
+				else
+				{
+					opMakeArgs.opCode = OpCode.make_para_scope_withsignature;
+				}
+			}
+		}
+
+		internal static void optimize_pushargements(Builder builder, ASBinCode.rtti.FunctionSignature signature,OpStep opPushArgs)
+		{
+			//特别注意接口和被继承的情况，接口的函数必须到运行时才能确定。所以检查时必须检查接口
+			bool findsuccess;
+
+			var func = findFunction(signature, builder, out findsuccess);
+
+			if (!findsuccess || func == null || !checkFunctionNotHasOverridesOrSealed(func, builder))
+			{
+				return;
+			}
+
+
+			if (isNativeModeConstPara(signature, builder, out findsuccess))
+			{
+				if (findsuccess)
+				{
+					int pid = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+					if (signature.parameters[pid].defaultValue == null)
+					{
+						opPushArgs.opCode = OpCode.push_parameter_nativeconstpara;
+						opPushArgs.jumoffset = signature.parameters.Count - ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+						opPushArgs.memregid1 = (short)((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+					}
+				}
+			}
+			else if (isNativeNotModeConstPara(signature, builder, out findsuccess))
+			{
+				if (findsuccess)
+				{
+					int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+					var parameter = signature.parameters[idx];
+					if (signature.onStackParameters > 0)
+					{
+						if (parameter.isOnStack)
+						{
+							opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
+							opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
+						}
+						else
+						{
+							opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+							opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
+						}
+					}
+					else
+					{
+						opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+						opPushArgs.jumoffset = idx;
+					}
+				}
+			}
+			else
+			{
+				bool checkisnotnative;
+				if (isNotNative(signature, builder, out checkisnotnative))
+				{
+					if (checkisnotnative)
+					{
+						int idx = ((ASBinCode.rtData.rtInt)opPushArgs.arg2.getValue(null, null)).value;
+						var parameter = signature.parameters[idx];
+
+						if (signature.onStackParameters > 0)
+						{
+							if (parameter.isOnStack)
+							{
+								opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetostack;
+								opPushArgs.jumoffset = ((StackSlotAccessor)parameter.varorreg)._index;
+							}
+							else
+							{
+								opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+								opPushArgs.jumoffset = ((Variable)parameter.varorreg).indexOfMembers;
+							}
+						}
+						else
+						{
+							opPushArgs.opCode = OpCode.push_parameter_skipcheck_storetoheap;
+							opPushArgs.jumoffset = idx;
+						}
+
+					}
+					else
+					{
+
+						opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+					}
+				}
+				else
+				{
+
+					opPushArgs.opCode = OpCode.push_parameter_skipcheck_testnative;
+				}
+
+			}
+		}
+
+
+		private static bool checkFunctionNotHasOverridesOrSealed(ASBinCode.rtti.FunctionDefine func, Builder builder)
 		{
 			
 			if (!func.isMethod)
@@ -1434,7 +1668,7 @@ namespace ASCompiler.compiler.builds
 			return false;
 		}
 
-		private ASBinCode.rtti.FunctionDefine findFunction(ASBinCode.rtti.FunctionSignature signature,Builder builder,out bool findsuccess)
+		private static ASBinCode.rtti.FunctionDefine findFunction(ASBinCode.rtti.FunctionSignature signature,Builder builder,out bool findsuccess)
 		{
 			//if (builder._signature_define.ContainsKey(signature))
 			{
@@ -1491,7 +1725,7 @@ namespace ASCompiler.compiler.builds
 			//return null;
 		}
 
-		private bool isNativeModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder,out bool findsuccess)
+		private static bool isNativeModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder,out bool findsuccess)
 		{
 
 			var func = findFunction(signature, builder,out findsuccess);
@@ -1545,7 +1779,7 @@ namespace ASCompiler.compiler.builds
 			return false;
 		}
 
-		private bool isNativeNotModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
+		private static bool isNativeNotModeConstPara(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
 		{
 			var func = findFunction(signature, builder, out findsuccess);
 			if (func != null && !func.isNative)
@@ -1609,7 +1843,7 @@ namespace ASCompiler.compiler.builds
 			}
 		}
 
-		private bool isNotNative(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
+		private static bool isNotNative(ASBinCode.rtti.FunctionSignature signature, Builder builder, out bool findsuccess)
 		{
 			var func = findFunction(signature, builder, out findsuccess);
 			if (func != null && func.isNative)

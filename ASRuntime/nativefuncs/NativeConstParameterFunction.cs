@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using ASBinCode.rtti;
 using ASBinCode;
+using ASBinCode.rtData;
 
 namespace ASRuntime.nativefuncs
 {
@@ -13,11 +14,79 @@ namespace ASRuntime.nativefuncs
     {
 		public class Argement
 		{
-			private StackSlot[] argementslots;
+			public class ArgementSlot : SLOT
+			{
+				public override SLOT assign(RunTimeValueBase value, out bool success)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void clear()
+				{
+					throw new NotImplementedException();
+				}
+				public RunTimeValueBase value;
+				public override bool directSet(RunTimeValueBase value)
+				{
+					this.value = value;
+					return true;
+				}
+
+				public override RunTimeValueBase getValue()
+				{
+					return value;
+				}
+
+				public override void setValue(rtBoolean value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(double value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(int value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(uint value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(string value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(rtNull value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public override void setValue(rtUndefined value)
+				{
+					throw new NotImplementedException();
+				}
+			}
+
+			public ArgementSlot[] _tempSlots;
+
+			private SLOT[] argementslots;
 
 			public Argement(int count)
 			{
-				argementslots = new StackSlot[count];
+				argementslots = new SLOT[count];
+
+				_tempSlots = new ArgementSlot[count];
+				for (int i = 0; i < count; i++)
+				{
+					_tempSlots[i] = new ArgementSlot();
+				}
+
 			}
 
 			public int Length
@@ -30,7 +99,7 @@ namespace ASRuntime.nativefuncs
 
 			public void SetSlot(SLOT slot,int index)
 			{
-				argementslots[index] = (StackSlot)slot;
+				argementslots[index] = slot;
 			}
 
 			public void ClearSlot()
@@ -106,11 +175,30 @@ namespace ASRuntime.nativefuncs
             throw new EngineException();
         }
 
-        //public sealed override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
-        //{
-        //    throw new EngineException();
-        //}
+		//public sealed override void execute2(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT[] argements, SLOT returnSlot, SourceToken token, object stackframe, out bool success)
+		//{
+		//    throw new EngineException();
+		//}
 
+		public void bindTempSlot()
+		{
+			for (int i = 0; i < argements.Length; i++)
+			{
+				argements.SetSlot(argements._tempSlots[i], i);
+			}
+		}
+		public void setTempSlotValue(RunTimeValueBase value, int idx)
+		{
+			argements[idx] = value;
+		}
+		public void unbindTempSlot()
+		{
+			argements.ClearSlot();
+			for (int i = 0; i < argements.Length; i++)
+			{
+				argements._tempSlots[i].value = null;
+			}
+		}
 
 
         public  void clearParameter()
