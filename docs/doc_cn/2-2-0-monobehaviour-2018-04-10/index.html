@@ -3,19 +3,23 @@
 <head>
     <meta charset="utf-8">
     
-    <title>分类: 1_3unityproj | Apple Juice</title>
+    <title>关于MonoBehaviour | Apple Juice</title>
     
     
-        <meta name="keywords" content="Apple Juice">
+        <meta name="keywords" content="关于MonoBehaviour">
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Apple Juice">
-<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/1-beginuse/1-3unityproj/index.html">
+    <meta name="description" content="上一章描述的脚本继承，可以自动处理那些用new关键字在脚本中创建实例的情况。但是，某些类型却无法使用new关键字创建，它们或者需要某些工厂方法创建，或者使用new关键字会报错。Unity中，这样的典型对象有Component类型。MonoBehaviour是其中的典型，它必须使用GameObject.AddComponent等方法创建。本章描述如何处理这种情况。代码创建工具会帮我们创建好GameO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于MonoBehaviour">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/index.html">
 <meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="上一章描述的脚本继承，可以自动处理那些用new关键字在脚本中创建实例的情况。但是，某些类型却无法使用new关键字创建，它们或者需要某些工厂方法创建，或者使用new关键字会报错。Unity中，这样的典型对象有Component类型。MonoBehaviour是其中的典型，它必须使用GameObject.AddComponent等方法创建。本章描述如何处理这种情况。代码创建工具会帮我们创建好GameO">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-10T11:40:05.161Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Apple Juice">
+<meta name="twitter:title" content="关于MonoBehaviour">
+<meta name="twitter:description" content="上一章描述的脚本继承，可以自动处理那些用new关键字在脚本中创建实例的情况。但是，某些类型却无法使用new关键字创建，它们或者需要某些工厂方法创建，或者使用new关键字会报错。Unity中，这样的典型对象有Component类型。MonoBehaviour是其中的典型，它必须使用GameObject.AddComponent等方法创建。本章描述如何处理这种情况。代码创建工具会帮我们创建好GameO">
     
 
     
@@ -180,20 +184,20 @@
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
                     
-                    <li class="directory">
+                    <li class="directory open">
                         <a href="#" data-role="directory">
-                            <i class="fa fa-folder"></i>
+                            <i class="fa fa-folder-open"></i>
                             &nbsp;
                             进阶话题
                         </a>
                          <ul class="unstyled" id="tree"> 
-                    <li class="directory">
+                    <li class="directory open">
                         <a href="#" data-role="directory">
-                            <i class="fa fa-folder"></i>
+                            <i class="fa fa-folder-open"></i>
                             &nbsp;
                             更好的使用
                         </a>
-                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-9-extendsprinciple-2018-04-10/">继承的原理</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">关于MonoBehaviour</a></li>  </ul> 
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-9-extendsprinciple-2018-04-10/">继承的原理</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">关于MonoBehaviour</a></li>  </ul> 
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a></li>  </ul> 
                     </li> 
@@ -268,116 +272,102 @@
     <div id="toTop" class="fa fa-angle-up"></div>
 </aside>
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fa fa-folder"></i></span>
-        <h1 class="title">1_3unityproj</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-2-2-0-monobehaviour" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">Demo工程介绍</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">
-            <time datetime="2018-03-27T07:49:37.000Z" itemprop="datePublished">2018-03-27</time>
-        </a>
-    </div>
-
-
-                    
+                    <div class="article-meta">
+                        
     <div class="article-category">
     	<i class="fa fa-folder"></i>
 		
 		
 		
-        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/1-3unityproj/">Unity工程</a>
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/">进阶话题</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/2-2adv/">更好的使用</a>
     </div>
 
-                    
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
+                        
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">
-            <time datetime="2018-03-21T11:40:02.000Z" itemprop="datePublished">2018-03-21</time>
+        <a href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">
+            <time datetime="2018-04-10T09:54:32.000Z" itemprop="datePublished">2018-04-10</time>
         </a>
     </div>
 
 
-                    
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-		
-		
-		
-        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/1-3unityproj/">Unity工程</a>
-    </div>
-
-                    
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                        
+                        
+                    </div>
+                
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">内容说明</a>
+        <h1 class="article-title" itemprop="name">
+            关于MonoBehaviour
         </h1>
     
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">
-            <time datetime="2018-03-21T10:52:28.000Z" itemprop="datePublished">2018-03-21</time>
-        </a>
-    </div>
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <p>上一章描述的脚本继承，可以自动处理那些用new关键字在脚本中创建实例的情况。但是，某些类型却无法使用new关键字创建，它们或者需要某些工厂方法创建，或者使用new关键字会报错。Unity中，这样的典型对象有Component类型。MonoBehaviour是其中的典型，它必须使用GameObject.AddComponent等方法创建。本章描述如何处理这种情况。<br>代码创建工具会帮我们创建好GameObject.AddComponent的API的大部分代码。并且已经注册到脚本引擎中。我只需将它拷贝一份出来，在它基础上进行一些修改，然后覆盖之前注册的代码即可。<br>使用CSWC对象的regNativeFunction(NativeFunctionBase nativefunction, bool isReplace)方法注册本地代码，并且可以指定是否覆盖。  </p>
+<h4 id="处理Component"><a href="#处理Component" class="headerlink" title="处理Component"></a>处理Component</h4><ol>
+<li>首先我们到自动生成的API代码中，找到 unityengine_GameObject_buildin 这个类。这个类内定义了unityengine_GameObject_addComponent嵌套类。这个嵌套类就是GameObject.AddComponet的API代码。</li>
+<li>我们新建一个叫GameObject_addComponent的类，然后将unityengine_GameObject_addComponent的代码拷贝到新的类型里去，并修改错误。</li>
+<li>execute3方法，就是实际调用GameObject.AddComponent的地方。我们在AddComponent调用后，如果生成的对象是一个适配器对象，则继续完成适配器的初始化工作。只需在后面添加如下代码即可:  </li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ICrossExtendAdapter crossExtendAdapter = _result_ <span class="keyword">as</span> ICrossExtendAdapter;</span><br><span class="line"><span class="keyword">if</span> (crossExtendAdapter != <span class="literal">null</span>)</span><br><span class="line">&#123;</span><br><span class="line">	ASBinCode.rtti.Class as3class = ((ASBinCode.rtData.rtObjectBase)argements[<span class="number">0</span>]).<span class="keyword">value</span>._class;</span><br><span class="line">	stackframe.player.MakeICrossExtendAdapterEnvironment(crossExtendAdapter, as3class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>将此方法注册到脚本引擎中。  </li>
+</ol>
+<p>这样，即可正确生成可在脚本中使用的Component类型。</p>
+<h4 id="处理MonoBehaviour"><a href="#处理MonoBehaviour" class="headerlink" title="处理MonoBehaviour"></a>处理MonoBehaviour</h4><p>MonoBehaviour是Component的子类。因此，经过以上处理，已经可以通过脚本挂载从脚本中定义的MonoBehaviour子类。但是，MonoBehaviour非常特殊，Unity会根据MonoBehaviour中是否定义有例如Update等方法来根据实际调用这些方法。这些方法不是virtual的，因此MonoBehaviour的适配器也需要特殊处理。</p>
+<ol>
+<li>如前那样，从自动生成的代码中找到unityengine_MonoBehaviour_buildin，然后找到unityengine_MonoBehaviourAdapter和_unityengine_MonoBehaviourAdapter_ctor，将他们的代码复制到新建的类型里去。</li>
+<li>MonoBehaviourAdapter_ctor 中有new MonoBehaviourAdapter() 的操作，将它删除，因为MonoBehaviour不会通过new创建</li>
+<li>修改MonoBehaviourAdapter的代码。在里面定义Update方法，然后将它转发到脚本系统中。代码如下:  </li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> ASBinCode.rtData.rtFunction _Update;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> _Update_hasfound;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!_Update_hasfound)</span><br><span class="line">	&#123;</span><br><span class="line">		_Update = (ASBinCode.rtData.rtFunction)player.getMethod(bindAS3Object, <span class="string">"Update"</span>);</span><br><span class="line">		_Update_hasfound = <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (_Update == <span class="literal">null</span>)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	player.InvokeFunction(_Update, <span class="number">0</span>, <span class="literal">null</span>, <span class="literal">null</span>, <span class="literal">null</span>, <span class="literal">null</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>将代码注册到系统中。</li>
+</ol>
+<p>如此，在脚本中定义的MonoBehaviour即可正确处理Update。</p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>Apple Juice系统自带脚本中已经处理好常用MonoBehaviour的情况，包括AddComponent,GetComponent系列等，有些MonoBehaviour事件未实现，例如OnAnimatorIK等等，如果有需要，可以仿照实现。这部分代码在GObj_Special中。  </p>
+<blockquote>
+<p>在脚本中可以执行SendMessage，给自定义的MonoBehaviour发送消息。这部分系统已处理，但是，<strong>无法</strong>从C#给脚本中定义的MonoBehaviour子类用SendMessage发送消息。因为MonoBehaviourAdapter中，不可能预知会有哪些方法名，因此，C#中直接用SendMessage是无法调用脚本中的方法的。如果确实需要，则需要调用<br>MonoBehaviourAdapter中的<br>internal bool F6554FF96D0D340948D3DCD4AA9225CCD(string arg0, object arg1, SendMessageOptions arg2)方法。其中arg0是方法名，arg1是参数。这是MonoBehaviourAdapter处理脚本中SendMessage的方法。可以直接通过它发送消息</p>
+</blockquote>
 
-
-                    
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-		
-		
-		
-        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/">开始使用</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/1-beginuse/1-3unityproj/">Unity工程</a>
-    </div>
-
-                    
-                </div>
             </div>
-        </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
     
-</div>
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
 </section>
         </div>
         <footer id="footer">
