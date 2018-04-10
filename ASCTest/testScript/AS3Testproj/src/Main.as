@@ -118,19 +118,78 @@ package
 				//showzip(stream);
 				//stream.close();
 				
-				var st:DateTime = DateTime.now;
-				var tt:Testobj = new Testobj(3);
-				for (var i:int = 0; i < 200000; i++) 
-				{
-					tt.a = i; tt.b = i; tt.c = i;
-					Testobj.stest();
-				}
+				//var st:DateTime = DateTime.now;
+				//var tt:Testobj = new Testobj(3);
+				//for (var i:int = 0; i < 200000; i++) 
+				//{
+					//tt.a = i; tt.b = i; tt.c = i;
+					//Testobj.stest();
+				//}
+				//
+				//trace( TimeSpan(DateTime.now-st).totalMilliseconds );
 				
-				trace( TimeSpan(DateTime.now-st).totalMilliseconds );
+				//var tt:Testobj = new Testobj(3);
+				//var a:Array = new Array();
+				//a[0] = tt;
+				//
+				//var b = a[0];
+				//
+				//a[0] = new Testobj(5);
+				//
+				//trace(b == tt,b.x);
+				//
+				//trace(tt.x);
+				//
+				//trace(a[0].x);
+				
+				//var tt=new Testobj(3);
+				//
+				//member = tt;
+				//
+				//var b = member;
+				//
+				//b.x = 99;
+				//
+				//trace(b == tt,b.x);
+				//
+				//member = new Testobj(5);
+				//
+				//trace(b == member,b.x,member.x,tt.x);
+				
+				arr = new Vector.<Testobj>();
+				
+				var b = new et();
+				
+				arr[0] = b;				
+				//member.dialog();
+				arr[1] = null;
+				arr[2] = b;
+				//trace(b.x);
+				
+				arr[0] = new Testobj(4);
+				
+				b = arr[0];
+				//b.dialog();
+				
+				//trace(b.x);
 				
 				
+				arr[1] = arr[0];
 				
+				arr[1] = new Testobj(1);
+				
+				trace(b == arr[1],b.x,arr[1].x);
+				arr[0].x = 99;
+				
+				trace(b == arr[0],b.x,arr[0].x);
+				
+				arr[2].dialog();
 		}
+		
+		public var arr:Vector.<Testobj>;
+		
+		//public var member:Testobj;
+		//public var member2:Testobj;
 		
 		private function abc(x:Number,y:Number,z:Number=7):void
 		{
@@ -205,20 +264,20 @@ package
 }
 
 
-//import autogencodelib.Testobj;
-//
-//class et extends Testobj
-//{
-	//public function et()
-	//{
-		//super(5);
-	//}
-	//
-	//override public function dialog():void
-	//{
-		//super.dialog();
-		//
-		//trace("override");
-	//
-	//}
-//}
+import autogencodelib.Testobj;
+
+class et extends Testobj
+{
+	public function et()
+	{
+		super(5);
+	}
+	
+	override public function dialog():void
+	{
+		super.dialog();
+		
+		trace("override");
+	
+	}
+}

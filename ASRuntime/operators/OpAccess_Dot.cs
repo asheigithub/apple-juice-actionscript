@@ -1291,7 +1291,7 @@ namespace ASRuntime.operators
 					if (value.rtType > RunTimeDataType.unknown)
 					{
 						var vd = array.innerArray[idx];
-						
+
 						{
 							var cls = classFinder.getClassByRunTimeDataType(value.rtType);
 							if (cls.isLink_System)
@@ -1304,14 +1304,51 @@ namespace ASRuntime.operators
 								}
 								else
 								{
-									((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+									//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+									var src = ((rtObjectBase)value).value;
+									link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
+
 								}
 								success = true;
 								return this;
 							}
 						}
 					}
+					//if (value.rtType > RunTimeDataType.unknown)
+					//{
+					//	var vd = array.innerArray[idx];
 
+					//	{
+					//		var cls = classFinder.getClassByRunTimeDataType(value.rtType);
+					//		if (cls.isLink_System)
+					//		{
+					//			//ASBinCode.rtti.LinkSystemObject link = (ASBinCode.rtti.LinkSystemObject)((rtObjectBase)vd).value;
+
+					//			if (cls.isStruct)
+					//			{
+					//				//link.CopyStructData((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)value).value);
+					//				array.innerArray[idx] = (RunTimeValueBase)value.Clone();
+					//			}
+					//			else
+					//			if (value is ASRuntime.StackLinkObjectCache.StackCacheObject)
+					//			{
+					//				array.innerArray[idx] = (RunTimeValueBase)value.Clone();
+					//			}
+					//			else
+					//			{
+					//				//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+					//				//var src = ((rtObjectBase)value).value;
+					//				//link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
+
+
+
+					//				array.innerArray[idx] = (RunTimeValueBase)value;
+					//			}
+					//			success = true;
+					//			return this;
+					//		}
+					//	}
+					//}
 				}
 
 				array.innerArray[idx] = (RunTimeValueBase)value.Clone(); //对数组的直接赋值，需要Clone

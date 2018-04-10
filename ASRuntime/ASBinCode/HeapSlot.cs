@@ -92,23 +92,35 @@ namespace ASBinCode
                         this.value = null;
                         break;
                     default:
-                        if (!ReferenceEquals(this.value, value))
-                        {
-                            rtObjectBase ro = (rtObjectBase)value;
-                            var _class = ro.value._class;
+						if (!ReferenceEquals(this.value, value))
+						{
+							rtObjectBase ro = (rtObjectBase)value;
+							var _class = ro.value._class;
 
-                            //if (this.value.rtType == value.rtType)//前面已有判断这里肯定相同
-                            {
-                                
-                                if (_class.isLink_System)
-                                {
-                                    if (_class.isStruct)
-                                    {
-                                        ((rtti.LinkSystemObject)((rtObjectBase)this.value).value)
-                                            .CopyStructData((rtti.LinkSystemObject)ro.value);
-                                    }
-                                    else
-                                    {
+							//if (this.value.rtType == value.rtType)//前面已有判断这里肯定相同
+							{
+
+								if (_class.isLink_System)
+								{
+									//if (_class.isStruct)
+									//{
+									//	this.value = (RunTimeValueBase)value.Clone();
+									//}
+									//else if (ro is ASRuntime.StackLinkObjectCache.StackCacheObject)
+									//{
+									//	this.value = (RunTimeValueBase)value.Clone();
+									//}
+									//else
+									//{
+									//	this.value = value;
+									//}
+									if (_class.isStruct)
+									{
+										((rtti.LinkSystemObject)((rtObjectBase)this.value).value)
+											.CopyStructData((rtti.LinkSystemObject)ro.value);
+									}
+									else
+									{
 										var dst = ((rtObjectBase)this.value).value;
 										var src = ro.value;
 
@@ -117,25 +129,25 @@ namespace ASBinCode
 										//((rtObjectBase)this.value).value = ro.value; 
 									}
 								}
-                                else
-                                {
-                                    this.value = value;
-                                }
-                            }
-                            //else
-                            //{
-                            //    this.value = (RunTimeValueBase)value.Clone(); //考虑处理结构类型struct
-                            //}
-                        }
-                        //this.value = (rtObject)value.Clone();
-                        //if (((rtObject)this.value).value.objectid != ((rtObject)value).value.objectid)
-                        //{
+								else
+								{
+									this.value = value;
+								}
+							}
+							//else
+							//{
+							//    this.value = (RunTimeValueBase)value.Clone(); //考虑处理结构类型struct
+							//}
+						}
+						//this.value = (rtObject)value.Clone();
+						//if (((rtObject)this.value).value.objectid != ((rtObject)value).value.objectid)
+						//{
 
-                        //}
+						//}
 
 
-                        //((rtObject)this.value).CopyFrom((rtObject)value);
-                        break;
+						//((rtObject)this.value).CopyFrom((rtObject)value);
+						break;
                 }
             }
             return true;

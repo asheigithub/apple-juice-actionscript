@@ -285,7 +285,7 @@ namespace ASRuntime
 									store[COMMREFTYPEOBJ] = value;
 
 								}
-                            }
+							}
                             else
                             {
 								//store[RunTimeDataType._OBJECT] = value;

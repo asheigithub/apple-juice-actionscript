@@ -540,7 +540,7 @@ namespace ASRuntime.operators
 					if (value.rtType > RunTimeDataType.unknown)
 					{
 						var vd = vector_data.innnerList[idx];
-						if (vd != null)
+						if (vd != null && vd.rtType != RunTimeDataType.rt_null)
 						{
 							var cls = classfinder.getClassByRunTimeDataType(value.rtType);
 							if (cls.isLink_System)
@@ -553,13 +553,62 @@ namespace ASRuntime.operators
 								}
 								else
 								{
-									((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+									//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+									//link.SetLinkData()									
+									var src = ((rtObjectBase)value).value;
+									link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
+									link._class = src._class;
+
+									vd.rtType = value.rtType;
+									((rtObjectBase)vd).objScope.blockId = src._class.blockid;
+
+
 								}
 								success = true;
 								return this;
 							}
 						}
 					}
+
+
+
+					//if (value.rtType > RunTimeDataType.unknown)
+					//{
+					//	var vd = vector_data.innnerList[idx];
+
+					//	{
+					//		var cls = classfinder.getClassByRunTimeDataType(value.rtType);
+					//		if (cls.isLink_System)
+					//		{
+					//			//ASBinCode.rtti.LinkSystemObject link = (ASBinCode.rtti.LinkSystemObject)((rtObjectBase)vd).value;
+
+					//			if (cls.isStruct)
+					//			{
+					//				//link.CopyStructData((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)value).value);
+					//				vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone();
+					//			}
+					//			else if (value is ASRuntime.StackLinkObjectCache.StackCacheObject)
+					//			{
+					//				vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone();
+					//			}
+					//			else
+					//			{
+					//				//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
+					//				//var src = ((rtObjectBase)value).value;
+					//				//link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
+
+
+
+					//				vector_data.innnerList[idx] = (RunTimeValueBase)value;
+					//			}
+					//			success = true;
+					//			return this;
+					//		}
+					//	}
+					//}
+
+
+
 
 					vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone(); //对容器的直接赋值，需要Clone																				   //return true;
 					success = true;
