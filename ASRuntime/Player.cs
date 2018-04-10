@@ -1027,7 +1027,7 @@ namespace ASRuntime
 												}
 
 												var returnslot = block.instructions[currentRunFrame.codeLinePtr].reg.getSlot(scope, currentRunFrame);
-
+												_executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
 												nf.execute3(
 												function.this_pointer != null ? function.this_pointer : scope.this_pointer,
 												swc.functions[function.functionId],
@@ -1039,7 +1039,10 @@ namespace ASRuntime
 											}
 											finally
 											{
+												_executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
 												nf.unbindTempSlot();
+												if (mb != null)
+													function.Clear();
 											}
 
 
@@ -1078,6 +1081,10 @@ namespace ASRuntime
 
 											var funcCaller = funcCallerPool.create(currentRunFrame, step.token);
 											funcCaller.SetFunction(function);
+											if (mb != null)
+											{
+												function.Clear();
+											}
 											funcCaller._tempSlot = currentRunFrame._tempSlot1;
 											funcCaller.toCallFunc = swc.functions[function.functionId];
 											if (!funcCaller.createParaScope()) { break; }

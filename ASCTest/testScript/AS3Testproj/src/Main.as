@@ -87,28 +87,28 @@ package
 			//trace(t[99]);
 			
 			
-			var t:Testobj = new Testobj(3);
-			
-			var st:DateTime = DateTime.now;
-			//var m:Number;
-			for (var i:int = 0; i < 200000	; i++) 
-			{
-				//m = i;
-				//m++;
-				//m++;
-				
-				t.roation(1, 2, 3);
-				
-				
-				
-				//t.inner.inner.inner.inner.name="123123";
-				//m--; m--;
-				
-				//this.abc(3, 4,10);
-			}
-			
-			
-			trace( TimeSpan(DateTime.now-st).totalMilliseconds );
+			//var t:Testobj = new Testobj(3);
+			//
+			//var st:DateTime = DateTime.now;
+			////var m:Number;
+			//for (var i:int = 0; i < 200000	; i++) 
+			//{
+				////m = i;
+				////m++;
+				////m++;
+				//
+				//t.roation(1, 2, 3);
+				//
+				//
+				//
+				////t.inner.inner.inner.inner.name="123123";
+				////m--; m--;
+				//
+				////this.abc(3, 4,10);
+			//}
+			//
+			//
+			//trace( TimeSpan(DateTime.now-st).totalMilliseconds );
 			
 			
 			
@@ -117,6 +117,19 @@ package
 				//stream.open(file,FileMode.READ);//读取文件
 				//showzip(stream);
 				//stream.close();
+				
+				var st:DateTime = DateTime.now;
+				var tt:Testobj = new Testobj(3);
+				for (var i:int = 0; i < 200000; i++) 
+				{
+					tt.a = i; tt.b = i; tt.c = i;
+					Testobj.stest();
+				}
+				
+				trace( TimeSpan(DateTime.now-st).totalMilliseconds );
+				
+				
+				
 		}
 		
 		private function abc(x:Number,y:Number,z:Number=7):void

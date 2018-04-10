@@ -867,7 +867,7 @@ namespace ASRuntime
 							}
 
 							var returnslot = block.instructions[codeLinePtr].reg.getSlot(scope, this);
-
+							player._executeToken = nf.getExecToken(function.functionId);
 							nf.execute3(
 							function.this_pointer != null ? function.this_pointer : scope.this_pointer,
 							player.swc.functions[function.functionId],
@@ -876,14 +876,16 @@ namespace ASRuntime
 							this,
 							out success
 							);
+							
 						}
 						finally
 						{
+							player._executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
 							nf.unbindTempSlot();
+							if (mb != null)
+								function.Clear();
 						}
 						
-
-						player._executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
 						player._nativefuncCaller = null;
 
 						if (success)
@@ -918,6 +920,8 @@ namespace ASRuntime
 
 						var funcCaller = player.funcCallerPool.create(this, step.token);
 						funcCaller.SetFunction(function);
+						if (mb != null)
+							function.Clear();
 						funcCaller._tempSlot = this._tempSlot1;
 						funcCaller.toCallFunc = player.swc.functions[function.functionId];
 						if (!funcCaller.createParaScope()) { break; }
@@ -937,6 +941,7 @@ namespace ASRuntime
 
 						}
 
+						
 
 						if (step.jumoffset == step.memregid1)
 						{

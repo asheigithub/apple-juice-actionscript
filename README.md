@@ -14,7 +14,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
   
 
 ### 下载地址
-[as3_unity预览测试包0.9.4f3](https://github.com/asheigithub/ASTool/raw/master/publish/lastrelease/as3_unity.zip)
+[as3_unity预览测试包0.9.5](https://github.com/asheigithub/ASTool/raw/master/publish/lastrelease/as3_unity.zip)
 
 #### 特色 ####
 - 对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。

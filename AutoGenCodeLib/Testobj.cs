@@ -51,6 +51,14 @@ namespace AutoGenCodeLib
 			return listtest;
 		}
 
+		public float a;
+		public float b;
+		public float c;
+
+		public static void stest()
+		{
+
+		}
 
 		//public override string ToString()
 		//{
