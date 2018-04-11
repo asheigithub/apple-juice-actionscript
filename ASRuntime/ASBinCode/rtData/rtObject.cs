@@ -75,7 +75,7 @@ namespace ASBinCode.rtData
 
 		public sealed override object Clone()
 		{
-			if (value._class.isLink_System )
+			if (value._class.isLink_System && value._class.isStruct )
 			{
 				rtti.LinkSystemObject lobj = (rtti.LinkSystemObject)value;
 

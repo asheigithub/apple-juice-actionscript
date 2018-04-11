@@ -17,6 +17,7 @@ package
 	import nochump.util.zip.ZipFile;
 	import nochump.util.zip.ZipOutput;
 	import system.DateTime;
+	import system.Decimal;
 	import system.EnvironmentVariableTarget;
 	import system.TimeSpan;
 	import system._Array_;
@@ -32,8 +33,11 @@ package
 		
 		public function Main()
 		{
+			var d:Decimal = new Decimal(5);
 			
+			d.prototype.bbb = function(){ trace(this); };
 			
+			Object( d).bbb();
 			
 			//var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
 			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
@@ -156,7 +160,7 @@ package
 				//
 				//trace(b == member,b.x,member.x,tt.x);
 				
-				arr = new Vector.<Testobj>();
+				arr = new Array();
 				
 				var b = new et();
 				
@@ -186,7 +190,7 @@ package
 				arr[2].dialog();
 		}
 		
-		public var arr:Vector.<Testobj>;
+		public var arr:Array;
 		
 		//public var member:Testobj;
 		//public var member2:Testobj;
@@ -268,9 +272,9 @@ import autogencodelib.Testobj;
 
 class et extends Testobj
 {
-	public function et()
+	public function et(v:int=5)
 	{
-		super(5);
+		super(v);
 	}
 	
 	override public function dialog():void
@@ -280,4 +284,5 @@ class et extends Testobj
 		trace("override");
 	
 	}
+
 }

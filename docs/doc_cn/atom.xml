@@ -6,7 +6,7 @@
   <link href="/apple-juice-actionscript/doc_cn/atom.xml" rel="self"/>
   
   <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/"/>
-  <updated>2018-04-10T10:55:26.175Z</updated>
+  <updated>2018-04-11T08:06:38.050Z</updated>
   <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>性能提示</title>
+    <link href="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/"/>
+    <id>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/</id>
+    <published>2018-04-11T04:09:29.000Z</published>
+    <updated>2018-04-11T08:06:38.050Z</updated>
+    
+    <content type="html"><![CDATA[<p>Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。</p><ol><li>变量类型：ActionScript3有编译时类型检查功能。如果编译时提供具体的变量类型，则能大幅提高运行性能。因为运行时将无需假设变量的类型，而直接使用最快的执行代码。如果不指定变量类型，则根据规则这个变量是个任意类型的变量。因此运行时将必须在运行时进行类型检查。</li><li>函数和对象方法：ActionScript3既可以使用和JS类似的函数，也可用和java类似的对象的方法。区别在于，对象的方法是绑定于对象的，它的this指针无法改变。而函数的this指针却是可以改变的。因此运行时在处理函数（包括匿名函数，闭包等等）的时候，不得不经常重新绑定函数的this。而方法则无此开销。</li><li>final的方法：类型的方法如果没有final修饰，同时类型本身也没有被final修饰，则说明它可能被子类覆盖。这样运行时在调用时，将不得不检查实际的对象类型来查找虚方法。如果可以是用final修饰对象，则可以避免虚方法查找。</li><li>dynamic的类型：用dynamic修饰的类型，可以在运行时动态的增加，删除对象的成员。但是代价就是更多的内存开销和较慢的执行速度，因为运行时将不得不动态查找成员。</li><li>prototype原型链：ActionScript3作为EcmaScript4,确实支持原型链系统。原型链可以动态的给类型的所有实例动态的添加方法和成员，但是同样的，原型链将导致运行时必须到原型链中进行查找，引起性能降低。</li></ol><blockquote><p>纵上所述，尽量避免使用方便的动态语言特性，使用强类型和类继承系统。<br>最后最重要的一点，鉴于脚本引擎无论如何不可能达到C#宿主的性能，因此，将不会改变的部分放在C#中，导出为API是最好的选择。</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;变量类型：ActionScript3有编译时类型检查功能。如果编译
+      
+    
+    </summary>
+    
+      <category term="2_advuse" scheme="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/2-advuse/"/>
+    
+      <category term="2_3performance" scheme="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/categories/2-advuse/2-3performance/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>继承的原理</title>

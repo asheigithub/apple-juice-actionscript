@@ -119,14 +119,19 @@ namespace ASBinCode
 										((rtti.LinkSystemObject)((rtObjectBase)this.value).value)
 											.CopyStructData((rtti.LinkSystemObject)ro.value);
 									}
+									else if (value is ASRuntime.StackLinkObjectCache.StackCacheObject)
+									{
+										this.value = (RunTimeValueBase)value.Clone();
+									}
 									else
 									{
-										var dst = ((rtObjectBase)this.value).value;
-										var src = ro.value;
+										//var dst = ((rtObjectBase)this.value).value;
+										//var src = ro.value;
 
-										((rtti.LinkObj<object>)dst).SetLinkData(((rtti.LinkObj<object>)src).value);
+										//((rtti.LinkObj<object>)dst).SetLinkData(((rtti.LinkObj<object>)src).value);
 
 										//((rtObjectBase)this.value).value = ro.value; 
+										this.value = value;
 									}
 								}
 								else

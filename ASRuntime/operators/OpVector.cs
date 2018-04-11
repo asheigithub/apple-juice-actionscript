@@ -551,18 +551,14 @@ namespace ASRuntime.operators
 								{
 									link.CopyStructData((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)value).value);
 								}
+								else if (value is StackLinkObjectCache.StackCacheObject)
+								{
+									vector_data.innnerList[idx] = (RunTimeValueBase)value.Clone();
+
+								}
 								else
 								{
-									//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
-									//link.SetLinkData()									
-									var src = ((rtObjectBase)value).value;
-									link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
-									link._class = src._class;
-
-									vd.rtType = value.rtType;
-									((rtObjectBase)vd).objScope.blockId = src._class.blockid;
-
-
+									vector_data.innnerList[idx] = value;
 								}
 								success = true;
 								return this;

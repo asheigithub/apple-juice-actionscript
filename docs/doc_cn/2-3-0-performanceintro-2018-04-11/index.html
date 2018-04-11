@@ -3,19 +3,23 @@
 <head>
     <meta charset="utf-8">
     
-    <title>归档 | Apple Juice</title>
+    <title>性能提示 | Apple Juice</title>
     
     
-        <meta name="keywords" content="Apple Juice">
+        <meta name="keywords" content="性能提示">
     
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Apple Juice">
-<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/archives/index.html">
+    <meta name="description" content="Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。  变量类型：ActionScript3有编译时类型检查功能。如果编译时提供具体的变量类型，则能大幅提高运行性能。因为运行时将无需假设变量的类型，而直接使用最快的执行代码。如果不指定变量类型，则根据规则这个变量是个任意类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="性能提示">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/index.html">
 <meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。  变量类型：ActionScript3有编译时类型检查功能。如果编译时提供具体的变量类型，则能大幅提高运行性能。因为运行时将无需假设变量的类型，而直接使用最快的执行代码。如果不指定变量类型，则根据规则这个变量是个任意类">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-11T08:06:38.050Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Apple Juice">
+<meta name="twitter:title" content="性能提示">
+<meta name="twitter:description" content="Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。  变量类型：ActionScript3有编译时类型检查功能。如果编译时提供具体的变量类型，则能大幅提高运行性能。因为运行时将无需假设变量的类型，而直接使用最快的执行代码。如果不指定变量类型，则根据规则这个变量是个任意类">
     
 
     
@@ -180,9 +184,9 @@
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
                     </li> 
                     
-                    <li class="directory">
+                    <li class="directory open">
                         <a href="#" data-role="directory">
-                            <i class="fa fa-folder"></i>
+                            <i class="fa fa-folder-open"></i>
                             &nbsp;
                             进阶话题
                         </a>
@@ -196,13 +200,13 @@
                          <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-9-extendsprinciple-2018-04-10/">继承的原理</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">关于MonoBehaviour</a></li>  </ul> 
                     </li> 
                     
-                    <li class="directory">
+                    <li class="directory open">
                         <a href="#" data-role="directory">
-                            <i class="fa fa-folder"></i>
+                            <i class="fa fa-folder-open"></i>
                             &nbsp;
                             性能提示
                         </a>
-                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/">性能提示</a></li>  </ul> 
+                         <ul class="unstyled" id="tree">  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/">性能提示</a></li>  </ul> 
                     </li> 
                      <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a></li>  </ul> 
                     </li> 
@@ -277,168 +281,87 @@
     <div id="toTop" class="fa fa-angle-up"></div>
 </aside>
             
-            <section id="main"><div class="timeline timeline-wrap">
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fa fa-calendar-o"></i></span>
-                <h1 class="title"><a href="/archives/2018/">2018</a></h1>
-            </div>
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fa fa-calendar"></i></span>
-                <h1 class="title"><a href="/archives/2018/04/">2018-04</a><span class="archive-list-count">3</span></h1>
-            </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-2-3-0-performanceintro" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/">进阶话题</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/2-3performance/">性能提示</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/">
+            <time datetime="2018-04-11T04:09:29.000Z" itemprop="datePublished">2018-04-11</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/">性能提示</a>
+        <h1 class="article-title" itemprop="name">
+            性能提示
         </h1>
     
 
-                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <p>Apple Juice脚本引擎本身对于结构体和C#的互操作等作了非常多的优化。但是，由于ActionScript3作为一门事实上的动态语言，因此还是有必要注意一些性能优化的注意点。</p>
+<ol>
+<li>变量类型：ActionScript3有编译时类型检查功能。如果编译时提供具体的变量类型，则能大幅提高运行性能。因为运行时将无需假设变量的类型，而直接使用最快的执行代码。如果不指定变量类型，则根据规则这个变量是个任意类型的变量。因此运行时将必须在运行时进行类型检查。</li>
+<li>函数和对象方法：ActionScript3既可以使用和JS类似的函数，也可用和java类似的对象的方法。区别在于，对象的方法是绑定于对象的，它的this指针无法改变。而函数的this指针却是可以改变的。因此运行时在处理函数（包括匿名函数，闭包等等）的时候，不得不经常重新绑定函数的this。而方法则无此开销。</li>
+<li>final的方法：类型的方法如果没有final修饰，同时类型本身也没有被final修饰，则说明它可能被子类覆盖。这样运行时在调用时，将不得不检查实际的对象类型来查找虚方法。如果可以是用final修饰对象，则可以避免虚方法查找。</li>
+<li>dynamic的类型：用dynamic修饰的类型，可以在运行时动态的增加，删除对象的成员。但是代价就是更多的内存开销和较慢的执行速度，因为运行时将不得不动态查找成员。</li>
+<li>prototype原型链：ActionScript3作为EcmaScript4,确实支持原型链系统。原型链可以动态的给类型的所有实例动态的添加方法和成员，但是同样的，原型链将导致运行时必须到原型链中进行查找，引起性能降低。</li>
+</ol>
+<blockquote>
+<p>纵上所述，尽量避免使用方便的动态语言特性，使用强类型和类继承系统。<br>最后最重要的一点，鉴于脚本引擎无论如何不可能达到C#宿主的性能，因此，将不会改变的部分放在C#中，导出为API是最好的选择。</p>
+</blockquote>
+
             </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/2-1-9-extendsprinciple-2018-04-10/">继承的原理</a>
-        </h1>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
     
 
-                
-            </div>
-        </div>
+
+
+
     
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">关于MonoBehaviour</a>
-        </h1>
     
 
-                
-            </div>
-        </div>
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fa fa-calendar"></i></span>
-                <h1 class="title"><a href="/archives/2018/03/">2018-03</a><span class="archive-list-count">7</span></h1>
-            </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a>
-        </h1>
-    
 
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a>
-        </h1>
-    
 
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">Demo工程介绍</a>
-        </h1>
-    
 
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a>
-        </h1>
-    
-
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">内容说明</a>
-        </h1>
-    
-
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a>
-        </h1>
-    
-
-                
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a>
-        </h1>
-    
-
-                
-            </div>
-        </div>
-    
-</div>
-
-    <nav id="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/apple-juice-actionscript/doc_cn/archives/page/2/">2</a><a class="extend next" rel="next" href="/apple-juice-actionscript/doc_cn/archives/page/2/">下一页 &raquo;</a>
-    </nav>
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
 </section>
         </div>
         <footer id="footer">

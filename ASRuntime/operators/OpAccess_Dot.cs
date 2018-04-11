@@ -1302,12 +1302,13 @@ namespace ASRuntime.operators
 								{
 									link.CopyStructData((ASBinCode.rtti.LinkSystemObject)((rtObjectBase)value).value);
 								}
+								else if (value is StackLinkObjectCache.StackCacheObject)
+								{
+									array.innerArray[idx] = (RunTimeValueBase)value.Clone();
+								}
 								else
 								{
-									//((rtObjectBase)vd).value = ((rtObjectBase)value).value;
-									var src = ((rtObjectBase)value).value;
-									link.SetLinkData(((ASBinCode.rtti.LinkObj<object>)src).value);
-
+									array.innerArray[idx] = value;
 								}
 								success = true;
 								return this;
