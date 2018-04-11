@@ -33,11 +33,11 @@ package
 		
 		public function Main()
 		{
-			var d:Decimal = new Decimal(5);
-			
-			d.prototype.bbb = function(){ trace(this); };
-			
-			Object( d).bbb();
+			//var d:Decimal = new Decimal(5);
+			//
+			//Decimal.prototype.bbb = function(){ trace(this); };
+			//
+			//Object( d).bbb();
 			
 			//var obj:Object = { foo: { foo2: { foo3: { foo4: "bar" } } } };
 			//var s:String = com.adobe.serialization.json.JSON.encode( obj );
@@ -66,29 +66,29 @@ package
 			
 			//var c:Class = getDefinitionByName("Main::et");
 			
-			//var t:* = new et();
-			//
-			//t.ATTT(EnvironmentVariableTarget.Process);
-			//
-			//var arr:_Array_ = Testobj.make(5);
-			//for each (var m:Testobj in arr)
-			//{
-				//trace(m.x);
-				//
-				//m.EventTest_addEventListener(function(sender, args)
-				//{
-					//trace(sender, args);
-				//
-				//});
-				//
-				//m.onEvent();
-			//}
-			//
-			//trace(t.geteList(null).count);
-			//
-			//t[99] += "bbbc";
-			//
-			//trace(t[99]);
+			var t:* = new et();
+			
+			t.ATTT(EnvironmentVariableTarget.Process);
+			
+			var arr1:_Array_ = Testobj.make(5);
+			for each (var m:Testobj in arr1)
+			{
+				trace(m.x);
+				
+				m.EventTest_addEventListener(function(sender, args)
+				{
+					trace(sender, args);
+				
+				});
+				
+				m.onEvent();
+			}
+			
+			trace(t.geteList(null).count);
+			
+			t[99] += "bbbc";
+			
+			trace(t[99]);
 			
 			
 			//var t:Testobj = new Testobj(3);
@@ -160,37 +160,37 @@ package
 				//
 				//trace(b == member,b.x,member.x,tt.x);
 				
-				arr = new Array();
-				
-				var b = new et();
-				
-				arr[0] = b;				
-				//member.dialog();
-				arr[1] = null;
-				arr[2] = b;
-				//trace(b.x);
-				
-				arr[0] = new Testobj(4);
-				
-				b = arr[0];
-				//b.dialog();
-				
-				//trace(b.x);
-				
-				
-				arr[1] = arr[0];
-				
-				arr[1] = new Testobj(1);
-				
-				trace(b == arr[1],b.x,arr[1].x);
-				arr[0].x = 99;
-				
-				trace(b == arr[0],b.x,arr[0].x);
-				
-				arr[2].dialog();
+				//arr = new Array();
+				//
+				//var b = new et();
+				//
+				//arr[0] = b;				
+				////member.dialog();
+				//arr[1] = null;
+				//arr[2] = b;
+				////trace(b.x);
+				//
+				//arr[0] = new Testobj(4);
+				//
+				//b = arr[0];
+				////b.dialog();
+				//
+				////trace(b.x);
+				//
+				//
+				//arr[1] = arr[0];
+				//
+				//arr[1] = new Testobj(1);
+				//
+				//trace(b == arr[1],b.x,arr[1].x);
+				//arr[0].x = 99;
+				//
+				//trace(b == arr[0],b.x,arr[0].x);
+				//
+				//arr[2].dialog();
 		}
 		
-		public var arr:Array;
+		//public var arr:Array;
 		
 		//public var member:Testobj;
 		//public var member2:Testobj;
@@ -286,3 +286,4 @@ class et extends Testobj
 	}
 
 }
+

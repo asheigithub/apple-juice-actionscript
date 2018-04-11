@@ -901,13 +901,13 @@ namespace ASCompiler.compiler.builds
 
             List<ASTool.AS3.Expr.AS3DataStackElement> args
                 = (List<ASTool.AS3.Expr.AS3DataStackElement>)step.Arg3.Data.Value;
-
-            createParaOp(args, signature, step.token, env, rFunc, builder, false, _cls,makeParaArg1);
+			OpStep temp = null;
+            createParaOp(out temp,args, signature, step.token, env, rFunc, builder, false, _cls,makeParaArg1);
 
         }
 
 
-        public void createParaOp(List<ASTool.AS3.Expr.AS3DataStackElement> args,
+        public void createParaOp(out OpStep step_prepare_constructor_argement, List<ASTool.AS3.Expr.AS3DataStackElement> args,
             ASBinCode.rtti.FunctionSignature signature, 
             ASTool.Token token, CompileEnv env,
             RightValueBase rFunc,Builder builder,bool isConstructor,ASBinCode.rtti.Class cls
@@ -952,7 +952,8 @@ namespace ASCompiler.compiler.builds
 
             if (!isConstructor)
             {
-                OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
+				step_prepare_constructor_argement = null;
+				OpStep opMakeArgs = new OpStep(OpCode.make_para_scope, new SourceToken(token.line, token.ptr, token.sourceFile));
                 opMakeArgs.arg1 = makeParaArg1==null? rFunc : makeParaArg1 ;
                 opMakeArgs.arg1Type = RunTimeDataType.rt_function;
                 toadd.Add(opMakeArgs);
@@ -1155,8 +1156,9 @@ namespace ASCompiler.compiler.builds
                 opMakeArgs.arg1 = new ASBinCode.rtData.RightValue( new ASBinCode.rtData.rtInt( cls.classid));
                 opMakeArgs.arg1Type = RunTimeDataType.rt_int;
                 toadd.Add(opMakeArgs);
-                
-            }
+				step_prepare_constructor_argement = opMakeArgs;
+
+			}
             
             bool hasIntoPara = false;
             for (int i = 0; i < args.Count; i++)

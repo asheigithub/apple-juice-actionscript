@@ -160,8 +160,23 @@ namespace ASCompiler.compiler.builds
             List<ASTool.AS3.Expr.AS3DataStackElement> args
             )
         {
-            //***查找构造函数**
-            if (_class.constructor != null)
+			var _cls = _class;
+			if (_cls.staticClass == null)
+			{
+				_cls = _cls.instanceClass;
+			}
+			if (_cls.isLink_System)
+			{
+				OpStep stepInitClass = new OpStep(OpCode.init_staticclass,
+							new SourceToken(token.line, token.ptr, token.sourceFile));
+				stepInitClass.arg1 = new ASBinCode.rtData.RightValue(
+					new ASBinCode.rtData.rtInt(_cls.classid));
+				stepInitClass.arg1Type = _cls.staticClass.getRtType();
+				env.block.opSteps.Add(stepInitClass);
+			}
+
+			//***查找构造函数**
+			if (_class.constructor != null)
             {
                 MethodGetterBase field = (MethodGetterBase)_class.constructor.bindField; //(Field)builder._classbuildingEnv[_class].block.scope.members[_class.constructor.index];
                 int blockid = field.refdefinedinblockid;
@@ -170,7 +185,33 @@ namespace ASCompiler.compiler.builds
                         builder.dictSignatures[blockid][field];
                 
                 FuncCallBuilder funcbuilder = new FuncCallBuilder();
-                funcbuilder.createParaOp(args, signature, token, env, field, builder, true, _class);
+				OpStep opMakeArgs = null;
+				funcbuilder.createParaOp(out opMakeArgs, args, signature, token, env, field, builder, true, _class);
+
+				if (_cls.isLink_System)
+				{
+					if (signature.parameters.Count == 0)
+					{
+						opMakeArgs.opCode = OpCode.prepare_constructor_argement_linksystem;
+						opMakeArgs.memregid1 = 0;
+					}
+					else
+					{
+						bool canconvert = true;
+						for (int i = 0; i < signature.parameters.Count; i++)
+						{
+							if (signature.parameters[i].defaultValue != null || signature.parameters[i].isPara)
+							{
+								canconvert = false;
+							}
+						}
+						if (canconvert)
+						{
+							opMakeArgs.opCode = OpCode.prepare_constructor_argement_linksystem;
+							opMakeArgs.memregid1 = (short)signature.parameters.Count;
+						}
+					}
+				}
             }
             else
             {
@@ -179,7 +220,13 @@ namespace ASCompiler.compiler.builds
                 opMakeArgs.arg1 = new ASBinCode.rtData.RightValue(new ASBinCode.rtData.rtInt(_class.classid));
                 opMakeArgs.arg1Type = RunTimeDataType.rt_int;
                 env.block.opSteps.Add(opMakeArgs);
-            }
+
+				if (_cls.isLink_System)
+				{
+					opMakeArgs.opCode = OpCode.prepare_constructor_argement_linksystem;
+					opMakeArgs.memregid1 = 0;
+				}
+			}
 
             OpStep op = new OpStep(OpCode.new_instance, new SourceToken(token.line, token.ptr, token.sourceFile));
             op.arg1 = new RightValue(new rtInt(_class.classid));

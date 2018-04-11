@@ -609,6 +609,104 @@ namespace ASRuntime
                 case OpCode.prepare_constructor_class_argement:
                     operators.OpCreateInstance.prepareConstructorClassArgements(this, step, scope);
                     break;
+				case OpCode.prepare_constructor_argement_linksystem:
+					//***就地创建系统对象***
+					{
+						var rv = step.arg1.getValue(scope, this);
+						int classid = ((ASBinCode.rtData.rtInt)rv).value;
+						var _class = player.swc.classes[classid];
+
+						{
+							Class cls;
+							if (_class.mainClass == null)
+							{
+								cls = _class;
+							}
+							else
+							{
+								cls = _class.mainClass;
+							}
+							if (!player.outpackage_runtimescope.ContainsKey(cls.classid))
+							{
+								operators.OpCreateInstance.prepareConstructorArgements(this, step, scope);
+								break;
+							}
+						}
+
+
+						++codeLinePtr;
+
+						int args = step.memregid1;
+
+						StackSlot stackSlot =(StackSlot)block.instructions[codeLinePtr+args].reg.getSlot(scope,this) ;
+						var cacheObject = stackSlot.getStackCacheObject(_class);
+
+						ClassMember ctor = _class.constructor;
+
+						ASBinCode.rtData.rtFunction function =
+							(ASBinCode.rtData.rtFunction)((MethodGetterBase)ctor.bindField).getConstructor(cacheObject.objScope);
+
+						var nf = (nativefuncs.NativeConstParameterFunction)player.swc.getNativeFunction(function.functionId);
+
+						int count = step.memregid1;
+
+						nf.bindTempSlot();
+						nf.bin = player.swc;
+						bool success = false;
+						try
+						{
+							for (int i = 0; i < count; i++)
+							{
+								var stepn = block.instructions[codeLinePtr];
+								RunTimeValueBase arg = stepn.arg1.getValue(scope, this);
+
+								nf.setTempSlotValue(arg, i);
+
+								++codeLinePtr;
+							}
+
+							var returnslot = block.instructions[codeLinePtr].reg.getSlot(scope, this);
+							player._executeToken = nf.getExecToken(function.functionId);
+							nf.execute3(
+							cacheObject,
+							player.swc.functions[function.functionId],
+							returnslot,
+							step.token,
+							this,
+							out success
+							);
+
+						}
+						finally
+						{
+							player._executeToken = nativefuncs.NativeConstParameterFunction.ExecuteToken.nulltoken;
+							nf.unbindTempSlot();
+							function.Clear();
+						}
+
+						player._nativefuncCaller = null;
+
+						if (success)
+						{
+							var receive_err = player.clear_nativeinvokeraiseerror();
+							if (receive_err != null)
+							{
+								receiveErrorFromStackFrame(receive_err);
+							}
+							else
+							{
+								stackSlot.directSet(cacheObject);
+								endStepNoError();
+							}
+						}
+						else
+						{
+							endStep();
+						}
+
+
+					}
+					break;
                 case OpCode.push_parameter_class:
                     operators.OpCreateInstance.push_parameter_class(this, step, scope);
                     break;
@@ -709,7 +807,10 @@ namespace ASRuntime
                         bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
                         rtFunction function = new rtFunction(funcid, ismethod);
-                        function.bind(scope);
+						//function.bind(scope);
+						operators.OpCallFunction.bindFunctionWhenCreate(function, this, scope,block.define_class_id);
+						
+
                         step.reg.getSlot(scope,this).directSet(function);
 
 						endStepNoError();

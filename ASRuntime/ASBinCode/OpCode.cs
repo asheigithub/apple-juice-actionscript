@@ -278,10 +278,14 @@ namespace ASBinCode
         /// 准备从class中创建类的构造函数
         /// </summary>
         prepare_constructor_class_argement = 72,
-        /// <summary>
-        /// 加class构造函数参数
-        /// </summary>
-        push_parameter_class=73,
+		/// <summary>
+		/// 准备创建链接本地对象
+		/// </summary>
+		prepare_constructor_argement_linksystem = 192,
+		/// <summary>
+		/// 加class构造函数参数
+		/// </summary>
+		push_parameter_class =73,
         /// <summary>
         /// 访问对象成员
         /// </summary>
@@ -648,5 +652,8 @@ namespace ASBinCode
 
 		//***191被使用，代码放到make_para****部分***
 		//make_para_scope_withsignature_nativeconstpara = 191,
+		//***192被使用，放到prepare_constructor_argement***后面***
+		//prepare_constructor_argement_linksystem=192,
+
 	}
 }

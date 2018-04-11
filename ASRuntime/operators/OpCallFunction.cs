@@ -9,6 +9,60 @@ namespace ASRuntime.operators
 {
     class OpCallFunction
     {
+		public static void bindFunctionWhenCreate(rtFunction function,StackFrame frame, RunTimeScope scope,int defclassid)
+		{
+			if (function.bindScope == null
+					||
+					function.bindScope.blockId == frame.scope.blockId
+					)
+			{
+				function.bind(frame.scope);
+			}
+
+			if (!function.ismethod)
+			{
+				if (function.this_pointer == null)
+				{
+					var s = frame.scope;
+					if (s.this_pointer != null && s.this_pointer is rtObjectBase)
+					{
+						rtObjectBase obj = (rtObjectBase)s.this_pointer;
+
+						if (obj.value is Global_Object)
+						{
+							function.setThis(obj);
+						}
+						else
+						{
+							var cls = frame.player.swc.classes[defclassid];  //obj.value._class;
+							if (cls.staticClass == null)
+							{
+								cls = cls.instanceClass;
+							}
+							if (cls.mainClass != null)
+							{
+								cls = cls.mainClass;
+							}
+
+							var ot = frame.player.outpackage_runtimescope[cls.classid];
+							function.setThis(ot.this_pointer);
+						}
+
+					}
+					else
+					{
+						if (frame.player.infoOutput != null)
+						{
+
+							frame.player.infoOutput.Warring("当前函数没有this指针。也许不是从文档类启动，而是从包外代码启动的");
+
+						}
+					}
+				}
+			}
+		}
+
+
         public static void bind(StackFrame frame, ASBinCode.OpStep step,RunTimeScope scope)
         {
             var rv = step.arg1.getValue(frame.scope, frame);
