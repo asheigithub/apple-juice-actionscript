@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    
+    <title>Unity交互性能和Lua的对比 | Apple Juice</title>
+    
+    
+        <meta name="keywords" content="Unity交互性能和Lua的对比">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="网络上有一篇主要关于Unity交互的Lua方案的性能对比测试。https://zhuanlan.zhihu.com/p/22673880 AppleJuice也进行了一次此测试。测试平台为手机 魅族Note5。对比对象为SLUA 1.5.5。双方均使用il2cpp打包。  AppleJuice是C#代码，因此在UnityEditor中测试结果不准确，需要发布到手机实测，或者发布为PC的exe,才能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity交互性能和Lua的对比">
+<meta property="og:url" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-4-0-slua-applejuice-2018-04-12/index.html">
+<meta property="og:site_name" content="Apple Juice">
+<meta property="og:description" content="网络上有一篇主要关于Unity交互的Lua方案的性能对比测试。https://zhuanlan.zhihu.com/p/22673880 AppleJuice也进行了一次此测试。测试平台为手机 魅族Note5。对比对象为SLUA 1.5.5。双方均使用il2cpp打包。  AppleJuice是C#代码，因此在UnityEditor中测试结果不准确，需要发布到手机实测，或者发布为PC的exe,才能">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/slua_applejuice_perf.jpg">
+<meta property="og:updated_time" content="2018-04-12T10:42:52.962Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unity交互性能和Lua的对比">
+<meta name="twitter:description" content="网络上有一篇主要关于Unity交互的Lua方案的性能对比测试。https://zhuanlan.zhihu.com/p/22673880 AppleJuice也进行了一次此测试。测试平台为手机 魅族Note5。对比对象为SLUA 1.5.5。双方均使用il2cpp打包。  AppleJuice是C#代码，因此在UnityEditor中测试结果不准确，需要发布到手机实测，或者发布为PC的exe,才能">
+<meta name="twitter:image" content="https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/slua_applejuice_perf.jpg">
+    
+
+    
+
+    
+        <link rel="icon" href="/apple-juice-actionscript/doc_cn/favicon.ico">
+    
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/css/style.css">
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/apple-juice-actionscript/doc_cn/libs/jquery/plugins/cookie/1.4.1/jquery.cookie.js"></script>
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/apple-juice-actionscript/doc_cn/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+    
+</head>
+</html>
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/apple-juice-actionscript/doc_cn/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Apple Juice</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a>
+                
+            </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/apple-juice-actionscript/doc_cn/',
+        CONTENT_URL: '/apple-juice-actionscript/doc_cn/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/apple-juice-actionscript/doc_cn/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/">首页</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/apple-juice-actionscript/doc_cn/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap" id="categories">
+        <h3 class="widget-title">
+            <span>分类</span>
+            &nbsp;
+            <a id="allExpand" href="#">
+                <i class="fa fa-angle-double-down fa-2x"></i>
+            </a>
+        </h3>
+        
+        
+        
+         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            开始使用
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            配置项目
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-2-0-createunityproject-2018-03-19/">创建Unity工程和脚本工程</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-3-0-projectconfig-2018-03-20/">ActionScript3项目配置</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-4-0-linkcodegenconfig-2018-03-20/">API导出工具</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            使用ActionScript3
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-5-0-useactionscript-2018-03-20/">类型转换</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/">新增语言特性</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-7-0-exportapi-2018-03-20/">.net API的导出</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/">使用自定义API</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            Unity工程
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-0-useunityproj-2018-03-21/">内容说明</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-1-unityplugin-2018-03-21/">Apple Juice Unity插件</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-9-2-unitydemointro-2018-03-27/">Demo工程介绍</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/1-1-0-overview-2018-03-19/">概述</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            进阶话题
+                        </a>
+                         <ul class="unstyled" id="tree"> 
+                    <li class="directory">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder"></i>
+                            &nbsp;
+                            更好的使用
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-0-extends-2018-03-28/">脚本继承</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-1-9-extendsprinciple-2018-04-10/">继承的原理</a></li>  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-2-0-monobehaviour-2018-04-10/">关于MonoBehaviour</a></li>  </ul> 
+                    </li> 
+                    
+                    <li class="directory open">
+                        <a href="#" data-role="directory">
+                            <i class="fa fa-folder-open"></i>
+                            &nbsp;
+                            性能提示
+                        </a>
+                         <ul class="unstyled" id="tree">  <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-3-0-performanceintro-2018-04-11/">性能提示</a></li>  <li class="file active"><a href="/apple-juice-actionscript/doc_cn/2-4-0-slua-applejuice-2018-04-12/">Unity交互性能和Lua的对比</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/2-0-0-advoverview-2018-03-28/">进阶概述</a></li>  </ul> 
+                    </li> 
+                     <li class="file"><a href="/apple-juice-actionscript/doc_cn/index-2018-03-16/">欢迎</a></li>  </ul> 
+    </div>
+    <script>
+        $(document).ready(function() {
+            var iconFolderOpenClass  = 'fa-folder-open';
+            var iconFolderCloseClass = 'fa-folder';
+            var iconAllExpandClass = 'fa-angle-double-down';
+            var iconAllPackClass = 'fa-angle-double-up';
+            // Handle directory-tree expansion:
+            // 左键单独展开目录
+            $(document).on('click', '#categories a[data-role="directory"]', function (event) {
+                event.preventDefault();
+
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var subtree = $(this).siblings('ul');
+                icon.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if (expanded) {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideUp({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderCloseClass);
+                } else {
+                    if (typeof subtree != 'undefined') {
+                        subtree.slideDown({ duration: 100 });
+                    }
+                    icon.addClass(iconFolderOpenClass);
+                }
+            });
+            // 右键展开下属所有目录
+            $('#categories a[data-role="directory"]').bind("contextmenu", function(event){
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconFolderOpenClass);
+                var listNode = $(this).siblings('ul');
+                var subtrees = $.merge(listNode.find('li ul'), listNode);
+                var icons = $.merge(listNode.find('.fa'), icon);
+                icons.removeClass(iconFolderOpenClass).removeClass(iconFolderCloseClass);
+                if(expanded) {
+                    subtrees.slideUp({ duration: 100 });
+                    icons.addClass(iconFolderCloseClass);
+                } else {
+                    subtrees.slideDown({ duration: 100 });
+                    icons.addClass(iconFolderOpenClass);
+                }
+            })
+            // 展开关闭所有目录按钮
+            $(document).on('click', '#allExpand', function (event) {
+                event.preventDefault();
+                
+                var icon = $(this).children('.fa');
+                var expanded = icon.hasClass(iconAllExpandClass);
+                icon.removeClass(iconAllExpandClass).removeClass(iconAllPackClass);
+                if(expanded) {
+                    $('#sidebar .fa.fa-folder').removeClass('fa-folder').addClass('fa-folder-open')
+                    $('#categories li ul').slideDown({ duration: 100 });
+                    icon.addClass(iconAllPackClass);
+                } else {
+                    $('#sidebar .fa.fa-folder-open').removeClass('fa-folder-open').addClass('fa-folder')
+                    $('#categories li ul').slideUp({ duration: 100 });
+                    icon.addClass(iconAllExpandClass);
+                }
+            });  
+        });
+    </script>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+            <section id="main"><article id="post-2-4-0-slua-applejuice" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+                    <div class="article-meta">
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+		
+		
+		
+        <a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/">进阶话题</a><i class="fa fa-angle-right"></i><a class="article-category-link" href="/apple-juice-actionscript/doc_cn/categories/2-advuse/2-3performance/">性能提示</a>
+    </div>
+
+                        
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/apple-juice-actionscript/doc_cn/2-4-0-slua-applejuice-2018-04-12/">
+            <time datetime="2018-04-12T10:15:43.000Z" itemprop="datePublished">2018-04-12</time>
+        </a>
+    </div>
+
+
+                        
+                        
+                    </div>
+                
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Unity交互性能和Lua的对比
+        </h1>
+    
+
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+        
+            
+        
+        
+            <p>网络上有一篇主要关于Unity交互的Lua方案的性能对比测试。<br><a href="https://zhuanlan.zhihu.com/p/22673880" title="Lua测试" rel="external nofollow noopener noreferrer" target="_blank">https://zhuanlan.zhihu.com/p/22673880</a></p>
+<p>AppleJuice也进行了一次此测试。测试平台为手机 魅族Note5。对比对象为SLUA 1.5.5。双方均使用il2cpp打包。</p>
+<blockquote>
+<p>AppleJuice是C#代码，因此在UnityEditor中测试结果不准确，需要发布到手机实测，或者发布为PC的exe,才能实际测试性能。</p>
+</blockquote>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">package</span> </span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> flash.system.System;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> system.DateTime;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> system.TimeSpan;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> unityengine.GameObject;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> unityengine.Transform;</span></span><br><span class="line">	<span class="meta"><span class="meta-keyword">import</span> unityengine.Vector3;</span></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * ...</span></span><br><span class="line"><span class="comment">	 * @author </span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Perf</span> </span></span><br><span class="line"><span class="class">	</span>&#123;</span><br><span class="line">		<span class="keyword">var</span> cube:GameObject = <span class="keyword">new</span> GameObject(<span class="string">"Script cube"</span>);</span><br><span class="line">		<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Perf</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Test1</span><span class="params">()</span>:void</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">var</span> d:DateTime = DateTime.now;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">var</span> transform:Transform = cube.transform;</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">200000</span>	; i++) </span><br><span class="line">			&#123;</span><br><span class="line">				transform.position = transform.position;</span><br><span class="line">			&#125;			</span><br><span class="line">			trace(  TimeSpan (DateTime.now-d).totalMilliseconds );</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Test2</span><span class="params">()</span>:void</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">var</span> d:DateTime = DateTime.now;</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">var</span> transform:Transform = cube.transform;</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">200000</span>	; i++) </span><br><span class="line">			&#123;</span><br><span class="line">				transform.rotate____(Vector3.up, <span class="number">90</span>);</span><br><span class="line">			&#125;			</span><br><span class="line">			trace(  TimeSpan (DateTime.now-d).totalMilliseconds );</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Test3</span><span class="params">()</span>:void</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">var</span> d:DateTime = DateTime.now;</span><br><span class="line">			</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">2000000</span>	; i++) </span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">var</span> v:Vector3 =<span class="keyword">new</span> Vector3(i,i,i)</span><br><span class="line">				Vector3.normalize(v)</span><br><span class="line">			&#125;			</span><br><span class="line">			trace(  TimeSpan (DateTime.now-d).totalMilliseconds );</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Test4</span><span class="params">()</span>:void</span></span><br><span class="line"><span class="function">		</span>&#123;</span><br><span class="line">			<span class="keyword">var</span> d:DateTime = DateTime.now;</span><br><span class="line">			</span><br><span class="line">			</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">var</span> i:int = <span class="number">0</span>; i &lt; <span class="number">200000</span>; i++) </span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">var</span> v:GameObject = GameObject.constructor_();</span><br><span class="line">			&#125;			</span><br><span class="line">			trace(  TimeSpan (DateTime.now-d).totalMilliseconds );</span><br><span class="line">			</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test1</span><span class="params">()</span></span></span><br><span class="line">	<span class="keyword">local</span> transform = cube.transform</span><br><span class="line">	<span class="keyword">local</span> start = <span class="built_in">os</span>.<span class="built_in">clock</span>()</span><br><span class="line">	<span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">200000</span> <span class="keyword">do</span></span><br><span class="line">        transform.position=transform.position</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"test1/lua "</span> .. (<span class="built_in">os</span>.<span class="built_in">clock</span>() - start));</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test2</span><span class="params">()</span></span></span><br><span class="line">	<span class="keyword">local</span> transform=cube.transform</span><br><span class="line">	<span class="keyword">local</span> start = <span class="built_in">os</span>.<span class="built_in">clock</span>()</span><br><span class="line">	<span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">200000</span> <span class="keyword">do</span></span><br><span class="line">		transform:Rotate(Vector3.up, <span class="number">90</span>)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"test2/lua "</span> .. (<span class="built_in">os</span>.<span class="built_in">clock</span>() - start));</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test3</span><span class="params">()</span></span></span><br><span class="line">	<span class="keyword">local</span> start = <span class="built_in">os</span>.<span class="built_in">clock</span>()</span><br><span class="line">	<span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">2000000</span> <span class="keyword">do</span> </span><br><span class="line">		<span class="keyword">local</span> v = Vector3(i,i,i)</span><br><span class="line">		Vector3.Normalize(v)</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"test3/lua "</span> .. (<span class="built_in">os</span>.<span class="built_in">clock</span>() - start));</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test4</span><span class="params">()</span></span></span><br><span class="line">	<span class="keyword">local</span> t = cube.transform</span><br><span class="line">	<span class="keyword">local</span> v = Vector3.one</span><br><span class="line">	<span class="keyword">local</span> start = <span class="built_in">os</span>.<span class="built_in">clock</span>()</span><br><span class="line">	<span class="keyword">for</span> i=<span class="number">1</span>,<span class="number">200000</span> <span class="keyword">do</span></span><br><span class="line">		<span class="keyword">local</span> v = GameObject()	</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"test4/lua "</span> .. (<span class="built_in">os</span>.<span class="built_in">clock</span>() - start));</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<h4 id="以下为测试结果-单位为秒。越小越好"><a href="#以下为测试结果-单位为秒。越小越好" class="headerlink" title="以下为测试结果 单位为秒。越小越好"></a>以下为测试结果 单位为秒。越小越好</h4><ol>
+<li>test1 slua 1.09  apple juice 1.14</li>
+<li>test2 slua 2.57  apple juice 1.84</li>
+<li>test3 slua 0.058 apple juice 25.9 <blockquote>
+<p>test3 实际上slua并没有和unity交互，因此这个测试不适于评估。</p>
+</blockquote>
+</li>
+<li>test4 slua 7.25  apple juice 4.128</li>
+</ol>
+<p><img src="/apple-juice-actionscript/doc_cn/images/slua_applejuice_perf.jpg" alt="结果截图说明"></p>
+
+            </div>
+        
+        <footer class="article-footer">
+        </footer>
+    </div>
+</article>
+
+
+    
+
+
+
+
+    
+    
+
+
+
+
+<!-- baidu url auto push script -->
+<script type="text/javascript">
+    !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=window.location.href,o=document.referrer;if(!e.test(r)){var n="//api.share.baidu.com/s.gif";o?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var t=new Image;t.src=n}}(window);
+</script>     
+</section>
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            asheigithub &copy; 2018 
+            
+			<a href="https://github.com/asheigithub/apple-juice-actionscript/blob/master/LICENSE" rel="external nofollow noopener noreferrer" target="_blank"><img style="max-width:100%;" alt="license" src="https://camo.githubusercontent.com/890acbdcb87868b382af9a4b1fac507b9659d9bf/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6c6963656e73652d4d49542d626c75652e737667" data-canonical-src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+			
+            <br> Powered by <a href="http://hexo.io/" target="_blank" rel="external nofollow noopener noreferrer">Hexo</a>. Theme - <a href="https://github.com/zthxxx/hexo-theme-Wikitten" rel="external nofollow noopener noreferrer" target="_blank">wikitten</a>
+            
+        </div>
+    </div>
+</footer>
+        
+
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/apple-juice-actionscript/doc_cn/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/apple-juice-actionscript/doc_cn/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+        <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true,
+            TeX: {
+                equationNumbers: {
+                  autoNumber: 'AMS'
+                }
+            }
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/apple-juice-actionscript/doc_cn/js/main.js"></script>
+
+    </div>
+</body>
