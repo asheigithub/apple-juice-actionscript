@@ -155,9 +155,9 @@ namespace AutoGenCodeLib
 
 		public int DoHandler(string v1,int v2,float v3)
 		{
-			TestType(typeof(System.Int64));
-
-			return int.Parse(v1) + v2 + (int)v3;
+			//TestType(typeof(System.Int64));
+			return handler(v1, v2, v3);
+			//return int.Parse(v1) + v2 + (int)v3;
 		}
 
 		public static void test(out int t2)

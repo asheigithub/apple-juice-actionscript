@@ -364,6 +364,8 @@ namespace ASCompiler.compiler
 				{
 					_toOptimizeCallFunctionOpSteps.Clear();
 				}
+				//***计算继承的操作符重载***
+				bin.operatorOverrides.ComputeExtendOverrides(bin);
 
 				if (options.isConsoleOut)
                 {
@@ -1497,23 +1499,23 @@ namespace ASCompiler.compiler
                 _toEvalDefaultParameters.Clear();
             }
             ASBinCode.rtti.FunctionDefine outf;
-            if (!bin.operatorOverrides.Check(out outf))
-            {
-                foreach (var item in buildoutfunctions)
-                {
-                    if (item.Value == outf)
-                    {
-                        pushBuildError(
-                            new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile, 
-                            ">,<,==,!=,>=,<=必须同时重载")
-                            );
+			if (!bin.operatorOverrides.Check(out outf))
+			{
+				foreach (var item in buildoutfunctions)
+				{
+					if (item.Value == outf)
+					{
+						pushBuildError(
+							new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
+							">,<,==,!=,>=,<=必须同时重载")
+							);
 
 
-                        break;
-                    }
-                }
-            }
-
+						break;
+					}
+				}
+			}
+			
             
         }
 

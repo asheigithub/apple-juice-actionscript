@@ -968,7 +968,10 @@ namespace ASRuntime
 											bool ismethod = ((rtBoolean)arr.innerArray[1]).value;
 
 											rtFunction function = new rtFunction(funcid, ismethod);
-											function.bind(scope);
+											//function.bind(scope);
+											operators.OpCallFunction.bindFunctionWhenCreate(function, currentRunFrame, scope, block.define_class_id);
+
+
 											step.reg.getSlot(scope, currentRunFrame).directSet(function);
 
 											currentRunFrame.endStepNoError();

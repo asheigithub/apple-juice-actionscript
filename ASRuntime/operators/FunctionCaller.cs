@@ -626,9 +626,25 @@ namespace ASRuntime.operators
 				var parameter = toCallFunc.signature.parameters;
 
 				RunTimeValueBase argement = getToCheckParameter(check_para_id);
-				if (argement.rtType != parameter[check_para_id].type
+
+				var argtype = argement.rtType;
+				var targettype = parameter[check_para_id].type;
+
+				if (argtype != targettype
 					&&
-					parameter[check_para_id].type != RunTimeDataType.rt_void
+					targettype != RunTimeDataType.rt_void
+					&&
+					!(argtype == RunTimeDataType.rt_null && targettype > RunTimeDataType.unknown)
+					&&
+					!(argtype > RunTimeDataType.unknown && targettype > RunTimeDataType.unknown
+						&&
+						(
+							ClassMemberFinder.check_isinherits(argement, targettype, player.swc)
+							||
+							ClassMemberFinder.check_isImplements(argement, targettype, player.swc)
+						)
+					)
+
 					)
 				{
 					BlockCallBackBase cb = player.blockCallBackPool.create();
@@ -985,7 +1001,7 @@ namespace ASRuntime.operators
 					release();
 
 				}
-				
+
 			}
 		}
 

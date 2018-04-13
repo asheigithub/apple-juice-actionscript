@@ -91,6 +91,17 @@ package
 			trace(t[99]);
 			
 			
+			
+			var mt:Testobj = new Testobj(6);
+			mt.handler = function(a:String,b:int,c:Number):int
+			{
+				trace(a, b, c);
+				return c;
+			};
+			
+			mt.doHandler("a", 3, 99);
+			
+			
 			//var t:Testobj = new Testobj(3);
 			//
 			//var st:DateTime = DateTime.now;
