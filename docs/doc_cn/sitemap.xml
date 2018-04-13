@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/</loc>
+    
+    <lastmod>2018-04-13T08:37:41.282Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/2-4-0-slua-applejuice-2018-04-12/</loc>
     
     <lastmod>2018-04-12T10:42:52.962Z</lastmod>
@@ -82,13 +89,6 @@
     <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-8-0-customapi-2018-03-21/</loc>
     
     <lastmod>2018-03-27T10:15:19.361Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://asheigithub.github.io/apple-juice-actionscript/doc_cn/1-6-0-newfeature-2018-03-20/</loc>
-    
-    <lastmod>2018-03-27T10:15:04.834Z</lastmod>
     
   </url>
   
