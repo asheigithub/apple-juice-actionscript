@@ -364,9 +364,11 @@ namespace ASCompiler.compiler
 				{
 					_toOptimizeCallFunctionOpSteps.Clear();
 				}
-				//***计算继承的操作符重载***
-				bin.operatorOverrides.ComputeExtendOverrides(bin);
-
+				if (buildErrors.Count == 0)
+				{
+					//***计算继承的操作符重载***
+					bin.operatorOverrides.ComputeExtendOverrides(bin);
+				}
 				if (options.isConsoleOut)
                 {
                     Console.WriteLine("编译结束");
