@@ -349,6 +349,12 @@ namespace ASRuntime
                 cacheobj.rtType = clsType.getRtType();
                 cacheobj.objScope.blockId = clsType.blockid;
 
+				if (link.GetLinkData() == null)
+				{
+					index = RunTimeDataType.rt_null;
+				}
+
+
             }
 
 			//store[RunTimeDataType._OBJECT] = cacheobj;

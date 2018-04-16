@@ -256,7 +256,7 @@ namespace ASCTest
 					for (int i = 0; i < swc.blocks.Count; i++)
                     {
                         var block = swc.blocks[i];
-						if (block != null && block.name.EndsWith("::test1"))// "CRC32::update"))
+						if (block != null && block.name.EndsWith("::Main"))// "CRC32::update"))
                         {
                             Console.WriteLine();
                             Console.WriteLine("====操作指令 block " + block.name + " " + block.id + "====");

@@ -33,6 +33,9 @@ package
 		
 		public function Main()
 		{
+			
+			
+			
 			//var d:Decimal = new Decimal(5);
 			//
 			//Decimal.prototype.bbb = function(){ trace(this); };

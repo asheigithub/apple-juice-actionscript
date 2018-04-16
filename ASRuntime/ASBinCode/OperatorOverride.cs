@@ -257,6 +257,7 @@ namespace ASBinCode
 		/// <param name="bin"></param>
 		public void ComputeExtendOverrides(CSWC bin)
 		{
+			
 			//***先收集继承关系****
 			extendstree tree = new extendstree();
 			tree.root = new extendstree.extendnode(bin.ObjectClass);
