@@ -53,4 +53,6 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 > 自动导出的API为actionscript3风格。比如**UnityEngine.UI.Button** 将被导出为 **unityengine.ui.Button**
 > 能将.net 类库中的类型包含继承关系和接口实现关系的导出。例如，**UnityEngine.MeshRenderer**  继承自 **UnityEngine.Renderer**  。那么导出后的as3类型也会保持以上的关系。
 
+欢迎加入QQ群提出建议或意见
+QQ群号 767203189
 
