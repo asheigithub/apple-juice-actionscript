@@ -16,43 +16,8 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 ### 下载地址
 [as3_unity 0.9.5](https://github.com/asheigithub/ASTool/raw/master/publish/lastrelease/as3_unity.zip)
 
-#### 特色 ####
-- 对.net的结构体有特殊优化。在脚本中只要在方法的局部变量中使用，可以任意的new而不会导致gc.因此使用UnityEngine.Vector3之类类型时，可以放心使用。
-- 对导出的类型有特殊优化。只要在方法的局部变量中使用，则脚本本身不产生额外的对象分配。
-- 实现操作符重载。导出的对象如果有操作符重载，则在脚本中同样可以使用。
-- 可以直接在脚本中继承MonoBehaviour。并且还可以将它挂载到GameObject上。
-- 可以使用yield语句返回一个IEnumerator,然后用Iterator包装为.net的IEnumerator接口。所以可以直接在脚本中写Unity的协程。如如下代码所示:  
-````actionscript
-    var mono:MonoBehaviour = GameObject.find("AS3Player").getComponent(MonoBehaviour) as MonoBehaviour;
-	trace(mono.name);
-	mono.startCoroutine( Iterator(  
-		(
-		function()
-		{
-			trace("a",Time.frameCount);
 
-			yield return 1;
-
-			trace("b",Time.frameCount);
-
-			yield return 2;
-
-			trace("c",Time.frameCount);
-			yield return 3;
-		}
-		)()
-	));
-````
-- 自动将.net 委托对应到ActionScript3的function对象。
-- 自动处理.net 类库中的 out ref类型的参数。
-- 可以在ActionScript3脚本中继承.net类库。还可以覆盖基类的虚方法。
-- 完整的编译期类型检查。脚本有完整的编译时类型检查，利于错误排查。
-- 完全实现的面向对象支持。完整支持类继承和接口。
-- FlashDevelop IDE支持。可以完全利用IDE的智能提示，编译错误也可在IDE中得到反馈。可在IDE中直接编译热更新代码成到Unity项目
-- api全自动导出 自动将.net类库导出给脚本使用。并且保留有原始类型信息。
-> 自动导出的API为actionscript3风格。比如**UnityEngine.UI.Button** 将被导出为 **unityengine.ui.Button**
-> 能将.net 类库中的类型包含继承关系和接口实现关系的导出。例如，**UnityEngine.MeshRenderer**  继承自 **UnityEngine.Renderer**  。那么导出后的as3类型也会保持以上的关系。
-
-欢迎加入QQ群提出建议或意见
-QQ群号 767203189
+#### 欢迎加入QQ群提出建议或意见 ####
+QQ群号 
+767203189
 
