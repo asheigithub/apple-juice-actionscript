@@ -44,8 +44,16 @@ namespace ASRuntime.operators
 								cls = cls.mainClass;
 							}
 
-							var ot = frame.player.outpackage_runtimescope[cls.classid];
-							function.setThis(ot.this_pointer);
+							if (frame.player.outpackage_runtimescope.ContainsKey(cls.classid))
+							{
+								var ot = frame.player.outpackage_runtimescope[cls.classid];
+								function.setThis(ot.this_pointer);
+							}
+							else
+							{
+								//***此处只有在$Object启动时发生***
+								function.setThis(obj);
+							}
 						}
 
 					}
