@@ -1,6 +1,5 @@
 package
 {
-	import flash.display.Sprite;
 	import system._Object_;
 	import unityengine.AccelerationEvent;
 	import unityengine.Animation;
@@ -28,7 +27,7 @@ package
 	 * ...
 	 * @author 
 	 */
-	public class Main extends Sprite 
+	public class Main
 	{
 		
 		var cubes:Vector.<GameObject> = new Vector.<GameObject>();		
