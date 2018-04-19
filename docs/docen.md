@@ -52,4 +52,4 @@ test:
 
 
 **The following is a gif picture, if not shown, please wait for a while**
-![gif](https://asheigithub.github.io/apple-juice-actionscript/doc_cn/images/as3_unity_demo4.gif) 
+![gif](doc_cn/images/as3_unity_demo4.gif) 
