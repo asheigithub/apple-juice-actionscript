@@ -257,15 +257,19 @@ namespace CMXMLCCLI
 			{
 				foreach (var err in builder.buildErrors)
 				{
-
+					
 					//Console.Error.WriteLine("file :" + err.srcFile);
 					//Console.Error.WriteLine("line :" + (err.line+1) + " ptr :" + (err.ptr+1));
 					//Console.Error.WriteLine(err.errorMsg);
-					Console.Error.WriteLine(fileFullPath[ err.srcFile] + ":" + (err.line + 1) + ":Error: " + err.errorMsg);
-					//input = input.Replace(vbCrLf, vbLf)
-					//input = input.Replace(vbCr, vbLf)
-					//Dim lines = input.Split(vbLf)
-					Console.Error.WriteLine();
+
+					if (err.srcFile !=null)
+					{
+						Console.Error.WriteLine(fileFullPath[err.srcFile] + ":" + (err.line + 1) + ":Error: " + err.errorMsg);
+						//input = input.Replace(vbCrLf, vbLf)
+						//input = input.Replace(vbCr, vbLf)
+						//Dim lines = input.Split(vbLf)
+						Console.Error.WriteLine();
+					}
 				}
 
 

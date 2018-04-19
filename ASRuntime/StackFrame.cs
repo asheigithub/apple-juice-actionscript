@@ -39,7 +39,8 @@ namespace ASRuntime
 
 				frame.baseUseSlots = block.totalStackSlots + 2;
 				frame.baseBottomSlotIndex = 0;
-				
+				frame.call_parameter_slotCount = 0;
+
 				return frame;
 			}
 

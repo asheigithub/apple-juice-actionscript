@@ -29,7 +29,11 @@ namespace ASRuntime.operators
 
 				return fc;
 			}
-
+			public override void ret(FunctionCaller c)
+			{
+				base.ret(c);
+				c.callbacker = null;
+			}
 		}
 
 

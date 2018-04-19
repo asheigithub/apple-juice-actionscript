@@ -87,7 +87,7 @@ namespace ASRuntime.nativefuncs.linksystem
 
 					((LinkObj<object>)((ASBinCode.rtData.rtObjectBase)thisObj).value).value = new RefOutStore();
 					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
-					
+
 					success = true;
 				}
 				catch (InvalidCastException ic)
@@ -114,7 +114,7 @@ namespace ASRuntime.nativefuncs.linksystem
 			}
 		}
 
-		class as3runtime_RefOutStore_setValue : NativeConstParameterFunction,IMethodGetter
+		class as3runtime_RefOutStore_setValue : NativeConstParameterFunction, IMethodGetter
 		{
 			public as3runtime_RefOutStore_setValue() : base(2)
 			{
@@ -187,7 +187,7 @@ namespace ASRuntime.nativefuncs.linksystem
 						arg1 = (System.Object)_temp;
 					}
 
-					_this.SetValue((System.String)arg0,(System.Object)arg1)
+					_this.SetValue((System.String)arg0, (System.Object)arg1)
 					;
 					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
 					success = true;
@@ -225,14 +225,14 @@ namespace ASRuntime.nativefuncs.linksystem
 			{
 				if (method == null)
 				{
-					method=typeof(RefOutStore).GetMethod("SetValue",new Type[] {typeof(System.String),typeof(System.Object)});;
+					method = typeof(RefOutStore).GetMethod("SetValue", new Type[] { typeof(System.String), typeof(System.Object) }); ;
 				}
 				return method;
 			}
 
 		}
 
-		class as3runtime_RefOutStore_getValue : NativeConstParameterFunction,IMethodGetter
+		class as3runtime_RefOutStore_getValue : NativeConstParameterFunction, IMethodGetter
 		{
 			public as3runtime_RefOutStore_getValue() : base(1)
 			{
@@ -286,8 +286,22 @@ namespace ASRuntime.nativefuncs.linksystem
 
 					object _result_ = _this.GetValue((System.String)arg0)
 					;
-					stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					if (_result_ == null)
+					{
+						stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
+					}
+					else
+					{
+						stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_,
+							stackframe.player.linktypemapper.getRuntimeDataType(_result_.GetType())
+							, returnSlot, bin, stackframe.player);
+					}
 					success = true;
+				}
+				catch (KeyNotFoundException kc)
+				{
+					success = false;
+					stackframe.throwAneException(token, "out or ref parameter not found." + kc.Message);
 				}
 				catch (ASRunTimeException tlc)
 				{
@@ -322,7 +336,7 @@ namespace ASRuntime.nativefuncs.linksystem
 			{
 				if (method == null)
 				{
-					method=typeof(RefOutStore).GetMethod("GetValue",new Type[] {typeof(System.String)});;
+					method = typeof(RefOutStore).GetMethod("GetValue", new Type[] { typeof(System.String) }); ;
 				}
 				return method;
 			}
