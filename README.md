@@ -9,6 +9,8 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
 
 
 ### 文档地址
+- English document (Use "google translation" to translate)
+[document](docs/docen.md)
 - 中文文档
   [https://asheigithub.github.io/apple-juice-actionscript/doc_cn/](https://asheigithub.github.io/apple-juice-actionscript/doc_cn/ "中文文档")
   
