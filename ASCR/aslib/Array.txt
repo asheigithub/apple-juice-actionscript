@@ -156,7 +156,7 @@
 
 		public function filter(callback:Function, thisObject:*=null) : Array
 		{
-			if(callback==null) return;
+			if(callback==null) return [];
 
 			if(thisObject !=null && _ismethod_(callback) )
 			{
@@ -178,6 +178,26 @@
 			return result;
 		}
 
+		public function map(callback:Function, thisObject:*=null) : Array
+		{
+			if(callback==null) return [];
+
+			if(thisObject !=null && _ismethod_(callback) )
+			{
+				throw "When the callback argument is a method of a class, the optional this argument must be null.";
+			}
+
+			var result:Array=[];
+
+			var len:uint = length;
+			for(var i:int=0;i<len;i++)
+			{
+				var e:* = _array[i];
+				result.push(callback.call(thisObject,e,i,_array));
+			}
+
+			return result;
+		}
 
 		/**
 		 * 指定数组中元素数量的非负整数。在向数组中添加新元素时，此属性会自动更新。当您给数组元素赋值（例如，my_array[index] = value）时，如果 index 是数字，而且 index+1 大于 length 属性，则 length 属性会更新为 index+1。

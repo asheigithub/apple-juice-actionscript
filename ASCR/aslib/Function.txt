@@ -68,5 +68,8 @@
 		[native,_function_call]
 		public function call (thisArg:*=null, ...rest) : *;
 		
+		[native,_function_getlength]
+		public function get length () : int;
+
 	}
 }

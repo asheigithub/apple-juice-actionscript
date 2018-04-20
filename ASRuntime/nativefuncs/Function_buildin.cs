@@ -575,4 +575,76 @@ namespace ASRuntime.nativefuncs
 
     }
 
+
+	class Functon_getLength : NativeConstParameterFunction
+	{
+		private List<RunTimeDataType> _paras;
+
+		public Functon_getLength():base(0)
+        {
+			_paras = new List<RunTimeDataType>();			
+		}
+
+		public override bool isMethod
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override string name
+		{
+			get
+			{
+				return "_function_getlength";
+			}
+		}
+
+		public override List<RunTimeDataType> parameters
+		{
+			get
+			{
+				return _paras;
+			}
+		}
+
+		public override RunTimeDataType returnType
+		{
+			get
+			{
+				return RunTimeDataType.rt_int;
+			}
+		}
+
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements,object stackframe,  out string errormessage, out int errorno)
+		//{
+
+
+		//    //throw new NotImplementedException();
+		//}
+
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			rtFunction func = (rtFunction)((rtObjectBase)thisObj).value.memberData[0].getValue();
+
+			var signature = stackframe.player.swc.functions[func.functionId].signature;
+			
+			success = true;
+
+			if (signature.parameters.Count == 0)
+			{
+				returnSlot.setValue(0);
+			}
+			else if (signature.parameters[signature.parameters.Count - 1].isPara)
+			{
+				returnSlot.setValue(signature.parameters.Count - 1);
+			}
+			else
+			{
+				returnSlot.setValue(signature.parameters.Count);
+			}
+		}
+	}
+
 }

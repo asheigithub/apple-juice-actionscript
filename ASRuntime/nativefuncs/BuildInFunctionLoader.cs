@@ -61,6 +61,7 @@ namespace ASRuntime.nativefuncs
             bin.regNativeFunction(new Function_apply());
             bin.regNativeFunction(new Function_call());
             bin.regNativeFunction(new Function_setPrototype());
+			bin.regNativeFunction(new Functon_getLength());
 
             bin.regNativeFunction(new Array_constructor());
             bin.regNativeFunction(new Array_fill());
