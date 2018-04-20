@@ -28,7 +28,17 @@ namespace ASBinCode.rtti
 
 		public override void CopyStructData(LinkSystemObject other)
 		{
-			value = ((LinkObj<T>)other).value;
+			//value = ((LinkObj<T>)other).value;
+			LinkObj<T> o = other as LinkObj<T>; //解决拆箱的问题
+			if (o != null)
+			{
+				value = o.value;
+			}
+			else
+			{
+				value = (T)other.GetLinkData();
+			}
+
 		}
 
 		public override void SetLinkData(object linkvalue)

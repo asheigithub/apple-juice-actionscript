@@ -71,6 +71,11 @@ package
 			
 			var t:* = new et();
 			
+			
+			var dt:DateTime = DateTime( et(t).loadObject());
+			trace(dt);
+			
+			
 			t.ATTT(EnvironmentVariableTarget.Process);
 			
 			var arr1:_Array_ = Testobj.make(5);

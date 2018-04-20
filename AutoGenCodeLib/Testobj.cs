@@ -60,6 +60,12 @@ namespace AutoGenCodeLib
 
 		}
 
+		public object LoadObject()
+		{
+			return DateTime.Now;
+		}
+
+
 		//public override string ToString()
 		//{
 		//	return string.Format("x:{0} y:{1}", x, y);

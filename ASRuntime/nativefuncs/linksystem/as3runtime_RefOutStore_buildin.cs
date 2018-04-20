@@ -286,16 +286,16 @@ namespace ASRuntime.nativefuncs.linksystem
 
 					object _result_ = _this.GetValue((System.String)arg0)
 					;
-					if (_result_ == null)
+					//if (_result_ == null)
 					{
 						stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_, functionDefine.signature.returnType, returnSlot, bin, stackframe.player);
 					}
-					else
-					{
-						stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_,
-							stackframe.player.linktypemapper.getRuntimeDataType(_result_.GetType())
-							, returnSlot, bin, stackframe.player);
-					}
+					//else
+					//{
+					//	stackframe.player.linktypemapper.storeLinkObject_ToSlot(_result_,
+					//		stackframe.player.linktypemapper.getRuntimeDataType(_result_.GetType())
+					//		, returnSlot, bin, stackframe.player);
+					//}
 					success = true;
 				}
 				catch (KeyNotFoundException kc)
