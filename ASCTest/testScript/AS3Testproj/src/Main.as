@@ -306,3 +306,34 @@ class et extends Testobj
 
 }
 
+
+function part(fn, ...arg) {
+    var all = arg || [];
+    return function(...rest)  {
+        var args = all.slice(0);
+		for (var i:int = 0; i < rest.length; i++) 
+		{
+			args.push(rest[i]);
+		}
+        
+        return fn.apply(this, args);
+    }
+}
+
+function add(a = 0, b = 0, c = 0) {
+    trace(a + b + c);
+}
+
+
+var addPart = part(add);
+addPart(9); //9
+try 
+{
+	addPart(9, 11,1,2,3,4,5);//20	
+}
+catch(e)
+{
+	trace(e);
+}
+
+

@@ -336,6 +336,13 @@ namespace ASRuntime.nativefuncs
                 {
                     bool success;
                     caller.pushParameter(argArray.innerArray[i], i,out success);
+					if (!success)
+					{
+						((IBlockCallBack)callbacker).noticeRunFailed();
+						caller.release();
+						((StackFrame)stackframe).endStep();
+						return;
+					}
                 }
             }
 
