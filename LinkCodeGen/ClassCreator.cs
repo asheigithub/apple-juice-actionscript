@@ -1401,15 +1401,15 @@ namespace LinkCodeGen
 						as3api.AppendLine("\t\t* " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(type) +"."+  method.Name).Replace("&", " &").Replace(";", "; "));
 
 						var paras = method.GetParameters();
-						if (paras.Length > 0)
-						{
-							as3api.AppendLine("\t\t*parameters:");
-						}
+						//if (paras.Length > 0)
+						//{
+						//	as3api.AppendLine("\t\t*parameters:");
+						//}
 						foreach (var item in paras)
 						{
-							as3api.Append("\t\t*  " + item.Name );
+							as3api.Append("\t\t* @param	" + item.Name );
 							
-							as3api.Append(" : " + ((item.IsOut && item.ParameterType.IsByRef)?"(Out)": (item.ParameterType.IsByRef?"(ByRef) ":""))+ System.Security.SecurityElement.Escape( NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&"," &").Replace(";","; "));
+							as3api.Append("\t" + ((item.IsOut && item.ParameterType.IsByRef)?"(Out)": (item.ParameterType.IsByRef?"(ByRef) ":""))+ System.Security.SecurityElement.Escape( NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&"," &").Replace(";","; "));
 
 							if (IsDelegate(item.ParameterType))
 							{
@@ -1425,10 +1425,10 @@ namespace LinkCodeGen
 
 						if (method.ReturnType != typeof(void))
 						{
-							as3api.AppendLine("\t\t*return:" );
+							as3api.AppendLine("\t\t* @return");
 
-							as3api.Append("\t\t*  ");
-							as3api.Append(" " + System.Security.SecurityElement.Escape(
+							//as3api.Append("\t\t*  ");
+							as3api.Append("\t" + System.Security.SecurityElement.Escape(
 								NativeCodeCreatorBase.GetTypeFullName(
 									method.ReturnType)).Replace("&", " &").Replace(";", "; "));
 

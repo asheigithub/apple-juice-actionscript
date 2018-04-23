@@ -61,7 +61,7 @@ namespace ASCTest
                 {
                     path=".\\";
                 }
-
+				
 				//path = "";
 				//files =new string[] { "E:/Manju-pc/as3protobuf/AS3ProtoBuf/src/com/netease/protobuf/Message.as" };
 
