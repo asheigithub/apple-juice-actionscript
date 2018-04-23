@@ -180,9 +180,10 @@ namespace LinkCodeGenCLI
 						}
 
 						var dll = System.Reflection.Assembly.ReflectionOnlyLoadFrom(fullpath);
-
-						dictionaryAssemblyLoadPath.Add(dll.FullName, fullpath);
-
+						if (!dictionaryAssemblyLoadPath.ContainsKey(dll.FullName))
+						{
+							dictionaryAssemblyLoadPath.Add(dll.FullName, fullpath);
+						}
 						List<string> definetypes = new List<string>();
 
 						List<string> definenamespaces = new List<string>();
@@ -475,9 +476,31 @@ namespace LinkCodeGenCLI
 
 				}
 
+
+				//如果都没找到，看是否是引用了加载dll**
+				var buildassemblys = (AssemblyListSection)System.Configuration.ConfigurationManager.GetSection("buildassemblys");
+				foreach (AssemblyDefineElement asm in buildassemblys.Assemblys)
+				{
+					string assembly = asm.StringValue;
+					string fullpath = System.IO.Path.GetFullPath(assembly);
+					if (args.Name.StartsWith(System.IO.Path.GetFileNameWithoutExtension(fullpath) + ","))
+					{
+						asmToCheck = replacePathVariable( System.IO.Path.GetDirectoryName(fullpath)  + "/" + name.Name + ".dll");
+						if (File.Exists(asmToCheck))
+						{
+							dictionaryAssemblyLoadPath.Add(args.Name, asmToCheck);
+							return Assembly.ReflectionOnlyLoadFrom(asmToCheck);
+						}
+
+					}
+
+				}
+
+
+
 			}
 
-			
+
 			return Assembly.ReflectionOnlyLoad(args.Name);
 
 		}

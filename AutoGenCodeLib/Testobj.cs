@@ -11,10 +11,18 @@ namespace AutoGenCodeLib
 	//		return "extabc";
 	//	}
 	//}
+	public static class SD
+	{
+		public static int DOTest(this Testobj obj, int a, int b)
+		{
+			return a + b;
+		}
+	}
+
 
     public class Testobj
 	{
-
+		
 
 		public static Testobj Ins = new Testobj();
 
