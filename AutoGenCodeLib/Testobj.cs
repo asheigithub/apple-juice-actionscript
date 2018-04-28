@@ -19,7 +19,9 @@ namespace AutoGenCodeLib
 		}
 	}
 
-
+	/// <summary>
+	/// Testobj
+	/// </summary>
     public class Testobj
 	{
 		
@@ -48,6 +50,9 @@ namespace AutoGenCodeLib
 			nc = new innerClass(this);
 		}
 
+		/// <summary>
+		/// 字段测试 x
+		/// </summary>
 		public ulong x;
 
 		public double y;
@@ -83,7 +88,9 @@ namespace AutoGenCodeLib
 		//{
 		//	Console.WriteLine(type.)
 		//}
-
+		/// <summary>
+		/// inner
+		/// </summary>
 		public class innerClass
 		{
 			private Testobj testobj;
@@ -124,6 +131,11 @@ namespace AutoGenCodeLib
 			get { return nc; }
 		}
 
+		/// <summary>
+		/// 创建Testobj数组
+		/// </summary>
+		/// <param name="count">要创建的个数</param>
+		/// <returns>Testobj[]数组</returns>
 		public static Testobj[] make(int count)
 		{
 			Testobj[] r = new Testobj[count];
@@ -201,6 +213,9 @@ namespace AutoGenCodeLib
 			return ArgsTest(6, 7, 8, 9, 0, a6);
 		}
 
+		/// <summary>
+		/// 事件测试
+		/// </summary>
 		public event EventHandler EventTest;
 
 		public void OnEvent()

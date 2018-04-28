@@ -13,6 +13,11 @@ namespace ASRuntime.nativefuncs
 			return new staticClassCreator(t, name);
 		}
 
+		public static NativeConstParameterFunction getSealedClassCreator(string name, Type t)
+		{
+			return new sealedClassCreator(t, name);
+		}
+
 		public static NativeConstParameterFunction getCreator<T>(string name, T v)
         {
             return new creator<T>(name, v);
@@ -103,7 +108,53 @@ namespace ASRuntime.nativefuncs
 		}
 	}
 
+	class sealedClassCreator : NativeConstParameterFunction, ILinkSystemObjCreator
+	{
+		private string fn;
+		private Type t;
+		List<RunTimeDataType> para;
+		public sealedClassCreator(Type type, string name) : base(1)
+		{
+			t = type;
+			fn = name;
+			para = new List<RunTimeDataType>();
+			para.Add(RunTimeDataType.rt_void);
+		}
 
+		public override string name { get { return fn; } }
+
+		public override List<RunTimeDataType> parameters { get { return para; } }
+
+		public override RunTimeDataType returnType { get { return RunTimeDataType.rt_void; } }
+
+		public override bool isMethod { get { return true; } }
+
+		//public override RunTimeValueBase execute(RunTimeValueBase thisObj, SLOT[] argements, object stackframe, out string errormessage, out int errorno)
+		//{
+		//	throw new NotImplementedException();
+		//}
+		public override void execute3(RunTimeValueBase thisObj, FunctionDefine functionDefine, SLOT returnSlot, SourceToken token, StackFrame stackframe, out bool success)
+		{
+			throw new NotImplementedException();
+		}
+
+
+		public Type getLinkSystemObjType()
+		{
+			return t;
+		}
+
+		public RunTimeValueBase makeObject(Class cls)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void setLinkObjectValueToSlot(SLOT slot, object player, object value, Class clsType)
+		{
+			//throw new NotImplementedException();
+			((StackSlot)slot).setLinkObjectValue(clsType, (Player)player, value);
+		}
+	}
 
 	class creator<T> : NativeConstParameterFunction,ILinkSystemObjCreator
     {

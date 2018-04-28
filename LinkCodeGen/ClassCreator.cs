@@ -7,6 +7,8 @@ namespace LinkCodeGen
 {
 	class ClassCreator:CreatorBase
 	{
+		protected byte[] xmlDoc;
+
 		public ClassCreator(Type classtype, string as3apidocpath, string csharpnativecodepath,
 			Dictionary<TypeKey, CreatorBase> typeCreators,
 			string linkcodenamespace
@@ -34,6 +36,27 @@ namespace LinkCodeGen
 				throw new ArgumentException("类型已配置为跳过");
 			}
 
+			try
+			{
+				string doc = System.IO.Path.GetDirectoryName(type.Assembly.Location) + "/" + System.IO.Path.GetFileNameWithoutExtension( type.Assembly.Location) + ".xml";
+
+				if (assemblyDoc.ContainsKey(doc))
+				{
+					xmlDoc = assemblyDoc[doc];
+				}
+				else if (System.IO.File.Exists(doc))
+				{
+					System.Xml.XmlDocument x = new System.Xml.XmlDocument();
+					x.Load(doc);
+
+					xmlDoc = System.Text.Encoding.UTF8.GetBytes( System.IO.File.ReadAllText(doc));
+					assemblyDoc.Add(doc, xmlDoc);
+				}
+			}
+			catch (Exception)
+			{
+
+			}
 
 			name = GetAS3ClassOrInterfaceName(classtype);
 			
@@ -616,14 +639,14 @@ namespace LinkCodeGen
 			bool isdelegate=false;
 			if (IsDelegate(type))
 			{
-				as3api.AppendLine("\t\t/**");
-				as3api.AppendLine("\t\t*包装委托:");
-				as3api.Append("\t\t* ");
+				as3api.AppendLine("\t/**");
+				as3api.AppendLine("\t*包装委托:");
+				as3api.Append("\t* ");
 				as3api.AppendLine( System.Security.SecurityElement.Escape( MethodNativeCodeCreatorBase.GetTypeFullName(type)).Replace("&"," &").Replace(";", "; "));
-				as3api.Append("\t\t* ");
+				as3api.Append("\t* ");
 				as3api.AppendLine(System.Security.SecurityElement.Escape(GetDelegateSignature(type)).Replace("&", " &").Replace(";", "; "));
 				//as3api.AppendLine("\t*/");
-				as3api.AppendLine();
+				as3api.AppendLine("\t* ");
 				isdelegate = true;
 			}
 
@@ -631,32 +654,87 @@ namespace LinkCodeGen
 			{
 				if (!isdelegate)
 				{
-					as3api.AppendLine("\t\t/**");
+					as3api.AppendLine("\t/**");
 				}
 				if (type.IsValueType)
 				{
-					as3api.AppendLine("\t\t* Struct");
+					as3api.AppendLine("\t* Struct");
 				}
 				else
 				{
 					if (type.IsAbstract)
 					{
-						as3api.AppendLine("\t\t* Abstract");
+						as3api.AppendLine("\t* Abstract");
 					}
 					if (type.IsSealed)
 					{
-						as3api.AppendLine("\t\t* Sealed");
+						as3api.AppendLine("\t* Sealed");
 					}
 				}
 
 				if (type.IsNested)
 				{
-					as3api.AppendLine("\t\t* Nested Type");
+					as3api.AppendLine("\t* Nested Type");
 				}
 
-				as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(this.type)).Replace("&", " &").Replace(";", "; "));
+				as3api.AppendLine("\t*  " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(this.type)).Replace("&", " &").Replace(";", "; "));
+
+				//***从xml文档中查找类型的说明****
+				if (xmlDoc != null)
+				{
+					string find = "T:" + type.FullName.Replace("+",".");
+
+
+					using (System.IO.MemoryStream ms = new System.IO.MemoryStream(xmlDoc,false ))
+					{
+						System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(ms);
+						while(xmlReader.Read())
+						{
+							if (xmlReader.Name == "member")
+							{
+								string tn = xmlReader.GetAttribute("name");
+								if (tn == find)
+								{
+									if (xmlReader.ReadToDescendant("summary"))
+									{
+										while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+										{
+											if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+												&&
+												xmlReader.Name == "summary"
+												)
+											{
+												goto xmlreadend;
+											}
+										}
+
+										string summary = xmlReader.Value;
+										summary.Replace("\r", "");
+
+										string[] lines = summary.Split('\n');
+
+										foreach (var l in lines)
+										{
+											as3api.AppendLine("\t*  " + System.Security.SecurityElement.Escape(
+												l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+										}
+										
+
+									}
+									goto xmlreadend;
+								}
+							}
+						}
+					}
+
+					xmlreadend:;
+
+
+				}
 				
-				as3api.AppendLine("\t\t*/");
+
+
+				as3api.AppendLine("\t*/");
 			}
 
 
@@ -727,15 +805,20 @@ namespace LinkCodeGen
 				//[creator];
 				//[native, _system_ArrayList_creator_]
 				//private static function _creator(type:Class):*;
-				if (!(type.GetConstructors().Length==0 && type.IsSealed && type.IsClass))
+				if (!(type.GetConstructors().Length == 0 && type.IsSealed && type.IsClass))
 				{
 					regfunctions.Add(
-					"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\"" + GetCreatorNativeFuncName(type) + "\", default(" +NativeCodeCreatorBase.GetTypeFullName( type) + ")));");
+					"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\"" + GetCreatorNativeFuncName(type) + "\", default(" + NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
+				}
+				else if (type.IsSealed)
+				{
+					regfunctions.Add(
+						"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getSealedClassCreator(\"" + GetCreatorNativeFuncName(type) + "\", typeof(" + NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
 				}
 				else
 				{
 					regfunctions.Add(
-						"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getStaticClassCreator(\"" + GetCreatorNativeFuncName(type) + "\", typeof(" + NativeCodeCreatorBase.GetTypeFullName( type) + ")));");
+						"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getStaticClassCreator(\"" + GetCreatorNativeFuncName(type) + "\", typeof(" + NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
 				}
 
 				as3api.Append("\t\t");
@@ -1200,6 +1283,59 @@ namespace LinkCodeGen
 							}
 
 
+							//***从xml文档中查找字段的说明****
+							if (xmlDoc != null)
+							{
+								string find = ":" + BuildIngType.FullName.Replace("+", ".") + "." + field.Name;
+								using (System.IO.MemoryStream ms = new System.IO.MemoryStream(xmlDoc,false))
+								{
+									System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(ms);
+									while (xmlReader.Read())
+									{
+										if (xmlReader.Name == "member")
+										{
+											string tn = xmlReader.GetAttribute("name");
+											if (tn !=null && tn.EndsWith(find))
+											{
+												if (xmlReader.ReadToDescendant("summary"))
+												{
+													while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+													{
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "summary"
+															)
+														{
+															goto xmlreadend;
+														}
+													}
+
+													string summary = xmlReader.Value;
+													summary.Replace("\r", "");
+
+													string[] lines = summary.Split('\n');
+
+													foreach (var l in lines)
+													{
+														as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(
+															l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+													}
+
+
+												}
+												goto xmlreadend;
+											}
+										}
+									}
+								}
+
+								xmlreadend:;
+
+
+							}
+
+
+
 							as3api.AppendLine("\t\t*/");
 						}
 
@@ -1494,13 +1630,178 @@ namespace LinkCodeGen
 					{
 						as3api.AppendLine("\t\t/**");
 
-						as3api.AppendLine("\t\t* " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(type) +"."+  method.Name).Replace("&", " &").Replace(";", "; "));
+						PropertyInfo p1;bool isprop = false;
+						if (!MethodNativeCodeCreator.CheckIsGetter(method, type, out p1))
+						{
+							isprop = true;
+							as3api.AppendLine("\t\t* " + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(type) + "." + method.Name).Replace("&", " &").Replace(";", "; "));
+						}
+
 
 						var paras = method.GetParameters();
-						//if (paras.Length > 0)
-						//{
-						//	as3api.AppendLine("\t\t*parameters:");
-						//}
+
+
+						//***从xml文档中查找方法的说明****
+
+						string[] returnsummary = { };
+						Dictionary<string, string[]> dictparams = new Dictionary<string, string[]>();
+
+						if (xmlDoc != null)
+						{
+							string find = ":" + BuildIngType.FullName.Replace("+", ".") + "." + method.Name;
+							if (paras.Length > 0)
+							{
+								find += "(";
+								for (int i = 0; i < paras.Length; i++)
+								{
+									find += NativeCodeCreatorBase.GetTypeFullName(
+										paras[i].ParameterType);
+									if (i < paras.Length - 1)
+									{
+										find += ",";
+									}
+								}
+
+								find += ")";
+							}
+							//***如果是属性，则查找属性***
+							PropertyInfo pp;
+							if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pp))
+							{
+								find = ":" + BuildIngType.FullName.Replace("+", ".") + "." + pp.Name;
+							}
+
+
+							using (System.IO.MemoryStream ms = new System.IO.MemoryStream(xmlDoc,false))
+							{
+								System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(ms);
+								while (xmlReader.Read())
+								{
+									if (xmlReader.Name == "member")
+									{
+										string tn = xmlReader.GetAttribute("name");
+										if (tn != null && tn.EndsWith(find))
+										{
+											if (xmlReader.ReadToDescendant("summary"))
+											{
+												while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+												{
+													if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+														&&
+														xmlReader.Name == "summary"
+														)
+													{
+														goto xmlreadend;
+													}
+												}
+
+												string summary = xmlReader.Value;
+												summary.Replace("\r", "");
+
+												string[] lines = summary.Split('\n');
+
+												foreach (var l in lines)
+												{
+													as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(
+														l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+												}
+
+												//***读取参数***
+												while (xmlReader.Read())
+												{
+													if (xmlReader.Name == "returns" && xmlReader.NodeType== System.Xml.XmlNodeType.Element)
+													{
+														break;
+													}
+
+													if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+														&&
+														xmlReader.Name == "member"
+														)
+													{
+														goto xmlreadend;
+													}
+
+													if (xmlReader.Name == "param" && xmlReader.NodeType== System.Xml.XmlNodeType.Element)
+													{														
+														string paraname = xmlReader.GetAttribute("name");
+
+														while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+														{
+															if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																&&
+																xmlReader.Name == "param"
+																)
+															{
+																goto paracountinue;
+															}
+														}
+
+														var paravalue = xmlReader.Value;
+														paravalue.Replace("\r", "");
+
+														returnsummary = paravalue.Split('\n');
+
+														dictparams.Add(paraname, returnsummary);
+													paracountinue:;
+														continue;
+													}
+
+												}
+
+
+												//***读取returns***
+												while ((xmlReader.Name =="returns" && xmlReader.NodeType== System.Xml.XmlNodeType.Element) || xmlReader.Read())
+												{
+													if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+														&&
+														xmlReader.Name == "member"
+														)
+													{
+														goto xmlreadend;
+													}
+
+													if (xmlReader.Name == "returns")
+													{
+														while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+														{
+															if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																&&
+																xmlReader.Name == "returns"
+																)
+															{
+																goto xmlreadend;
+															}
+														}
+
+														var retvalue = xmlReader.Value;
+														retvalue.Replace("\r", "");
+
+														returnsummary = retvalue.Split('\n');
+														goto xmlreadend;
+													}
+
+												}
+
+
+											}
+
+											goto xmlreadend;
+										}
+									}
+								}
+							}
+
+							xmlreadend:;
+
+
+						}
+
+
+
+
+
+
 						foreach (var item in paras)
 						{
 							as3api.Append("\t\t* @param	" + item.Name );
@@ -1517,11 +1818,21 @@ namespace LinkCodeGen
 							}
 
 							as3api.AppendLine();
+
+							if (dictparams.ContainsKey(item.Name))
+							{
+								foreach (var l in dictparams[item.Name])
+								{
+									as3api.AppendLine("\t\t*        \t" + System.Security.SecurityElement.Escape(
+										l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+								}
+							}
+
 						}
 
-						if (method.ReturnType != typeof(void))
+						if (method.ReturnType != typeof(void) && !isprop)
 						{
-							as3api.AppendLine("\t\t* @return");
+							as3api.Append("\t\t* @return");
 
 							//as3api.Append("\t\t*  ");
 							as3api.Append("\t" + System.Security.SecurityElement.Escape(
@@ -1538,6 +1849,13 @@ namespace LinkCodeGen
 							}
 
 							as3api.AppendLine();
+
+							foreach (var l in returnsummary)
+							{
+								as3api.AppendLine("\t\t*       \t" + System.Security.SecurityElement.Escape(
+									l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+							}
+
 						}
 
 

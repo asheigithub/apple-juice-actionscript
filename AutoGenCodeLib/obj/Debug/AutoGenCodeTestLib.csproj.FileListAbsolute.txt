@@ -9,3 +9,4 @@ E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csprojResolveAssemblyReference.cache
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
+F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.xml

@@ -8,8 +8,13 @@ namespace LinkCodeGen
 	abstract class CreatorBase
 	{
 		public static Dictionary<string, object> as3keywords;//= { "import","extend", "dynamic" };
+
+		protected static Dictionary<string,byte[]> assemblyDoc;
+
 		static CreatorBase()
 		{
+			assemblyDoc = new Dictionary<string, byte[]>();
+
 			as3keywords = new Dictionary<string, object>();
 			as3keywords.Add("import", null);
 			as3keywords.Add("extend", null);
