@@ -140,42 +140,91 @@ namespace LinkCodeGen
 			opoverrides = new List<System.Reflection.MethodInfo>();
 			virtualmethodlist = new List<MethodInfo>();
 
+			bool donotaddprotectedctor = false; //如果有难以自动生成适配器代码的方法，则不要考虑保护的构造函数
+
+			foreach (var item in type.GetMethods( BindingFlags.NonPublic | BindingFlags.Instance))
+			{
+				if (item.IsAbstract)
+					donotaddprotectedctor = true;
+			}
+
+
 			foreach (var method in type.GetMethods())
 			{
+				if (method.IsSpecialName)
+				{
+					if ((method.IsAbstract))
+					{
+						PropertyInfo p;
+						if (!MethodNativeCodeCreator.CheckIsGetter(method, type, out p))
+						{
+							donotaddprotectedctor = true;
+						}						
+					}
+				}
+
 				if (!method.DeclaringType.Equals(type)
 					)
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				if (IsSkipMember(method))
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				if (!method.IsPublic)
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				if (method.IsGenericMethod)
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				//if (method.ReturnType.IsGenericType)
 				if(method.ReturnType.IsGenericTypeDefinition)
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
 				if (IsObsolete(method,type))
 				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
 					continue;
 				}
 
@@ -186,6 +235,10 @@ namespace LinkCodeGen
 					var e= type.GetEvent(eventname);
 					if (IsObsolete(e, type))
 					{
+						if ((method.IsAbstract))
+						{
+							donotaddprotectedctor = true;
+						}
 						continue;
 					}
 				}
@@ -195,6 +248,10 @@ namespace LinkCodeGen
 					var e = type.GetEvent(eventname);
 					if (IsObsolete(e, type))
 					{
+						if ((method.IsAbstract))
+						{
+							donotaddprotectedctor = true;
+						}
 						continue;
 					}
 				}
@@ -207,6 +264,10 @@ namespace LinkCodeGen
 					if (IsSkipType(method.ReturnType))
 					{
 						Console.WriteLine(method.ToString() + "返回类型被配置为需要跳过");
+						if ((method.IsAbstract))
+						{
+							donotaddprotectedctor = true;
+						}
 						continue;
 					}
 
@@ -297,8 +358,8 @@ namespace LinkCodeGen
 					else
 					{
 						methodlist.Add(method);
-						
-						if (method.IsVirtual && !method.IsStatic && !method.IsSpecialName && !method.IsFinal)
+
+						if ( (method.IsVirtual  && !method.IsStatic && !method.IsSpecialName && !method.IsFinal) || method.IsAbstract)
 						{
 							bool hasref = false;
 							//***如果有ref或out的方法则不能重写***
@@ -314,20 +375,33 @@ namespace LinkCodeGen
 							{
 								virtualmethodlist.Add(method);
 							}
+							else
+							{
+								donotaddprotectedctor = true;
+							}
 						}
 
+					}
+				}
+				else
+				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
 					}
 				}
 			}
 			
 
 			constructorlist = new List<System.Reflection.ConstructorInfo>();
-			var ctors = type.GetConstructors();
+			protectedonstructorList = new List<ConstructorInfo>();
+			var ctors = type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var ctor in ctors)
 			{
 				if (type.IsAbstract)
 				{
-					continue;
+					if(ctor.IsPublic || donotaddprotectedctor)
+						continue;
 				}
 				if (!ctor.DeclaringType.Equals(type))
 				{
@@ -344,7 +418,7 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				if (!ctor.IsPublic)
+				if (!ctor.IsPublic && (!ctor.IsFamily || donotaddprotectedctor))
 				{
 					continue;
 				}
@@ -409,7 +483,14 @@ namespace LinkCodeGen
 
 				if (parachecked)
 				{
-					constructorlist.Add(ctor);
+					if (ctor.IsPublic)
+					{
+						constructorlist.Add(ctor);
+					}
+					else if (ctor.IsFamily && !donotaddprotectedctor)
+					{
+						protectedonstructorList.Add(ctor);
+					}
 				}
 			}
 
@@ -468,6 +549,8 @@ namespace LinkCodeGen
 		List<System.Reflection.ConstructorInfo> constructorlist;
 		List<System.Reflection.FieldInfo> fieldlist;
 		List<Type> implements;
+
+		List<ConstructorInfo> protectedonstructorList;
 
 		private System.Reflection.MethodInfo maptointerfacemethod(System.Reflection.MethodInfo method)
 		{
@@ -910,8 +993,18 @@ namespace LinkCodeGen
 					as3api.Append("();");
 				}
 
-				if (!type.IsSealed && !type.IsValueType && constructorlist.Count >0)
+				if (!type.IsSealed && !type.IsValueType && (constructorlist.Count >0 || protectedonstructorList.Count>0))
 				{
+					ConstructorInfo adpctorfunc = null;
+					if (constructorlist.Count > 0)
+					{
+						adpctorfunc = constructorlist[0];
+					}
+					else
+					{
+						adpctorfunc = protectedonstructorList[0];
+					}
+
 					//****创建继承适配器****
 					string adaptername = GetNativeFunctionPart1(type) + "Adapter";
 					string extendclassname = MethodNativeCodeCreatorBase.GetTypeFullName(type);
@@ -938,7 +1031,7 @@ namespace LinkCodeGen
 				this.bindAS3Object = bindAS3Object;
 			}
 ");
-					var ctorfunc = constructorlist[0];
+					var ctorfunc = adpctorfunc;
 					var paras = ctorfunc.GetParameters();
 					string ctor = @"			public " + adaptername + "(";
 
@@ -992,13 +1085,13 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 						as3api.Append("private function _" + name + "Adapter");
 
-						appendFunctionParameters(as3api, constructorlist[0], type, typeimports, null);
+						appendFunctionParameters(as3api, adpctorfunc, type, typeimports, null);
 
 						//***编写本地方法***
 						//regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(new {0}());", ctorname));
 						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + ctorname, ctorname));
 
-						nativefuncClasses.Add(new AdapterCtorNativeCodeCreator(ctorname, constructorlist[0], type, GetNativeFunctionPart1(type) + "Adapter").GetCode());
+						nativefuncClasses.Add(new AdapterCtorNativeCodeCreator(ctorname, adpctorfunc, type, GetNativeFunctionPart1(type) + "Adapter").GetCode());
 
 
 					}
@@ -1308,6 +1401,8 @@ namespace LinkCodeGen
 						var mname = GetMethodName(pinfo.Name, method, type,dictStaticUseNames,dictUseNames);
 						as3api.Append(mname);
 						dictUseNames.Add("get " + mname, null);
+
+						methodas3names.Add(method, "@"+mname+"_get");
 					}
 					else if (MethodNativeCodeCreator.CheckIsIndexerSetter(mapinterface, mapinterface.DeclaringType, out pinfo) && !existsindexsetter
 						&& method.GetParameters().Length == 2
@@ -1354,6 +1449,7 @@ namespace LinkCodeGen
 						as3api.Append(mname);
 						dictUseNames.Add("set " + mname, null);
 
+						
 					}
 					else
 					{
@@ -1516,6 +1612,8 @@ namespace LinkCodeGen
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 
+						methodas3names.Add(method, "@" + mname +"_get");
+
 						if (method.IsStatic)
 						{
 							dictStaticUseNames.Add("get " + mname, null);
@@ -1584,6 +1682,8 @@ namespace LinkCodeGen
 
 						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
+
+						
 
 						if (method.IsStatic)
 						{

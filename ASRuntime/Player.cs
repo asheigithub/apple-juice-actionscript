@@ -3429,7 +3429,14 @@ namespace ASRuntime
 									return obj;
 								}
 							}
-
+							else if (cls.isLink_System)
+							{
+								return ((ASBinCode.rtti.LinkSystemObject)((ASBinCode.rtData.rtObject)obj).value).GetLinkData();
+							}
+							else if (cls.isCrossExtend)
+							{
+								return ((ASBinCode.rtti.LinkSystemObject)((ASBinCode.rtData.rtObject)obj).value).GetLinkData();
+							}
 						}
 
 						return obj;

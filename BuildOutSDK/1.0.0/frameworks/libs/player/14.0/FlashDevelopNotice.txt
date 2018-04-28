@@ -1,2 +1,0 @@
-This 'playerglobal.swc' was copied here automatically by FlashDevelop from:
-D:\Program Files (x86)\FlashDevelop\Tools\flexlibs\frameworks\libs\player\14.0\playerglobal.swc

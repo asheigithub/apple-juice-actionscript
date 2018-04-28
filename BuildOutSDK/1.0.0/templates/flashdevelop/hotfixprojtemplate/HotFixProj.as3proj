@@ -17,8 +17,6 @@
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="{SDKPATH}\as3_commapi\api" />
-    <class path="{SDKPATH}\as3_commapi\sharpapi" />
     <class path="as3_unity" />
   </classpaths>
   <!-- Build options -->

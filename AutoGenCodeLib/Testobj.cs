@@ -242,5 +242,21 @@ namespace AutoGenCodeLib
 		}
 		
 	}
+
+	public abstract class pttest
+	{
+		protected pttest()
+		{
+		}
+
+		public abstract void abc();
+
+		public abstract int abc2();
+
+		public abstract int b { get; }
+
+	}
+
+
 }
 

@@ -1766,12 +1766,13 @@ Public Class AS3FileGrammarAnalyser
             testpertoken = testpertoken.preToken
         End While
 
-        If testpertoken.Type = Token.TokenType.identifier And testpertoken.line = node.MatchedToken.line Then
-            Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
-        End If
+		'如果前面那个token是个关键字，比如else,则可以通过
+		If testpertoken.Type = Token.TokenType.identifier And (testpertoken.StringValue <> "else") And testpertoken.line = node.MatchedToken.line Then
+			Throw New GrammarException(node.MatchedToken, "Expecting either a 'semicolon' or a 'new line' here.")
+		End If
 
 
-        Dim as3return As New AS3Return(node.MatchedToken)
+		Dim as3return As New AS3Return(node.MatchedToken)
 
         If node.Nodes(1).Nodes.Count > 0 Then
 

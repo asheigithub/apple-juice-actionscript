@@ -33,7 +33,22 @@ namespace CMXMLCCLI
 
 					foreach (var p in srcpath)
 					{
-						if (!p.Replace('\\','/').EndsWith("FlashDevelop/Library/AS3/classes")
+						string pp = p.Replace('\\', '/');
+						if (pp.EndsWith("/Library/AS3/classes"))
+						{
+							pp = pp + "/org/flashdevelop";
+
+							if (System.IO.Directory.Exists(pp))
+							{
+								continue;
+							}
+							//if (pp.IndexOf("FlashDevelop") >= 0)
+							//{
+							//	continue;
+							//}
+						}
+
+						//if (!p.Replace('\\','/').EndsWith("FlashDevelop/Library/AS3/classes")
 							
 							//&&
 							//!p.Replace('\\', '/').EndsWith("/as3_commapi/api")
@@ -41,11 +56,11 @@ namespace CMXMLCCLI
 							//!p.Replace('\\', '/').EndsWith("/as3_commapi/sharpapi")
 							//&&
 							//!p.Replace('\\', '/').EndsWith("/as3_unityapi")
-							)
-						{
+							//)
+						//{
 							srcpathList.Add( System.IO.Path.GetFullPath(p));
 							Console.WriteLine("Add Source Path:" + System.IO.Path.GetFullPath(p));
-						}
+						//}
 					}
 
 

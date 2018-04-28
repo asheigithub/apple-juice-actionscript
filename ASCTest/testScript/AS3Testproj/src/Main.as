@@ -33,9 +33,6 @@ package
 		
 		public function Main()
 		{
-			
-			
-			
 			//var d:Decimal = new Decimal(5);
 			//
 			//Decimal.prototype.bbb = function(){ trace(this); };
@@ -288,6 +285,7 @@ package
 
 
 import autogencodelib.Testobj;
+import autogencodelib.pttest;
 
 class et extends Testobj
 {
@@ -305,4 +303,18 @@ class et extends Testobj
 	}
 
 }
+
+class ttt extends pttest
+{
+	override public function get b():int 
+	{
+		return 5;
+	}
+	
+	
+}
+
+var t:ttt = new ttt();
+trace(t.b);
+
 

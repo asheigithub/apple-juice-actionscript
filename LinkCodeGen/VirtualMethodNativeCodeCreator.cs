@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace LinkCodeGen
@@ -27,36 +28,62 @@ namespace LinkCodeGen
 			string as3functionvariable = "_as3function_" + vmidx;
 			string as3functionvariableid = "_as3functionId_" + vmidx;
 
-			code += "\t\t\tprivate ASBinCode.rtData.rtFunction " + as3functionvariable +";\n";
-			code += "\t\t\tprivate int "+as3functionvariableid+ " =-1;\n";
+
+			
+
+
+
+			code += "\t\t\tprivate ASBinCode.rtData.rtFunction " + as3functionvariable + ";\n";
+			code += "\t\t\tprivate int " + as3functionvariableid + " =-1;\n";
 
 			code += "\t\t\t";
 			code += "public override ";
 
-			if (method.ReturnType == typeof(void))
+			if (!method.IsSpecialName)
 			{
-				code += "void";
+
+				if (method.ReturnType == typeof(void))
+				{
+					code += "void";
+				}
+				else
+				{
+					code += GetTypeFullName(method.ReturnType);
+				}
+
+				code += " " + method.Name;
+
+				code += "(";
+				foreach (var item in paras)
+				{
+					code += GetTypeFullName(item.ParameterType) + " ";
+					code += item.Name;
+
+					if (item != paras[paras.Length - 1])
+					{
+						code += ",";
+					}
+				}
+				code += ")";
+				code += "\n";
+
 			}
 			else
 			{
+				PropertyInfo p;
+				MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p);
+
+				
+				
 				code += GetTypeFullName(method.ReturnType);
+				code += " ";
+
+				code += p.Name;
+				code += "\n\t\t\t{";
+				code += "\n\t\t\t\tget";
+				code += "\n";
 			}
 
-			code += " " + method.Name;
-
-			code += "(";
-			foreach (var item in paras)
-			{
-				code += GetTypeFullName(item.ParameterType) + " ";
-				code += item.Name;
-
-				if (item != paras[paras.Length - 1])
-				{
-					code += ",";
-				}
-			}
-			code += ")";
-			code += "\n";
 			code += "\t\t\t{\n";
 
 
@@ -71,8 +98,9 @@ namespace LinkCodeGen
 
 			code += prepareAS3Method.Replace("[as3functionvariable]", as3functionvariable).Replace("[as3methodname]", classname).Replace("[as3functionvariableid]",as3functionvariableid);
 
-
-			string invokesupercondition = @"
+			if (!method.IsAbstract)
+			{
+				string invokesupercondition = @"
 				if ([as3functionvariable] != null &&
 				(player == null || (player != null && NativeConstParameterFunction.checkToken(
 				new NativeConstParameterFunction.ExecuteToken(
@@ -82,32 +110,52 @@ namespace LinkCodeGen
 				)
 				)
 ";
-			code+=invokesupercondition.Replace("[as3functionvariable]", as3functionvariable).Replace("[as3functionvariableid]", as3functionvariableid);
 
-			code += "\t\t\t\t{\n";
+				code += invokesupercondition.Replace("[as3functionvariable]", as3functionvariable).Replace("[as3functionvariableid]", as3functionvariableid);
 
-			if (method.ReturnType != typeof(void))
-			{
-				code += "\t\t\t\t\treturn ";
-			}
+				code += "\t\t\t\t{\n";
 
-			code += "base." + method.Name + "(";
-
-			foreach (var item in paras)
-			{
-				code += item.Name;
-				if (item != paras[paras.Length - 1])
+				if (method.ReturnType != typeof(void))
 				{
-					code += ",";
+					code += "\t\t\t\t\treturn ";
 				}
+
+				code += "base." + method.Name + "(";
+
+				foreach (var item in paras)
+				{
+					code += item.Name;
+					if (item != paras[paras.Length - 1])
+					{
+						code += ",";
+					}
+				}
+
+
+				code += ");\n";
+
+				code += "\t\t\t\t}\n";
+
+				code += "\t\t\t\telse\n";
 			}
+			else
+			{
+				string invokesupercondition = @"
+				if ([as3functionvariable] != null &&
+					(player == null || (player != null && NativeConstParameterFunction.checkToken(
+					new NativeConstParameterFunction.ExecuteToken(
+					player.ExecuteToken.tokenid, [as3functionvariableid]
+					)
+					))
+				))
+				{
+					throw new ASRunTimeException(""不能调用抽象方法"",new Exception());
+				}
+				else
+";
+				code += invokesupercondition.Replace("[as3functionvariable]", as3functionvariable).Replace("[as3functionvariableid]", as3functionvariableid);
 
-
-			code += ");\n";
-
-			code += "\t\t\t\t}\n";
-
-			code += "\t\t\t\telse\n";
+			}
 
 			code += "\t\t\t\t{\n";
 
@@ -169,6 +217,10 @@ namespace LinkCodeGen
 
 			code += "\t\t\t}\n";
 
+			if (method.IsSpecialName)
+			{
+				code += "\t\t\t}\n";
+			}
 
 			return code;
 
