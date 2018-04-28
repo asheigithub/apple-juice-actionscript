@@ -952,7 +952,7 @@ namespace LinkCodeGen
 			}
 			else
 			{
-				if (GetPackageName(this.type) != GetPackageName(type))
+				if (GetPackageName(this.type) != GetPackageName(type) || true)
 				{
 					return GetPackageName(type) + "." + name;
 				}

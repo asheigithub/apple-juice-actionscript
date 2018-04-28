@@ -154,7 +154,7 @@ public class ASRuntimeMenus
 		//		sdkpath = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(process.StandardOutput.ReadLine()));
 		//	}
 		//}
-
+		
 		//***创建项目***
 		string as3projpath;
 		{
@@ -261,9 +261,47 @@ public class ASRuntimeMenus
 
 				string assembly = string.Empty;
 
-				assembly += string.Format("<assembly value=\"{0}\"></assembly>\n", typeof(UnityEngine.GameObject).Assembly.Location);
-				assembly += string.Format("<assembly value=\"{0}\"></assembly>\n", typeof(UnityEngine.UI.Image).Assembly.Location);
+				List<string> assemblylists = new List<string>();
+				assemblylists.Add(typeof(UnityEngine.GameObject).Assembly.Location);
+				assemblylists.Add(typeof(UnityEngine.UI.Image).Assembly.Location);
 
+				//***获取热更工程里用到的dll****
+				var hotassembly = typeof(ActionScriptStartUp).Assembly;
+				assemblylists.Add(hotassembly.Location);
+
+				List<string> resolvepaths = new List<string>();
+
+				foreach (var item in hotassembly.GetReferencedAssemblies())
+				{
+					var a = System.Reflection.Assembly.Load(item);
+					string p = System.IO.Path.GetDirectoryName(a.Location);
+					if (!resolvepaths.Contains(p))
+						resolvepaths.Add( p);
+				}
+				
+				string RESOLVEPATH = "";
+				foreach (var item in resolvepaths)
+				{
+					RESOLVEPATH += string.Format("<item value=\"{0}\"></item>\n", item);
+				}
+				genapi = genapi.Replace("{RESOLVEPATH}", RESOLVEPATH);
+
+
+				Dictionary<string, object> dictAssembly = new Dictionary<string, object>();
+				for (int i = 0; i < assemblylists.Count; i++)
+				{
+					if (!dictAssembly.ContainsKey(assemblylists[i]))
+					{
+						dictAssembly.Add(assemblylists[i], null);
+					}
+				}
+
+				foreach (var item in dictAssembly.Keys)
+				{
+					assembly += string.Format("<assembly value=\"{0}\"></assembly>\n", item);
+				}
+				//assembly += string.Format("<assembly value=\"{0}\"></assembly>\n", typeof(UnityEngine.GameObject).Assembly.Location);
+				//assembly += string.Format("<assembly value=\"{0}\"></assembly>\n", typeof(UnityEngine.UI.Image).Assembly.Location);
 
 				genapi = genapi.Replace("{UNITYDLLS}", assembly);
 
