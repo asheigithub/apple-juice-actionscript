@@ -212,6 +212,7 @@ namespace LinkCodeGen
 
 		public static void MakeCreator(Type type, Dictionary<TypeKey, CreatorBase> typeCreators, string as3apidocpath,string csharpnativecodepath,string linkcodenamespace)
 		{
+			
 			if (type.IsInterface)
 			{
 				if (!typeCreators.ContainsKey( new TypeKey( type)) && !IsSkipCreator(type))
@@ -338,6 +339,11 @@ namespace LinkCodeGen
 				return true;
 			}
 
+			if (type.IsNested && !type.IsNestedPublic)
+			{
+				return true;
+			}
+
 			if (type.IsEnum)
 			{
 				foreach (var item in NotCreateNameSpace)
@@ -367,6 +373,8 @@ namespace LinkCodeGen
 					return IsSkipType(type.GetElementType());
 				}
 			}
+
+			
 
 			if (type.IsNotPublic)
 			{
@@ -980,6 +988,29 @@ namespace LinkCodeGen
 
 			
 			var members = methodAtType.GetMember(dotName);
+			//***加上受保护的方法***
+			var pmem = methodAtType.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic);
+			List<MemberInfo> _tempmembers = new List<MemberInfo>();
+			_tempmembers.AddRange(members);
+			foreach (var item in pmem)
+			{
+				if (item is FieldInfo)
+				{
+					if (((FieldInfo)item).IsFamily)
+					{
+						_tempmembers.Add(item);
+					}
+				}
+				else if (item is MethodBase)
+				{
+					if (((MethodBase)item).IsFamily)
+					{
+						_tempmembers.Add(item);
+					}
+				}
+				
+			}
+			members = _tempmembers.ToArray();
 
 			//var props = methodAtType.GetProperties();
 			//bool isprop = false;
@@ -1044,6 +1075,28 @@ namespace LinkCodeGen
 				{
 					var inherit =basetype.GetMember(dotName);	
 					inheritmember.AddRange(inherit);
+
+					//***继承的受保护的对象***
+					var pinherit = basetype.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic);
+					foreach (var item in pinherit)
+					{
+						if (item is FieldInfo)
+						{
+							if (((FieldInfo)item).IsFamily)
+							{
+								inheritmember.Add(item);
+							}
+						}
+						else if (item is MethodBase)
+						{
+							if (((MethodBase)item).IsFamily)
+							{
+								inheritmember.Add(item);
+							}
+						}
+					}
+
+					//***********************
 					basetype = basetype.BaseType;
 				}
 

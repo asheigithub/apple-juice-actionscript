@@ -286,6 +286,7 @@ package
 
 import autogencodelib.Testobj;
 import autogencodelib.pttest;
+import system.Int64;
 
 class et extends Testobj
 {
@@ -306,15 +307,30 @@ class et extends Testobj
 
 class ttt extends pttest
 {
-	override public function get b():int 
+	override protected function get b():int 
 	{
-		return 5;
+		return 987;
 	}
 	
+	public function get b2():int
+	{
+		trace(testabsstring(9, 0));
+		
+		return b;
+	}
 	
+	override protected function testabsstring(a:int, b:system.Int64):String 
+	{
+		trace(a, b);
+		trace(ptint());
+		return a + " " + b + super.testabsstring(0,0);
+	}
+
 }
 
 var t:ttt = new ttt();
-trace(t.b);
+//trace(t.b2);
+
+t.test();
 
 

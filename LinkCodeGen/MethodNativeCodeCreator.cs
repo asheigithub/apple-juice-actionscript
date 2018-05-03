@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -141,6 +142,15 @@ namespace LinkCodeGen
 				{
 					string loadthis = Properties.Resources.LoadThis;
 					loadthis = loadthis.Replace("[thisObjtype]", GetTypeFullName(methodAtType));
+
+					if (!method.IsPublic)
+					{
+						loadthis = Properties.Resources.LoadThis;
+						//改为adapter的桥接的保护方法
+						loadthis = loadthis.Replace("[thisObjtype]", CreatorBase.GetNativeFunctionPart1(methodAtType) + "Adapter");
+					}
+
+
 					funccode = funccode.Replace("[loadthis]", loadthis);
 				}
 
@@ -161,10 +171,15 @@ namespace LinkCodeGen
 				loadargs = loadargs + GetLoadArgementString(typeof(ASRuntime.nativefuncs.linksystem.RefOutStore),paras.Length);
 				loadargs = loadargs + "\n";
 			}
-
+			
 
 				funccode = funccode.Replace("[loadargement]", loadargs);
 
+			var oldmethod = method;
+			if (!method.IsPublic)
+			{
+				method = new adaptermethodinfo(method);
+			}
 				var rettype = GetAS3Runtimetype(method.ReturnType);
 				if (rettype == ASBinCode.RunTimeDataType.fun_void)
 				{
@@ -272,6 +287,9 @@ namespace LinkCodeGen
 						funccode = funccode.Replace("[storeresult]", storeresult);
 
 					}
+
+				method = oldmethod;
+
 				}
 				else
 				{
@@ -363,4 +381,90 @@ namespace LinkCodeGen
 		}
 
 	}
+
+	class adaptermethodinfo : MethodInfo
+	{
+		private MethodInfo wapper;
+		public adaptermethodinfo(MethodInfo wapper)
+		{
+			this.wapper = wapper;
+		}
+
+		public override Type ReturnType => wapper.ReturnType;
+		public override ParameterInfo ReturnParameter => wapper.ReturnParameter;
+		public override CallingConventions CallingConvention => wapper.CallingConvention;
+		public override bool ContainsGenericParameters => wapper.ContainsGenericParameters;
+		public override Type[] GetGenericArguments()
+		{
+			return wapper.GetGenericArguments();
+		}
+		public override MethodInfo GetGenericMethodDefinition()
+		{
+			return wapper.GetGenericMethodDefinition();
+		}
+		public override MethodBody GetMethodBody()
+		{
+			return wapper.GetMethodBody();
+		}
+		public override bool IsGenericMethod => wapper.IsGenericMethod;
+		public override bool IsGenericMethodDefinition => wapper.IsGenericMethodDefinition;
+		public override MethodInfo MakeGenericMethod(params Type[] typeArguments)
+		{
+			return wapper.MakeGenericMethod(typeArguments);
+		}
+		public override MemberTypes MemberType => wapper.MemberType;
+		public override int MetadataToken => wapper.MetadataToken;
+		public override Module Module => wapper.Module;
+		
+
+
+		public override ICustomAttributeProvider ReturnTypeCustomAttributes => wapper.ReturnTypeCustomAttributes;
+
+		public override RuntimeMethodHandle MethodHandle => wapper.MethodHandle;
+
+		public override MethodAttributes Attributes => wapper.Attributes;
+
+		public override string Name => wapper.Name+"___Adapter";
+
+		public override Type DeclaringType => wapper.DeclaringType;
+
+		public override Type ReflectedType => wapper.ReflectedType;
+
+		public override MethodInfo GetBaseDefinition()
+		{
+			return wapper.GetBaseDefinition();
+		}
+
+		public override object[] GetCustomAttributes(bool inherit)
+		{
+			return wapper.GetCustomAttributes(inherit);
+		}
+
+		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		{
+			return wapper.GetCustomAttributes(attributeType, inherit);
+		}
+
+		public override MethodImplAttributes GetMethodImplementationFlags()
+		{
+			return wapper.GetMethodImplementationFlags();
+		}
+
+		public override ParameterInfo[] GetParameters()
+		{
+			return wapper.GetParameters();
+		}
+
+		public override object Invoke(object obj, BindingFlags invokeAttr, Binder binder, object[] parameters, CultureInfo culture)
+		{
+			return wapper.Invoke(obj, invokeAttr, binder, parameters, culture);
+		}
+
+		public override bool IsDefined(Type attributeType, bool inherit)
+		{
+			return wapper.IsDefined(attributeType, inherit);
+		}
+	}
+
+
 }

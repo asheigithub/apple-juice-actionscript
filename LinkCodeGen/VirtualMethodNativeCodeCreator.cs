@@ -28,8 +28,75 @@ namespace LinkCodeGen
 			string as3functionvariable = "_as3function_" + vmidx;
 			string as3functionvariableid = "_as3functionId_" + vmidx;
 
+			if (!method.IsPublic)
+			{
+				//***将受保护的方法公开***
+				code += "\t\t\tpublic ";
 
-			
+				if (method.ReturnType == typeof(void))
+				{
+					code += "void";
+				}
+				else
+				{
+					code += GetTypeFullName(method.ReturnType);
+				}
+
+				code += " "  +method.Name + "___Adapter";
+
+				code += "(";
+				foreach (var item in paras)
+				{
+					code += GetTypeFullName(item.ParameterType) + " ";
+					code += item.Name;
+
+					if (item != paras[paras.Length - 1])
+					{
+						code += ",";
+					}
+				}
+				code += ")";
+				code += "\n";
+
+				code += "\t\t\t{\n";
+
+				code += "\t\t\t\t{\n";
+
+				if (method.ReturnType != typeof(void))
+				{
+					code += "\t\t\t\t\treturn ";
+				}
+				if (!method.IsSpecialName)
+				{
+					code += "this." + method.Name + "(";
+
+					foreach (var item in paras)
+					{
+						code += item.Name;
+						if (item != paras[paras.Length - 1])
+						{
+							code += ",";
+						}
+					}
+
+
+					code += ");\n";
+				}
+				else
+				{
+					PropertyInfo p;
+					MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p, !method.IsPublic);
+
+					code += "this." + p.Name + ";\n";
+
+				}
+
+
+				code += "\t\t\t\t}\n";
+
+
+				code += "\t\t\t}\n";
+			}
 
 
 
@@ -37,7 +104,14 @@ namespace LinkCodeGen
 			code += "\t\t\tprivate int " + as3functionvariableid + " =-1;\n";
 
 			code += "\t\t\t";
-			code += "public override ";
+			if (method.IsPublic)
+			{
+				code += "public override ";
+			}
+			else
+			{
+				code += "protected override ";
+			}
 
 			if (!method.IsSpecialName)
 			{
@@ -71,7 +145,7 @@ namespace LinkCodeGen
 			else
 			{
 				PropertyInfo p;
-				MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p);
+				MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p, !method.IsPublic );
 
 				
 				
@@ -119,20 +193,30 @@ namespace LinkCodeGen
 				{
 					code += "\t\t\t\t\treturn ";
 				}
-
-				code += "base." + method.Name + "(";
-
-				foreach (var item in paras)
+				if (!method.IsSpecialName)
 				{
-					code += item.Name;
-					if (item != paras[paras.Length - 1])
+					code += "base." + method.Name + "(";
+
+					foreach (var item in paras)
 					{
-						code += ",";
+						code += item.Name;
+						if (item != paras[paras.Length - 1])
+						{
+							code += ",";
+						}
 					}
+
+
+					code += ");\n";
 				}
+				else
+				{
+					PropertyInfo p;
+					MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p,!method.IsPublic);
 
+					code += "base." + p.Name + ";\n";
 
-				code += ");\n";
+				}
 
 				code += "\t\t\t\t}\n";
 
@@ -225,6 +309,92 @@ namespace LinkCodeGen
 			return code;
 
 		}
+
+
+		public string GetPublicProtectedCode()
+		{
+			var paras = method.GetParameters();
+			int paracount = paras.Length;
+
+
+
+			string code = "";
+
+			if (!method.IsPublic)
+			{
+				//***将受保护的方法公开***
+				code += "\t\t\tpublic ";
+
+				if (method.ReturnType == typeof(void))
+				{
+					code += "void";
+				}
+				else
+				{
+					code += GetTypeFullName(method.ReturnType);
+				}
+
+				code += " " + method.Name + "___Adapter";
+
+				code += "(";
+				foreach (var item in paras)
+				{
+					code += GetTypeFullName(item.ParameterType) + " ";
+					code += item.Name;
+
+					if (item != paras[paras.Length - 1])
+					{
+						code += ",";
+					}
+				}
+				code += ")";
+				code += "\n";
+
+				code += "\t\t\t{\n";
+
+				code += "\t\t\t\t{\n";
+
+				if (method.ReturnType != typeof(void))
+				{
+					code += "\t\t\t\t\treturn ";
+				}
+				if (!method.IsSpecialName)
+				{
+					code += "this." + method.Name + "(";
+
+					foreach (var item in paras)
+					{
+						code += item.Name;
+						if (item != paras[paras.Length - 1])
+						{
+							code += ",";
+						}
+					}
+
+
+					code += ");\n";
+				}
+				else
+				{
+					PropertyInfo p;
+					MethodNativeCodeCreator.CheckIsGetter(method, methodAtType, out p, !method.IsPublic);
+
+					code += "this." + p.Name + ";\n";
+
+				}
+
+
+				code += "\t\t\t\t}\n";
+
+
+				code += "\t\t\t}\n";
+			}
+
+			return code;
+
+		}
+
+
 	}
 
 }

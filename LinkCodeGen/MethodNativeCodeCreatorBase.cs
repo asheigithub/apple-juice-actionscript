@@ -63,23 +63,48 @@ namespace LinkCodeGen
 		/// <param name="method"></param>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static bool CheckIsGetter(MethodInfo method, Type type, out PropertyInfo propinfo)
+		public static bool CheckIsGetter(MethodInfo method, Type type, out PropertyInfo propinfo,bool includeprotected=false)
 		{
-			var props = type.GetProperties();
+			includeprotected = !method.IsPublic;
 
-			foreach (var item in props)
+			if (!includeprotected)
 			{
-				if (Equals(method, item.GetGetMethod()))
+				var props = type.GetProperties();
+
+				foreach (var item in props)
 				{
-					if (item.GetIndexParameters().Length == 0)
+					if (Equals(method, item.GetGetMethod()))
 					{
-						propinfo = item;
-						return true;
+						if (item.GetIndexParameters().Length == 0)
+						{
+							propinfo = item;
+							return true;
+						}
 					}
 				}
+				propinfo = null;
+				return false;
 			}
-			propinfo = null;
-			return false;
+			else
+			{
+				var props = type.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+				if (method.IsPublic || method.IsFamily)
+				{
+					foreach (var item in props)
+					{
+						if (Equals(method, item.GetGetMethod(true)))
+						{
+							if (item.GetIndexParameters().Length == 0)
+							{
+								propinfo = item;
+								return true;
+							}
+						}
+					}
+				}
+				propinfo = null;
+				return false;
+			}
 		}
 
 		/// <summary>

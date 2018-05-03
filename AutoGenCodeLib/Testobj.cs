@@ -36,6 +36,10 @@ namespace AutoGenCodeLib
 			return new Testobj() { x = testobj.x, y = testobj.y };
 		}
 
+		/// <summary>
+		/// 构造Testobj实例
+		/// </summary>
+		/// <param name="x">x的初始值</param>
 		public Testobj(uint x)
 		{
 			this.x = x;
@@ -258,17 +262,29 @@ namespace AutoGenCodeLib
 		
 	}
 
-	public abstract class pttest
+	public  class pttest
 	{
-		protected pttest()
+		
+		//public abstract void abc();
+
+		//public abstract int abc2();
+
+		protected virtual int b { get; }
+
+		protected virtual string testabsstring(int a, long b) { return null; }
+
+		protected int ptint()
 		{
+			return 5;
 		}
 
-		public abstract void abc();
 
-		public abstract int abc2();
 
-		public abstract int b { get; }
+
+		public void Test()
+		{
+			var s = testabsstring(6, 7);
+		}
 
 	}
 

@@ -6,11 +6,11 @@ using ASBinCode.rtData;
 
 namespace ASRuntime
 {
-    /// <summary>
-    /// 程序执行栈的存储结构
-    /// </summary>
-    public sealed class StackSlot : SLOT
-    {
+	/// <summary>
+	/// 程序执行栈的存储结构
+	/// </summary>
+	public sealed class StackSlot : SLOT
+	{
 		/// <summary>
 		/// 所有引用类型都用一个槽
 		/// </summary>
@@ -18,26 +18,26 @@ namespace ASRuntime
 
 		internal Player player;
 
-        public StackSlot(CSWC classfinder,Player player)
-        {
+		public StackSlot(CSWC classfinder, Player player)
+		{
 			this.player = player;
-            store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT+1];
-            index = (int)RunTimeDataType.unknown;
+			store = new RunTimeValueBase[(int)RunTimeDataType._OBJECT + 1];
+			index = (int)RunTimeDataType.unknown;
 
-			_cache_arraySlot = new operators.OpAccess_Dot.arraySlot(null,0,classfinder);
-            _cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0,classfinder);
-            _cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
-            _cache_setthisslot = new SetThisItemSlot();
-            
-            //存储器设置初始值
-            for (int i = 0; i < RunTimeDataType._OBJECT+1; i++)
-            {
-                RunTimeDataType t = (RunTimeDataType)i;
-                if(t != RunTimeDataType.unknown)
-                {
-                    store[i] = TypeConverter.getDefaultValue(t).getValue(null,null);
-                }
-            }
+			_cache_arraySlot = new operators.OpAccess_Dot.arraySlot(null, 0, classfinder);
+			_cache_vectorSlot = new operators.OpVector.vectorSLot(null, 0, classfinder);
+			_cache_prototypeSlot = new operators.OpAccess_Dot.prototypeSlot(null, null, null);
+			_cache_setthisslot = new SetThisItemSlot();
+
+			//存储器设置初始值
+			for (int i = 0; i < RunTimeDataType._OBJECT + 1; i++)
+			{
+				RunTimeDataType t = (RunTimeDataType)i;
+				if (t != RunTimeDataType.unknown)
+				{
+					store[i] = TypeConverter.getDefaultValue(t).getValue(null, null);
+				}
+			}
 
 			store[RunTimeDataType.rt_array] = null;
 			store[RunTimeDataType.rt_string] = null;
@@ -45,23 +45,23 @@ namespace ASRuntime
 
 
 			_numberValue = (rtNumber)store[RunTimeDataType.rt_number];
-            _intValue = (rtInt)store[RunTimeDataType.rt_int];
-            _uintValue = (rtUInt)store[RunTimeDataType.rt_uint];
+			_intValue = (rtInt)store[RunTimeDataType.rt_int];
+			_uintValue = (rtUInt)store[RunTimeDataType.rt_uint];
 			_stringValue = new rtString(string.Empty);
 
 			_functionValue = new rtFunction(-1, false);
 			_functon_result = new rtFunction(-1, false);
-        }
+		}
 
-        private rtNumber _numberValue;
-        private rtInt _intValue;
-        private rtUInt _uintValue;		
+		private rtNumber _numberValue;
+		private rtInt _intValue;
+		private rtUInt _uintValue;
 		private rtString _stringValue;
 #if DEBUG
 		private 
 #else
 		internal
-#endif 
+#endif
 			rtFunction _functionValue;
 
 #if DEBUG
@@ -76,26 +76,35 @@ namespace ASRuntime
 		internal StackObjects stackObjects;
 
 		internal operators.OpAccess_Dot.arraySlot _cache_arraySlot;
-        internal operators.OpVector.vectorSLot _cache_vectorSlot;
-        internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
-        internal SetThisItemSlot _cache_setthisslot;
+		internal operators.OpVector.vectorSLot _cache_vectorSlot;
+		internal operators.OpAccess_Dot.prototypeSlot _cache_prototypeSlot;
+		internal SetThisItemSlot _cache_setthisslot;
 
-        
 
-        internal StackLinkObjectCache _linkObjCache;
-		
+
+		internal StackLinkObjectCache _linkObjCache;
+
 #if DEBUG
 		private
 #else
 		internal
-#endif 
+#endif
 			SLOT linktarget;
 
 		public void linkTo(SLOT linktarget)
-        {
-			needclear = true;refPropChanged = true;
-            this.linktarget = linktarget;index = -1;
-        }
+		{
+
+			if (linktarget != null)
+			{
+				needclear = true; refPropChanged = true;
+				this.linktarget = linktarget; index = -1;
+			}
+			else if (this.linktarget != null)
+			{
+				this.linktarget = null;
+				index = RunTimeDataType.unknown;
+			}
+		}
 
 		public SLOT getLinkSlot()
 		{
@@ -116,42 +125,42 @@ namespace ASRuntime
 #endif
 			RunTimeValueBase[] store;
 
-        public sealed override bool isPropGetterSetter
-        {
-            get
-            {
-                if (linktarget != null)
-                {
+		public sealed override bool isPropGetterSetter
+		{
+			get
+			{
+				if (linktarget != null)
+				{
 					return linktarget.isPropGetterSetter;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
 
-        public sealed override bool isSetThisItem
-        {
-            get
-            {
-                if (linktarget != null)
-                {
+		public sealed override bool isSetThisItem
+		{
+			get
+			{
+				if (linktarget != null)
+				{
 					return linktarget.isSetThisItem;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
 
 		public override SLOT assign(RunTimeValueBase value, out bool success)
 		{
-			
+
 			if (linktarget != null)
 			{
-				linktarget.assign(value,out success);
+				linktarget.assign(value, out success);
 
 				var result = linktarget;
 
@@ -168,78 +177,79 @@ namespace ASRuntime
 
 
 		public sealed override bool directSet(RunTimeValueBase value)
-        {
-			
-            if (linktarget != null)
-            {
-                return  linktarget.directSet(value);
-            }
-            else
-            {
+		{
 
-                index = (int)value.rtType;
-                //if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
-                //{
-                //    index = RunTimeDataType._OBJECT;
-                //}               
-                //值类型必须拷贝!!否则值可能被其他引用而导致错误
-                //私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
-                switch (value.rtType)
-                {
-                    case RunTimeDataType.rt_boolean:
-                        store[0] = value;
-                        break;
-                    case RunTimeDataType.rt_int:
-                        //setValue(((rtInt)value).value);
-                        _intValue.value = ((rtInt)value).value;
-                        break;
-                    case RunTimeDataType.rt_uint:
-                        //setValue(((rtUInt)value).value);
-                        _uintValue.value = ((rtUInt)value).value;
-                        break;
-                    case RunTimeDataType.rt_number:
-                        
-                        _numberValue.value= ((rtNumber)value).value;
-                        
-                        break;
-                    case RunTimeDataType.rt_string:
-                        setValue(((rtString)value).value);
-                        break;
-                    case RunTimeDataType.rt_void:
-                        store[index] = value;
-                        break;
-                    case RunTimeDataType.rt_null:
-                        store[6] = value;
-                        break;
-                    case RunTimeDataType.rt_function:
-                        {//Function需要保存上下文环境。因此需要像值类型那样进行拷贝
+			if (linktarget != null)
+			{
+				return linktarget.directSet(value);
+			}
+			else
+			{
+
+				index = (int)value.rtType;
+
+				//if (index > RunTimeDataType.unknown) //若大于unknown,则说明是一个对象
+				//{
+				//    index = RunTimeDataType._OBJECT;
+				//}               
+				//值类型必须拷贝!!否则值可能被其他引用而导致错误
+				//私有构造函数的数据可以直接传引用，否则必须拷贝赋值。
+				switch (value.rtType)
+				{
+					case RunTimeDataType.rt_boolean:
+						store[0] = value;
+						break;
+					case RunTimeDataType.rt_int:
+						//setValue(((rtInt)value).value);
+						_intValue.value = ((rtInt)value).value;
+						break;
+					case RunTimeDataType.rt_uint:
+						//setValue(((rtUInt)value).value);
+						_uintValue.value = ((rtUInt)value).value;
+						break;
+					case RunTimeDataType.rt_number:
+
+						_numberValue.value = ((rtNumber)value).value;
+
+						break;
+					case RunTimeDataType.rt_string:
+						setValue(((rtString)value).value);
+						break;
+					case RunTimeDataType.rt_void:
+						store[index] = value;
+						break;
+					case RunTimeDataType.rt_null:
+						store[6] = value;
+						break;
+					case RunTimeDataType.rt_function:
+						{//Function需要保存上下文环境。因此需要像值类型那样进行拷贝
 							_functionValue.CopyFrom((rtFunction)value);
 							//store[index] = _functionValue;
 							store[COMMREFTYPEOBJ] = _functionValue;
 							needclear = true; refPropChanged = true;
 						}
-                        break;
-                    case RunTimeDataType.fun_void:
-                        store[8] = value;
-                        break;
-                    case RunTimeDataType.rt_array:
-                        {
+						break;
+					case RunTimeDataType.fun_void:
+						store[8] = value;
+						break;
+					case RunTimeDataType.rt_array:
+						{
 							//store[index] = value;
 							store[COMMREFTYPEOBJ] = value; refPropChanged = true;
 						}
-                        break;
-                    case RunTimeDataType.unknown:
-                        store[10] = null;
-                        break;
-                    default:
-                        {
+						break;
+					case RunTimeDataType.unknown:
+						store[10] = null;
+						break;
+					default:
+						{
 							index = RunTimeDataType._OBJECT;
-							rtObjectBase obj = (rtObjectBase)value;refPropChanged = true;
-                            if (obj.value._class.isLink_System)
-                            {
+							rtObjectBase obj = (rtObjectBase)value; refPropChanged = true;
+							if (obj.value._class.isLink_System)
+							{
 								if (obj is StackLinkObjectCache.StackCacheObject)
 								{
-									needclear = true; 
+									needclear = true;
 									//链接到系统的对象。这里需要用到缓存的rtObject，以避免当调用链接对象的方法并返回的也是链接对象时，
 									//要重新创建rtObject,而是直接更新缓存的rtObject.
 									var cacheobj = _linkObjCache.getCacheObj(obj.value._class);
@@ -286,18 +296,18 @@ namespace ASRuntime
 
 								}
 							}
-                            else
-                            {
+							else
+							{
 								//store[RunTimeDataType._OBJECT] = value;
 								store[COMMREFTYPEOBJ] = value;
-                            }
-                        }
-                        break;
-                }
-                return true;
-            }
-            
-        }
+							}
+						}
+						break;
+				}
+				return true;
+			}
+
+		}
 
 		//仅用于链接对象的new时，直接new到栈中,此时返回缓存对象再执行后续的构造函数操作
 		internal StackLinkObjectCache.StackCacheObject getStackCacheObject(ASBinCode.rtti.Class clsType)
@@ -327,27 +337,27 @@ namespace ASRuntime
 		}
 
 
-        //仅用于链接对象的赋值更新
-        public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player ,T value)
-        {
-			
+		//仅用于链接对象的赋值更新
+		public void setLinkObjectValue<T>(ASBinCode.rtti.Class clsType, Player player, T value)
+		{
+
 			needclear = true; refPropChanged = true;
 			index = RunTimeDataType._OBJECT;
 
-            var cacheobj = _linkObjCache.getCacheObj(clsType);
-			
-            if (clsType.isStruct )
-            {
-                var link = (ASBinCode.rtti.LinkObj<T>)cacheobj.value;
-                link.value = value;
-            }
-            else
-            {
-                var link = (ASBinCode.rtti.LinkSystemObject)cacheobj.value;
-                link._class = clsType;
-                link.SetLinkData(value);
-                cacheobj.rtType = clsType.getRtType();
-                cacheobj.objScope.blockId = clsType.blockid;
+			var cacheobj = _linkObjCache.getCacheObj(clsType);
+
+			if (clsType.isStruct)
+			{
+				var link = (ASBinCode.rtti.LinkObj<T>)cacheobj.value;
+				link.value = value;
+			}
+			else
+			{
+				var link = (ASBinCode.rtti.LinkSystemObject)cacheobj.value;
+				link._class = clsType;
+				link.SetLinkData(value);
+				cacheobj.rtType = clsType.getRtType();
+				cacheobj.objScope.blockId = clsType.blockid;
 
 				if (link.GetLinkData() == null)
 				{
@@ -355,30 +365,30 @@ namespace ASRuntime
 				}
 
 
-            }
+			}
 
 			//store[RunTimeDataType._OBJECT] = cacheobj;
 			store[COMMREFTYPEOBJ] = cacheobj;
-        }
+		}
 
 
-        public sealed override RunTimeValueBase getValue()
-        {
-			
+		public sealed override RunTimeValueBase getValue()
+		{
+
 			//if (linktarget != null)
-   //         {
-   //             return linktarget.getValue();
-   //         }
-   //         else
-            {
+			//         {
+			//             return linktarget.getValue();
+			//         }
+			//         else
+			{
 				switch (index)
 				{
 					case -1:
 						return linktarget.getValue();
-					
+
 					case RunTimeDataType.rt_array:
-					case RunTimeDataType.rt_string:					
-						//return store[COMMREFTYPEOBJ];
+					case RunTimeDataType.rt_string:
+					//return store[COMMREFTYPEOBJ];
 					case RunTimeDataType._OBJECT:
 						return store[COMMREFTYPEOBJ];
 					case RunTimeDataType.rt_function:
@@ -397,7 +407,7 @@ namespace ASRuntime
 					//}
 					default:
 						return store[index];
-						
+
 				}
 
 
@@ -412,132 +422,132 @@ namespace ASRuntime
 				//}
 
 			}
-            //throw new NotImplementedException();
-        }
+			//throw new NotImplementedException();
+		}
 
-        public sealed override void setValue(string value)
-        {
-			
-            if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_string;
-                if (value == null)
-                {
+		public sealed override void setValue(string value)
+		{
+
+			if (linktarget != null)
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_string;
+				if (value == null)
+				{
 					//store[(int)RunTimeDataType.rt_string] = rtNull.nullptr;
 					store[COMMREFTYPEOBJ] = rtNull.nullptr;
-                }
-                else
-                {
-					_stringValue.value =  value;
+				}
+				else
+				{
+					_stringValue.value = value;
 					//store[RunTimeDataType.rt_string] = _stringValue;
 					store[COMMREFTYPEOBJ] = _stringValue;
-					
+
 				}
-            }
-        }
+			}
+		}
 
-        public sealed override void setValue(rtUndefined value)
-        {
-			
-            if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_void;
-                store[index] = value;
-            }
-        }
+		public sealed override void setValue(rtUndefined value)
+		{
 
-        public sealed override void setValue(rtNull value)
-        {
-			
 			if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_null;
-                store[index] = value;
-            }
-        }
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_void;
+				store[index] = value;
+			}
+		}
 
-        public sealed override void setValue(uint value)
-        {
-			
-			if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_uint;
-                _uintValue.value = value;
-                //((rtUInt)store[index]).value = value;
-            }
-        }
+		public sealed override void setValue(rtNull value)
+		{
 
-        public sealed override void setValue(int value)
-        {
-			
 			if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_int;
-                _intValue.value = value;
-                //((rtInt)store[index]).value = value;
-            }
-        }
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_null;
+				store[index] = value;
+			}
+		}
 
-        public sealed override void setValue(double value)
-        {
-			
-			if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_number;
-                _numberValue.value = value;
-                //((rtNumber)store[index]).value = value;
-            }
-        }
+		public sealed override void setValue(uint value)
+		{
 
-        public sealed override void setValue(rtBoolean value)
-        {
-			
 			if (linktarget != null)
-            {
-                linktarget.setValue(value);
-            }
-            else
-            {
-                index = RunTimeDataType.rt_boolean;
-                store[index] = value;
-            }
-        }
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_uint;
+				_uintValue.value = value;
+				//((rtUInt)store[index]).value = value;
+			}
+		}
+
+		public sealed override void setValue(int value)
+		{
+
+			if (linktarget != null)
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_int;
+				_intValue.value = value;
+				//((rtInt)store[index]).value = value;
+			}
+		}
+
+		public sealed override void setValue(double value)
+		{
+
+			if (linktarget != null)
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_number;
+				_numberValue.value = value;
+				//((rtNumber)store[index]).value = value;
+			}
+		}
+
+		public sealed override void setValue(rtBoolean value)
+		{
+
+			if (linktarget != null)
+			{
+				linktarget.setValue(value);
+			}
+			else
+			{
+				index = RunTimeDataType.rt_boolean;
+				store[index] = value;
+			}
+		}
 
 #if DEBUG
 
 #else
-	internal
-#endif 
+		internal
+#endif
 		bool needclear;
 
 		internal bool refPropChanged;
 
-        public sealed override void clear()
-        {
+		public sealed override void clear()
+		{
 			if (refPropChanged)
 			{
 				refPropChanged = false;
@@ -562,16 +572,16 @@ namespace ASRuntime
 				store[COMMREFTYPEOBJ] = rtNull.nullptr;
 			}
 			index = (int)RunTimeDataType.unknown;
-        }
+		}
 
-		
-		
+
+
 
 		public struct StackObjects
 		{
 			public static readonly StackObjects EMPTY = new StackObjects();
 
-			
+
 			public ASBinCode.ClassPropertyGetter propGetSet;
 			public ASBinCode.rtData.rtObjectBase propBindObj;
 			public ASBinCode.rtti.Class superPropBindClass;
@@ -580,5 +590,5 @@ namespace ASRuntime
 
 
 
-    }
+	}
 }

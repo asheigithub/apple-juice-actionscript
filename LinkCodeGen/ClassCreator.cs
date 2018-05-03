@@ -18,7 +18,7 @@ namespace LinkCodeGen
 			{
 				throw new ArgumentException("类型不是类或结构体");
 			}
-
+			
 			//if (classtype.IsGenericType)
 			//{
 			//	throw new ArgumentException("不支持泛型接口");
@@ -162,18 +162,29 @@ namespace LinkCodeGen
 			methodlist = new List<System.Reflection.MethodInfo>();
 			opoverrides = new List<System.Reflection.MethodInfo>();
 			virtualmethodlist = new List<MethodInfo>();
+			protectvirtualmethodlist = new List<MethodInfo>();
+			protectedmethodlist = new List<MethodInfo>();
 
 			bool donotaddprotectedctor = false; //如果有难以自动生成适配器代码的方法，则不要考虑保护的构造函数
 
-			foreach (var item in type.GetMethods( BindingFlags.NonPublic | BindingFlags.Instance))
+			//foreach (var item in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+			//{
+			//	if (item.IsAbstract)
+			//		donotaddprotectedctor = true;
+			//}
+			
+			foreach (var method in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
 			{
-				if (item.IsAbstract)
-					donotaddprotectedctor = true;
-			}
+				if (method.IsPrivate || (!method.IsPublic && !method.IsFamily))
+				{
+					if (method.IsAbstract)
+					{
+						donotaddprotectedctor = true;
+					}
+					continue;
+				}
+				
 
-
-			foreach (var method in type.GetMethods())
-			{
 				if (method.IsSpecialName)
 				{
 					if ((method.IsAbstract))
@@ -197,15 +208,6 @@ namespace LinkCodeGen
 				}
 
 				if (IsSkipMember(method))
-				{
-					if ((method.IsAbstract))
-					{
-						donotaddprotectedctor = true;
-					}
-					continue;
-				}
-
-				if (!method.IsPublic)
 				{
 					if ((method.IsAbstract))
 					{
@@ -251,7 +253,6 @@ namespace LinkCodeGen
 					continue;
 				}
 
-
 				if (method.IsSpecialName && method.Name.StartsWith("add_") && method.GetParameters().Length == 1 && CreatorBase.IsDelegate(method.GetParameters()[0].ParameterType))
 				{
 					string eventname = method.Name.Substring(4);
@@ -278,8 +279,6 @@ namespace LinkCodeGen
 						continue;
 					}
 				}
-
-
 
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(method.ReturnType);
 				if (rt > ASBinCode.RunTimeDataType.unknown)
@@ -372,17 +371,47 @@ namespace LinkCodeGen
 
 				if (parachecked)
 				{
+					if (!method.IsPublic)
+					{
+						if ((method.IsAbstract && !method.IsFamily))
+						{
+							donotaddprotectedctor = true;
+						}
+						if (!method.IsFamily)
+						{
+							continue;
+						}
+					}
+
+
+
 					MakeCreator(method.ReturnType, typeCreators);
 
 					if (method.IsSpecialName && method.Name.StartsWith("op_") && method.IsStatic) //操作符重载
 					{
-						opoverrides.Add(method);
+						if (method.IsPublic)
+						{
+							opoverrides.Add(method);
+						}
 					}
 					else
 					{
-						methodlist.Add(method);
+						if (method.IsPublic)
+						{
+							methodlist.Add(method);
+						}
 
-						if ( (method.IsVirtual  && !method.IsStatic && !method.IsSpecialName && !method.IsFinal) || method.IsAbstract)
+						bool isgetter=false; //虚getter可以覆盖
+						if (method.IsSpecialName)
+						{
+							PropertyInfo p;
+							if (MethodNativeCodeCreator.CheckIsGetter(method, type, out p,true))
+							{
+								isgetter = true;
+							}
+						}
+
+						if ((method.IsVirtual && !method.IsStatic && !(method.IsSpecialName && !isgetter) && !method.IsFinal) || method.IsAbstract)
 						{
 							bool hasref = false;
 							//***如果有ref或out的方法则不能重写***
@@ -397,18 +426,40 @@ namespace LinkCodeGen
 							if (!hasref)
 							{
 								virtualmethodlist.Add(method);
+
+								if (method.IsFamily)
+								{
+									protectvirtualmethodlist.Add(method);
+								}
+
 							}
 							else
 							{
 								donotaddprotectedctor = true;
 							}
 						}
-
+						else if (!method.IsVirtual && method.IsFamily && !(method.IsSpecialName && !isgetter) && !method.IsStatic)
+						{
+							bool hasref = false;
+							//***如果有ref或out的方法则不能重写***
+							foreach (var item in method.GetParameters())
+							{
+								if (item.ParameterType.IsByRef)
+								{
+									hasref = true;
+									break;
+								}
+							}
+							if (!hasref)
+							{
+								protectedmethodlist.Add(method);
+							}
+						}
 					}
 				}
 				else
 				{
-					if ((method.IsAbstract))
+					if ((method.IsAbstract) || !method.IsPublic)
 					{
 						donotaddprotectedctor = true;
 					}
@@ -423,7 +474,7 @@ namespace LinkCodeGen
 			{
 				if (type.IsAbstract)
 				{
-					if(ctor.IsPublic || donotaddprotectedctor)
+					if(donotaddprotectedctor)
 						continue;
 				}
 				if (!ctor.DeclaringType.Equals(type))
@@ -568,6 +619,10 @@ namespace LinkCodeGen
 		List<System.Reflection.MethodInfo> methodlist;
 		List<System.Reflection.MethodInfo> opoverrides;
 		List<System.Reflection.MethodInfo> virtualmethodlist;
+
+		List<System.Reflection.MethodInfo> protectvirtualmethodlist;
+		List<System.Reflection.MethodInfo> protectedmethodlist;
+
 
 		List<System.Reflection.ConstructorInfo> constructorlist;
 		List<System.Reflection.FieldInfo> fieldlist;
@@ -810,7 +865,7 @@ namespace LinkCodeGen
 					regfunctions.Add(
 					"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getCreator(\"" + GetCreatorNativeFuncName(type) + "\", default(" + NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
 				}
-				else if (type.IsSealed)
+				else if (!(type.IsSealed && type.IsAbstract))
 				{
 					regfunctions.Add(
 						"\t\t\tbin.regNativeFunction(LinkSystem_Buildin.getSealedClassCreator(\"" + GetCreatorNativeFuncName(type) + "\", typeof(" + NativeCodeCreatorBase.GetTypeFullName(type) + ")));");
@@ -834,11 +889,11 @@ namespace LinkCodeGen
 
 				dictUseNames.Add("_creator", null);
 			}
-
+			bool adaptercreated = false;
 			//***加入构造函数***
 			if (!isdelegate)
 			{
-				if (constructorlist.Count > 0)
+				if (!type.IsAbstract && constructorlist.Count > 0)
 				{
 					as3api.AppendLine();
 					as3api.AppendLine("\t\t//*********构造函数*******");
@@ -848,6 +903,202 @@ namespace LinkCodeGen
 					{
 						//[native, _system_collections_ArrayList_static_createInstance]
 						//public static function createInstance(c:ICollection):ArrayList;
+
+						#region 创建构造函数摘要
+						//****编写方法摘要****
+						{
+							as3api.AppendLine("\t\t/**");
+							var ctor = constructorlist[i];					
+							var paras = ctor.GetParameters();
+
+
+							//***从xml文档中查找方法的说明****
+
+							string[] returnsummary = { };
+							Dictionary<string, string[]> dictparams = new Dictionary<string, string[]>();
+
+							if (xmlDoc != null)
+							{
+								string find = ":" + BuildIngType.FullName.Replace("+", ".") + ".#ctor";
+								if (paras.Length > 0)
+								{
+									find += "(";
+									for (int j = 0; j < paras.Length; j++)
+									{
+										find += NativeCodeCreatorBase.GetTypeFullName(
+											paras[j].ParameterType);
+										if (j < paras.Length - 1)
+										{
+											find += ",";
+										}
+									}
+
+									find += ")";
+								}
+
+								using (System.IO.MemoryStream ms = new System.IO.MemoryStream(xmlDoc, false))
+								{
+									System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(ms);
+									while (xmlReader.Read())
+									{
+										if (xmlReader.Name == "member")
+										{
+											string tn = xmlReader.GetAttribute("name");
+											if (tn != null && tn.EndsWith(find))
+											{
+												if (xmlReader.ReadToDescendant("summary"))
+												{
+													while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+													{
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "summary"
+															)
+														{
+															goto xmlreadend;
+														}
+													}
+
+													string summary = xmlReader.Value;
+													summary.Replace("\r", "");
+
+													string[] lines = summary.Split('\n');
+
+													foreach (var l in lines)
+													{
+														as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(
+															l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+													}
+
+													//***读取参数***
+													while (xmlReader.Read())
+													{
+														if (xmlReader.Name == "returns" && xmlReader.NodeType == System.Xml.XmlNodeType.Element)
+														{
+															break;
+														}
+
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "member"
+															)
+														{
+															goto xmlreadend;
+														}
+
+														if (xmlReader.Name == "param" && xmlReader.NodeType == System.Xml.XmlNodeType.Element)
+														{
+															string paraname = xmlReader.GetAttribute("name");
+
+															while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+															{
+																if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																	&&
+																	xmlReader.Name == "param"
+																	)
+																{
+																	goto paracountinue;
+																}
+															}
+
+															var paravalue = xmlReader.Value;
+															paravalue.Replace("\r", "");
+
+															returnsummary = paravalue.Split('\n');
+
+															dictparams[paraname] = returnsummary;//);
+															paracountinue:;
+															continue;
+														}
+
+													}
+
+
+													//***读取returns***
+													while ((xmlReader.Name == "returns" && xmlReader.NodeType == System.Xml.XmlNodeType.Element) || xmlReader.Read())
+													{
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "member"
+															)
+														{
+															goto xmlreadend;
+														}
+
+														if (xmlReader.Name == "returns")
+														{
+															while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+															{
+																if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																	&&
+																	xmlReader.Name == "returns"
+																	)
+																{
+																	goto xmlreadend;
+																}
+															}
+
+															var retvalue = xmlReader.Value;
+															retvalue.Replace("\r", "");
+
+															returnsummary = retvalue.Split('\n');
+															goto xmlreadend;
+														}
+
+													}
+
+
+												}
+
+												goto xmlreadend;
+											}
+										}
+									}
+								}
+
+								xmlreadend:;
+
+
+							}
+
+
+
+
+
+
+							foreach (var item in paras)
+							{
+								as3api.Append("\t\t* @param	" + item.Name);
+
+								as3api.Append("\t" + ((item.IsOut && item.ParameterType.IsByRef) ? "(Out)" : (item.ParameterType.IsByRef ? "(ByRef) " : "")) + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&", " &").Replace(";", "; "));
+
+								if (IsDelegate(item.ParameterType))
+								{
+									as3api.Append(" [" +
+										System.Security.SecurityElement.Escape(
+										GetDelegateSignature(item.ParameterType))
+										.Replace("&", " &").Replace(";", "; ")
+										+ "]");
+								}
+
+								as3api.AppendLine();
+
+								if (dictparams.ContainsKey(item.Name))
+								{
+									foreach (var l in dictparams[item.Name])
+									{
+										as3api.AppendLine("\t\t*        \t" + System.Security.SecurityElement.Escape(
+											l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+									}
+								}
+
+							}
+
+							as3api.AppendLine("\t\t*/");
+						}
+
+						#endregion
+
 						string createinstancename = GetNativeFunctionPart1(type) + "_constructor" + "".PadRight(i, '_');
 						as3api.Append("\t\t");
 						as3api.AppendLine(string.Format("[native,{0}];", createinstancename));
@@ -873,6 +1124,203 @@ namespace LinkCodeGen
 					{
 						//[native, _system_ArrayList_ctor_]
 						//public function ArrayList();
+
+
+						#region 创建构造函数摘要
+						//****编写方法摘要****
+						{
+							as3api.AppendLine("\t\t/**");
+							var ctor = constructorlist[0];
+							var paras = ctor.GetParameters();
+
+
+							//***从xml文档中查找方法的说明****
+
+							string[] returnsummary = { };
+							Dictionary<string, string[]> dictparams = new Dictionary<string, string[]>();
+
+							if (xmlDoc != null)
+							{
+								string find = ":" + BuildIngType.FullName.Replace("+", ".") + ".#ctor";
+								if (paras.Length > 0)
+								{
+									find += "(";
+									for (int j = 0; j < paras.Length; j++)
+									{
+										find += NativeCodeCreatorBase.GetTypeFullName(
+											paras[j].ParameterType);
+										if (j < paras.Length - 1)
+										{
+											find += ",";
+										}
+									}
+
+									find += ")";
+								}
+
+								using (System.IO.MemoryStream ms = new System.IO.MemoryStream(xmlDoc, false))
+								{
+									System.Xml.XmlReader xmlReader = System.Xml.XmlReader.Create(ms);
+									while (xmlReader.Read())
+									{
+										if (xmlReader.Name == "member")
+										{
+											string tn = xmlReader.GetAttribute("name");
+											if (tn != null && tn.EndsWith(find))
+											{
+												if (xmlReader.ReadToDescendant("summary"))
+												{
+													while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+													{
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "summary"
+															)
+														{
+															goto xmlreadend;
+														}
+													}
+
+													string summary = xmlReader.Value;
+													summary.Replace("\r", "");
+
+													string[] lines = summary.Split('\n');
+
+													foreach (var l in lines)
+													{
+														as3api.AppendLine("\t\t*  " + System.Security.SecurityElement.Escape(
+															l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+													}
+
+													//***读取参数***
+													while (xmlReader.Read())
+													{
+														if (xmlReader.Name == "returns" && xmlReader.NodeType == System.Xml.XmlNodeType.Element)
+														{
+															break;
+														}
+
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "member"
+															)
+														{
+															goto xmlreadend;
+														}
+
+														if (xmlReader.Name == "param" && xmlReader.NodeType == System.Xml.XmlNodeType.Element)
+														{
+															string paraname = xmlReader.GetAttribute("name");
+
+															while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+															{
+																if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																	&&
+																	xmlReader.Name == "param"
+																	)
+																{
+																	goto paracountinue;
+																}
+															}
+
+															var paravalue = xmlReader.Value;
+															paravalue.Replace("\r", "");
+
+															returnsummary = paravalue.Split('\n');
+
+															dictparams[paraname]= returnsummary;
+															paracountinue:;
+															continue;
+														}
+
+													}
+
+
+													//***读取returns***
+													while ((xmlReader.Name == "returns" && xmlReader.NodeType == System.Xml.XmlNodeType.Element) || xmlReader.Read())
+													{
+														if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+															&&
+															xmlReader.Name == "member"
+															)
+														{
+															goto xmlreadend;
+														}
+
+														if (xmlReader.Name == "returns")
+														{
+															while (xmlReader.NodeType != System.Xml.XmlNodeType.Text && xmlReader.Read())
+															{
+																if (xmlReader.NodeType == System.Xml.XmlNodeType.EndElement
+																	&&
+																	xmlReader.Name == "returns"
+																	)
+																{
+																	goto xmlreadend;
+																}
+															}
+
+															var retvalue = xmlReader.Value;
+															retvalue.Replace("\r", "");
+
+															returnsummary = retvalue.Split('\n');
+															goto xmlreadend;
+														}
+
+													}
+
+
+												}
+
+												goto xmlreadend;
+											}
+										}
+									}
+								}
+
+								xmlreadend:;
+
+
+							}
+
+
+
+
+
+
+							foreach (var item in paras)
+							{
+								as3api.Append("\t\t* @param	" + item.Name);
+
+								as3api.Append("\t" + ((item.IsOut && item.ParameterType.IsByRef) ? "(Out)" : (item.ParameterType.IsByRef ? "(ByRef) " : "")) + System.Security.SecurityElement.Escape(NativeCodeCreatorBase.GetTypeFullName(item.ParameterType)).Replace("&", " &").Replace(";", "; "));
+
+								if (IsDelegate(item.ParameterType))
+								{
+									as3api.Append(" [" +
+										System.Security.SecurityElement.Escape(
+										GetDelegateSignature(item.ParameterType))
+										.Replace("&", " &").Replace(";", "; ")
+										+ "]");
+								}
+
+								as3api.AppendLine();
+
+								if (dictparams.ContainsKey(item.Name))
+								{
+									foreach (var l in dictparams[item.Name])
+									{
+										as3api.AppendLine("\t\t*        \t" + System.Security.SecurityElement.Escape(
+											l.TrimStart()).Replace("&", " &").Replace(";", "; "));
+									}
+								}
+
+							}
+
+							as3api.AppendLine("\t\t*/");
+						}
+
+						#endregion
+
 
 						string ctorname = GetCtorNativeFuncName(type);
 
@@ -1075,8 +1523,28 @@ namespace LinkCodeGen
 
 					as3api.Append("();");
 				}
+				
+				if (!type.IsSealed && !type.IsValueType && (constructorlist.Count >0 || protectedonstructorList.Count>0)
+					
+					&&
 
-				if (!type.IsSealed && !type.IsValueType && (constructorlist.Count >0 || protectedonstructorList.Count>0))
+					(
+						!(
+						//***如果是抽象类，则只能处理构造函数没有参数的情况
+						type.IsAbstract &&
+						(
+						(
+							constructorlist.Count>0 && constructorlist[0].GetParameters().Length !=0
+						)
+						||
+						(
+							protectedonstructorList.Count >0 && protectedonstructorList[0].GetParameters().Length !=0
+						)
+						)
+						)
+					)
+
+					)
 				{
 					ConstructorInfo adpctorfunc = null;
 					if (constructorlist.Count > 0)
@@ -1176,7 +1644,7 @@ namespace LinkCodeGen
 
 						nativefuncClasses.Add(new AdapterCtorNativeCodeCreator(ctorname, adpctorfunc, type, GetNativeFunctionPart1(type) + "Adapter").GetCode());
 
-
+						adaptercreated = true;
 					}
 
 
@@ -1461,8 +1929,26 @@ namespace LinkCodeGen
 				as3api.AppendLine("\t\t//*********公共方法*******");				
 			}
 
-			foreach (var method in methodlist)
+			var allmethods = methodlist;
+			if (adaptercreated)
 			{
+				allmethods.AddRange(protectvirtualmethodlist);
+
+				allmethods.AddRange(protectedmethodlist);
+
+			}
+			bool flagshowprotected=false;
+			foreach (var method in allmethods)
+			{
+				if (!flagshowprotected)
+				{
+					flagshowprotected = true;
+					if (method.IsFamily)
+					{
+						as3api.AppendLine();
+						as3api.AppendLine("\t\t//*********受保护的方法*******");
+					}
+				}
 				for (int i = 0; i < toimplmethods.Count; i++)
 				{
 					if (toimplmethods[i].method == method)
@@ -1525,7 +2011,14 @@ namespace LinkCodeGen
 						as3api.AppendLine();
 
 						as3api.Append("\t\t");
-						as3api.Append("public ");
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
 
 						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
@@ -1572,7 +2065,14 @@ namespace LinkCodeGen
 						as3api.AppendLine();
 
 						as3api.Append("\t\t");
-						as3api.Append("public ");
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
 
 						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
@@ -1591,8 +2091,14 @@ namespace LinkCodeGen
 					{
 						as3api.AppendLine(string.Format("\t\t[native,{0}];", InterfaceCreator.GetMethodNativeFunctionName(mapinterface, mapinterface.DeclaringType, null, null)));
 						as3api.Append("\t\t");
-						as3api.Append("public ");
-
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
 						if (!method.IsVirtual || method.IsFinal || ismustfinal)
 						{
 							as3api.Append("final ");
@@ -1742,7 +2248,7 @@ namespace LinkCodeGen
 
 														returnsummary = paravalue.Split('\n');
 
-														dictparams.Add(paraname, returnsummary);
+														dictparams[paraname]= returnsummary;
 													paracountinue:;
 														continue;
 													}
@@ -1913,7 +2419,15 @@ namespace LinkCodeGen
 						as3api.AppendLine();
 
 						as3api.Append("\t\t");
-						as3api.Append("public ");
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
+
 						if (method.IsStatic)
 						{
 							as3api.Append("static ");
@@ -1986,7 +2500,14 @@ namespace LinkCodeGen
 						as3api.AppendLine();
 
 						as3api.Append("\t\t");
-						as3api.Append("public ");
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
 						if (method.IsStatic)
 						{
 							as3api.Append("static ");
@@ -2016,7 +2537,14 @@ namespace LinkCodeGen
 					{
 						as3api.AppendLine(string.Format("\t\t[native,{0}];", nativefunctionname));
 						as3api.Append("\t\t");
-						as3api.Append("public ");
+						if (method.IsPublic)
+						{
+							as3api.Append("public ");
+						}
+						else
+						{
+							as3api.Append("protected ");
+						}
 						if (method.IsStatic)
 						{
 							as3api.Append("static ");
@@ -2569,9 +3097,20 @@ namespace LinkCodeGen
 					{
 						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++,methodas3names[item]);
 						adapteroverridefunc.AppendLine(mc.GetCode());
-
 					}
 				}
+
+				//****公开受保护的方法***
+				foreach (var item in protectedmethodlist)
+				{
+					if (methodas3names.ContainsKey(item))
+					{
+						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item]);
+						adapteroverridefunc.AppendLine(mc.GetPublicProtectedCode());
+					}
+				}
+
+
 			}
 
 			nativefunc.AppendLine(adapterfunc.Replace("[overrides]",adapteroverridefunc.ToString()).ToString());
