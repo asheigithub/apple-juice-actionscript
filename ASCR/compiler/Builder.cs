@@ -2652,7 +2652,11 @@ namespace ASCompiler.compiler
                                 }
                                 else
                                 {
-                                    buildExpression(env, variable.ValueExpr);
+									if (variable.ValueExpr.Value !=null && variable.ValueExpr.Value.IsReg)
+									{
+										buildExpression(env, variable.ValueExpr);
+									}
+									
                                     defaultv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
                                         stmt.Token, this
                                         );
@@ -2740,7 +2744,10 @@ namespace ASCompiler.compiler
                                 }
                                 else
                                 {
-                                    buildExpression(env, variable.ValueExpr);
+									if (variable.ValueExpr.Value != null && variable.ValueExpr.Value.IsReg)
+									{
+										buildExpression(env, variable.ValueExpr);
+									}
                                     defaultv = builds.ExpressionBuilder.getRightValue(env, variable.ValueExpr.Value,
                                         stmt.Token, this
                                         );

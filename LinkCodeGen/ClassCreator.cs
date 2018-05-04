@@ -9,6 +9,21 @@ namespace LinkCodeGen
 	{
 		protected byte[] xmlDoc;
 
+		private bool isOverrideOrInherits(MethodInfo method)
+		{
+			if (!method.DeclaringType.Equals(type)
+					)
+			{
+				return true;
+			}
+			if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
+			{
+				return true;
+			}
+			return false;
+		}
+
+
 		public ClassCreator(Type classtype, string as3apidocpath, string csharpnativecodepath,
 			Dictionary<TypeKey, CreatorBase> typeCreators,
 			string linkcodenamespace
@@ -173,6 +188,7 @@ namespace LinkCodeGen
 			//		donotaddprotectedctor = true;
 			//}
 			
+
 			foreach (var method in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
 			{
 				if (method.IsPrivate || (!method.IsPublic && !method.IsFamily))
@@ -197,15 +213,15 @@ namespace LinkCodeGen
 					}
 				}
 
-				if (!method.DeclaringType.Equals(type)
-					)
-				{
-					if ((method.IsAbstract))
-					{
-						donotaddprotectedctor = true;
-					}
-					continue;
-				}
+				//if (!method.DeclaringType.Equals(type)
+				//	)
+				//{
+				//	if ((method.IsAbstract))
+				//	{
+				//		donotaddprotectedctor = true;
+				//	}
+				//	continue;
+				//}
 
 				if (IsSkipMember(method))
 				{
@@ -216,14 +232,14 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
-				{
-					if ((method.IsAbstract))
-					{
-						donotaddprotectedctor = true;
-					}
-					continue;
-				}
+				//if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
+				//{
+				//	if ((method.IsAbstract))
+				//	{
+				//		donotaddprotectedctor = true;
+				//	}
+				//	continue;
+				//}
 
 				if (method.IsGenericMethod)
 				{
@@ -387,7 +403,10 @@ namespace LinkCodeGen
 
 					MakeCreator(method.ReturnType, typeCreators);
 
-					if (method.IsSpecialName && method.Name.StartsWith("op_") && method.IsStatic) //操作符重载
+					if (
+						!isOverrideOrInherits(method)
+						&&
+						method.IsSpecialName && method.Name.StartsWith("op_") && method.IsStatic) //操作符重载
 					{
 						if (method.IsPublic)
 						{
@@ -396,7 +415,7 @@ namespace LinkCodeGen
 					}
 					else
 					{
-						if (method.IsPublic)
+						if (method.IsPublic && !isOverrideOrInherits(method))
 						{
 							methodlist.Add(method);
 						}
@@ -662,6 +681,7 @@ namespace LinkCodeGen
 			return null;
 		}
 
+		
 		private Type super;
 		public override string Create()
 		{
@@ -1940,6 +1960,9 @@ namespace LinkCodeGen
 			bool flagshowprotected=false;
 			foreach (var method in allmethods)
 			{
+				if (isOverrideOrInherits(method))
+					continue;
+
 				if (!flagshowprotected)
 				{
 					flagshowprotected = true;
@@ -3088,6 +3111,7 @@ namespace LinkCodeGen
 
 			if (adapterfunc.Length > 0)
 			{
+				
 				int vmindex=0;
 
 				//****函数重载***
@@ -3095,9 +3119,14 @@ namespace LinkCodeGen
 				{
 					if (methodas3names.ContainsKey(item))
 					{
-						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++,methodas3names[item]);
+						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item]);
 						adapteroverridefunc.AppendLine(mc.GetCode());
 					}
+					//else if (methodas3names.ContainsKey(item.GetBaseDefinition()))
+					//{
+					//	VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item.GetBaseDefinition()]);
+					//	adapteroverridefunc.AppendLine(mc.GetCode());
+					//}
 				}
 
 				//****公开受保护的方法***
@@ -3108,6 +3137,11 @@ namespace LinkCodeGen
 						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item]);
 						adapteroverridefunc.AppendLine(mc.GetPublicProtectedCode());
 					}
+					//else if (methodas3names.ContainsKey(item.GetBaseDefinition()))
+					//{
+					//	VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item.GetBaseDefinition()]);
+					//	adapteroverridefunc.AppendLine(mc.GetPublicProtectedCode());
+					//}
 				}
 
 

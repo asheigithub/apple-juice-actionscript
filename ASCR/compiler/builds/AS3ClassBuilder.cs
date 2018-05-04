@@ -716,7 +716,18 @@ namespace ASCompiler.compiler.builds
                 var sm = supercls.classMembers[i];
                 var bf = sm.bindField;
 
+				if (bf is ClassPropertyGetter)
+				{
+					ClassPropertyGetter template = (ClassPropertyGetter)bf;
 
+					bf = new ClassPropertyGetter(template.name, template._class, template.indexOfMembers);
+
+					ClassPropertyGetter _bf = (ClassPropertyGetter)bf;
+					_bf.getter = template.getter;
+					_bf.setter = template.setter;
+					_bf.valueType = template.valueType;
+
+				}
 
 
                 ASBinCode.rtti.ClassMember member = new ASBinCode.rtti.ClassMember(sm.name, cls, bf);
@@ -1263,7 +1274,7 @@ namespace ASCompiler.compiler.builds
 
                             //***查找ClassPropertyGetter****
                             ClassPropertyGetter pg = null;
-
+							int foundidx = -1;
                             for (int i = 0; i < cls.classMembers.Count; i++)
                             {
                                 if (cls.classMembers[i].name== as3function.Name && cls.classMembers[i].inheritFrom==null )
@@ -1302,47 +1313,47 @@ namespace ASCompiler.compiler.builds
                                                                     "期望一个属性")
                                             );
                                     }
+
+									foundidx = i;
                                 }
                             }
 
-                            if (pg == null)
-                            {
-                                pg = new ClassPropertyGetter(as3function.Name, cls, cls.classMembers.Count);
-                                ASBinCode.rtti.ClassMember m = new ASBinCode.rtti.ClassMember(as3function.Name, cls, pg);
-                                
-                                cls.classMembers.Add(m);
-                                m.isPublic = true;
+							if (pg == null)
+							{
+								pg = new ClassPropertyGetter(as3function.Name, cls, cls.classMembers.Count);
+								ASBinCode.rtti.ClassMember m = new ASBinCode.rtti.ClassMember(as3function.Name, cls, pg);
+								
+								cls.classMembers.Add(m);
+								m.isPublic = true;
 
-                                m.isStatic = member.isStatic;
+								m.isStatic = member.isStatic;
 
-                                //***从拷贝过来的成员中复制继承的访问器属性***
-                                for (int i = cls.classMembers.Count-1; i >=0; i--)
-                                {
-                                    if (cls.classMembers[i].inheritFrom != null)
-                                    {
-                                        if (cls.classMembers[i].name == pg.name
-                                            &&
-                                            cls.classMembers[i].bindField is ClassPropertyGetter
-                                            )
-                                        {
-                                            ClassPropertyGetter copyed =
-                                                (ClassPropertyGetter)cls.classMembers[i].bindField;
+								//***从拷贝过来的成员中复制继承的访问器属性***
+								for (int i = cls.classMembers.Count - 1; i >= 0; i--)
+								{
+									if (cls.classMembers[i].inheritFrom != null)
+									{
+										if (cls.classMembers[i].name == pg.name
+											&&
+											cls.classMembers[i].bindField is ClassPropertyGetter
+											)
+										{
+											ClassPropertyGetter copyed =
+												(ClassPropertyGetter)cls.classMembers[i].bindField;
 
-                                            pg.getter = copyed.getter;
-                                            pg.setter = copyed.setter;
+											pg.getter = copyed.getter;
+											pg.setter = copyed.setter;
 
-                                            m.setTypeWhenCompile(cls.classMembers[i].valueType);
+											m.setTypeWhenCompile(cls.classMembers[i].valueType);
 
-                                            break;
-                                        }
-                                    }
+											break;
+										}
+									}
 
-                                }
+								}
 
-
-
-
-                            }
+							}
+							
                             if (member.isGetter)
                             {
                                 pg.getter = (MethodGetterBase)member.bindField;

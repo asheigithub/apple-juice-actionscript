@@ -286,7 +286,20 @@ namespace AutoGenCodeLib
 			var s = testabsstring(6, 7);
 		}
 
+		public virtual int getvvv()
+		{
+			return 123;
+		}
+
 	}
+
+	public class ptt2 :pttest
+	{
+		public virtual void kkk()
+		{
+		}
+	}
+
 
 
 }

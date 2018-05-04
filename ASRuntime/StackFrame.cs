@@ -1573,7 +1573,7 @@ namespace ASRuntime
 			}
 			execing = false;
 
-			if (hasCallJump || hasCallReturn || runtimeError != null)
+			if (hasCallJump || hasCallReturn || (runtimeError != null && block.name != "#blank"))
 			{
 				throw new EngineException();
 			}

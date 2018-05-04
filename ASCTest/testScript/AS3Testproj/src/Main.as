@@ -285,6 +285,7 @@ package
 
 
 import autogencodelib.Testobj;
+import autogencodelib.ptt2;
 import autogencodelib.pttest;
 import system.Int64;
 
@@ -327,6 +328,25 @@ class ttt extends pttest
 	}
 
 }
+
+class t2 extends ptt2
+{
+	public function t2()
+	{
+		var m = b;
+		//trace("getvvv", getvvv() );
+		//var m = b;
+	}
+	
+	override public function getvvv():int 
+	{
+		return  456;
+	}
+	
+}
+
+var t22:pttest = new t2();
+
 
 var t:ttt = new ttt();
 //trace(t.b2);
