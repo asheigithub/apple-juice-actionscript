@@ -998,13 +998,22 @@ namespace LinkCodeGen
 				{
 					if (((FieldInfo)item).IsFamily)
 					{
+						if (IsSkipMember(item))
+							continue;
+						if (IsSkipType(((FieldInfo)item).FieldType))
+							continue;
+
 						_tempmembers.Add(item);
 					}
 				}
-				else if (item is MethodBase)
+				else if (item is MethodInfo)
 				{
-					if (((MethodBase)item).IsFamily)
+					if (((MethodInfo)item).IsFamily)
 					{
+						if (IsSkipMember(item))
+							continue;
+						if (InterfaceCreator.isMethodSkip((MethodInfo)item))
+							continue;
 						_tempmembers.Add(item);
 					}
 				}
@@ -1077,20 +1086,29 @@ namespace LinkCodeGen
 					inheritmember.AddRange(inherit);
 
 					//***继承的受保护的对象***
-					var pinherit = basetype.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic);
+					var pinherit = basetype.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic );
 					foreach (var item in pinherit)
 					{
 						if (item is FieldInfo)
 						{
 							if (((FieldInfo)item).IsFamily)
 							{
+								if (IsSkipMember(item))
+									continue;
+								if (IsSkipType(((FieldInfo)item).FieldType))
+									continue;
+
 								inheritmember.Add(item);
 							}
 						}
-						else if (item is MethodBase)
+						else if (item is MethodInfo)
 						{
-							if (((MethodBase)item).IsFamily)
+							if (((MethodInfo)item).IsFamily)
 							{
+								if (IsSkipMember(item))
+									continue;
+								if (InterfaceCreator.isMethodSkip((MethodInfo)item))
+									continue;
 								inheritmember.Add(item);
 							}
 						}

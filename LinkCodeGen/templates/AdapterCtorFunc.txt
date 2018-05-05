@@ -49,6 +49,8 @@
 
 				try
 				{
+					Player._calling_icrossextendadapter_ctor_player = stackframe.player;
+					Player._making_icrossextendadapter_obj = (ASBinCode.rtData.rtObjectBase)thisObj;
 [loadargement]
 					[setnativeinstance]
 					returnSlot.directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -75,6 +77,10 @@
 					success = false;
 					stackframe.throwAneException(token, n.Message);
 				}
-
+				finally
+				{
+					Player._calling_icrossextendadapter_ctor_player = null;
+					Player._making_icrossextendadapter_obj = null;
+				}
 			}
 		}

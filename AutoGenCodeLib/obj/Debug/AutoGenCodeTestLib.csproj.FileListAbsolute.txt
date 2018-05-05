@@ -10,3 +10,4 @@ E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csprojResolveAssemblyRefer
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
 F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.xml
+E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.xml

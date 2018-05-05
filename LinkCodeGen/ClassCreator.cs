@@ -5,9 +5,40 @@ using System.Text;
 
 namespace LinkCodeGen
 {
+	class MethodAndFName
+	{
+		public MethodInfo method;
+		public string name;
+	}
+
 	class ClassCreator:CreatorBase
 	{
 		protected byte[] xmlDoc;
+
+		private bool isSkipOverride(MethodInfo method)
+		{
+			if (method.Name == "OnValidate"
+				||
+				method.Name == "Reset"
+				)
+			{
+				var type = method.DeclaringType;
+				while (type != null)
+				{
+					if (NativeCodeCreatorBase.GetTypeFullName(type) == "UnityEngine.MonoBehaviour")
+					{
+						return true;
+					}
+					type = type.BaseType;
+				}
+
+
+			}
+
+			return false;
+		}
+
+
 
 		private bool isOverrideOrInherits(MethodInfo method)
 		{
@@ -22,7 +53,9 @@ namespace LinkCodeGen
 			}
 			return false;
 		}
+		private static Dictionary<Type, List<MethodAndFName>> dictVirtualMethods = new Dictionary<Type, List<MethodAndFName>>();
 
+		public static Dictionary<Type, string> dictTypeAdapterInterfaceName = new Dictionary<Type, string>();
 
 		public ClassCreator(Type classtype, string as3apidocpath, string csharpnativecodepath,
 			Dictionary<TypeKey, CreatorBase> typeCreators,
@@ -232,6 +265,15 @@ namespace LinkCodeGen
 					continue;
 				}
 
+				if (isOverrideOrInherits(method))
+				{
+					if ((method.IsAbstract))
+					{
+						donotaddprotectedctor = true;
+					}
+					continue;
+				}
+
 				//if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
 				//{
 				//	if ((method.IsAbstract))
@@ -430,7 +472,9 @@ namespace LinkCodeGen
 							}
 						}
 
-						if ((method.IsVirtual && !method.IsStatic && !(method.IsSpecialName && !isgetter) && !method.IsFinal) || method.IsAbstract)
+						if ((method.IsVirtual && !method.IsStatic && !(method.IsSpecialName && !isgetter) && !method.IsFinal 
+							&& !isSkipOverride(method)
+							) || method.IsAbstract)
 						{
 							bool hasref = false;
 							//***如果有ref或out的方法则不能重写***
@@ -441,6 +485,9 @@ namespace LinkCodeGen
 									hasref = true;
 									break;
 								}
+
+								
+
 							}
 							if (!hasref)
 							{
@@ -457,7 +504,9 @@ namespace LinkCodeGen
 								donotaddprotectedctor = true;
 							}
 						}
-						else if (!method.IsVirtual && method.IsFamily && !(method.IsSpecialName && !isgetter) && !method.IsStatic)
+						else if (!method.IsVirtual && method.IsFamily && !(method.IsSpecialName && !isgetter) && !method.IsStatic
+							&& !isSkipOverride(method)
+							)
 						{
 							bool hasref = false;
 							//***如果有ref或out的方法则不能重写***
@@ -694,6 +743,7 @@ namespace LinkCodeGen
 
 			StringBuilder adapterfunc = new StringBuilder();
 			StringBuilder adapteroverridefunc = new StringBuilder();
+			StringBuilder interfacedefinefunc = new StringBuilder();
 
 			//GenNativeFuncImport(nativefunc);
 			GenNativeFuncNameSpaceAndClass(nativefunc);
@@ -1543,9 +1593,9 @@ namespace LinkCodeGen
 
 					as3api.Append("();");
 				}
-				
-				if (!type.IsSealed && !type.IsValueType && (constructorlist.Count >0 || protectedonstructorList.Count>0)
-					
+
+				if (type !=typeof(System.MarshalByRefObject) && !type.IsSealed && !type.IsValueType && (constructorlist.Count > 0 || protectedonstructorList.Count > 0)
+
 					&&
 
 					(
@@ -1554,11 +1604,11 @@ namespace LinkCodeGen
 						type.IsAbstract &&
 						(
 						(
-							constructorlist.Count>0 && constructorlist[0].GetParameters().Length !=0
+							constructorlist.Count > 0 && constructorlist[0].GetParameters().Length != 0
 						)
 						||
 						(
-							protectedonstructorList.Count >0 && protectedonstructorList[0].GetParameters().Length !=0
+							protectedonstructorList.Count > 0 && protectedonstructorList[0].GetParameters().Length != 0
 						)
 						)
 						)
@@ -1580,8 +1630,33 @@ namespace LinkCodeGen
 					string adaptername = GetNativeFunctionPart1(type) + "Adapter";
 					string extendclassname = MethodNativeCodeCreatorBase.GetTypeFullName(type);
 
+
+					string adapterinterfacename = "I" + adaptername;
+					string namespacepart = linkcodenamespace + (string.IsNullOrEmpty(linkcodenamespace) ? "" : ".") + GetNativeFunctionClassName(type);
+
+					dictTypeAdapterInterfaceName.Add(type, namespacepart +"."+ adapterinterfacename);
+
 					adapterfunc.Append("\t\t");
-					adapterfunc.AppendLine("public class "+adaptername+" :"+extendclassname+" ,ASRuntime.ICrossExtendAdapter");
+					adapterfunc.AppendLine("public interface "+adapterinterfacename);
+					adapterfunc.Append("\t\t");
+					adapterfunc.AppendLine("{");
+					adapterfunc.AppendLine("[interfacedefine]");
+					adapterfunc.AppendLine("\t\t}");
+
+					var bt = type.BaseType;
+					while (bt !=null)
+					{
+						if (dictTypeAdapterInterfaceName.ContainsKey(bt))
+						{
+							adapterinterfacename += ", " + dictTypeAdapterInterfaceName[bt];
+						}
+						bt = bt.BaseType;
+					}
+
+
+
+					adapterfunc.Append("\t\t");
+					adapterfunc.AppendLine("public class "+adaptername+" :"+extendclassname+" ,ASRuntime.ICrossExtendAdapter, " + adapterinterfacename );
 					adapterfunc.Append("\t\t");
 					adapterfunc.AppendLine("{");
 
@@ -3111,22 +3186,45 @@ namespace LinkCodeGen
 
 			if (adapterfunc.Length > 0)
 			{
-				
+
+				dictVirtualMethods.Add(type, new List<MethodAndFName>());
+				var toaddvirtuallist = dictVirtualMethods[type];
+
 				int vmindex=0;
 
-				//****函数重载***
+				//***写入基类的虚方法覆盖和公开受保护方法****
+				var bt = type.BaseType;
+				while ( bt !=null )
+				{
+					if (dictVirtualMethods.ContainsKey(bt))
+					{
+						foreach (var item in dictVirtualMethods[bt])
+						{
+							VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item.method, bt, vmindex++, item.name);
+							adapteroverridefunc.AppendLine(mc.GetCode());
+						}
+					}
+
+					bt = bt.BaseType;
+				}
+
+				
+				//****虚方法覆盖***
 				foreach (var item in virtualmethodlist)
 				{
 					if (methodas3names.ContainsKey(item))
 					{
 						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item]);
 						adapteroverridefunc.AppendLine(mc.GetCode());
+
+						toaddvirtuallist.Add(new MethodAndFName() { method=item, name = methodas3names[item] });
+
+						if (!item.IsPublic)
+						{
+							interfacedefinefunc.AppendLine(mc.GetPublicProtectedInterfaceDefine());
+						}
 					}
-					//else if (methodas3names.ContainsKey(item.GetBaseDefinition()))
-					//{
-					//	VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item.GetBaseDefinition()]);
-					//	adapteroverridefunc.AppendLine(mc.GetCode());
-					//}
+					
 				}
 
 				//****公开受保护的方法***
@@ -3136,19 +3234,26 @@ namespace LinkCodeGen
 					{
 						VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item]);
 						adapteroverridefunc.AppendLine(mc.GetPublicProtectedCode());
+
+						interfacedefinefunc.AppendLine(mc.GetPublicProtectedInterfaceDefine());
+
+						toaddvirtuallist.Add(new MethodAndFName() { method = item, name = methodas3names[item] });
 					}
-					//else if (methodas3names.ContainsKey(item.GetBaseDefinition()))
-					//{
-					//	VirtualMethodNativeCodeCreator mc = new VirtualMethodNativeCodeCreator(item, type, vmindex++, methodas3names[item.GetBaseDefinition()]);
-					//	adapteroverridefunc.AppendLine(mc.GetPublicProtectedCode());
-					//}
+					
 				}
 
 
 			}
 
-			nativefunc.AppendLine(adapterfunc.Replace("[overrides]",adapteroverridefunc.ToString()).ToString());
-
+			nativefunc.AppendLine(
+				adapterfunc.Replace("[overrides]",adapteroverridefunc.ToString())
+						 .Replace("[interfacedefine]",interfacedefinefunc.ToString())
+				.ToString()
+				
+				
+				
+				);
+			
 
 
 			for (int i = 0; i < nativefuncClasses.Count; i++)

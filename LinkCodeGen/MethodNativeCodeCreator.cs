@@ -147,7 +147,7 @@ namespace LinkCodeGen
 					{
 						loadthis = Properties.Resources.LoadThis;
 						//改为adapter的桥接的保护方法
-						loadthis = loadthis.Replace("[thisObjtype]", CreatorBase.GetNativeFunctionPart1(methodAtType) + "Adapter");
+						loadthis = loadthis.Replace("[thisObjtype]", ClassCreator.dictTypeAdapterInterfaceName[methodAtType]);
 					}
 
 

@@ -334,8 +334,14 @@ class t2 extends ptt2
 	public function t2()
 	{
 		var m = b;
+		trace(m,b);
 		//trace("getvvv", getvvv() );
 		//var m = b;
+	}
+	
+	override protected function get b():int 
+	{
+		return 99;
 	}
 	
 	override public function getvvv():int 
@@ -349,8 +355,8 @@ var t22:pttest = new t2();
 
 
 var t:ttt = new ttt();
-//trace(t.b2);
+trace(t.b2);
 
-t.test();
+//.test();
 
 

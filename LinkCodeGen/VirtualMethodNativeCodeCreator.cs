@@ -100,17 +100,31 @@ namespace LinkCodeGen
 
 
 
-			code += "\t\t\tprivate ASBinCode.rtData.rtFunction " + as3functionvariable + ";\n";
-			code += "\t\t\tprivate int " + as3functionvariableid + " =-1;\n";
-
-			code += "\t\t\t";
+			
 			if (method.IsPublic)
 			{
+				code += "\t\t\tprivate ASBinCode.rtData.rtFunction " + as3functionvariable + ";\n";
+				code += "\t\t\tprivate int " + as3functionvariableid + " =-1;\n";
+
+				code += "\t\t\t";
+
 				code += "public override ";
 			}
 			else
 			{
-				code += "protected override ";
+				if (method.IsAbstract || method.IsVirtual)
+				{
+					code += "\t\t\tprivate ASBinCode.rtData.rtFunction " + as3functionvariable + ";\n";
+					code += "\t\t\tprivate int " + as3functionvariableid + " =-1;\n";
+
+					code += "\t\t\t";
+
+					code += "protected override ";
+				}
+				else
+				{
+					return code;
+				}
 			}
 
 			if (!method.IsSpecialName)
@@ -162,6 +176,12 @@ namespace LinkCodeGen
 
 
 			string prepareAS3Method = @"
+				if (player == null && Player._calling_icrossextendadapter_ctor_player != null)
+				{
+					SetAS3RuntimeEnvironment(Player._calling_icrossextendadapter_ctor_player, Player._making_icrossextendadapter_obj.value._class, Player._making_icrossextendadapter_obj);
+					((LinkObj<object>)(Player._making_icrossextendadapter_obj.value)).value = this;
+				}
+
 				if ([as3functionvariable] == null)
 					[as3functionvariable] = (ASBinCode.rtData.rtFunction)player.getMethod(bindAS3Object, ""[as3methodname]"");
 				if ([as3functionvariableid] == -1)
@@ -394,7 +414,49 @@ namespace LinkCodeGen
 
 		}
 
+		public string GetPublicProtectedInterfaceDefine()
+		{
+			var paras = method.GetParameters();
+			int paracount = paras.Length;
 
+
+
+			string code = "";
+
+			if (!method.IsPublic)
+			{
+				//***将受保护的方法公开***
+				code += "\t\t\t ";
+
+				if (method.ReturnType == typeof(void))
+				{
+					code += "void";
+				}
+				else
+				{
+					code += GetTypeFullName(method.ReturnType);
+				}
+
+				code += " " + method.Name + "___Adapter";
+
+				code += "(";
+				foreach (var item in paras)
+				{
+					code += GetTypeFullName(item.ParameterType) + " ";
+					code += item.Name;
+
+					if (item != paras[paras.Length - 1])
+					{
+						code += ",";
+					}
+				}
+				code += ");";
+				code += "\n";
+			
+			}
+
+			return code;
+		}
 	}
 
 }

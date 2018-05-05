@@ -4159,6 +4159,8 @@ namespace ASRuntime
 
 		}
 
+		public static Player _calling_icrossextendadapter_ctor_player;
+		public static ASBinCode.rtData.rtObjectBase _making_icrossextendadapter_obj;
 
 		public void MakeICrossExtendAdapterEnvironment(ICrossExtendAdapter adapter, ASBinCode.rtti.Class as3class)
 		{
