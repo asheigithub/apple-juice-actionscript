@@ -77,7 +77,12 @@ namespace ASCompiler.compiler
 			{
 				if (item.Name == key.Name && item.Package.Name == key.Package.Name)
 				{
-					throw new BuildException(0, 0, key.as3SrcFile.srcFile, "重复编译类型" + value.package + ":" + value.name + "。");
+					var m1 = item.Package.MainClass;
+					var m2 = key.Package.MainClass;
+					if (m1 == m2)
+					{
+						throw new BuildException(0, 0, key.as3SrcFile.srcFile, "重复编译类型" + value.package + ":" + value.name + "。");
+					}
 				}
 			}
 

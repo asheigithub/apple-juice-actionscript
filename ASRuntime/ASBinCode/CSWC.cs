@@ -117,7 +117,7 @@ namespace ASBinCode
 		public int MaxMemIntCount;
 		public int MaxMemUIntCount;
 		public int MaxMemBooleanCount;
-		
+
 		public List<IMemReg> MemRegList;
 
 		public CSWC()
@@ -406,14 +406,26 @@ namespace ASBinCode
 				dictionary = new Dictionary<string, Class>();
 				foreach (var item in classes)
 				{
+					if (item.staticClass == null)
+						continue;
+
+					var cn = item.name;
+					if (item.ispackageout)
+					{
+						cn = item.mainClass.name + "#" + item.name;
+					}
+
 					if (string.IsNullOrEmpty(item.package))
 					{
-						dictionary.Add(item.name, item);
+
+						dictionary.Add(cn, item);
+
+
 					}
 					else
 					{
-						dictionary.Add(item.package + "." + item.name, item);
-						dictionary.Add(item.package + "::" + item.name, item);
+						dictionary.Add(item.package + "." + cn, item);
+						dictionary.Add(item.package + "::" + cn, item);
 					}
 				}
 			}

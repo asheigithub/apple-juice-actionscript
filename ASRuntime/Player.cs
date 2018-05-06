@@ -45,13 +45,13 @@ namespace ASRuntime
 
 			memnumber = new double[swc.MaxMemNumberCount];
 			memint = new int[swc.MaxMemIntCount];
-			
+
 			foreach (var m in swc.MemRegList)
 			{
 				m.setMemCache_Number(memnumber);
 				m.setMemCache_Int(memint);
 			}
-			
+
 			if (swc.NativeFunctionCount == 0)
 			{
 				ASRuntime.nativefuncs.BuildInFunctionLoader.loadBuildInFunctions(swc);
@@ -183,7 +183,7 @@ namespace ASRuntime
 				stackSlots[i].clear();
 			}
 
-			
+
 
 
 			funcCallerPool.reset();
@@ -209,7 +209,7 @@ namespace ASRuntime
 		{
 			if (!_hasInitStack)
 			{
-				
+
 				stackSlots = new StackSlot[STACKSLOTLENGTH];
 				for (int i = 0; i < STACKSLOTLENGTH; i++)
 				{
@@ -223,9 +223,9 @@ namespace ASRuntime
 				}
 
 
-				
 
-				
+
+
 
 
 				stackframePool = new StackFrame.StackFramePool(this, stackSlots, memnumber, memint);
@@ -2012,9 +2012,18 @@ namespace ASRuntime
 			{
 				if (this_pointer is rtObjectBase)
 				{
-					if (callerScope.scopeType != RunTimeScopeType.function)
+					var objscope = ((rtObjectBase)this_pointer).objScope;
+
+					if (objscope != null && objscope.scopeType == RunTimeScopeType.outpackagemember && callerScope.scopeType == RunTimeScopeType.objectinstance
+						&&
+						callerScope.parent == objscope //表示callerScop和objscope在一起定义的
+						)
 					{
-						frame.scope = ((rtObjectBase)this_pointer).objScope;
+						frame.scope = callerScope;
+					}
+					else if (callerScope.scopeType != RunTimeScopeType.function)
+					{
+						frame.scope = objscope;
 					}
 					else
 					{
@@ -2141,7 +2150,7 @@ namespace ASRuntime
 			funcCaller.loadDefineFromFunction();
 
 			if (!funcCaller.createParaScope()) { error = currentRunFrame.runtimeError == null ? new error.InternalError(swc, token, "创建参数失败") : currentRunFrame.runtimeError; return false; }
-#region pushparameter
+			#region pushparameter
 			int c = 0;
 			bool success;
 
@@ -2251,7 +2260,7 @@ namespace ASRuntime
 				}
 			}
 
-#endregion
+			#endregion
 
 			funcCaller.returnSlot = resultSlot;
 			funcCaller._tempSlot = currentRunFrame._tempSlot2;
@@ -2408,7 +2417,7 @@ namespace ASRuntime
 				currentRunFrame.step();
 #else
 
-#region 人肉内联
+				#region 人肉内联
 
 				var block = currentRunFrame.block;
 				
@@ -3187,7 +3196,7 @@ namespace ASRuntime
 				}
 
 
-#endregion
+				#endregion
 
 #endif
 
@@ -3366,7 +3375,6 @@ namespace ASRuntime
 			}
 
 
-
 			string t = sb.ToString();
 			sb.Remove(0, sb.Length);
 			return t;
@@ -3392,7 +3400,7 @@ namespace ASRuntime
 
 
 
-#region 外部接口
+		#region 外部接口
 
 		private object convertReturnValue(object obj)
 		{
@@ -3448,7 +3456,7 @@ namespace ASRuntime
 			}
 		}
 
-#region getClass
+		#region getClass
 
 		public ASBinCode.rtti.Class getClass(string name)
 		{
@@ -3460,9 +3468,9 @@ namespace ASRuntime
 			return swc.getClassDefinitionByName(name);
 		}
 
-#endregion
+		#endregion
 
-#region prepaeParameter
+		#region prepaeParameter
 
 		private RunTimeValueBase prepareParameter(ASBinCode.rtti.FunctionSignature sig, int paraIndex, object value, StackSlot tempSLot)
 		{
@@ -3514,9 +3522,9 @@ namespace ASRuntime
 			}
 		}
 
-#endregion
+		#endregion
 
-#region createInstance
+		#region createInstance
 
 		public ASBinCode.rtData.rtObject createInstance(string classname)
 		{
@@ -3644,9 +3652,9 @@ namespace ASRuntime
 			}
 		}
 
-#endregion
+		#endregion
 
-#region getMethod
+		#region getMethod
 
 		public rtFunction getMethod(rtObjectBase thisObj, string name)
 		{
@@ -3720,10 +3728,10 @@ namespace ASRuntime
 			//	}
 			//}
 		}
-#endregion
+		#endregion
 
 
-#region invokeMethod
+		#region invokeMethod
 		public object invokeMethod(string type, string methodname)
 		{
 			return invokeMethod(type, methodname, 0, null, null, null, null, null, null);
@@ -4280,9 +4288,9 @@ namespace ASRuntime
 
 
 
-#endregion
+		#endregion
 
-#region getClassStaticInstance
+		#region getClassStaticInstance
 		private rtObjectBase getClassStaticInstance(string type)
 		{
 
@@ -4315,9 +4323,9 @@ namespace ASRuntime
 			}
 
 		}
-#endregion
+		#endregion
 
-#region get_set_member
+		#region get_set_member
 
 		public object getMemberValue(rtObjectBase thisObj, string memberPath)
 		{
@@ -4565,10 +4573,10 @@ namespace ASRuntime
 			setMemberValue(clsObj, memberPath, value, indexArgs);
 		}
 
-#endregion
+		#endregion
 
 
-#region ByteArray
+		#region ByteArray
 
 		/// <summary>
 		/// 创建一个ByteArray对象
@@ -4589,7 +4597,7 @@ namespace ASRuntime
 		}
 
 
-#endregion
+		#endregion
 
 		delegate Type ddd(Type t);
 
@@ -4642,7 +4650,7 @@ namespace ASRuntime
 							System.Reflection.MethodInfo method;
 							try
 							{
-								method = methodGetter.GetMethodInfo(functiondefine,swc,this);
+								method = methodGetter.GetMethodInfo(functiondefine, swc, this);
 							}
 							catch (System.Reflection.AmbiguousMatchException e)
 							{
@@ -4727,7 +4735,7 @@ namespace ASRuntime
 			return new ASRuntime.nativefuncs.linksystem.Iterator(v, this);
 		}
 
-#endregion
+		#endregion
 
 
 
