@@ -41,6 +41,10 @@ namespace ASRuntime
 				frame.baseBottomSlotIndex = 0;
 				frame.call_parameter_slotCount = 0;
 
+#if DEBUG
+				frame.execing = false;
+#endif
+
 				return frame;
 			}
 

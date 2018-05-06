@@ -297,6 +297,7 @@ namespace AutoGenCodeLib
 	{
 		public virtual void kkk()
 		{
+			
 		}
 	}
 

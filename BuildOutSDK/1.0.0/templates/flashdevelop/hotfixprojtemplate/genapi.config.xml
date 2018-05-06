@@ -63,6 +63,7 @@
 	<item value="{UNITYINSTALLPATH}\Editor\Data\Managed\UnityEngine"></item>
 	<item value="{UNITYINSTALLPATH}\Editor\Data\UnityExtensions\Unity\GUISystem"></item>
 	<item value="{UNITYPROJPATH}\Library\UnityAssemblies"></item>
+	{RESOLVEPATH}
   </resolvepath>
   
   
@@ -137,7 +138,7 @@
 	<item value="System.Text.RegularExpressions"></item>
 	<item value="System.IO.Ports"></item>
   </notcreatenamespace>
-
+  
   <!--The following types will be skipped-->
   <notcreatetypes>
     <item value="System.Exception"></item>
@@ -197,6 +198,11 @@
     <item value="UnityEngine.ClusterNetwork"></item>
     <item value="UnityEngine.ClusterInput"></item>
     <item value="UnityEngine.ClusterInputType"></item>
+	
+	<item value="UnityEngine.Playables.PlayableGraph"></item>
+	<item value="Unity.Collections.LowLevel.Unsafe.AtomicSafetyHandle"></item>
+	<item value="Unity.Collections.LowLevel.Unsafe.DisposeSentinel"></item>
+	<item value="Unity.Collections.LowLevel.Unsafe.EnforceJobResult"></item>
 
   </notcreatetypes>
 
@@ -209,10 +215,23 @@
 
     <item value="UnityEngine.Light::UnityEngine.Vector2 get_areaSize()"></item>
     <item value="UnityEngine.Light::Void set_areaSize(UnityEngine.Vector2)"></item>
+	  
+	<item value="UnityEngine.Light::Single get_shadowRadius()"></item>
+	<item value="UnityEngine.Light::Void set_shadowRadius(Single)"></item>
+	<item value="UnityEngine.Light::Single get_shadowAngle()"></item> 
+	<item value="UnityEngine.Light::Void set_shadowAngle(Single)"></item>
+	  
+	<item value="UnityEngine.Texture::UnityEngine.Hash128 get_imageContentsHash()"></item> 
+	<item value="UnityEngine.Texture::Void set_imageContentsHash(UnityEngine.Hash128)"></item> 
+	   
+	  
 
     <item value="UnityEngine.MonoBehaviour::Boolean get_runInEditMode()"></item>
     <item value="UnityEngine.MonoBehaviour::Void set_runInEditMode(Boolean)"></item>
 
+	<item value="UnityEngine.MonoBehaviour::UnityEngine.Coroutine StartCoroutine(System.String)"></item>
+	<item value="UnityEngine.MonoBehaviour::UnityEngine.Coroutine StartCoroutine(System.String, System.Object)"></item>
+	  
     <item value="UnityEngine.UI.Graphic::Void OnRebuildRequested()"></item>
 
     <item value="UnityEngine.Terrain::Boolean get_bakeLightProbesForTrees()"></item>
@@ -248,4 +267,5 @@
     <item value="UnityEngine.Component::Void SendMessageUpwards(System.String, UnityEngine.SendMessageOptions)"></item>
 	  
   </notcreatemembers>
+  
 </configuration>

@@ -55,12 +55,6 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\LinkCodeGenCLI\bin\ToGenLibrary\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\LinkCodeGenCLI\bin\ToGenLibrary\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\LinkCodeGenCLI\bin\Debug\codeoutput.cs">

@@ -12,6 +12,13 @@ namespace ASCTest
 
         static void Main(string[] args)
         {
+			//var m= typeof(UnityEngine.Light).GetMethod("get_shadowRadius");
+
+			//var ss= m.DeclaringType.FullName + "::" + m.ToString();
+
+			//var k = ss;
+
+
 			//{
 			//	ASRuntime.Player player = new ASRuntime.Player();
 
