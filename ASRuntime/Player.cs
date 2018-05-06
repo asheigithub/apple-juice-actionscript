@@ -2012,18 +2012,26 @@ namespace ASRuntime
 			{
 				if (this_pointer is rtObjectBase)
 				{
-					var objscope = ((rtObjectBase)this_pointer).objScope;
+					//var objscope = ((rtObjectBase)this_pointer).objScope;
 
-					if (objscope != null && objscope.scopeType == RunTimeScopeType.outpackagemember && callerScope.scopeType == RunTimeScopeType.objectinstance
-						&&
-						callerScope.parent == objscope //表示callerScop和objscope在一起定义的
-						)
+					//if (objscope != null && objscope.scopeType == RunTimeScopeType.outpackagemember && callerScope.scopeType == RunTimeScopeType.objectinstance
+					//	&&
+					//	callerScope.parent == objscope //表示callerScop和objscope在一起定义的
+					//	)
+					//{
+					//	frame.scope = callerScope;
+					//}
+					//else if (callerScope.scopeType == RunTimeScopeType.objectinstance && callerScope.parent !=objscope && callerScope.this_pointer==this_pointer)
+					//{
+					//	frame.scope = callerScope;
+					//}
+					//else if (callerScope.scopeType != RunTimeScopeType.function && callerScope.this_pointer == this_pointer)
+					//{
+					//	frame.scope = objscope;
+					//}
+					if (callerScope.this_pointer == this_pointer)
 					{
 						frame.scope = callerScope;
-					}
-					else if (callerScope.scopeType != RunTimeScopeType.function)
-					{
-						frame.scope = objscope;
 					}
 					else
 					{
