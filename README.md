@@ -16,7 +16,7 @@ Unity的API或者自己开发的C# API提供了工具直接转换为actionscript
   
 
 ### 下载地址
-[as3_unity 0.96f5](https://github.com/asheigithub/apple-juice-actionscript/releases/download/v0.96f5/as3_unity096f5.zip)
+[as3_unity](https://github.com/asheigithub/apple-juice-actionscript/releases)
 
 
 #### 欢迎加入QQ群提出建议或意见 ####

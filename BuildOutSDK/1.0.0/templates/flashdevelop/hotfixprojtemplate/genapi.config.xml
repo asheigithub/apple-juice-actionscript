@@ -52,7 +52,6 @@
    
 	<assembly value="{SYSTEMDLL}"></assembly>
     {UNITYDLLS}
-	<assembly value="{UNITYPROJPATH}\Library\ScriptAssemblies\Assembly-CSharp.dll"></assembly>
 	
   </buildassemblys>
   <!--Which paths to find dependent assemblies for DLLs.
