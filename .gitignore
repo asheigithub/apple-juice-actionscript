@@ -37,3 +37,7 @@ UnityPluginTool/obj/
 ASCR/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 .vs/ASTool/v15/sqlite3/storage.ide
 .vs/ASTool/v15/sqlite3/storage.ide
+.vs/ASTool/v15/Server/sqlite3/db.lock
+.vs/ASTool/v15/Server/sqlite3/storage.ide
+.vs/ASTool/v15/Server/sqlite3/storage.ide-shm
+.vs/ASTool/v15/Server/sqlite3/storage.ide-wal

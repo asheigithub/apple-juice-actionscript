@@ -533,7 +533,8 @@ namespace LinkCodeGen
 					}
 				}
 			}
-			
+
+            
 
 			constructorlist = new List<System.Reflection.ConstructorInfo>();
 			protectedonstructorList = new List<ConstructorInfo>();
@@ -2067,7 +2068,7 @@ namespace LinkCodeGen
 					}
 				}
 
-
+                
 
 
 				string returntype = GetAS3TypeString(method.ReturnType, typeimports,null,null,null);
@@ -2756,7 +2757,9 @@ namespace LinkCodeGen
 					}
 					else
 					{
-						regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunctionname, nativefunctionname));
+                        
+
+                        regfunctions.Add(string.Format("\t\t\tbin.regNativeFunction(\"{0}\",\"{1}\");", LinkCodeNampScapePart + nativefunctionname, nativefunctionname));
 
 						if (method.IsStatic)
 						{

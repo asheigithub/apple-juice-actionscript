@@ -80,3 +80,17 @@ F:\ASTool\ASCR\obj\Debug\ASCompiler.csproj.GenerateResource.Cache
 F:\ASTool\ASCR\obj\Debug\ASCompiler.csproj.CoreCompileInputs.cache
 F:\ASTool\ASCR\obj\Debug\ASCompiler.dll
 F:\ASTool\ASCR\obj\Debug\ASCompiler.pdb
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASCompiler.dll
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASCompiler.pdb
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASRuntime.dll
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASTool.dll
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASRuntime.pdb
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASTool.pdb
+F:\GitHub\apple-juice-actionscript\ASCR\bin\Debug\ASTool.xml
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.csprojAssemblyReference.cache
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.Properties.Resources.resources
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.csproj.GenerateResource.cache
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.csproj.CoreCompileInputs.cache
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.csproj.CopyComplete
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.dll
+F:\GitHub\apple-juice-actionscript\ASCR\obj\Debug\ASCompiler.pdb

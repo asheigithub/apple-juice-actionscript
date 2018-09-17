@@ -259,7 +259,8 @@ namespace LinkCodeGen
 		{
 			string nativefunName;
 
-			System.Reflection.PropertyInfo pinfo;
+            
+            System.Reflection.PropertyInfo pinfo;
 			if (MethodNativeCodeCreator.CheckIsIndexerGetter(method, type, out pinfo)
 
 				&& method.GetParameters().Length == 1

@@ -4,7 +4,7 @@ cd %~dp0 & cd ..
 :user_configuration
 
 :: Static path to ASRuntime SDK
-set ASRuntime_SDK={SDKPATH}
+set ASRuntime_SDK="{SDKPATH}"
 
 :validation
 if not exist "%ASRuntime_SDK%\bin" goto asruntimesdk

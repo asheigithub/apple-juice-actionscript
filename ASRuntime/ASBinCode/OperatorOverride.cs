@@ -118,39 +118,75 @@ namespace ASBinCode
             {
 				foreach (var key in operFunctions[i].Keys)
 				{
-					if (i == (int)OverrideableOperator.Equality)
-					{
-						var dict = operFunctions[(int)OverrideableOperator.Inequality];
-						if (!dict.ContainsKey(key))
-						{
-							function = operFunctions[i][key].define;
-							return false;
-						}
-					}
-					else if (i == (int)OverrideableOperator.Inequality)
-					{
-						var dict = operFunctions[(int)OverrideableOperator.Equality];
-						if (!dict.ContainsKey(key))
-						{
-							function = operFunctions[i][key].define;
-							return false;
-						}
-					}
-					else
-					{
-						//***查找其他操作符定义***
-						for (int j = 0; j < (int)OverrideableOperator.Inequality; j++)
-						{
+                    if (i == (int)OverrideableOperator.Equality)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.Inequality];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    else if (i == (int)OverrideableOperator.Inequality)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.Equality];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    else if (i == (int)OverrideableOperator.GreatherThan)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.LessThan];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    else if (i == (int)OverrideableOperator.LessThan)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.GreatherThan];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    else if (i == (int)OverrideableOperator.GreatherThanOrEqual)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.LessThanOrEqual];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    else if (i == (int)OverrideableOperator.LessThanOrEqual)
+                    {
+                        var dict = operFunctions[(int)OverrideableOperator.GreatherThanOrEqual];
+                        if (!dict.ContainsKey(key))
+                        {
+                            function = operFunctions[i][key].define;
+                            return false;
+                        }
+                    }
+                    //else
+                    //{
+                    //    //***查找其他操作符定义***
+                    //    for (int j = 0; j < (int)OverrideableOperator.Inequality; j++)
+                    //    {
 
-							var dict = operFunctions[j];
-							if (!dict.ContainsKey(key))
-							{
-								function = operFunctions[i][key].define;
-								return false;
-							}
+                    //        var dict = operFunctions[j];
+                    //        if (!dict.ContainsKey(key))
+                    //        {
+                    //            function = operFunctions[i][key].define;
+                    //            return false;
+                    //        }
 
-						}
-					}
+                    //    }
+                    //}
 
                     
                 }

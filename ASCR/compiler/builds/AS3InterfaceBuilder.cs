@@ -415,7 +415,7 @@ namespace ASCompiler.compiler.builds
                         //            tooverridefunctions.Add(cls.classMembers[j]);
                         //            continue;
                         //        }
-                                
+
                         //        if (cls.classMembers[j].inheritFrom == null
                         //            )
                         //        {
@@ -433,6 +433,20 @@ namespace ASCompiler.compiler.builds
                         //        }
                         //    }
                         //}
+                        for (int j = 0; j < cls.classMembers.Count; j++)
+                        {
+                            if (cls.classMembers[j].name == funcname
+                                &&
+                                cls.classMembers[j].inheritFrom == null
+                                )
+                            {
+
+                                throw new BuildException(
+                                    new BuildError(stmt.Token.line, stmt.Token.ptr, stmt.Token.sourceFile,
+                                                            "重复的接口成员:" + as3function.Name)
+                                    );
+                            }
+                        }
 
                         if (as3function.Access.IsStatic)
                         {

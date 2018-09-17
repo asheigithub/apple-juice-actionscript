@@ -991,8 +991,32 @@ namespace LinkCodeGen
 			//***加上受保护的方法***
 			var pmem = methodAtType.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic);
 			List<MemberInfo> _tempmembers = new List<MemberInfo>();
-			_tempmembers.AddRange(members);
-			foreach (var item in pmem)
+            //_tempmembers.AddRange(members);
+            foreach (var item in members)
+            {
+                if (IsSkipMember(item))
+                    continue;
+                if (item is FieldInfo)
+                {
+                    if (IsSkipType(((FieldInfo)item).FieldType))
+                        continue;
+
+                    _tempmembers.Add(item);
+                    
+                }
+                else if (item is MethodInfo)
+                {
+                    if (InterfaceCreator.isMethodSkip((MethodInfo)item))
+                        continue;
+                    _tempmembers.Add(item);                   
+                }
+                else
+                {
+                    _tempmembers.Add(item);
+                }
+            }
+
+            foreach (var item in pmem)
 			{
 				if (item is FieldInfo)
 				{

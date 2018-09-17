@@ -1509,7 +1509,7 @@ namespace ASCompiler.compiler
 					{
 						pushBuildError(
 							new BuildError(item.Key.token.line, item.Key.token.ptr, item.Key.token.sourceFile,
-							">,<,==,!=,>=,<=必须同时重载")
+							">,<;==,!=;>=,<=必须同时重载")
 							);
 
 

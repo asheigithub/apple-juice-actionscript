@@ -284,79 +284,10 @@ package
 }
 
 
-import autogencodelib.Testobj;
-import autogencodelib.ptt2;
-import autogencodelib.pttest;
-import system.Int64;
 
-class et extends Testobj
+interface iii
 {
-	public function et(v:int=5)
-	{
-		super(v);
-	}
-	
-	override public function dialog():void
-	{
-		super.dialog();
-		
-		trace("override");
-	
-	}
-
-}
-
-class ttt extends pttest
-{
-	override protected function get b():int 
-	{
-		return 987;
-	}
-	
-	public function get b2():int
-	{
-		trace(testabsstring(9, 0));
-		
-		return b;
-	}
-	
-	override protected function testabsstring(a:int, b:system.Int64):String 
-	{
-		trace(a, b);
-		trace(ptint());
-		return a + " " + b + super.testabsstring(0,0);
-	}
-
-}
-
-class t2 extends ptt2
-{
-	public function t2()
-	{
-		var m = b;
-		trace(m,b);
-		//trace("getvvv", getvvv() );
-		//var m = b;
-	}
-	
-	override protected function get b():int 
-	{
-		return 99;
-	}
-	
-	override public function getvvv():int 
-	{
-		return  456;
-	}
+	function log();
+	function log(i);
 	
 }
-
-var t22:pttest = new t2();
-
-
-var t:ttt = new ttt();
-trace(t.b2);
-
-//.test();
-
-
