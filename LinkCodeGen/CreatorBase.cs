@@ -308,10 +308,13 @@ namespace LinkCodeGen
 			var c = CustomAttributeData.GetCustomAttributes(type);
 			foreach (CustomAttributeData item in c)
 			{
-				if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
-				{
-					return true;
-				}
+                if (item.Constructor != null)
+                {
+                    if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
+                    {
+                        return true;
+                    }
+                }
 			}
 
 			//object[] objs = type.GetCustomAttributes(typeof(System.ObsoleteAttribute), false);
@@ -348,6 +351,8 @@ namespace LinkCodeGen
 			{
 				foreach (var item in NotCreateNameSpace)
 				{
+                    if (type.Namespace == null)
+                        return true;
 					if (type.Namespace == item)
 						return true;
 					if (type.Namespace.StartsWith(item + "."))
@@ -409,6 +414,8 @@ namespace LinkCodeGen
 
 			foreach (var item in NotCreateNameSpace)
 			{
+                if (type.Namespace == null)
+                    return true;
 				if (type.Namespace == item)
 					return true;
 				if (type.Namespace.StartsWith(item + "."))
