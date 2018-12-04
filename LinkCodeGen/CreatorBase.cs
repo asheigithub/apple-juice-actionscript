@@ -402,7 +402,18 @@ namespace LinkCodeGen
 			{
 				return true;
 			}
-			
+            if (type.IsGenericType)
+            {
+                var testtypes = type.GetGenericArguments();
+                foreach (var item in testtypes)
+                {
+                    if (IsSkipType(item))
+                    {
+                        return true;
+                    }
+                }
+
+            }
 
 			if (type.IsArray)
 			{
@@ -617,7 +628,16 @@ namespace LinkCodeGen
 				string ext = string.Empty;
 				foreach (var item in defparams)
 				{
-					ext +="_"+ GetAS3ClassOrInterfaceName(item,true);
+                    string ns = "";
+                    if (item.Namespace != null && item.Namespace !="System")
+                    {
+                        ns = item.Namespace.Replace(".", "__");
+                    }
+                    if (ns.Length > 0)
+                        ns = ns + "_";
+
+
+                    ext +="_"+ ns + GetAS3ClassOrInterfaceName(item,true);
 				}
 
 				int idx = type.Name.IndexOf("`");
@@ -684,7 +704,15 @@ namespace LinkCodeGen
 				string ext = string.Empty;
 				foreach (var item in defparams)
 				{
-					ext += "_" + GetSharpTypeName(item);
+                    string ns = "";
+                    if (item.Namespace != null && item.Namespace !="System")
+                    {
+                        ns = item.Namespace.Replace(".","__");
+                    }
+                    if (ns.Length > 0)
+                        ns = ns + "_";
+
+					ext += "_" + ns + GetSharpTypeName(item);
 				}
 
 				int idx = csharptype.Name.IndexOf("`");

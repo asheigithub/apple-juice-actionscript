@@ -232,7 +232,7 @@ namespace LinkCodeGen
 					}
 					continue;
 				}
-				
+               
 
 				if (method.IsSpecialName)
 				{
@@ -274,16 +274,75 @@ namespace LinkCodeGen
 					continue;
 				}
 
-				//if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
-				//{
-				//	if ((method.IsAbstract))
-				//	{
-				//		donotaddprotectedctor = true;
-				//	}
-				//	continue;
-				//}
+                if ((method.Attributes & MethodAttributes.Virtual) != 0 &&
+                    (method.Attributes & MethodAttributes.NewSlot) == 0)
+                {
+                    // the property's 'get' method is an override
+                }
+                else
+                {
+                    if (method.IsHideBySig)
+                    {
+                        var flags = BindingFlags.Public | BindingFlags.NonPublic; //method.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic;
+                        flags |= method.IsStatic ? BindingFlags.Static : BindingFlags.Instance;
+                        var param = method.GetParameters();
+                        Type[] paramTypes = new Type[param.Length];
+                        for (int i = 0; i < param.Length; i++)
+                        {
+                            paramTypes[i] = param[i].ParameterType;
+                        }
 
-				if (method.IsGenericMethod)
+                        if (method.DeclaringType.BaseType.GetMethod(method.Name, flags, null, paramTypes, null) != null)
+                        {
+                            // the property's 'get' method shadows by signature
+                            if ((method.IsAbstract))
+                            {
+                                donotaddprotectedctor = true;
+                            }
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        var flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+                        var basemethods = (method.DeclaringType.BaseType.GetMethods(flags));//.Any(m => m.Name == getMethod.Name))
+                        // the property's 'get' method shadows by name
+
+                        bool hidebyname=false;
+
+                        foreach (var item in basemethods)
+                        {
+                            if (item.Name == method.Name)
+                            {
+                                if ((method.IsAbstract))
+                                {
+                                    donotaddprotectedctor = true;
+                                }
+                               
+                                hidebyname = true;
+                             break;
+                            }
+                        }
+
+                        if (hidebyname)
+                        {
+                            continue;
+                        }
+                    }
+
+                }
+
+
+                //if (!method.Equals(method.GetBaseDefinition())) //override的，跳过
+                //{
+                //	if ((method.IsAbstract))
+                //	{
+                //		donotaddprotectedctor = true;
+                //	}
+                //	continue;
+                //}
+
+                if (method.IsGenericMethod)
 				{
 					if ((method.IsAbstract))
 					{
