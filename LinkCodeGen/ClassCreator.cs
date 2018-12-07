@@ -1660,17 +1660,17 @@ namespace LinkCodeGen
 
 					(
 						!(
-						//***如果是抽象类，则只能处理构造函数没有参数的情况
-						type.IsAbstract &&
-						(
-						(
-							constructorlist.Count > 0 && constructorlist[0].GetParameters().Length != 0
-						)
-						||
-						(
-							protectedonstructorList.Count > 0 && protectedonstructorList[0].GetParameters().Length != 0
-						)
-						)
+						//***如果是抽象类 或没有public构造函数的类，则只能处理构造函数没有参数的情况
+						(type.IsAbstract || constructorlist.Count==0) &&
+						    (
+						        (
+							        constructorlist.Count > 0 && constructorlist[0].GetParameters().Length != 0
+						        )
+						        ||
+						        (
+							        protectedonstructorList.Count > 0 && protectedonstructorList[0].GetParameters().Length != 0
+						        )
+						    )
 						)
 					)
 
