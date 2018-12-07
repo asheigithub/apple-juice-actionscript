@@ -62,6 +62,38 @@ namespace LinkCodeGen
 
 		}
 
+        private bool CheckAssemblyShape(Type classtype, List<Type> types)
+        {
+            if (classtype==null)
+                return false;
+
+            if (classtype.Assembly.GetName().Name == "Assembly-CSharp")
+                return true;
+
+            if (classtype.IsGenericType)
+            {
+                foreach (var item in classtype.GetGenericArguments())
+                {
+                    if (CheckAssemblyShape(item, types))
+                        return true;
+                }
+            }
+
+
+            //foreach (var item in types)
+            //{
+            //    if (item.IsSubclassOf(classtype))
+            //    {
+            //        if (item.Assembly.GetName().Name == "Assembly-CSharp")
+            //            return true;
+            //    }
+
+            //}
+
+
+            return false;
+        }
+
 		public void MakeCode(System.IO.Stream combiedcodestm, string as3apipath, string csharpcodepath, string chsharpcodenamespace,
 			string regfunctioncodenamespace,string AssemblyCSharpCodePath, out string regfunctioncode)
 		{
@@ -76,16 +108,22 @@ namespace LinkCodeGen
 					&& (classtype.IsClass || classtype.IsValueType) && classtype.IsPublic
 					)
 				{
-					if (AssemblyCSharpCodePath != null && classtype.Assembly.GetName().Name == "Assembly-CSharp")
-					{
-						CreatorBase.MakeCreator(classtype, creators, as3apipath, AssemblyCSharpCodePath, chsharpcodenamespace);
-					}
-					else
-					{
-						CreatorBase.MakeCreator(classtype, creators, as3apipath, csharpcodepath, chsharpcodenamespace);
-					}
+                    				
+					CreatorBase.MakeCreator(classtype, creators, as3apipath, csharpcodepath, chsharpcodenamespace);					
 				}
+
 			}
+
+            foreach (var creator in creators.Values)
+            {
+                //如果涉及Assembly-CSharp中声明的类型则放到AssemblyPath中去
+
+                if (AssemblyCSharpCodePath != null && CheckAssemblyShape(creator.BuildIngType, types))
+                {
+                    creator.SetNativeCodePath(AssemblyCSharpCodePath);
+                }
+            }
+
 
 			StringBuilder regclassSb = new StringBuilder();
 

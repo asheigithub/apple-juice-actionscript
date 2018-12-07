@@ -1651,7 +1651,7 @@ namespace LinkCodeGen
 					as3api.Append("\t\t");
 					as3api.Append("public function " + name);
 
-					as3api.Append("();");
+					as3api.AppendLine("();");
 				}
 
 				if (type !=typeof(System.MarshalByRefObject) && !type.IsSealed && !type.IsValueType && (constructorlist.Count > 0 || protectedonstructorList.Count > 0)

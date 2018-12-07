@@ -209,6 +209,11 @@ namespace LinkCodeGen
 			this.linkcodenamespace = linkcodenamespace;
 		}
 
+        public void SetNativeCodePath(string path)
+        {
+            this.csharpnativecodepath = path;
+        }
+
 
 		public static void MakeCreator(Type type, Dictionary<TypeKey, CreatorBase> typeCreators, string as3apidocpath,string csharpnativecodepath,string linkcodenamespace)
 		{
