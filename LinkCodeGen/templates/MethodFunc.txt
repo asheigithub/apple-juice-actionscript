@@ -72,7 +72,7 @@
 					success = false;
 					stackframe.throwAneException(token, i.Message);
 				}
-				catch (NotSupportedException n)
+				catch (Exception n)
 				{
 					success = false;
 					stackframe.throwAneException(token, n.Message);
