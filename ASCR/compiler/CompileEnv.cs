@@ -1623,7 +1623,10 @@ namespace ASCompiler.compiler
 									}
 									else
 									{
-										dictCanNotOptimize.Add(register, null);
+                                        if (!dictCanNotOptimize.ContainsKey(register))
+                                        {
+                                            dictCanNotOptimize.Add(register, null);
+                                        }
 										//i--;
 										//break;
 										continue;

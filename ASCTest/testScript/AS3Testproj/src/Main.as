@@ -284,10 +284,3 @@ package
 }
 
 
-
-interface iii
-{
-	function log();
-	function log(i);
-	
-}

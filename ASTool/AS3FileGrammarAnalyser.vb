@@ -1285,7 +1285,7 @@ Public Class AS3FileGrammarAnalyser
 
         Else
             If func.IsAnonymous Then
-                If Not current_expression_canfunctioninvoke.Peek() And current_expression_canfunctioninvoke.Count < 3 Then
+                If current_expression_canfunctioninvoke.Count = 0 OrElse (Not current_expression_canfunctioninvoke.Peek() And current_expression_canfunctioninvoke.Count < 3) Then
                     Throw New GrammarException(node.MatchedToken, "'function' is not allowed here")
                 End If
             End If

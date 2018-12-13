@@ -148,3 +148,12 @@ trace(f);
 var f = new fib();
 var ff = fib(f);
 trace(ff);
+
+var b = {};
+b.a = function(i:int)
+{
+	trace(i * i);
+	
+}
+
+b.a(66);

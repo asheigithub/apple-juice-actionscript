@@ -8,3 +8,9 @@ E:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\bin\Release\AutoGenCodeLib.pdb
 E:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\obj\Release\AutoGenCodeLib.pdb
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\bin\Release\AutoGenCodeLib.dll
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\bin\Release\AutoGenCodeLib.pdb
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csprojAssemblyReference.cache
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Release\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Release\AutoGenCodeLib.dll
+F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Release\AutoGenCodeLib.pdb
