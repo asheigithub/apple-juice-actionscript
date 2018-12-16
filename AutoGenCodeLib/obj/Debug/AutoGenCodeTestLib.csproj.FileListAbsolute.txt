@@ -6,7 +6,6 @@ F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 F:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
 E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.pdb
-E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csprojResolveAssemblyReference.cache
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
 F:\ASTool\AutoGenCodeLib\bin\Debug\AutoGenCodeLib.xml
@@ -18,3 +17,5 @@ F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.c
 F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache
 F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.dll
 F:\GitHub\apple-juice-actionscript\AutoGenCodeLib\obj\Debug\AutoGenCodeLib.pdb
+E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csprojAssemblyReference.cache
+E:\ASTool\AutoGenCodeLib\obj\Debug\AutoGenCodeTestLib.csproj.CoreCompileInputs.cache

@@ -9,7 +9,7 @@ public class ASRuntimeMenus
 	static ASRuntimeSettings LoadOrCreateSetting()
 	{
 		var settings = AssetDatabase.LoadAssetAtPath("Assets/ASRuntimePlayer/settings.asset", typeof(ASRuntimeSettings));
-		if (settings == null )
+		if (settings == null)
 		{
 			settings = ScriptableObject.CreateInstance(typeof(ASRuntimeSettings));
 
@@ -124,7 +124,7 @@ public class ASRuntimeMenus
 			}
 		}
 
-		
+
 		settings.SDKPath = sdkpath;
 
 
@@ -154,7 +154,7 @@ public class ASRuntimeMenus
 		//		sdkpath = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(process.StandardOutput.ReadLine()));
 		//	}
 		//}
-		
+
 		//***创建项目***
 		string as3projpath;
 		{
@@ -226,6 +226,14 @@ public class ASRuntimeMenus
 			{
 				string CreateUnityAPI = System.IO.File.ReadAllText(sdkpath + "/templates/flashdevelop/hotfixprojtemplate/bat/CreateUnityAPI.bat");
 				CreateUnityAPI = CreateUnityAPI.Replace("{UNITYPROJPATH}", unityprojectpath);
+
+				string version = "";
+				if (System.Environment.Version.Major == 4)
+				{
+					version = "_v4";
+				}
+				CreateUnityAPI = CreateUnityAPI.Replace("{VERSION}", version);
+
 				System.IO.File.WriteAllText(as3projpath + "/bat/CreateUnityAPI.bat", CreateUnityAPI);
 			}
 			{
@@ -276,9 +284,9 @@ public class ASRuntimeMenus
 					var a = System.Reflection.Assembly.Load(item);
 					string p = System.IO.Path.GetDirectoryName(a.Location);
 					if (!resolvepaths.Contains(p))
-						resolvepaths.Add( p);
+						resolvepaths.Add(p);
 				}
-				
+
 				string RESOLVEPATH = "";
 				foreach (var item in resolvepaths)
 				{
@@ -366,7 +374,7 @@ public class ASRuntimeMenus
 				return;
 			}
 
-			string dir= EditorUtility.OpenFolderPanel("Find ActionScript Project", System.IO.Path.GetDirectoryName(Application.dataPath), string.Empty);
+			string dir = EditorUtility.OpenFolderPanel("Find ActionScript Project", System.IO.Path.GetDirectoryName(Application.dataPath), string.Empty);
 			if (!string.IsNullOrEmpty(dir) && System.IO.Directory.Exists(dir))
 			{
 				settings.AS3ProjectPath = dir;
@@ -390,10 +398,10 @@ public class ASRuntimeMenus
 		UnityEditor.FileUtil.DeleteFileOrDirectory(Application.dataPath + "/ASRuntimePlayer/RegCode");
 		UnityEditor.FileUtil.DeleteFileOrDirectory(Application.dataPath + "/Standard Assets/ASRuntime/ScriptSupport/Generated");
 		EditorUtility.DisplayDialog("ASRuntime", "API code cleanup completed", "OK");
-		AssetDatabase.Refresh( ImportAssetOptions.Default);
-		
+		AssetDatabase.Refresh(ImportAssetOptions.Default);
+
 	}
 
-	
+
 
 }

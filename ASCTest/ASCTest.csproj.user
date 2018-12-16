@@ -18,4 +18,7 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DOTNET4|AnyCPU'">
+    <StartArguments>../../testScript/AS3Testproj/src/</StartArguments>
+  </PropertyGroup>
 </Project>

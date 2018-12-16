@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>config=F:\UnityAS3\AS_2018_1\HotFixProj\genapi.config.xml</StartArguments>
+    <StartArguments>config=E:\Unity\AS3Unity2018\UTest3\HotFixProj\genapi.config.xml</StartArguments>
   </PropertyGroup>
 </Project>

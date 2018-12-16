@@ -1,0 +1,16 @@
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\LinkCodeGenCLI.exe
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\LinkCodeGenCLI.pdb
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASCompiler.dll
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASRuntime.dll
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASTool.dll
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\LinkCodeGen.dll
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASCompiler.pdb
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASRuntime.pdb
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASTool.pdb
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\ASTool.xml
+E:\ASTool\LinkCodeGenCLI_v4\bin\Debug\LinkCodeGen.pdb
+E:\ASTool\LinkCodeGenCLI_v4\obj\Debug\LinkCodeGenCLI_v4.csprojAssemblyReference.cache
+E:\ASTool\LinkCodeGenCLI_v4\obj\Debug\LinkCodeGenCLI_v4.csproj.CoreCompileInputs.cache
+E:\ASTool\LinkCodeGenCLI_v4\obj\Debug\LinkCodeGenCLI_v4.csproj.CopyComplete
+E:\ASTool\LinkCodeGenCLI_v4\obj\Debug\LinkCodeGenCLI.exe
+E:\ASTool\LinkCodeGenCLI_v4\obj\Debug\LinkCodeGenCLI.pdb

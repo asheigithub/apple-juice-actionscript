@@ -3382,7 +3382,7 @@ namespace LinkCodeGen
 					hasref = true;
 				}
 				
-				if (para.IsOptional)
+				if (para.IsOptional && !hasref)
 				{
 					as3api.Append("=");
 

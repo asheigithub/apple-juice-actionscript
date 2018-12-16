@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("LinkCodeGenCLI")]
+[assembly: AssemblyTitle("LinkCodeGenCLI_v4")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LinkCodeGenCLI")]
+[assembly: AssemblyProduct("LinkCodeGenCLI_v4")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("e13da238-07dc-4806-a7fa-b1ca8a846861")]
+[assembly: Guid("1f5a556d-3e0e-425a-8a27-bf868b15fa48")]
 
 // 程序集的版本信息由下列四个值组成: 
 //

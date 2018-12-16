@@ -4,13 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E13DA238-07DC-4806-A7FA-B1CA8A846861}</ProjectGuid>
+    <ProjectGuid>{1F5A556D-3E0E-425A-8A27-BF868B15FA48}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>LinkCodeGenCLI</RootNamespace>
     <AssemblyName>LinkCodeGenCLI</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,33 +30,23 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DOTNET4|AnyCPU'">
-    <OutputPath>bin\DOTNET4\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppConfig.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="..\LinkCodeGenCLI\AppConfig.cs">
+      <Link>AppConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\LinkCodeGenCLI\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\LinkCodeGenCLI\TypesLoader.cs">
+      <Link>TypesLoader.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypesLoader.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ASCR\ASCompiler.csproj">
@@ -79,7 +68,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy *.dll $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli\
-copy *.exe $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli\</PostBuildEvent>
+    <PostBuildEvent>copy *.dll $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli_v4\
+copy *.exe $(SolutionDir)BuildOutSDK\1.0.0\linkcodegencli_v4\</PostBuildEvent>
   </PropertyGroup>
 </Project>

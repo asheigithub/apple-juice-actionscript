@@ -276,7 +276,7 @@ namespace LinkCodeGenCLI
 						Environment.Exit(1);
 						return;
 					}
-
+					
 
 				}
 			}

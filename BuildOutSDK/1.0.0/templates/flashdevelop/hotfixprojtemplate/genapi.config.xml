@@ -50,7 +50,7 @@
 <!--Configure DLLs to export-->
   <buildassemblys>
    
-	<assembly value="{SYSTEMDLL}"></assembly>
+	<!--<assembly value="{SYSTEMDLL}"></assembly>-->
     {UNITYDLLS}
 	
   </buildassemblys>
@@ -132,6 +132,7 @@
     <item value="UnityEngine.Networking"></item>
     <item value="UnityEngine.Profiling"></item>
     <item value="UnityEngine.SocialPlatforms"></item>
+    <item value="UnityEngine.tvOS"></item>
     <item value="Mono"></item>
 	<item value="System.Collections.Specialized"></item>
 	<item value="System.Text.RegularExpressions"></item>
@@ -197,6 +198,10 @@
     <item value="UnityEngine.ClusterNetwork"></item>
     <item value="UnityEngine.ClusterInput"></item>
     <item value="UnityEngine.ClusterInputType"></item>
+    <item value="UnityEngine.DrivenRectTransformTracker"></item>
+    <item value="UnityEngine.LightProbeGroup"></item>
+    <item value="UnityEngine.Light"></item>
+    <item value="UnityEngine.QualitySettings"></item>
 	
 	<item value="UnityEngine.Playables.PlayableGraph"></item>
 	<item value="Unity.Collections.LowLevel.Unsafe.AtomicSafetyHandle"></item>
