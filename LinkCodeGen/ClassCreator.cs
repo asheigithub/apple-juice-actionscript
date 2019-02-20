@@ -51,7 +51,8 @@ namespace LinkCodeGen
 			{
 				return true;
 			}
-			return false;
+
+            return false;
 		}
 		private static Dictionary<Type, List<MethodAndFName>> dictVirtualMethods = new Dictionary<Type, List<MethodAndFName>>();
 
@@ -1726,11 +1727,11 @@ namespace LinkCodeGen
 
 			public ASBinCode.rtData.rtObjectBase AS3Object { get { return bindAS3Object; } }
 
-			protected Player player;
-			private Class typeclass;
+			protected ASRuntime.Player player;
+			private ASBinCode.rtti.Class typeclass;
 			private ASBinCode.rtData.rtObjectBase bindAS3Object;
 
-			public void SetAS3RuntimeEnvironment(Player player, Class typeclass, ASBinCode.rtData.rtObjectBase bindAS3Object)
+			public void SetAS3RuntimeEnvironment(ASRuntime.Player player, ASBinCode.rtti.Class typeclass, ASBinCode.rtData.rtObjectBase bindAS3Object)
 			{
 				this.player = player;
 				this.typeclass = typeclass;
@@ -2092,10 +2093,15 @@ namespace LinkCodeGen
 				allmethods.AddRange(protectedmethodlist);
 
 			}
-			bool flagshowprotected=false;
+
+            
+
+            bool flagshowprotected=false;
 			foreach (var method in allmethods)
 			{
-				if (isOverrideOrInherits(method))
+               
+
+                if (isOverrideOrInherits(method))
 					continue;
 
 				if (!flagshowprotected)
@@ -2156,7 +2162,7 @@ namespace LinkCodeGen
 						as3api.Append("\t\t");
 
 //"getThisItem"
-						var n=GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var n=GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 						//as3api.Append("function getThisItem");
 						as3api.Append("function "+n);
 						//dictUseNames.Add("getThisItem", null);
@@ -2185,7 +2191,7 @@ namespace LinkCodeGen
 						
 						as3api.Append("function get ");
 
-						var mname = GetMethodName(pinfo.Name, method, type,dictStaticUseNames,dictUseNames);
+						var mname = GetMethodName(pinfo.Name,true, method, type,dictStaticUseNames,dictUseNames);
 						as3api.Append(mname);
 						dictUseNames.Add("get " + mname, null);
 
@@ -2208,7 +2214,7 @@ namespace LinkCodeGen
 
 						as3api.Append("\t\t");
 //"setThisItem"
-						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var n = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 						//as3api.Append("function setThisItem");
 						as3api.Append("function "+n);
 						dictUseNames.Add(n, null);
@@ -2239,7 +2245,7 @@ namespace LinkCodeGen
 
 						as3api.Append("function set ");
 
-						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
+						var mname = GetMethodName(pinfo.Name,true, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 						dictUseNames.Add("set " + mname, null);
 
@@ -2265,7 +2271,7 @@ namespace LinkCodeGen
 						as3api.Append("function ");
 
 
-						var mname = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var mname = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 						dictUseNames.Add(mname, null);
 
@@ -2281,12 +2287,12 @@ namespace LinkCodeGen
 						{
 							if (type.BaseType !=null && type.BaseType.GetMethod(method.Name) != null)
 							{
-								dictUseNames.Add(GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames), null);
+								dictUseNames.Add(GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames), null);
 							}
 						}
 						catch (System.Reflection.AmbiguousMatchException)
 						{
-							dictUseNames.Add(GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames), null);
+							dictUseNames.Add(GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames), null);
 						}
 					}
 
@@ -2526,7 +2532,7 @@ namespace LinkCodeGen
 						as3api.AppendLine("\t\t*/");
 					}
 
-
+                   
 
 					string nativefunctionname= InterfaceCreator.GetMethodNativeFunctionName(method, type, dictStaticUseNames, dictUseNames);
 					System.Reflection.PropertyInfo pinfo;
@@ -2555,7 +2561,7 @@ namespace LinkCodeGen
 							as3api.Append("final ");
 						}
 						//"getThisItem"
-						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var n = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append("function "+n);
 
 
@@ -2599,7 +2605,7 @@ namespace LinkCodeGen
 
 						
 
-						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
+						var mname = GetMethodName(pinfo.Name,true, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 
 						methodas3names.Add(method, "@" + mname +"_get");
@@ -2636,7 +2642,7 @@ namespace LinkCodeGen
 							as3api.Append("final ");
 						}
 						//"setThisItem"
-						var n = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var n = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 
 						as3api.Append("function "+n);
 
@@ -2677,7 +2683,7 @@ namespace LinkCodeGen
 
 						as3api.Append("function set ");
 
-						var mname = GetMethodName(pinfo.Name, method, type, dictStaticUseNames, dictUseNames);
+						var mname = GetMethodName(pinfo.Name,true, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 
 						
@@ -2716,7 +2722,7 @@ namespace LinkCodeGen
 
 						
 
-						var mname = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+						var mname = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 						as3api.Append(mname);
 
 						if (method.IsStatic)
@@ -2875,7 +2881,7 @@ namespace LinkCodeGen
 					
 					as3api.Append("function ");
 
-					var mname = GetMethodName(method.Name, method, type, dictStaticUseNames, dictUseNames);
+					var mname = GetMethodName(method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 					as3api.Append(mname);
 
 					if (method.IsStatic)
@@ -2935,7 +2941,7 @@ namespace LinkCodeGen
 							as3api.Append("static ");
 							as3api.Append("function ");
 
-							var oname = GetMethodName("_operator_" + method.Name, method, type, dictStaticUseNames, dictUseNames);
+							var oname = GetMethodName("_operator_" + method.Name,false, method, type, dictStaticUseNames, dictUseNames);
 							as3api.Append(oname);
 							if (method.IsStatic)
 							{
@@ -3074,7 +3080,7 @@ namespace LinkCodeGen
 
 				var as3argtype=as3typename[ (ASBinCode.RunTimeDataType)kv.Value[0]];
 
-				var funname = GetMethodName( "_implicit_from_value",kv.Key,type,dictStaticUseNames,dictUseNames);
+				var funname = GetMethodName( "_implicit_from_value",false,kv.Key,type,dictStaticUseNames,dictUseNames);
 
 				as3api.AppendLine(string.Format("\t\t[implicit_from];"));
 				as3api.AppendLine(string.Format("\t\t[native,{0}];", (string)kv.Value[1]));
@@ -3100,7 +3106,7 @@ namespace LinkCodeGen
 
 				var as3argtype = as3typename[(ASBinCode.RunTimeDataType)kv.Value[0]];
 
-				var funname = GetMethodName("_explicit_from_value", kv.Key, type, dictStaticUseNames, dictUseNames);
+				var funname = GetMethodName("_explicit_from_value",false, kv.Key, type, dictStaticUseNames, dictUseNames);
 
 				as3api.AppendLine(string.Format("\t\t[explicit_from];"));
 				as3api.AppendLine(string.Format("\t\t[native,{0}];", (string)kv.Value[1]));
@@ -3128,7 +3134,7 @@ namespace LinkCodeGen
 				var as3argtype = as3typename[(ASBinCode.RunTimeDataType)kv.Value[0]];
 
 				
-				var funname = GetMethodName("valueOf", kv.Key, type, dictUseNames, dictUseNames);
+				var funname = GetMethodName("valueOf",false, kv.Key, type, dictUseNames, dictUseNames);
 
 				string nativefunname = GetNativeFunctionPart1(type) + "_" + funname ;
 
@@ -3169,7 +3175,7 @@ namespace LinkCodeGen
 
 					
 
-					var funname = GetMethodName("valueOf", kv.Key, type, dictUseNames, dictUseNames);
+					var funname = GetMethodName("valueOf",false, kv.Key, type, dictUseNames, dictUseNames);
 
 					string nativefunname = GetNativeFunctionPart1(type) + "_" + funname;
 
@@ -3211,7 +3217,7 @@ namespace LinkCodeGen
 				as3api.Append("function ");
 
 				string mn = GetMethodName( GetNativeFunctionPart1(item._interface) + "_" +
-					item.interfacemethod.Name
+					item.interfacemethod.Name,false
 					,
 					item.method, type, dictStaticUseNames, dictUseNames
 					);
@@ -3331,7 +3337,8 @@ namespace LinkCodeGen
 			//Console.WriteLine(as3api.ToString());
 
 			string as3file = as3apidocpath +"/"+ GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
-			string nativefunfile = csharpnativecodepath +"/"+ GetNativeFunctionClassName(type) + ".cs";
+			//string nativefunfile = csharpnativecodepath +"/"+ GetNativeFunctionClassName(type) + ".cs";
+			string nativefunfile = csharpnativecodepath +"/ClassFile_" + (classfileid++) +  ".cs";
 
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
 			System.IO.File.WriteAllText(as3file, as3api.ToString());
@@ -3346,7 +3353,7 @@ namespace LinkCodeGen
 			return nativefunc.ToString();
 
 		}
-
+        static int classfileid = 0;
 
 		private void appendFunctionParameters(StringBuilder as3api,System.Reflection.MethodBase method, Type checktype ,Dictionary<Type,String> typeimports,string returntype)
 		{

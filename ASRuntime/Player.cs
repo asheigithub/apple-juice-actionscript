@@ -33,7 +33,7 @@ namespace ASRuntime
 		/// </summary>
 		private int[] memint;
 
-#if WHENDEV
+#if WHENDEV 
 		internal CSWC swc;
 #else
 		public CSWC swc;

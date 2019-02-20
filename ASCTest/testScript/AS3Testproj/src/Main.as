@@ -66,15 +66,15 @@ package
 			
 			//var c:Class = getDefinitionByName("Main::et");
 			
-			var t:* = new et();
-			
-			
-			var dt:DateTime = DateTime( et(t).loadObject());
-			trace(dt);
-			
-			
-			t.ATTT(EnvironmentVariableTarget.Process);
-			
+			//var t:* = new et();
+			//
+			//
+			//var dt:DateTime = DateTime( et(t).loadObject());
+			//trace(dt);
+			//
+			//
+			//t.ATTT(EnvironmentVariableTarget.Process);
+			//
 			var arr1:_Array_ = Testobj.make(5);
 			for each (var m:Testobj in arr1)
 			{
@@ -89,11 +89,11 @@ package
 				m.onEvent();
 			}
 			
-			trace(t.geteList(null).count);
-			
-			t[99] += "bbbc";
-			
-			trace(t[99]);
+			//trace(t.geteList(null).count);
+			//
+			//t[99] += "bbbc";
+			//
+			//trace(t[99]);
 			
 			
 			

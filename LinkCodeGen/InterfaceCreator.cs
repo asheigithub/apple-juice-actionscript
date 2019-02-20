@@ -266,7 +266,7 @@ namespace LinkCodeGen
 				&& method.GetParameters().Length == 1
 				)
 			{
-				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
+				string testname = GetMethodName(method.Name,false, method, type, staticusenames, usenames);
 				if (testname == method.Name)
 				{
 					testname = "getThisItem";
@@ -279,7 +279,7 @@ namespace LinkCodeGen
 			}
 			else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
 			{
-				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type,staticusenames,usenames));
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, false,method, type,staticusenames,usenames));
 
 			}
 			else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo)
@@ -288,7 +288,7 @@ namespace LinkCodeGen
 				)
 			{
 				//****索引器****
-				string testname = GetMethodName(method.Name, method, type, staticusenames, usenames);
+				string testname = GetMethodName(method.Name,false, method, type, staticusenames, usenames);
 				if (testname == method.Name)
 				{
 					testname = "setThisItem";
@@ -299,13 +299,13 @@ namespace LinkCodeGen
 			}
 			else if (MethodNativeCodeCreator.CheckIsSetter(method, type, out pinfo))
 			{
-				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type, staticusenames, usenames));
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name,false, method, type, staticusenames, usenames));
 
 			}
 			else
 			{
 
-				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name, method, type, staticusenames, usenames));
+				nativefunName = string.Format("{0}_{1}", GetNativeFunctionPart1(type), GetMethodName(method.Name,false, method, type, staticusenames, usenames));
 			}
 
 			if (method.IsStatic)
@@ -581,7 +581,7 @@ namespace LinkCodeGen
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
-					var name = GetMethodName(method.Name, method, type, null, null);
+					var name = GetMethodName(method.Name,false, method, type, null, null);
 					as3api.Append("function " + name);
 				}
 				else if (MethodNativeCodeCreator.CheckIsGetter(method, type, out pinfo))
@@ -593,7 +593,7 @@ namespace LinkCodeGen
 
 					as3api.Append("\t\t");
 					as3api.Append("function get ");
-					as3api.Append(GetMethodName(pinfo.Name, method,type, null, null));
+					as3api.Append(GetMethodName(pinfo.Name,true, method,type, null, null));
 				}
 				else if (MethodNativeCodeCreator.CheckIsIndexerSetter(method, type, out pinfo) && !existsindexsetter)
 				{
@@ -607,7 +607,7 @@ namespace LinkCodeGen
 					as3api.AppendLine();
 
 					as3api.Append("\t\t");
-					var name = GetMethodName(method.Name, method, type, null, null);
+					var name = GetMethodName(method.Name,false, method, type, null, null);
 					as3api.Append("function " + name);
 
 					var temp = paras[0];
@@ -624,7 +624,7 @@ namespace LinkCodeGen
 
 					as3api.Append("\t\t");
 					as3api.Append("function set ");
-					as3api.Append(GetMethodName(pinfo.Name, method,type, null, null));
+					as3api.Append(GetMethodName(pinfo.Name,true, method,type, null, null));
 				}
 				else
 				{
@@ -636,7 +636,7 @@ namespace LinkCodeGen
 
 					as3api.Append("\t\t");
 					as3api.Append("function ");
-					as3api.Append(GetMethodName(method.Name,method,type, null, null));
+					as3api.Append(GetMethodName(method.Name,false,method,type, null, null));
 				}
 
 				as3api.Append("(");
@@ -809,7 +809,8 @@ namespace LinkCodeGen
 			//Console.WriteLine(nativefunc.ToString());
 
 			string as3file = as3apidocpath + "/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
-			string nativefunfile = csharpnativecodepath + "/" + GetNativeFunctionClassName(type) + ".cs";
+			//string nativefunfile = csharpnativecodepath + "/" + GetNativeFunctionClassName(type) + ".cs";
+			string nativefunfile = csharpnativecodepath + "/Interface_" + (interfaceid++) + ".cs";
 
 			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
 			System.IO.File.WriteAllText(as3file, as3api.ToString());
@@ -824,6 +825,6 @@ namespace LinkCodeGen
 			return nativefunc.ToString();
 			
 		}
-
+        static int interfaceid = 0;
 	}
 }

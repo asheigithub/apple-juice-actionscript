@@ -502,8 +502,19 @@ namespace LinkCodeGenCLI
 
 			}
 
-
-			return Assembly.ReflectionOnlyLoad(args.Name);
+            try
+            {
+                return Assembly.ReflectionOnlyLoad(args.Name);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("程序集 "+ args.Name+ " 没有找到。请将此程序集所在路径加入 <resolvepath>节中");
+                Console.WriteLine("在Unity工程中可找到此程序集。");
+                Console.ResetColor();
+                throw;
+            }
+			
 
 		}
 	}

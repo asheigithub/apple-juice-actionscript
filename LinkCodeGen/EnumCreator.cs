@@ -267,7 +267,8 @@ namespace LinkCodeGen
             //Console.WriteLine(nativefunc.ToString());
 
             string as3file = as3apidocpath + "/" + GetPackageName(type).Replace(".", "/") + "/" + name + ".as";
-            string nativefunfile = csharpnativecodepath +"/" + GetNativeFunctionClassName(type) + ".cs";
+            //string nativefunfile = csharpnativecodepath + "/" + GetNativeFunctionClassName(type) + ".cs";
+            string nativefunfile = csharpnativecodepath +"/Enum_" + (enumid++) + ".cs";
 
             System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(as3file));
             System.IO.File.WriteAllText(as3file, as3api.ToString());
@@ -282,7 +283,7 @@ namespace LinkCodeGen
 			return nativefunc.ToString();
         }
 
-
+        static int enumid = 0;
 
     }
 }

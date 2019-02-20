@@ -78,15 +78,21 @@ namespace LinkCodeGen
 				}
 			}
 
-			var c = CustomAttributeData.GetCustomAttributes(member);
-			foreach (CustomAttributeData item in c)
-			{
-				if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
-				{
-					return true;
-				}
-			}
-			return false;
+            if (member != null)
+            {
+                var c = CustomAttributeData.GetCustomAttributes(member);
+                foreach (CustomAttributeData item in c)
+                {
+                    if (item.Constructor.DeclaringType == typeof(System.ObsoleteAttribute))
+                    {
+                        return true;
+                    }
+                }
+
+            }
+
+
+            return false;
 			//object[] objs= member.GetCustomAttributes(typeof(System.ObsoleteAttribute),false);
 
 			//if (objs.Length>0)
@@ -306,10 +312,24 @@ namespace LinkCodeGen
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static bool IsSkipType(Type type,bool includeref=false)
+		public static bool IsSkipType(Type type,bool includeref=false,System.Collections.Generic.Dictionary<Type,object> dicttestd=null )
 		{
 			if (type == null)
 				return true;
+
+            if (dicttestd != null)
+            {
+                if (dicttestd.ContainsKey(type))
+                    return false;
+                else
+                    dicttestd.Add(type, null);
+            }
+            else
+            {
+                dicttestd = new Dictionary<Type, object>();
+                dicttestd.Add(type,null);
+            }
+
 			var c = CustomAttributeData.GetCustomAttributes(type);
 			foreach (CustomAttributeData item in c)
 			{
@@ -380,7 +400,7 @@ namespace LinkCodeGen
 				}
 				else if(type.HasElementType)
 				{
-					return IsSkipType(type.GetElementType());
+					return IsSkipType(type.GetElementType(),false,dicttestd);
 				}
 			}
 
@@ -393,7 +413,7 @@ namespace LinkCodeGen
 
 			if (type.IsNested)
 			{
-				if (IsSkipType(type.DeclaringType))
+				if (IsSkipType(type.DeclaringType,false,dicttestd))
 				{
 					return true;
 				}
@@ -412,7 +432,7 @@ namespace LinkCodeGen
                 var testtypes = type.GetGenericArguments();
                 foreach (var item in testtypes)
                 {
-                    if (IsSkipType(item))
+                    if (IsSkipType(item,false,dicttestd))
                     {
                         return true;
                     }
@@ -422,7 +442,7 @@ namespace LinkCodeGen
 
 			if (type.IsArray)
 			{
-				return IsSkipType(type.GetElementType());
+				return IsSkipType(type.GetElementType(),false,dicttestd);
 			}
 
 			if (type.Namespace == null)
@@ -461,7 +481,7 @@ namespace LinkCodeGen
 				var rt = MethodNativeCodeCreator.GetAS3Runtimetype(m.ReturnType);
 				if (rt > ASBinCode.RunTimeDataType.unknown)
 				{
-					if (IsSkipType(m.ReturnType))
+					if (IsSkipType(m.ReturnType,false,dicttestd))
 					{
 						return true;
 					}
@@ -496,7 +516,7 @@ namespace LinkCodeGen
 						}
 					}
 
-					if (IsSkipType(p.ParameterType))
+					if (IsSkipType(p.ParameterType,false,dicttestd))
 					{
 						return true;
 					}
@@ -516,7 +536,7 @@ namespace LinkCodeGen
 
 			if (type.BaseType != null)
 			{
-				return IsSkipType(type.BaseType);
+				return IsSkipType(type.BaseType,false,dicttestd);
 			}
 
 			return false;
@@ -1011,7 +1031,7 @@ namespace LinkCodeGen
 			}
 		}
 
-		protected static string GetMethodName(string dotName, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
+		protected static string GetMethodName(string dotName,bool checkgettersetter, System.Reflection.MethodInfo method, Type methodAtType, Dictionary<string,object> staticusenames,Dictionary<string,object> usenames )
 		{
 			if (method.IsSpecialName && method.Name.StartsWith("add_") && method.GetParameters().Length==1 && IsDelegate( method.GetParameters()[0].ParameterType))
 			{
@@ -1026,10 +1046,12 @@ namespace LinkCodeGen
 				return eventname + "_removeEventListener";
 			}
 
-			
-			var members = methodAtType.GetMember(dotName);
+
+            string fname = dotName;
+
+			var members = methodAtType.GetMember(fname);
 			//***加上受保护的方法***
-			var pmem = methodAtType.GetMember(dotName, BindingFlags.Instance | BindingFlags.NonPublic);
+			var pmem = methodAtType.GetMember(fname, BindingFlags.Instance | BindingFlags.NonPublic);
 			List<MemberInfo> _tempmembers = new List<MemberInfo>();
             //_tempmembers.AddRange(members);
             foreach (var item in members)
@@ -1083,7 +1105,48 @@ namespace LinkCodeGen
 				}
 				
 			}
-			members = _tempmembers.ToArray();
+
+            //if (checkgettersetter && method.Name.Length>5 && Char.IsUpper( method.Name[4]))
+            //{
+            //    fname = method.Name;
+            //    fname = fname.Substring(0, 4) + Char.ToLower(fname[4]) + fname.Substring(5);
+
+            //    var mb2 = methodAtType.GetMember(fname);
+            //    List<MemberInfo> temp = new List<MemberInfo>();
+            //    foreach (var item in mb2)
+            //    {
+            //        if (IsSkipMember(item))
+            //            continue;
+            //        if (item is FieldInfo)
+            //        {
+            //            if (IsSkipType(((FieldInfo)item).FieldType))
+            //                continue;
+
+            //            temp.Add(item);
+
+            //        }
+            //        else if (item is MethodInfo)
+            //        {
+            //            if (InterfaceCreator.isMethodSkip((MethodInfo)item))
+            //                continue;
+            //            temp.Add(item);
+            //        }
+            //        else
+            //        {
+            //            temp.Add(item);
+            //        }
+            //    }
+            //    if (temp.Count > 0)
+            //    {
+            //        dotName = dotName + "".PadLeft(temp.Count, '_');
+            //    }
+            //}
+
+
+
+
+
+            members = _tempmembers.ToArray();
 
 			//var props = methodAtType.GetProperties();
 			//bool isprop = false;
@@ -1101,26 +1164,57 @@ namespace LinkCodeGen
 			
 			//if (!isprop)
 			{
-				if (Char.IsLower(dotName[0]))
-				{
-					List<System.Reflection.MemberInfo> temp = new List<System.Reflection.MemberInfo>();
+                if (Char.IsUpper(dotName[0]))
+                {
+                    List<System.Reflection.MemberInfo> temp = new List<System.Reflection.MemberInfo>();
 
-					var ms = methodAtType.GetMember(Char.ToUpper(dotName[0]) + dotName.Substring(1));
-					foreach (var item in ms)
-					{
-						if (item.MemberType != MemberTypes.NestedType)
-						{
-							temp.Add(item);
-						}
-					}
-					
-					if (temp.Count > 0)
-					{
-						dotName = dotName + "".PadLeft(temp.Count, '_');
-					}
+                    var ms = methodAtType.GetMember(Char.ToLower(dotName[0]) + dotName.Substring(1));
+                    foreach (var item in ms)
+                    {
+                        if (IsSkipMember(item))
+                            continue;
 
-				}
-			}
+                        if (item.MemberType != MemberTypes.NestedType)
+                        {
+                            temp.Add(item);
+                        }
+                    }
+
+                    if (temp.Count > 0)
+                    {
+                        dotName = dotName + "".PadLeft(temp.Count, '_');
+                    }
+
+                }
+
+                //查看基类中有无首字符大小写冲突
+                if(methodAtType.BaseType !=null)
+                {
+                    if (Char.IsLower(dotName[0]))
+                    {
+                        List<System.Reflection.MemberInfo> temp = new List<System.Reflection.MemberInfo>();
+
+                        var ms = methodAtType.BaseType.GetMember(Char.ToUpper(dotName[0]) + dotName.Substring(1));
+                        foreach (var item in ms)
+                        {
+                            if (IsSkipMember(item))
+                                continue;
+
+                            if (item.MemberType != MemberTypes.NestedType)
+                            {
+                                temp.Add(item);
+                            }
+                        }
+
+                        if (temp.Count > 0)
+                        {
+                            dotName = dotName + "".PadLeft(temp.Count, '_');
+                        }
+                    }
+                }
+
+
+            }
 
 			if (methodAtType.IsInterface)
 			{
