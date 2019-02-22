@@ -1102,6 +1102,7 @@ namespace ASRuntime.nativefuncs
 				default:
 
 					var c = stackframe.player.swc.getClassByRunTimeDataType(type);
+
 					if (c.instanceClass != null)
 						c = c.instanceClass;
 

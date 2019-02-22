@@ -163,6 +163,35 @@ namespace ASRuntime
 			}
 		}
 
+        public bool TryGetRuntimeDataType(Type linkType,out RunTimeDataType rt)
+        {
+            if (linkType.IsArray)
+            {
+                rt= link_type[arrayType];
+                return true;
+            }
+
+            RunTimeDataType ot;
+            if (link_type.TryGetValue(linkType, out ot))
+            {
+                rt= ot;
+                return true;
+            }
+            else
+            {
+                if (linkType.IsSubclassOf(type_link[_OBJECT_LINK]))
+                {
+                    rt= _OBJECT_LINK;
+                    return true;
+                }
+                else
+                {
+                    rt = RunTimeDataType.unknown;
+                    return false;
+                }
+            }
+        }
+
 		public RunTimeDataType getRuntimeDataType(Type linkType)
 		{
 			if (linkType.IsArray)
@@ -203,19 +232,45 @@ namespace ASRuntime
 			else
 			{
 				RunTimeDataType rt = defineReturnType; //getLinkType(funcDefine.signature.returnType);
-													   //RunTimeDataType rt =
-													   //    getRuntimeDataType(obj.GetType());
-				if (rt == RunTimeDataType.rt_void)
-				{
-					rt = getRuntimeDataType(obj.GetType());
+                                                       //RunTimeDataType rt =
+                                                       //    getRuntimeDataType(obj.GetType());
+                if (rt == RunTimeDataType.rt_void)
+                {
+                    rt = getRuntimeDataType(obj.GetType());
 
-					if (rt == _FLOAT)
-						rt = RunTimeDataType.rt_number;
-					else if (rt == _SHORT)
-						rt = RunTimeDataType.rt_int;
-					else if (rt == _USHORT)
-						rt = RunTimeDataType.rt_uint;
-				}
+                    if (rt == _FLOAT)
+                        rt = RunTimeDataType.rt_number;
+                    else if (rt == _SHORT)
+                        rt = RunTimeDataType.rt_int;
+                    else if (rt == _USHORT)
+                        rt = RunTimeDataType.rt_uint;
+                }
+                else if (rt == player.swc.LinkObjectClass.getRtType())
+                {
+                    //***拆箱***
+                    RunTimeDataType realrt;
+                    if (TryGetRuntimeDataType(obj.GetType(), out realrt))
+                    {
+                        rt = realrt;
+                        if (realrt == _FLOAT)
+                        {
+                            rt = RunTimeDataType.rt_number;
+                        }
+                        else if (realrt == _SHORT)
+                        {
+                            rt = RunTimeDataType.rt_int;
+                        }
+                        else if (realrt == _USHORT)
+                        {
+                            rt = RunTimeDataType.rt_uint;
+                        }
+                        else if (realrt > RunTimeDataType.unknown)
+                        {
+                            ASRuntime.operators.InstanceCreator.init_static_class(player.swc.getClassByRunTimeDataType(rt), player, null);
+                        }
+                    }
+                }
+
 
 				if (rt == _DICT_KEY)
 				{

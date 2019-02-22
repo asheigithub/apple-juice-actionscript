@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2018/12/13'</value>
+      <value>'2019/2/22'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -33,6 +33,7 @@
       <path-element>F:\GitHub\apple-juice-actionscript\ASCTest\testScript\AS3Testproj\src</path-element>
       <path-element>F:\GitHub\apple-juice-actionscript\as3_commapi\api</path-element>
       <path-element>F:\GitHub\apple-juice-actionscript\as3_commapi\sharpapi</path-element>
+      <path-element>F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI\bin\Debug\as3api</path-element>
       <path-element>D:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>

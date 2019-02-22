@@ -709,7 +709,7 @@ namespace ASRuntime.operators
                     }
 
                     var member = ClassMemberFinder.find(rtObj.value._class, name, finder);
-
+                   
                     if (member == null)
                     {
                         if (rtObj.value._class.dynamic) //如果是动态类型

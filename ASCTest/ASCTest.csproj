@@ -72,7 +72,6 @@
     <Compile Include="..\LinkCodeGenCLI\bin\Debug\regNativeCode.cs">
       <Link>autoCreateCodes\regNativeCode.cs</Link>
     </Compile>
-    <Compile Include="autoCreateCodes\autogencodelib_TestobjAdapter.cs" />
     <Compile Include="extFunctions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
