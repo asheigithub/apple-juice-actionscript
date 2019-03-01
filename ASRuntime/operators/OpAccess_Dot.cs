@@ -341,7 +341,7 @@ namespace ASRuntime.operators
 							funCaller.returnSlot = register.getSlot(scope, frame);
 
 							BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-							cb.setCallBacker(_get_this_item_callbacker);
+							cb.setCallBacker(D_get_this_item_callbacker);
 							cb.step = step;
 							cb.args = frame;
 
@@ -483,7 +483,7 @@ namespace ASRuntime.operators
                 {
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_convert_callbacker);
+                    cb.setCallBacker(D_convert_callbacker);
                     cb.scope = scope;
                     cb.step = step;
 
@@ -503,13 +503,13 @@ namespace ASRuntime.operators
             }
         }
 
-        
 
+        private static BlockCallBackBase.dgeCallbacker D_get_this_item_callbacker = new BlockCallBackBase.dgeCallbacker(_get_this_item_callbacker);
         private static void _get_this_item_callbacker(BlockCallBackBase sender, object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_convert_callbacker = new BlockCallBackBase.dgeCallbacker(_convert_callbacker);
         private static void _convert_callbacker(BlockCallBackBase sender,object args)
         {
             object[] a = (object[])sender.args;

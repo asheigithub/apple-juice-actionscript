@@ -71,7 +71,7 @@ namespace ASRuntime.operators
 						cb.scope = scope;
 						cb.step = step;
 						cb.args = frame;
-						cb.setCallBacker(_vectorConvertCallBacker);
+						cb.setCallBacker(D_vectorConvertCallBacker);
 						cb.cacheObjects[0] = slot;
 
 						//***调用强制类型转换***
@@ -87,7 +87,7 @@ namespace ASRuntime.operators
 						cb.scope = scope;
 						cb.step = step;
 						cb.args = frame;
-						cb.setCallBacker(_objectmemberslotConvertCallbacker);
+						cb.setCallBacker(D_objectmemberslotConvertCallbacker);
 						cb.cacheObjects[0] = slot;
 
 						//***调用强制类型转换***
@@ -136,6 +136,7 @@ namespace ASRuntime.operators
 
         }
 
+        private static BlockCallBackBase.dgeCallbacker D_vectorConvertCallBacker = new BlockCallBackBase.dgeCallbacker(_vectorConvertCallBacker);
         internal static void _vectorConvertCallBacker(BlockCallBackBase sender,object args)
         {
             StackFrame frame = (StackFrame)sender.args;
@@ -163,7 +164,8 @@ namespace ASRuntime.operators
 			}
             
         }
-		internal static void _objectmemberslotConvertCallbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_objectmemberslotConvertCallbacker = new BlockCallBackBase.dgeCallbacker(_objectmemberslotConvertCallbacker);
+        internal static void _objectmemberslotConvertCallbacker(BlockCallBackBase sender, object args)
 		{
 			StackFrame frame = (StackFrame)sender.args;
 			OpStep step = sender.step;
@@ -275,7 +277,7 @@ namespace ASRuntime.operators
                 funCaller.returnSlot = frame._tempSlot1;
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_assign_callbacker);
+                cb.setCallBacker(D_assign_callbacker);
                 cb.step = step;
                 cb.args = frame;
 
@@ -290,7 +292,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-
+        private static BlockCallBackBase.dgeCallbacker D_assign_callbacker = new BlockCallBackBase.dgeCallbacker(_assign_callbacker);
         private static void _assign_callbacker(BlockCallBackBase sender,object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);
@@ -337,7 +339,7 @@ namespace ASRuntime.operators
             funCaller.returnSlot = frame._tempSlot1;
 
             BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-            cb.setCallBacker(_setthisitem_callbacker);
+            cb.setCallBacker(D_setthisitem_callbacker);
             cb.step = step;
             cb.args = frame;
 			
@@ -347,7 +349,7 @@ namespace ASRuntime.operators
 
             return;
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_setthisitem_callbacker = new BlockCallBackBase.dgeCallbacker(_setthisitem_callbacker);
         private static void _setthisitem_callbacker(BlockCallBackBase sender, object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);

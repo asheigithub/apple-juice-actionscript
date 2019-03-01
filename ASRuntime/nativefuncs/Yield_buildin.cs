@@ -82,7 +82,7 @@ namespace ASRuntime.nativefuncs
 
             BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = yieldObj;
-            cb.setCallBacker(_movenext_callbacker);
+            cb.setCallBacker(D_movenext_callbacker);
 
 
             frame.player.callBlock(
@@ -94,8 +94,8 @@ namespace ASRuntime.nativefuncs
 
 
         }
-
-        private void _movenext_callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_movenext_callbacker = new BlockCallBackBase.dgeCallbacker(_movenext_callbacker);
+        private static void _movenext_callbacker(BlockCallBackBase sender, object args)
         {
             ASBinCode.rtti.YieldObject yieldObj = (ASBinCode.rtti.YieldObject)sender.args;
 

@@ -189,6 +189,8 @@ namespace ASRuntime.operators
             return init_static_class(cls, player, token);
         }
 
+        private static BlockCallBackBase.dgeCallbacker D_afterCreateStaticInstanceCallBacker = new BlockCallBackBase.dgeCallbacker(afterCreateStaticInstanceCallBacker);
+        private static BlockCallBackBase.dgeCallbacker D_creatorFailed = new BlockCallBackBase.dgeCallbacker(creatorFailed);
 
         public void createInstance()
         {
@@ -199,8 +201,8 @@ namespace ASRuntime.operators
 				//afterCreateStaticInstance callbacker = new afterCreateStaticInstance();
 				var callbacker= player.blockCallBackPool.create();
 				callbacker.args = this;
-				callbacker.setCallBacker(afterCreateStaticInstanceCallBacker);
-				callbacker.setWhenFailed(creatorFailed);
+				callbacker.setCallBacker(D_afterCreateStaticInstanceCallBacker);
+				callbacker.setWhenFailed(D_creatorFailed);
 
                 ASBinCode.RunTimeScope objScope;
                 var obj = makeObj(player,token, _class.staticClass, callbacker,this, out objScope);
@@ -271,7 +273,7 @@ namespace ASRuntime.operators
 
             exec_step0();
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_afterCreateOutScopeCallbacker = new BlockCallBackBase.dgeCallbacker(afterCreateOutScopeCallbacker);
         private void exec_step0()
         {
             Class cls;
@@ -289,8 +291,8 @@ namespace ASRuntime.operators
 				//afterCreateOutScope callbacker = new afterCreateOutScope();
 				var callbacker= player.blockCallBackPool.create();
                 callbacker.args = this;
-				callbacker.setWhenFailed(creatorFailed);
-				callbacker.setCallBacker(afterCreateOutScopeCallbacker);
+				callbacker.setWhenFailed(D_creatorFailed);
+				callbacker.setCallBacker(D_afterCreateOutScopeCallbacker);
 
                 if (make_outpackage_scope(cls, callbacker))
                 {
@@ -392,15 +394,15 @@ namespace ASRuntime.operators
         }
 
 
-
+        private static BlockCallBackBase.dgeCallbacker D_afterCreateInstanceDataCallBacker = new BlockCallBackBase.dgeCallbacker(afterCreateInstanceDataCallBacker);
         private void exec_step1()
         {
 			
 			BlockCallBackBase callbacker = player.blockCallBackPool.create();
 			callbacker.args = this;
 
-			callbacker.setCallBacker(afterCreateInstanceDataCallBacker);
-			callbacker.setWhenFailed(creatorFailed);
+			callbacker.setCallBacker(D_afterCreateInstanceDataCallBacker);
+			callbacker.setWhenFailed(D_creatorFailed);
 
             ASBinCode.RunTimeScope objScope;
 			
@@ -510,8 +512,8 @@ namespace ASRuntime.operators
 				//callbacker.objScope = objScope;
 				//callbacker.rtObject = _object;
 				callbacker.cacheObjects[0] = _object;
-				callbacker.setWhenFailed(creatorFailed);
-				callbacker.setCallBacker(afterCallConstructorCallbacker);
+				callbacker.setWhenFailed(D_creatorFailed);
+				callbacker.setCallBacker(D_afterCallConstructorCallbacker);
 
 				
                 constructorCaller.callbacker = callbacker;
@@ -528,8 +530,9 @@ namespace ASRuntime.operators
                 exec_step3(_object);
             }
         }
+        private static BlockCallBackBase.dgeCallbacker D_afterCallConstructorCallbacker = new BlockCallBackBase.dgeCallbacker(afterCallConstructorCallbacker);
 
-		private static void afterCallConstructorCallbacker(BlockCallBackBase sender, object args)
+        private static void afterCallConstructorCallbacker(BlockCallBackBase sender, object args)
 		{
 			((InstanceCreator)sender.args).
 			   exec_step3(
@@ -562,20 +565,23 @@ namespace ASRuntime.operators
                 cb.args = cb.cacheObjects; //new object[] { rtobject , _temp };
                 cb.cacheObjects[0] = rtobject;
                 cb.cacheObjects[1] = _temp;
+                cb.cacheObjects[2] = this;
 
-                cb.setCallBacker(_finalStep);
+                cb.setCallBacker(D_finalStep);
 
                 _function_constructor.callbacker = cb;
                 _function_constructor.call();
                 _function_constructor = null;
             }
         }
-
-        private void _finalStep(BlockCallBackBase sender,object args)
+        private static BlockCallBackBase.dgeCallbacker D_finalStep = new BlockCallBackBase.dgeCallbacker(_finalStep);
+        private static void _finalStep(BlockCallBackBase sender,object args)
         {
             object[] a = (object[])sender.args;
 
-            objectResult = (ASBinCode.rtData.rtObjectBase)a[0];
+            InstanceCreator creator = (InstanceCreator)a[2];
+
+            creator.objectResult = (ASBinCode.rtData.rtObjectBase)a[0];
 
             //***如果有返回值****
             var returnvalue = ((SLOT)a[1]).getValue(); ((SLOT)a[1]).directSet(ASBinCode.rtData.rtUndefined.undefined);
@@ -592,14 +598,14 @@ namespace ASRuntime.operators
                 returnvalue.rtType != RunTimeDataType.rt_uint
                 )
             {
-                objectResult = returnvalue;
+                creator. objectResult = returnvalue;
             }
 
             //objectResult.directSet((ASBinCode.rtData.rtObject)sender.args);
-            if (callbacker != null)
+            if (creator.callbacker != null)
             {
-                callbacker.call(this);
-                callbacker = null;
+                creator.callbacker.call(creator);
+                creator.callbacker = null;
             }
         }
 

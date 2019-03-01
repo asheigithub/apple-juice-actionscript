@@ -325,7 +325,7 @@ namespace ASRuntime.operators
         //    }
         //}
 
-
+        private static BlockCallBackBase.dgeCallbacker D_objcreated = new BlockCallBackBase.dgeCallbacker(objcreated);
         public static void exec(StackFrame frame, ASBinCode.OpStep step, ASBinCode.RunTimeScope scope)
         {
             //int classid = ((ASBinCode.rtData.rtInt)step.arg1.getValue(scope)).value;
@@ -337,10 +337,10 @@ namespace ASRuntime.operators
             frame.instanceCreator.token = step.token;
 			frame.instanceCreator.objectStoreToSlot = step.reg.getSlot(scope, frame);
             
-
+            
             BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
-            cb.setCallBacker(objcreated);
+            cb.setCallBacker(D_objcreated);
 			
             cb.scope = scope;
             cb.step = step;
@@ -360,7 +360,7 @@ namespace ASRuntime.operators
 
 			BlockCallBackBase cb = frame.player.blockCallBackPool.create();
             cb.args = frame;
-            cb.setCallBacker(objcreated);
+            cb.setCallBacker(D_objcreated);
             cb.scope = scope;
             cb.step = step;
             

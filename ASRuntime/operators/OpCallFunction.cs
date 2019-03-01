@@ -742,7 +742,7 @@ namespace ASRuntime.operators
 					BlockCallBackBase cb = frame.player.blockCallBackPool.create();
 					cb.step = step;
 					cb.args = frame;
-					cb.setCallBacker(_convert_cb);
+					cb.setCallBacker(D_convert_cb);
 
 
 
@@ -756,7 +756,9 @@ namespace ASRuntime.operators
 			}
 
 		}
-		private static void _convert_cb(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_convert_cb = new BlockCallBackBase.dgeCallbacker(_convert_cb);
+
+        private static void _convert_cb(BlockCallBackBase sender, object args)
 		{
 			((StackFrame)sender.args).endStep(sender.step);
 		}

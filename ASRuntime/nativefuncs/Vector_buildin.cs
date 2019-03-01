@@ -902,15 +902,15 @@ namespace ASRuntime.nativefuncs
             sendargs[8] = new rtInt(0);
 
             sepcb.args = sendargs;
-            sepcb.setCallBacker(_SeptoString_CB);
+            sepcb.setCallBacker(D_SeptoString_CB);
 
             operators.OpCast.CastValue(argements[0].getValue(), RunTimeDataType.rt_string,
                 frame, token, scope, frame._tempSlot1, sepcb, false);
 
 
         }
-
-        private void _SeptoString_CB(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_SeptoString_CB = new BlockCallBackBase.dgeCallbacker(_SeptoString_CB);
+        private static void _SeptoString_CB(BlockCallBackBase sender, object args)
         {
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
@@ -930,7 +930,7 @@ namespace ASRuntime.nativefuncs
             BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
             valueCB._intArg = sender._intArg + 1;
             valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
-            valueCB.setCallBacker(_ValueToString_CB);
+            valueCB.setCallBacker(D_ValueToString_CB);
 
             operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
                 frame,
@@ -942,8 +942,8 @@ namespace ASRuntime.nativefuncs
 
         }
 
-        
-        private void _ValueToString_CB(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_ValueToString_CB = new BlockCallBackBase.dgeCallbacker(_ValueToString_CB);
+        private static void _ValueToString_CB(BlockCallBackBase sender, object args)
         {
 
             object[] receiveArgs = (object[])sender.args;
@@ -958,7 +958,7 @@ namespace ASRuntime.nativefuncs
                 BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                 valueCB._intArg = sender._intArg;
                 valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
-                valueCB.setCallBacker(_ValueToString_CB);
+                valueCB.setCallBacker(D_ValueToString_CB);
 
                 frame.player.CallBlankBlock(valueCB);
                 return;
@@ -993,7 +993,7 @@ namespace ASRuntime.nativefuncs
                         BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                         valueCB._intArg = sender._intArg + 1;
                         valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
-                        valueCB.setCallBacker(_ValueToString_CB);
+                        valueCB.setCallBacker(D_ValueToString_CB);
 
                         operators.OpCast.CastValue(array[sender._intArg], RunTimeDataType.rt_string,
                             frame,

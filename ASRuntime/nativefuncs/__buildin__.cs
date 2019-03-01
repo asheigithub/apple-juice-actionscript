@@ -218,7 +218,7 @@ namespace ASRuntime.nativefuncs
             BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
             valueCB._intArg = sender._intArg + 1;
             valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
-            valueCB.setCallBacker(_ValueToString_CB);
+            valueCB.setCallBacker(D_ValueToString_CB);
 			valueCB._intArg2 = sender._intArg2;
             var v = array.innerArray[sender._intArg];
             if (v.rtType == RunTimeDataType.rt_void)
@@ -238,8 +238,8 @@ namespace ASRuntime.nativefuncs
                 );
 
         }
-
-        private void _ValueToString_CB(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_ValueToString_CB = new BlockCallBackBase.dgeCallbacker(_ValueToString_CB);
+        private static void _ValueToString_CB(BlockCallBackBase sender, object args)
         {
             object[] receiveArgs = (object[])sender.args;
             StackFrame frame = (StackFrame)receiveArgs[2];
@@ -254,7 +254,7 @@ namespace ASRuntime.nativefuncs
                 BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                 valueCB._intArg = sender._intArg;valueCB._intArg2 = 0;
                 valueCB.args = valueCB.copyFromReceiveArgs( receiveArgs);
-                valueCB.setCallBacker(_ValueToString_CB);
+                valueCB.setCallBacker(D_ValueToString_CB);
 
                 frame.player.CallBlankBlock(valueCB);
                 return;
@@ -279,7 +279,7 @@ namespace ASRuntime.nativefuncs
                 BlockCallBackBase valueCB = frame.player.blockCallBackPool.create();
                 valueCB._intArg = sender._intArg + 1;valueCB._intArg2 = sender._intArg2;
                 valueCB.args = valueCB.copyFromReceiveArgs(receiveArgs);
-                valueCB.setCallBacker(_ValueToString_CB);
+                valueCB.setCallBacker(D_ValueToString_CB);
 
                 var v = array.innerArray[sender._intArg];
                 if (v.rtType == RunTimeDataType.rt_void)

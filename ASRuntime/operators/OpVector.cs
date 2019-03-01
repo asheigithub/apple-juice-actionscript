@@ -253,7 +253,7 @@ namespace ASRuntime.operators
 
 			BlockCallBackBase cb = frame.player.blockCallBackPool.create();
 			cb.args = frame;
-			cb.setCallBacker(objcreated);
+			cb.setCallBacker(D_objcreated);
 			cb.scope = scope;
 			cb.step = step;
 
@@ -263,8 +263,8 @@ namespace ASRuntime.operators
 			return;
 
 		}
-
-		private static void objcreated(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_objcreated = new BlockCallBackBase.dgeCallbacker(objcreated);
+        private static void objcreated(BlockCallBackBase sender, object args)
 		{
 			var vector = ((StackFrame)sender.args).instanceCreator.objectResult;
 
@@ -324,7 +324,7 @@ namespace ASRuntime.operators
 					BlockCallBackBase cb = frame.player.blockCallBackPool.create();
 					cb.step = step;
 					cb.args = frame;
-					cb.setCallBacker(_allpushed);
+					cb.setCallBacker(D_allpushed);
 
 					pushAllElementToVector(o, array.innnerList, frame, step.token, scope, cb);
 				}
@@ -362,14 +362,14 @@ namespace ASRuntime.operators
 					BlockCallBackBase cb = frame.player.blockCallBackPool.create();
 					cb.step = step;
 					cb.args = frame;
-					cb.setCallBacker(_allpushed);
+					cb.setCallBacker(D_allpushed);
 
 					pushAllElementToVector(o, array.innerArray, frame, step.token, scope, cb);
 				}
 			}
 		}
-
-		private static void _allpushed(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_allpushed = new BlockCallBackBase.dgeCallbacker(_allpushed);
+        private static void _allpushed(BlockCallBackBase sender, object args)
 		{
 			((StackFrame)sender.args).endStep(sender.step);
 		}
@@ -383,7 +383,7 @@ namespace ASRuntime.operators
 		{
 			BlockCallBackBase convertCb = frame.player.blockCallBackPool.create();
 			convertCb._intArg = 0;
-			convertCb.setCallBacker(_convertCB);
+			convertCb.setCallBacker(D_convertCB);
 
 			object[] args = convertCb.cacheObjects; //new object[6];
 			args[0] = vd;
@@ -398,8 +398,9 @@ namespace ASRuntime.operators
 				vd.vector_type, frame, token, scope, frame._tempSlot1,
 				convertCb, false);
 		}
+        private static BlockCallBackBase.dgeCallbacker D_convertCB = new BlockCallBackBase.dgeCallbacker(_convertCB);
 
-		private static void _convertCB(BlockCallBackBase sender, object args)
+        private static void _convertCB(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 

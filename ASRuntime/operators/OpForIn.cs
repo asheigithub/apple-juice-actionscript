@@ -56,7 +56,7 @@ namespace ASRuntime.operators
                     funCaller.returnSlot = frame._tempSlot1;
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_getEnumerator_callbacker);
+                    cb.setCallBacker(D_getEnumerator_callbacker);
                     cb.step = step;
                     cb.args = frame;
                     cb.scope = scope;
@@ -82,7 +82,7 @@ namespace ASRuntime.operators
 
             frame.endStep();
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_getEnumerator_callbacker = new BlockCallBackBase.dgeCallbacker(_getEnumerator_callbacker);
         private static void _getEnumerator_callbacker(BlockCallBackBase sender, object args)
         {
             StackFrame frame = (StackFrame)sender.args;
@@ -141,7 +141,7 @@ namespace ASRuntime.operators
                     funCaller.returnSlot = frame._tempSlot1;
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_getEnumerator_callbacker);
+                    cb.setCallBacker(D_getEnumerator_callbacker);
                     cb.step = step;
                     cb.args = frame;
                     cb.scope = scope;
@@ -220,7 +220,7 @@ namespace ASRuntime.operators
                     funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_enumerator_operator_callbacker);
+                    cb.setCallBacker(D_enumerator_operator_callbacker);
                     cb.step = step;
                     cb.args = frame;
 
@@ -238,7 +238,7 @@ namespace ASRuntime.operators
 
             frame.endStep(step);
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_enumerator_operator_callbacker = new BlockCallBackBase.dgeCallbacker(_enumerator_operator_callbacker);
         private static void _enumerator_operator_callbacker(BlockCallBackBase sender, object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);
@@ -278,7 +278,7 @@ namespace ASRuntime.operators
                     funCaller.returnSlot = step.reg.getSlot(scope, frame);
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_enumerator_operator_callbacker);
+                    cb.setCallBacker(D_enumerator_operator_callbacker);
                     cb.step = step;
                     cb.args = frame;
 

@@ -28,4 +28,11 @@ package
 
 }
 
+function a(b:int)
+{
+	this.a = 1;
+}
 
+var o = new a(3);
+trace(o+this);
+trace([1, 2, 3, true].join([3,4]));

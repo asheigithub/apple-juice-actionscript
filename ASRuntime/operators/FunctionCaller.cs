@@ -622,8 +622,10 @@ namespace ASRuntime.operators
 			_getArgementSlot(para_id).directSet(value);
 		}
 
+        private static BlockCallBackBase.dgeCallbacker D_check_para_callbacker = new BlockCallBackBase.dgeCallbacker(check_para_callbacker);
+        private static BlockCallBackBase.dgeCallbacker D_check_para_failed = new BlockCallBackBase.dgeCallbacker(check_para_failed);
 
-		private void check_para(BlockCallBackBase checkparacb)
+        private void check_para(BlockCallBackBase checkparacb)
 		{
 			while (check_para_id < pushedArgs)
 			{
@@ -654,9 +656,10 @@ namespace ASRuntime.operators
 					BlockCallBackBase cb = player.blockCallBackPool.create();
 					cb.args = argement;
 					cb._intArg = check_para_id;
-					cb.setCallBacker(check_para_callbacker);
-					cb.setWhenFailed(check_para_failed);
-
+                    cb.cacheObjects[0] = this;
+					cb.setCallBacker(D_check_para_callbacker);
+					cb.setWhenFailed(D_check_para_failed);
+                    
 					check_para_id++;
 
 					OpCast.CastValue(argement, parameter[
@@ -718,24 +721,26 @@ namespace ASRuntime.operators
 			doCall_allcheckpass();
 		}
 
-		private void check_para_failed(BlockCallBackBase sender, object args)
+		private static void check_para_failed(BlockCallBackBase sender, object args)
 		{
+            FunctionCaller caller = (FunctionCaller)sender.cacheObjects[0];
 			//清理栈
-			clear_para_slot(invokerFrame, onstackparametercount); onstackparametercount = 0;
-			if (callbacker != null)
+			clear_para_slot(caller.invokerFrame, caller.onstackparametercount); caller.onstackparametercount = 0;
+			if (caller.callbacker != null)
 			{
-				callbacker.noticeRunFailed();
+                caller.callbacker.noticeRunFailed();
 			}
-			release();
+            caller.release();
 		}
 
-		private void check_para_callbacker(BlockCallBackBase sender, object args)
+		private static void check_para_callbacker(BlockCallBackBase sender, object args)
 		{
 			if (sender.isSuccess)
 			{
+                FunctionCaller caller = (FunctionCaller)sender.cacheObjects[0];
 				//CallFuncHeap[sender._intArg].directSet(_tempSlot.getValue());
-				setCheckedParameter(sender._intArg, _tempSlot.getValue());
-				check_para(sender);
+				caller.setCheckedParameter(sender._intArg, caller._tempSlot.getValue());
+				caller.check_para(sender);
 			}
 			else
 			{
@@ -745,7 +750,10 @@ namespace ASRuntime.operators
 			}
 		}
 
-		internal void doCall_allcheckpass()
+        private static BlockCallBackBase.dgeCallbacker D_callfun_cb = new BlockCallBackBase.dgeCallbacker(callfun_cb);
+        private static BlockCallBackBase.dgeCallbacker D_callfun_failed = new BlockCallBackBase.dgeCallbacker(callfun_failed);
+
+        internal void doCall_allcheckpass()
 		{
 
 			if (toCallFunc.isYield)
@@ -822,8 +830,8 @@ namespace ASRuntime.operators
 					cb.cacheObjects[0] = callbacker;
 					cb.cacheObjects[1] = invokerFrame;
 
-					cb.setCallBacker(callfun_cb);
-					cb.setWhenFailed(callfun_failed);
+					cb.setCallBacker(D_callfun_cb);
+					cb.setWhenFailed(D_callfun_failed);
 					cb._intArg = onstackparametercount;
 					onstackparametercount = 0;
 

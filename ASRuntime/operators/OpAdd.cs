@@ -176,7 +176,7 @@ namespace ASRuntime.operators
             {
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_Cast_TwoString_Callbacker);
+                cb.setCallBacker(D_Cast_TwoString_Callbacker);
                 cb.args = frame;
                 cb.scope = scope;
                 cb.step = step;
@@ -201,7 +201,7 @@ namespace ASRuntime.operators
         }
 
 
-
+        private static BlockCallBackBase.dgeCallbacker D_Cast_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_Cast_TwoString_Callbacker);
         private static void _Cast_TwoString_Callbacker(BlockCallBackBase sender,object args)
         {
             string v1;

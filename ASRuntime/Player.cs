@@ -2287,8 +2287,10 @@ namespace ASRuntime
 			public bool isSuccess;
 			public bool isEnd;
 		}
+        private static BlockCallBackBase.dgeCallbacker D_runfuntionEnd = new BlockCallBackBase.dgeCallbacker(runfuntionEnd);
+        private static BlockCallBackBase.dgeCallbacker D_runfuntionFailed = new BlockCallBackBase.dgeCallbacker(runfuntionFailed);
 
-		internal bool runFuncCaller(operators.FunctionCaller funcCaller, SourceToken token, out error.InternalError error)
+        internal bool runFuncCaller(operators.FunctionCaller funcCaller, SourceToken token, out error.InternalError error)
 		{
 			if (funcCaller.callbacker != null)
 			{
@@ -2299,8 +2301,8 @@ namespace ASRuntime
 			r.isSuccess = false; r.isEnd = false;
 
 			BlockCallBackBase cb = blockCallBackPool.create();
-			cb.setCallBacker(runfuntionEnd);
-			cb.setWhenFailed(runfuntionFailed);
+			cb.setCallBacker(D_runfuntionEnd);
+			cb.setWhenFailed(D_runfuntionFailed);
 			cb.cacheObjects[0] = r;
 
 			funcCaller.callbacker = cb;

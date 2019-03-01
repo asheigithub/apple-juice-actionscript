@@ -468,7 +468,7 @@ namespace ASRuntime.operators
 				args[0] = frame;
 				args[1] = list; //(ASBinCode.rtData.rtArray)TypeConverter.ObjectImplicit_ToPrimitive((ASBinCode.rtData.rtObject)v2);
 				cb_tostr_arr.args = args;
-				cb_tostr_arr.setCallBacker(_cb_tostr_arr);
+				cb_tostr_arr.setCallBacker(D_cb_tostr_arr);
 
 				//***转字符串***
 				OpCast.CastValue(v1, RunTimeDataType.rt_string, frame,
@@ -546,15 +546,15 @@ namespace ASRuntime.operators
 			object[] a = cb_tostr_obj.cacheObjects; //new object[2];
 			a[0] = frame;
 			a[1] = v2;
-			cb_tostr_obj.setCallBacker(_cb_tostr_obj);
+			cb_tostr_obj.setCallBacker(D_cb_tostr_obj);
 			cb_tostr_obj.args = a;
 
 			OpCast.CastValue(v1, RunTimeDataType.rt_string, frame, step.token, scope, frame._tempSlot1, cb_tostr_obj, false);
 
 
 		}
-
-		private static void _cb_tostr_obj(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_cb_tostr_obj = new BlockCallBackBase.dgeCallbacker(_cb_tostr_obj);
+        private static void _cb_tostr_obj(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 			StackFrame frame = (StackFrame)a[0];
@@ -660,8 +660,8 @@ namespace ASRuntime.operators
 			}
 
 		}
-
-		private static void _cb_tostr_arr(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_cb_tostr_arr = new BlockCallBackBase.dgeCallbacker(_cb_tostr_arr);
+        private static void _cb_tostr_arr(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 			StackFrame frame = (StackFrame)a[0];
@@ -710,7 +710,7 @@ namespace ASRuntime.operators
 				a[0] = frame;
 				a[1] = scope;
 				cb_obj_tobool.step = step;
-				cb_obj_tobool.setCallBacker(_cb_obj_tobool);
+				cb_obj_tobool.setCallBacker(D_cb_obj_tobool);
 				cb_obj_tobool.args = a;
 				OpCast.CastValue(testvalue, RunTimeDataType.rt_boolean, frame, step.token, scope, frame._tempSlot1, cb_obj_tobool, false);
 
@@ -731,8 +731,8 @@ namespace ASRuntime.operators
 				//frame.endStep(step);
 			}
 		}
-
-		private static void _cb_obj_tobool(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_cb_obj_tobool = new BlockCallBackBase.dgeCallbacker(_cb_obj_tobool);
+        private static void _cb_obj_tobool(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 			StackFrame frame = (StackFrame)a[0];
@@ -853,7 +853,7 @@ namespace ASRuntime.operators
 			{
 
 				BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-				cb.setCallBacker(_GTVoid_TwoString_Callbacker);
+				cb.setCallBacker(D_GTVoid_TwoString_Callbacker);
 				cb.args = frame;
 				cb.scope = scope;
 				cb.step = step;
@@ -908,7 +908,8 @@ namespace ASRuntime.operators
 				}
 			}
 		}
-		private static void _GTVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_GTVoid_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_GTVoid_TwoString_Callbacker);
+        private static void _GTVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1;
 			string s2;
@@ -987,7 +988,7 @@ namespace ASRuntime.operators
 			{
 
 				BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-				cb.setCallBacker(_GEVoid_TwoString_Callbacker);
+				cb.setCallBacker(D_GEVoid_TwoString_Callbacker);
 				cb.args = frame;
 				cb.scope = scope;
 				cb.step = step;
@@ -1013,8 +1014,8 @@ namespace ASRuntime.operators
 			}
 			frame.endStep(step);
 		}
-
-		private static void _GEVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_GEVoid_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_GEVoid_TwoString_Callbacker);
+        private static void _GEVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1, s2;
 			_readTwoStringFromCallBacker(sender, out s1, out s2);
@@ -1152,7 +1153,7 @@ namespace ASRuntime.operators
 			   )
 			{
 				BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-				cb.setCallBacker(_LTVoid_TwoString_Callbacker);
+				cb.setCallBacker(D_LTVoid_TwoString_Callbacker);
 				cb.scope = scope;
 				cb.args = frame;
 				cb.step = step;
@@ -1178,8 +1179,8 @@ namespace ASRuntime.operators
 			}
 			frame.endStep(step);
 		}
-
-		private static void _LTVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_LTVoid_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_LTVoid_TwoString_Callbacker);
+        private static void _LTVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1;
 			string s2;
@@ -1278,7 +1279,8 @@ namespace ASRuntime.operators
 			}
 			frame.endStep(step);
 		}
-		private static void _LEVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_LEVoid_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_LEVoid_TwoString_Callbacker);
+        private static void _LEVoid_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1, s2;
 			_readTwoStringFromCallBacker(sender, out s1, out s2);
@@ -1350,7 +1352,7 @@ namespace ASRuntime.operators
 			{
 				//***转成字符串比较***
 				BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-				cb.setCallBacker(_EQ_TwoString_Callbacker);
+				cb.setCallBacker(D_EQ_TwoString_Callbacker);
 				cb.args = frame;
 				cb.scope = scope;
 				cb.step = step;
@@ -1376,8 +1378,8 @@ namespace ASRuntime.operators
 				frame.endStep(step);
 			}
 		}
-
-		private static void _EQ_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_EQ_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_EQ_TwoString_Callbacker);
+        private static void _EQ_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1, s2; _readTwoStringFromCallBacker(sender, out s1, out s2);
 
@@ -1442,7 +1444,7 @@ namespace ASRuntime.operators
 			{
 				//***转成字符串比较***
 				BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-				cb.setCallBacker(_NOTEQ_TwoString_Callbacker);
+				cb.setCallBacker(D_NOTEQ_TwoString_Callbacker);
 				cb.args = frame;
 				cb.scope = scope;
 				cb.step = step;
@@ -1468,8 +1470,8 @@ namespace ASRuntime.operators
 				frame.endStep(step);
 			}
 		}
-
-		private static void _NOTEQ_TwoString_Callbacker(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_NOTEQ_TwoString_Callbacker = new BlockCallBackBase.dgeCallbacker(_NOTEQ_TwoString_Callbacker);
+        private static void _NOTEQ_TwoString_Callbacker(BlockCallBackBase sender, object args)
 		{
 			string s1, s2; _readTwoStringFromCallBacker(sender, out s1, out s2);
 			StackFrame frame = (StackFrame)sender.args;

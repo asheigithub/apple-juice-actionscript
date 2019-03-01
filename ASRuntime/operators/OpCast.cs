@@ -65,7 +65,7 @@ namespace ASRuntime.operators
             {
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_CastCallBacker);
+                cb.setCallBacker(D_CastCallBacker);
                 cb.args = frame;
                 cb.scope = scope;
 
@@ -85,6 +85,7 @@ namespace ASRuntime.operators
             }
             
         }
+        private static BlockCallBackBase.dgeCallbacker D_CastCallBacker = new BlockCallBackBase.dgeCallbacker(_CastCallBacker);
         private static void _CastCallBacker(BlockCallBackBase sender, object args)
         {
             if (sender.isSuccess)
@@ -414,7 +415,7 @@ namespace ASRuntime.operators
                     if (function != null)
                     {
                         BlockCallBackBase toStringCB = frame.player.blockCallBackPool.create();
-                        toStringCB.setCallBacker(_toString_CB);
+                        toStringCB.setCallBacker(D_toString_CB);
                         toStringCB._intArg = targetType;
 
 
@@ -554,7 +555,7 @@ namespace ASRuntime.operators
                                 fc.returnSlot = storeto;
 
                                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                                cb.setCallBacker(_primivite_Obj);
+                                cb.setCallBacker(D_primivite_Obj);
 
                                 //object[] sendargs = new object[5];
                                 //sendargs[0] = frame;
@@ -614,7 +615,7 @@ namespace ASRuntime.operators
                     else
                     {
                         BlockCallBackBase valueofCB = frame.player.blockCallBackPool.create();
-                        valueofCB.setCallBacker(_Cast_ValueOf_CB);
+                        valueofCB.setCallBacker(D_Cast_ValueOf_CB);
                         valueofCB._intArg = targetType;
 
                         object[] sendargs = valueofCB.cacheObjects; //new object[7];
@@ -640,7 +641,7 @@ namespace ASRuntime.operators
                 }
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_toString_CB = new BlockCallBackBase.dgeCallbacker(_toString_CB);
         private static void _toString_CB(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
@@ -673,7 +674,7 @@ namespace ASRuntime.operators
                     );
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_Cast_ValueOf_CB = new BlockCallBackBase.dgeCallbacker(_Cast_ValueOf_CB);
         private static void _Cast_ValueOf_CB(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
@@ -719,7 +720,7 @@ namespace ASRuntime.operators
             }
         }
 
-
+        private static BlockCallBackBase.dgeCallbacker D_primivite_Obj = new BlockCallBackBase.dgeCallbacker(_primivite_Obj);
         private static void _primivite_Obj(BlockCallBackBase sender, object args)
         {
             //object[] a = (object[])sender.args;
@@ -753,7 +754,7 @@ namespace ASRuntime.operators
         {
             BlockCallBackBase cb1 = frame.player.blockCallBackPool.create();
             cb1._intArg = targetType;
-            cb1.setCallBacker(_CastTwoValue_Backer);
+            cb1.setCallBacker(D_CastTwoValue_Backer);
 
             object[] tosend = cb1.cacheObjects; //new object[6];
             tosend[0] = srcValue2;
@@ -767,6 +768,7 @@ namespace ASRuntime.operators
             CastValue(srcValue1, targetType, frame, token, scope, _tempstoreto1, cb1,false);
 
         }
+        private static BlockCallBackBase.dgeCallbacker D_CastTwoValue_Backer = new BlockCallBackBase.dgeCallbacker(_CastTwoValue_Backer);
         private static void _CastTwoValue_Backer(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
@@ -833,7 +835,7 @@ namespace ASRuntime.operators
                     fc.returnSlot = _tempstoreto;
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_primitive_to_obj_callbacker);
+                    cb.setCallBacker(D_primitive_to_obj_callbacker);
                     cb.step = step;
                     cb.scope = scope;
 
@@ -859,7 +861,7 @@ namespace ASRuntime.operators
                 exec(srcValue, rtNull.nullptr, frame, step, scope);
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_primitive_to_obj_callbacker = new BlockCallBackBase.dgeCallbacker(_primitive_to_obj_callbacker);
         private static void _primitive_to_obj_callbacker(BlockCallBackBase cb,object args)
         {
             object[] a = (object[])cb.args;
@@ -875,7 +877,7 @@ namespace ASRuntime.operators
 
 
         #region valueOf
-
+        private static BlockCallBackBase.dgeCallbacker D_exec_valueof_callback = new BlockCallBackBase.dgeCallbacker(_exec_valueof_callback);
         private static void _exec_valueof_callback(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
@@ -924,7 +926,7 @@ namespace ASRuntime.operators
                     backargs[4] = scope;
                     backargs[5] = exec;
                     callbacker.args = backargs;
-                    callbacker.setCallBacker(_exec_valueof_callback);
+                    callbacker.setCallBacker(D_exec_valueof_callback);
                 }
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
@@ -936,8 +938,8 @@ namespace ASRuntime.operators
                 tosend[4] = _tempstoreto2;
                 tosend[5] = callbacker;
                 cb.args = tosend;
-                cb.setCallBacker(_AfterGetOneValueOf);
-				cb.setWhenFailed(_GetOneValueOfFailed);
+                cb.setCallBacker(D_AfterGetOneValueOf);
+				cb.setWhenFailed(D_GetOneValueOfFailed);
 
                 InvokeValueOf((rtObjectBase)srcValue1, frame, token, scope, _tempstoreto1, cb);
             }
@@ -956,12 +958,12 @@ namespace ASRuntime.operators
 						backargs[4] = scope;
 						backargs[5] = exec;
 						callbacker.args = backargs;
-						callbacker.setCallBacker(_exec_valueof_callback);
+						callbacker.setCallBacker(D_exec_valueof_callback);
 					}
 
 					BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_AfterGetTwoValueOf);
-					cb.setWhenFailed(_GetTwoValueOfFailed);
+                    cb.setCallBacker(D_AfterGetTwoValueOf);
+					cb.setWhenFailed(D_GetTwoValueOfFailed);
                     cb.args = callbacker;
                     InvokeValueOf((rtObjectBase)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
@@ -975,20 +977,20 @@ namespace ASRuntime.operators
                 }
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_GetTwoValueOfFailed = new BlockCallBackBase.dgeCallbacker(_GetTwoValueOfFailed);
 		private static void _GetTwoValueOfFailed(BlockCallBackBase sender, object args)
 		{
 			((BlockCallBackBase)sender.args).noticeRunFailed();
 		}
-
-		private static void _GetOneValueOfFailed(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_GetOneValueOfFailed = new BlockCallBackBase.dgeCallbacker(_GetOneValueOfFailed);
+        private static void _GetOneValueOfFailed(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 			BlockCallBackBase callbacker = (BlockCallBackBase)a[5];
 			callbacker.noticeRunFailed();
 		}
-
-		private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_AfterGetOneValueOf = new BlockCallBackBase.dgeCallbacker(_AfterGetOneValueOf);
+        private static void _AfterGetOneValueOf(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
             RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
@@ -1002,7 +1004,7 @@ namespace ASRuntime.operators
             if (srcValue2 is rtObjectBase)
             {
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_AfterGetTwoValueOf);
+                cb.setCallBacker(D_AfterGetTwoValueOf);
                 cb.args = callbacker;
                 InvokeValueOf((rtObjectBase)srcValue2, frame, token, scope, storeto, cb);
             }
@@ -1012,7 +1014,7 @@ namespace ASRuntime.operators
                 callbacker.call(null);
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_AfterGetTwoValueOf = new BlockCallBackBase.dgeCallbacker(_AfterGetTwoValueOf);
         private static void _AfterGetTwoValueOf(BlockCallBackBase sender, object args)
         {
             ((BlockCallBackBase)sender.args).call(null);
@@ -1128,7 +1130,7 @@ namespace ASRuntime.operators
             if (function != null)
             {
                 BlockCallBackBase valueofCB = frame.player.blockCallBackPool.create();
-                valueofCB.setCallBacker(_InvokeValueOf_Backer);
+                valueofCB.setCallBacker(D_InvokeValueOf_Backer);
 
                 FunctionCaller fc = frame.player.funcCallerPool.create( frame, token);
                 //fc.releaseAfterCall = true;
@@ -1146,7 +1148,7 @@ namespace ASRuntime.operators
                 fc.callbacker = valueofCB;
                 if (!fc.createParaScope()) { callbacker.noticeRunFailed(); valueofCB.noticeRunFailed(); return; }
 
-				valueofCB.setWhenFailed(_InvokeValueOf_Backer_Failed);
+				valueofCB.setWhenFailed(D_InvokeValueOf_Backer_Failed);
 
                 fc.call();
             }
@@ -1164,8 +1166,8 @@ namespace ASRuntime.operators
                 callbacker.call(null);
             }
         }
-
-		private static void _InvokeValueOf_Backer_Failed(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_InvokeValueOf_Backer_Failed = new BlockCallBackBase.dgeCallbacker(_InvokeValueOf_Backer_Failed);
+        private static void _InvokeValueOf_Backer_Failed(BlockCallBackBase sender, object args)
 		{
 			object[] a = (object[])sender.args;
 
@@ -1174,8 +1176,8 @@ namespace ASRuntime.operators
 
 			callbacker.noticeRunFailed();
 		}
-
-		private static void _InvokeValueOf_Backer(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_InvokeValueOf_Backer = new BlockCallBackBase.dgeCallbacker(_InvokeValueOf_Backer);
+        private static void _InvokeValueOf_Backer(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
 
@@ -1197,6 +1199,7 @@ namespace ASRuntime.operators
 
 
         #region toString
+        private static BlockCallBackBase.dgeCallbacker D_exec_toString_callback = new BlockCallBackBase.dgeCallbacker(_exec_toString_callback);
         private static void _exec_toString_callback(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
@@ -1236,7 +1239,7 @@ namespace ASRuntime.operators
                     backargs[4] = scope;
                     backargs[5] = exec;
                     callbacker.args = backargs;
-                    callbacker.setCallBacker(_exec_toString_callback);
+                    callbacker.setCallBacker(D_exec_toString_callback);
                 }
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
@@ -1248,7 +1251,7 @@ namespace ASRuntime.operators
                 tosend[4] = _tempstoreto2;
                 tosend[5] = callbacker;
                 cb.args = tosend;
-                cb.setCallBacker(_AfterGetOneToString);
+                cb.setCallBacker(D_AfterGetOneToString);
 
                 InvokeToString((rtObjectBase)srcValue1, frame, token, scope, _tempstoreto1, cb);
             }
@@ -1267,12 +1270,12 @@ namespace ASRuntime.operators
                         backargs[4] = scope;
                         backargs[5] = exec;
                         callbacker.args = backargs;
-                        callbacker.setCallBacker(_exec_toString_callback);
+                        callbacker.setCallBacker(D_exec_toString_callback);
                     }
 
                     BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                    cb.setCallBacker(_AfterGetTwoToString);
-					cb.setWhenFailed(_GetTwoStringFailed);
+                    cb.setCallBacker(D_AfterGetTwoToString);
+					cb.setWhenFailed(D_GetTwoStringFailed);
                     cb.args = callbacker;
                     InvokeToString((rtObjectBase)srcValue2, frame, token, scope, _tempstoreto2, cb);
                 }
@@ -1286,13 +1289,13 @@ namespace ASRuntime.operators
                 }
             }
         }
-
-		private static void _GetTwoStringFailed(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_GetTwoStringFailed = new BlockCallBackBase.dgeCallbacker(_GetTwoStringFailed);
+        private static void _GetTwoStringFailed(BlockCallBackBase sender, object args)
 		{
 			((BlockCallBackBase)sender.args).noticeRunFailed();
 		}
-
-		private static void _AfterGetOneToString(BlockCallBackBase sender, object args)
+        private static BlockCallBackBase.dgeCallbacker D_AfterGetOneToString = new BlockCallBackBase.dgeCallbacker(_AfterGetOneToString);
+        private static void _AfterGetOneToString(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;
             RunTimeValueBase srcValue2 = (RunTimeValueBase)a[0];
@@ -1306,7 +1309,7 @@ namespace ASRuntime.operators
             if (srcValue2 is rtObjectBase)
             {
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_AfterGetTwoToString);
+                cb.setCallBacker(D_AfterGetTwoToString);
                 cb.args = callbacker;
                 InvokeToString((rtObjectBase)srcValue2, frame, token, scope, storeto, cb);
             }
@@ -1316,7 +1319,7 @@ namespace ASRuntime.operators
                 callbacker.call(null);
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_AfterGetTwoToString = new BlockCallBackBase.dgeCallbacker(_AfterGetTwoToString);
         private static void _AfterGetTwoToString(BlockCallBackBase sender, object args)
         {
             ((BlockCallBackBase)sender.args).call(null);
@@ -1423,7 +1426,7 @@ namespace ASRuntime.operators
             if (function != null)
             {
                 BlockCallBackBase toStringCB = frame.player.blockCallBackPool.create();
-                toStringCB.setCallBacker(_InvokeToString_Backer);
+                toStringCB.setCallBacker(D_InvokeToString_Backer);
 
                 operators.FunctionCaller fc = frame.player.funcCallerPool.create( frame, token);
                 //fc.releaseAfterCall = true;
@@ -1449,7 +1452,7 @@ namespace ASRuntime.operators
                 callbacker.call(null);
             }
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_InvokeToString_Backer = new BlockCallBackBase.dgeCallbacker(_InvokeToString_Backer);
         private static void _InvokeToString_Backer(BlockCallBackBase sender, object args)
         {
             object[] a = (object[])sender.args;

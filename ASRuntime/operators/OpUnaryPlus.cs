@@ -34,14 +34,14 @@ namespace ASRuntime.operators
                 cb.scope = scope;
                 cb.step = step;
                 cb.args = frame;
-                cb.setCallBacker(_tonumber_cb);
+                cb.setCallBacker(D_tonumber_cb);
 
                 OpCast.CastValue(v, RunTimeDataType.rt_number,
                     frame, step.token, scope, frame._tempSlot1, cb, false);
             }
 
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_tonumber_cb = new BlockCallBackBase.dgeCallbacker(_tonumber_cb);
         private static void _tonumber_cb(BlockCallBackBase sender, object args)
         {
             StackFrame frame = (StackFrame)sender.args;

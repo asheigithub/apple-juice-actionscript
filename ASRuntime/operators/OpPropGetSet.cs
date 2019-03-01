@@ -62,7 +62,7 @@ namespace ASRuntime.operators
 				ret._cache_setthisslot.set_this_item = sslot.set_this_item;
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_get_this_item_callbacker);
+                cb.setCallBacker(D_get_this_item_callbacker);
                 cb.step = step;
                 cb.args = frame;
 
@@ -95,7 +95,7 @@ namespace ASRuntime.operators
 
            
         }
-
+        private static BlockCallBackBase.dgeCallbacker D_get_this_item_callbacker = new BlockCallBackBase.dgeCallbacker(_get_this_item_callbacker);
         private static void _get_this_item_callbacker(BlockCallBackBase sender, object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);
@@ -189,7 +189,7 @@ namespace ASRuntime.operators
 
 
                 BlockCallBackBase cb = frame.player.blockCallBackPool.create();
-                cb.setCallBacker(_getter_callbacker);
+                cb.setCallBacker(D_getter_callbacker);
                 cb.step = step;
                 cb.args = frame;
 
@@ -204,7 +204,7 @@ namespace ASRuntime.operators
             frame.endStep(step);
         }
 
-
+        private static BlockCallBackBase.dgeCallbacker D_getter_callbacker = new BlockCallBackBase.dgeCallbacker(_getter_callbacker);
         private static void _getter_callbacker(BlockCallBackBase sender, object args)
         {
             ((StackFrame)sender.args).endStep(sender.step);
