@@ -406,7 +406,7 @@ namespace ASCompiler.compiler
             {
                 ASTool.AS3.AS3SrcFile srcfile = tobuildfiles[i];
 				
-                if (!System.IO.Path.GetDirectoryName(srcfile.srcFile)
+                if (!string.IsNullOrEmpty(srcfile.srcFile) && !System.IO.Path.GetDirectoryName(srcfile.srcFile)
                     .Replace('\\', '.').Replace('/','.')
                     .Equals(srcfile.Package.Name))
                 {

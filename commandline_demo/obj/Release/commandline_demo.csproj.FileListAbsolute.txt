@@ -1,0 +1,15 @@
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\commandline_demo.exe.config
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\commandline_demo.exe
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\commandline_demo.pdb
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASCompiler.dll
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASRuntime.dll
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASTool.dll
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASCompiler.pdb
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASRuntime.pdb
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASTool.pdb
+F:\GitHub\apple-juice-actionscript\commandline_demo\bin\Release\ASTool.xml
+F:\GitHub\apple-juice-actionscript\commandline_demo\obj\Release\commandline_demo.csprojAssemblyReference.cache
+F:\GitHub\apple-juice-actionscript\commandline_demo\obj\Release\commandline_demo.csproj.CoreCompileInputs.cache
+F:\GitHub\apple-juice-actionscript\commandline_demo\obj\Release\commandline_demo.csproj.CopyComplete
+F:\GitHub\apple-juice-actionscript\commandline_demo\obj\Release\commandline_demo.exe
+F:\GitHub\apple-juice-actionscript\commandline_demo\obj\Release\commandline_demo.pdb
