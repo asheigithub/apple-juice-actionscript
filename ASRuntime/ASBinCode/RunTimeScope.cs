@@ -11,8 +11,8 @@ namespace ASBinCode
         
         public int blockId;
         public RunTimeScope(
-            
-            SLOT[] memberDataList,
+
+            HeapSlot[] memberDataList,
             
             int blockid,
             RunTimeScope parent,
@@ -35,7 +35,7 @@ namespace ASBinCode
 
 
 
-        public readonly SLOT[] memberData;
+        public readonly HeapSlot[] memberData;
         
 
         

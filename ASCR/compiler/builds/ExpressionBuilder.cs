@@ -749,8 +749,7 @@ namespace ASCompiler.compiler.builds
                             memberLeftValue is MethodGetterBase
                             ||
                             ((StackSlotAccessor)memberLeftValue)._regMember.bindField is MethodGetterBase
-                            //||
-                            //((Register)memberLeftValue)._regMember.bindField is ClassPropertyGetter
+                            
                             ||
                             (((StackSlotAccessor)memberLeftValue)._regMember.bindField is VariableBase
                                 &&

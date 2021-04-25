@@ -55,7 +55,9 @@ namespace ASCTest
 									   //path = @"F:\ASTool\ASCTest\testScript\AS3Testproj\src\";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\src";
 									   //path = @"E:\Manju-pc\as3protobuf\AS3ProtoBuf\protobuflib";
-									   path = @"../..\testScript\AS3Testproj\amd";
+									   //path = @"../..\testScript\AS3Testproj\amd";
+										path = @"F:\GitHub\juice-script\testscript\src";
+
 				//path = @"../..\testScript\AS3Testproj\src";
 
 

@@ -13,12 +13,12 @@ namespace ASRuntime
         public readonly ASBinCode.CodeBlock block;
         public readonly int codeLinePtr;
 
-        public readonly ASBinCode.RunTimeScope scope;
+        //public readonly ASBinCode.RunTimeScope scope;
 		//public readonly ASBinCode.RunTimeValueBase scope_thispointer;
 
 		
-		public readonly int offset;
-		public readonly StackSlot[] stack;
+		private readonly int offset;
+        private readonly StackSlot[] stack;
 
 		public FrameInfo(ASBinCode.CodeBlock block,int codeLinePtr,
             ASBinCode.RunTimeScope scope,
@@ -28,9 +28,9 @@ namespace ASRuntime
         {
             this.codeLinePtr = codeLinePtr;
             this.block = block;
-            this.scope = scope;
+            //this.scope = scope;
             //this.scope_thispointer = scope_thispointer;
-           
+            
             this.offset = offset;
             this.stack = stack;
         }

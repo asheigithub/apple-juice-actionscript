@@ -25,11 +25,16 @@ Public Class Grammar
 
     Public ErrorFFStr As String
 
-    Public Sub New(tokenlist As TokenList)
+	Public ErrorOut As System.IO.TextWriter
+
+
+	Public Sub New(tokenlist As TokenList)
 
         hasError = False
 
-        tokenlist.Reset()
+		ErrorOut = Console.Error
+
+		tokenlist.Reset()
         tokenlist.GetNextToken()
 
 
@@ -1029,13 +1034,13 @@ Public Class Grammar
 		hasError = True
 
 		'Console.WriteLine(String.Format("匹配失败!{0} 行{1} 列{2},符号{3} ", msg, token.line + 1, token.ptr, token.StringValue))
-		Console.Error.WriteLine(token.sourceFileFullPath & ":" & token.line + 1 & ":Error:" & msg)
+		ErrorOut.WriteLine(token.sourceFileFullPath & ":" & token.line + 1 & ":Error:" & msg)
 
 
 
-		Console.Error.WriteLine(lines(token.line))
-		Console.Error.WriteLine("^".PadLeft(token.ptr))
-		Console.Error.WriteLine()
+		ErrorOut.WriteLine(lines(token.line))
+		ErrorOut.WriteLine("^".PadLeft(token.ptr))
+		ErrorOut.WriteLine()
 
 
 	End Sub

@@ -1132,7 +1132,15 @@ Public Class AS3FileGrammarAnalyser
 
                     MemberScopeStack.Peek().ExprDataStack.Pop()
 
-                    Dim func As AS3Function = MemberScopeStack.Peek()
+                    Dim mlist = MemberScopeStack.Peek()
+                    If TypeOf mlist Is AS3MemberListBase Then
+                        Dim l = CType(mlist, AS3MemberListBase)
+                        mlist = l(l.Count - 1)
+
+                    End If
+
+
+                    Dim func As AS3Function = mlist
                     Dim stmt As New AS3StmtExpressions(node.MatchedToken)
                     stmt.as3exprlist = currentparseExprListStack.Pop()
                     func.StamentsStack.Peek().Add(stmt)
@@ -2705,12 +2713,21 @@ Public Class AS3FileGrammarAnalyser
                     optype = Expr.OpType.BitXor
                 End If
 
-				Dim reg = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
+                Dim loadreg = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
+                Dim loadop = New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
+                loadop.Type = Expr.OpType.Assigning
+                loadop.OpCode = "="
+                loadop.Arg1 = loadreg
+                loadop.Arg2 = arg1
+                node.exprsteplist.Add(loadop)
+
+
+                Dim reg = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
 				Dim op As New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
                 op.Type = optype
                 op.OpCode = rcode
                 op.Arg1 = reg
-                op.Arg2 = arg1
+                op.Arg2 = loadreg
                 op.Arg3 = arg2
 
                 node.exprsteplist.Add(op)

@@ -18,7 +18,7 @@ namespace ASBinCode
         public readonly bool isoutclass;
 
         /// <summary>
-        /// 运行环境定义
+        /// 运行作用域定义
         /// </summary>
         public IScope scope;
         

@@ -11,11 +11,11 @@ namespace ASRuntime.error
     /// </summary>
     public class InternalError
     {
-        public ASBinCode.SourceToken token;
+        //public ASBinCode.SourceToken token;
 
         public string message;
 
-        public int errorCode;
+        //public int errorCode;
 
 
         public ASBinCode.RunTimeValueBase errorValue;
@@ -31,7 +31,7 @@ namespace ASRuntime.error
 
         public InternalError(CSWC swc,ASBinCode.SourceToken token,string message):this(swc)
         {
-            this.token = token;
+            //this.token = token;
             this.message = message;
             this.errorValue = null;
         }
@@ -46,14 +46,14 @@ namespace ASRuntime.error
 
         public InternalError(CSWC swc,ASBinCode.SourceToken token, string message ,ASBinCode.RunTimeValueBase errorValue ):this(swc)
         {
-            this.token = token;
+            //this.token = token;
             this.message = message;
             this.errorValue = errorValue;
         }
 
         public InternalError(CSWC swc,ASBinCode.SourceToken token, ASBinCode.RunTimeValueBase errorValue):this(swc)
         {
-            this.token = token;
+            //this.token = token;
             this.errorValue = errorValue;
             if (errorValue != null)
             {
