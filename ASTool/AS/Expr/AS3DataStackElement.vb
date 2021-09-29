@@ -17,7 +17,8 @@
 
 			If IsReg Then
 
-				Return "<V" & Reg.ID & " G:" & Reg.StmtID & ">"
+				'Return "<V" & Reg.ID & " G:" & Reg.StmtID & ">"
+				Return "<V" & Reg.ID & ">"
 			Else
 
 				If Not Data.Value Is Nothing Then

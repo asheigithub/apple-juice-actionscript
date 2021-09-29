@@ -731,15 +731,18 @@ namespace ASRuntime.nativefuncs
 					//return new rtString(string.Empty);
 					returnSlot.setValue(string.Empty);
 				}
-				if (len > b.Length - st)
-				{
-					//return new rtString(b.Substring(st));
-					returnSlot.setValue(b.Substring(st));
-				}
 				else
 				{
-					//return new rtString(b.Substring(st, len));
-					returnSlot.setValue(b.Substring(st, len));
+					if (len > b.Length - st)
+					{
+						//return new rtString(b.Substring(st));
+						returnSlot.setValue(b.Substring(st));
+					}
+					else
+					{
+						//return new rtString(b.Substring(st, len));
+						returnSlot.setValue(b.Substring(st, len));
+					}
 				}
 			}
 		}
@@ -848,8 +851,9 @@ namespace ASRuntime.nativefuncs
 				if (maxcount < 0) //{ return new rtArray(); }
 				{
 					returnSlot.directSet(new rtArray());
+					return;
 				}
-
+				
 				var split = b.Split(new string[] { delimiter }, StringSplitOptions.None);
 				rtArray result = new rtArray();
 				for (int i = 0; i < split.Length && i < maxcount; i++)

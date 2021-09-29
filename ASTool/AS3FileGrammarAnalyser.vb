@@ -2716,7 +2716,7 @@ Public Class AS3FileGrammarAnalyser
                 Dim loadreg = Expr.AS3DataStackElement.MakeReg(MemberScopeStack.Peek().NextRegId(), expressionGroup)
                 Dim loadop = New AS3.Expr.AS3ExprStep(node.Nodes(0).MatchedToken)
                 loadop.Type = Expr.OpType.Assigning
-                loadop.OpCode = "="
+                loadop.OpCode = "@*"
                 loadop.Arg1 = loadreg
                 loadop.Arg2 = arg1
                 node.exprsteplist.Add(loadop)

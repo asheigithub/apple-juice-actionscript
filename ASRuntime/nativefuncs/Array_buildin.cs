@@ -1018,6 +1018,7 @@ namespace ASRuntime.nativefuncs
 			else if (idx > arr.innerArray.Count - 1)
 			{
 				returnSlot.directSet(rtUndefined.undefined);
+                return;
 			}
 
 			var r = arr.innerArray[idx];
