@@ -74,9 +74,10 @@ public class ASRuntimeMenus
 		string testlocation = typeof(UnityEditorInternal.AssetStore).Assembly.Location;
 		string dir = System.IO.Path.GetDirectoryName(testlocation).Replace('\\', '/');
 		string unityInstallEditorDir = string.Empty;
-		if (dir.EndsWith("Editor/Data/Managed"))
+		int pathidx = dir.IndexOf("Editor/Data/Managed");
+		if (pathidx>0)
 		{
-			dir = System.IO.Path.GetDirectoryName(System.IO.Path.GetDirectoryName(dir));
+			dir = System.IO.Path.GetDirectoryName( dir.Substring(0,pathidx + 11) );
 
 			if (System.IO.File.Exists(dir + "/Unity.exe"))
 			{

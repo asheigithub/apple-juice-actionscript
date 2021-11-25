@@ -209,29 +209,47 @@ namespace LinkCodeGenCLI
 							}
 						}
 
-						foreach (var type in dll.GetExportedTypes())
-						{
-							if (definetypes.Count == 0 && definenamespaces.Count == 0
-								//||
-								//definetypes.Contains(type.FullName)
-								)
+                        try
+                        {
+							foreach (var type in dll.GetExportedTypes())
 							{
-								types.Add(type);
-							}
-							else
-							{
-								if (definetypes.Contains(type.FullName))
+								if (definetypes.Count == 0 && definenamespaces.Count == 0
+									//||
+									//definetypes.Contains(type.FullName)
+									)
 								{
 									types.Add(type);
 								}
-								else if (definenamespaces.Contains(type.Namespace))
+								else
 								{
-									types.Add(type);
+									if (definetypes.Contains(type.FullName))
+									{
+										types.Add(type);
+									}
+									else if (definenamespaces.Contains(type.Namespace))
+									{
+										types.Add(type);
+									}
 								}
 							}
-						}
+                        }
+                        catch (TypeLoadException)
+                        {
+							if (types.Count == 0)
+							{
+								types.Add(dll.GetType("UnityEngine.GameObject"));
+								types.Add(dll.GetType("UnityEngine.Time"));
+								types.Add(dll.GetType("UnityEngine.Random"));
+								types.Add(dll.GetType("UnityEngine.MeshRenderer"));
+								types.Add(dll.GetType("UnityEngine.SpriteRenderer"));
+							}
+                        }
 
-					}
+                        
+
+
+
+                    }
 					catch (System.IO.FileLoadException e)
 					{
 						Console.WriteLine(e.ToString());

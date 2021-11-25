@@ -116,10 +116,9 @@ namespace LinkCodeGen
 
 		protected string GetLoadArgementString(Type parameterType,int position)
 		{
-			bool isbyRef=false;
+			
 			if (parameterType.IsByRef)
 			{
-				isbyRef = true;
 				parameterType = parameterType.GetElementType();
 			}
 

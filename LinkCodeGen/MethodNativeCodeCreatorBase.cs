@@ -476,7 +476,7 @@ namespace LinkCodeGen
 				{
 					storeresult += string.Format( CreatorBase.GetOutKeyWord(paras[i],method) + " arg{0}", i);
 				}
-				else if (paras[i].ParameterType.IsByRef)
+				else if (paras[i].ParameterType.IsByRef && !paras[i].IsIn)
 				{
 					storeresult += string.Format("ref arg{0}", i);
 				}

@@ -25,8 +25,8 @@ F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\bin\Release\ASRuntime.pdb
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\bin\Release\ASTool.pdb
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\bin\Release\ASTool.xml
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\bin\Release\LinkCodeGen.pdb
-F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI_v4.csprojAssemblyReference.cache
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI_v4.csproj.CoreCompileInputs.cache
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI_v4.csproj.CopyComplete
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI.exe
 F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI.pdb
+F:\GitHub\apple-juice-actionscript\LinkCodeGenCLI_v4\obj\Release\LinkCodeGenCLI_v4.csproj.AssemblyReference.cache

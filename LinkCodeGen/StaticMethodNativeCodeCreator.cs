@@ -33,7 +33,7 @@ namespace LinkCodeGen
 			bool hasref = false;
 			foreach (var item in paras)
 			{
-				if (item.ParameterType.IsByRef)
+				if (item.ParameterType.IsByRef && !item.IsIn)
 				{
 					paracount += 1;
 					hasref = true;
@@ -219,7 +219,7 @@ namespace LinkCodeGen
 				toreplace = toreplace.Replace("[storeidx]", paras.Length.ToString());
 				for (int i = 0; i < paras.Length; i++)
 				{
-					if (paras[i].ParameterType.IsByRef)
+					if (paras[i].ParameterType.IsByRef && !paras[i].IsIn)
 					{
 						toreplace += storetemplate.Replace("[storeidx]", paras.Length.ToString()).Replace("[argidx]", i.ToString());
 					}

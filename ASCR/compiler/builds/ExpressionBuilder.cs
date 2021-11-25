@@ -885,6 +885,34 @@ namespace ASCompiler.compiler.builds
 
                 }
             }
+
+            else if (step.OpCode == "@*")
+            {
+                RightValueBase rv = getRightValue(env, step.Arg2, step.token, builder);
+
+                if (rv is PackagePathGetter)
+                {
+                    throw new BuildException(
+                        new BuildError(step.token.line, step.token.ptr, step.token.sourceFile,
+                        "Package cannot be used as a value: '" + ((PackagePathGetter)rv).path + "'."));
+                }
+
+                //尝试读值
+                StackSlotAccessor eax = env.createASTRegister(step.Arg1.Reg);
+                eax.valueType = rv.valueType;
+
+                
+                OpStep op = new OpStep(OpCode.assigning, new SourceToken(step.token.line, step.token.ptr, step.token.sourceFile));
+                op.reg = eax;
+                op.regType = eax.valueType;
+                op.arg1 = rv;
+                op.arg1Type = rv.valueType;
+                op.arg2 = null;
+                op.arg2Type = RunTimeDataType.unknown;
+
+                env.block.opSteps.Add(op);
+
+            }
             else
             {
                 throw new BuildException(
